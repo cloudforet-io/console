@@ -4,35 +4,28 @@ const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/Clo
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
-
-const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
+// const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
 // const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
-
-
-const Collector = () => import('@/views/inventory/collector/pages/Collector.vue');
-
-const CollectorPlugins = () => import('@/views/inventory/collector/pages/CollectorPlugins.vue');
-const CollectorCreator = () => import('@/views/inventory/collector/pages/CollectorCreator.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {
     path: 'inventory',
     name: 'inventory',
-    redirect: 'inventory/data-center',
+    redirect: 'inventory/server',
     meta: { label: 'Inventory', breadcrumb: true },
     components: {
         lnb: InventoryNavBar,
         main: Inventory,
     },
     children: [
-        {
-            path: 'data-center',
-            name: 'dataCenter',
-            meta: { label: 'Data Center', breadcrumb: true },
-            component: DataCenter,
-        },
+        // {
+        //     path: 'data-center',
+        //     name: 'dataCenter',
+        //     meta: { label: 'Data Center', breadcrumb: true },
+        //     component: DataCenter,
+        // },
         {
             path: 'server',
             meta: {
@@ -94,59 +87,6 @@ export default {
                 },
             ],
 
-        },
-        {
-            path: 'collector',
-            name: 'collector',
-            redirect: '/inventory/collector',
-            meta: {
-                label: 'Collector',
-                breadcrumb: true,
-                api: fluentApi.inventory().collector(),
-            },
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: '/',
-                    name: 'collectorMain',
-                    component: Collector,
-                },
-                {
-                    path: ':resourceId/tags',
-                    name: 'collectorTags',
-                    meta: { label: 'tags' },
-                    props: true,
-                    component: TagsPage,
-                },
-                {
-                    path: 'create',
-                    name: 'createCollector',
-                    meta: { label: 'Create Collector', breadcrumb: true },
-                    redirect: './create/plugins',
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: 'plugins',
-                            name: 'collectorPlugins',
-                            component: CollectorPlugins,
-                        },
-                        {
-                            path: 'collector-creator',
-                            name: Symbol('collector-creator'),
-                            // redirect: './plugins',
-                            component: { template: '<router-view />' },
-                            children: [
-                                {
-                                    path: ':pluginId',
-                                    name: Symbol(':pluginId'),
-                                    props: true,
-                                    component: CollectorCreator,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ],
         },
     ],
 };

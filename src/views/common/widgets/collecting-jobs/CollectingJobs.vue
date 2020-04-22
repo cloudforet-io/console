@@ -128,7 +128,7 @@ export default defineComponent({
             },
             getData,
             onRowClick() {
-                vm.$router.push('/inventory/collector');
+                vm.$router.push('/plugin/collector');
             },
         };
     },

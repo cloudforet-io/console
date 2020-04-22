@@ -1,12 +1,8 @@
 import { fluentApi } from '@/lib/fluent-api';
 
-const Identity = () => import('@/views/identity/Identity');
-
-const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
-const User = () => import('@/views/identity/user/User');
-const Project = () => import('@//views/identity/project/pages/Project2');
-const ProjectDetail = () => import('@/views/identity/project/pages/ProjectDetail');
-const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccount');
+const ProjectNavBar = () => import('@/views/project/ProjectNavBar');
+const Project = () => import('@//views/project/project/pages/Project2');
+const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {
@@ -15,7 +11,7 @@ export default {
     // redirect: '/project',
     meta: { label: 'Project', breadcrumb: true, api: fluentApi.identity().project() },
     components: {
-        lnb: IdentityNavBar,
+        lnb: ProjectNavBar,
         main: { template: '<router-view />' },
     },
     children: [
