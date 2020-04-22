@@ -7,10 +7,9 @@ export default {
     functional: true,
     components: { PDictList },
     props: {
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
+        options: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
             type: Object,

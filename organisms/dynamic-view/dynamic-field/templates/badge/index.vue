@@ -8,7 +8,7 @@ export default {
     components: { PBadge },
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
+        options: {
             type: Object,
             default: () => ({}),
         },
@@ -20,8 +20,8 @@ export default {
     render(h, { props }) {
         return h(PBadge, {
             props: {
-                backgroundColor: _.get(props.view_option, ['background_color'], null),
-                textColor: _.get(props.view_option, ['text_color'], null),
+                backgroundColor: _.get(props.options, ['background_color'], null),
+                textColor: _.get(props.options, ['text_color'], null),
             },
         },
         props.data);

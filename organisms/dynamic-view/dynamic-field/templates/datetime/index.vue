@@ -7,10 +7,9 @@ export default {
     name: 'PDynamicFieldDatetime',
     functional: true,
     props: {
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
+        options: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
             type: [String, Object, Array, Boolean, Number],
@@ -18,24 +17,24 @@ export default {
         },
     },
     render(h, { props, data }) {
-        let result:String = '';
+        let result = '';
         if (props.data) {
-            let time:dt;
-            if (props.view_option.source_type === 'iso861') {
-                if (props.view_option.source_format) {
-                    time = dt.fromFormat(props.data, props.view_option.source_format);
+            let time: dt;
+            if (props.options.source_type === 'iso861') {
+                if (props.options.source_format) {
+                    time = dt.fromFormat(props.data, props.options.source_format);
                 } else {
                     time = dt.fromISO(props.data);
                 }
-            } else if (props.view_option.source_format === 'seconds') {
+            } else if (props.options.source_format === 'seconds') {
                 time = dt.fromSeconds(Number(props.data));
             } else {
                 time = dt.fromISO(props.data);
             }
 
             time = time.setZone(getTimezone());
-            if (props.view_option.display_format) {
-                result = time.toFormat(props.view_option.display_format);
+            if (props.options.display_format) {
+                result = time.toFormat(props.options.display_format);
             } else {
                 result = time.toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' For display Timezone
             }
