@@ -1,9 +1,12 @@
 <template>
-    <p-data-table v-bind="ts.state" v-on="$listeners">
-        <template v-for="slot of slots" v-slot:[slot.name]="{value}">
-            <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
-        </template>
-    </p-data-table>
+    <div>
+        <p-panel-top>{{ name }}</p-panel-top>
+        <p-data-table :items="items" :fields="fields" v-on="$listeners">
+            <template v-for="slot of slots" v-slot:[slot.name]="{value}">
+                <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
+            </template>
+        </p-data-table>
+    </div>
 </template>
 
 <script lang="ts">
@@ -11,24 +14,9 @@ import { defineComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import { DynamicFieldType, DynamicLayoutProps } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 
-interface DataSourceType {
-    name: string;
-    key: string;
-    // eslint-disable-next-line camelcase
-    view_type?: string;
-    // eslint-disable-next-line camelcase
-    view_option?: any;
-}
-
-interface Props {
-    // eslint-disable-next-line camelcase
-    data_source: DataSourceType[];
-    data: any;
-    // eslint-disable-next-line camelcase
-    key_path: string;
-}
 
 interface Field {
     name: string;
@@ -41,6 +29,8 @@ export default defineComponent({
     components: {
         PDynamicField,
         PDataTable,
+        PPanelTop,
+
     },
     props: {
         name: {
@@ -53,56 +43,25 @@ export default defineComponent({
         },
         data: {
             type: [Object, Array],
-            default: () => ({}),
-        },
-        api: {
-            type: Object,
             default: null,
         },
     },
-    setup(props: Props) {
-        const fields: Ref<Readonly<Field[]> > = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
+    setup(props: DynamicLayoutProps) {
+        const fields: Ref<Readonly<Field[]> > = computed((): Field[] => (props.options.fields as DynamicFieldType[]).map((ds: DynamicFieldType): Field => ({
             name: ds.key,
             label: ds.name,
         })));
-        const items = computed(() => (props.key_path ? _.get(props.data, props.key_path) : props.data));
-
-        const ts = new DataTableToolSet({
-            fields,
-            items,
-            colCopy: true,
-            striped: true,
-            bordered: false,
-            padding: false,
-            hover: false,
-        });
-
-        const slots: Ref<Readonly<DataSourceType[]>> = computed((): DataSourceType[] => props.data_source.map((ds: DataSourceType): DataSourceType => ({
+        const items = computed(() => (props.options.root_path ? _.get(props.data, props.options.root_path) : props.data));
+        console.log(items.value);
+        const slots = computed((): DynamicFieldType[] => (props.options.fields as DynamicFieldType[]).map(ds => ({
             ...ds,
             name: `col-${ds.key}-format`,
         })));
         return {
+            fields,
             slots,
-            ts,
+            items,
         };
     },
 });
 </script>
-
-<style scoped lang="postcss">
-    .p-dynamic-view-simple-table-header{
-        margin-bottom: 1rem;
-        .title{
-            display: flex;
-            text-align: left;
-            font:  18px Arial;
-            letter-spacing: 0;
-            color: #202433;
-            opacity: 1;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-            align-self:center;
-        }
-    }
-
-</style>

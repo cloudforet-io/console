@@ -29,7 +29,6 @@ import {
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import { GetAction } from '@/lib/fluent-api';
-import { SearchTableFluentAPI } from '@/lib/api/table';
 import Definition from './definition.vue';
 
 export default defineComponent({
@@ -79,7 +78,6 @@ export default defineComponent({
         });
 
         const getData = async () => {
-            console.log('get data');
             let action: GetAction<any, any> = props.api?.resource.get() as GetAction<any, any>;
             if (props.api?.getAction) {
                 action = props.api.getAction(action) as GetAction<any, any>;
@@ -88,27 +86,21 @@ export default defineComponent({
                 action = action.setOnly(...onlyKeys.value);
             }
             const resp = await action.execute();
-            console.debug(resp.data, 'data');
             state.data = resp.data || {};
         };
 
         let apiWatchStop: any = null;
-        const toolset = ref<SearchTableFluentAPI>(null);
         watch(() => state.isApiMode, (after, before) => {
             if (after !== before) {
                 if (after) {
                     // @ts-ignore
-                    toolset.value = new SearchTableFluentAPI(props.api?.resource.list());
-                    toolset.value.getData();
                     apiWatchStop = watch(() => [props.isShow, props.api], (aft, bef) => {
-                        console.debug('debug', aft, bef);
                         const isShow: boolean = aft[0] as boolean;
                         const beforeIsShow = bef ? bef[0] : false;
                         const afterApi: DynamicLayoutApiProp = aft[1] as DynamicLayoutApiProp;
                         const beforeApi: undefined|DynamicLayoutApiProp = bef ? bef[1] as DynamicLayoutApiProp : undefined;
 
                         if ((isShow && isShow !== beforeIsShow) || (afterApi.resource !== beforeApi?.resource || afterApi.getAction !== beforeApi?.getAction)) {
-                            console.log('request get dat');
                             getData();
                         }
                     });
@@ -131,7 +123,6 @@ export default defineComponent({
         return {
             defs,
             noData,
-            toolset,
         };
     },
 });

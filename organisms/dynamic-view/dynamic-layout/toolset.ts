@@ -4,6 +4,7 @@ import {
 } from '@/lib/fluent-api';
 import _ from 'lodash';
 import { Computed, ComputedOrRef } from '@/lib/type';
+import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 
 
 export interface DynamicFieldType {
@@ -36,6 +37,7 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     name: string;
     type: string;
     api?: DynamicLayoutApiProp;
+    toolset?: DynamicFluentAPIToolSet;
     data: any;
     isShow: boolean;
 }

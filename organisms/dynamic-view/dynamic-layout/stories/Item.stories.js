@@ -2,11 +2,11 @@
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { object } from '@storybook/addon-knobs';
 import { mockFluentApi } from '@sb/mockApi';
-import { computed, ref } from '@vue/composition-api';
-import md from './SDynamicLayout.md';
+import { ref } from '@vue/composition-api';
+import md from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.md';
 
 export default {
-    title: 'organisms/dynamic-view/dynamic-layout',
+    title: 'organisms/dynamic-view/dynamic-layout/item',
     component: SDynamicLayout,
     parameters: {
         notes: md,
@@ -173,7 +173,7 @@ const data = {
     },
 };
 
-const itemLayout = {
+const defaultLayout = {
     name: 'EC2 Instance',
     type: 'item',
     options: {
@@ -209,13 +209,13 @@ const itemLayout = {
     },
 };
 
-export const itemType = () => ({
+export const defaultCase = () => ({
     components: { SDynamicLayout },
-    template: '<div class="w-full bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
     props: {
         layout: {
             type: Object,
-            default: object('layout', itemLayout, 'layout'),
+            default: object('layout', defaultLayout, 'layout'),
         },
         data: {
             type: Object,
@@ -226,7 +226,7 @@ export const itemType = () => ({
 
 });
 
-const itemLayoutRootPath = {
+const rootPathLayout = {
     name: 'EC2 Instance',
     type: 'item',
     options: {
@@ -262,209 +262,35 @@ const itemLayoutRootPath = {
         }],
     },
 };
-export const itemTypeWidthRootPath = () => ({
+export const rootPath = () => ({
     components: { SDynamicLayout },
-    template: '<div class="w-3/4 bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
     setup() {
         return {
-            layout: itemLayoutRootPath,
+            layout: rootPathLayout,
             data,
         };
     },
 });
 
-export const itemTypeWidthApi = () => ({
+export const apiMode = () => ({
     components: { SDynamicLayout },
-    template: `<div class="screen-full bg-white">
+    template: `<div class="w-screen bg-white">
         <span>
         <input type="checkbox" v-model="isShow"> is show    
         </span>
-        <div class="bg-blue text-white" @click="showData()">show data</div>
         <SDynamicLayout v-bind="layout" :is-show="isShow" :api="api" ref="item"/>
     </div>`,
 
     setup() {
-        const item = ref(null);
-        const ts = computed(() => (item.value ? item.value.toolset : null));
         const isShow = ref(true);
-        const showData = () => {
-            console.log(item.value);
-            console.log(ts.value.tableTS.state.items);
-        };
-        console.log('toolset', ts.value);
-
         return {
-            layout: itemLayoutRootPath,
+            layout: rootPathLayout,
             api: {
                 resource: mockFluentApi.inventory().server(),
                 getAction: action => action.setId('dynamicTest'),
             },
             isShow,
-            item,
-            showData,
         };
     },
 });
-// const subData = [
-//     {
-//         IndexName: 'add-pk-index-1',
-//         Projection: { ProjectionType: 'ALL' },
-//         IndexStatus: 'ACTIVE',
-//         ProvisionedThroughput: {
-//             NumberOfDecreasesToday: 1, ReadCapacityUnits: 5, WriteCapacityUnits: 5,
-//         },
-//         ItemCount: 0,
-//     },
-//     {
-//         IndexName: 'add-pk-index-2',
-//         KeySchema: [{ AttributeName: 'add-pk', KeyType: 'HASH' }],
-//         Projection: { ProjectionType: 'Half' },
-//         IndexStatus: 'ACTIVE',
-//         ProvisionedThroughput: {
-//             NumberOfDecreasesToday: 1, ReadCapacityUnits: 9, WriteCapacityUnits: 5,
-//         },
-//         ItemCount: 10,
-//     },
-//     {
-//         IndexName: 'add-pk-index-3',
-//         KeySchema: [{ AttributeName: 'add-pk', KeyType: 'HASH' }],
-//         Projection: { ProjectionType: 'ALL' },
-//         IndexStatus: 'DEACTIVATE',
-//         ProvisionedThroughput: {
-//             NumberOfDecreasesToday: 1, ReadCapacityUnits: 15, WriteCapacityUnits: 2,
-//         },
-//         ItemCount: 300,
-//     },
-//     {
-//         IndexName: 'add-pk-index-4',
-//         KeySchema: [{ AttributeName: 'add-pk', KeyType: 'HASH' }],
-//         Projection: { ProjectionType: 'KEY_ONLY' },
-//         IndexStatus: 'ACTIVE',
-//         ProvisionedThroughput: {
-//             NumberOfDecreasesToday: 1, ReadCapacityUnits: 3, WriteCapacityUnits: 1,
-//         },
-//         ItemCount: 1000,
-//     },
-// ];
-// //
-// // export const tableType = () => ({
-// //     components: { PDynamicView },
-// //     template: '<div style="width: 80vw"><PDynamicView view_type="table" :data_source="data_source" :apiHandler="apiHandler" :data="null"/></div>',
-// //     setup(props, { parent }) {
-// //         return {
-// //             apiHandler: new MockSubDataAPI(subData),
-// //             data_source: [
-// //                 {
-// //                     name: 'Index Name',
-// //                     key: 'IndexName',
-// //                 },
-// //                 {
-// //                     name: 'Projection Type',
-// //                     key: 'Projection.ProjectionType',
-// //                 },
-// //                 {
-// //                     name: 'Item Count',
-// //                     key: 'ItemCount',
-// //                 },
-// //                 {
-// //                     name: 'status',
-// //                     key: 'IndexStatus',
-// //                     view_type: 'enum',
-// //                     view_option: {
-// //                         DEACTIVE: {
-// //                             view_option: {
-// //                                 text_color: '#FF7750',
-// //                                 icon: {
-// //                                     image: 'aws-ec2',
-// //                                     color: '#FF7750',
-// //                                 },
-// //                             },
-// //                             view_type: 'state',
-// //                         },
-// //                         ACTIVE: {
-// //                             view_option: {
-// //                                 text_color: '#60B731',
-// //                                 icon: {
-// //                                     image: 'aws-ec2',
-// //                                     color: '#60B731',
-// //                                 },
-// //                             },
-// //                             view_type: 'state',
-// //                         },
-// //
-// //                     },
-// //                 },
-// //                 {
-// //                     name: 'Write capacity units',
-// //                     key: 'ProvisionedThroughput.WriteCapacityUnits',
-// //                 },
-// //                 {
-// //                     name: 'Read capacity units',
-// //                     key: 'ProvisionedThroughput.ReadCapacityUnits',
-// //                 },
-// //             ],
-// //
-// //         };
-// //     },
-// // });
-//
-// export const simpleTable = () => ({
-//     components: { PDynamicView },
-//     template: '<div style="width: 80vw"><PDynamicView view_type="simple-table" :data_source="data_source"  :data="data.GlobalSecondaryIndexes"/></div>',
-//     setup(props, { parent }) {
-//         return {
-//             data,
-//             data_source: [
-//                 {
-//                     name: 'Index Name',
-//                     key: 'IndexName',
-//                 },
-//                 {
-//                     name: 'Projection Type',
-//                     key: 'Projection.ProjectionType',
-//                 },
-//                 {
-//                     name: 'Item Count',
-//                     key: 'ItemCount',
-//                 },
-//                 {
-//                     name: 'status',
-//                     key: 'IndexStatus',
-//                     view_type: 'enum',
-//                     view_option: {
-//                         DEACTIVE: {
-//                             view_option: {
-//                                 text_color: '#FF7750',
-//                                 icon: {
-//                                     image: 'aws-ec2',
-//                                     color: '#FF7750',
-//                                 },
-//                             },
-//                             view_type: 'state',
-//                         },
-//                         ACTIVE: {
-//                             view_option: {
-//                                 text_color: '#60B731',
-//                                 icon: {
-//                                     image: 'aws-ec2',
-//                                     color: '#60B731',
-//                                 },
-//                             },
-//                             view_type: 'state',
-//                         },
-//
-//                     },
-//                 },
-//                 {
-//                     name: 'Write capacity units',
-//                     key: 'ProvisionedThroughput.WriteCapacityUnits',
-//                 },
-//                 {
-//                     name: 'Read capacity units',
-//                     key: 'ProvisionedThroughput.ReadCapacityUnits',
-//                 },
-//             ],
-//
-//         };
-//     },
-// });
