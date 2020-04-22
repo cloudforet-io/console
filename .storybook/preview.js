@@ -27,7 +27,7 @@ import { fontUrls, webFonts } from '@/styles/web-fonts';
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
-
+import {axiosInstance} from '@sb/mockApi'
 
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
@@ -45,6 +45,7 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
 
 Vue.prototype.$velocity = velocity;
+Vue.prototype.$http = axiosInstance;
 
 webFontLoader.load({
     google: {

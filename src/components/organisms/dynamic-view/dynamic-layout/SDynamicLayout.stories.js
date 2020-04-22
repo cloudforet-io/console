@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { object } from '@storybook/addon-knobs';
+import { mockFluentApi } from '@sb/mockApi';
+import { computed, ref } from '@vue/composition-api';
 import md from './SDynamicLayout.md';
 
 export default {
@@ -267,6 +269,39 @@ export const itemTypeWidthRootPath = () => ({
         return {
             layout: itemLayoutRootPath,
             data,
+        };
+    },
+});
+
+export const itemTypeWidthApi = () => ({
+    components: { SDynamicLayout },
+    template: `<div class="screen-full bg-white">
+        <span>
+        <input type="checkbox" v-model="isShow"> is show    
+        </span>
+        <div class="bg-blue text-white" @click="showData()">show data</div>
+        <SDynamicLayout v-bind="layout" :is-show="isShow" :api="api" ref="item"/>
+    </div>`,
+
+    setup() {
+        const item = ref(null);
+        const ts = computed(() => (item.value ? item.value.toolset : null));
+        const isShow = ref(true);
+        const showData = () => {
+            console.log(item.value);
+            console.log(ts.value.tableTS.state.items);
+        };
+        console.log('toolset', ts.value);
+
+        return {
+            layout: itemLayoutRootPath,
+            api: {
+                resource: mockFluentApi.inventory().server(),
+                getAction: action => action.setId('dynamicTest'),
+            },
+            isShow,
+            item,
+            showData,
         };
     },
 });
