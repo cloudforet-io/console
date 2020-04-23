@@ -78,8 +78,9 @@ export default defineComponent({
                             gridLines: {
                                 display: true,
                                 drawTicks: false,
-                                color: gray[100],
-                                zeroLineColor: gray[100],
+                                drawBorder: true,
+                                color: gray[200],
+                                zeroLineColor: gray[200],
                             },
                             ticks: {
                                 display: true,
@@ -87,20 +88,26 @@ export default defineComponent({
                                 autoSkipPadding: 20,
                                 padding: 10,
                                 suggestedMin: 0,
+                                fontColor: gray[900],
+                                fontSize: 12,
                             },
                         }],
                         xAxes: [{
                             gridLines: {
                                 display: true,
                                 drawTicks: false,
-                                color: gray[100],
-                                zeroLineColor: gray[100],
+                                drawBorder: true,
+                                color: gray[200],
+                                zeroLineColor: gray[200],
+                                offsetGridLines: false,
                             },
                             ticks: {
                                 autoSkip: true,
                                 autoSkipPadding: 50,
                                 padding: 10,
                                 maxRotation: 0,
+                                fontColor: gray[900],
+                                fontSize: 12,
                             },
                             afterTickToLabelConversion(scaleInstance): void {
                                 scaleInstance.ticks[0] = null;
@@ -113,12 +120,30 @@ export default defineComponent({
                         mode: 'point',
                     },
                 },
+                plugins: [{
+                    beforeDraw(chart: SLineChart): void {
+                        const ctx: CanvasRenderingContext2D | null = chart.ctx;
+                        if (!ctx) return;
+
+                        ctx.save();
+
+                        ctx.strokeStyle = gray[200];
+                        ctx.lineWidth = 1;
+
+                        ctx.beginPath();
+                        ctx.moveTo(chart.chartArea.right, chart.chartArea.top);
+                        ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
+                        ctx.stroke();
+
+                        ctx.restore();
+                    },
+                }],
             });
 
         watch(() => props.dataset, () => {
             if (ts.state.chart) {
                 _.forEach(props.dataset, (ds, label) => {
-                    ts.state.chart?.updateData(ds, label);
+                    ts.state.chart?.upsertData(ds, label);
                     ts.state.chart?.setLabels(getLabels());
                 });
                 ts.state.chart.update();
@@ -133,7 +158,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .chart {
-        @apply mt-5 relative;
+        @apply mt-5 relative px-2;
         height: 12.5rem;
     }
     .shade {
