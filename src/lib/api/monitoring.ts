@@ -39,7 +39,7 @@ export class MetricAPI<
             const res = await this.dataSourceApi.execute();
             this.dataSources = res.data.results;
             this.ts.setDataTools(this.dataSources);
-            this.ts.setStatisticsTypes(this.dataSources);
+            // this.ts.setStatisticsTypes(this.dataSources);
         } catch (e) {
             console.error(e);
         }

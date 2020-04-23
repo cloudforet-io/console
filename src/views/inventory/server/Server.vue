@@ -167,7 +167,11 @@
                 <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
             </template>
             <template #monitoring>
-                <s-monitoring resource-type="'inventory.Server'" :resources="apiHandler.tableTS.selectState.selectItems" />
+                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
+                              :data-tools="metricAPIHandler.ts.state.dataTools"
+                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
+                              :resources="metricAPIHandler.ts.state.resources"
+                />
             </template>
         </PTab>
 
@@ -480,6 +484,7 @@ export default {
             multiSelectTabs: makeTrItems([
                 ['data', 'TAB.DATA', { keepAlive: true }],
                 ['admin', 'TAB.ADMIN'],
+                ['monitoring', 'TAB.MONITORING'],
             ], context.parent),
             multiSelectActiveTab: 'data',
         });

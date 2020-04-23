@@ -6,6 +6,7 @@ import {
 } from '@/lib/toolset';
 import { SChart } from '@/lib/chart/s-chart';
 import { ChartConfiguration } from 'chart.js';
+import {UnwrapRef} from "@vue/composition-api/dist/reactivity";
 
 interface ChartStateType<C> {
     chartRef: null | HTMLCanvasElement;
@@ -14,8 +15,8 @@ interface ChartStateType<C> {
 
 
 @HelperToolSet()
-export class SChartToolSet<C extends SChart, D=any> {
-    state: ChartStateType<C> & D;
+export class SChartToolSet<C extends SChart, D=object> {
+    state: UnwrapRef<ChartStateType<C> & D>;
 
     ChartClass: new (...args) => C;
 
@@ -30,7 +31,7 @@ export class SChartToolSet<C extends SChart, D=any> {
         initData: D = {} as D,
         config: ChartConfiguration = {},
     ) {
-        this.state = initReactive<ChartStateType<C> & D>(false, {
+        this.state = initReactive<UnwrapRef<ChartStateType<C> & D>>(false, {
             chartRef: null,
             chart: null,
         }, initData);
@@ -44,8 +45,8 @@ export class SChartToolSet<C extends SChart, D=any> {
 
         watch(() => this.state.chartRef, (val) => {
             if (val) {
-                this.state.chart = new this.ChartClass(val, config);
-                this.draw(this.state.chart);
+                this.state.chart = new this.ChartClass(val, config) as any;
+                this.draw(this.state.chart as any);
             }
         }, {
             lazy: true,

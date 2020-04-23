@@ -143,10 +143,7 @@ export default defineComponent({
         }
         tr {
             td {
-                @apply h-10 px-4 z-0 whitespace-no-wrap overflow-hidden align-middle min-w-28;
-                line-height: 150%;
-
-                text-overflow: ellipsis;
+                @apply h-10 px-4 z-0 truncate align-middle min-w-28 text-sm leading-normal;
             }
             &:first-child {
                 td {

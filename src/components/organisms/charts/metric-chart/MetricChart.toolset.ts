@@ -24,6 +24,14 @@ export const metricChartProps = {
             return typeof unit.x === 'string' && typeof unit.y === 'string';
         },
     },
+    title: {
+        type: String,
+        default: '',
+    },
+    error: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 export interface MetricChartProps {
@@ -34,4 +42,6 @@ export interface MetricChartProps {
     labels: string[];
     colors: string[];
     unit: { x: string; y: string };
+    title: string;
+    error?: boolean;
 }
