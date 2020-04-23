@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { AxiosInstance } from 'axios';
+
 export type ApiMethods = 'post' | 'get' | 'delete' | 'put';
 
 export interface LongFilterType {
@@ -77,28 +79,6 @@ export interface QueryApiState<T=any> extends BaseQueryState<T> {
     count_only: boolean;
     query: () => Query;
 }
-//
-// export interface StatQuery {
-//     filter?: FilterType[];
-//     // sort: string;
-//     limit?: number;
-//     start?: string;
-//     end?: string;
-//     aggregate?: Array<undefined | string>;
-//     merge?: Array<undefined | string>;
-// }
-//
-// export interface StatQueryApiState<T=any> {
-//     filter?: FilterItem[];
-//     // sortBy: string;
-//     limit?: number;
-//     start?: string;
-//     end?: string;
-//     aggregate?: Array<undefined | string>;
-//     merge?: Array<undefined | string>;
-//     extraParameter?: T;
-// }
-
 
 export interface DataSourceItem {
     name: string;
@@ -169,4 +149,8 @@ export interface ProjectGroupInfo extends Tags {
     created_by: string;
     created_at: TimeStamp;
     deleted_at: TimeStamp;
+}
+
+export interface ApiType {
+    instance: AxiosInstance;
 }

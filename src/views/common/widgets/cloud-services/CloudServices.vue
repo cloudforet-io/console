@@ -64,7 +64,6 @@ import {
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import { useStore, ProviderStoreType, ProviderInfo } from '@/store/toolset';
 import _ from 'lodash';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -111,22 +110,22 @@ export default defineComponent({
         });
 
 
-        const api = fluentApi.statisticsTest().stat().query<Value>()
-            .setServiceType('inventory.cloud-service')
-            .addField('cloud_service_id', OPERATORS.count, 'count')
-            .addField('provider', OPERATORS.value, 'provider')
-            .addField('cloud_service_group', OPERATORS.value, 'group')
-            .addField('cloud_service_type', OPERATORS.value, 'name')
-            .setGroupBy('provider', 'cloud_service_group', 'cloud_service_type')
-            .setSort('cloud_service_id')
-            .setLimit(12);
+        // const api = fluentApi.statisticsTest().stat().query<Value>()
+        //     .setServiceType('inventory.cloud-service')
+        //     .addField('cloud_service_id', OPERATORS.count, 'count')
+        //     .addField('provider', OPERATORS.value, 'provider')
+        //     .addField('cloud_service_group', OPERATORS.value, 'group')
+        //     .addField('cloud_service_type', OPERATORS.value, 'name')
+        //     .setGroupBy('provider', 'cloud_service_group', 'cloud_service_type')
+        //     .setSort('cloud_service_id')
+        //     .setLimit(12);
 
         const getData = async (): Promise<void> => {
             state.loading = true;
             await providerStore.getProvider();
             try {
-                const res = await api.execute();
-                state.data = res.data.values;
+                // const res = await api.execute();
+                // state.data = res.data.values;
             } catch (e) {
                 state.data = arrayOf(12, () => ({
                     provider: 'aws',

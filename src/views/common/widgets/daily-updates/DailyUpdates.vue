@@ -62,17 +62,12 @@ import PSelectableItem from '@/components/molecules/selectable-item/SelectableIt
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import {
-    DiffQueryAPI, DiffResponse, HistoryResponse, OPERATORS,
-} from '@/lib/fluent-api/statistics/toolset_origin';
 import moment from 'moment';
 import { getTimestamp } from '@/lib/util';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
-import { number } from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/lib/casual';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import _ from 'lodash';
-import { VTooltip } from 'v-tooltip';
 
 export default defineComponent({
     name: 'DailyUpdates',
@@ -132,15 +127,15 @@ export default defineComponent({
         });
 
 
-        const serverApi = fluentApi.statisticsTest().history().diff<Server>()
-            .setTopic('inventory_server_daily_diff')
-            .setFrom(getTimestamp(moment().subtract(1, 'day')))
-            .setField('count');
+        // const serverApi = fluentApi.statisticsTest().history().diff<Server>()
+        //     .setTopic('inventory_server_daily_diff')
+        //     .setFrom(getTimestamp(moment().subtract(1, 'day')))
+        //     .setField('count');
 
         const getServerData = async (): Promise<void> => {
             try {
-                const res = await serverApi.execute();
-                state.serverData = res.data.values;
+                // const res = await serverApi.execute();
+                // state.serverData = res.data.values;
             } catch (e) {
                 state.serverData = [{
                     count: casual.integer(-30, 30),
@@ -148,16 +143,16 @@ export default defineComponent({
             }
         };
 
-        const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
-            .setTopic('inventory_cloud_service_daily_diff')
-            .setGroupBy('cloud_service_type', 'cloud_service_group', 'provider')
-            .setFrom(getTimestamp(moment().subtract(1, 'day')))
-            .setField('count');
+        // const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
+        //     .setTopic('inventory_cloud_service_daily_diff')
+        //     .setGroupBy('cloud_service_type', 'cloud_service_group', 'provider')
+        //     .setFrom(getTimestamp(moment().subtract(1, 'day')))
+        //     .setField('count');
 
         const getCloudServiceData = async (): Promise<void> => {
             try {
-                const res = await cloudServiceApi.execute();
-                state.cloudServiceData = res.data.values;
+                // const res = await cloudServiceApi.execute();
+                // state.cloudServiceData = res.data.values;
             } catch (e) {
                 state.cloudServiceData = arrayOf(casual.integer(5, 15), () => ({
                     provider: casual.random_element(['aws', 'azure', 'google_cloud']),

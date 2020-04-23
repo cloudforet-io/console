@@ -10,16 +10,10 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    StatQueryApiState,
-    StatQuery,
-    BaseQueryState, BaseQuery,
+    BaseQueryState, BaseQuery, ApiType,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
-
-export interface ApiType {
-    instance: AxiosInstance;
-}
 
 export abstract class ActionAPI<parameter=any, resp=any> {
     protected abstract path: string;
