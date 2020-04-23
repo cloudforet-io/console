@@ -100,17 +100,17 @@ export const stateType = () => ({
                 },
                 {
                     option: {
-                        text_color: '#EF3817',
+                        text_color: 'red.300',
                         icon: {
-                            image: 'ic_delete',
-                            color: '#EF3817',
+                            image: 'fas fa-address-book fa-spin',
+                            color: 'red.500',
                         },
                     },
                     raw: 'deactive',
                 },
                 {
                     option: {
-                        text_color: '#FFCE02',
+                        text_color: 'yellow',
                         icon: {
                             image: 'aws-ec2',
                             color: '#FFCE02',
@@ -139,6 +139,25 @@ export const badgeType = () => ({
                         text_color: '#60B731',
                     },
                     raw: 'test',
+                },
+                {
+                    option: {
+                        text_color: 'peacock',
+                    },
+                    raw: 'named color',
+                },
+                {
+                    option: {
+                        text_color: 'green.300',
+                        background_color: 'green.800',
+                    },
+                    raw: 'named color2',
+                },
+                {
+                    option: {
+                        text_color: 'green.600',
+                    },
+                    raw: 'named color3',
                 },
                 {
                     option: {

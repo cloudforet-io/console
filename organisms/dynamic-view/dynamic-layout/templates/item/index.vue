@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="!isLoading">
         <p-panel-top>{{ name }}</p-panel-top>
         <table v-if="!noData" class="content-table">
             <tbody>

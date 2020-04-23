@@ -35,7 +35,7 @@
 | props | support? |
 |-------|----------|
 | data  |  O       |
-| api   |  X       |
+| api   |  O(get)  |
 |toolset|  X       |
 
 
