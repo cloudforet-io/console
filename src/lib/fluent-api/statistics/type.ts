@@ -89,3 +89,16 @@ export interface HistoryListResp {
     values: object;
     created_at: TimeStamp;
 }
+
+export interface HistoryDiffParam {
+    topic: string;
+    start: TimeStamp;
+    end: TimeStamp;
+    default_fields: string[];
+    diff_fields: string[];
+}
+
+export interface HistoryDiffResp<value> {
+    topic: string;
+    results: value[];
+}

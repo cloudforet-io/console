@@ -2,7 +2,7 @@
 import { BaseQueryAPI } from '@/lib/fluent-api/toolset';
 import { isNotEmpty } from '@/lib/util';
 import {
-    Aggregate, Group, GroupFieldsItem, GroupKeyItem, GroupKeys, STAT_OPERATORS, StatQueryState, UnwindItem,
+    Aggregate, Group, GroupFieldsItem, GroupKeys, STAT_OPERATORS, StatQueryState, UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
 import { ApiType } from '@/lib/fluent-api/type';
 
