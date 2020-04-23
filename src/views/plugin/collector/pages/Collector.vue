@@ -281,7 +281,6 @@ export default {
         };
         mountBusEvent(CollectorEventBus, 'confirmTags', confirmTags);
 
-
         const listCredentialsByCollector = async (query) => {
             const crdId = _.get(state.selectedItem, 'plugin_info.credential_id');
             const crdgId = _.get(state.selectedItem, 'plugin_info.credential_group_id');

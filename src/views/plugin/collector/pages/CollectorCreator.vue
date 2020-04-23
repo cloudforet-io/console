@@ -6,6 +6,7 @@ import { crdState } from '@/views/plugin/collector/modules/ChooseCredentials.vue
 import { confState } from '@/views/plugin/collector/modules/ConfigureCollector.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     name: 'CollectorPlugins',
@@ -13,28 +14,21 @@ export default {
     setup(props, context) {
         const state = setDataState(context.root);
 
+        const getProvider = fluentApi.identity().provider().get();
 
         const listCredentials = async (params) => {
             const url = state.crdState.crdType === 'Credentials'
                 ? '/secret/credential/list' : '/secret/credential-group/list';
             // eslint-disable-next-line camelcase
-            params.include_credential_group = true;
-
-            state.crdState.loading = true;
-            state.crdState.items = [];
-
-            try {
-                const res = await context.parent.$http.post(url, params);
-                state.crdState.selectIndex = [];
-                state.crdState.totalCount = res.data.total_count;
-                state.crdState.items = res.data.results;
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.crdState.loading = false;
-            }
+            // params.include_credential_group = true;
+            const provider = state.confState.provider;
+            const resp = await fluentApi.secret().secret().list().setProvider(provider)
+                .execute();
+            const pluginSchema = resp.data.results.map(item => item.schema);
+            state.confState.pluginSchema = pluginSchema;
         };
-        mountBusEvent(CollectorEventBus, 'listCredentials', listCredentials);
+        listCredentials();
+        // mountBusEvent(CollectorEventBus, 'listCredentials', listCredentials);
 
 
         const getPlugin = async (params) => {
@@ -43,6 +37,7 @@ export default {
             try {
                 const res = await context.parent.$http.post('/repository/plugin/get', params);
                 state.confState.plugin = res.data;
+                state.confState.provider = res.data.provider;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -67,7 +62,7 @@ export default {
 
 
         const createCollector = async () => {
-            const crdKey = state.crdState.crdType === 'Credentials' ? 'credential_id' : 'credential_group_id';
+            // const crdKey = state.crdState.crdType === 'Credentials' ? 'credential_id' : 'credential_group_id';
             const params = {
                 name: state.confState.name,
                 priority: state.confState.priority,
@@ -77,7 +72,8 @@ export default {
                     // eslint-disable-next-line camelcase
                     plugin_id: state.confState.plugin.plugin_id,
                     version: state.confState.selectedVersion,
-                    [crdKey]: state.crdState.items[state.crdState.selectIndex[0]][crdKey],
+                    provider: state.confState.provider,
+                    // [crdKey]: state.crdState.items[state.crdState.selectIndex[0]][crdKey],
                 },
             };
 
@@ -85,48 +81,85 @@ export default {
                 params.options = state.confState.optionsValue;
             }
 
-            try {
-                const res = await context.parent.$http.post('/inventory/collector/create', params);
-                context.root.$router.push('/plugin/collector');
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'create collector',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            } catch (e) {
-                /**
-                 * temporary codes before verify function developed
-                 */
-                if (e.message.includes('ERROR_AUTHENTICATION_FAILURE_PLUGIN')) {
+            await fluentApi.inventory().collector().create().setParameter({
+                ...params,
+            })
+                .execute()
+                .then(() => {
+                    context.root.$router.push('/plugin/collector');
                     context.root.$notify({
                         group: 'noticeBottomRight',
-                        type: 'warning',
-                        title: 'Wrong Credentials',
-                        text: 'Please choose credentials or credentials group that matches the selected plugin.',
+                        type: 'success',
+                        title: 'success',
+                        text: 'create collector',
                         duration: 2000,
                         speed: 1000,
                     });
-                    return;
-                }
-
-                console.error(e);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
+                })
+                .catch((e) => {
+                    if (e.message.includes('ERROR_AUTHENTICATION_FAILURE_PLUGIN')) {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'warning',
+                            title: 'Wrong Credentials',
+                            text: 'Please choose credentials or credentials group that matches the selected plugin.',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                        return;
+                    }
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: 'request Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
                 });
-            }
+
+            // try {
+            //     const res = await context.parent.$http.post('/inventory/collector/create', params);
+            //     context.root.$router.push('/plugin/collector');
+            //     context.root.$notify({
+            //         group: 'noticeBottomRight',
+            //         type: 'success',
+            //         title: 'success',
+            //         text: 'create collector',
+            //         duration: 2000,
+            //         speed: 1000,
+            //     });
+            // } catch (e) {
+            //     /**
+            //      * temporary codes before verify function developed
+            //      */
+            //     if (e.message.includes('ERROR_AUTHENTICATION_FAILURE_PLUGIN')) {
+            //         context.root.$notify({
+            //             group: 'noticeBottomRight',
+            //             type: 'warning',
+            //             title: 'Wrong Credentials',
+            //             text: 'Please choose credentials or credentials group that matches the selected plugin.',
+            //             duration: 2000,
+            //             speed: 1000,
+            //         });
+            //         return;
+            //     }
+            //
+            //     console.error(e);
+            //     context.root.$notify({
+            //         group: 'noticeBottomRight',
+            //         type: 'alert',
+            //         title: 'Fail',
+            //         text: 'request Fail',
+            //         duration: 2000,
+            //         speed: 1000,
+            //     });
         };
         mountBusEvent(CollectorEventBus, 'createCollector', createCollector);
 
         return {
             ...toRefs(state),
+            getProvider,
         };
     },
 };

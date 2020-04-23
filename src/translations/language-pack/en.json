@@ -229,7 +229,8 @@
 		"SERVER": "Server",
 		"SERVICE_PROVIDER": "Service Provider",
 		"START_TIME": "Start Time",
-		"STATE": "State"
+		"STATE": "State",
+		"SUPPORTED": "Supported"
 	},
 	"FORM": {
 		"LABEL": {

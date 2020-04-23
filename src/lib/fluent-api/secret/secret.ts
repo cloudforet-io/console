@@ -55,6 +55,11 @@ class List extends ListAction<any, SecretListResp> {
         delete this.apiState.extraParameter.credential_id;
         return this.clone();
     }
+
+    setProvider(provider: string): this {
+        this.apiState.extraParameter.provider = provider;
+        return this.clone();
+    }
 }
 export default class Secret extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
     protected name = 'secret';
