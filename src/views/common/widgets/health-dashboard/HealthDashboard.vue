@@ -62,7 +62,7 @@ import PTooltipButton from '@/components/organisms/buttons/tooltip-button/Toolti
 import { fluentApi } from '@/lib/fluent-api';
 import {
     DiffQueryAPI, DiffResponse, HistoryResponse, OPERATORS,
-} from '@/lib/fluent-api/statistics/toolset';
+} from '@/lib/fluent-api/statistics/toolset_origin';
 import moment from 'moment';
 import { getTimestamp } from '@/lib/util';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';

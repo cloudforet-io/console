@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { Service } from '@/lib/fluent-api/toolset';
-import Stat from '@/lib/fluent-api/statistics/stat';
+import Stat from '@/lib/fluent-api/statistics/stat-new';
 import History from '@/lib/fluent-api/statistics/history';
 
 

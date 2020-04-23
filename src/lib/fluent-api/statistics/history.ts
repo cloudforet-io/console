@@ -2,7 +2,7 @@ import { Resource, ResourceActions } from '@/lib/fluent-api/toolset';
 import {
     DiffQueryAPI,
     HistoryQueryAPI, HistoryResponse,
-} from '@/lib/fluent-api/statistics/toolset';
+} from '@/lib/fluent-api/statistics/toolset_origin';
 
 
 // example query

@@ -63,7 +63,7 @@ import _ from 'lodash';
 import Color from 'color';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import { OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import casual from '@/lib/casual';
 import { SChartToolSet } from '@/lib/chart/toolset';
 
@@ -105,12 +105,38 @@ export default defineComponent({
             count: number;
         }
 
-        const api = fluentApi.statisticsTest().stat().query<Value>()
-            .setServiceType('identity.service-account')
-            .setGroupBy('provider')
-            .addField('provider', OPERATORS.value, 'provider')
-            .addField('service_account_id', OPERATORS.count, 'count')
-            .setSort('provider');
+        // const api = fluentApi.statisticsTest().stat().query<Value>()
+        //     .setServiceType('identity.service-account')
+        //     .setGroupBy('provider')
+        //     .addField('provider', OPERATORS.value, 'provider')
+        //     .addField('service_account_id', OPERATORS.count, 'count')
+        //     .setSort('provider');
+
+        const api = fluentApi.statisticsTest().stat().query()
+            .setResourceType('identity.service-account')
+            .setAggregate({
+                group: {
+                    keys: [{ key: 'project_id', name: 'project_id' }],
+                    fields: [{ operator: 'count', name: 'project_count' }],
+                },
+            })
+            .setJoin([{
+                key: 'project_id',
+                // eslint-disable-next-line camelcase
+                resource_type: 'inventory.Server',
+                aggregate: [{
+                    group: {
+                        keys: [{ key: 'project_id', name: 'project_id' }],
+                        fields: [{ operator: 'count', name: 'project_count' }],
+                    },
+                }],
+            }])
+            .setFormula({
+                name: 'resource_count',
+                formula: 'server_count + cloud_service_count',
+            })
+            .setSort('provider')
+            .setLimit(5);
 
         interface Data {
             name: string;

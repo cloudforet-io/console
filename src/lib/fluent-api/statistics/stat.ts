@@ -1,5 +1,5 @@
 import { Resource, ResourceActions } from '@/lib/fluent-api/toolset';
-import { StatQueryAPI, StatResponse } from '@/lib/fluent-api/statistics/toolset';
+import { StatQueryAPI, StatResponse } from '@/lib/fluent-api/statistics/toolset_origin';
 
 
 /*

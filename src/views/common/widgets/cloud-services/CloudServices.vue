@@ -64,7 +64,7 @@ import {
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import { OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import { useStore, ProviderStoreType, ProviderInfo } from '@/store/toolset';
 import _ from 'lodash';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';

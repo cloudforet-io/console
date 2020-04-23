@@ -34,7 +34,7 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLa
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SLineChart } from '@/lib/chart/line-chart';
 import { SChartToolSet } from '@/lib/chart/toolset';
-import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import { gray } from '@/styles/colors';
 import casual, { arrayOf } from '@/lib/casual';
 

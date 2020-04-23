@@ -27,7 +27,7 @@ import { SBarChart } from '@/lib/chart/bar-chart';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import { OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import casual, { arrayOf } from '@/lib/casual';
 
 export default defineComponent({

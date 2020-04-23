@@ -1,6 +1,6 @@
 import { Location } from 'vue-router';
 import { colorset } from '@/lib/util';
-import { DiffQueryAPI, HistoryQueryAPI } from '@/lib/fluent-api/statistics/toolset';
+import { DiffQueryAPI, HistoryQueryAPI } from '@/lib/fluent-api/statistics/toolset_origin';
 
 export const serviceSummaryProps = {
     title: {

@@ -51,7 +51,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import { getTimezone } from '@/lib/util';
 import moment from 'moment';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import { OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTr from '@/components/atoms/table/Tr.vue';

@@ -52,7 +52,7 @@ export interface BaseQueryState<param> {
     filterOr: FilterItem[];
     fixFilter: FilterItem[];
     extraParameter: param;
-    query: () => StatQuery;
+    // query: () => StatQuery;
 }
 
 export interface Query extends BaseQuery {
@@ -77,27 +77,27 @@ export interface QueryApiState<T=any> extends BaseQueryState<T> {
     count_only: boolean;
     query: () => Query;
 }
-
-export interface StatQuery {
-    filter?: FilterType[];
-    // sort: string;
-    limit?: number;
-    start?: string;
-    end?: string;
-    aggregate?: Array<undefined | string>;
-    merge?: Array<undefined | string>;
-}
-
-export interface StatQueryApiState<T=any> {
-    filter?: FilterItem[];
-    // sortBy: string;
-    limit?: number;
-    start?: string;
-    end?: string;
-    aggregate?: Array<undefined | string>;
-    merge?: Array<undefined | string>;
-    extraParameter?: T;
-}
+//
+// export interface StatQuery {
+//     filter?: FilterType[];
+//     // sort: string;
+//     limit?: number;
+//     start?: string;
+//     end?: string;
+//     aggregate?: Array<undefined | string>;
+//     merge?: Array<undefined | string>;
+// }
+//
+// export interface StatQueryApiState<T=any> {
+//     filter?: FilterItem[];
+//     // sortBy: string;
+//     limit?: number;
+//     start?: string;
+//     end?: string;
+//     aggregate?: Array<undefined | string>;
+//     merge?: Array<undefined | string>;
+//     extraParameter?: T;
+// }
 
 
 export interface DataSourceItem {
