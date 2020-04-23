@@ -21,9 +21,7 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, Ref, toRefs,
-} from '@vue/composition-api';
+import { computed, defineComponent, toRefs } from '@vue/composition-api';
 import numeral from 'numeral';
 import {
     serviceSummaryProps,
@@ -34,9 +32,11 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLa
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SLineChart } from '@/lib/chart/line-chart';
 import { SChartToolSet } from '@/lib/chart/toolset';
-import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+// import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset_origin';
 import { gray } from '@/styles/colors';
 import casual, { arrayOf } from '@/lib/casual';
+import { fluentApi } from '@/lib/fluent-api';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
 export default defineComponent({
     name: 'ServiceSummary',
@@ -60,21 +60,30 @@ export default defineComponent({
             });
 
 
-        const summaryApi: Ref<Readonly<
-            HistoryQueryAPI<undefined, HistoryResponse<Data>>>
-            > = computed(() => props.api
-                .setLimit(7)
-                .setSort('created_at')
-                .addField('', OPERATORS.count, 'count')
-                .setTopic('topic'));
+        // const summaryApi: Ref<Readonly<
+        //     HistoryQueryAPI<undefined, HistoryResponse<Data>>>
+        //     > = computed(() => props.api);
+        // .setLimit(7)
+        // .setSort('created_at')
+        // .addField('', OPERATORS.count, 'count')
+        // .setTopic('topic'));
         // .setFrom(getTimestamp(moment().subtract(7, 'day'))));
+
+        const summaryApi = fluentApi.statisticsTest().resource().stat()
+            .setResourceType('inventory.Server')
+            .addGroupKey('project_id', 'project_id')
+            .addGroupKey('name', 'project_name')
+            .addGroupKey('project_group.name', 'project_group.name')
+            .addGroupField('project_count', STAT_OPERATORS.count)
+            .addGroupField('selected_id', STAT_OPERATORS.set, 'project_id');
+
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
             try {
-                const res = await summaryApi.value.execute();
-                ts.state.data = res.data.values.map(d => d.count);
+                const res = await summaryApi.execute();
+                // ts.state.data = res.data.values.map(d => d.count);
             } catch (e) {
                 ts.state.data = arrayOf(7, () => casual.integer(0, 1000000));
             } finally {
