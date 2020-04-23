@@ -7,8 +7,6 @@ const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {
     path: 'project',
-    name: 'project',
-    // redirect: '/project',
     meta: { label: 'Project', breadcrumb: true, api: fluentApi.identity().project() },
     components: {
         lnb: ProjectNavBar,

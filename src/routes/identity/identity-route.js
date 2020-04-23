@@ -10,19 +10,13 @@ const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 export default {
     path: 'identity',
     name: 'identity',
-    redirect: '/identity/service-account',
+    redirect: '/identity/user',
     meta: { label: 'Identity', breadcrumb: true },
     components: {
         lnb: IdentityNavBar,
         main: Identity,
     },
     children: [
-        // {
-        //     path: 'project',
-        //     name: 'project',
-        //     meta: { label: 'Project', breadcrumb: true },
-        //     component: Project,
-        // },
         {
             path: 'user',
             name: 'user',
@@ -49,7 +43,6 @@ export default {
         },
         {
             path: 'service-account',
-            name: 'service-account',
             meta: {
                 label: 'Service Account',
                 breadcrumb: true,
