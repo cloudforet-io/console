@@ -37,7 +37,7 @@
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('WORD.STATISTICS') }}</span>
                 <p-select-dropdown v-model="selectedStat" :items="statItems" />
-                <p-icon-button class="ml-4 flex-shrink-0" name="ic_refresh" />
+                <p-icon-button class="ml-4 flex-shrink-0" name="ic_refresh" @click="listChartMetrics" />
             </div>
         </section>
         <section class="py-4">
@@ -46,39 +46,38 @@
                     <strong>{{ $t('WORD.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
-            <div v-if="loading">
+            <div v-if="metricsLoading">
                 <p-lottie name="spinner" auto />
             </div>
             <div v-else-if="noData">
                 No data
             </div>
-            <div v-else>
-                <p-grid-layout :items="metrics" row-gap="3rem" column-gap="1rem"
-                               card-height="12.5rem"
+            <template v-else>
+                <p-grid-layout :items="chartMetrics" row-gap="3rem" column-gap="1rem"
+                               card-height="auto"
                                card-min-width="23.125rem"
                                card-max-width="23.125rem"
                                :card-class="() => []"
                 >
-                    <template #card="{item}">
-                        <span class="title leading-normal">{{ item.name }}</span>
-                        <span class="text-sm text-gray leading-normal">&nbsp;({{ item.unit.y }})</span>
-                        <p-metric-chart :loading="!chartDatasets[item.key]"
-                                        :labels="chartDatasets[item.key] ? chartDatasets[item.key].labels : []"
-                                        :dataset="chartDatasets[item.key] ? chartDatasets[item.key].dataset : {}"
+                    <template #card="{item, index}">
+                        <p-metric-chart :loading="chartMetrics[index].loading"
+                                        :labels="chartMetrics[index].labels"
+                                        :dataset="chartMetrics[index].dataset"
                                         :colors="colors"
-                                        :unit="item.unit"
-                                        class="mt-5"
+                                        :unit="item.metric.unit"
+                                        :title="item.metric.name"
+                                        :error="item.error"
                         />
                     </template>
                 </p-grid-layout>
-            </div>
+            </template>
         </section>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
     monitoringProps,
@@ -87,21 +86,19 @@ import {
 } from '@/components/organisms/monitoring/Monitoring.toolset';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import {
-    coral, blue, violet, yellow, green, peacock,
+    blue, coral, green, peacock, violet, yellow,
 } from '@/styles/colors';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import _ from 'lodash';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import { fluentApi } from '@/lib/fluent-api';
+import { fluentApi, TimeStamp } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { BtnType } from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.toolset';
-import { MetricResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
+import { MetricListResp, MetricResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
 import { GetMetricData, MetricList } from '@/lib/fluent-api/monitoring/metric';
 import moment, { Moment } from 'moment';
-import { chartTimestampFormatter, getTimestamp } from '@/lib/util';
+import { getTimestamp } from '@/lib/util';
 import PMetricChart from '@/components/organisms/charts/metric-chart/MetricChart.vue';
-import { SChartToolSet } from '@/lib/chart/toolset';
-import { SLineChart } from '@/lib/chart/line-chart';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
@@ -118,29 +115,34 @@ export default defineComponent({
     props: monitoringProps,
     setup(props: MonitoringProps) {
         console.debug('resources: ', props.resources);
-        console.debug('props.dataTools: ', props.dataTools);
 
         const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
         const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
+        const LOAD_LIMIT = 12;
+
+        interface ChartMetric {
+            loading: boolean;
+            labels: string[];
+            dataset: {[resourceKey: string]: number[]};
+            metric: MetricResp;
+            error?: boolean;
+        }
 
         interface State {
             tools: readonly BtnType[];
             selectedToolId: string;
             selectedTimeRange: string;
+            statisticsTypes: readonly STATISTICS_TYPE[];
             statItems: readonly {type: string; label: string; name: string}[];
             selectedStat: STATISTICS_TYPE;
+            metricsLoading: boolean;
             metrics: MetricResp[];
+            chartMetrics: ChartMetric[];
             availableResources: MonitoringResourceType[];
-            loading: boolean;
             noData: boolean;
-            chartDatasets: {
-                [metricKey: string]: {
-                    labels: string[];
-                    dataset: {[resourceKey: string]: number[]};
-                };
-            };
+            currentLoadIdx: number;
             metricListApi: MetricList;
-            metricDataApi: GetMetricData;
+            chartMetricApi: GetMetricData;
         }
 
         const state: UnwrapRef<State> = reactive({
@@ -151,29 +153,99 @@ export default defineComponent({
             }))),
             selectedToolId: props.dataTools[0]?.id,
             selectedTimeRange: '1w',
-            statItems: computed(() => props.statisticsTypes.map(d => ({
+            statisticsTypes: computed(() => {
+                const tool = _.find(
+                    props.dataTools,
+                    { id: state.selectedToolId },
+                );
+                return tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
+            }),
+            statItems: computed(() => state.statisticsTypes.map(d => ({
                 type: 'item', label: _.capitalize(d), name: d,
             }))),
-            selectedStat: props.statisticsTypes[0],
+            selectedStat: STATISTICS_TYPE.average,
+            metricsLoading: true,
             metrics: [],
+            chartMetrics: [],
             availableResources: [],
-            loading: true,
             noData: false,
-            chartDatasets: {},
+            currentLoadIdx: 0,
             metricListApi: computed(() => fluentApi.monitoring().metric().list()
                 .setResourceType(props.resourceType)
                 .setId(state.selectedToolId)
                 .setResources(...props.resources.map(d => d.id))),
-            metricDataApi: computed(() => fluentApi.monitoring().metric().getData()
+            chartMetricApi: computed(() => fluentApi.monitoring().metric().getData()
                 .setId(state.selectedToolId)
                 .setResourceType(props.resourceType)
-                .setResources(...props.resources.map(d => d.id))
-                .setStat(state.selectedStat))
-            ,
+                .setStat(state.selectedStat)),
         });
 
-        const setAvailableResources = (data) => {
+        const listMetrics = async (): Promise<MetricListResp> => {
+            console.debug('execute list metric info');
+            state.metricsLoading = true;
+            try {
+                const res = await state.metricListApi.execute();
+                return res.data;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.metricsLoading = false;
+            }
+            return {
+                metrics: [],
+                // eslint-disable-next-line camelcase
+                available_resources: {},
+            };
+        };
+
+        const getStartTimestamp = (end: Moment): TimeStamp => {
+            const units = state.selectedTimeRange.match(/[^0-9]/g) || [];
+            return getTimestamp(end.subtract(
+                _.parseInt(state.selectedTimeRange),
+                    units[0] as 'w'|'d'|'h',
+            ));
+        };
+
+
+        const getChartMetric = async (api: GetMetricData, chart: ChartMetric): Promise<void> => {
+            chart.loading = true;
+            try {
+                const res = await api.setMetricKey(chart.metric.key).execute();
+                chart.labels = res.data.labels;
+                chart.dataset = res.data.resource_values;
+                chart.error = false;
+            } catch (e) {
+                console.error(e);
+                chart.error = true;
+            } finally {
+                chart.loading = false;
+            }
+        };
+
+        const getChartMetricApi = (): GetMetricData => {
+            const now = moment();
+            return state.chartMetricApi.setEnd(getTimestamp(now))
+                .setStart(getStartTimestamp(now))
+                .setResources(...state.availableResources.map(d => d.id));
+        };
+
+        const listChartMetrics = _.debounce(async (): Promise<void> => {
+            if (state.availableResources.length === 0) return;
+            console.debug('execute list chartMetrics');
+            try {
+                const api = getChartMetricApi();
+                await Promise.all(state.chartMetrics.map(c => getChartMetric(
+                    api.clone(),
+                    c,
+                )));
+            } catch (e) {
+                console.error(e);
+            }
+        }, 300);
+
+        const setAvailableResources = (data): void => {
             let count = 0;
+            state.availableResources = [];
             _.some(data, (v, k) => {
                 if (v) {
                     const resource = _.find(props.resources, { id: k });
@@ -184,71 +256,66 @@ export default defineComponent({
             });
         };
 
-        const listMetricInfo = async () => {
-            state.loading = true;
+        const initChartMetrics = (): void => {
+            state.chartMetrics = _.map(state.metrics, m => ({
+                dataset: {},
+                labels: [],
+                loading: true,
+                metric: m,
+            }));
+        };
+
+        const reset = (): void => {
+            state.metricsLoading = true;
+            state.chartMetrics = [];
             state.metrics = [];
             state.availableResources = [];
-            state.chartDatasets = {};
-            try {
-                const res = await state.metricListApi.execute();
-                state.metrics = res.data.metrics;
-                setAvailableResources(res.data.available_resources);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
+            state.currentLoadIdx = 0;
         };
 
-        const getStartTimestamp = (end: Moment) => {
-            const units = state.selectedTimeRange.match(/[^0-9]/g) || [];
-            return getTimestamp(end.subtract(
-                _.parseInt(state.selectedTimeRange),
-                    units[0] as 'w'|'d'|'h',
-            ));
-        };
+        const listAll = _.debounce(async (): Promise<void> => {
+            console.debug('execute list chartMetrics');
+            reset();
+
+            const metricInfo = await listMetrics();
+            state.metrics = metricInfo.metrics;
+
+            initChartMetrics();
+            setAvailableResources(metricInfo.available_resources);
+
+            await listChartMetrics();
+        }, 300);
 
 
-        const getMetricData = async (api: GetMetricData, metric: MetricResp) => {
-            try {
-                const res = await api.setMetricKey(metric.key).execute();
-                state.chartDatasets[metric.key] = {
-                    labels: res.data.labels,
-                    dataset: res.data.resource_values,
-                };
-            } catch (e) {
-                console.error(e);
-            }
-        };
+        onMounted(() => {
+            watch(() => state.statisticsTypes, (types) => {
+                if (types) state.selectedStat = types[0] || STATISTICS_TYPE.average;
+            });
 
-        const listMetrics = async () => {
-            const now = moment();
-            const api = state.metricDataApi.setEnd(getTimestamp(now))
-                .setStart(getStartTimestamp(now));
-            try {
-                await listMetricInfo();
-                await Promise.all(state.metrics.map((m, i) => getMetricData(
-                    api.clone(),
-                    m,
-                )));
-                state.chartDatasets = { ...state.chartDatasets };
-            } catch (e) {
-                console.error(e);
-            }
-        };
+            watch([() => props.resources, () => state.selectedToolId], (resources, toolId) => {
+                if (resources.length > 0 && toolId) listAll();
+                else state.noData = true;
+            }, {
+                lazy: true,
+            });
 
-        watch(() => props.dataTools, (tools, old) => {
-            if (tools.length > 0) listMetrics();
-            else state.noData = true;
+            watch([() => state.selectedTimeRange, () => state.selectedStat], (timeRange, stat) => {
+                if (timeRange && stat) listChartMetrics();
+            }, {
+                lazy: true,
+            });
+
+            listAll();
         });
 
         return {
             ...toRefs(state),
             colors,
             timeRanges,
-            legendFormatter(resource) {
+            legendFormatter(resource): string {
                 return resource.name ? `${resource.id}(${resource.name})` : resource.id;
             },
+            listChartMetrics,
         };
     },
 });

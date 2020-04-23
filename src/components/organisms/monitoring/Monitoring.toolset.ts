@@ -25,10 +25,10 @@ export const monitoringProps = {
             return dataTools.every(d => d.id && d.name);
         },
     },
-    statisticsTypes: {
-        type: Array,
-        default: () => [],
-    },
+    // statisticsTypes: {
+    //     type: Array,
+    //     default: () => [],
+    // },
     viewType: {
         type: Object,
         default: () => ({}),
@@ -50,13 +50,14 @@ export interface MonitoringResourceType {
 export interface DataToolType {
     id: string;
     name: string;
+    statisticsTypes: STATISTICS_TYPE[];
 }
 
 export interface MonitoringProps {
     resourceType: string;
     resources: MonitoringResourceType[];
     dataTools: DataToolType[];
-    statisticsTypes: STATISTICS_TYPE[];
+    // statisticsTypes: STATISTICS_TYPE[];
     // apiHandler: MetricList;
 }
 
@@ -69,7 +70,7 @@ export class MonitoringState<D, S extends MonitoringProps = MonitoringProps> {
             resourceType: '',
             resources: [],
             dataTools: [],
-            statisticsTypes: [],
+            // statisticsTypes: [],
             // apiHandler: fluentApi.monitoring().metric().list(),
         };
     }
@@ -98,6 +99,7 @@ export class MonitoringToolSet<D> extends MonitoringState<D> {
                 return {
                     id: d.data_source_id,
                     name: d.name,
+                    statisticsTypes: d.plugin_info.options.supported_stat || [STATISTICS_TYPE.average],
                 };
             }
             return undefined;
@@ -105,11 +107,11 @@ export class MonitoringToolSet<D> extends MonitoringState<D> {
             .value();
     }
 
-    setStatisticsTypes(data: DataSourceResp[]): void {
-        this.state.statisticsTypes = _.reduce(data,
-            (stats, d) => [...stats, ...(d.plugin_info.options.supported_stat || [])],
-            [] as STATISTICS_TYPE[]);
-    }
+    // setStatisticsTypes(data: DataSourceResp[]): void {
+    //     this.state.statisticsTypes = _.reduce(data,
+    //         (stats, d) => [...stats, ...(d.plugin_info.options.supported_stat || [])],
+    //         [] as STATISTICS_TYPE[]);
+    // }
 
     setResources(resourceData: any) {
         this.state.resources = resourceData.map(d => ({

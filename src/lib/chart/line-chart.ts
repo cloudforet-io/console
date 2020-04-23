@@ -105,6 +105,7 @@ export class SLineChart extends SChart implements SLineChartInterface {
              ...this.metaDatasets,
              ...lineChartSettings.metaDatasets,
              backgroundColor: this.getBackgroundColor,
+             borderColor: this.getBorderColor,
          };
      }
 
@@ -144,8 +145,8 @@ export class SLineChart extends SChart implements SLineChartInterface {
          return this;
      }
 
-     protected getBackgroundColor: Scriptable<ChartColor> = ({ dataIndex }): ChartColor => {
-         const color = this.colors[dataIndex || 0];
+     protected getBackgroundColor: Scriptable<ChartColor> = ({ datasetIndex }): ChartColor => {
+         const color = this.colors[datasetIndex || 0];
          if (!this.gradientHeight) return color;
          const gradient = this.ctx?.createLinearGradient(0, 0, 0, this.gradientHeight);
          gradient?.addColorStop(0, Color(color).alpha(0.25).toString());
@@ -153,4 +154,7 @@ export class SLineChart extends SChart implements SLineChartInterface {
          gradient?.addColorStop(1, Color(color).alpha(0).toString());
          return gradient || color;
      }
+
+    protected getBorderColor: Scriptable<ChartColor> =
+        ({ datasetIndex }): ChartColor => this.colors[datasetIndex || 0]
 }

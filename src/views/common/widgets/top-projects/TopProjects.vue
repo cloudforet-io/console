@@ -245,6 +245,7 @@ export default defineComponent({
 }
 .chart {
     height: 180px;
+    width: 100%;
 }
 .color {
     display: inline-block;
