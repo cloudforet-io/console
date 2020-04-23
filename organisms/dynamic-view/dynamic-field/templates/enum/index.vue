@@ -7,10 +7,9 @@ export default {
     functional: true,
     components: { PDynamicField },
     props: {
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
+        options: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
             type: [String, Object, Array, Boolean, Number],
@@ -19,7 +18,7 @@ export default {
     },
     render(h, { props }) {
         // eslint-disable-next-line camelcase
-        const option = _.get(props.view_option, [props.data], { view_type: 'text' });
+        const option = _.get(props.options, [props.data], { view_type: 'text' });
         return h(PDynamicField, { props: { ...option, data: props.data } });
     },
 };
