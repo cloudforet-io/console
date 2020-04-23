@@ -89,6 +89,13 @@
                     :data_source="historyAPIHandler.dataSource"
                 />
             </template>
+            <template #monitoring>
+                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
+                              :data-tools="metricAPIHandler.ts.state.dataTools"
+                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
+                              :resources="metricAPIHandler.ts.state.resources"
+                />
+            </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
               :tabs="multiItemTab.state.tabs"
@@ -109,6 +116,13 @@
                     view_type="table"
                     :api-handler="adminApiHandler"
                     :data_source="adminApiHandler.dataSource"
+                />
+            </template>
+            <template #monitoring>
+                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
+                              :data-tools="metricAPIHandler.ts.state.dataTools"
+                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
+                              :resources="metricAPIHandler.ts.state.resources"
                 />
             </template>
         </PTab>
@@ -159,6 +173,8 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
+import { MetricAPI } from '@/lib/api/monitoring';
 
 export default {
     name: 'CloudServicePage',
@@ -182,6 +198,7 @@ export default {
         SProjectTreeModal,
         SCollectModal,
         PPanelTop,
+        SMonitoring,
     },
     props: {
         provider: {
@@ -225,6 +242,7 @@ export default {
                 ['rawData', 'TAB.RAW_DATA'],
                 ['admin', 'TAB.ADMIN'],
                 ['history', 'TAB.HISTORY'],
+                ['monitoring', 'TAB.MONITORING'],
             ]),
         });
         singleItemTab.syncState.activeTab = 'detail';
@@ -233,6 +251,7 @@ export default {
             tabs: makeTrItems([
                 ['data', 'TAB.DATA'],
                 ['admin', 'TAB.ADMIN'],
+                ['monitoring', 'TAB.MONITORING'],
             ]),
         });
         multiItemTab.syncState.activeTab = 'data';
@@ -375,6 +394,11 @@ export default {
         // @ts-ignore
         const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
 
+        const metricAPIHandler = new MetricAPI(
+            'inventory.CloudService',
+            'cloud_service_id',
+            apiHandler,
+        );
 
         return {
             ...toRefs(state),
@@ -391,6 +415,7 @@ export default {
             multiItemTab,
             adminApiHandler,
             historyAPIHandler,
+            metricAPIHandler,
         };
     },
 };
