@@ -1,27 +1,12 @@
-import { Resource, ResourceActions } from '@/lib/fluent-api/toolset';
-import {
-    DiffQueryAPI,
-    HistoryQueryAPI, HistoryResponse,
-} from '@/lib/fluent-api/statistics/toolset_origin';
+import { ListAction, Resource, ResourceActions } from '@/lib/fluent-api/toolset';
+import { HistoryListParam, HistoryListResp } from '@/lib/fluent-api/statistics/type';
+import { ListType } from '@/lib/fluent-api/type';
 
-
-// example query
-/*
- */
-
-class Query<value> extends HistoryQueryAPI<any, HistoryResponse<value>> {
-    path = 'query'
+class List extends ListAction<HistoryListParam, ListType<HistoryListResp>> {
 }
 
-class Diff<value> extends DiffQueryAPI<any, HistoryResponse<value>> {
-    path = 'diff'
-}
-
-
-export default class History extends Resource implements ResourceActions<'query'|'diff'> {
+export default class History extends Resource implements ResourceActions<'list'> {
     name = 'history'
 
-    query<value>(): Query<value> { return new Query(this.api, this.baseUrl); }
-
-    diff<value>(): Diff<value> { return new Diff(this.api, this.baseUrl); }
+    list(): List { return new List(this.api, this.baseUrl); }
 }

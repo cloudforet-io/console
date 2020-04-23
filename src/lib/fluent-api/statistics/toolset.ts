@@ -1,54 +1,14 @@
 /* eslint-disable camelcase */
-import {
-    BaseQueryState,
-    FilterItem,
-} from '@/lib/fluent-api/type';
-import { ApiType, BaseQueryAPI } from '@/lib/fluent-api/toolset';
+import { BaseQueryAPI } from '@/lib/fluent-api/toolset';
 import { isNotEmpty } from '@/lib/util';
+import {
+    Aggregate, Group, GroupFieldsItem, GroupKeyItem, GroupKeys, STAT_OPERATORS, StatQueryState, UnwindItem,
+} from '@/lib/fluent-api/statistics/type';
+import { ApiType } from '@/lib/fluent-api/type';
 
-export interface StatResponse<value> {
-    service_type: string;
-    values: value[];
-}
 
-export enum OPERATORS {
-    value = 'VALUE',
-    count = 'COUNT',
-    sum = 'SUM',
-    average = 'AVERAGE',
-    min = 'MIN',
-    max = 'MAX'
-}
-
-export interface KeyType {
-    key: string;
-    name: string;
-}
-
-export interface FieldType {
-    key?: string;
-    name: string;
-    operator: string;
-}
-
-export interface AggregateType {
-    group: {
-        keys: KeyType[];
-        fields: FieldType[];
-    };
-}
-export interface StatisticsQueryState<param> extends BaseQueryState<param> {
-    aggregate: AggregateType[];
-    sort?: object;
-    limit?: number;
-}
-
-// export type StatQueryState = StatisticsQueryState<any> {
-//
-// }
-
-export abstract class StatisticsQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
-    protected apiState: StatisticsQueryState<parameter> ;
+export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
+    protected apiState: StatQueryState<parameter> ;
 
     constructor(
         api: ApiType,
@@ -58,24 +18,26 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends BaseQueryAPI<p
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            aggregate: {},
+            aggregate: {
+                group: {
+                    keys: [],
+                },
+            },
             filter: [],
             filterOr: [],
             fixFilter: [],
-            sort: {},
-            limit: undefined,
             extraParameter: {},
             ...initState,
         };
     }
 
-    protected query = (): StatisticsQueryState<parameter> => this.getStatisticsQuery<StatisticsQueryState<parameter>>({} as StatisticsQueryState<parameter>);
+    protected query = (): StatQueryState<parameter> => this.getStatisticsQuery<StatQueryState<parameter>>({} as StatQueryState<parameter>);
 
-    protected getStatisticsQuery<Q extends StatisticsQueryState<parameter>>(query: Q): Q {
-        if (isNotEmpty(this.apiState.aggregate)) query.aggregate = this.apiState.aggregate;
+    protected getStatisticsQuery<Q extends StatQueryState<parameter>>(query: Q): Q {
+        query.aggregate = this.apiState.aggregate;
         if (isNotEmpty(this.apiState.sort)) query.sort = this.apiState.sort;
         if (isNotEmpty(this.apiState.limit)) query.limit = this.apiState.limit;
-        return this.getBaseQuery<StatisticsQueryState<parameter>>(query) as Q;
+        return this.getBaseQuery<StatQueryState<parameter>>(query) as Q;
     }
 
     getParameter = (): any => ({
@@ -83,58 +45,64 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends BaseQueryAPI<p
         ...this.apiState.extraParameter,
     });
 
-    setAggregate(...args: AggregateType[]): this {
-        this.apiState.aggregate = args;
-        return this.clone();
+    setAggregate(aggregate: Aggregate): this {
+        const api = this.clone();
+        api.apiState.aggregate = aggregate;
+        return api;
     }
 
-    setFilter(...args: FilterItem[]): this {
-        this.apiState.filter = args;
-        return this.clone();
+    setGroup(group: Group): this {
+        const api = this.clone();
+        api.apiState.aggregate.group = group;
+        return api;
     }
 
-    setFilterOr(...args: FilterItem[]): this {
-        this.apiState.filterOr = args;
-        return this.clone();
+    setGroupKeys(...args: GroupKeys): this {
+        const api = this.clone();
+        api.apiState.aggregate.group.keys = args;
+        return api;
     }
 
-    setSort(key: string, desc = true): this {
-        this.apiState.sort = { key, desc };
-        return this.clone();
+    addGroupKey(key: string, name: string): this {
+        const api = this.clone();
+        api.apiState.aggregate.group.keys.push({ key, name });
+        return api;
+    }
+
+    setGroupFields(...args: GroupFieldsItem[]): this {
+        const api = this.clone();
+        api.apiState.aggregate.group.fields = args;
+        return api;
+    }
+
+    addGroupField(name: string, operator: STAT_OPERATORS, key?: string): this {
+        const api = this.clone();
+        const item: GroupFieldsItem = { name, operator };
+        if (!api.apiState.aggregate.group.fields) api.apiState.aggregate.group.fields = [];
+        if (key) item.key = key;
+        api.apiState.aggregate.group.fields.push(item);
+        return api;
+    }
+
+    setUnwind(...args: UnwindItem[]): this {
+        const api = this.clone();
+        api.apiState.aggregate.unwind = args;
+        return api;
+    }
+
+    setSort(name: string, desc = true): this {
+        const api = this.clone();
+        api.apiState.sort = { name, desc };
+        return api;
     }
 
     setLimit(limit: number): this {
-        this.apiState.limit = limit;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.limit = limit;
+        return api;
     }
 }
 
-// export abstract class StatQueryAPI<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
-//     protected apiState: StatQueryState<parameter> ;
-//
-//     constructor(
-//         api: ApiType,
-//         baseUrl: string,
-//         initState: StatQueryState<parameter> = {} as StatQueryState<parameter>,
-//         transformer: null|((any) => any) = null,
-//     ) {
-//         super(api, baseUrl, undefined, transformer);
-//         this.apiState = {
-//             filter: [],
-//             filterOr: [],
-//             fixFilter: [],
-//             sort: {},
-//             limit: undefined,
-//             extraParameter: {},
-//             ...initState,
-//         };
-//     }
-//
-//     protected query = (): StatQueryState<any> => {
-//         const query: StatQueryState<any> = {
-//             resource_type: this.apiState.resource_type,
-//         } as StatQueryState<any>;
-//         if (this.apiState.join) query.join = this.apiState.join;
-//         return this.getStatisticsQuery<StatQueryState<any>>(query);
-//     }
-// }
+export abstract class StatAction<parameter, resp> extends StatQueryAPI<parameter, resp> {
+    protected path = 'stat';
+}
