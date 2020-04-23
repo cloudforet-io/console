@@ -19,33 +19,20 @@ export abstract class MetricAction<param extends MetricParameter, resp> extends 
     }
 
     setResourceType(type: string): this {
-        this.apiState.parameter.resource_type = type;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.resource_type = type;
+        return api;
     }
 
     setResources(...args: string[]): this {
-        this.apiState.parameter.resources = args;
-        return this.clone();
+        const api = this.clone();
+        if (args.length > 0) api.apiState.parameter.resources = args;
+        return api;
     }
 }
 
 export class MetricList extends MetricAction<MetricParameter, MetricListResp> {
     path = 'list';
-
-    setId(id: string): this {
-        this.apiState.parameter.data_source_id = id;
-        return this.clone();
-    }
-
-    setResourceType(type: string): this {
-        this.apiState.parameter.resource_type = type;
-        return this.clone();
-    }
-
-    setResources(...args: string[]): this {
-        this.apiState.parameter.resources = args;
-        return this.clone();
-    }
 }
 
 
@@ -59,23 +46,27 @@ export class GetMetricData extends MetricAction<MetricDataParameter, MetricDataR
     }
 
     setStart(start: TimeStamp): this {
-        this.apiState.parameter.start = start;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.start = start;
+        return api;
     }
 
     setEnd(end: TimeStamp): this {
-        this.apiState.parameter.end = end;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.end = end;
+        return api;
     }
 
     setPeriod(period: number): this {
-        this.apiState.parameter.period = period;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.period = period;
+        return api;
     }
 
     setStat(stat: STATISTICS_TYPE): this {
-        this.apiState.parameter.stat = stat;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.stat = stat;
+        return api;
     }
 }
 
