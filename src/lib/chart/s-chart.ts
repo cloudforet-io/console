@@ -16,7 +16,7 @@ export interface SChartInterface extends Chart {
     metaDatasets: ChartDataSets;
     colors: string[];
     addData: (...args) => SChartInterface;
-    updateData: (...args) => SChartInterface;
+    upsertData: (...args) => SChartInterface;
     setDatasets: (...args) => SChartInterface;
     setOptions: (...args) => SChartInterface;
     setPlugins: (...args) => SChartInterface;
@@ -87,13 +87,14 @@ export abstract class SChart extends Chart implements SChartInterface {
         return this;
     }
 
-    updateData(data: Array<number | null | undefined> | ChartPoint[], label: string, render = false): this {
+    upsertData(data: Array<number | null | undefined> | ChartPoint[], label: string, render = false): this {
         const exist = this.data.datasets?.some((ds) => {
             if (ds.label === label) {
                 ds.data = data;
             }
             return ds.label === label;
         });
+        if (!exist) this.addData(data, label);
         if (render) this.update();
         return this;
     }
