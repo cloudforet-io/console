@@ -113,7 +113,8 @@ const itemLayout = {
                     type: 'state',
                     options: {
                         icon: {
-                            color: 'green',
+                            image: 'fab fa-500px',
+                            color: 'green.400',
                         },
                     },
                 },
@@ -130,6 +131,37 @@ const itemLayout = {
     },
 };
 
+
+const simpleTableLayout = {
+    name: 'Simple Table Layout!',
+    type: 'simple-table',
+    options: {
+        root_path: 'data.security_group_rules',
+        fields: [
+            {
+                name: 'Name',
+                key: 'security_group_name',
+            },
+            {
+                name: 'Port Max',
+                key: 'port_range_max',
+            },
+            {
+                name: 'Port Min',
+                key: 'port_range_min',
+            },
+            {
+                name: 'Port',
+                key: 'port',
+            },
+            {
+                name: 'Protocol',
+                key: 'port',
+            },
+        ],
+    },
+};
+
 export const apiMode = () => ({
     components: { SDynamicSubData, PButton },
     template: `
@@ -139,12 +171,10 @@ export const apiMode = () => ({
         </div>`,
     setup() {
         const isShow = ref(true);
-        const layouts = [defaultLayout, changeLayout, itemLayout];
+        const layouts = [defaultLayout, changeLayout, itemLayout, simpleTableLayout];
         const selectId = ref(casual.make_id('server'));
         const changeSetId = () => {
-            console.log('before', selectId.value);
             selectId.value = casual.make_id('server');
-            console.log('after', selectId.value);
         };
 
         return {

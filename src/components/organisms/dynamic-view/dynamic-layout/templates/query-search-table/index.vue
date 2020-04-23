@@ -1,5 +1,6 @@
 <template>
     <p-toolbox-table
+        v-if="!isLoading"
         v-bind="apiHandler.tableTS.state"
         :fields="fields"
         :all-page="apiHandler.tableTS.state.allPage"
