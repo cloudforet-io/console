@@ -26,11 +26,12 @@ interface BaseOptions {
     fields?: DynamicFieldType[];
 }
 
-export type GetAction<action=ActionAPI>=(action: action) => action;
+export type GetAction<action extends ActionAPI = ActionAPI> = (action: action) => action;
 
-export interface DynamicLayoutApiProp{
+export interface DynamicLayoutApiProp<T=ActionAPI>{
     resource: Resource&ResourceActions<'get'|'list'|'getData'>;
-    getAction?: GetAction;
+    // @ts-ignore
+    getAction?: GetAction<T>;
 }
 
 
@@ -42,18 +43,19 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     toolset?: DynamicFluentAPIToolSet;
     data: any;
     isShow: boolean;
+    isLoading: boolean;
 }
 interface Field {
     name: string;
     label: string;
 }
 
-export const makeFields = (props: DynamicLayoutProps) => computed((): Field[] => (props.options.fields as DynamicFieldType[]).map((ds: DynamicFieldType): Field => ({
+export const makeFields = (props: DynamicLayoutProps|any) => computed((): Field[] => (props.options.fields as DynamicFieldType[]).map((ds: DynamicFieldType): Field => ({
     name: ds.key,
     label: ds.name,
 })));
 
-export const makeTableSlots = (props: DynamicLayoutProps) => computed((): DynamicFieldType[] => (props.options.fields as DynamicFieldType[]).map(ds => ({
+export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicFieldType[] => (props.options.fields as DynamicFieldType[]).map(ds => ({
     ...ds,
     name: `col-${ds.key}-format`,
 })));
@@ -70,11 +72,5 @@ export const makeDefs = (fields: ComputedOrRef<DynamicFieldType[]>, data: Comput
     }
     return [];
 });
-// export const trackApiProps = (props: DynamicLayoutProps, handler: DynamicFluentAPIToolSet) => {
-//     const watcher = watch(() => props.api, (after, before) => {
-//         if (after && after.resource !== before?.resource) {
-//             handler.action = props.api;
-//         }
-//     });
-//     return watcher;
-// };
+
+export const checkCanGetData = (props: DynamicLayoutProps) => props.isShow && !props.isLoading;

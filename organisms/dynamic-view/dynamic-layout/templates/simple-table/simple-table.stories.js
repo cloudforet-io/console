@@ -1,13 +1,13 @@
 /* eslint-disable camelcase */
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayoutSimpleTable from '@/components/organisms/dynamic-view/dynamic-layout/templates/simple-table/index.vue';
+
 import { object } from '@storybook/addon-knobs';
-import { mockFluentApi } from '@sb/mockApi';
-import { ref } from '@vue/composition-api';
 import md from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.md';
 
 export default {
-    title: 'organisms/dynamic-view/dynamic-layout/table',
-    component: SDynamicLayout,
+    title: 'organisms/dynamic-view/dynamic-layout/simple-table',
+    component: SDynamicLayoutSimpleTable,
     parameters: {
         notes: md,
     },
@@ -59,6 +59,9 @@ const data = {
                 port_range_min: 80,
                 port_range_max: 80,
                 port: '80',
+                nested: {
+                    child: 'test nested',
+                },
                 security_group_name: 'web security group',
                 security_group_id: '...',
                 remote_cidr: '172.16.0.0/16',
@@ -70,6 +73,9 @@ const data = {
                 port_range_min: 80,
                 port_range_max: 80,
                 port: '80',
+                nested: {
+                    child: 'test nested',
+                },
                 security_group_name: 'web security group-2',
                 security_group_id: '...',
                 remote_cidr: '172.16.0.0/16',
@@ -81,6 +87,9 @@ const data = {
                 port_range_min: 80,
                 port_range_max: 80,
                 port: '80',
+                nested: {
+                    child: 'test nested',
+                },
                 security_group_name: 'web security group-3',
                 security_group_id: '...',
                 remote_cidr: '172.16.0.0/16',
@@ -98,7 +107,7 @@ const data = {
 
 const defaultLayout = {
     name: 'Security Group Rules',
-    type: 'table',
+    type: 'simple-table',
     options: {
         root_path: 'data.security_group_rules',
         fields: [
@@ -113,6 +122,10 @@ const defaultLayout = {
             {
                 name: 'Port Min',
                 key: 'port_range_min',
+            },
+            {
+                name: 'nested',
+                key: 'nested.child',
             },
             {
                 name: 'Port',
@@ -150,18 +163,19 @@ const defaultLayout = {
     },
 };
 
-export const apiMode = () => ({
+export const defaultCase = () => ({
     components: { SDynamicLayout },
-    template: '<div  class="w-screen bg-white"><SDynamicLayout v-bind="layout" :api="api" :is-show="isShow" /></div>',
-    setup() {
-        const isShow = ref(true);
-        return {
-            layout: defaultLayout,
-            api: {
-                resource: mockFluentApi.inventory().server(),
-            },
-            isShow,
-        };
+    template: '<div  class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    props: {
+        layout: {
+            type: Object,
+            default: object('layout', defaultLayout, 'layout'),
+        },
+        data: {
+            type: Object,
+            default: object('data', data, 'data'),
+        },
+
     },
 
 });
