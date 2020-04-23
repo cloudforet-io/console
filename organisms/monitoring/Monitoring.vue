@@ -49,8 +49,8 @@
             <div v-if="metricsLoading">
                 <p-lottie name="spinner" auto />
             </div>
-            <div v-else-if="noData">
-                No data
+            <div v-else-if="metrics.length === 0" class="text-center text-gray">
+                No Metrics
             </div>
             <template v-else>
                 <p-grid-layout :items="chartMetrics" row-gap="3rem" column-gap="1rem"
@@ -70,6 +70,12 @@
                         />
                     </template>
                 </p-grid-layout>
+                <p-button v-if="chartMetrics.length !== metrics.length"
+                          outline style-type="black" class="more-btn"
+                          @click="loadChartMetrics"
+                >
+                    MORE
+                </p-button>
             </template>
         </section>
     </div>
@@ -101,10 +107,12 @@ import { getTimestamp } from '@/lib/util';
 import PMetricChart from '@/components/organisms/charts/metric-chart/MetricChart.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 export default defineComponent({
     name: 'SMonitoring',
     components: {
+        PButton,
         PLottie,
         PGridLayout,
         PSelectDropdown,
@@ -114,8 +122,6 @@ export default defineComponent({
     },
     props: monitoringProps,
     setup(props: MonitoringProps) {
-        console.debug('resources: ', props.resources);
-
         const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
         const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
         const LOAD_LIMIT = 12;
@@ -140,7 +146,6 @@ export default defineComponent({
             chartMetrics: ChartMetric[];
             availableResources: MonitoringResourceType[];
             noData: boolean;
-            currentLoadIdx: number;
             metricListApi: MetricList;
             chartMetricApi: GetMetricData;
         }
@@ -152,7 +157,7 @@ export default defineComponent({
                 vbind: { styleType: 'black', outline: state.selectedToolId !== d.id },
             }))),
             selectedToolId: props.dataTools[0]?.id,
-            selectedTimeRange: '1w',
+            selectedTimeRange: '1h',
             statisticsTypes: computed(() => {
                 const tool = _.find(
                     props.dataTools,
@@ -169,7 +174,6 @@ export default defineComponent({
             chartMetrics: [],
             availableResources: [],
             noData: false,
-            currentLoadIdx: 0,
             metricListApi: computed(() => fluentApi.monitoring().metric().list()
                 .setResourceType(props.resourceType)
                 .setId(state.selectedToolId)
@@ -229,15 +233,19 @@ export default defineComponent({
                 .setResources(...state.availableResources.map(d => d.id));
         };
 
-        const listChartMetrics = _.debounce(async (): Promise<void> => {
+        const listChartMetrics = _.debounce(async (start = 0): Promise<void> => {
             if (state.availableResources.length === 0) return;
-            console.debug('execute list chartMetrics');
+            console.debug('execute list chartMetrics from', start, 'to', state.chartMetrics.length - 1);
             try {
                 const api = getChartMetricApi();
-                await Promise.all(state.chartMetrics.map(c => getChartMetric(
-                    api.clone(),
-                    c,
-                )));
+
+                await Promise.all(
+                    _.range(start, state.chartMetrics.length)
+                        .map(i => getChartMetric(
+                            api.clone(),
+                            state.chartMetrics[i],
+                        )),
+                );
             } catch (e) {
                 console.error(e);
             }
@@ -246,23 +254,29 @@ export default defineComponent({
         const setAvailableResources = (data): void => {
             let count = 0;
             state.availableResources = [];
-            _.some(data, (v, k) => {
-                if (v) {
-                    const resource = _.find(props.resources, { id: k });
-                    if (resource) state.availableResources.push(resource);
+            _.some(props.resources, (resource, i) => {
+                if (data[resource.id]) {
+                    state.availableResources.push(resource);
                     count++;
                 }
                 return count === 10;
             });
         };
 
-        const initChartMetrics = (): void => {
-            state.chartMetrics = _.map(state.metrics, m => ({
-                dataset: {},
-                labels: [],
-                loading: true,
-                metric: m,
-            }));
+        const initChartMetrics = (start = 0): void => {
+            let endIdx = start + LOAD_LIMIT;
+            if (endIdx > state.metrics.length) endIdx = state.metrics.length;
+
+            console.debug('init chart metrics from', start, 'to', endIdx - 1);
+            _.range(start, endIdx).forEach((current) => {
+                state.chartMetrics[current] = {
+                    dataset: {},
+                    labels: [],
+                    loading: true,
+                    metric: state.metrics[current],
+                };
+            });
+            state.chartMetrics = [...state.chartMetrics];
         };
 
         const reset = (): void => {
@@ -270,7 +284,12 @@ export default defineComponent({
             state.chartMetrics = [];
             state.metrics = [];
             state.availableResources = [];
-            state.currentLoadIdx = 0;
+        };
+
+        const loadChartMetrics = async () => {
+            const start = state.chartMetrics.length;
+            initChartMetrics(start);
+            await listChartMetrics(start);
         };
 
         const listAll = _.debounce(async (): Promise<void> => {
@@ -278,11 +297,12 @@ export default defineComponent({
             reset();
 
             const metricInfo = await listMetrics();
-            state.metrics = metricInfo.metrics;
+            state.metrics = _.sortBy(metricInfo.metrics, m => m.name);
 
-            initChartMetrics();
             setAvailableResources(metricInfo.available_resources);
 
+            if (state.metrics.length === 0) return;
+            initChartMetrics();
             await listChartMetrics();
         }, 300);
 
@@ -294,7 +314,6 @@ export default defineComponent({
 
             watch([() => props.resources, () => state.selectedToolId], (resources, toolId) => {
                 if (resources.length > 0 && toolId) listAll();
-                else state.noData = true;
             }, {
                 lazy: true,
             });
@@ -316,6 +335,7 @@ export default defineComponent({
                 return resource.name ? `${resource.id}(${resource.name})` : resource.id;
             },
             listChartMetrics,
+            loadChartMetrics,
         };
     },
 });
@@ -341,9 +361,15 @@ export default defineComponent({
             margin-right: 0;
             padding: 0 0.75rem;
             font-weight: normal;
+            font-size: 0.875rem;
             &.active {
                 @apply text-secondary font-bold;
             }
         }
+    }
+    .more-btn::v-deep {
+        @apply border-gray-300 mt-12 block mx-auto;
+        max-width: 38rem;
+        width: 40%;
     }
 </style>
