@@ -1,15 +1,7 @@
 <template>
     <p-toolbox-table
-        :items="apiHandler.tableTS.state.items"
+        v-bind="apiHandler.tableTS.state"
         :fields="fields"
-        :selectable="typeof apiHandler.tableTS.state.selectable === 'boolean'? apiHandler.tableTS.state.selectable : false"
-        :multi-select="typeof apiHandler.tableTS.state.multiSelect === 'boolean'? apiHandler.tableTS.state.multiSelect : false"
-        :sortable="typeof apiHandler.tableTS.state.sortable === 'boolean'? apiHandler.tableTS.state.sortable : true"
-        :hover="typeof apiHandler.tableTS.state.hover === 'boolean'? apiHandler.tableTS.state.hover : true"
-        :shadow="typeof apiHandler.tableTS.state.shadow === 'boolean'? apiHandler.tableTS.state.shadow : false"
-        :border="typeof apiHandler.tableTS.state.border === 'boolean'? apiHandler.tableTS.state.border : false"
-        :padding="typeof apiHandler.tableTS.state.padding === 'boolean'? apiHandler.tableTS.state.padding : false"
-        :excel-visible="typeof apiHandler.tableTS.state.excelVisible === 'boolean'? apiHandler.tableTS.state.excelVisible : true"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -17,7 +9,6 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
@@ -25,14 +16,23 @@
         @changePageNumber="getData"
         @clickRefresh="getData"
         @changeSort="getData"
+        @clickExcel="exportExcel"
     >
         <template #toolbox-top>
-            <slot name="toolbox-top" />
+            <slot v-if="showTitle||$scopedSlots['toolbox-top']" name="toolbox-top">
+                <PPanelTop v-if="showTitle"
+                           style="margin: 0px; margin-top: 0.5rem"
+                           :use-total-count="true"
+                           :total-count="apiHandler.totalCount.value"
+                >
+                    {{ name }}
+                </PPanelTop>
+            </slot>
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2">
-                <p-search :search-text="proxySearchText" @update:search-text="updateSearchText($event)" @onSearch="getData" />
+                <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
             </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
@@ -46,17 +46,20 @@
 import {
     computed, reactive, Ref, toRefs, watch,
 } from '@vue/composition-api';
-import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import { SearchTableAPI, SearchTableFluentAPI } from '@/lib/api/table';
 import {
-    DynamicFieldType, DynamicLayoutApiProp,
     DynamicLayoutProps,
-    makeFields, makeTableSlots, GetAction,
+    makeFields, makeTableSlots, GetAction, checkCanGetData,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import { ActionAPI, QueryAPI, GetDataAction } from '@/lib/fluent-api';
+import {
+    ActionAPI, QueryAPI, GetDataAction, fluentApi,
+} from '@/lib/fluent-api';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
+import _ from 'lodash';
 
 interface Field {
     name: string;
@@ -70,6 +73,7 @@ export default {
         PDynamicField,
         PToolboxTable,
         PSearch,
+        PPanelTop,
     },
     props: {
         name: {
@@ -92,21 +96,61 @@ export default {
             type: Boolean,
             default: true,
         },
+        showTitle: {
+            type: Boolean,
+            default: true,
+        },
+        isLoading: {
+            type: Boolean,
+            required: true,
+        },
     },
     setup(props: DynamicLayoutProps) {
-        let apiHandler: SearchTableFluentAPI = props.toolset as SearchTableFluentAPI || new SearchTableFluentAPI(null as unknown as QueryAPI<any, any>);
+        const defaultInitData = {
+            selectable: false,
+            excelVisible: true,
+            responsiveStyle: { height: '24rem', 'overflow-y': 'auto' },
+        };
+        let apiHandler: SearchTableFluentAPI = props.toolset as SearchTableFluentAPI
+            || new SearchTableFluentAPI(null as unknown as QueryAPI<any, any>, defaultInitData);
         const state = reactive({
             isToolsetMode: computed(() => !!props.toolset),
         });
-        console.log(state.isToolsetMode, 'toolset mode');
-        console.log(apiHandler, 'handler');
-        const getData = async () => {
-            if (apiHandler.action && props.isShow) {
-                await apiHandler.getData();
-                console.log(apiHandler.tableTS.state.items);
+        const exportAction = fluentApi.addons().excel().export();
+        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
+        exportToolSet.action = exportAction.setDataSource(props.options.fields || []);
+        const exportExcel = () => {
+            exportToolSet.getData();
+        };
+        const debounceGetData = _.debounce(apiHandler.getData, 200);
+        const getData = () => {
+            if (apiHandler.action && checkCanGetData(props)) {
+                debounceGetData();
             }
         };
+
+
         let apiWatchStop: any = null;
+        let optionsWatchStop: any = null;
+
+        const resetAction = async () => {
+            let action;
+            if (props.options.root_path) {
+                action = (props.api?.resource.getData() as GetDataAction<any, any>).setKeyPath(props.options.root_path);
+            } else {
+                action = props.api?.resource.list();
+            }
+
+            const getAction = props.api?.getAction;
+            if (getAction) {
+                action = getAction(action) as QueryAPI<any, any>;
+            }
+            // @ts-ignore
+            apiHandler.action = action;
+            exportToolSet.target = apiHandler;
+            await getData();
+        };
+
 
         watch(() => state.isToolsetMode, (after, before) => {
             if (after !== before) {
@@ -114,25 +158,24 @@ export default {
                     // @ts-ignore
                     apiWatchStop = watch(() => props.api, async (aft, bef) => {
                         if (aft && (aft.resource !== bef?.resource || aft.getAction !== bef?.getAction)) {
-                            let action;
-                            if (props.options.root_path) {
-                                action = (aft.resource.getData() as GetDataAction<any, any>).setKeyPath(props.options.root_path);
-                            } else {
-                                action = aft.resource.list();
-                            }
-
-                            const getAction = props.api?.getAction;
-                            if (getAction) {
-                                action = getAction(action) as QueryAPI<any, any>;
-                            }
-                            // @ts-ignore
-                            apiHandler.action = action;
-                            await getData();
+                            await resetAction();
                         }
                     });
-                } else if (apiWatchStop) {
-                    apiWatchStop();
-                    apiHandler = props.toolset as SearchTableFluentAPI;
+                    optionsWatchStop = watch(() => props.options, async (aft, bef) => {
+                        if (aft && aft !== bef) {
+                            exportToolSet.action = exportAction.setDataSource(aft.fields || []);
+                            await resetAction();
+                        }
+                    });
+                } else {
+                    if (apiWatchStop) {
+                        apiWatchStop();
+                        apiHandler = props.toolset as SearchTableFluentAPI;
+                        exportToolSet.target = apiHandler;
+                    }
+                    if (optionsWatchStop) {
+                        optionsWatchStop();
+                    }
                 }
             }
         });
@@ -145,23 +188,24 @@ export default {
 
         const fields = makeFields(props);
         const slots = makeTableSlots(props);
-        const proxySearchText = computed(() => apiHandler.tableTS.searchText.value);
-        const updateSearchText = (value) => {
-            try {
-                apiHandler.tableTS.searchText.value = value;
-            } catch (e) {
-                console.error(e);
-            }
-        };
+
+        const proxySearchText = computed({
+            get: () => apiHandler.tableTS.searchText.value,
+            set: (value) => {
+                if (value !== apiHandler.tableTS.searchText.value) {
+                    apiHandler.tableTS.searchText.value = value;
+                }
+            },
+        });
+
         return {
             ...toRefs(state),
             fields,
             slots,
             getData,
             proxySearchText,
-            updateSearchText,
             apiHandler,
-
+            exportExcel,
         };
     },
 };

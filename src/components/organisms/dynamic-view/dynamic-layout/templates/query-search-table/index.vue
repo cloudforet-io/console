@@ -1,69 +1,65 @@
 <template>
     <p-toolbox-table
-        :items="apiHandler.tableTS.state.items"
+        v-bind="apiHandler.tableTS.state"
         :fields="fields"
-        :selectable="typeof apiHandler.tableTS.state.selectable === 'boolean'? apiHandler.tableTS.state.selectable : true"
-        :sortable="typeof apiHandler.tableTS.state.sortable === 'boolean'? apiHandler.tableTS.state.sortable : true"
-        :hover="typeof apiHandler.tableTS.state.hover === 'boolean'? apiHandler.tableTS.state.hover : true"
-        :shadow="typeof apiHandler.tableTS.state.shadow === 'boolean'? apiHandler.tableTS.state.shadow : true"
-        :border="typeof apiHandler.tableTS.state.border === 'boolean'? apiHandler.tableTS.state.border : true"
-        :padding="typeof apiHandler.tableTS.state.padding === 'boolean'? apiHandler.tableTS.state.padding : true"
-        :dragable="typeof apiHandler.tableTS.state.dragable === 'boolean'? apiHandler.tableTS.state.dragable : true"
-        :multi-select="typeof apiHandler.tableTS.state.multiSelect === 'boolean'? apiHandler.tableTS.state.multiSelect : true"
-        :excel-visible="typeof apiHandler.tableTS.state.excelVisible === 'boolean'? apiHandler.tableTS.state.excelVisible : false"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
-        :this-page.sync="apiHandler.tableTS.syncState.thisPage"
-        :page-size.sync="apiHandler.tableTS.syncState.pageSize"
         :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
         :loading.sync="apiHandler.tableTS.syncState.loading"
-        :responsive-style="responsiveStyle"
+        :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+        :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
-        @changePageSize="apiHandler.getData"
-        @changePageNumber="apiHandler.getData"
-        @clickRefresh="apiHandler.getData"
-        @changeSort="apiHandler.getData"
+        @changePageSize="getData"
+        @changePageNumber="getData"
+        @clickRefresh="getData"
+        @changeSort="getData"
+        @clickExcel="exportExcel"
     >
+        >
         <template #toolbox-top>
-            <slot name="toolbox-top" />
+            <slot v-if="showTitle||$scopedSlots['toolbox-top']" name="toolbox-top">
+                <PPanelTop v-if="showTitle"
+                           style="margin: 0px; margin-top: 0.5rem"
+                           :use-total-count="true"
+                           :total-count="apiHandler.totalCount.value"
+                >
+                    {{ name }}
+                </PPanelTop>
+            </slot>
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item">
-                <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"
-                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
+                <p-query-search-bar
+                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
+                    @newQuery="newQuery"
                 />
             </div>
         </template>
-        <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" #toolbox-bottom>
+        <template v-if="tags.length !==0" #toolbox-bottom>
             <p-col :col="12">
                 <p-hr style="width: 100%;" />
                 <p-query-search-tags style="margin-top: .5rem;"
-                                     :tags="apiHandler.tableTS.querySearch.tags.value"
-                                     @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
-                                     @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
+                                     :tags="tags"
+                                     @deleteTag="deleteTag"
+                                     @deleteAllTags="deleteAllTags"
                 />
             </p-col>
         </template>
-        <template v-for="slot of slots" v-slot:[slot.name]="{item}">
-            <slot :name="slot.name" :item="item">
-                <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.options"
-                                 :data="getValue(item,slot.path)"
-                />
-            </slot>
+        <template v-for="slot of slots" v-slot:[slot.name]="{value}">
+            <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
         </template>
     </p-toolbox-table>
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    computed, Ref,
+    computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
@@ -71,33 +67,17 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import { QuerySearchTableAPI } from '@/lib/api/table';
-
-interface DataSourceType {
-    name: string;
-    key: string;
-    view_type?: string;
-    view_option?: any;
-}
-
-interface Props {
-    data_source: DataSourceType[];
-    data: any;
-    rootMode: boolean;
-    apiHandler: QuerySearchTableAPI;
-}
-
-interface SlotBind {
-    name: string;
-    view_type: string;
-    view_option: any;
-    path: string[];
-}
-
-interface Field {
-    name: string;
-    label: string;
-}
+import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import { fluentApi, QueryAPI } from '@/lib/fluent-api';
+import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
+import {
+    checkCanGetData,
+    DynamicLayoutProps,
+    makeFields,
+    makeTableSlots,
+} from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 
 
 export default {
@@ -109,6 +89,7 @@ export default {
         PCol,
         PHr,
         PQuerySearchTags,
+        PPanelTop,
     },
     props: {
         name: {
@@ -119,38 +100,155 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        data: {
-            type: [Object, Array],
-            default: () => ({}),
-        },
         api: {
             type: Object,
             default: null,
         },
-        responsiveStyle: {
+        toolset: {
             type: Object,
-            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
+            default: null,
         },
-        useTitle: {
+        isShow: {
+            type: Boolean,
+            default: true,
+        },
+        showTitle: {
             type: Boolean,
             default: true,
         },
     },
-    setup(props) {
-        const fields: Ref<Readonly<Field[]>> = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
-            name: ds.key,
-            label: ds.name,
-        })));
-        const slots: Ref<Readonly<SlotBind[]>> = computed((): SlotBind[] => props.data_source.map((ds: DataSourceType): SlotBind => ({
-            name: `col-${ds.key}-format`,
-            view_type: ds.view_type || 'text',
-            view_option: ds.view_option,
-            path: ds.key.split('.'),
-        })));
+    setup(props: DynamicLayoutProps) {
+        const defaultInitData = {
+            selectable: false,
+            excelVisible: true,
+            responsiveStyle: { height: '24rem', 'overflow-y': 'auto' },
+        };
+        const fields = makeFields(props);
+        const slots = makeTableSlots(props);
+
+        const getAction = () => {
+            let action = props.api?.resource.list() as QueryAPI<any, any>;
+            const getAct = props.api?.getAction;
+            if (getAct) {
+                action = getAct(action) as QueryAPI<any, any>;
+            }
+            return action as QueryAPI<any, any>;
+        };
+        const getKeys = () => fields.value.map(field => field.name);
+        const makeApiToolset = () => {
+            const keys = getKeys();
+            const acMeta = {
+                handlerClass: QuerySearchTableACHandler,
+                args: {
+                    keys,
+                    suggestKeys: keys,
+                },
+            };
+            return new QuerySearchTableFluentAPI(
+                getAction(),
+                defaultInitData,
+                undefined, acMeta,
+            );
+        };
+        let apiHandler = props.toolset as QuerySearchTableFluentAPI || makeApiToolset();
+        const state = reactive({
+            isToolsetMode: computed(() => !!props.toolset),
+        });
+        const exportAction = fluentApi.addons().excel().export();
+        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
+        exportToolSet.action = exportAction.setDataSource(props.options.fields || []);
+        const exportExcel = () => {
+            exportToolSet.getData();
+        };
+
+
+        const getData = async () => {
+            if (apiHandler.action && checkCanGetData(props)) {
+                await apiHandler.getData();
+            }
+        };
+        let apiWatchStop: any = null;
+        let optionsWatchStop: any = null;
+
+        const resetAction = async () => {
+            apiHandler.action = getAction();
+            exportToolSet.target = apiHandler;
+            await getData();
+        };
+
+        onMounted(() => {
+            watch(() => state.isToolsetMode, (after, before) => {
+                if (after !== before) {
+                    if (!after) {
+                        // @ts-ignore
+                        apiWatchStop = watch(() => props.api, async (aft, bef) => {
+                            if (aft && (aft.resource !== bef?.resource || aft.getAction !== bef?.getAction)) {
+                                await resetAction();
+                            }
+                        });
+                        optionsWatchStop = watch(() => props.options, async (aft, bef) => {
+                            if (aft && aft !== bef) {
+                                const keys = getKeys();
+                                apiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
+                                apiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
+                                exportToolSet.action = exportAction.setDataSource(aft.fields || []);
+                                await resetAction();
+                            }
+                        });
+                    } else {
+                        if (apiWatchStop) {
+                            apiWatchStop();
+                            apiHandler = props.toolset as QuerySearchTableFluentAPI;
+                            exportToolSet.target = apiHandler;
+                        }
+                        if (optionsWatchStop) {
+                            optionsWatchStop();
+                        }
+                    }
+                }
+            });
+            watch(() => props.isShow, async (aft, bef) => {
+                if (aft && aft !== bef) {
+                    await getData();
+                }
+            });
+        });
+
+
+        const proxySearchText = computed({
+            get: () => apiHandler.tableTS.querySearch.state.searchText,
+            set: (value) => {
+                if (value !== apiHandler.tableTS.querySearch.state.searchText) {
+                    apiHandler.tableTS.querySearch.state.searchText = value;
+                }
+            },
+        });
+
+        const newQuery = (event) => {
+            apiHandler.tableTS.querySearch.addTag(event);
+        };
+        const acHandler = computed(() => apiHandler.tableTS.querySearch.acHandler.value);
+        const tags = computed(() => apiHandler.tableTS.querySearch.tags.value || []);
+        const deleteTag = (event) => {
+            apiHandler.tableTS.querySearch.deleteTag(event);
+        };
+        const deleteAllTags = () => {
+            apiHandler.tableTS.querySearch.deleteAllTags();
+        };
         return {
+            ...toRefs(state),
             fields,
             slots,
-            getValue: (item, path) => _.get(item, path),
+            getData,
+            apiHandler,
+            exportExcel,
+
+            proxySearchText,
+            newQuery,
+            acHandler,
+            tags,
+            deleteTag,
+            deleteAllTags,
         };
     },
 };

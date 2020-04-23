@@ -60,6 +60,28 @@ const dynamicLayoutData = {
                 prtocol: 'TCP',
                 remote: '172.16.0.0/16',
             },
+            {
+                port_range_min: 80,
+                port_range_max: 80,
+                port: '80',
+                security_group_name: 'web security group-2',
+                security_group_id: '...',
+                remote_cidr: '172.16.0.0/16',
+                direction: 'inbound',
+                prtocol: 'TCP',
+                remote: '172.16.0.0/16',
+            },
+            {
+                port_range_min: 80,
+                port_range_max: 80,
+                port: '80',
+                security_group_name: 'web security group-3',
+                security_group_id: '...',
+                remote_cidr: '172.16.0.0/16',
+                direction: 'inbound',
+                prtocol: 'UDP',
+                remote: '172.16.0.0/16',
+            },
         ],
     },
     reference: {
@@ -170,7 +192,11 @@ const dynamicLayoutData = {
 export default [
     new MockData('/inventory/server/list', () => makeArrayResults(arrayOf(15, casual._server), 80)),
     new MockData('/inventory/server/get', () => dynamicLayoutData),
-    new MockData('/inventory/server/get-data', req => makeArrayResults(dynamicLayoutData.data.security_group_rules, 20)),
+    new MockData('/inventory/server/get-data', (req) => {
+        console.log(req);
+        const data = JSON.parse(req.data);
+        return makeArrayResults(_.get(dynamicLayoutData, data.key_path), 20);
+    }),
     new MockData('/inventory/cloud-service-type/list', () => makeArrayResults(arrayOf(15, casual._cloudServiceType), 1)),
     new MockData('/inventory/cloud-service-type/get', () => casual.cloudServiceType),
     new MockData('/inventory/cloud-service/list', () => makeArrayResults(arrayOf(15, casual._cloudService), 80)),

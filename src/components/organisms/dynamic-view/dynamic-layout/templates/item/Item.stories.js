@@ -1,13 +1,15 @@
 /* eslint-disable camelcase */
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayoutItem from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/index.vue';
+
 import { object } from '@storybook/addon-knobs';
-import { mockFluentApi } from '@sb/mockApi';
 import { ref } from '@vue/composition-api';
-import md from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.md';
+import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/item.md';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     title: 'organisms/dynamic-view/dynamic-layout/item',
-    component: SDynamicLayout,
+    component: SDynamicLayoutItem,
     parameters: {
         notes: md,
     },
@@ -287,7 +289,7 @@ export const apiMode = () => ({
         return {
             layout: rootPathLayout,
             api: {
-                resource: mockFluentApi.inventory().server(),
+                resource: fluentApi.inventory().server(),
                 getAction: action => action.setId('dynamicTest'),
             },
             isShow,

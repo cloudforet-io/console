@@ -25,7 +25,7 @@ import {
     DynamicFieldType,
     DynamicLayoutProps,
     makeDefs,
-    DynamicLayoutApiProp,
+    DynamicLayoutApiProp, checkCanGetData,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import { GetAction } from '@/lib/fluent-api';
@@ -60,6 +60,10 @@ export default defineComponent({
             type: Boolean,
             default: true,
         },
+        isLoading: {
+            type: Boolean,
+            required: true,
+        },
     },
     setup(props: DynamicLayoutProps) {
         const state = reactive({
@@ -78,16 +82,19 @@ export default defineComponent({
         });
 
         const getData = async () => {
-            let action: GetAction<any, any> = props.api?.resource.get() as GetAction<any, any>;
-            if (props.api?.getAction) {
-                action = props.api.getAction(action) as GetAction<any, any>;
+            if (checkCanGetData(props)) {
+                let action: GetAction<any, any> = props.api?.resource.get() as GetAction<any, any>;
+                if (props.api?.getAction) {
+                    action = props.api.getAction(action) as GetAction<any, any>;
+                }
+                if (onlyKeys.value.length) {
+                    action = action.setOnly(...onlyKeys.value);
+                }
+                const resp = await action.execute();
+                state.data = resp.data || {};
             }
-            if (onlyKeys.value.length) {
-                action = action.setOnly(...onlyKeys.value);
-            }
-            const resp = await action.execute();
-            state.data = resp.data || {};
         };
+        // const getData = _.debounce(getDataFunc, 50);
 
         let apiWatchStop: any = null;
         watch(() => state.isApiMode, (after, before) => {
@@ -99,7 +106,6 @@ export default defineComponent({
                         const beforeIsShow = bef ? bef[0] : false;
                         const afterApi: DynamicLayoutApiProp = aft[1] as DynamicLayoutApiProp;
                         const beforeApi: undefined|DynamicLayoutApiProp = bef ? bef[1] as DynamicLayoutApiProp : undefined;
-
                         if ((isShow && isShow !== beforeIsShow) || (afterApi.resource !== beforeApi?.resource || afterApi.getAction !== beforeApi?.getAction)) {
                             getData();
                         }

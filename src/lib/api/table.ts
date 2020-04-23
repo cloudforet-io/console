@@ -69,7 +69,7 @@ export abstract class BaseTableFluentAPI<
         } catch (e) {
             this.tableTS.state.items = [];
             this.tableTS.state.allPage = 1;
-            // this.totalCount.value = 0;
+            this.totalCount.value = 0;
         }
         this.tableTS.syncState.loading = false;
     };
@@ -356,13 +356,18 @@ export class QuerySearchTableFluentAPI<
         super(action);
         this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
-            if (tags !== preTags) {
+            if (tags !== preTags && this.action) {
                 await this.getData();
             }
         });
     }
 
-    getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+    getAction = () => {
+        if (Array.isArray(this.tableTS.querySearch.tags.value)) {
+            return this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+        }
+        return this.getDefaultAction();
+    }
 
     resetAll = () => {
         this.defaultReset();
