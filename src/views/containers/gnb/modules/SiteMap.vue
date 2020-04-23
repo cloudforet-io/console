@@ -101,7 +101,7 @@
                         <li>
                             <router-link class="group" to="/management">
                                 <span class="icon">
-                                    <p-i name="ic_plugin"
+                                    <p-i name="ic_admin"
                                     />
                                 </span>
                                 <span class="name">Management</span>

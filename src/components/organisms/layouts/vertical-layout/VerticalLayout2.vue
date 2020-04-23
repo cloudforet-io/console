@@ -80,7 +80,8 @@ export default {
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hide && !state.transition ? 0 : 1,
-                overflow: 'auto',
+                overflowY: 'auto',
+                overflowX: 'hidden',
             })),
             mainStyle: computed(() => ({
                 width: `calc( 100% - ${state.width}px )`,
@@ -159,7 +160,8 @@ export default {
         flex-direction: column;
         justify-content: stretch;
         /*flex-grow: 1;*/
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
     .resizer-container {
         display: flex;

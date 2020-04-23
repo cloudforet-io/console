@@ -95,7 +95,7 @@ export default {
             const prom = new Promise<boolean>((resolve, reject) => {
                 console.debug(args)
                 const data = args[1] || '';
-                if (data.length < 20) {
+                if (data.length <= 20) {
                     resolve(true);
                 }
                 resolve(false);

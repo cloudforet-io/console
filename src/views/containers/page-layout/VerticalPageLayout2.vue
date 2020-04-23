@@ -1,4 +1,4 @@
-<template>
+'<template>
     <p-vertical-layout2 v-bind="$props" v-on="$listeners">
         <template #sidebar="prop">
             <slot name="sidebar"
