@@ -12,7 +12,7 @@ import { editor } from 'monaco-editor';
 import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
 
 interface MEComponent{
-    editor:editor.IEditor
+    editor: editor.IEditor;
 }
 
 
@@ -28,7 +28,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const monaco:Ref<MEComponent|null> = ref(null);
+        const monaco: Ref<MEComponent|null> = ref(null);
         onMounted(() => {
             watch(() => props.item, (pre, next) => {
                 if (pre !== next && (monaco.value as MEComponent).editor !== null) {

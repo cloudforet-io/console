@@ -6,6 +6,7 @@ import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/tab
 import PButton from '@/components/atoms/buttons/Button.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import casual from '@/lib/casual';
+import { boolean } from '@storybook/addon-knobs';
 
 export default {
     title: 'organisms/dynamic-view/dynamic-sub-data',
@@ -169,6 +170,39 @@ export const apiMode = () => ({
             <p-button style-type="primary" @click="changeSetId"> change id</p-button>
             <SDynamicSubData :layouts="layouts" :resource-api="resourceApi" :select-id="selectId" :is-show="isShow" />
         </div>`,
+    setup() {
+        const isShow = ref(true);
+        const layouts = [defaultLayout, changeLayout, itemLayout, simpleTableLayout];
+        const selectId = ref(casual.make_id('server'));
+        const changeSetId = () => {
+            selectId.value = casual.make_id('server');
+        };
+
+        return {
+            selectId,
+            layouts,
+            resourceApi: fluentApi.inventory().server(),
+            isShow,
+            changeSetId,
+        };
+    },
+
+});
+
+
+export const loading = () => ({
+    components: { SDynamicSubData, PButton },
+    template: `
+        <div  class="w-screen bg-white">
+            <p-button style-type="primary" @click="changeSetId"> change id</p-button>
+            <SDynamicSubData :is-loading="isLoading" :layouts="layouts" :resource-api="resourceApi" :select-id="selectId" :is-show="isShow" />
+        </div>`,
+    props: {
+        isLoading: {
+            type: Boolean,
+            default: boolean('is loading', true),
+        },
+    },
     setup() {
         const isShow = ref(true);
         const layouts = [defaultLayout, changeLayout, itemLayout, simpleTableLayout];
