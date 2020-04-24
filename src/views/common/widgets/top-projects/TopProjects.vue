@@ -85,12 +85,12 @@
                         </p-td>
                         <p-td class="text-center">
                             <p-badge :background-color="colors.servers">
-                                {{ item.servers }}
+                                {{ item.servers || 0 }}
                             </p-badge>
                         </p-td>
                         <p-td class="text-center">
                             <p-badge :background-color="colors.cloud_services">
-                                {{ item.cloud_services }}
+                                {{ item.cloud_services || 0 }}
                             </p-badge>
                         </p-td>
                     </p-tr>
@@ -99,12 +99,12 @@
                 <!-- others -->
                 <template #col-project_group="{value}">
                     <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ value }}
+                        {{ value || 0 }}
                     </p-td>
                 </template>
                 <template #col-project="{value}">
                     <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ value }}
+                        {{ value || 0 }}
                     </p-td>
                 </template>
                 <template #col-rank-format="{index}">
@@ -114,12 +114,12 @@
                 </template>
                 <template #col-servers-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        {{ value }}
+                        {{ value || 0 }}
                     </div>
                 </template>
                 <template #col-cloud_services-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        {{ value }}
+                        {{ value || 0 }}
                     </div>
                 </template>
             </p-data-table>
@@ -137,9 +137,7 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLa
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import {
-    secondary, secondary1,
-} from '@/styles/colors';
+import { secondary, secondary1 } from '@/styles/colors';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -147,11 +145,8 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import casual, { arrayOf } from '@/lib/casual';
-import { languages } from 'monaco-editor';
-
-import css = languages.css;
-
+import { fluentApi } from '@/lib/fluent-api';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
 export default defineComponent({
     name: 'TopProjects',
@@ -168,15 +163,17 @@ export default defineComponent({
     setup() {
         const vm: any = getCurrentInstance();
 
-        interface DataType {
-            project_group: string;
+        interface Value {
+            project_id: string;
             project: string;
-            servers: number;
-            cloud_services: number;
+            project_group: string;
+            servers?: number;
+            cloud_services?: number;
+            total?: number;
         }
 
         interface InitDataType {
-            data: Array<DataType | undefined>;
+            data: Value[];
             loading: boolean;
             colors: {
                 servers: string;
@@ -209,20 +206,35 @@ export default defineComponent({
                 ])),
             }, { type: 'horizontalBar' });
 
-        const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-            resolve(arrayOf(5, () => ({
-                project_group: casual.text,
-                project: casual.text,
-                servers: casual.integer(0, 300),
-                cloud_services: casual.integer(0, 300),
-            })) as DataType[]);
-        });
+        const api = fluentApi.statisticsTest().resource().stat<Value>()
+            .setResourceType('identity.Project')
+            .addGroupKey('project_id', 'project_id')
+            .addGroupKey('name', 'project')
+            .addGroupKey('project_group.name', 'project_group')
+            .setJoinResourceType('inventory.Server')
+            .addJoinKey('project_id')
+            .addJoinGroupKey('project_id', 'project_id')
+            .addJoinGroupField('servers', STAT_OPERATORS.count)
+            .setJoinResourceType('inventory.CloudService', 1)
+            .addJoinKey('project_id', 1)
+            .addJoinGroupKey('project_id', 'project_id', 1)
+            .addJoinGroupField('cloud_services', STAT_OPERATORS.count, undefined, 1)
+            .addFormula('total', 'cloud_services + servers')
+            .setSort('total')
+            .setLimit(5);
 
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
-            ts.state.data = await api();
-            ts.state.loading = false;
+            try {
+                const res = await api.execute();
+                console.debug('top project > get data', res);
+                ts.state.data = res.data.results;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                ts.state.loading = false;
+            }
         };
 
         setTimeout(() => {
@@ -231,7 +243,7 @@ export default defineComponent({
 
         return {
             ...toRefs(ts.state),
-            onRowClick() {
+            onRowClick(): void {
                 vm.$router.push('/plugin/project');
             },
         };
