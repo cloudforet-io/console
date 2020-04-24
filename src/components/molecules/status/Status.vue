@@ -1,6 +1,7 @@
 <template>
     <span class="p-status">
-        <p-i v-if="icon" :name="icon" :color="iconStyle" />
+        <span v-if="isFortAwesome" :style="{color:iconColor||null}"><i :class="icon.split(' ')" /></span>
+        <p-i v-else-if="icon" :name="icon" :color="iconStyle" />
         <span v-else class="circle" :style="circleStyle" />
         <p-label class="label" :style="labelStyle">
             {{ text }}
@@ -11,7 +12,9 @@
 <script>
 import PI from '@/components/atoms/icons/PI.vue';
 import PLabel from '@/components/atoms/labels/Label.vue';
+import { computed } from '@vue/composition-api';
 
+const fontAwesomePrefix = RegExp('fa-');
 export default {
     name: 'PStatus',
     components: { PI, PLabel },
@@ -33,16 +36,23 @@ export default {
             default: null,
         },
     },
-    computed: {
-        labelStyle() {
-            return this.textColor ? { color: this.textColor } : null;
-        },
-        circleStyle() {
-            return this.iconColor ? { backgroundColor: this.iconColor } : null;
-        },
-        iconStyle() {
-            return this.iconColor ? `transparent ${this.iconColor}` : null;
-        },
+    setup(props) {
+        const labelStyle = computed(() => (props.textColor ? { color: props.textColor } : null));
+        const circleStyle = computed(() => (props.iconColor ? { backgroundColor: props.iconColor } : null));
+        const iconStyle = computed(() => (props.iconColor ? `transparent ${props.iconColor}` : null));
+        const isFortAwesome = computed(() => {
+            if (props.icon && fontAwesomePrefix.test(props.icon)) {
+                return true;
+            }
+            return false;
+        });
+
+        return {
+            labelStyle,
+            circleStyle,
+            iconStyle,
+            isFortAwesome,
+        };
     },
 };
 </script>

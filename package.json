@@ -88,6 +88,7 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
+    "@fortawesome/fontawesome-free": "^5.13.0",
     "@fullhuman/postcss-purgecss": "^2.1.0",
     "@storybook/addon-a11y": "^5.3.1",
     "@storybook/addon-actions": "^5.3.1",

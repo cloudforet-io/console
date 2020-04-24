@@ -1,5 +1,5 @@
 <template>
-    <component :is="component" :view_option="view_option" :data="data" />
+    <component :is="component" :options="options" :data="data" />
 </template>
 
 <script lang="ts">
@@ -17,12 +17,12 @@ export default defineComponent({
     name: 'PDynamicField',
     props: {
         // eslint-disable-next-line @typescript-eslint/camelcase,camelcase
-        view_type: {
+        type: {
             type: String,
             default: 'text',
         },
         // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
-        view_option: {
+        options: {
             type: Object,
             default: () => ({}),
         },
@@ -31,10 +31,11 @@ export default defineComponent({
             default: '',
         },
     },
-    setup(props: any) {
+    setup(props) {
+        // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)),
         });
         onMounted((): void => {
             state.loader()
