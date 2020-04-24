@@ -90,8 +90,16 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        getAction: {
+            type: Function,
+            default: action => action.setServiceType('identity.service-account')
+                .setGroupBy('provider')
+                .addField('provider', OPERATORS.value, 'provider')
+                .addField('service_account_id', OPERATORS.count, 'count')
+                .setSort('provider'),
+        },
     },
-    setup() {
+    setup(props) {
         const vm: any = getCurrentInstance();
 
         const {

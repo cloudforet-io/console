@@ -32,7 +32,7 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "duplicated"
+                  "image": "ic_state_duplicated"
                 }
               }
             },
@@ -40,7 +40,7 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "disconnected"
+                  "image": "ic_state_disconnected"
                 }
               }
             },
@@ -48,7 +48,7 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "manual"
+                  "image": "ic_state_manual"
                 }
               }
             }
@@ -62,8 +62,7 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "fas fa-ad",
-                  "color": "#60B731"
+                  "color": "green.500"
                 }
               }
             },
@@ -71,8 +70,7 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "round",
-                  "color": "#FFCE02"
+                  "color": "yellow.500"
                 }
               }
             },
@@ -80,8 +78,7 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "round",
-                  "color": "#FF3700"
+                  "color": "red.500"
                 }
               }
             },
@@ -89,8 +86,8 @@
               "type": "state",
               "options": {
                 "icon": {
-                  "image": "round",
-                  "color": "#FF3700"
+                  "image": "fas fa-times",
+                  "color": "red.500"
                 }
               }
             }
@@ -109,29 +106,29 @@
             "VM": {
               "type": "badge",
               "options": {
-                "color": "#FFFFFF",
-                "background_color": "#0080FB"
+                "color": "white",
+                "background_color": "blue.500"
               }
             },
             "BAREMETAL": {
               "type": "badge",
               "options": {
-                "color": "#FFFFFF",
-                "background_color": "#2CBAA5"
+                "color": "white",
+                "background_color": "peacock.500"
               }
             },
             "HYPERVISOR": {
               "type": "badge",
               "options": {
-                "color": "#FFFFFF",
-                "background_color": "#FF3700"
+                "color": "white",
+                "background_color": "red.500"
               }
             },
             "UNKNOWN": {
               "type": "badge",
               "options": {
-                "color": "#FFFFFF",
-                "background_color": "#6B6E7B"
+                "color": "white",
+                "background_color": "gray.600"
               }
             }
           }
@@ -149,11 +146,11 @@
             "item": {
               "type": "badge",
               "options": {
-                "text_color": "#FFFFFF",
-                "background_color": "#858895"
+                "text_color": "white",
+                "background_color": "gray.500"
               }
             },
-            "delimiter": "&nbsp; "
+            "delimiter": "  "
           }
         },{
           "key": "collection_info.secrets",
@@ -163,11 +160,11 @@
             "item": {
               "type": "badge",
               "options": {
-                "text_color": "#FFFFFF",
-                "background_color": "#858895"
+                "text_color": "white",
+                "background_color": "gray.500"
               }
             },
-            "delimiter": "&nbsp; "
+            "delimiter": "  "
           }
         },{
           "key": "collection_info.collectors",
@@ -177,11 +174,11 @@
             "item": {
               "type": "badge",
               "options": {
-                "text_color": "#FFFFFF",
-                "background_color": "#858895"
+                "text_color": "white",
+                "background_color": "gray.500"
               }
             },
-            "delimiter": "&nbsp; "
+            "delimiter": "  "
           }
         },{
           "key": "created_at",

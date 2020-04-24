@@ -10,6 +10,7 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+        :responsive-style="responsiveStyle"
 
         :setting-visible="false"
         :use-cursor-loading="true"
@@ -113,16 +114,23 @@ export default {
             type: Boolean,
             default: true,
         },
+        isLoading: {
+            type: Boolean,
+            default: true,
+        },
         showTitle: {
             type: Boolean,
             default: true,
+        },
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
     },
     setup(props: DynamicLayoutProps) {
         const defaultInitData = {
             selectable: false,
             excelVisible: true,
-            responsiveStyle: { height: '24rem', 'overflow-y': 'auto' },
         };
         const fields = makeFields(props);
         const slots = makeTableSlots(props);
@@ -151,6 +159,7 @@ export default {
                 undefined, acMeta,
             );
         };
+        console.debug(props.toolset, 'toolset');
         let apiHandler = props.toolset as QuerySearchTableFluentAPI || makeApiToolset();
         const state = reactive({
             isToolsetMode: computed(() => !!props.toolset),
