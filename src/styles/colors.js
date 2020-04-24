@@ -60,7 +60,7 @@ const palette = {
     },
     blue: {
         100: '#F5F9FD',
-        200: '#CCE6FF',
+        200: '#E9F4FF',
         300: '#66B5FF',
         400: '#43BEFF',
         500: '#0080FB',

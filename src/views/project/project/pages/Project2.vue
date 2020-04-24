@@ -6,7 +6,7 @@
                     Project Group
                     <p-i name="ic_plus" color="transparent inherit"
                          width="1rem" height="1rem" class="add-btn"
-                         @click="openProjectGroupForm"
+                         @click="openProjectGroupForm(true)"
                     />
                 </div>
                 <p-tree
@@ -25,10 +25,17 @@
                     </template>
                     <template #extra="{node, hoveredNode}">
                         <span v-show="node===hoveredNode"
-                              @click.stop="openProjectGroupForm">
-                            <p-i :name="'ic_plus'" color="transparent inherit"
-                                 width="1rem" height="1rem"
-                            />
+                              @mouseenter.stop="hovered(node)"
+                              @click.stop="openProjectGroupForm(false)"
+                        >
+                            <p-tooltip-button class="help" :tooltip="'하위 프로젝트 그룹 생성'" position="top"
+                            >
+                                <template #button>
+                                    <p-i :name="'ic_plus'" color="transparent inherit"
+                                         width="1rem" height="1rem"
+                                    />
+                                </template>
+                            </p-tooltip-button>
                         </span>
                     </template>
                 </p-tree>
@@ -107,9 +114,8 @@
                                          @click="clickServiceAccount"
                                     >
                                         <p>
-                                            <p-i :name="'btn_circle_plus_blue--hover'"
-                                                 color="transparent inherit"
-                                                 width="1rem" height="1rem" class="btn_circle_plus_blue"
+                                            <p-i :name="'btn_circle_plus_blue'"
+                                                 width="24px" height="24px" class="btn_circle_plus_blue"
                                             />
                                             Add Service Account
                                         </p>
@@ -208,6 +214,7 @@ import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
@@ -244,7 +251,7 @@ import SProjectGroupCreateFormModal from '@/views/project/project/modules/Projec
     interface State {
         item: any;
         items: ProjectCardData[];
-        selectedId: string;
+        selectedId: any;
         node: any;
         hasChildProject: boolean;
         hasChildProjectGroup: boolean;
@@ -256,6 +263,7 @@ export default {
     components: {
         PVerticalPageLayout2,
         PTree,
+        PTooltipButton,
         PButton,
         PI,
         PQuerySearchBar,
@@ -315,11 +323,11 @@ export default {
             resp.data.results.forEach((item) => {
                 const id = item.project_id;
                 const setCard = (items) => { cardSummary.value[id] = items; };
-                // statisticsAPI.setId(id).execute().then((rp) => {
-                //     if (rp.data) {
-                //         setCard(rp.data);
-                //     }
-                // });
+                statisticsAPI.setId(id).execute().then((rp) => {
+                    if (rp.data) {
+                        setCard(rp.data);
+                    }
+                });
             });
             const temp = resp.data.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
@@ -358,6 +366,7 @@ export default {
                     suggestKeys: [],
                 },
             },
+            computed(() => treeApiHandler.ts.metaState.firstSelectedNode),
         );
 
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
@@ -391,6 +400,11 @@ export default {
             state.items = [];
         };
 
+        const hovered = async (item) => {
+            state.selectedId = item.data.id;
+            state.node = item;
+        };
+
         /**
          * Click Card Item
          */
@@ -419,6 +433,7 @@ export default {
             projectGroupFormVisible: false,
             projectFormVisible: false,
             projectGroupDeleteFormVisible: false,
+            isRoot: false,
             headerTitle: '',
             themeColor: '',
             modalContent: '',
@@ -460,11 +475,15 @@ export default {
             formState.projectGroupDeleteFormVisible = false;
         };
 
-        const openProjectGroupForm = () => {
+        const openProjectGroupForm = (isRoot) => {
+            if (isRoot) {
+                formState.isRoot = true;
+            }
             formState.projectGroupFormVisible = true;
         };
 
         const projectGroupFormConfirm = (item) => {
+            if (formState.isRoot) state.selectedId = null;
             fluentApi.identity().projectGroup().create().setParameter({
                 parent_project_group_id: state.selectedId,
                 ...item,
@@ -492,7 +511,8 @@ export default {
                 })
                 .finally(() => {
                     const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
-                    treeApiHandler.ts.treeRef.value.addNode(undefined, newNode, addMode[addModeIdx.value]);
+                    if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode, addMode[addModeIdx.value]);
+                    treeApiHandler.ts.treeRef.value.addNode(state.node, newNode, 'append');
                 });
             formState.projectGroupFormVisible = false;
         };
@@ -544,6 +564,7 @@ export default {
             ...toRefs(formState),
             skeletons: _.range(3),
             selected,
+            hovered,
             clickCard,
             clickServiceAccount,
             cardSummary,
@@ -627,6 +648,9 @@ export default {
             p {
                 @apply text-secondary;
                 font-size: 0.87rem;
+            }
+            .btn_circle_plus_blue {
+                margin-right: 0.5rem;
             }
         }
     }
