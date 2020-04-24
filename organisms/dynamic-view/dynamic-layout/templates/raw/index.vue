@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w-full">
         <p-panel-top v-if="showTitle">
             {{ name }}
         </p-panel-top>
