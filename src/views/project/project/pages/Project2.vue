@@ -6,7 +6,7 @@
                     Project Group
                     <p-i name="ic_plus" color="transparent inherit"
                          width="1rem" height="1rem" class="add-btn"
-                         @click="openProjectGroupForm"
+                         @click="openProjectGroupForm(true)"
                     />
                 </div>
                 <p-tree
@@ -24,10 +24,18 @@
                         />
                     </template>
                     <template #extra="{node, hoveredNode}">
-                        <span v-show="node===hoveredNode" @click.stop="openProjectGroupForm">
-                            <p-i :name="'ic_plus'" color="transparent inherit"
-                                 width="1rem" height="1rem"
-                            />
+                        <span v-show="node===hoveredNode"
+                              @mouseenter.stop="hovered(node)"
+                              @click.stop="openProjectGroupForm(false)"
+                        >
+                            <p-tooltip-button class="help" :tooltip="'하위 프로젝트 그룹 생성'" position="top"
+                            >
+                                <template #button>
+                                    <p-i :name="'ic_plus'" color="transparent inherit"
+                                         width="1rem" height="1rem"
+                                    />
+                                </template>
+                            </p-tooltip-button>
                         </span>
                     </template>
                 </p-tree>
@@ -53,7 +61,7 @@
                             <p id="current-project-grp">
                                 {{ currentGroup }}
                                 <p-i v-if="!hasChildProject && !hasChildProjectGroup " name="ic_transhcan" color="transparent inherit"
-                                     width="1.5rem" height="1.5rem" class="add-btn"
+                                     width="1.5rem" height="1.5rem" class="delete-btn"
                                      @click="openProjectGroupDeleteForm()"
                                 />
                             </p>
@@ -106,9 +114,8 @@
                                          @click="clickServiceAccount"
                                     >
                                         <p>
-                                            <p-i :name="'btn_circle_plus_blue--hover'"
-                                                 color="transparent inherit"
-                                                 width="1rem" height="1rem" class="btn_circle_plus_blue"
+                                            <p-i :name="'btn_circle_plus_blue'"
+                                                 width="24px" height="24px" class="btn_circle_plus_blue"
                                             />
                                             Add Service Account
                                         </p>
@@ -207,6 +214,7 @@ import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
@@ -243,7 +251,7 @@ import SProjectGroupCreateFormModal from '@/views/project/project/modules/Projec
     interface State {
         item: any;
         items: ProjectCardData[];
-        selectedId: string;
+        selectedId: any;
         node: any;
         hasChildProject: boolean;
         hasChildProjectGroup: boolean;
@@ -255,11 +263,11 @@ export default {
     components: {
         PVerticalPageLayout2,
         PTree,
+        PTooltipButton,
         PButton,
         PI,
         PQuerySearchBar,
         PQuerySearchTags,
-        PCheckBox,
         PSkeleton,
         PToolboxGridLayout,
         PButtonModal,
@@ -315,11 +323,11 @@ export default {
             resp.data.results.forEach((item) => {
                 const id = item.project_id;
                 const setCard = (items) => { cardSummary.value[id] = items; };
-                // statisticsAPI.setId(id).execute().then((rp) => {
-                //     if (rp.data) {
-                //         setCard(rp.data);
-                //     }
-                // });
+                statisticsAPI.setId(id).execute().then((rp) => {
+                    if (rp.data) {
+                        setCard(rp.data);
+                    }
+                });
             });
             const temp = resp.data.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
@@ -358,6 +366,7 @@ export default {
                     suggestKeys: [],
                 },
             },
+            computed(() => treeApiHandler.ts.metaState.firstSelectedNode),
         );
 
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
@@ -391,6 +400,11 @@ export default {
             state.items = [];
         };
 
+        const hovered = async (item) => {
+            state.selectedId = item.data.id;
+            state.node = item;
+        };
+
         /**
          * Click Card Item
          */
@@ -419,6 +433,7 @@ export default {
             projectGroupFormVisible: false,
             projectFormVisible: false,
             projectGroupDeleteFormVisible: false,
+            isRoot: false,
             headerTitle: '',
             themeColor: '',
             modalContent: '',
@@ -460,11 +475,15 @@ export default {
             formState.projectGroupDeleteFormVisible = false;
         };
 
-        const openProjectGroupForm = () => {
+        const openProjectGroupForm = (isRoot) => {
+            if (isRoot) {
+                formState.isRoot = true;
+            }
             formState.projectGroupFormVisible = true;
         };
 
         const projectGroupFormConfirm = (item) => {
+            if (formState.isRoot) state.selectedId = null;
             fluentApi.identity().projectGroup().create().setParameter({
                 parent_project_group_id: state.selectedId,
                 ...item,
@@ -492,7 +511,8 @@ export default {
                 })
                 .finally(() => {
                     const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
-                    treeApiHandler.ts.treeRef.value.addNode(undefined, newNode, addMode[addModeIdx.value]);
+                    if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode, addMode[addModeIdx.value]);
+                    treeApiHandler.ts.treeRef.value.addNode(state.node, newNode, 'append');
                 });
             formState.projectGroupFormVisible = false;
         };
@@ -544,6 +564,7 @@ export default {
             ...toRefs(formState),
             skeletons: _.range(3),
             selected,
+            hovered,
             clickCard,
             clickServiceAccount,
             cardSummary,
@@ -573,10 +594,9 @@ export default {
         font-weight: bold;
         font-size: 0.88rem;
         overflow-x: hidden;
-    }
-
-    .add-btn {
-        cursor: pointer;
+        .add-btn {
+            cursor: pointer;
+        }
     }
 
     #parent-project-grp {
@@ -589,6 +609,9 @@ export default {
         padding-bottom: .5rem;
         font-size: 1.5rem;
         font-weight: bold;
+        .delete-btn {
+            cursor: pointer;
+        }
     }
 
     .empty {
@@ -601,36 +624,34 @@ export default {
         margin-left: 1.5rem;
         margin-right: 1.5rem;
         margin-top: 1.5rem;
-    }
+        .project-group-name {
+            @apply text-gray-500;
+            font-size: .75rem;
+            margin-bottom: .25rem;
+        }
+        #project-name {
+            font-size: 1.12rem;
+            font-weight: bold;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            padding-bottom: 1.3rem;
+        }
+        .provider-icon {
+            max-width: 1.5rem;
+            max-height: 1.5rem;
+            display: inline;
+            margin-right: .5rem;
+        }
 
-    .project-group-name {
-        @apply text-gray-500;
-        font-size: .75rem;
-        margin-bottom: .25rem;
-    }
-
-    #project-name {
-        font-size: 1.12rem;
-        font-weight: bold;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        padding-bottom: 1.3rem;
-    }
-
-    .provider-icon {
-        max-width: 1.5rem;
-        max-height: 1.5rem;
-        display: inline;
-        margin-right: .5rem;
-    }
-
-    .empty-providers {
-        z-index: 999;
-        p {
-            @apply text-secondary;
-            z-index: 999;
-            font-size: 0.87rem;
+        .empty-providers {
+            p {
+                @apply text-secondary;
+                font-size: 0.87rem;
+            }
+            .btn_circle_plus_blue {
+                margin-right: 0.5rem;
+            }
         }
     }
 
@@ -644,23 +665,22 @@ export default {
         margin-top: 0.87rem;
         margin-left: 1.5rem;
         margin-right: 1.5rem;
-    }
+        .summary-item-text {
+            display: inline-block;
+            font-size: 0.88rem;
+            text-align: left;
+            margin-bottom: .9rem;
+        }
 
-    .summary-item-text {
-        display: inline-block;
-        font-size: 0.88rem;
-        text-align: left;
-        margin-bottom: .9rem;
-    }
-
-    .summary-item-num {
-        @apply text-gray-500;
-        display: inline-block;
-        font-size: 1rem;
-        font-weight: bold;
-        margin-bottom: 0.75rem;
-        text-align: right;
-        float: right;
+        .summary-item-num {
+            @apply text-gray-500;
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            text-align: right;
+            float: right;
+        }
     }
 
     .tool {
@@ -669,16 +689,6 @@ export default {
         .tool-left {
             .tool-left-btn {
                 margin-right: 1rem;
-            }
-        }
-        .tool-right {
-            display: flex;
-            justify-content: flex-end;
-            .tool-right-checkbox {
-                padding-top: .5rem;
-            }
-            .tool-right-btn {
-                margin-left: 1rem;
             }
         }
     }

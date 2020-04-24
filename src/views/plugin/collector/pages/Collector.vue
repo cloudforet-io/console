@@ -281,38 +281,56 @@ export default {
         };
         mountBusEvent(CollectorEventBus, 'confirmTags', confirmTags);
 
+        // const listCredentialsByCollector = async (query) => {
+        //     console.log('state', state.items)
+        //     const crdId = _.get(state.selectedItem, 'plugin_info.credential_id');
+        //     const crdgId = _.get(state.selectedItem, 'plugin_info.credential_group_id');
+        //
+        //     const params = {
+        //         query,
+        //         // eslint-disable-next-line camelcase
+        //         include_credential_group: true,
+        //     };
+        //
+        //     state.crdState.loading = true;
+        //     state.crdState.items = [];
+        //     try {
+        //         // eslint-disable-next-line camelcase
+        //         if (crdId) params.credential_id = crdId;
+        //         // eslint-disable-next-line camelcase
+        //         else if (crdgId) params.credential_group_id = crdgId;
+        //         else throw new Error('No credential id or credential group id');
+        //
+        //         const res = await context.parent.$http.post('/secret/credential/list', params);
+        //         state.crdState.selectIndex = [];
+        //         state.crdState.totalCount = res.data.total_count;
+        //         state.crdState.items = res.data.results;
+        //     } catch (e) {
+        //         console.error(e);
+        //     } finally {
+        //         state.crdState.loading = false;
+        //     }
+        // };
+        // mountBusEvent(CollectorEventBus, 'listCredentialsByCollector', listCredentialsByCollector);
 
         const listCredentialsByCollector = async (query) => {
-            const crdId = _.get(state.selectedItem, 'plugin_info.credential_id');
-            const crdgId = _.get(state.selectedItem, 'plugin_info.credential_group_id');
-
-            const params = {
-                query,
-                // eslint-disable-next-line camelcase
-                include_credential_group: true,
-            };
-
+            const provider = state.selectedItem.provider;
+            const schema = state.selectedItem.capability.supported_schema.map(item => item);
             state.crdState.loading = true;
-            state.crdState.items = [];
-            try {
-                // eslint-disable-next-line camelcase
-                if (crdId) params.credential_id = crdId;
-                // eslint-disable-next-line camelcase
-                else if (crdgId) params.credential_group_id = crdgId;
-                else throw new Error('No credential id or credential group id');
-
-                const res = await context.parent.$http.post('/secret/credential/list', params);
-                state.crdState.selectIndex = [];
-                state.crdState.totalCount = res.data.total_count;
-                state.crdState.items = res.data.results;
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.crdState.loading = false;
-            }
+            await fluentApi.secret().secret().list().setProvider(provider)
+                .setSchema(schema[0])
+                .execute()
+                .then((res) => {
+                    state.crdState.items = res.data.results;
+                })
+                .catch((e) => {
+                    console.error(e);
+                })
+                .finally(() => {
+                    state.crdState.loading = false;
+                });
         };
         mountBusEvent(CollectorEventBus, 'listCredentialsByCollector', listCredentialsByCollector);
-
 
         const listCredentials = async (params) => {
             state.collectDataState.loading = true;

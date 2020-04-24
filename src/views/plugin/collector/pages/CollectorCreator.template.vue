@@ -43,14 +43,18 @@
                 </div>
             </template>
             <template #contents-credentials>
-                <choose-credentials ref="crd"
-                                    :items="crdState.items"
-                                    :plugin-id="confState.pluginId"
-                                    :total-count="crdState.totalCount"
-                                    :loading="crdState.loading"
-                                    :crd-type.sync="crdState.crdType"
-                                    :select-index.sync="crdState.selectIndex"
-                                    @changeValidState="updateTabInvalid(1, $event)"
+<!--                                <choose-credentials ref="crd"-->
+<!--                                                    :items="crdState.items"-->
+<!--                                                    :plugin-id="confState.pluginId"-->
+<!--                                                    :total-count="crdState.totalCount"-->
+<!--                                                    :loading="crdState.loading"-->
+<!--                                                    :crd-type.sync="crdState.crdType"-->
+<!--                                                    :select-index.sync="crdState.selectIndex"-->
+<!--                                                    @changeValidState="updateTabInvalid(1, $event)"-->
+<!--                                />-->
+                <confirm-credentials ref="crd"
+                                     :items="confState.pluginSchema"
+                                     :provider="confState.provider"
                 />
             </template>
             <template #step-append-tags>
@@ -79,6 +83,7 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue');
 const ConfigureCollector = () => import('@/views/plugin/collector/modules/ConfigureCollector.vue');
 const ChooseCredentials = () => import('@/views/plugin/collector/modules/ChooseCredentials.vue');
+const ConfirmCredentials = () => import('@/views/plugin/collector/modules/ConfirmCredentials.vue');
 
 const getCrdState = () => reactive({
     items: [],
@@ -97,6 +102,8 @@ const getConfState = root => reactive({
     selectedVersion: _.get(root, '$route.query.version', ''),
     priority: 10,
     optionsValue: {},
+    provider: '',
+    pluginSchema: [],
 });
 
 /**
@@ -125,6 +132,7 @@ export default {
         PProgressWizard,
         ConfigureCollector,
         ChooseCredentials,
+        ConfirmCredentials,
         PDictInputGroup,
     },
     setup(props, { refs, root, parent }) {
@@ -140,7 +148,7 @@ export default {
                 {
                     key: 'credentials',
                     showValidation: false,
-                    invalid: true,
+                    invalid: false,
                 },
                 {
                     key: 'tags',
@@ -174,14 +182,14 @@ export default {
             let res = null;
 
             if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.validate();
-            else if (state.tabs[beforeIdx].key === 'credentials') res = refs.crd.validate();
+            // else if (state.tabs[beforeIdx].key === 'credentials') res = true;
             else return;
 
             updateTabInvalid(beforeIdx, res);
         };
 
         const goBackToCollectors = () => {
-            root.$router.push('/plugin/collector');
+            root.$router.push('/plugin/collector/create/plugins');
         };
 
         return {

@@ -1,6 +1,5 @@
 import { Location } from 'vue-router';
 import { colorset } from '@/lib/util';
-import { DiffQueryAPI, HistoryQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 
 export const serviceSummaryProps = {
     title: {
@@ -20,7 +19,7 @@ export const serviceSummaryProps = {
         // eslint-disable-next-line no-empty-function
         default: () => ({}),
         validator(api) {
-            return api instanceof HistoryQueryAPI;
+            return true;// api instanceof HistoryQueryAPI;
         },
     },
 };
@@ -29,5 +28,5 @@ export interface ServiceSummaryPropsType {
     title: string;
     to: Location | string;
     color: string;
-    api: HistoryQueryAPI<any, any>;
+    api: any;// HistoryQueryAPI<any, any>;
 }
