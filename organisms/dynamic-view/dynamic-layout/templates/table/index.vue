@@ -110,6 +110,8 @@ export default {
         const defaultInitData = {
             selectable: false,
             excelVisible: true,
+            shadow: false,
+            border: false,
             responsiveStyle: { height: '24rem', 'overflow-y': 'auto' },
         };
         let apiHandler: SearchTableFluentAPI = props.toolset as SearchTableFluentAPI
