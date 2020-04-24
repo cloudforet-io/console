@@ -4,13 +4,13 @@
             <template>
                 {{ $t('PANEL.CREDENTIAL') }}
             </template>
-            <template #extra>
-                <router-link class="credential-btn" :to="credentialPath" target="_blank">
-                    <p-button outline style-type="gray900">
-                        {{ $t('INVENTORY.MANAGE_CRD') }}
-                    </p-button>
-                </router-link>
-            </template>
+<!--            <template #extra>-->
+<!--                <router-link class="credential-btn" :to="credentialPath" target="_blank">-->
+<!--                    <p-button outline style-type="gray900">-->
+<!--                        {{ $t('INVENTORY.MANAGE_CRD') }}-->
+<!--                    </p-button>-->
+<!--                </router-link>-->
+<!--            </template>-->
         </p-panel-top>
         <p-toolbox-table :items="items"
                          :fields="fields"
@@ -39,21 +39,21 @@
                 <!--                    {{$t('COMMON.VERIFY') }}-->
                 <!--                </p-button>-->
             </template>
-            <template #col-credential_groups-format="{value}">
-                <span>
-                    <p-badge v-for="crdg in value"
-                             :key="crdg.credential_group_id"
-                             style-type="gray200"
-                    >
-                        {{ crdg.name }}
-                    </p-badge>
-                </span>
-            </template>
+<!--            <template #col-credential_groups-format="{value}">-->
+<!--                <span>-->
+<!--                    <p-badge v-for="crdg in value"-->
+<!--                             :key="crdg.credential_group_id"-->
+<!--                             style-type="gray200"-->
+<!--                    >-->
+<!--                        {{ crdg.name }}-->
+<!--                    </p-badge>-->
+<!--                </span>-->
+<!--            </template>-->
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
             </template>
             <template #col-collect-format="{item}">
-                <p-button outline style-type="gray900" @click.stop="$emit('collectData', item)">
+                <p-button outline style-type="gray900" @click.stop="openCollectDataModal(item)">
                     {{ $t('COMMON.COL_DATA') }}
                 </p-button>
             </template>
@@ -61,6 +61,12 @@
 
         <credential-verify-modal v-if="verifyModalVisible" :visible="verifyModalVisible"
                                  :items="selectedItems"
+        />
+
+        <collect-data-modal v-if="collectDataVisible"
+                            :visible.sync="collectDataVisible"
+                            :collector="collector"
+                            :credential="targetCredential"
         />
     </div>
 </template>
@@ -82,6 +88,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import {defaultQuery} from "@/lib/api/query";
 import {fluentApi} from "@/lib/fluent-api";
 
+const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 const CredentialVerifyModal = () => import('@/views/plugin/collector/modules/CredentialVerifyModal.vue');
 
 export default {
@@ -91,6 +98,7 @@ export default {
         PToolboxTable,
         PButton,
         PBadge,
+        CollectDataModal,
         CredentialVerifyModal,
     },
     props: {
@@ -109,7 +117,6 @@ export default {
         const state = reactive({
             fields: [
                 ...makeTrItems([
-                    ['credential_id', 'COMMON.ID', { size: '400px' }],
                     ['name', 'COMMON.NAME', { size: '400px' }],
                     // ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
                     // ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
@@ -125,6 +132,8 @@ export default {
             // credentialPath: computed(() => (_.get(props.collector, 'plugin_info.credential_id')
             //     ? '/secret/credentials' : '/secret/credentials-group')),
             credentialPath: '/secret/credentials',
+            collectDataVisible: false,
+            targetCredential: null
         });
 
         const query = computed(() => (defaultQuery(
@@ -138,7 +147,7 @@ export default {
         };
 
 
-        listCredentials();
+        // listCredentials();
 
         watch(() => props.collector, () => {
             listCredentials();
@@ -148,6 +157,10 @@ export default {
             ...toRefs(state),
             listCredentials,
             timestampFormatter,
+            openCollectDataModal(item) {
+                state.collectDataVisible = true;
+                state.targetCredential = item
+            }
         };
     },
 };
