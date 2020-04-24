@@ -48,8 +48,8 @@ export default defineComponent({
 </script>
 <style lang="postcss" scoped>
     .p-raw-data{
-        width: 100%;
-        height: 70vh;
+        @apply w-auto;
+        height: 65vh;
     }
 
 

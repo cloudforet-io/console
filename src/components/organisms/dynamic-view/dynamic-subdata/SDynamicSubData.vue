@@ -1,21 +1,29 @@
 <template>
-    <transition appear>
-        <div v-if="names.length >= 1" class="s-dynamic-subdata my-8">
+    <div class="s-dynamic-subdata my-8">
+        <transition name="fade" mode="out-in">
+            <SkePSelectBtnGroup v-if="!layouts" class="skeleton mx-4" />
             <p-select-btn-group
+                v-else
                 class="ml-4"
                 :buttons="buttons" :selected.sync="selected"
             />
+        </transition>
+        <transition name="fade" mode="out-in">
+            <div v-if="!layouts">
+                <p-skeleton width="20rem" height="2rem" class="mx-4 mt-8 mb-4" />
+                <p-skeleton width="100%" height="15rem" class="w-full" />
+            </div>
             <SDynamicLayout
+                v-else
                 v-bind="selectedLayout"
                 :api="api"
                 :is-show="isShow"
             />
-        </div>
-
-        <p-empty v-else class="my-8">
+        </transition>
+        <p-empty v-if="layouts&&names.length == 0" class="my-8">
             No data
         </p-empty>
-    </transition>
+    </div>
 </template>
 
 <script lang="ts">
@@ -107,3 +115,14 @@ export default defineComponent({
     },
 });
 </script>
+<style lang="postcss">
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .2s;
+        .skeleton{
+            transition:opacity 0s;
+        }
+    }
+    .fade-enter, .fade-leave-to {
+        opacity: 0;
+    }
+</style>

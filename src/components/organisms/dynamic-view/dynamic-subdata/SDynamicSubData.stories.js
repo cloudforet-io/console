@@ -193,30 +193,25 @@ export const apiMode = () => ({
 export const loading = () => ({
     components: { SDynamicSubData, PButton },
     template: `
-        <div  class="w-screen bg-white">
-            <p-button style-type="primary" @click="changeSetId"> change id</p-button>
-            <SDynamicSubData :is-loading="isLoading" :layouts="layouts" :resource-api="resourceApi" :select-id="selectId" :is-show="isShow" />
+        <div  class="w-screen h-screen bg-white">
+            <p-button style-type="primary" @click="isLoading=!isLoading"> change loading </p-button>
+            <SDynamicSubData  :layouts="isLoading? null: layouts" :resource-api="resourceApi" :select-id="selectId" :is-show="isShow" />
         </div>`,
     props: {
-        isLoading: {
-            type: Boolean,
-            default: boolean('is loading', true),
-        },
+
     },
     setup() {
         const isShow = ref(true);
+        const isLoading = ref(true);
         const layouts = [defaultLayout, changeLayout, itemLayout, simpleTableLayout];
         const selectId = ref(casual.make_id('server'));
-        const changeSetId = () => {
-            selectId.value = casual.make_id('server');
-        };
 
         return {
             selectId,
             layouts,
+            isLoading,
             resourceApi: fluentApi.inventory().server(),
             isShow,
-            changeSetId,
         };
     },
 
