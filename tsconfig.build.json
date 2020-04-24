@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
     "baseUrl": ".",
     "declaration": true,

@@ -1,10 +1,7 @@
 <script lang="ts">
 import _ from 'lodash';
-import { max } from 'moment';
-import path from 'vue-i18n/src/path';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 
-import get = Reflect.get;
 
 export default {
     name: 'PDynamicFieldList',

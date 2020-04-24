@@ -106,13 +106,9 @@
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail>
-                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :data-source="baseInfoDetails" />
-            </template>
-            <template #data>
-                <PDynamicSubData
+                <p-server-detail
                     :select-id="apiHandler.tableTS.selectState.firstSelectItem.server_id"
-                    :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
-                    :action="getDataAction"
+                    :is-show="activeTab ==='detail'"
                 />
             </template>
             <template #tag>
@@ -121,9 +117,6 @@
                     :resource-id="apiHandler.tableTS.selectState.firstSelectItem.server_id"
                     tag-page-name="serverTags"
                 />
-            </template>
-            <template #rawData>
-                <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #admin>
                 <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
@@ -248,6 +241,7 @@ import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
 
 const serverStateVF = {
     name: 'State',
@@ -346,6 +340,7 @@ const exportDataSource = [
     deleteAtVF,
 ];
 
+
 export default {
     name: 'Server',
     filters: {
@@ -362,8 +357,6 @@ export default {
         PQuerySearchTags,
         PServerDetail,
         PTab,
-        PDynamicSubData,
-        PRawData,
         PDataTable,
         PQuerySearchBar,
         PTableCheckModal,
@@ -472,9 +465,7 @@ export default {
         const tabData = reactive({
             tabs: computed(() => makeTrItems([
                 ['detail', 'TAB.DETAILS'],
-                ['data', 'TAB.DATA'],
                 ['tag', 'TAB.TAG'],
-                ['rawData', 'TAB.RAW_DATA'],
                 ['admin', 'TAB.ADMIN'],
                 ['history', 'TAB.HISTORY'],
                 ['monitoring', 'TAB.MONITORING'],
@@ -654,6 +645,8 @@ export default {
             'server_id',
             apiHandler,
         );
+
+
 
         return {
             ...toRefs(tabData),
