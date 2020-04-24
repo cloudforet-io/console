@@ -6,6 +6,7 @@ import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/tab
 import PButton from '@/components/atoms/buttons/Button.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import casual from '@/lib/casual';
+import { boolean } from '@storybook/addon-knobs';
 
 export default {
     title: 'organisms/dynamic-view/dynamic-sub-data',
@@ -183,6 +184,34 @@ export const apiMode = () => ({
             resourceApi: fluentApi.inventory().server(),
             isShow,
             changeSetId,
+        };
+    },
+
+});
+
+
+export const loading = () => ({
+    components: { SDynamicSubData, PButton },
+    template: `
+        <div  class="w-screen h-screen bg-white">
+            <p-button style-type="primary" @click="isLoading=!isLoading"> change loading </p-button>
+            <SDynamicSubData  :layouts="isLoading? null: layouts" :resource-api="resourceApi" :select-id="selectId" :is-show="isShow" />
+        </div>`,
+    props: {
+
+    },
+    setup() {
+        const isShow = ref(true);
+        const isLoading = ref(true);
+        const layouts = [defaultLayout, changeLayout, itemLayout, simpleTableLayout];
+        const selectId = ref(casual.make_id('server'));
+
+        return {
+            selectId,
+            layouts,
+            isLoading,
+            resourceApi: fluentApi.inventory().server(),
+            isShow,
         };
     },
 
