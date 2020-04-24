@@ -1,9 +1,10 @@
 /* eslint-disable camelcase */
 import {
-    ActionAPI, ApiType, Resource,
+    ActionAPI, Resource,
     ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
+    ApiType,
     DataSourceItem,
 } from '@/lib/fluent-api/type';
 import { readonlyRefArg } from '@/lib/type';

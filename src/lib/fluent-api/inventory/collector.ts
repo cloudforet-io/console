@@ -15,14 +15,20 @@ interface IdParameter {
     [idField]: string;
 }
 
-export interface CollectorModel extends IdParameter, Tags{
+export enum COLLECTOR_STATE {
+    enabled = 'ENABLED',
+    disabled = 'DISABLED'
+}
+
+export interface CollectorModel extends IdParameter, Tags {
     name: string;
-    state: string;
+    state: COLLECTOR_STATE;
+    provider: string;
+    capability: object;
     plugin_info: CollectorPluginModel;
     priority: number;
     created_at: TimeStamp;
     last_collected_at: TimeStamp | null;
-    domain_id: string;
 }
 
 export type CollectorListResp = ListType<CollectorModel>

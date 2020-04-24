@@ -161,13 +161,14 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
 
     protected abstract query = (): BaseQuery => this.getBaseQuery<BaseQuery>({} as BaseQuery);
 
-    protected getBaseQuery<Q extends BaseQuery>(query: Q): Q {
-        if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
-            const newFilter: FilterType[] | undefined = filterItemToQuery(this.apiState.filter, this.apiState.fixFilter);
+    protected getBaseQuery<Q extends BaseQuery>(query: Q, state?: BaseQueryState<any>): Q {
+        const apiState = state || this.apiState;
+        if (this.apiState.filter.length > 0 || apiState.fixFilter.length > 0) {
+            const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filter, apiState.fixFilter);
             if (newFilter) query.filter = newFilter;
         }
-        if (isNotEmpty(this.apiState.filterOr)) {
-            const newFilter = filterItemToQuery(this.apiState.filterOr);
+        if (isNotEmpty(apiState.filterOr)) {
+            const newFilter = filterItemToQuery(apiState.filterOr);
             if (newFilter) query.filter_or = newFilter;
         }
         return query as Q;

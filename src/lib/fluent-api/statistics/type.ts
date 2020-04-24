@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { BaseQueryState, TimeStamp } from '@/lib/fluent-api/type';
+import { BaseQuery, BaseQueryState, TimeStamp } from '@/lib/fluent-api/type';
 
 /* Stat Query */
 export enum STAT_OPERATORS {
@@ -18,12 +18,6 @@ export interface GroupKeyItem {
     name: string;
 }
 
-export interface OneOrMoreArray<T> extends Array<T> {
-    0: T;
-}
-
-export type GroupKeys = OneOrMoreArray<GroupKeyItem>;
-
 export interface GroupFieldsItem {
     key?: string;
     name: string;
@@ -31,8 +25,8 @@ export interface GroupFieldsItem {
 }
 
 export interface Group {
-    keys: GroupKeys;
-    fields?: GroupFieldsItem[];
+    keys: GroupKeyItem[];
+    fields: GroupFieldsItem[];
 }
 
 export interface UnwindItem {
@@ -51,16 +45,23 @@ export interface StatSort {
 
 export interface StatQueryState<param> extends BaseQueryState<param> {
     aggregate: Aggregate;
-    sort: StatSort;
-    limit: number;
+    sort?: StatSort;
+    limit?: number;
+}
+
+export interface StatQuery extends BaseQuery {
+    aggregate: Aggregate;
+    sort?: StatSort;
+    limit?: number;
 }
 
 /* Resource */
-export interface JoinItem<param> extends StatQueryState<param> {
-    key: string;
+export interface JoinStateItem {
+    keys: string[];
+    type: string;
     resource_type: string;
     data_source_id?: string;
-    query: StatQueryState<param>;
+    query: StatQueryState<undefined>;
 }
 
 export interface FormulaItem {
@@ -68,10 +69,25 @@ export interface FormulaItem {
     formula: string;
 }
 
-export interface ResourceStatParam<joinParam> {
+export interface ResourceStatState {
     resource_type: string;
-    join: JoinItem<joinParam>[];
-    formulas: FormulaItem[];
+    joinState: JoinStateItem[];
+    formulas?: FormulaItem[];
+    data_source_id?: string;
+}
+
+export interface JoinItem {
+    keys: string[];
+    resource_type: string;
+    data_source_id?: string;
+    query: StatQuery;
+    type?: string;
+}
+
+export interface ResourceStatParam {
+    resource_type: string;
+    join?: JoinItem[];
+    formulas?: FormulaItem[];
     data_source_id?: string;
 }
 
@@ -80,8 +96,8 @@ export interface StatResponse<value> {
 }
 
 /* History */
-export interface HistoryListParam {
-    topic?: string;
+export interface HistoryParam {
+    topic: string;
 }
 
 export interface HistoryListResp {

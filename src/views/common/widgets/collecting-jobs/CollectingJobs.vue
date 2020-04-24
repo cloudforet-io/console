@@ -55,6 +55,7 @@ import { DataTableToolSet } from '@/components/organisms/tables/data-table/tools
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
+import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
 
 export default defineComponent({
     name: 'CollectingJobs',
@@ -88,28 +89,24 @@ export default defineComponent({
             start: TimeStamp;
         }
 
-        // const api = fluentApi.statisticsTest().history().query<Data>()
-        //     .addField('collector_id', OPERATORS.value, 'name')
-        //     .addField('created_at', OPERATORS.value, 'start')
-        //     .setLimit(7)
-        //     .setSort('created_at')
-        //     .setFilterOr(
-        //         { key: 'state', operator: '=', value: 'CREATED' },
-        //         { key: 'state', operator: '=', value: 'IN_PROGRESS' },
-        //     );
+
+        const api = fluentApi.inventory().jobs().list().setOnly('job_id', 'collector_info', 'created_at')
+            .setFilter({ key: 'state', value: [JOB_STATE.created, JOB_STATE.progress], operator: '' })
+            .setSortBy('created_at')
+            .setPageSize(5)
+            .setThisPage(1);
 
         const getData = async () => {
             ts.syncState.loading = true;
             ts.state.items = [];
             try {
-                // const res = await api.execute();
-            } catch (e) {
-                ts.state.items = arrayOf(casual.integer(0, 5), () => ({
-                    name: casual.word,
-                    start: {
-                        seconds: `${casual.unix_time}`,
-                    },
+                const res = await api.execute();
+                ts.state.items = res.data.results.map(d => ({
+                    name: d.collector_info.name,
+                    start: d.created_at,
                 }));
+            } catch (e) {
+                console.error(e);
             } finally {
                 ts.syncState.loading = false;
             }
