@@ -12,22 +12,16 @@ interface SLineChartInterface extends SChartInterface {
     setFill: (...args) => SLineChartInterface;
     setMin: (...args) => SLineChartInterface;
     setMax: (...args) => SLineChartInterface;
-    // setPointRadius: (...args) => SLineChartInterface;
     setLineTension: (...args) => SLineChartInterface;
-    // setBackgroundColor: (...args) => SLineChartInterface;
 }
 
-const lineChartSettings: SettingsInterface = {
+export const lineChartSettings: SettingsInterface = {
     metaDatasets: {
         borderWidth: 1,
         fill: 'start',
         pointRadius: 0,
         pointBorderWidth: 0,
         lineTension: 0.25,
-        // fill: false,
-        // borderWidth: 2,
-        // lineTension: 0,
-        // pointRadius: 0,
     },
     options: {
         maintainAspectRatio: false,
@@ -61,10 +55,6 @@ const lineChartSettings: SettingsInterface = {
             }],
         },
         tooltips,
-        // maintainAspectRatio: false,
-        // legend: {
-        //     display: false,
-        // },
         // scales: {
         //     yAxes: [{
         //         gridLines: {
@@ -104,16 +94,6 @@ const lineChartSettings: SettingsInterface = {
         // },
     },
     plugins: [{}],
-    // [{
-    //     beforeInit(chart: SLineChart): void {
-    //         const labels: (string | number | number[] | string[] | Date | Date[] | Moment | Moment[])[] | undefined = chart.data.labels;
-    //         labels?.forEach((e, i, a) => {
-    //             if (typeof e === 'string' && /\n/.test(e)) {
-    //                 a[i] = e.split(/\n/);
-    //             }
-    //         });
-    //     },
-    // }]
 };
 
 export class SLineChart extends SChart implements SLineChartInterface {
@@ -125,6 +105,7 @@ export class SLineChart extends SChart implements SLineChartInterface {
              ...this.metaDatasets,
              ...lineChartSettings.metaDatasets,
              backgroundColor: this.getBackgroundColor,
+             borderColor: this.getBorderColor,
          };
      }
 
@@ -164,8 +145,8 @@ export class SLineChart extends SChart implements SLineChartInterface {
          return this;
      }
 
-     protected getBackgroundColor: Scriptable<ChartColor> = ({ dataIndex }): ChartColor => {
-         const color = this.colors[dataIndex || 0];
+     protected getBackgroundColor: Scriptable<ChartColor> = ({ datasetIndex }): ChartColor => {
+         const color = this.colors[datasetIndex || 0];
          if (!this.gradientHeight) return color;
          const gradient = this.ctx?.createLinearGradient(0, 0, 0, this.gradientHeight);
          gradient?.addColorStop(0, Color(color).alpha(0.25).toString());
@@ -173,4 +154,7 @@ export class SLineChart extends SChart implements SLineChartInterface {
          gradient?.addColorStop(1, Color(color).alpha(0).toString());
          return gradient || color;
      }
+
+    protected getBorderColor: Scriptable<ChartColor> =
+        ({ datasetIndex }): ChartColor => this.colors[datasetIndex || 0]
 }

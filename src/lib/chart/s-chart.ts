@@ -16,6 +16,7 @@ export interface SChartInterface extends Chart {
     metaDatasets: ChartDataSets;
     colors: string[];
     addData: (...args) => SChartInterface;
+    upsertData: (...args) => SChartInterface;
     setDatasets: (...args) => SChartInterface;
     setOptions: (...args) => SChartInterface;
     setPlugins: (...args) => SChartInterface;
@@ -24,6 +25,14 @@ export interface SChartInterface extends Chart {
     setBorderWidth: (...args) => SChartInterface;
     setTooltipEnabled: (...args) => SChartInterface;
     setAnimationDuration: (...args) => SChartInterface;
+    setGridLineColor: (...args) => SChartInterface;
+    setGridLineDisplay: (...args) => SChartInterface;
+    setGridLineDrawTicks: (...args) => SChartInterface;
+    setGridLineZeroLineColor: (...args) => SChartInterface;
+    setTicksDisplay: (...args) => SChartInterface;
+    setTicksAutoSkip: (...args) => SChartInterface;
+    setTicksAutoSkipPadding: (...args) => SChartInterface;
+    setTicksPadding: (...args) => SChartInterface;
     apply: (...args) => SChartInterface;
 }
 
@@ -78,6 +87,18 @@ export abstract class SChart extends Chart implements SChartInterface {
         return this;
     }
 
+    upsertData(data: Array<number | null | undefined> | ChartPoint[], label: string, render = false): this {
+        const exist = this.data.datasets?.some((ds) => {
+            if (ds.label === label) {
+                ds.data = data;
+            }
+            return ds.label === label;
+        });
+        if (!exist) this.addData(data, label);
+        if (render) this.update();
+        return this;
+    }
+
     setDatasets(datasets: ChartDataSets[]): this {
         this.data.datasets = datasets;
         return this;
@@ -96,7 +117,7 @@ export abstract class SChart extends Chart implements SChartInterface {
         return this;
     }
 
-    setLabels(labels: string[]): this {
+    setLabels(labels: string[] | string[][]): this {
         this.data.labels = labels;
         return this;
     }
@@ -118,6 +139,60 @@ export abstract class SChart extends Chart implements SChartInterface {
 
     setAnimationDuration(duration: number): this {
         _.set(this, 'options.animation.duration', duration);
+        return this;
+    }
+
+    protected setAxesProps(prop: string, key: string, value: any, axe?: 'y'|'x') {
+        const axes = axe ? [`${axe}Axes`] : ['yAxes', 'xAxes'];
+        axes.forEach((axeName) => {
+            if (this.options.scales) {
+                [axeName].forEach((d) => {
+                    if (d[prop]) d[prop][key] = value;
+                    else d[prop] = { [key]: value };
+                });
+            } else {
+                this.options.scales = { [axeName]: [{ [prop]: { [key]: value } }] };
+            }
+        });
+    }
+
+    setGridLineColor(color: string, axe?: 'y'|'x'): this {
+        this.setAxesProps('gridLines', 'color', color, axe);
+        return this;
+    }
+
+    setGridLineDisplay(display: boolean, axe?: 'y'|'x'): this {
+        this.setAxesProps('gridLines', 'display', display, axe);
+        return this;
+    }
+
+    setGridLineDrawTicks(drawTicks: boolean, axe?: 'y'|'x'): this {
+        this.setAxesProps('gridLines', 'drawTicks', drawTicks, axe);
+        return this;
+    }
+
+    setGridLineZeroLineColor(color: string, axe?: 'y'|'x'): this {
+        this.setAxesProps('gridLines', 'zeroLineColor', color, axe);
+        return this;
+    }
+
+    setTicksDisplay(display: boolean, axe?: 'y'|'x'): this {
+        this.setAxesProps('ticks', 'display', display, axe);
+        return this;
+    }
+
+    setTicksAutoSkip(autoSkip: boolean, axe?: 'y'|'x'): this {
+        this.setAxesProps('ticks', 'autoSkip', autoSkip, axe);
+        return this;
+    }
+
+    setTicksAutoSkipPadding(autoSkipPadding: number, axe?: 'y'|'x'): this {
+        this.setAxesProps('ticks', 'autoSkipPadding', autoSkipPadding, axe);
+        return this;
+    }
+
+    setTicksPadding(padding: number, axe?: 'y'|'x'): this {
+        this.setAxesProps('ticks', 'padding', padding, axe);
         return this;
     }
 

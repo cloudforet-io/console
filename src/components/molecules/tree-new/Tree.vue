@@ -8,9 +8,11 @@
             <template #default="{node}">
                 <span class="tree-scope"
                       @click="onNodeClick(node, $event)"
+                      @mouseover="onNodeHover(node, true)"
+                      @mouseleave="onNodeHover(node, false)"
                       @click.right.stop.prevent="onNodeRightClick(node, $event)"
                 >
-                    <span>
+                    <span class="scope-content">
                         <slot name="icon"
                               :node="node"
                               :hasChildren="node.hasChildren()"
@@ -28,6 +30,7 @@
                               name="spinner" auto
                               height="auto" width="1rem"
                     />
+                    <slot name="extra" :node="node" :hoveredNode="hoveredNode" />
                 </span>
             </template>
         </tree>
@@ -62,6 +65,7 @@ export default defineComponent({
         const state: any = reactive({
             tree: null,
             selectedNode: null,
+            hoveredNode: null,
             fetchingNodeId: null,
             treeOptions: computed(() => {
                 const result: TreeOptionsInterface = {
@@ -76,6 +80,10 @@ export default defineComponent({
                 return result;
             }),
         });
+
+        const onNodeHover = (node, isHover) => {
+            state.hoveredNode = isHover ? node : null;
+        };
 
         const onNodeClick = (node, e) => {
             if (props.selectMode) {
@@ -103,11 +111,15 @@ export default defineComponent({
         type addType = 'append' | 'prepend' | 'before' | 'after';
         const addNode = (node, newItem: string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
             if (state.tree) {
-                if (node) {
-                    state.tree[type](node, newItem);
-                } else {
+                console.log('node test', node)
+                if (!node) {
                     state.tree[type](newItem);
                 }
+                // if (node) {
+                //     state.tree[type](node, newItem);
+                // } else {
+                //     state.tree[type](newItem);
+                // }
             }
         };
 
@@ -132,6 +144,7 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
+            onNodeHover,
             onNodeClick,
             onTreeRightClick,
             onNodeRightClick,
@@ -156,8 +169,9 @@ export default defineComponent({
         mask-image: url($(url));
     }
 
-    @define-mixin tree-selected $bg-color, $color {
+    @define-mixin tree-selected $bg-color, $color, $border-color {
         background: $bg-color;
+        border: 0.8px solid $border-color;
 
         .tree-arrow.has-child {
             &:after {
@@ -181,7 +195,7 @@ export default defineComponent({
             /*font-size: .875rem;*/
             border-radius: 2px;
             .tree-anchor {
-                @apply text-gray;
+                @apply text-black;
             }
         }
         .tree-arrow {
@@ -206,18 +220,16 @@ export default defineComponent({
             padding-left: 0;
         }
         .tree-node {
+            > .tree-content:hover {
+                @mixin tree-selected transparent, theme('colors.secondary'), transparent;
+            }
             &.selected > .tree-content {
-                @mixin tree-selected theme('colors.primary2'), theme('colors.white');
-                &:hover {
-                    @mixin tree-selected theme('colors.primary2'), theme('colors.gray.900');
-                }
+                @mixin tree-selected theme('colors.blue.200'), theme('colors.secondary'), theme('colors.secondary');
             }
             &:hover {
-             @mixin tree-selected "~@/assets/icons/ic_tree_arrow--opened.svg";
+             @mixin tree-selected transparent, theme('colors.secondary'), transparent;
              }
-            > .tree-content:hover {
-                @mixin tree-selected transparent, theme('colors.gray.900');
-            }
+
         }
     }
 
@@ -227,9 +239,8 @@ export default defineComponent({
         justify-content: space-between;
     }
 
-    .tree-scope span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 12.5rem;
+    .scope-content {
+        @apply truncate;
+        /*flex-grow: 1;*/
     }
 </style>

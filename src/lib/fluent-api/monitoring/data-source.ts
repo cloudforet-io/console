@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-    ListAction, Resource, ResourceActions,
+    ListAction, Resource, ResourceActions, SetParameterAction,
 } from '@/lib/fluent-api/toolset';
 import {
     ListType,
@@ -13,29 +13,31 @@ import {
 } from '@/lib/fluent-api/monitoring/type';
 
 
-class List extends ListAction<DataSourceParameter, ListType<DataSourceResp>> {
+class List extends SetParameterAction<DataSourceParameter, ListType<DataSourceResp>> {
+    path = 'list';
+
     setId(id: string): this {
-        this.apiState.extraParameter.data_source_id = id;
+        this.apiState.parameter.data_source_id = id;
         return this.clone();
     }
 
     setName(name: string): this {
-        this.apiState.extraParameter.name = name;
+        this.apiState.parameter.name = name;
         return this.clone();
     }
 
     setState(state: DataSourceState): this {
-        this.apiState.extraParameter.state = state;
+        this.apiState.parameter.state = state;
         return this.clone();
     }
 
     setMonitoringType(type: MONITORING_TYPE): this {
-        this.apiState.extraParameter.monitoring_type = type;
+        this.apiState.parameter.monitoring_type = type;
         return this.clone();
     }
 
     setProvider(provider: string): this {
-        this.apiState.extraParameter.provider = provider;
+        this.apiState.parameter.provider = provider;
         return this.clone();
     }
 }

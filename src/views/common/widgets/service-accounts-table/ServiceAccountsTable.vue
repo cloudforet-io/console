@@ -164,7 +164,7 @@ export default defineComponent({
             return {
                 ...toRefs(state),
                 onRowClick() {
-                    vm.$router.push('/identity/project');
+                    vm.$router.push('/plugin/project');
                 },
             };
     },

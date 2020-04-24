@@ -2,31 +2,13 @@
     <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
-                <p-toolbox-table
-                    ref="toolbox"
-                    :items="apiHandler.tableTS.state.items"
-                    :fields="fields"
-                    :selectable="true"
-                    :sortable="true"
-                    :dragable="true"
-                    :hover="true"
-                    :responsive="true"
-                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
-                    :setting-visible="false"
-                    :use-cursor-loading="true"
-                    :excel-visible="true"
-                    :all-page="apiHandler.tableTS.state.allPage"
-                    :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
-                    :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
-                    :this-page.sync="apiHandler.tableTS.syncState.thisPage"
-                    :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
-                    :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-                    :loading.sync="apiHandler.tableTS.syncState.loading"
-                    @changePageSize="apiHandler.getData()"
-                    @changePageNumber="apiHandler.getData()"
-                    @clickRefresh="apiHandler.getData()"
-                    @changeSort="apiHandler.getData()"
-                    @clickExcel="exportToolSet.getData()"
+                <SDynamicLayout
+                    v-bind="mainTableLayout"
+                    :toolset="apiHandler"
+                    :vbind="{
+                        responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
+                        showTitle:false
+                    }"
                 >
                     <template #toolbox-left>
                         <PIconTextButton style-type="primary-dark"
@@ -38,7 +20,7 @@
                         </PIconTextButton>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
-                            class="left-toolbox-item"
+                            class="left-toolbox-item mr-4"
                             :menu="dropdown"
                             @click-in-service="clickInService"
                             @click-maintenance="clickMaintenance"
@@ -48,60 +30,10 @@
                             @click-link="apiHandler.tableTS.linkState.openLink()"
                             @click-exportExcel="exportToolSet.getData()"
                         >
-                            Action
+                            {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
-                        <div class="left-toolbox-item">
-                            <p-query-search-bar
-                                :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
-                                :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
-                                @newQuery="apiHandler.tableTS.querySearch.addTag"
-                            />
-                        </div>
                     </template>
-
-                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
-                        <p-col :col="12">
-                            <p-hr style="width: 100%;" />
-                            <p-query-search-tags style="margin-top: 0.5rem;"
-                                                 :tags="apiHandler.tableTS.querySearch.tags.value"
-                                                 @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
-                                                 @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
-                            />
-                        </p-col>
-                    </template>
-                    <template v-slot:col-state-format="data">
-                        <p-status v-bind="serverStateFormatter(data.value)" />
-                    </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.console_force_data.project }}
-                    </template>
-                    <template />
-                    <template v-slot:col-updated_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                    <template v-slot:col-core-format="data">
-                        {{ data | getValue(['item','data','base','core']) }}
-                    </template>
-                    <template v-slot:col-memory-format="data">
-                        {{ data | getValue(['item','data','base','memory']) }}
-                    </template>
-                    <template v-slot:col-pool-format="data">
-                        {{ data | getValue(['item','pool_info','name']) }}
-                    </template>
-                    <template v-slot:col-os_distro-format="data">
-                        {{ data | getValue(['item','data','os','od_distro']) }}
-                    </template>
-                    <template v-slot:col-server_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.value)">
-                            {{ data.value }}
-                        </PBadge>
-                    </template>
-                    <template v-slot:col-platform_type-format="data">
-                        <PBadge v-if="data.item.data.platform && data.item.data.platform.type" v-bind="platformBadgeFormatter(data.item.data.platform.type)">
-                            {{ data | getValue(['item','data','platform','type']) }}
-                        </PBadge>
-                    </template>
-                </p-toolbox-table>
+                </SDynamicLayout>
             </template>
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
@@ -160,7 +92,11 @@
                 <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
             </template>
             <template #monitoring>
-                <s-monitoring resource-type="'inventory.Server'" :resources="apiHandler.tableTS.selectState.selectItems" />
+                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
+                              :data-tools="metricAPIHandler.ts.state.dataTools"
+                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
+                              :resources="metricAPIHandler.ts.state.resources"
+                />
             </template>
         </PTab>
 
@@ -212,7 +148,6 @@ import PQuerySearchBar from '@/components/organisms/search/query-search-bar/Quer
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
-import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import { AdminFluentAPI, HistoryFluentAPI, QuerySearchTableFluentAPI } from '@/lib/api/table';
@@ -237,7 +172,8 @@ import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import baseTable from '@/views/inventory/server/schema/base_table.json';
 
 const serverStateVF = {
     name: 'State',
@@ -363,9 +299,18 @@ export default {
         SProjectTreeModal,
         SCollectModal,
         SMonitoring,
+        SDynamicLayout,
         STagsPanel,
     },
     setup(props, context) {
+        const mainTableLayout = computed<any>(() => ({
+            name: 'Server',
+            type: baseTable.type as any,
+            options: {
+                fields: baseTable.options.fields,
+            },
+
+        }));
         class ACHandler extends QuerySearchTableACHandler {
             // eslint-disable-next-line class-methods-use-this
             get valuesFetchUrl() {
@@ -430,7 +375,16 @@ export default {
             });
         const apiHandler = new QuerySearchTableFluentAPI(
             action,
-            undefined,
+            {
+                selectable: true,
+                sortable: true,
+                dragable: true,
+                hover: true,
+                responsive: true,
+                'setting-visible': false,
+                'use-cursor-loading': true,
+                'excel-visible': true,
+            },
             undefined,
             { handlerClass: ACHandler, args },
         );
@@ -471,6 +425,7 @@ export default {
             multiSelectTabs: makeTrItems([
                 ['data', 'TAB.DATA', { keepAlive: true }],
                 ['admin', 'TAB.ADMIN'],
+                ['monitoring', 'TAB.MONITORING'],
             ], context.parent),
             multiSelectActiveTab: 'data',
         });
@@ -642,7 +597,6 @@ export default {
         );
 
 
-
         return {
             ...toRefs(tabData),
             dropdown,
@@ -674,6 +628,7 @@ export default {
             baseInfoDetails,
             collectModalState,
             metricAPIHandler,
+            mainTableLayout,
         };
     },
 };

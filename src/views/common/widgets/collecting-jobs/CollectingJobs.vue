@@ -51,7 +51,6 @@ import { makeTrItems } from '@/lib/view-helper';
 import { getTimezone } from '@/lib/util';
 import moment from 'moment';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTr from '@/components/atoms/table/Tr.vue';
@@ -89,21 +88,21 @@ export default defineComponent({
             start: TimeStamp;
         }
 
-        const api = fluentApi.statisticsTest().history().query<Data>()
-            .addField('collector_id', OPERATORS.value, 'name')
-            .addField('created_at', OPERATORS.value, 'start')
-            .setLimit(7)
-            .setSort('created_at')
-            .setFilterOr(
-                { key: 'state', operator: '=', value: 'CREATED' },
-                { key: 'state', operator: '=', value: 'IN_PROGRESS' },
-            );
+        // const api = fluentApi.statisticsTest().history().query<Data>()
+        //     .addField('collector_id', OPERATORS.value, 'name')
+        //     .addField('created_at', OPERATORS.value, 'start')
+        //     .setLimit(7)
+        //     .setSort('created_at')
+        //     .setFilterOr(
+        //         { key: 'state', operator: '=', value: 'CREATED' },
+        //         { key: 'state', operator: '=', value: 'IN_PROGRESS' },
+        //     );
 
         const getData = async () => {
             ts.syncState.loading = true;
             ts.state.items = [];
             try {
-                const res = await api.execute();
+                // const res = await api.execute();
             } catch (e) {
                 ts.state.items = arrayOf(casual.integer(0, 5), () => ({
                     name: casual.word,
@@ -128,7 +127,7 @@ export default defineComponent({
             },
             getData,
             onRowClick() {
-                vm.$router.push('/inventory/collector');
+                vm.$router.push('/plugin/collector');
             },
         };
     },

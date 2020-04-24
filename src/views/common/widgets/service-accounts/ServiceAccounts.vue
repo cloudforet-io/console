@@ -63,7 +63,6 @@ import _ from 'lodash';
 import Color from 'color';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import casual from '@/lib/casual';
 import { SChartToolSet } from '@/lib/chart/toolset';
 
@@ -91,8 +90,16 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        getAction: {
+            type: Function,
+            default: action => action.setServiceType('identity.service-account')
+                .setGroupBy('provider')
+                .addField('provider', OPERATORS.value, 'provider')
+                .addField('service_account_id', OPERATORS.count, 'count')
+                .setSort('provider'),
+        },
     },
-    setup() {
+    setup(props) {
         const vm: any = getCurrentInstance();
 
         const {
@@ -105,12 +112,38 @@ export default defineComponent({
             count: number;
         }
 
-        const api = fluentApi.statisticsTest().stat().query<Value>()
-            .setServiceType('identity.service-account')
-            .setGroupBy('provider')
-            .addField('provider', OPERATORS.value, 'provider')
-            .addField('service_account_id', OPERATORS.count, 'count')
-            .setSort('provider');
+        // const api = fluentApi.statisticsTest().stat().query<Value>()
+        //     .setServiceType('identity.service-account')
+        //     .setGroupBy('provider')
+        //     .addField('provider', OPERATORS.value, 'provider')
+        //     .addField('service_account_id', OPERATORS.count, 'count')
+        //     .setSort('provider');
+
+        // const api = fluentApi.statisticsTest().stat().query()
+        //     .setResourceType('identity.service-account')
+        //     .setAggregate({
+        //         group: {
+        //             keys: [{ key: 'project_id', name: 'project_id' }],
+        //             fields: [{ operator: 'count', name: 'project_count' }],
+        //         },
+        //     })
+        //     .setJoin([{
+        //         key: 'project_id',
+        //         // eslint-disable-next-line camelcase
+        //         resource_type: 'inventory.Server',
+        //         aggregate: [{
+        //             group: {
+        //                 keys: [{ key: 'project_id', name: 'project_id' }],
+        //                 fields: [{ operator: 'count', name: 'project_count' }],
+        //             },
+        //         }],
+        //     }])
+        //     .setFormula({
+        //         name: 'resource_count',
+        //         formula: 'server_count + cloud_service_count',
+        //     })
+        //     .setSort('provider')
+        //     .setLimit(5);
 
         interface Data {
             name: string;
@@ -167,20 +200,20 @@ export default defineComponent({
             ts.state.data = {};
             await providerStore.getProvider();
             try {
-                const res = await api.execute();
-                _.forEach(res.data.values, (d: Value) => {
-                    if (providerStore.state.providers[d.provider]) {
-                        ts.state.data[d.provider] = {
-                            ...providerStore.state.providers[d.provider],
-                            count: d.count,
-                        };
-                    } else {
-                        ts.state.data.others = {
-                            ...others,
-                            count: d.count,
-                        };
-                    }
-                });
+                // const res = await api.execute();
+                // _.forEach(res.data.values, (d: Value) => {
+                //     if (providerStore.state.providers[d.provider]) {
+                //         ts.state.data[d.provider] = {
+                //             ...providerStore.state.providers[d.provider],
+                //             count: d.count,
+                //         };
+                //     } else {
+                //         ts.state.data.others = {
+                //             ...others,
+                //             count: d.count,
+                //         };
+                //     }
+                // });
             } catch (e) {
                 ts.state.data = {
                     aws: { ...providerStore.state.providers.aws, count: casual.integer(0, 50) },

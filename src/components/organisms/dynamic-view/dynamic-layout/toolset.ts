@@ -44,6 +44,7 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     data: any;
     isShow: boolean;
     isLoading: boolean;
+    responsiveStyle?: any;
 }
 interface Field {
     name: string;

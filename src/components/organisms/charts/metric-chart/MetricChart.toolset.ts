@@ -1,3 +1,5 @@
+import { isNotEmpty } from '@/lib/util';
+
 export const metricChartProps = {
     loading: {
         type: Boolean,
@@ -15,6 +17,21 @@ export const metricChartProps = {
         type: Array,
         default: () => [],
     },
+    unit: {
+        type: Object,
+        default: () => ({ x: 'Timestamp', y: 'Count' }),
+        validator(unit) {
+            return typeof unit.x === 'string' && typeof unit.y === 'string';
+        },
+    },
+    title: {
+        type: String,
+        default: '',
+    },
+    error: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 export interface MetricChartProps {
@@ -24,4 +41,7 @@ export interface MetricChartProps {
     };
     labels: string[];
     colors: string[];
+    unit: { x: string; y: string };
+    title: string;
+    error?: boolean;
 }

@@ -8,9 +8,13 @@ import inventoryRoute from '@/routes/inventory/inventory-route';
 import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 import pluginRoute from '@/routes/plugin/plugin-route';
+import projectRoute from '@/routes/project/project-route';
+import managementRoute from '@/routes/management/management-route';
+
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
+import { fluentApi } from '@/lib/fluent-api';
 
 Vue.use(VueRouter);
 
@@ -75,6 +79,8 @@ const router = new VueRouter({
                 inventoryRoute,
                 secretRoute,
                 pluginRoute,
+                projectRoute,
+                managementRoute,
             ],
         },
         { path: '*', component: ErrorPage },

@@ -37,7 +37,7 @@
                     </p-tr>
                     <p-tr key="blank" class="!bg-white h-2" />
                     <p-tr key="create-project" class="!bg-gray-100 cursor-pointer">
-                        <router-link to="/identity/project" tag="td" :colspan="fields.length"
+                        <router-link to="/plugin/project" tag="td" :colspan="fields.length"
                                      class="rounded-sm text-center"
                         >
                             <p-i name="ic_plus_square" width="1rem" height="1rem"
@@ -232,7 +232,7 @@ export default defineComponent({
         return {
             ...toRefs(ts.state),
             onRowClick() {
-                vm.$router.push('/identity/project');
+                vm.$router.push('/plugin/project');
             },
         };
     },
@@ -245,6 +245,7 @@ export default defineComponent({
 }
 .chart {
     height: 180px;
+    width: 100%;
 }
 .color {
     display: inline-block;

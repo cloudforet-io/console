@@ -40,28 +40,17 @@ export default defineComponent({
 <style lang="postcss" scoped>
     .p-loader {
         position: relative;
-        width: 100%;
-        height: 100%;
     }
     .loader {
         position: absolute;
-        &.fade-in-enter-active {
-            transition: opacity 0.5s;
-        }
-        &.fade-in-enter {
-            opacity: 0;
-        }
-        &.fade-in-enter-to {
-            opacity: 1;
-        }
     }
-    .fade-in-leave-active {
+    .fade-in-leave-active, .fade-in-enter-active {
         transition: opacity 0.5s;
     }
-    .fade-in-leave-to {
+    .fade-in-leave-to, .fade-in-enter {
         opacity: 0;
     }
-    .fade-in-enter-to {
+    .fade-in-enter-to, .fade-in-leave {
         opacity: 1;
     }
 </style>
