@@ -229,7 +229,8 @@
 		"SERVER": "서버",
 		"SERVICE_PROVIDER": "서비스 프로바이더",
 		"START_TIME": "시작 시간",
-		"STATE": "상태"
+		"STATE": "상태",
+		"SUPPORTED": "지원"
 	},
 	"FORM": {
 		"LABEL": {

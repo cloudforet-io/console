@@ -80,6 +80,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import {defaultQuery} from "@/lib/api/query";
+import {fluentApi} from "@/lib/fluent-api";
 
 const CredentialVerifyModal = () => import('@/views/plugin/collector/modules/CredentialVerifyModal.vue');
 
@@ -131,7 +132,8 @@ export default {
             state.sortBy, state.sortDesc,
         )));
 
-        const listCredentials = () => {
+        //TODO: list credentials by provider & plugin
+        const listCredentials = async() => {
             CollectorEventBus.$emit('listCredentialsByCollector', query.value);
         };
 

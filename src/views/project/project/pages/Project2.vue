@@ -24,7 +24,8 @@
                         />
                     </template>
                     <template #extra="{node, hoveredNode}">
-                        <span v-show="node===hoveredNode" @click.stop="openProjectGroupForm">
+                        <span v-show="node===hoveredNode"
+                              @click.stop="openProjectGroupForm">
                             <p-i :name="'ic_plus'" color="transparent inherit"
                                  width="1rem" height="1rem"
                             />
@@ -53,7 +54,7 @@
                             <p id="current-project-grp">
                                 {{ currentGroup }}
                                 <p-i v-if="!hasChildProject && !hasChildProjectGroup " name="ic_transhcan" color="transparent inherit"
-                                     width="1.5rem" height="1.5rem" class="add-btn"
+                                     width="1.5rem" height="1.5rem" class="delete-btn"
                                      @click="openProjectGroupDeleteForm()"
                                 />
                             </p>
@@ -259,7 +260,6 @@ export default {
         PI,
         PQuerySearchBar,
         PQuerySearchTags,
-        PCheckBox,
         PSkeleton,
         PToolboxGridLayout,
         PButtonModal,
@@ -573,10 +573,9 @@ export default {
         font-weight: bold;
         font-size: 0.88rem;
         overflow-x: hidden;
-    }
-
-    .add-btn {
-        cursor: pointer;
+        .add-btn {
+            cursor: pointer;
+        }
     }
 
     #parent-project-grp {
@@ -589,6 +588,9 @@ export default {
         padding-bottom: .5rem;
         font-size: 1.5rem;
         font-weight: bold;
+        .delete-btn {
+            cursor: pointer;
+        }
     }
 
     .empty {
@@ -601,36 +603,31 @@ export default {
         margin-left: 1.5rem;
         margin-right: 1.5rem;
         margin-top: 1.5rem;
-    }
+        .project-group-name {
+            @apply text-gray-500;
+            font-size: .75rem;
+            margin-bottom: .25rem;
+        }
+        #project-name {
+            font-size: 1.12rem;
+            font-weight: bold;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            padding-bottom: 1.3rem;
+        }
+        .provider-icon {
+            max-width: 1.5rem;
+            max-height: 1.5rem;
+            display: inline;
+            margin-right: .5rem;
+        }
 
-    .project-group-name {
-        @apply text-gray-500;
-        font-size: .75rem;
-        margin-bottom: .25rem;
-    }
-
-    #project-name {
-        font-size: 1.12rem;
-        font-weight: bold;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        padding-bottom: 1.3rem;
-    }
-
-    .provider-icon {
-        max-width: 1.5rem;
-        max-height: 1.5rem;
-        display: inline;
-        margin-right: .5rem;
-    }
-
-    .empty-providers {
-        z-index: 999;
-        p {
-            @apply text-secondary;
-            z-index: 999;
-            font-size: 0.87rem;
+        .empty-providers {
+            p {
+                @apply text-secondary;
+                font-size: 0.87rem;
+            }
         }
     }
 
@@ -644,23 +641,22 @@ export default {
         margin-top: 0.87rem;
         margin-left: 1.5rem;
         margin-right: 1.5rem;
-    }
+        .summary-item-text {
+            display: inline-block;
+            font-size: 0.88rem;
+            text-align: left;
+            margin-bottom: .9rem;
+        }
 
-    .summary-item-text {
-        display: inline-block;
-        font-size: 0.88rem;
-        text-align: left;
-        margin-bottom: .9rem;
-    }
-
-    .summary-item-num {
-        @apply text-gray-500;
-        display: inline-block;
-        font-size: 1rem;
-        font-weight: bold;
-        margin-bottom: 0.75rem;
-        text-align: right;
-        float: right;
+        .summary-item-num {
+            @apply text-gray-500;
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            text-align: right;
+            float: right;
+        }
     }
 
     .tool {
@@ -669,16 +665,6 @@ export default {
         .tool-left {
             .tool-left-btn {
                 margin-right: 1rem;
-            }
-        }
-        .tool-right {
-            display: flex;
-            justify-content: flex-end;
-            .tool-right-checkbox {
-                padding-top: .5rem;
-            }
-            .tool-right-btn {
-                margin-left: 1rem;
             }
         }
     }
