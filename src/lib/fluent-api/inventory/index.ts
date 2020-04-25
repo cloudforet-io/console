@@ -4,6 +4,7 @@ import Collector from '@/lib/fluent-api/inventory/collector';
 import Region from '@/lib/fluent-api/inventory/region';
 import Zone from '@/lib/fluent-api/inventory/zone';
 import Pool from '@/lib/fluent-api/inventory/pool';
+import Job from '@/lib/fluent-api/inventory/job';
 import CloudService from './cloud-service';
 import CloudServiceType from './cloud-service-type';
 
@@ -23,4 +24,6 @@ export default class Inventory extends Service implements ServiceResources<'clou
     zone() { return new Zone(this.api, this.name); }
 
     pool() { return new Pool(this.api, this.name); }
+
+    jobs(): Job { return new Job(this.api, this.name); }
 }

@@ -58,14 +58,12 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
-import { useStore, ProviderStoreType, ProviderInfo } from '@/store/toolset';
+import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import _ from 'lodash';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import casual, { arrayOf } from '@/lib/casual';
@@ -73,6 +71,7 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.v
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
 export default defineComponent({
     name: 'CloudServices',
@@ -110,30 +109,31 @@ export default defineComponent({
             providers: computed(() => providerStore.state.providers),
         });
 
-
-        const api = fluentApi.statisticsTest().stat().query<Value>()
-            .setServiceType('inventory.cloud-service')
-            .addField('cloud_service_id', OPERATORS.count, 'count')
-            .addField('provider', OPERATORS.value, 'provider')
-            .addField('cloud_service_group', OPERATORS.value, 'group')
-            .addField('cloud_service_type', OPERATORS.value, 'name')
-            .setGroupBy('provider', 'cloud_service_group', 'cloud_service_type')
-            .setSort('cloud_service_id')
+        const api = fluentApi.statisticsTest().resource().stat<Value>()
+            .setResourceType('inventory.CloudServiceType')
+            .setFilter({ key: 'tags.spaceone:is_major', value: 'true', operator: '=' })
+            .addGroupKey('name', 'name')
+            .addGroupKey('group', 'group')
+            .addGroupKey('provider', 'provider')
+            .addGroupKey('tags.spaceone:icon', 'icon')
+            .setJoinKeys(['name', 'group', 'provider'])
+            .setJoinResourceType('inventory.CloudService')
+            .addJoinGroupKey('cloud_service_type', 'name')
+            .addJoinGroupKey('cloud_service_group', 'group')
+            .addJoinGroupKey('provider', 'provider')
+            .addJoinGroupField('count', STAT_OPERATORS.count)
+            .setSort('count')
             .setLimit(12);
+
 
         const getData = async (): Promise<void> => {
             state.loading = true;
             await providerStore.getProvider();
             try {
                 const res = await api.execute();
-                state.data = res.data.values;
+                state.data = res.data.results;
             } catch (e) {
-                state.data = arrayOf(12, () => ({
-                    provider: 'aws',
-                    group: casual.text,
-                    name: casual.text,
-                    count: casual.integer(0),
-                })) as Value[];
+                console.error(e);
             } finally {
                 state.loading = false;
             }

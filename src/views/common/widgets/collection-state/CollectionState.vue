@@ -17,18 +17,18 @@
 
 <script lang="ts">
 import {
-    defineComponent, toRefs, computed, Ref,
+    computed, defineComponent, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import { coral, primary, gray } from '@/styles/colors';
+import { coral, gray, primary } from '@/styles/colors';
 import _ from 'lodash';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import casual, { arrayOf } from '@/lib/casual';
+import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
 
 export default defineComponent({
     name: 'CollectionState',
@@ -72,35 +72,27 @@ export default defineComponent({
             count: number;
             date: string;
         }
-        const api = fluentApi.statisticsTest().history().query<Data>()
-            .addField('state', OPERATORS.value, 'state')
-            .addField('created_at', OPERATORS.value, 'date')
-            .setLimit(7)
-            .setSort('created_at')
-            .setGroupBy('created_at')
-            .setFilterOr(
-                { key: 'state', operator: '=', value: 'FINISHED' },
-                { key: 'state', operator: '=', value: 'FAILURE' },
-            );
+        // const api = fluentApi.statisticsTest().history().query<Data>()
+        //     .addField('state', OPERATORS.value, 'state')
+        //     .addField('created_at', OPERATORS.value, 'date')
+        //     .setLimit(7)
+        //     .setSort('created_at')
+        //     .setGroupBy('created_at')
+        //     .setFilterOr(
+        //         { key: 'state', operator: '=', value: 'FINISHED' },
+        //         { key: 'state', operator: '=', value: 'FAILURE' },
+        //     );
 
-        // const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-        //     setTimeout(() => {
-        //         resolve([{
-        //             date: '4/1', // MM/DD
-        //             success: 40,
-        //             failure: 11,
-        //         }]);
-        //     }, 1000);
-        // });
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
             try {
-                const res = await api.execute();
-                // res.data.values.forEach(v => {
+                // const res = await api.execute();
+                // res.data.results.forEach(v => {
                 //     ts.state.data.push({
-                //         date: v.c
+                //         date: v.created_at,
+                //         success: v.
                 //     })
                 // })
             } catch (e) {

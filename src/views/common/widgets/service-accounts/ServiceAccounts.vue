@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, onMounted, reactive, Ref, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, Ref, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
@@ -61,11 +61,10 @@ import { ProviderStoreType, useStore } from '@/store/toolset';
 import { violet, yellow } from '@/styles/colors';
 import _ from 'lodash';
 import Color from 'color';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { fluentApi } from '@/lib/fluent-api';
-import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import casual from '@/lib/casual';
 import { SChartToolSet } from '@/lib/chart/toolset';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
 export default defineComponent({
     name: 'ServiceAccounts',
@@ -105,12 +104,10 @@ export default defineComponent({
             count: number;
         }
 
-        const api = fluentApi.statisticsTest().stat().query<Value>()
-            .setServiceType('identity.service-account')
-            .setGroupBy('provider')
-            .addField('provider', OPERATORS.value, 'provider')
-            .addField('service_account_id', OPERATORS.count, 'count')
-            .setSort('provider');
+        const api = fluentApi.statisticsTest().resource().stat<Value>()
+            .setResourceType('identity.ServiceAccount')
+            .addGroupKey('provider', 'provider')
+            .addGroupField('count', STAT_OPERATORS.count);
 
         interface Data {
             name: string;
@@ -168,7 +165,7 @@ export default defineComponent({
             await providerStore.getProvider();
             try {
                 const res = await api.execute();
-                _.forEach(res.data.values, (d: Value) => {
+                _.forEach(res.data.results, (d: Value) => {
                     if (providerStore.state.providers[d.provider]) {
                         ts.state.data[d.provider] = {
                             ...providerStore.state.providers[d.provider],
@@ -182,15 +179,7 @@ export default defineComponent({
                     }
                 });
             } catch (e) {
-                ts.state.data = {
-                    aws: { ...providerStore.state.providers.aws, count: casual.integer(0, 50) },
-                    azure: { ...providerStore.state.providers.azure, count: casual.integer(0, 50) },
-                    // eslint-disable-next-line camelcase
-                    google_cloud: { ...providerStore.state.providers.google_cloud, count: casual.integer(0, 50) },
-                    others: {
-                        name: 'Others', icon: 'ic_provider_other', color: yellow[500], count: casual.integer(0, 50),
-                    },
-                };
+                console.error(e);
             } finally {
                 ts.state.loading = false;
             }

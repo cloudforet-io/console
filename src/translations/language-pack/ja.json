@@ -229,7 +229,8 @@
 		"SERVER": "",
 		"SERVICE_PROVIDER": "",
 		"START_TIME": "",
-		"STATE": ""
+		"STATE": "",
+		"SUPPORTED": ""
 	},
 	"FORM": {
 		"LABEL": {

@@ -8,6 +8,6 @@ export const DOMAIN_INFO = {
 };
 
 export default [
-    new MockData('/statistics/inventory/server/diff', () => makeArrayResults(arrayOf(20, casual._resourceDiff), 20)),
-    new MockData('/statistics/inventory/cloud-service/diff', () => []),
+    // new MockData('/statistics/inventory/server/diff', () => makeArrayResults(arrayOf(20, casual._resourceDiff), 20)),
+    // new MockData('/statistics/inventory/cloud-service/diff', () => []),
 ];
