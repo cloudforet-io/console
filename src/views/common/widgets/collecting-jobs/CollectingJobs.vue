@@ -90,7 +90,7 @@ export default defineComponent({
         }
 
 
-        const api = fluentApi.inventory().jobs().list().setOnly('job_id', 'collector_info', 'created_at')
+        const api = fluentApi.inventory().jobs().list().setOnly('job_id', 'collector', 'created_at')
             .setFilter({ key: 'state', value: [JOB_STATE.created, JOB_STATE.progress], operator: '' })
             .setSortBy('created_at')
             .setPageSize(5)

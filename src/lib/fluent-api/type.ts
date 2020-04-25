@@ -5,7 +5,7 @@ export type ApiMethods = 'post' | 'get' | 'delete' | 'put';
 
 export interface LongFilterType {
     key: string;
-    value: string | string[];
+    value: string | Array<string|null> | null;
     operator: string;
 }
 
@@ -13,13 +13,13 @@ type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$';
 
 export interface FilterItem extends LongFilterType {
     key: string;
-    value: string | string[];
+    value: string | Array<string|null> | null;
     operator: OperatorType;
 }
 
 export interface ShortFilterType {
     k: string;
-    v: string | string[];
+    v: string | Array<string|null> | null;
     o: string;
 }
 

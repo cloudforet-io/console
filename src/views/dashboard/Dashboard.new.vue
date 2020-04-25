@@ -4,18 +4,21 @@
                                 sm:col-end-5
                                 lg:col-end-4"
                          title="projects"
+                         resourceType="identity.Project"
                          :color="projects.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-5 sm:col-end-9
                                 lg:col-start-4 lg:col-end-7"
                          title="servers"
+                         resourceType="inventory.Server"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-9
                                 lg:col-start-7 lg:col-end-10"
                          title="cloud services"
+                         resourceType="inventory.CloudService"
                          :color="cloudServices.color"
         />
         <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
