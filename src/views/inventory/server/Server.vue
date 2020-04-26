@@ -132,21 +132,15 @@ import {
     computed, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
     getValue, platformBadgeFormatter, serverStateFormatter, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import PCol from '@/components/atoms/grid/col/Col.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
-import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
@@ -160,7 +154,6 @@ import {
     getFetchValues,
     makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { ServerListResp, ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
@@ -173,7 +166,7 @@ import { MetricAPI } from '@/lib/api/monitoring';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import baseTable from '@/views/inventory/server/schema/base_table.json';
+import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 
 const serverStateVF = {
     name: 'State',
@@ -283,17 +276,11 @@ export default {
         GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
-        PToolboxTable,
-        PBadge,
         PDropdownMenuBtn,
-        PQuerySearchTags,
         PServerDetail,
         PTab,
         PDataTable,
-        PQuerySearchBar,
         PTableCheckModal,
-        PCol,
-        PHr,
         PIconTextButton,
         PDynamicView,
         SProjectTreeModal,
