@@ -20,9 +20,9 @@
                 :is-show="isShow"
             />
         </transition>
-        <p-empty v-if="layouts&&names.length == 0" class="my-8">
-            No data
-        </p-empty>
+<!--        <p-empty v-if="layouts&&names.length == 0" class="my-8">-->
+<!--            No data-->
+<!--        </p-empty>-->
     </div>
 </template>
 
@@ -80,7 +80,6 @@ export default defineComponent({
             layoutData: computed(() => _.zipObject(state.names, props.layouts)),
         });
         const api = computed(() => {
-            console.debug('reset api', props.selectId);
             return {
                 resource: props.resourceApi,
                 getAction: (action) => {
@@ -97,7 +96,6 @@ export default defineComponent({
             name, label: name, vbind: { styleType: 'gray900-hover', outline: selected.value !== name },
         })));
         watch(() => state.names, (aft, bef) => {
-            console.debug('change state names', state.names, selected.value);
             if (aft && aft.length >= 1 && !_.isEqual(aft, bef) && !new Set(aft).has(selected.value)) {
                 selected.value = aft[0];
             }

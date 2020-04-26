@@ -14,7 +14,7 @@ import managementRoute from '@/routes/management/management-route';
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
-import { fluentApi } from '@/lib/fluent-api';
+import DynamicLayoutHelper from '@/views/common/helper/DynamicLayoutHelper.vue';
 
 Vue.use(VueRouter);
 
@@ -82,6 +82,12 @@ const router = new VueRouter({
                 projectRoute,
                 managementRoute,
             ],
+        },
+        {
+            path: '/helper',
+            name: 'Helper',
+            component: DynamicLayoutHelper,
+
         },
         { path: '*', component: ErrorPage },
     ],
