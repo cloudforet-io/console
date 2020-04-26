@@ -112,11 +112,14 @@ export default defineComponent({
         const addNode = (node, newItem: string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
             if (state.tree) {
                 console.log('node test', node)
-                if (node) {
-                    state.tree[type](node, newItem);
-                } else {
+                if (!node) {
                     state.tree[type](newItem);
                 }
+                // if (node) {
+                //     state.tree[type](node, newItem);
+                // } else {
+                //     state.tree[type](newItem);
+                // }
             }
         };
 
@@ -192,7 +195,7 @@ export default defineComponent({
             /*font-size: .875rem;*/
             border-radius: 2px;
             .tree-anchor {
-                @apply text-gray;
+                @apply text-black;
             }
         }
         .tree-arrow {
@@ -217,19 +220,16 @@ export default defineComponent({
             padding-left: 0;
         }
         .tree-node {
+            > .tree-content:hover {
+                @mixin tree-selected transparent, theme('colors.secondary'), transparent;
+            }
             &.selected > .tree-content {
                 @mixin tree-selected theme('colors.blue.200'), theme('colors.secondary'), theme('colors.secondary');
-
             }
-            &:hover {
-             @mixin tree-selected "~@/assets/icons/ic_tree_arrow--opened.svg";
-             }
             &:hover {
              @mixin tree-selected transparent, theme('colors.secondary'), transparent;
              }
-            > .tree-content:hover {
-                @mixin tree-selected theme('colors.blue.200'), theme('colors.secondary'), theme('colors.secondary');
-            }
+
         }
     }
 

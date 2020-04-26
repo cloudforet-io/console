@@ -108,7 +108,7 @@
                     tag-page-name="collectorTags"
                 />
             </template>
-            <template #credentials>
+            <template #credentials v-if="activeTab === 'credentials'">
                 <collector-credentials :collector="selectedItem"
                                        :total-count="crdState.totalCount"
                                        :items="crdState.items"
@@ -165,8 +165,6 @@
         <collect-data-modal v-if="collectDataState.modalVisible"
                             :visible.sync="collectDataState.modalVisible"
                             :collector="selectedItem"
-                            :loading="collectDataState.loading"
-                            :credentials="collectDataState.credentials"
         />
 
         <p-table-check-modal v-if="checkModalState.mode"

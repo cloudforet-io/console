@@ -12,7 +12,7 @@
             <p-dynamic-view view_type="query-search-table"
                             :api-handler="apiHandler"
                             :data_source="dataSource"
-                            :vbind="{responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding':'-1rem'}}"
+                            :vbind="{responsiveStyle:{'overflow-y':'auto','overflow-x':'auto', 'padding':'-1rem'}}"
                             :data="null"
                             v-bind="apiHandler.tableTS.selectState.selectItems"
                             @rowLeftClick="onSelect"

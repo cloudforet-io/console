@@ -38,15 +38,11 @@
                     <p class="sub-header">
                         {{ $t('INVENTORY.COL_OPS') }}
                     </p>
-                    <p-field-group :label="isCredentialType ?$t('COMMON.CREDENTIAL') :$t('COMMON.CREDENTIAL_GRP')">
-                        <div v-if="isCredentialType">
-                            <p-text-input :value="credentials[0] ? credentials[0].name : ''"
-                                          disabled
-                            />
-                        </div>
-                        <div v-else>
-                            <p-select-dropdown v-model="selectedCrdId" :items="crdsMenu" />
-                        </div>
+                    <p-field-group :label="$t('COMMON.CREDENTIAL')">
+                        <p-text-input :value="credential ? credential.name : $t('COMMON.All')"
+                                      disabled
+                                      class="w-full"
+                        />
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.COL_MODE')">
                         <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
@@ -123,6 +119,10 @@ export default defineComponent({
             default: () => ({}),
         },
         visible: Boolean,
+        credential: {
+            type: Object,
+            default: null,
+        },
     },
     setup(props, context: SetupContext) {
         const state = reactive({
@@ -222,24 +222,24 @@ export default defineComponent({
         };
 
 
-        const listCredentials = async () => {
-            if (state.credentials.length > 0) return;
-            state.loading = true;
-            let res: AxiosResponse;
-            if (state.isCredentialType) {
-                res = await secretManagerApi.secret().list()
-                    .setSecretId(props.collector.plugin_info.credential_id)
-                    .execute();
-            } else {
-                res = await secretManagerApi.secret().list()
-                    .setSecretGroupId(props.collector.plugin_info.credential_group_id)
-                    .execute();
-            }
-            state.credentials = res.data.results;
-            state.loading = false;
-        };
+        // const listCredentials = async () => {
+        //     if (state.credentials.length > 0) return;
+        //     state.loading = true;
+        //     let res: AxiosResponse;
+        //     if (state.isCredentialType) {
+        //         res = await secretManagerApi.secret().list()
+        //             .setSecretId(props.collector.plugin_info.credential_id)
+        //             .execute();
+        //     } else {
+        //         res = await secretManagerApi.secret().list()
+        //             .setSecretGroupId(props.collector.plugin_info.credential_group_id)
+        //             .execute();
+        //     }
+        //     state.credentials = res.data.results;
+        //     state.loading = false;
+        // };
 
-        listCredentials();
+        // listCredentials();
 
         return {
             ...toRefs(state),

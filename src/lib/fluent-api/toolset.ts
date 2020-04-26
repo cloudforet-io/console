@@ -440,12 +440,12 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         this.apiState = apiState;
     }
 
-    getParameter = (): { query: Query } & parameter => {
-        const query = { only: this.apiState.only };
-        return {
-            ...this.apiState.parameter,
-            query,
-        };
+    getParameter = (): { only?: string[] } & parameter => {
+        const parms: any = { ...this.apiState.parameter };
+        if (this.apiState.only.length) {
+            parms.only = this.apiState.only;
+        }
+        return parms;
     };
 
     setOnly(...args: string[]): this {
@@ -562,6 +562,7 @@ export abstract class CollectAction<parameter, resp> extends SetParameterAction<
 }
 
 export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI};
+export type OptionalResourceActions<actions extends string> = { [key in actions]?: (...args: any[]) => ActionAPI};
 
 export abstract class Resource {
     protected abstract name: string;
@@ -582,7 +583,7 @@ export abstract class Service {
     constructor(public api: ApiType) { }
 }
 
-export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update'|'get'>{}
+export interface BaseResources<parameter, resp > extends Resource, ResourceActions<'update'|'get'>{}
 
 export interface DictResource<parameter, resp> extends Resource, ResourceActions<'update'|'get'> {
     update: () => UpdateAction<parameter, resp>;

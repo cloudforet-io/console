@@ -1,4 +1,4 @@
-import { watch } from '@vue/composition-api';
+import {ref, watch} from '@vue/composition-api';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -120,11 +120,12 @@ export class QuerySearchGridFluentAPI<
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         acHandlerMeta: ACHandlerMeta = defaultACHandler,
+        isShow: any = ref(true),
     ) {
         super(action);
         this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
-            if (tags !== preTags) {
+            if (isShow.value && tags !== preTags) {
                 await this.getData();
             }
         });

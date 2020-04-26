@@ -1,6 +1,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import PBadge from '@/components/atoms/badges/Badge.vue';
+import { getColor } from '@/components/organisms/dynamic-view/dynamic-field/toolset';
 
 export default {
     name: 'PDynamicFieldBadge',
@@ -8,7 +9,7 @@ export default {
     components: { PBadge },
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
+        options: {
             type: Object,
             default: () => ({}),
         },
@@ -20,8 +21,8 @@ export default {
     render(h, { props }) {
         return h(PBadge, {
             props: {
-                backgroundColor: _.get(props.view_option, ['background_color'], null),
-                textColor: _.get(props.view_option, ['text_color'], null),
+                backgroundColor: getColor(_.get(props.options, ['background_color'], null)),
+                textColor: getColor(_.get(props.options, ['text_color'], null)),
             },
         },
         props.data);

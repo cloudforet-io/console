@@ -1,7 +1,6 @@
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
@@ -10,7 +9,7 @@ import { getKnobProps } from '@sb/storybook-util';
 import { skeletonProps } from '@/components/atoms/skeletons/Skeleton.toolset';
 
 export default {
-    title: 'molecules/skeletons/ItemSkeleton',
+    title: 'atoms/skeletons/ItemSkeleton',
     component: PSkeleton,
     parameters: {
         info: {
