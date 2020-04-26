@@ -562,6 +562,7 @@ export abstract class CollectAction<parameter, resp> extends SetParameterAction<
 }
 
 export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI};
+export type OptionalResourceActions<actions extends string> = { [key in actions]?: (...args: any[]) => ActionAPI};
 
 export abstract class Resource {
     protected abstract name: string;
@@ -582,7 +583,7 @@ export abstract class Service {
     constructor(public api: ApiType) { }
 }
 
-export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update'|'get'>{}
+export interface BaseResources<parameter, resp > extends Resource, ResourceActions<'update'|'get'>{}
 
 export interface DictResource<parameter, resp> extends Resource, ResourceActions<'update'|'get'> {
     update: () => UpdateAction<parameter, resp>;

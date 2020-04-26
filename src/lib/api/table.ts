@@ -39,10 +39,11 @@ export abstract class BaseTableFluentAPI<
     > extends DynamicFluentAPIToolSet<parameter, resp, action> {
     tableTS: T;
 
-    totalCount=ref<number>(0)
+    totalCount: Ref<number>;
 
     protected constructor(action: action) {
         super(action);
+        this.totalCount = ref(0);
         this.tableTS = new ToolboxTableToolSet<initData, initSyncData>() as T;
     }
 
@@ -355,13 +356,18 @@ export class QuerySearchTableFluentAPI<
         super(action);
         this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
-            if (tags !== preTags) {
+            if (tags !== preTags && this.action) {
                 await this.getData();
             }
         });
     }
 
-    getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+    getAction = () => {
+        if (Array.isArray(this.tableTS.querySearch.tags.value)) {
+            return this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+        }
+        return this.getDefaultAction();
+    }
 
     resetAll = () => {
         this.defaultReset();

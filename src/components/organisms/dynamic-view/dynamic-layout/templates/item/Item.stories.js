@@ -1,13 +1,21 @@
 /* eslint-disable camelcase */
-import { makeArrayResults, MockData } from '@/lib/mock/toolset';
-import { arrayOf } from '@/lib/casual';
-import casual from '@/lib/mock/casual';
-import _ from 'lodash';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayoutItem from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/index.vue';
 
-export const DOMAIN_INFO = {
-    domain_id: 'domain_test_id',
+import { object } from '@storybook/addon-knobs';
+import { ref } from '@vue/composition-api';
+import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/item.md';
+import { fluentApi } from '@/lib/fluent-api';
+
+export default {
+    title: 'organisms/dynamic-view/dynamic-layout/item',
+    component: SDynamicLayoutItem,
+    parameters: {
+        notes: md,
+    },
 };
-const dynamicLayoutData = {
+
+const data = {
     name: 'cloudone-dev-eks-cluster-adm-worker',
     primary_ip_address: '172.16.16.100',
     server_type: 'VM',
@@ -58,28 +66,6 @@ const dynamicLayoutData = {
                 remote_cidr: '172.16.0.0/16',
                 direction: 'inbound',
                 prtocol: 'TCP',
-                remote: '172.16.0.0/16',
-            },
-            {
-                port_range_min: 80,
-                port_range_max: 80,
-                port: '80',
-                security_group_name: 'web security group-2',
-                security_group_id: '...',
-                remote_cidr: '172.16.0.0/16',
-                direction: 'inbound',
-                prtocol: 'TCP',
-                remote: '172.16.0.0/16',
-            },
-            {
-                port_range_min: 80,
-                port_range_max: 80,
-                port: '80',
-                security_group_name: 'web security group-3',
-                security_group_id: '...',
-                remote_cidr: '172.16.0.0/16',
-                direction: 'inbound',
-                prtocol: 'UDP',
                 remote: '172.16.0.0/16',
             },
         ],
@@ -189,34 +175,124 @@ const dynamicLayoutData = {
     },
 };
 
-export default [
-    new MockData('/inventory/server/list', () => makeArrayResults(arrayOf(15, casual._server), 80)),
-    new MockData('/inventory/server/get', () => dynamicLayoutData),
-    new MockData('/inventory/server/get-data', (req) => {
-        console.log(req);
-        const data = JSON.parse(req.data);
-        return makeArrayResults(_.get(dynamicLayoutData, data.key_path), 20);
-    }),
-    new MockData('/inventory/cloud-service-type/list', () => makeArrayResults(arrayOf(15, casual._cloudServiceType), 1)),
-    new MockData('/inventory/cloud-service-type/get', () => casual.cloudServiceType),
-    new MockData('/inventory/cloud-service/list', () => makeArrayResults(arrayOf(15, casual._cloudService), 80)),
-    new MockData('/inventory/cloud-service/get', () => casual.cloudService),
-    new MockData(RegExp('.*?/.*?/member/list'), () => makeArrayResults(arrayOf(5, casual._member), 35)),
-    new MockData('/inventory/collector/list', (req) => {
-        const params: any = JSON.parse(req.data);
-        const filter: any = _.get(params, 'query.filter');
-        if (filter) {
-            const res: any[] = [];
-            _.map(filter, (f) => {
-                const key = f.k || f.key;
-                let values: any = f.v || f.value;
-                if (typeof values === 'string') values = [values];
-                _.map(values, (v) => {
-                    res.push(casual._collector({ [key]: v }));
-                });
-            });
-            return makeArrayResults(res, res.length);
-        }
-        return makeArrayResults(arrayOf(15, casual._collector), 80);
-    }),
-];
+const defaultLayout = {
+    name: 'EC2 Instance',
+    type: 'item',
+    options: {
+        fields: [{
+            name: 'Instance ID',
+            key: 'data.compute.instance_name',
+        }, {
+            name: 'Region',
+            key: 'data.compute.region',
+        }, {
+            name: 'Instance State',
+            key: 'data.compute.instance_state',
+            type: 'enum',
+            options: {
+                running: {
+                    type: 'state',
+                    options: {
+                        icon: {
+                            color: 'green',
+                        },
+                    },
+                },
+                'shutting-down': {
+                    type: 'state',
+                    options: {
+                        icon: {
+                            color: 'red',
+                        },
+                    },
+                },
+            },
+        }],
+    },
+};
+
+export const defaultCase = () => ({
+    components: { SDynamicLayout },
+    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    props: {
+        layout: {
+            type: Object,
+            default: object('layout', defaultLayout, 'layout'),
+        },
+        data: {
+            type: Object,
+            default: object('data', data, 'data'),
+        },
+
+    },
+
+});
+
+const rootPathLayout = {
+    name: 'EC2 Instance',
+    type: 'item',
+    options: {
+        root_path: 'data.compute',
+        fields: [{
+            name: 'Instance ID',
+            key: 'instance_name',
+        }, {
+            name: 'Region',
+            key: 'region',
+        }, {
+            name: 'Instance State',
+            key: 'instance_state',
+            type: 'enum',
+            options: {
+                running: {
+                    type: 'state',
+                    options: {
+                        icon: {
+                            color: 'green',
+                        },
+                    },
+                },
+                'shutting-down': {
+                    type: 'state',
+                    options: {
+                        icon: {
+                            color: 'red',
+                        },
+                    },
+                },
+            },
+        }],
+    },
+};
+export const rootPath = () => ({
+    components: { SDynamicLayout },
+    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    setup() {
+        return {
+            layout: rootPathLayout,
+            data,
+        };
+    },
+});
+
+export const apiMode = () => ({
+    components: { SDynamicLayout },
+    template: `<div class="w-screen bg-white">
+        <span>
+        <input type="checkbox" v-model="isShow"> is show    
+        </span>
+        <SDynamicLayout v-bind="layout" :is-show="isShow" :api="api" ref="item"/>
+    </div>`,
+
+    setup() {
+        const isShow = ref(true);
+        return {
+            layout: rootPathLayout,
+            api: {
+                resource: fluentApi.inventory().server(),
+                getAction: action => action.setId('dynamicTest'),
+            },
+            isShow,
+        };
+    },
+});
