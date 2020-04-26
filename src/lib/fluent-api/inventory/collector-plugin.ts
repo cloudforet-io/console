@@ -22,6 +22,7 @@ interface PluginOptions {
 export interface CollectorPluginModel extends IdParameter {
     version: string;
     options: PluginOptions;
-    credential_id?: string;
-    credential_group_id?: string;
+    secret_id?: string;
+    secret_group_id?: string;
+    provider?: string;
 }

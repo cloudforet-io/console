@@ -6,7 +6,6 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
 
 const idField = 'secret_group_id';
 

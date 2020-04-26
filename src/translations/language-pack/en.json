@@ -415,6 +415,8 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "cloud service",
+		"COLLECTOR": "Collector",
+		"ID": "ID",
 		"KEY": "Key",
 		"LOCAL_TIME": "Local Time",
 		"RESOURCE": "Resource",
@@ -425,6 +427,7 @@
 		"TIME_RANGE": "Time Range",
 		"USER": "user",
 		"VALUE": "Value",
+		"VERSION": "Version",
 		"VM": "vm"
 	}
 }
