@@ -2,7 +2,7 @@
     <general-page-layout class="h-screen">
         <PPageTitle class="mt-4">
             <template #title>
-                Data
+                <i class="fas fa-database text-blue-400 " /> Choice Data Mode
             </template>
         </PPageTitle>
         <p-tab class="w-full" :tabs="modeTab.state.tabs"
@@ -36,9 +36,9 @@
         </p-tab>
         <HorizontalLayout>
             <template #container="{height}">
-                <PPageTitle class="my-4">
+                <PPageTitle class="mt-8 mb-4">
                     <template #title>
-                        Scehma
+                        <i class="fas fa-edit text-green-400" /> Edit Schema
                     </template>
                 </PPageTitle>
                 <p-tab class="w-full" :tabs="typeTab.state.tabs"
@@ -50,7 +50,7 @@
                                 <PCheckBox v-model="subDataDefault" />   use Default
                             </div>
                             <transition name="fade">
-                                <PMonacoEditor v-if="!(subDataDefault&&subDataDefaultSchema)" :style="{height:height+'px'}" class="editor"
+                                <PMonacoEditor v-if="!(subDataDefault&&subDataDefaultSchema)" :style="{height:height+'px'}"
                                                :code.sync="subDataSchema"
                                 />
                                 <RawData v-else :item="subDataDefaultSchema" :style="{height:height+'px'}" />
@@ -60,12 +60,10 @@
                     <template #table>
                         <div class="tab-content">
                             <div v-if="tableDefaultSchema">
-                                <PCheckBox v-model="subDataDefault" />  use Default
+                                <PCheckBox v-model="tableDefault" />  use Default
                             </div>
                             <transition name="fade">
-                                <PMonacoEditor v-if="!(tableDefault&&tableDefaultSchema)" :style="{height:height+'px'}" :code.sync="tableSchema"
-                                               class="editor"
-                                />
+                                <PMonacoEditor v-if="!(tableDefault&&tableDefaultSchema)" :style="{height:height+'px'}" :code.sync="tableSchema" />
                                 <RawData v-else :item="tableDefaultSchema" :style="{height:height+'px'}" />
                             </transition>
                         </div>
@@ -76,20 +74,27 @@
 
         <PPageTitle class="mt-8">
             <template #title>
-                Result
+                <i class="fas fa-smile-wink text-yellow-400" />  Result
             </template>
             <template #extra-area>
-                <p-button class="ml-4" style-type="primary" @click="forceRefresh">
+                <p-button class="ml-4" style-type="primary" outline
+                          @click="forceRefresh"
+                >
                     Force Refresh
                 </p-button>
             </template>
         </PPageTitle>
-        <PPaneLayout>
+        <PPaneLayout v-if="modeTab.syncState.activeTab==='api'&&!(selectResource&&selectService)">
+            <div class="p-8 text-lg font-bold border-red-800 bg-red-100 text-red-500">
+                <i class="fas fa-exclamation-triangle" /> &nbsp;서비스와 리소스를 선택해주세요!
+            </div>
+        </PPaneLayout>
+        <PPaneLayout v-else>
             <div class="p-4 font-bold border-blue-800 bg-blue-100 text-blue-500">
-                <i class="fas fa-info-circle" /> 간혹 스키마 혹은 데이터가 제대로 반영 안될 경우 Force Refresh를 눌러주세요
+                <i class="fas fa-info-circle" /> &nbsp; 스키마 혹은 데이터가 제대로 반영 안될 경우 Force Refresh를 눌러주세요
             </div>
             <div v-if="modeTab.syncState.activeTab==='api'&&noData" class="p-4 font-bold border-red-800 bg-red-100 text-red-500">
-                <i class="fas fa-warning" />서버에 해당 리소스의 데이터가 없습니다!
+                <i class="fas fa-exclamation-triangle" /> &nbsp;서버에 해당 리소스의 데이터가 없습니다!
             </div>
             <transition name="fade">
                 <div v-if="refresh" class="tab-content">
@@ -179,6 +184,8 @@ const defaultSchema = {
 };
 const makeItem = (names: string[]) => names.map(s => ({ type: 'item', name: s, label: s }));
 const serviceList = makeItem(getServerList());
+
+const tableSchemaSample = '{\n    "type":"query-search-table",\n    "name":"test",\n    "options":{\n        "fields":[\n            {\n                "type":"text",\n                "key":"name",\n                "name":"name"\n            }\n        ]\n    }\n}';
 
 
 export default defineComponent({
@@ -273,7 +280,8 @@ export default defineComponent({
         });
 
         const tableState = reactive({
-            tableSchema: '{}',
+            // eslint-disable-next-line max-len
+            tableSchema: tableSchemaSample,
             tableDefault: true,
             tableDefaultSchema: computed(() => {
                 if (state.selectService && state.selectResource) {
