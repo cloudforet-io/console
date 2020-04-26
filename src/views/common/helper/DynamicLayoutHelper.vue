@@ -49,10 +49,12 @@
                             <div v-if="subDataDefaultSchema">
                                 <PCheckBox v-model="subDataDefault" />   use Default
                             </div>
-                            <PMonacoEditor v-if="!(subDataDefault&&subDataDefaultSchema)" :style="{height:height+'px'}" class="editor"
-                                           :code.sync="subDataSchema"
-                            />
-                            <RawData v-else :item="subDataDefaultSchema" :style="{height:height+'px'}" />
+                            <transition name="fade">
+                                <PMonacoEditor v-if="!(subDataDefault&&subDataDefaultSchema)" :style="{height:height+'px'}" class="editor"
+                                               :code.sync="subDataSchema"
+                                />
+                                <RawData v-else :item="subDataDefaultSchema" :style="{height:height+'px'}" />
+                            </transition>
                         </div>
                     </template>
                     <template #table>
@@ -60,10 +62,12 @@
                             <div v-if="tableDefaultSchema">
                                 <PCheckBox v-model="subDataDefault" />  use Default
                             </div>
-                            <PMonacoEditor v-if="!(tableDefault&&tableDefaultSchema)" :style="{height:height+'px'}" :code.sync="tableSchema"
-                                           class="editor"
-                            />
-                            <RawData v-else :item="tableDefaultSchema" :style="{height:height+'px'}" />
+                            <transition name="fade">
+                                <PMonacoEditor v-if="!(tableDefault&&tableDefaultSchema)" :style="{height:height+'px'}" :code.sync="tableSchema"
+                                               class="editor"
+                                />
+                                <RawData v-else :item="tableDefaultSchema" :style="{height:height+'px'}" />
+                            </transition>
                         </div>
                     </template>
                 </p-tab>
@@ -74,21 +78,38 @@
             <template #title>
                 Result
             </template>
+            <template #extra-area>
+                <p-button class="ml-4" style-type="primary" @click="forceRefresh">
+                    Force Refresh
+                </p-button>
+            </template>
         </PPageTitle>
         <PPaneLayout>
-            <div class="tab-content">
-                <s-dynamic-sub-data
-                    v-if="typeTab.syncState.activeTab==='subData'"
-                    :layouts="layouts"
-                    :resource-api="resourceApi"
-                    :select-id="selectedId"
-                    :is-show="typeTab.syncState.activeTab==='subData'&&resourceApi&&selectedId"
-                />
-                <s-dynamic-layout
-                    v-else
-                    v-bind="layout"
-                />
+            <div class="p-4 font-bold border-blue-800 bg-blue-100 text-blue-500">
+                <i class="fas fa-info-circle" /> 간혹 스키마 혹은 데이터가 제대로 반영 안될 경우 Force Refresh를 눌러주세요
             </div>
+            <div v-if="modeTab.syncState.activeTab==='api'&&noData" class="p-4 font-bold border-red-800 bg-red-100 text-red-500">
+                <i class="fas fa-warning" />서버에 해당 리소스의 데이터가 없습니다!
+            </div>
+            <transition name="fade">
+                <div v-if="refresh" class="tab-content">
+                    <transition name="fade">
+                        <s-dynamic-sub-data
+                            v-if="typeTab.syncState.activeTab==='subData'"
+                            :layouts="layouts"
+                            :resource-api="resourceApi"
+                            :select-id="selectedId"
+                            :is-show="typeTab.syncState.activeTab==='subData'"
+                        />
+                        <s-dynamic-layout
+                            v-else
+                            v-bind="layout"
+                            :api="{resource:resourceApi}"
+                            :is-show="typeTab.syncState.activeTab==='table'"
+                        />
+                    </transition>
+                </div>
+            </transition>
         </PPaneLayout>
     </general-page-layout>
 </template>
@@ -113,6 +134,7 @@ import ServerTable from '@/metadata-schema/view/inventory/server/table/layout/ba
 import CloudServiceSD from '@/metadata-schema/view/inventory/cloud_service/sub_data/layouts/base_info.json';
 import CloudServiceTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 const checkApi = (api: any, target: string, matches: string[]): boolean => {
     // eslint-disable-next-line no-proto
@@ -173,6 +195,7 @@ export default defineComponent({
         PCheckBox,
         RawData,
         HorizontalLayout,
+        PButton,
     },
     setup() {
         const vm = getCurrentInstance();
@@ -192,6 +215,8 @@ export default defineComponent({
             selectService: '',
             selectResource: '',
             selectedId: '',
+            noData: false,
+            refresh: true,
             resourceList: computed(() => {
                 if (state.selectService) {
                     const list: string[] = [];
@@ -218,6 +243,11 @@ export default defineComponent({
 
 
         });
+        const forceRefresh = () => {
+            state.refresh = false;
+            console.debug('foreRefresh');
+            setTimeout(() => { state.refresh = true; }, 300);
+        };
         const subDataState = reactive({
             // eslint-disable-next-line no-useless-escape
             subDataSchema: '[\n    {\"type\":\"raw\",\"name\":\"test\"}\n]',
@@ -268,6 +298,11 @@ export default defineComponent({
                 const idField: string = state.resourceApi.get().idField;
                 state.selectedId = resp.data.results && resp.data.results.length ? resp.data.results[0][idField] : '';
                 state.data = resp.data.results;
+                if (resp.data.results.length === 0) {
+                    state.noData = true;
+                } else {
+                    state.noData = false;
+                }
             }
         });
         return {
@@ -277,6 +312,7 @@ export default defineComponent({
             ...toRefs(subDataState),
             ...toRefs(tableState),
             serviceList,
+            forceRefresh,
         };
     },
 });
@@ -301,8 +337,13 @@ export default defineComponent({
             }
         }
     }
-    .editor{
-        height: 50vh;
+    .fade-enter,
+    .fade-leave-to {
+        opacity: 0;
     }
 
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: 0.2s;
+    }
 </style>
