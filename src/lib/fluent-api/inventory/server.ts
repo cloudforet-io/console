@@ -30,24 +30,24 @@ interface ServerGetParameter {
 }
 
 class Get extends GetAction<ServerGetParameter, ServerModel> {
-    protected idField = idField
+    idField = idField
 }
 
 class Update extends UpdateAction<any, any> {
-    protected idField = idField
+    idField = idField
 }
 
 
 class List extends ListAction<any, ServerListResp> {}
 
 class GetData extends GetDataAction<any, ListType<any>> {
-    protected idField = idField
+    idField = idField
 }
 
 class ChangeProject extends SubMultiItemAction<any, any> {
     path = 'change-project'
 
-    protected idField = 'project_id'
+    idField = 'project_id'
 
     protected subIdsField = idsField
 

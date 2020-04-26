@@ -35,7 +35,7 @@ interface CstGetParameter {
 }
 
 class Get extends GetAction<CstGetParameter, CloudServiceTypeModel> {
-    protected idField = 'cloud_service_type_id'
+    idField = 'cloud_service_type_id'
 }
 
 interface CstListParameter {

@@ -57,21 +57,21 @@ interface CollectParameter extends IdParameter {
 class Create extends CreateAction<CreateParameter, any> {}
 
 class Update extends UpdateAction<UpdateParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 
 class Delete extends SingleDeleteAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 
 class Get extends GetAction<IdParameter, CollectorModel> {
-    protected idField = idField;
+    idField = idField;
 }
 
 class List extends ListAction<any, CollectorListResp> {}
 
 class Collect extends CollectAction<CollectParameter, any> {
-    protected idField = idField;
+    idField = idField;
 
     setId(id: string): this {
         const api = this.clone();

@@ -28,7 +28,7 @@ export interface SupervisorModel extends IdParameter, Tags {
 export type SupervisorListResp = ListType<SupervisorModel>
 
 class Get extends GetAction<IdParameter, SupervisorModel> {
-    protected idField = idField;
+    idField = idField;
 }
 class List extends ListAction<any, SupervisorListResp> {}
 export default class Supervisor extends Resource implements ResourceActions<'get'|'list'> {

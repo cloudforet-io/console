@@ -32,7 +32,7 @@ export type ProviderListResp = ListType<ProviderModel>
 
 
 class Get extends GetAction<IdParameter, ProviderModel> {
-    protected idField = idField;
+    idField = idField;
 }
 class List extends ListAction<any, ProviderListResp> {}
 export default class Provider extends Resource implements ResourceActions<'get'|'list'> {
