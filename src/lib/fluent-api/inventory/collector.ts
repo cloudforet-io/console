@@ -11,6 +11,12 @@ import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugi
 
 const idField = 'collector_id';
 
+export enum COLLECT_MODE {
+    all = 'ALL',
+    create = 'CREATE',
+    update = 'UPDATE'
+}
+
 interface IdParameter {
     [idField]: string;
 }
@@ -40,12 +46,13 @@ interface UpdateParameter extends Tags, IdParameter {
     name: string;
 }
 
-export interface CollectParameter extends IdParameter {
+interface CollectParameter extends IdParameter {
     collect_mode?: string;
     filter?: any;
     credential_id?: string;
     credential_group_id?: string;
 }
+
 
 class Create extends CreateAction<CreateParameter, any> {}
 
@@ -65,6 +72,36 @@ class List extends ListAction<any, CollectorListResp> {}
 
 class Collect extends CollectAction<CollectParameter, any> {
     protected idField = idField;
+
+    setId(id: string): this {
+        const api = this.clone();
+        api.apiState.parameter.collector_id = id;
+        return api;
+    }
+
+    setCollectMode(mode: COLLECT_MODE): this {
+        const api = this.clone();
+        api.apiState.parameter.collect_mode = mode;
+        return api;
+    }
+
+    setCredentialId(credentialId: string): this {
+        const api = this.clone();
+        api.apiState.parameter.credential_id = credentialId;
+        return api;
+    }
+
+    setCredentialGroupId(credentialGroupId: string): this {
+        const api = this.clone();
+        api.apiState.parameter.credential_group_id = credentialGroupId;
+        return api;
+    }
+
+    setFilters(...args: any): this {
+        const api = this.clone();
+        api.apiState.parameter.filter = args;
+        return api;
+    }
 }
 
 export default class Collector extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {

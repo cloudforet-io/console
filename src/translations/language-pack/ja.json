@@ -415,6 +415,8 @@
 	"WORD": {
 		"CIDR": "",
 		"CLOUDSERVICE": "",
+		"COLLECTOR": "",
+		"ID": "",
 		"KEY": "",
 		"LOCAL_TIME": "",
 		"RESOURCE": "",
@@ -425,6 +427,7 @@
 		"TIME_RANGE": "",
 		"USER": "",
 		"VALUE": "",
+		"VERSION": "",
 		"VM": ""
 	}
 }

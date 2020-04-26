@@ -62,7 +62,6 @@ import { violet, yellow } from '@/styles/colors';
 import _ from 'lodash';
 import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
-import casual from '@/lib/casual';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
@@ -90,14 +89,14 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
-        getAction: {
-            type: Function,
-            default: action => action.setServiceType('identity.service-account')
-                .setGroupBy('provider')
-                .addField('provider', OPERATORS.value, 'provider')
-                .addField('service_account_id', OPERATORS.count, 'count')
-                .setSort('provider'),
-        },
+        // getAction: {
+        //     type: Function,
+        //     default: action => action.setServiceType('identity.service-account')
+        //         .setGroupBy('provider')
+        //         .addField('provider', OPERATORS.value, 'provider')
+        //         .addField('service_account_id', OPERATORS.count, 'count')
+        //         .setSort('provider'),
+        // },
     },
     setup(props) {
         const vm: any = getCurrentInstance();
