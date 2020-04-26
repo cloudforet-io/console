@@ -440,12 +440,12 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         this.apiState = apiState;
     }
 
-    getParameter = (): { query: Query } & parameter => {
-        const query = { only: this.apiState.only };
-        return {
-            ...this.apiState.parameter,
-            query,
-        };
+    getParameter = (): { only?: string[] } & parameter => {
+        const parms: any = { ...this.apiState.parameter };
+        if (this.apiState.only.length) {
+            parms.only = this.apiState.only;
+        }
+        return parms;
     };
 
     setOnly(...args: string[]): this {

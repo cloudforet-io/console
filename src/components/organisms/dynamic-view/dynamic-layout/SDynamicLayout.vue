@@ -1,13 +1,15 @@
 <template>
-    <component :is="component"
-               :name="name"
-               :options="options"
-               :data="data"
-               :api="api"
-               :is-show="isShow"
-               v-bind="vbind"
-               :is-loading="isLoading"
-               v-on="$listeners"
+    <component
+        :is="component"
+        :name="name"
+        :options="options"
+        :data="data"
+        :api="api"
+        :toolset="toolset"
+        :is-show="isShow"
+        v-bind="vbind"
+        :is-loading="isLoading"
+        v-on="$listeners"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -22,6 +24,8 @@ import {
     computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { Computed } from '@/lib/type';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import _ from 'lodash';
 import { DynamicLayoutProps } from './toolset';
 
 
@@ -32,14 +36,15 @@ interface State {
 
 export default defineComponent({
     name: 'SDynamicLayout',
+    components: { PSkeleton },
     props: {
         name: {
             type: String,
-            required: true,
+            default: '',
         },
         type: {
             type: String,
-            required: true,
+            default: '',
         },
         options: {
             type: Object,
@@ -94,8 +99,8 @@ export default defineComponent({
         onMounted((): void => {
             // @ts-ignore
             getComponent();
-            watch(() => props.type, (aft, bef) => {
-                if (aft !== bef) {
+            watch(() => [props.type, props.name], (aft, bef) => {
+                if (!_.isEqual(aft, bef)) {
                     state.isLoading = true;
                     getComponent();
                 }

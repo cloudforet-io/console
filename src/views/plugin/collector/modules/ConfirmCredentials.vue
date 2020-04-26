@@ -81,6 +81,9 @@ export default {
                 .then((res) => {
                     state.schema = res.data.capability.supported_schema.map(name => ({ name }));
                     state.isLoadSchema = true;
+                })
+                .catch((e) => {
+                    console.error(e);
                 });
         };
 
