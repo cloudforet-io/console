@@ -52,6 +52,7 @@ export default {
         });
         const changSelectItem = (value) => {
             emit('input', value);
+            emit('onSelected', value);
         };
         const invalidClass = computed(() => ({ 'is-invalid-btn': props.invalid }));
         return {
