@@ -189,11 +189,10 @@ export default defineComponent({
 
         const collectData = async (id: string): Promise<void> => {
             try {
-                await collectorApi.collect().setParameter({
-                    // eslint-disable-next-line camelcase
-                    collector_id: id,
-                    filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
-                }).execute();
+                await collectorApi.collect()
+                    .setId(id)
+                    .setFilters({ [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) })
+                    .execute();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
