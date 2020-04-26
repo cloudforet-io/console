@@ -320,7 +320,7 @@ export abstract class UpdateAction<parameter, resp> extends SetParameterAction<p
 }
 
 export abstract class SingleItemAction<parameter, resp> extends RawParameterAction<parameter, resp> implements SingleItemActionInterface {
-    protected abstract idField: string;
+    public abstract idField: string;
 
 
     setId(id: string): this {

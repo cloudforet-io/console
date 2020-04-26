@@ -1,6 +1,7 @@
 import { api as consoleApi } from '@/lib/api/axios';
 import { ApiType } from '@/lib/fluent-api/type';
 import Monitoring from '@/lib/fluent-api/monitoring';
+import { ApiType } from '@/lib/type';
 import InventoryService from './inventory';
 import PluginService from './plugin';
 import SecretService from './secret';
