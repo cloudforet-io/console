@@ -23,10 +23,10 @@ interface UpdateParameter extends Tags, IdParameter {
 class Create extends CreateAction<CreateParameter, any> {}
 class Update extends UpdateAction<UpdateParameter, any> {}
 class Delete extends SingleDeleteAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class Get extends GetAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 export default class DomainOwner extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'> {
     protected name = 'domain-owner';

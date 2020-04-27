@@ -5,6 +5,7 @@
         :options="options"
         :data="data"
         :api="api"
+        :toolset="toolset"
         :is-show="isShow"
         v-bind="vbind"
         :is-loading="isLoading"

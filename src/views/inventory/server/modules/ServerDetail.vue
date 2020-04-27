@@ -16,7 +16,7 @@ import {
     defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import baseInfoSchema from '@/views/inventory/server/schema/base_info.json';
+import baseInfoSchema from '@/metadata-schema/view/inventory/server/sub_data/layouts/base_info.json';
 
 const rawLayout = {
     name: 'Raw Data',

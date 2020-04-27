@@ -45,10 +45,10 @@ interface UpdateParameter extends Tags, IdParameter {
 class Create extends CreateAction<CreateParameter, any> {}
 class Update extends UpdateAction<UpdateParameter, any> {}
 class Delete extends SingleDeleteAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class Get extends GetAction<IdParameter, ProjectModel> {
-    protected idField = idField;
+    idField = idField;
 }
 
 interface ProjectListParameter {
@@ -62,7 +62,7 @@ class List extends ListAction<ProjectListParameter, ProjectListResp> {
 }
 
 class MemberList extends SingleItemMemberListAction<any, any> {
-    protected idField = idField;
+    idField = idField;
 }
 
 interface ProjectTreeParameter {

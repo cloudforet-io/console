@@ -6,7 +6,7 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { CollectorModel } from '@/lib/fluent-api/inventory/collector';
+import { CollectorModel, COLLECT_MODE } from '@/lib/fluent-api/inventory/collector';
 
 const idField = 'job_id';
 
@@ -23,11 +23,6 @@ export enum JOB_STATE {
     success = 'SUCCESS'
 }
 
-export enum COLLECT_MODE {
-    all = 'ALL',
-    create = 'CREATE',
-    update = 'UPDATE'
-}
 
 export interface JobParam {
     job_id?: string;

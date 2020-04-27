@@ -2,31 +2,13 @@
     <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
-                <p-toolbox-table
-                    ref="toolbox"
-                    :items="apiHandler.tableTS.state.items"
-                    :fields="fields"
-                    :selectable="true"
-                    :sortable="true"
-                    :dragable="true"
-                    :hover="true"
-                    :responsive="true"
-                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
-                    :setting-visible="false"
-                    :use-cursor-loading="true"
-                    :excel-visible="true"
-                    :all-page="apiHandler.tableTS.state.allPage"
-                    :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
-                    :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
-                    :this-page.sync="apiHandler.tableTS.syncState.thisPage"
-                    :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
-                    :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-                    :loading.sync="apiHandler.tableTS.syncState.loading"
-                    @changePageSize="apiHandler.getData()"
-                    @changePageNumber="apiHandler.getData()"
-                    @clickRefresh="apiHandler.getData()"
-                    @changeSort="apiHandler.getData()"
-                    @clickExcel="exportToolSet.getData()"
+                <SDynamicLayout
+                    v-bind="mainTableLayout"
+                    :toolset="apiHandler"
+                    :vbind="{
+                        responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
+                        showTitle:false
+                    }"
                 >
                     <template #toolbox-left>
                         <PIconTextButton style-type="primary-dark"
@@ -38,7 +20,7 @@
                         </PIconTextButton>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
-                            class="left-toolbox-item"
+                            class="left-toolbox-item mr-4"
                             :menu="dropdown"
                             @click-in-service="clickInService"
                             @click-maintenance="clickMaintenance"
@@ -48,60 +30,10 @@
                             @click-link="apiHandler.tableTS.linkState.openLink()"
                             @click-exportExcel="exportToolSet.getData()"
                         >
-                            Action
+                            {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
-                        <div class="left-toolbox-item">
-                            <p-query-search-bar
-                                :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
-                                :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
-                                @newQuery="apiHandler.tableTS.querySearch.addTag"
-                            />
-                        </div>
                     </template>
-
-                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
-                        <p-col :col="12">
-                            <p-hr style="width: 100%;" />
-                            <p-query-search-tags style="margin-top: 0.5rem;"
-                                                 :tags="apiHandler.tableTS.querySearch.tags.value"
-                                                 @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
-                                                 @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
-                            />
-                        </p-col>
-                    </template>
-                    <template v-slot:col-state-format="data">
-                        <p-status v-bind="serverStateFormatter(data.value)" />
-                    </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.console_force_data.project }}
-                    </template>
-                    <template />
-                    <template v-slot:col-updated_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                    <template v-slot:col-core-format="data">
-                        {{ data | getValue(['item','data','base','core']) }}
-                    </template>
-                    <template v-slot:col-memory-format="data">
-                        {{ data | getValue(['item','data','base','memory']) }}
-                    </template>
-                    <template v-slot:col-pool-format="data">
-                        {{ data | getValue(['item','pool_info','name']) }}
-                    </template>
-                    <template v-slot:col-os_distro-format="data">
-                        {{ data | getValue(['item','data','os','od_distro']) }}
-                    </template>
-                    <template v-slot:col-server_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.value)">
-                            {{ data.value }}
-                        </PBadge>
-                    </template>
-                    <template v-slot:col-platform_type-format="data">
-                        <PBadge v-if="data.item.data.platform && data.item.data.platform.type" v-bind="platformBadgeFormatter(data.item.data.platform.type)">
-                            {{ data | getValue(['item','data','platform','type']) }}
-                        </PBadge>
-                    </template>
-                </p-toolbox-table>
+                </SDynamicLayout>
             </template>
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
@@ -200,23 +132,16 @@ import {
     computed, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
     getValue, platformBadgeFormatter, serverStateFormatter, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import PCol from '@/components/atoms/grid/col/Col.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
-import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
-import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import { AdminFluentAPI, HistoryFluentAPI, QuerySearchTableFluentAPI } from '@/lib/api/table';
@@ -229,7 +154,6 @@ import {
     getFetchValues,
     makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { ServerListResp, ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
@@ -241,7 +165,8 @@ import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 
 const serverStateVF = {
     name: 'State',
@@ -351,25 +276,28 @@ export default {
         GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
-        PToolboxTable,
-        PBadge,
         PDropdownMenuBtn,
-        PQuerySearchTags,
         PServerDetail,
         PTab,
         PDataTable,
-        PQuerySearchBar,
         PTableCheckModal,
-        PCol,
-        PHr,
         PIconTextButton,
         PDynamicView,
         SProjectTreeModal,
         SCollectModal,
         SMonitoring,
+        SDynamicLayout,
         STagsPanel,
     },
     setup(props, context) {
+        const mainTableLayout = computed<any>(() => ({
+            name: 'Server',
+            type: baseTable.type as any,
+            options: {
+                fields: baseTable.options.fields,
+            },
+
+        }));
         class ACHandler extends QuerySearchTableACHandler {
             // eslint-disable-next-line class-methods-use-this
             get valuesFetchUrl() {
@@ -434,7 +362,16 @@ export default {
             });
         const apiHandler = new QuerySearchTableFluentAPI(
             action,
-            undefined,
+            {
+                selectable: true,
+                sortable: true,
+                dragable: true,
+                hover: true,
+                responsive: true,
+                'setting-visible': false,
+                'use-cursor-loading': true,
+                'excel-visible': true,
+            },
             undefined,
             { handlerClass: ACHandler, args },
         );
@@ -647,7 +584,6 @@ export default {
         );
 
 
-
         return {
             ...toRefs(tabData),
             dropdown,
@@ -679,6 +615,7 @@ export default {
             baseInfoDetails,
             collectModalState,
             metricAPIHandler,
+            mainTableLayout,
         };
     },
 };

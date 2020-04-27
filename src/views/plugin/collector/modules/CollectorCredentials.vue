@@ -4,13 +4,6 @@
             <template>
                 {{ $t('PANEL.CREDENTIAL') }}
             </template>
-<!--            <template #extra>-->
-<!--                <router-link class="credential-btn" :to="credentialPath" target="_blank">-->
-<!--                    <p-button outline style-type="gray900">-->
-<!--                        {{ $t('INVENTORY.MANAGE_CRD') }}-->
-<!--                    </p-button>-->
-<!--                </router-link>-->
-<!--            </template>-->
         </p-panel-top>
         <p-toolbox-table :items="items"
                          :fields="fields"
@@ -32,23 +25,6 @@
                          @clickRefresh="listCredentials"
                          @changeSort="listCredentials"
         >
-            <template #toolbox-left>
-                <!--                <p-button style-type="safe" :disabled="selectedItems.length === 0"-->
-                <!--                          @click="onClickVerify"-->
-                <!--                >-->
-                <!--                    {{$t('COMMON.VERIFY') }}-->
-                <!--                </p-button>-->
-            </template>
-<!--            <template #col-credential_groups-format="{value}">-->
-<!--                <span>-->
-<!--                    <p-badge v-for="crdg in value"-->
-<!--                             :key="crdg.credential_group_id"-->
-<!--                             style-type="gray200"-->
-<!--                    >-->
-<!--                        {{ crdg.name }}-->
-<!--                    </p-badge>-->
-<!--                </span>-->
-<!--            </template>-->
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
             </template>
@@ -59,34 +35,32 @@
             </template>
         </p-toolbox-table>
 
-        <credential-verify-modal v-if="verifyModalVisible" :visible="verifyModalVisible"
+        <credential-verify-modal v-if="verifyModalVisible" :visible.sync="verifyModalVisible"
                                  :items="selectedItems"
         />
 
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
                             :collector="collector"
-                            :credential="targetCredential"
+                            :credential-id="targetCredentialId"
         />
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
     reactive, toRefs, computed, ref, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
-import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import { makeProxy } from '@/lib/compostion-util';
-import {defaultQuery} from "@/lib/api/query";
-import {fluentApi} from "@/lib/fluent-api";
+import { fluentApi } from '@/lib/fluent-api';
+import { SecretModel } from '@/lib/fluent-api/secret/secret';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 const CredentialVerifyModal = () => import('@/views/plugin/collector/modules/CredentialVerifyModal.vue');
@@ -97,70 +71,73 @@ export default {
         PPanelTop,
         PToolboxTable,
         PButton,
-        PBadge,
         CollectDataModal,
         CredentialVerifyModal,
     },
     props: {
         collector: Object,
-        totalCount: Number,
-        items: Array,
-        loading: Boolean,
-        selectIndex: Array,
-        selectedItems: Array,
-        /**
-         * sync prop
-         */
-        verifyModalVisible: Boolean,
     },
-    setup(props, { parent, emit, root }) {
+    setup(props, { parent }) {
         const state = reactive({
-            fields: [
+            items: [],
+            totalCount: 0,
+            loading: true,
+            selectIndex: [],
+            selectedItems: [],
+            fields: computed(() => [
                 ...makeTrItems([
                     ['name', 'COMMON.NAME', { size: '400px' }],
-                    // ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
-                    // ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
                     ['created_at', 'COMMON.CREATED', { size: '300px' }],
                 ], parent),
-                { name: 'collect', label: ' ', sortable: false }],
+                { name: 'collect', label: ' ', sortable: false },
+            ]),
             sortBy: '',
             sortDesc: '',
             pageSize: 10,
             thisPage: 1,
             allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
-            onClickVerify() { emit('verifyModalVisible:update', true); },
-            // credentialPath: computed(() => (_.get(props.collector, 'plugin_info.credential_id')
-            //     ? '/secret/credentials' : '/secret/credentials-group')),
-            credentialPath: '/secret/credentials',
+            verifyModalVisible: false,
             collectDataVisible: false,
-            targetCredential: null
+            targetCredentialId: null,
         });
 
-        const query = computed(() => (defaultQuery(
-            state.thisPage, state.pageSize,
-            state.sortBy, state.sortDesc,
-        )));
+        const listApi = computed(() => fluentApi.secret().secret().list()
+            .setPageSize(state.pageSize)
+            .setThisPage(state.thisPage)
+            .setSortBy(state.sortBy)
+            .setSortDesc(state.sortDesc));
 
-        //TODO: list credentials by provider & plugin
-        const listCredentials = async() => {
-            CollectorEventBus.$emit('listCredentialsByCollector', query.value);
+        // TODO: list credentials by provider & plugin
+        const listCredentials = async (): Promise<void> => {
+            state.loading = true;
+            try {
+                const res = await listApi.value.execute();
+                state.items = res.data.results;
+                state.totalCount = res.data.total_count;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
 
-        // listCredentials();
+        listCredentials();
 
         watch(() => props.collector, () => {
             listCredentials();
+        }, {
+            lazy: true,
         });
 
         return {
             ...toRefs(state),
             listCredentials,
             timestampFormatter,
-            openCollectDataModal(item) {
+            openCollectDataModal(item: SecretModel) {
                 state.collectDataVisible = true;
-                state.targetCredential = item
-            }
+                state.targetCredentialId = item.secret_id || null;
+            },
         };
     },
 };

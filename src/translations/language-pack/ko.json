@@ -415,6 +415,8 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "클라우드 서비스",
+		"COLLECTOR": "컬렉",
+		"ID": "아이디",
 		"KEY": "키",
 		"LOCAL_TIME": "로컬 시간",
 		"RESOURCE": "리소스",
@@ -425,6 +427,7 @@
 		"TIME_RANGE": "시간 범위",
 		"USER": "사용자",
 		"VALUE": "값",
+		"VERSION": "버",
 		"VM": "가상머신"
 	}
 }

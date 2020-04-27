@@ -10,7 +10,7 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    BaseQueryState, BaseQuery, ApiType,
+    BaseQueryState, BaseQuery, ApiType
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
@@ -320,7 +320,7 @@ export abstract class UpdateAction<parameter, resp> extends SetParameterAction<p
 }
 
 export abstract class SingleItemAction<parameter, resp> extends RawParameterAction<parameter, resp> implements SingleItemActionInterface {
-    protected abstract idField: string;
+    public abstract idField: string;
 
 
     setId(id: string): this {
@@ -557,7 +557,7 @@ export abstract class GetDataAction<parameter, resp> extends QueryAPI<parameter,
     }
 }
 
-export abstract class CollectAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+export abstract class CollectAction<parameter, resp> extends RawParameterAction<parameter, resp> {
     protected path = 'collect';
 }
 

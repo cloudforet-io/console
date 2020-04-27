@@ -6,7 +6,6 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
 
 const idField = 'secret_group_id';
 
@@ -27,10 +26,10 @@ interface UpdateParameter extends Tags, IdParameter {
 class Create extends CreateAction<CreateParameter, any> {}
 class Update extends UpdateAction<UpdateParameter, any> {}
 class Delete extends SingleDeleteAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class Get extends GetAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class List extends ListAction<any, SecretGroupListResp> {}
 export default class SecretGroup extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {

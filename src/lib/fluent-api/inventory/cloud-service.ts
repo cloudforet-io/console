@@ -45,13 +45,13 @@ interface UpdateParameter extends Tags, IdParameter{
 class Create extends CreateAction<CreateParameter, any> {}
 class Update extends UpdateAction<UpdateParameter, any> {}
 class Delete extends SingleDeleteAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class Get extends GetAction<IdParameter, CloudServiceModel> {
-    protected idField = idField;
+    idField = idField;
 }
 class GetData extends GetDataAction<any, ListType<any>> {
-    protected idField = idField
+    idField = idField
 }
 
 class List extends ListAction<any, CloudServiceListResp> {}

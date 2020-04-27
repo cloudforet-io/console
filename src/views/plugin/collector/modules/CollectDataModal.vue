@@ -25,10 +25,10 @@
                                 {{ collector.name }}
                             </p>
                             <p class="info">
-                                Collector ID: {{ collector.collector_id }}
+                                {{ $t('WORD.COLLECTOR') }} {{ $t('WORD.ID') }}: {{ collector.collector_id }}
                             </p>
                             <p class="info">
-                                Version: {{ version }}
+                                {{ $t('WORD.VERSION') }}: {{ version }}
                             </p>
                         </p-col>
                     </p-row>
@@ -39,7 +39,7 @@
                         {{ $t('INVENTORY.COL_OPS') }}
                     </p>
                     <p-field-group :label="$t('COMMON.CREDENTIAL')">
-                        <p-text-input :value="credential ? credential.name : $t('COMMON.All')"
+                        <p-text-input :value="credential ? credential.name : $t('COMMON.ALL')"
                                       disabled
                                       class="w-full"
                         />
@@ -78,11 +78,11 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, defineComponent, SetupContext,
+    toRefs, reactive, computed, defineComponent, SetupContext, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import config from '@/lib/config';
-import { makeTrItems } from '@/lib/view-helper/index';
+import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
@@ -96,8 +96,7 @@ import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { CollectParameter } from '@/lib/fluent-api/inventory/collector';
-import { AxiosResponse } from 'axios';
+import { COLLECT_MODE } from '@/lib/fluent-api/inventory/collector';
 
 
 export default defineComponent({
@@ -118,24 +117,24 @@ export default defineComponent({
             type: Object,
             default: () => ({}),
         },
+        /* sync */
         visible: Boolean,
-        credential: {
-            type: Object,
+        credentialId: {
+            type: String,
             default: null,
         },
     },
     setup(props, context: SetupContext) {
         const state = reactive({
             loading: false,
-            credentials: [],
+            credential: null,
             proxyVisible: makeProxy('visible', props, context.emit),
-            isCredentialType: computed(() => !!props.collector.plugin_info.credential_id),
             showValidation: false,
-            collectModeMenu: makeTrItems([
+            collectModeMenu: computed(() => makeTrItems([
                 ['ALL', 'COMMON.ALL'],
                 ['CREATE', 'BTN.CREATE'],
                 ['UPDATE', 'BTN.UPDATE'],
-            ], context.parent, { type: 'item' }),
+            ], context.parent, { type: 'item' })),
             selectedCollectMode: 'ALL',
             image: computed(() => _.get(props.collector, 'tags.icon', config.get('COLLECTOR_IMG'))),
             version: computed(() => _.get(props.collector, 'plugin_info.version', '')),
@@ -147,16 +146,7 @@ export default defineComponent({
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
-            crdsMenu: computed(() => [
-                // @ts-ignore
-                { type: 'item', label: context.parent.$t('COMMON.ALL'), name: 'all' },
-                ...state.credentials.map((crd: any) => ({ type: 'item', label: crd.name, name: crd.credential_id })),
-            ]),
-            selectedCrdId: 'all',
         });
-
-        const collectorApi = fluentApi.inventory().collector();
-        const secretManagerApi = fluentApi.secret();
 
         let vdApi = setValidation(state.filterFormats, state.filters);
 
@@ -173,32 +163,23 @@ export default defineComponent({
             state.showValidation = false;
             state.filters = {};
             vdApi = setValidation(state.filterFormats, state.filters);
-            state.selectedCrdId = 'all';
         };
 
-        const getParams = (): CollectParameter => {
-            const params: CollectParameter = {
-                // eslint-disable-next-line camelcase
-                collector_id: props.collector.collector_id,
-                // eslint-disable-next-line camelcase
-                collect_mode: state.selectedCollectMode,
-            };
+        const collectorApi = computed(() => {
+            const api = fluentApi.inventory().collector().collect()
+                .setId(props.collector.collector_id)
+                .setCollectMode(state.selectedCollectMode as COLLECT_MODE);
+            if (!_.isEmpty(state.filters)) api.setFilters(state.filters);
+            if (props.credentialId) api.setCredentialId(props.credentialId);
+            return api;
+        });
 
-            if (!_.isEmpty(state.filters)) params.filter = state.filters;
-
-            // eslint-disable-next-line camelcase
-            if (state.selectedCrdId === 'all') params.credential_group_id = props.collector.plugin_info.credential_group_id;
-            // eslint-disable-next-line camelcase
-            else params.credential_id = state.selectedCrdId;
-
-            return params;
-        };
-        const onClickCollectConfirm = async () => {
+        const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
             state.showValidation = true;
             if (await vdApi.allValidation()) {
                 try {
-                    await collectorApi.collect().setParameter(getParams()).execute();
+                    await collectorApi.value.execute();
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'success',
@@ -221,25 +202,26 @@ export default defineComponent({
             state.loading = false;
         };
 
+        const secretManagerApi = fluentApi.secret().secret().get();
 
-        // const listCredentials = async () => {
-        //     if (state.credentials.length > 0) return;
-        //     state.loading = true;
-        //     let res: AxiosResponse;
-        //     if (state.isCredentialType) {
-        //         res = await secretManagerApi.secret().list()
-        //             .setSecretId(props.collector.plugin_info.credential_id)
-        //             .execute();
-        //     } else {
-        //         res = await secretManagerApi.secret().list()
-        //             .setSecretGroupId(props.collector.plugin_info.credential_group_id)
-        //             .execute();
-        //     }
-        //     state.credentials = res.data.results;
-        //     state.loading = false;
-        // };
+        const getCredential = async (): Promise<void> => {
+            state.loading = true;
+            state.credential = null;
+            try {
+                const res = await secretManagerApi.setId(props.credentialId)
+                    .execute();
+                state.credential = res.data;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
 
-        // listCredentials();
+        watch(() => props.credentialId, (id) => {
+            if (id) getCredential();
+            else state.credential = null;
+        });
 
         return {
             ...toRefs(state),
@@ -268,12 +250,12 @@ export default defineComponent({
         margin-bottom: 1rem;
     }
     .info {
-        font-size: .875rem;
+        font-size: 0.875rem;
     }
     .desc {
         margin-top: 1rem;
         margin-bottom: 2rem;
-        font-size: .875rem;
+        font-size: 0.875rem;
     }
 }
 .right-container {
@@ -281,8 +263,8 @@ export default defineComponent({
 }
 .sub-header {
     @apply text-gray-400;
-    margin-bottom: .875rem;
-    font-size: .875rem;
+    margin-bottom: 0.875rem;
+    font-size: 0.875rem;
     font-weight: bold;
 }
 .reset-btn {
@@ -295,7 +277,7 @@ export default defineComponent({
     height: 100%;
     .spinner {
         display: inline-flex;
-        padding-right: .25rem;
+        padding-right: 0.25rem;
     }
 }
 </style>

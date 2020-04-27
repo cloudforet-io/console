@@ -116,16 +116,14 @@ export default defineComponent({
             .addGroupKey('group', 'group')
             .addGroupKey('provider', 'provider')
             .addGroupKey('tags.spaceone:icon', 'icon')
-            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'])
+            .setJoinKeys(['name', 'group', 'provider'])
             .setJoinResourceType('inventory.CloudService')
-            .addJoinGroupKey('name', 'name')
-            .addJoinGroupKey('group', 'group')
+            .addJoinGroupKey('cloud_service_type', 'name')
+            .addJoinGroupKey('cloud_service_group', 'group')
             .addJoinGroupKey('provider', 'provider')
             .addJoinGroupField('count', STAT_OPERATORS.count)
             .setSort('count')
             .setLimit(12);
-
-        api.debug();
 
 
         const getData = async (): Promise<void> => {

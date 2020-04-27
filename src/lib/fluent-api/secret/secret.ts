@@ -6,7 +6,6 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
 
 const idField = 'secret_id';
 
@@ -14,7 +13,8 @@ interface IdParameter {
     [idField]: string;
 }
 
-export interface SecretModel extends IdParameter, Tags {
+export interface SecretModel extends Tags {
+    secret_id: string;
     name: string;
     secret_type: 'CREDENTIALS'|'CONFIG'|string;
     'secret_groups': string[];
@@ -38,10 +38,10 @@ interface UpdateParameter extends Tags, IdParameter {
 class Create extends CreateAction<CreateParameter, any> {}
 class Update extends UpdateAction<UpdateParameter, any> {}
 class Delete extends SingleDeleteAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class Get extends GetAction<IdParameter, any> {
-    protected idField = idField;
+    idField = idField;
 }
 class List extends ListAction<any, SecretListResp> {
     setSecretId(id: string): this{
