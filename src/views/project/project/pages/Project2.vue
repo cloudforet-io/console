@@ -28,8 +28,7 @@
                               @mouseenter.stop="hovered(node)"
                               @click.stop="openProjectGroupForm(false)"
                         >
-                            <p-tooltip-button class="help" :tooltip="'하위 프로젝트 그룹 생성'" position="top"
-                            >
+                            <p-tooltip-button class="help" :tooltip="'하위 프로젝트 그룹 생성'" position="top">
                                 <template #button>
                                     <p-i :name="'ic_plus'" color="transparent inherit"
                                          width="1rem" height="1rem"
@@ -45,12 +44,12 @@
             <div v-if="treeApiHandler.ts.metaState.firstSelectedNode">
                 <p-toolbox-grid-layout
                     v-bind="apiHandler.gridTS.state"
-                    card-height="16.2rem"
+                    card-height="16rem"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                    @changePageNumber="apiHandler.getData()"
-                    @changePageSize="apiHandler.getData()"
-                    @clickRefresh="apiHandler.getData()"
+                    @changePageNumber="apiHandler.getData"
+                    @changePageSize="apiHandler.getData"
+                    @clickRefresh="apiHandler.getData"
                     @card:click.self="clickCard"
                 >
                     <template #toolbox-top>
@@ -71,7 +70,7 @@
                         <div class="flex flex-row xs:flex-col sm:flex-col md:flex-row lg:flex-row xl:flew-row tool">
                             <div class="flex flex-row flex-wrap w-full tool-left">
                                 <div class="tool-left-btn">
-                                    <p-button style-type="primary-dark" @click="openProjectForm()">
+                                    <p-button style-type="primary-dark" @click="openProjectForm">
                                         {{ $t('INVENTORY.CRT_PROJ') }}
                                     </p-button>
                                 </div>
@@ -131,9 +130,9 @@
                             <hr class="solid">
                             <div class="project-summary">
                                 <div v-if="cardSummary[item.project_id]" class="summary-item">
-                                    <span class="summary-item-text">Cloud Service</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].cloud_service }}</span><br>
-                                    <span class="summary-item-text">Server</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].server }}</span><br>
-                                    <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].member }}</span>
+                                    <span class="summary-item-text">Cloud Service</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span><br>
+                                    <span class="summary-item-text">Server</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span><br>
+                                    <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].member_count }}</span>
                                 </div>
                                 <div v-else class="loading">
                                     <div v-for="v in skeletons" :key="v" class="flex items-center p-2">
@@ -204,24 +203,22 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, defineComponent, getCurrentInstance, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree';
-import TreeItem, { TreeItemInterface, TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
+import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
 import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
+import { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
@@ -229,10 +226,11 @@ import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
-import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import log from '@/lib/fluent-api/monitoring/log';
 
 
     interface Summary {
@@ -301,7 +299,25 @@ export default {
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
         const projectAPI = fluentApi.identity().project();
         const projectGroupAPI = fluentApi.identity().projectGroup();
-        const statisticsAPI = fluentApi.statistics().projectSummary();
+        // const statisticsAPI = fluentApi.statistics().projectSummary();
+        const statisticsAPI = fluentApi.statisticsTest().resource().stat()
+            .setResourceType('identity.Project')
+            .addGroupKey('project_id', 'project_id')
+
+            .setJoinResourceType('inventory.Server')
+            .addJoinKey('project_id')
+            .addJoinGroupKey('project_id', 'project_id')
+            .addJoinGroupField('servers_count', STAT_OPERATORS.count)
+
+            .setJoinResourceType('inventory.CloudService', 1)
+            .addJoinKey('project_id', 1)
+            .addJoinGroupKey('project_id', 'project_id', 1)
+            .addJoinGroupField('cloud_services', STAT_OPERATORS.count, undefined, 1)
+
+            .setJoinResourceType('identity.Project', 2)
+            .addJoinKey('project_id', 2)
+            .addJoinGroupKey('project_id', 'project_id', 2)
+            .addJoinGroupField('member_count', STAT_OPERATORS.size, 'project_member.user', 2);
 
         /**
              Add Node to Tree
@@ -316,19 +332,26 @@ export default {
         const createdData = reactive({});
         const cardSummary = ref(createdData);
         const projectSummary = ref(createdData);
+        const getSubProject = (action: any) => action.setFilter({ key: 'project_group_id', operator: '=', value: state.selectedId });
 
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
+            // get card statistics information
             const ids = resp.data.results.map(item => item.project_id);
             cardSummary.value = reactive(_.zipObject(ids));
-            resp.data.results.forEach((item) => {
-                const id = item.project_id;
-                const setCard = (items) => { cardSummary.value[id] = items; };
-                statisticsAPI.setId(id).execute().then((rp) => {
-                    if (rp.data) {
-                        setCard(rp.data);
-                    }
+            const setCard = (items) => {
+                items.forEach((item) => {
+                    const project_id = item.project_id;
+                    item.cloud_services = item?.cloud_services || 0;
+                    item.servers_count = item?.servers_count || 0;
+                    cardSummary.value[project_id] = item;
                 });
+            };
+            getSubProject(statisticsAPI).execute().then((rp) => {
+                if (rp.data?.results) {
+                    setCard(rp.data.results);
+                }
             });
+            // get provider list
             const temp = resp.data.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
                 const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
@@ -401,6 +424,7 @@ export default {
         };
 
         const hovered = async (item) => {
+            state.selectedId = null;
             state.selectedId = item.data.id;
             state.node = item;
         };

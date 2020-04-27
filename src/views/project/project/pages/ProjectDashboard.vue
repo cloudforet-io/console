@@ -4,13 +4,13 @@
                                 sm:col-end-6
                                 lg:col-end-5
                                 "
-                         title="servers" :api="servers.api"
+                         title="servers" resourceType="inventory.Server"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-10"
-                         title="cloud services" :api="cloudServices.api"
+                         title="cloud services" resourceType="inventory.CloudService"
                          :color="cloudServices.color"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
@@ -77,15 +77,12 @@ export default {
             projectName: '',
             projects: {
                 color: blue[600],
-                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
             servers: {
                 color: secondary,
-                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
             cloudServices: {
                 color: secondary1,
-                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
         });
 
