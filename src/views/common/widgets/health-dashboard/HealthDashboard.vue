@@ -22,11 +22,11 @@
                             &zwnj;
                         </template>
                         <template #contents>
-                            <div v-tooltip.bottom-start="{content: item.group, delay: {show: 500}}" class="group-name">
+                            <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
                                 {{ item.group }}
                                 <p-i name="ic_external-link" width=".7rem" height=".7rem" />
                             </div>
-                            <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}" class="name">
+                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
                                 <p-i name="common-gear" width=".8rem" height=".8rem" />
                                 {{ item.name }} / {{ item.name }}
                             </div>

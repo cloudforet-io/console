@@ -7,9 +7,9 @@
             <canvas ref="chartRef" />
         </p-chart-loader>
         <template #extra>
-            <span v-for="(color, legend) in colors" :key="legend" class="legend">
-                <span class="color" :style="{color}" />
-                {{ legend }}
+            <span v-for="(legend) in legends" :key="legend.name" class="legend">
+                <span class="color" :style="{color: legend.color}" />
+                {{ legend.name }}
             </span>
         </template>
     </p-widget-layout>
@@ -29,6 +29,7 @@ import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import casual, { arrayOf } from '@/lib/casual';
 import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
+import moment from 'moment';
 
 export default defineComponent({
     name: 'CollectionState',
@@ -46,25 +47,23 @@ export default defineComponent({
         interface InitDataType {
             data: Array<DataType | undefined>;
             loading: boolean;
-            colors: {
-                success: Ref<Readonly<string>>;
-                failure: Ref<Readonly<string>>;
-            };
+            colors: Ref<Readonly<string[]>>;
         }
+        const LEGEND_COLORS: {[k: string]: string} = {
+            success: primary,
+            failure: coral.default,
+        };
 
         const ts = new SChartToolSet<SBarChart, InitDataType>(SBarChart,
             (chart: SBarChart) => (chart.addData(ts.state.data.map(d => d.success), 'Success')
                 .addData(ts.state.data.map(d => d.failure), 'Failure')
                 .setLabels(ts.state.data.map(d => d.date))
-                .setColors(_.values(ts.state.colors))
+                .setColors(ts.state.colors)
                 .setTicksCount(5)
                 .apply()), {
                 data: [],
                 loading: true,
-                colors: {
-                    success: computed(() => (ts.state.loading ? gray[500] : primary)),
-                    failure: computed(() => (ts.state.loading ? gray[500] : coral.default)),
-                },
+                colors: computed(() => _.map(LEGEND_COLORS, v => (ts.state.loading ? gray[500] : v))),
             });
 
         interface Data {
@@ -83,7 +82,11 @@ export default defineComponent({
         //         { key: 'state', operator: '=', value: 'FAILURE' },
         //     );
 
-
+        // ts.state.data = arrayOf(7, () => ({
+        //     date: casual.date('MM/DD'),
+        //     success: casual.integer(0, 100),
+        //     failure: casual.integer(0, 100),
+        // }));
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
@@ -95,11 +98,18 @@ export default defineComponent({
                 //         success: v.
                 //     })
                 // })
+                // TODO: api
+                ts.state.data = _.range(7).map((v, i) => ({
+                    date: moment().subtract(7 - i, 'd').format('MM/DD'),
+                    failure: 0,
+                    success: 0,
+                }));
             } catch (e) {
-                ts.state.data = arrayOf(7, () => ({
-                    date: casual.date('MM/DD'),
-                    success: casual.integer(0, 100),
-                    failure: casual.integer(0, 100),
+                console.error(e);
+                ts.state.data = _.range(7).map((v, i) => ({
+                    date: moment().subtract(7 - i, 'd').format('MM/DD'),
+                    failure: 0,
+                    success: 0,
                 }));
             } finally {
                 ts.state.loading = false;
@@ -112,6 +122,10 @@ export default defineComponent({
 
         return {
             ...toRefs(ts.state),
+            legends: computed(() => _.chain(LEGEND_COLORS)
+                .map((v, k) => ({ name: k, color: v }))
+                .reverse()
+                .value()),
         };
     },
 });
