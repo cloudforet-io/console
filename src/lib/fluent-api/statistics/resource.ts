@@ -144,7 +144,7 @@ class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
     addJoinGroupField(name: string, operator: STAT_OPERATORS, key?: string, joinIndex = 0): this {
         const api = this.clone();
         if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
-        return this.addGroupField(name, operator, key, `apiState.extraParameter.joinState[${joinIndex}].query.aggregate.group.fields`);
+        return api.addGroupField(name, operator, key, `apiState.extraParameter.joinState[${joinIndex}].query.aggregate.group.fields`);
     }
 
     setJoinSort(name: string, desc = true, joinIndex = 0): this {
