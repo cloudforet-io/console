@@ -668,10 +668,8 @@ export default {
 
         .left{
             @apply flex items-center;
-            .title{
+            .title {
                 @apply ml-4 text-base;
-                font-family: "Noto Sans";
-
             }
         }
         .right{

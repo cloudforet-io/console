@@ -174,7 +174,9 @@
     </general-page-layout>
 </template>
 
-<script>
+<script lang="ts">
+/* eslint-disable class-methods-use-this */
+
 import {
     reactive, toRefs, computed, ref,
 } from '@vue/composition-api';
@@ -196,6 +198,12 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import {
+    defaultAutocompleteHandler,
+    getEnumValues
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { QuerySearchTableACHandler } from '../../../../lib/api/auto-complete';
 
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
@@ -204,13 +212,52 @@ const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
 const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
 const PQuerySearchBar = () => import('@/components/organisms/search/query-search-bar/QuerySearchBar.vue');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
+const PTableCheckModal = () => import('@/components/organisms/modals/table-modal/TableCheckModal.vue');
 
 const CollectorUpdateModal = () => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue');
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 const CollectorDetail = () => import('@/views/plugin/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/plugin/collector/modules/CollectorCredentials');
 const CollectorSchedules = () => import('@/views/plugin/collector/modules/CollectorSchedules');
+
+class ACHandler extends defaultAutocompleteHandler {
+    get keys(): string[] {
+        return ['collector_id', 'name', 'state', 'priority',
+            'plugin_info.options.supported_resource_type'];
+    }
+
+    get suggestKeys(): string[] { return ['collector_id', 'name']; }
+
+    get parent() { return context.parent; }
+
+    get valuesFetchUrl(): string { return '/inventory/collector/list'; }
+
+    get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
+
+    constructor() {
+        super();
+        this.handlerMap.value.push(...[
+            getEnumValues('state', ['ENABLED', 'DISABLED']),
+            getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+        ]);
+    }
+}
+
+const tableApiHandler = new QuerySearchTableFluentAPI(
+    fluentApi.inventory().collector().list(),
+    {
+        selectable: true,
+        sortable: true,
+        dragable: true,
+        hover: true,
+        responsive: true,
+        'setting-visible': false,
+        'use-cursor-loading': true,
+        'excel-visible': true,
+    },
+    undefined,
+    { handlerClass: ACHandler },
+);
 
 const collectorState = reactive({
     selectIndex: [],
@@ -222,7 +269,7 @@ const collectorState = reactive({
     }),
     multiItems: computed(() => collectorState.sortSelectIndex.map(idx => collectorState.items[idx])),
     loading: false,
-    getCollectors: () => {
+    getCollectors: async (): Promise<void> => {
         collectorEventBus.$emit('getCollectorList');
     },
     selectedItem: computed(() => collectorState.items[collectorState.selectIndex[0]]),
@@ -458,7 +505,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         margin-left: 1rem;
         &:last-child {
             flex-grow: 1;
