@@ -105,8 +105,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .p-table-check-modal-sub-title{
-        font-family: Roboto;
+    .p-table-check-modal-sub-title {
         font-style: normal;
         font-weight: normal;
         font-size: 1.5rem;

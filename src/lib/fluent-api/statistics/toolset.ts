@@ -47,47 +47,47 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         ...this.apiState.extraParameter,
     });
 
-    setAggregate(aggregate: Aggregate, path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate', aggregate);
+    setAggregate(aggregate: Aggregate): this {
+        const api = this.clone();
+        this.apiState.aggregate = aggregate;
         return api;
     }
 
-    setGroup(group: Group, path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.group', group);
+    setGroup(group: Group): this {
+        const api = this.clone();
+        this.apiState.aggregate.group = group;
         return api;
     }
 
-    setGroupKeys(keys: GroupKeyItem[], path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.group.keys', keys);
+    setGroupKeys(...args: GroupKeyItem[]): this {
+        const api = this.clone();
+        this.apiState.aggregate.group.keys = args;
         return api;
     }
 
-    addGroupKey(key: string, name: string, path?: string): this {
-        const api = path ? this : this.clone();
-        _.get(api, path || 'apiState.aggregate.group.keys', []).push({ key, name });
+    addGroupKey(key: string, name: string): this {
+        const api = this.clone();
+        this.apiState.aggregate.group.keys.push({ key, name });
         return api;
     }
 
-    setGroupFields(fields: GroupFieldsItem[], path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.group.fields', fields);
+    setGroupFields(...args: GroupFieldsItem[]): this {
+        const api = this.clone();
+        this.apiState.aggregate.group.fields = args;
         return api;
     }
 
-    addGroupField(name: string, operator: STAT_OPERATORS, key?: string, path?: string): this {
-        const api = path ? this : this.clone();
+    addGroupField(name: string, operator: STAT_OPERATORS, key?: string): this {
+        const api = this.clone();
         const item: GroupFieldsItem = { name, operator };
         if (key) item.key = key;
-        _.get(api, path || 'apiState.aggregate.group.fields', []).push(item);
+        api.apiState.aggregate.group.fields.push(item);
         return api;
     }
 
-    setUnwind(unwinds: UnwindItem[], path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.unwind', unwinds);
+    setUnwind(...args: UnwindItem[]): this {
+        const api = this.clone();
+        this.apiState.aggregate.unwind = args;
         return api;
     }
 

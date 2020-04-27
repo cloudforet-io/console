@@ -36,6 +36,7 @@ import { gray } from '@/styles/colors';
 import casual, { arrayOf } from '@/lib/casual';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import _ from 'lodash';
 
 export default defineComponent({
     name: 'ServiceSummary',
@@ -75,8 +76,12 @@ export default defineComponent({
             try {
                 const res = await countApi.execute();
                 ts.state.count = res.data.results[0]?.count || 0;
+                // TODO: trends api
+                ts.state.data = _.fill(_.range(7), 0);
             } catch (e) {
-                ts.state.data = arrayOf(7, () => casual.integer(0, 1000000));
+                console.error(e);
+                ts.state.count = 0;
+                ts.state.data = _.fill(_.range(7), 0);
             } finally {
                 ts.state.loading = false;
             }
