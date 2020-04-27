@@ -130,7 +130,6 @@ export default {
 
 <style lang="postcss" scoped>
     .p-double-check-modal-sub-title{
-        font-family: Roboto;
         font-style: normal;
         font-weight: normal;
         font-size: 1.5rem;

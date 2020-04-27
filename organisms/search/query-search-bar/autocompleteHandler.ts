@@ -1,10 +1,10 @@
 import Fuse from 'fuse.js';
 import _ from 'lodash';
-import {autoCompleteQuery} from "@/lib/api/query";
+import { autoCompleteQuery } from '@/lib/api/query';
 
 export interface SearchQueryType {
-    key: string,
-    operator: string,
+    key: string;
+    operator: string;
     value: any;
 }
 
@@ -19,15 +19,15 @@ export const searchContextType = Object.freeze({
 });
 
 interface handlerMap {
-    key:any[];
-    value:any[];
+    key: any[];
+    value: any[];
 }
 
 // todo: TS 도입시 인터페이스로 대체
 export class baseAutocompleteHandler {
-    public handlerMap:handlerMap;
+    handlerMap: handlerMap;
 
-    constructor(args?:any) {
+    constructor(args?: any) {
         this.handlerMap = {
             key: [],
             value: [],
@@ -35,8 +35,8 @@ export class baseAutocompleteHandler {
     }
 
     async getAutoCompleteData(contextType, inputText, searchQuery) {
-        const result:any[] = [];
-        let handlers:any[] = [];
+        const result: any[] = [];
+        let handlers: any[] = [];
         // const txt = isRef(inputText) ? inputText.value : inputText;
         if (contextType === searchContextType.Key) {
             handlers = this.handlerMap.key;
@@ -126,7 +126,7 @@ export const getKeys = (rawKeys) => {
     };
 };
 export const getSuggest = suggestKeys => (contextType, inputText) => {
-    const result:string[] = [];
+    const result: string[] = [];
     suggestKeys.forEach((key) => { result.push(`${key}:${inputText}`); });
     return ['Suggest', result];
 };
@@ -140,7 +140,7 @@ export const getSuggest = suggestKeys => (contextType, inputText) => {
  * @param matchKey
  * @returns {function(...[*]=)}
  */
-export const getFetchValues = (key:string, urlPath:string, parent:any, limit:number = 10, matchKey?:string) => async (contextType, inputText, searchQuery) => {
+export const getFetchValues = (key: string, urlPath: string, parent: any, limit = 10, matchKey?: string) => async (contextType, inputText, searchQuery) => {
     if (searchQuery.key === key) {
         const realKey = matchKey || searchQuery.key;
         const res = await parent.$http.post(urlPath, {
@@ -162,7 +162,7 @@ export const getFetchValues = (key:string, urlPath:string, parent:any, limit:num
  * @param valuesFetchKeys
  * @returns {Array|*[]}
  */
-export const makeValuesFetchHandler = (parent:any, valuesFetchUrl:string, valuesFetchKeys:string[]) => {
+export const makeValuesFetchHandler = (parent: any, valuesFetchUrl: string, valuesFetchKeys: string[]) => {
     if (parent && valuesFetchUrl && valuesFetchKeys.length > 0) {
         return _.flatMap(valuesFetchKeys, key => getFetchValues(key, valuesFetchUrl, parent));
     }
