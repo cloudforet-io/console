@@ -16,7 +16,7 @@
                         <p-skeleton class="flex-grow" />
                     </div>
                 </template>
-                <p-grid-layout v-else :items="items" row-gap="0.5rem"
+                <p-grid-layout v-else :items="data" row-gap="0.5rem"
                                column-gap="0" :fix-column="1" card-min-width="0"
                                card-height="auto" :card-class="() => []"
                 >
@@ -26,8 +26,8 @@
                                            @click="onItemClick(item, idx)"
                         >
                             <template #contents>
-                                <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}"
-                                     class="ml-2 text-base truncate leading-tight"
+                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
+                                     class="mx-2 text-base truncate leading-tight"
                                 >
                                     {{ item.name }}
                                 </div>
@@ -57,7 +57,7 @@ import PSelectableItem from '@/components/molecules/selectable-item/SelectableIt
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SPieChart } from '@/lib/chart/pie-chart';
-import { ProviderStoreType, useStore } from '@/store/toolset';
+import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import { violet, yellow } from '@/styles/colors';
 import _ from 'lodash';
 import Color from 'color';
@@ -116,30 +116,18 @@ export default defineComponent({
             .addGroupKey('provider', 'provider')
             .addGroupField('count', STAT_OPERATORS.count);
 
-        interface Data {
+        interface Item {
+            provider: string;
             name: string;
             icon: string;
             color: string;
             count: number;
         }
-        interface Item extends Data {
-            provider: string;
-        }
         interface StateInterface {
             loaderRef: HTMLCanvasElement | null;
-            data: {
-                [provider: string]: Data;
-            };
+            data: Item[];
             loading: boolean;
-            items: Ref<Readonly<Item[]>>;
         }
-
-        const others = {
-            name: 'Others',
-            icon: 'ic_provider_other',
-            color: yellow[500],
-        };
-
 
         const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
             chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
@@ -147,12 +135,8 @@ export default defineComponent({
                 .setColors(_.map(ts.state.data, d => d.color))
                 .apply(), {
                 loaderRef: null,
-                data: {},
+                data: [],
                 loading: true,
-                items: computed(() => _.map(ts.state.data, (d: Data, k) => ({
-                    provider: k,
-                    ...d,
-                }))),
             });
 
         watch(() => ts.state.loaderRef, () => {
@@ -168,23 +152,27 @@ export default defineComponent({
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
-            ts.state.data = {};
+            ts.state.data = [];
             await providerStore.getProvider();
             try {
                 const res = await api.execute();
-                _.forEach(res.data.results, (d: Value) => {
-                    if (providerStore.state.providers[d.provider]) {
-                        ts.state.data[d.provider] = {
-                            ...providerStore.state.providers[d.provider],
+                const others: Item = {
+                    name: 'Others',
+                    icon: 'ic_provider_other',
+                    color: yellow[500],
+                    count: 0,
+                    provider: '',
+                };
+                _.forEach(res.data.results, (d: Value, i) => {
+                    const providers: ProviderInfo = providerStore.state.providers;
+                    if (providers[d.provider]) {
+                        ts.state.data.push({
+                            ...providers[d.provider],
                             count: d.count,
-                        };
-                    } else {
-                        ts.state.data.others = {
-                            ...others,
-                            count: d.count,
-                        };
-                    }
+                        });
+                    } else others.count += d.count;
                 });
+                ts.state.data.push(others);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -216,13 +204,13 @@ export default defineComponent({
         font-weight: bold;
     }
     .legends {
-        @apply mt-4 w-full flex-grow justify-center items-center m-auto;
+        @apply w-full flex-grow justify-center items-center m-auto;
     }
     .chart-container {
-        @apply flex justify-center items-center;
+        @apply flex justify-center items-center mb-4;
     }
     .reverse {
-        @apply block;
+        @apply block mb-0;
         height: 24rem;
     }
 

@@ -2,13 +2,6 @@
     <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
                      help="Daily Updates"
     >
-        <template #help="{help}">
-            <p-i v-tooltip="'Daily Updates'" class="help"
-                 name="ic_tooltip" width="1rem"
-                 height="1rem"
-                 color="inherit transparent"
-            />
-        </template>
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
                 <p-skeleton width="2rem" height="2rem" class="mr-4" />
@@ -30,10 +23,10 @@
                 <template #card="{item, index}">
                     <p-selectable-item :icon-url="iconUrl(item)" theme="card" @click="onItemClick(item, idx)">
                         <template #contents>
-                            <div v-tooltip.bottom-start="{content: item.group, delay: {show: 500}}" class="group-name">
+                            <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
                                 {{ item.group }}
                             </div>
-                            <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}" class="name">
+                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
                                 {{ item.name }}
                             </div>
                         </template>
