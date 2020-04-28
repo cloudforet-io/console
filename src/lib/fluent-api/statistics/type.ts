@@ -78,7 +78,7 @@ export interface ResourceStatState {
 }
 
 export interface JoinItem {
-    join_keys: string[];
+    keys: string[];
     resource_type: string;
     data_source_id?: string;
     query: StatQuery;

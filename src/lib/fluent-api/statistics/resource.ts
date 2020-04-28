@@ -14,7 +14,7 @@ import {
     StatResponse, UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
 import { isNotEmpty } from '@/lib/util';
-import { ApiType } from '@/lib/fluent-api/type';
+import { ApiType, FilterItem } from '@/lib/fluent-api/type';
 import _ from 'lodash';
 
 
@@ -60,7 +60,7 @@ export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<
         if (isNotEmpty(this.apiState.extraParameter.joinState)) {
             param.join = this.apiState.extraParameter.joinState?.map((j) => {
                 const join: JoinItem = {
-                    join_keys: j.keys,
+                    keys: j.keys,
                     resource_type: j.resource_type,
                     query: this.getStatisticsQuery({} as StatQuery, j.query),
                 };
@@ -200,6 +200,27 @@ export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<
         const api = this.clone();
         this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].query.aggregate.unwind?.push(unwind);
+        return api;
+    }
+
+    setJoinFilter(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.filter = filters;
+        return api;
+    }
+
+    setJoinFilterOr(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.filterOr = filters;
+        return api;
+    }
+
+    setJoinFixFilter(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.fixFilter = filters;
         return api;
     }
 
