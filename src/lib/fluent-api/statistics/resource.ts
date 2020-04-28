@@ -194,6 +194,13 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
         return api;
     }
 
+    addJoinUnwind(unwind: UnwindItem, joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.unwind?.push(unwind);
+        return api;
+    }
+
     setFormula(formulas: FormulaItem[]): this {
         const api = this.clone();
         api.apiState.extraParameter.formulas = formulas;
