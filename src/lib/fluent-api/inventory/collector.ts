@@ -43,7 +43,9 @@ interface CreateParameter extends Tags {
     name: string;
 }
 interface UpdateParameter extends Tags, IdParameter {
-    name: string;
+    name?: string;
+    plugin_info?: CollectorPluginModel;
+    priority?: number;
 }
 
 interface CollectParameter extends IdParameter {
@@ -58,6 +60,12 @@ class Create extends CreateAction<CreateParameter, any> {}
 
 class Update extends UpdateAction<UpdateParameter, any> {
     idField = idField;
+
+    // setParameter(parameter: UpdateParameter): this {
+    //     const api = this.clone();
+    //     api.apiState.parameter = parameter;
+    //     return api;
+    // }
 }
 
 class Delete extends SingleDeleteAction<IdParameter, any> {

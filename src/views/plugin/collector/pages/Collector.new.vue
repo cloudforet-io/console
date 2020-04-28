@@ -39,16 +39,17 @@
                             />
                         </div>
                     </template>
-                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
                         <p-col :col="12" class="mb-2">
                             <p-hr class="w-full" />
                             <p-row class="mt-2">
                                 <div class="flex-grow-0">
-                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                                    <p-icon-button name="ic_delete" @click="apiHandler.tableTS.querySearch.deleteAllTags" />
                                 </div>
                                 <div class="flex-grow ml-4">
-                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                                           @delete="queryListTools.deleteTag(idx)"
+                                    <p-tag v-for="(tag, idx) in apiHandler.tableTS.querySearch.tags.value" :key="idx + tag"
+                                           style="margin-top: 0.375rem; margin-bottom: 0.37rem;"
+                                           @delete="apiHandler.tableTS.querySearch.deleteTag(idx)"
                                     >
                                         {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
                                     </p-tag>
@@ -86,14 +87,14 @@
         </p-horizontal-layout>
 
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne"
-               :tabs="tabs"
-               :active-tab.sync="activeTab"
+               :tabs="tabState.tabs"
+               :active-tab.sync="tabState.activeTab"
         >
             <template #detail>
                 <collector-detail :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #tag>
-                <s-tags-panel :is-show="activeTab==='tag'"
+                <s-tags-panel :is-show="tabState.activeTab==='tag'"
                               :resource-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
                               tag-page-name="collectorTags"
                 />
@@ -112,8 +113,10 @@
                 />
             </template>
         </p-tab>
-        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="multiActiveTab">
-            <template #selected>
+        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
+               :tabs="tabState.multiTabs" :active-tab.sync="tabState.multiActiveTab"
+        >
+            <template #data>
                 <p-data-table
                     :fields="multiFields"
                     :sortable="false"
@@ -210,25 +213,19 @@ const CollectorCredentials = () => import('@/views/plugin/collector/modules/Coll
 const CollectorSchedules = () => import('@/views/plugin/collector/modules/CollectorSchedules.vue');
 
 
-const setTabData = (props, context) => {
-    const state = reactive({
-        activeTab: 'detail',
-        tabs: makeTrItems([
-            ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-            ['tag', 'TAB.TAG'],
-            ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
-        ], context.parent),
-        multiActiveTab: 'selected',
-        multiTabs: makeTrItems([
-            ['selected', 'PANEL.SELECTED', { keepAlive: true }],
-        ], context.parent),
-    });
-
-    return {
-        ...toRefs(state),
-    };
-};
+const setTabData = (props, context) => (reactive({
+    activeTab: 'detail',
+    tabs: makeTrItems([
+        ['detail', 'PANEL.DETAILS', { keepAlive: true }],
+        ['tag', 'TAB.TAG'],
+        ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+        ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
+    ], context.parent),
+    multiActiveTab: 'data',
+    multiTabs: makeTrItems([
+        ['data', 'TAB.DATA', { keepAlive: true }],
+    ], context.parent),
+}));
 
 const checkModalState = reactive({
     visible: false,
@@ -300,11 +297,6 @@ export const collectorSetup = (props, context) => {
                 ['created_at', 'COMMON.CREATED'],
             ],
             context.parent)),
-            multiFields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
-                ['priority', 'COMMON.PRIORITY'],
-            ], context.parent)),
         },
         undefined,
         {
@@ -328,19 +320,20 @@ export const collectorSetup = (props, context) => {
         context.parent,
         { type: 'item' })));
 
+    const multiFields = computed(() => makeTrItems([
+        ['name', 'COMMON.NAME'],
+        ['state', 'COMMON.STATE'],
+        ['priority', 'COMMON.PRIORITY'],
+    ], context.parent));
+
 
     const state = reactive({
-        ...setTabData(props, context),
+        tabState: setTabData(props, context),
         checkModalState,
         updateModalState,
         scheduleState,
-        ACHandler,
-        apiHandler,
-        timestampFormatter,
-        collectorStateFormatter,
-        getIcon: data => _.get(data, 'item.tags.icon', ''),
-        queryListTools: tagList(ref([]), true, collectorEventBus, 'getCollectorList'),
         dropdown,
+        multiFields,
         collectDataModalVisible: false,
     });
 
@@ -384,6 +377,11 @@ export const collectorSetup = (props, context) => {
 
     return {
         ...toRefs(state),
+        ACHandler,
+        apiHandler,
+        timestampFormatter,
+        collectorStateFormatter,
+        getIcon: data => _.get(data, 'item.tags.icon', ''),
         onClickUpdate,
         onClickEnable,
         onClickDisable,
