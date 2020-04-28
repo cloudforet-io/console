@@ -33,9 +33,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader
 import { SLineChart } from '@/lib/chart/line-chart';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { gray } from '@/styles/colors';
-import casual, { arrayOf } from '@/lib/casual';
 import { fluentApi } from '@/lib/fluent-api';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import _ from 'lodash';
 
 export default defineComponent({
@@ -65,15 +63,14 @@ export default defineComponent({
         interface Value {
             count: number;
         }
-        const countApi = computed(() => props.getAction(fluentApi.statisticsTest().resource().stat<Value>()
-            .setCount('count')));
+        const api = fluentApi.statisticsTest().resource().stat<Value>().setCount('count');
 
         // const trendApi = fluentApi.statisticsTest().history()
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
             try {
-                const res = await countApi.value.execute();
+                const res = await props.getAction(api).execute();
                 ts.state.count = res.data.results[0]?.count || 0;
                 // TODO: trends api
                 ts.state.data = _.fill(_.range(7), 0);

@@ -3,23 +3,17 @@
         <service-summary class="col-start-1 col-end-13
                                 sm:col-end-5
                                 lg:col-end-4"
-                         title="projects"
-                         resourceType="identity.Project"
-                         :color="projects.color"
+                         v-bind="projects.state"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-5 sm:col-end-9
                                 lg:col-start-4 lg:col-end-7"
-                         title="servers"
-                         resourceType="inventory.Server"
-                         :color="servers.color"
+                         v-bind="servers.state"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-9
                                 lg:col-start-7 lg:col-end-10"
-                         title="cloud services"
-                         resourceType="inventory.CloudService"
-                         :color="cloudServices.color"
+                         v-bind="cloudServices.state"
         />
         <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
                                  row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
@@ -48,7 +42,8 @@ import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAcco
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
-import { fluentApi } from '@/lib/fluent-api';
+import { Stat } from '@/lib/fluent-api/statistics/resource';
+import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 
 export default defineComponent({
     name: 'Dashboard',
@@ -62,23 +57,32 @@ export default defineComponent({
         TopProjects,
     },
     setup() {
-        const state = reactive({
-            projects: {
-                color: blue[600],
-                // api: fluentApi.statisticsTest().history().query().setTopic('topic'),
-            },
-            servers: {
-                color: secondary,
-                // api: fluentApi.statisticsTest().history().query().setTopic('topic'),
-            },
-            cloudServices: {
-                color: secondary1,
-                // api: fluentApi.statisticsTest().history().query().setTopic('topic'),
-            },
+
+        const projects = new ServiceSummaryWidgetState({
+            title: 'projects',
+            to: '/project',
+            color: blue[600],
+            getAction: (api: Stat<any>) => api.setResourceType('identity.Project'),
+        });
+
+        const servers = new ServiceSummaryWidgetState({
+            title: 'servers',
+            to: '/inventory/server',
+            color: secondary,
+            getAction: (api: Stat<any>) => api.setResourceType('identity.Project'),
+        });
+
+        const cloudServices = new ServiceSummaryWidgetState({
+            title: 'cloud services',
+            to: '/inventory/cloud-service',
+            color: secondary1,
+            getAction: (api: Stat<any>) => api.setResourceType('identity.Project'),
         });
 
         return {
-            ...toRefs(state),
+            projects,
+            servers,
+            cloudServices,
         };
     },
 });

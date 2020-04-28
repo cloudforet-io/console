@@ -307,8 +307,9 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
 
 export abstract class SetParameterAction<parameter, resp> extends RawParameterAction<parameter, resp> {
     setParameter(parameter: parameter): this {
-        this.apiState.parameter = parameter;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter = parameter;
+        return api;
     }
 }
 

@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, Ref, toRefs, watch,
+    defineComponent, getCurrentInstance, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
@@ -65,6 +65,10 @@ import { fluentApi } from '@/lib/fluent-api';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
+import {
+    serviceAccountsProps,
+    ServiceAccountsPropsType,
+} from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
 
 export default defineComponent({
     name: 'ServiceAccounts',
@@ -77,31 +81,8 @@ export default defineComponent({
         PSkeleton,
         PChartLoader,
     },
-    props: {
-        title: {
-            type: String,
-            default: '',
-        },
-        classes: {
-            type: String,
-            default: '',
-        },
-        reverse: {
-            type: Boolean,
-            default: false,
-        },
-        getAction: {
-            type: Function,
-            default: (action: Stat<any>): Stat<any> => action.setResourceType('inventory.Server')
-                .setSort('count')
-                .addGroupKey('data.compute.region_name', 'region')
-                .setFilter({ key: 'data.compute.region_name', value: null, operator: '!=' },
-                    { key: 'project_id', value: 'project-87925ea3ce65', operator: '=' })
-
-            ,
-        },
-    },
-    setup(props: any) {
+    props: serviceAccountsProps,
+    setup(props: ServiceAccountsPropsType) {
         const vm: any = getCurrentInstance();
 
         const {
@@ -114,10 +95,9 @@ export default defineComponent({
             count: number;
         }
 
-        const api = computed(() => props.getAction(fluentApi.statisticsTest().resource().stat<Value>()
-            // .setResourceType('identity.ServiceAccount')
+        const api = fluentApi.statisticsTest().resource().stat<Value>()
             .addGroupKey('provider', 'provider')
-            .addGroupField('count', STAT_OPERATORS.count)));
+            .addGroupField('count', STAT_OPERATORS.count);
 
         interface Item {
             provider: string;
@@ -158,7 +138,7 @@ export default defineComponent({
             ts.state.data = [];
             await providerStore.getProvider();
             try {
-                const res = await api.value.execute();
+                const res = await props.getAction(api).execute();
                 const others: Item = {
                     name: 'Others',
                     icon: 'ic_provider_other',

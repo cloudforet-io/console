@@ -70,8 +70,9 @@ export abstract class BaseTableFluentAPI<
             this.tableTS.state.items = [];
             this.tableTS.state.allPage = 1;
             this.totalCount.value = 0;
+        } finally {
+            this.tableTS.syncState.loading = false;
         }
-        this.tableTS.syncState.loading = false;
     };
 
     protected defaultReset = () => {
