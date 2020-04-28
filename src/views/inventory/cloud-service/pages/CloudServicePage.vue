@@ -14,14 +14,14 @@
                     </div>
                     <div class="right" />
                 </div>
-                <p-dynamic-view view_type="query-search-table"
-                                :api-handler="apiHandler"
-                                :data_source="dataSource"
-                                :vbind="{
-                                    responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}
-                                }"
-                                :data="null"
-                                @clickExcel="exportToolSet.getData()"
+                <s-dynamic-layout type="query-search-table"
+                                  :toolset="apiHandler"
+                                  name="cloudService"
+                                  :options="options"
+                                  :vbind="{
+                                      responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
+                                      showTitle:false
+                                  }"
                 >
                     <template #toolbox-left>
                         <PIconTextButton style-type="primary-dark"
@@ -37,28 +37,21 @@
                             :menu="csDropdownMenu"
                             @click-project="clickProject"
                             @click-link="apiHandler.tableTS.linkState.openLink()"
-                            @click-exportExcel="exportToolSet.getData()"
                         >
                             Action
                         </PDropdownMenuBtn>
                     </template>
-                </p-dynamic-view>
+                </s-dynamic-layout>
             </template>
         </p-horizontal-layout>
         <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
             <template #detail>
-                <PDynamicDetails
-                    :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"
-                    :data="apiHandler.tableTS.selectState.firstSelectItem"
-                />
+                <!--                <SDynamicSubData-->
+                <!--                    :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"-->
+                <!--                    :data="apiHandler.tableTS.selectState.firstSelectItem"-->
+                <!--                />-->
             </template>
-            <template #data>
-                <PDynamicSubData
-                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
-                    :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
-                    :action="csGetDataAction"
-                />
-            </template>
+
             <template #tag>
                 <s-tags-panel
                     :is-show="singleItemTab.syncState.activeTab==='tag'"
@@ -66,27 +59,16 @@
                     tag-page-name="cloudServicePageTags"
                 />
             </template>
-            <template #rawData>
-                <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
-            </template>
             <template #admin>
-                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
-                    {{ $t('TAB.ADMIN') }}
-                </PPanelTop>
-                <p-dynamic-view
-                    view_type="table"
-                    :api-handler="adminApiHandler"
-                    :data_source="adminApiHandler.dataSource"
+                <s-dynamic-layout :api="adminApi"
+                                  :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                  v-bind="defaultAdminLayout"
                 />
             </template>
             <template #history>
-                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="historyAPIHandler.totalCount.value">
-                    {{ $t('TAB.HISTORY') }}
-                </PPanelTop>
-                <p-dynamic-view
-                    view_type="table"
-                    :api-handler="historyAPIHandler"
-                    :data_source="historyAPIHandler.dataSource"
+                <s-dynamic-layout :api="historyApi"
+                                  :is-show="historyIsShow" :name="$t('TAB.HISTORY')"
+                                  v-bind="defaultHistoryLayout"
                 />
             </template>
             <template #monitoring>
@@ -102,20 +84,16 @@
               :active-tab.sync="multiItemTab.syncState.activeTab"
         >
             <template #data>
-                <p-dynamic-view
-                    view_type="simple-table"
+                <s-dynamic-layout
+                    type="simple-table"
                     :data_source="dataSource"
                     :data="apiHandler.tableTS.selectState.selectItems"
                 />
             </template>
             <template #admin>
-                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
-                    {{ $t('TAB.ADMIN') }}
-                </PPanelTop>
-                <p-dynamic-view
-                    view_type="table"
-                    :api-handler="adminApiHandler"
-                    :data_source="adminApiHandler.dataSource"
+                <s-dynamic-layout :api="adminApi"
+                                  :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                  v-bind="defaultAdminLayout"
                 />
             </template>
             <template #monitoring>
@@ -143,7 +121,6 @@
 import {
     reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
@@ -153,11 +130,11 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
-    AdminFluentAPI,
-    HistoryFluentAPI, QuerySearchTableFluentAPI,
+    defaultAdminLayout, defaultHistoryLayout,
+    QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
+
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi } from '@/lib/fluent-api';
@@ -175,6 +152,11 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
+import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
+import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+
 
 export default {
     name: 'CloudServicePage',
@@ -184,11 +166,11 @@ export default {
     components: {
         GeneralPageLayout,
         PHorizontalLayout,
-        PDynamicView,
+        SDynamicLayout,
         PI,
         PIconTextButton,
         PTab,
-        PDynamicSubData,
+        SDynamicSubData,
         STagsPanel,
         PRawData,
         PDropdownMenuBtn,
@@ -221,25 +203,26 @@ export default {
 
         const state = reactive({
             originDataSource: [],
-            dataSource: computed(() => [
+            fields: computed(() => [
                 ...state.originDataSource,
                 {
-                    name: 'project', key: 'console_force_data.project', view_type: 'text', view_option: {},
+                    name: 'project', key: 'console_force_data.project', type: 'text',
                 },
             ]),
-            exportDataSource: computed(() => [
-                ...state.originDataSource,
-                {
-                    name: 'project', key: 'project_id', view_type: 'text', view_option: {},
-                },
-            ]),
+            options: computed(() => ({
+                fields: state.fields,
+            })),
+            // exportDataSource: computed(() => [
+            //     ...state.originDataSource,
+            //     {
+            //         name: 'project', key: 'project_id', view_type: 'text', view_option: {},
+            //     },
+            // ]),
         });
         const singleItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
-                ['data', 'TAB.DATA'],
                 ['tag', 'TAB.TAG'],
-                ['rawData', 'TAB.RAW_DATA'],
                 ['admin', 'TAB.ADMIN'],
                 ['history', 'TAB.HISTORY'],
                 ['monitoring', 'TAB.MONITORING'],
@@ -283,7 +266,7 @@ export default {
             if (resp.data.total_count !== 1) {
                 context.$router.push({ name: 'error' });
             }
-            state.originDataSource = resp.data.results[0].data_source;
+            // state.originDataSource = resp.data.results[0].data_source;
         };
         const apiHandler = new QuerySearchTableFluentAPI(csListAction, {
             shadow: true,
@@ -293,12 +276,12 @@ export default {
             dragable: true,
             excelVisible: true,
         });
-        const exportAction = fluentApi.addons().excel().export();
-        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
-        onMounted(async () => {
-            await getDataSource(props.provider, props.group, props.name);
-            exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
-        });
+        // const exportAction = fluentApi.addons().excel().export();
+        // const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
+        // onMounted(async () => {
+        //     await getDataSource(props.provider, props.group, props.name);
+        //     exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
+        // });
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
@@ -310,7 +293,7 @@ export default {
                 );
                 await apiHandler.getData();
                 console.debug(state.exportDataSource);
-                exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
+                // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
         apiHandler.getData();
@@ -371,16 +354,18 @@ export default {
             }
             return result;
         });
+        const adminApi = computed<DynamicLayoutApiProp>(() => {
+            let ids: string[] = [];
+            if (apiHandler.tableTS.selectState.isSelectOne) {
+                ids = [apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id];
+            } else {
+                ids = apiHandler.tableTS.selectState.selectItems.map(it => it.cloud_service_id);
+            }
+            return {
+                resource: fluentApi.inventory().cloudService().memberList().setIds(ids),
 
-        const adminApiHandler = new AdminFluentAPI(
-            fluentApi.inventory().cloudService().memberList(),
-            adminIsShow,
-            'cloud_service_id',
-            apiHandler,
-        );
-
-        // @ts-ignore
-
+            };
+        });
         const historyIsShow = computed(() => {
             let result = false;
             if (apiHandler.tableTS.selectState.isSelectOne) {
@@ -388,11 +373,15 @@ export default {
             }
             return result;
         });
-        const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id);
-        const getDataAction = fluentApi.inventory().cloudService().getData();
+        const historyApi = computed<DynamicLayoutApiProp>(() => {
+            const selectIdForHistory = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
+            return {
+                resource: fluentApi.inventory().server(),
+                getAction: (act: any) => act.setId(selectIdForHistory),
 
-        // @ts-ignore
-        const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
+            };
+        });
+
 
         const metricAPIHandler = new MetricAPI(
             'inventory.CloudService',
@@ -407,15 +396,18 @@ export default {
             projectModalVisible,
             clickProject,
             changeProject,
-            exportToolSet,
             csGetDataAction,
             ...toRefs(collectModalState),
             clickCollectData,
             singleItemTab,
             multiItemTab,
-            adminApiHandler,
-            historyAPIHandler,
             metricAPIHandler,
+            defaultAdminLayout,
+            defaultHistoryLayout,
+            adminApi,
+            adminIsShow,
+            historyApi,
+            historyIsShow,
         };
     },
 };

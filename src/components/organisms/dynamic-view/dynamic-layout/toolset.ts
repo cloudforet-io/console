@@ -29,7 +29,7 @@ interface BaseOptions {
 export type GetAction<action extends ActionAPI = ActionAPI> = (action: action) => action;
 
 export interface DynamicLayoutApiProp<T=ActionAPI>{
-    resource: Resource&ResourceActions<'get'|'list'|'getData'>;
+    resource: Resource&ResourceActions<'get'|'list'|'getData'>|ActionAPI;
     // @ts-ignore
     getAction?: GetAction<T>;
 }

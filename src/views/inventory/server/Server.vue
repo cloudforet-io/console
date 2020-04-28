@@ -51,16 +51,16 @@
                 />
             </template>
             <template #admin>
-                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
-                    {{ $t('TAB.ADMIN') }}
-                </PPanelTop>
-                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+                <SDynamicLayout :api="adminApi"
+                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                v-bind="defaultAdminLayout"
+                />
             </template>
             <template #history>
-                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="historyAPIHandler.totalCount.value">
-                    {{ $t('TAB.HISTORY') }}
-                </PPanelTop>
-                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
+                <SDynamicLayout :api="historyApi"
+                                :is-show="historyIsShow" :name="$t('TAB.HISTORY')"
+                                v-bind="defaultHistoryLayout"
+                />
             </template>
             <template #monitoring>
                 <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
@@ -86,10 +86,10 @@
                 </p-data-table>
             </template>
             <template #admin>
-                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
-                    {{ $t('TAB.ADMIN') }}
-                </PPanelTop>
-                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+                <SDynamicLayout :api="adminApi"
+                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                v-bind="defaultAdminLayout"
+                />
             </template>
             <template #monitoring>
                 <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
@@ -143,12 +143,12 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import { AdminFluentAPI, HistoryFluentAPI, QuerySearchTableFluentAPI } from '@/lib/api/table';
+import {
+    defaultAdminLayout, defaultHistoryLayout, QuerySearchTableFluentAPI,
+} from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi, MultiItemAction } from '@/lib/fluent-api';
-import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
     getEnumValues,
     getFetchValues,
@@ -159,111 +159,13 @@ import { ServerListResp, ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
-import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
-
-const serverStateVF = {
-    name: 'State',
-    key: 'state',
-    view_type: 'enum',
-    view_option: {
-        INSERVICE: {
-            view_type: 'state',
-            view_option: {
-                text_color: '#222532',
-                icon: {
-                    color: '#60B731',
-                },
-            },
-        },
-        PENDING: {
-            view_type: 'state',
-            view_option: {
-                text_color: '#222532',
-                icon: {
-                    color: '#FF7750',
-                },
-            },
-        },
-        MAINTENANCE: {
-            view_type: 'state',
-            view_option: {
-                text_color: '#222532',
-                icon: {
-                    color: '#FFCE02',
-                },
-            },
-        },
-        CLOSED: {
-            view_type: 'state',
-            view_option: {
-                text_color: '#EF3817',
-                icon: {
-                    color: '#EF3817',
-                },
-            },
-        },
-        DELETED: {
-            view_type: 'state',
-            view_option: {
-                text_color: '#858895',
-                icon: {
-                    color: '#858895',
-                },
-            },
-        },
-    },
-};
-
-const serverListDataSource = [
-    { name: 'Project', key: 'console_force_data.project' },
-    { name: 'Name', key: 'name' },
-    serverStateVF,
-    { name: 'Primary IP', key: 'primary_ip_address' },
-    { name: 'Server Type', key: 'server_type' },
-    { name: 'OS Type', key: 'os_type' },
-    { name: 'Pool', key: 'pool_info.pool_id' },
-    updateAtVF,
-];
-
-
-const baseInfoDetails = [
-    { name: 'ID', key: 'server_id' },
-    { name: 'Name', key: 'name' },
-    serverStateVF,
-    { name: 'Primary IP', key: 'primary_ip_address' },
-    { name: 'Server Type', key: 'server_type' },
-    { name: 'OS Type', key: 'os_type' },
-    { name: 'Project', key: 'console_force_data.project' },
-    { name: 'Region', key: 'region_info.region_id' },
-    { name: 'Zone', key: 'zone_info.zone_id' },
-    { name: 'Pool', key: 'pool_info.pool_id' },
-    createAtVF,
-    updateAtVF,
-    deleteAtVF,
-];
-
-const exportDataSource = [
-    { name: 'ID', key: 'server_id' },
-    { name: 'Name', key: 'name' },
-    serverStateVF,
-    { name: 'Primary IP', key: 'primary_ip_address' },
-    { name: 'Server Type', key: 'server_type' },
-    { name: 'OS Type', key: 'os_type' },
-    { name: 'Project', key: 'project_id' },
-    { name: 'Region', key: 'region_info.region_id' },
-    { name: 'Zone', key: 'zone_info.zone_id' },
-    { name: 'Pool', key: 'pool_info.pool_id' },
-    createAtVF,
-    updateAtVF,
-    deleteAtVF,
-];
+import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 
 
 export default {
@@ -272,7 +174,6 @@ export default {
         getValue,
     },
     components: {
-        PPanelTop,
         GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
@@ -282,7 +183,6 @@ export default {
         PDataTable,
         PTableCheckModal,
         PIconTextButton,
-        PDynamicView,
         SProjectTreeModal,
         SCollectModal,
         SMonitoring,
@@ -533,9 +433,6 @@ export default {
             await apiHandler.getData();
             projectModalVisible.value = false;
         };
-        const exportAction = fluentApi.addons().excel().export().setDataSource(exportDataSource);
-
-        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
 
         const adminIsShow = computed(() => {
@@ -551,13 +448,25 @@ export default {
 
             return result;
         });
-        const adminApiHandler = new AdminFluentAPI(
-            fluentApi.inventory().server().memberList(),
-            adminIsShow,
-            'server_id',
-            apiHandler,
-        );
+        const adminApi = computed<DynamicLayoutApiProp>(() => {
+            let servers: string[] = [];
+            if (apiHandler.tableTS.selectState.isSelectOne) {
+                servers = [apiHandler.tableTS.selectState.firstSelectItem.server_id];
+            } else {
+                servers = apiHandler.tableTS.selectState.selectItems.map(it => it.server_id);
+            }
+            return {
+                resource: fluentApi.inventory().server().memberList().setIds(servers),
+            };
+        });
 
+        const historyApi = computed<DynamicLayoutApiProp>(() => {
+            const selectIdForHistory = apiHandler.tableTS.selectState.firstSelectItem.server_id;
+            return {
+                resource: fluentApi.inventory().server().getData().setId(selectIdForHistory),
+                getAction: (act: any) => act.setId(selectIdForHistory),
+            };
+        });
         const historyIsShow = computed(() => {
             let result = false;
 
@@ -567,11 +476,6 @@ export default {
 
             return result;
         });
-        const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
-        const getDataAction = fluentApi.inventory().server().getData();
-
-        // @ts-ignore
-        const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
 
         const collectModalState = reactive({
             visible: false,
@@ -608,11 +512,12 @@ export default {
             apiHandler,
             fields,
             multiSelectFields,
-            exportToolSet,
-            adminApiHandler,
-            getDataAction,
-            historyAPIHandler,
-            baseInfoDetails,
+            defaultAdminLayout,
+            defaultHistoryLayout,
+            adminApi,
+            adminIsShow,
+            historyApi,
+            historyIsShow,
             collectModalState,
             metricAPIHandler,
             mainTableLayout,
