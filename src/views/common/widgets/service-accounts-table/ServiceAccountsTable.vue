@@ -12,21 +12,21 @@
             >
                 <!-- th -->
                 <template #th-servers="{field}">
-                    <div class="custom-th"
+                    <div class="text-center custom-th"
                          :style="{color: colors.servers}"
                     >
                         {{ field.label }}
                     </div>
                 </template>
                 <template #th-cloud_services="{field}">
-                    <div class="custom-th"
+                    <div class="text-center custom-th"
                          :style="{color: colors.cloud_services}"
                     >
                         {{ field.label }}
                     </div>
                 </template>
                 <template #th-credentials="{field}">
-                    <div class="custom-th"
+                    <div class="text-center custom-th"
                          :style="{color: colors.credentials, 'font-weight': 'bold'}"
                     >
                         {{ field.label }}
@@ -39,27 +39,27 @@
                          :style="{'padding-top':'0.5rem', 'padding-left':'1.04rem', 'vertical-align':'middle'}"
                     >
                         <span class="color" />
-                        {{ data.provider }}
+                        {{ value || 0 }}
                     </div>
                 </template>
                 <template #col-account_name="{value}">
                     <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ data.service_account_name }}
+                        {{ value || 0 }}
                     </p-td>
                 </template>
-                <template #col-servers-format="{value}">
+                <template #col-server_count-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        {{ data.server_count }}
+                        {{ value || 0 }}
                     </div>
                 </template>
-                <template #col-cloud_services-format="{value}">
+                <template #col-cloud_service_count-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        {{ data.cloud_service_count }}
+                        {{ value || 0 }}
                     </div>
                 </template>
-                <template #col-credentials-format="{value}">
+                <template #col-secret_count-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.credentials}">
-                        {{ data.secret_count }}
+                        {{ value || 0 }}
                     </div>
                 </template>
             </p-data-table>
@@ -172,25 +172,18 @@ export default defineComponent({
                 state.data = [];
                 try {
                     const res = await api.execute();
-                    // state.data = res.data.results.map((item) => {
-                    //     item.cloud_service_count = item?.cloud_service_count || 0;
-                    //     item.secret_count = item?.secret_count || 0;
-                    //     item.server_count = item?.server_count || 0;
-                    //     return item;
-                    // });
-                    res.data.results.forEach((item) => {
-                        item.cloud_service_count = item?.cloud_service_count || 0;
-                        item.server_count = item?.server_count || 0;
-                        item.secret_count = item?.secret_count || 0;
-                        state.data.push({...item});
-                    });
-
+                    state.data = res.data.results.map((item) => ({
+                        provider: item.provider,
+                        service_account_name: item.service_account_name,
+                        cloud_service_count: item?.cloud_service_count || 0,
+                        server_count: item?.server_count || 0,
+                        secret_count: item?.secret_count || 0,
+                    }));
                 } catch (e) {
                     console.error(e);
                 } finally {
                     state.loading = false;
                 }
-                return state.data;
             };
 
             setTimeout(() => {
