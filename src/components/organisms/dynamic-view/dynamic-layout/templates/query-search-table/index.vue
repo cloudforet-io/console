@@ -70,7 +70,9 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import { fluentApi, QueryAPI } from '@/lib/fluent-api';
+import {
+    ActionAPI, BaseResources, fluentApi, GetDataAction, QueryAPI, ResourceActions,
+} from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
     checkCanGetData,
@@ -136,7 +138,12 @@ export default {
         const slots = makeTableSlots(props);
 
         const getAction = () => {
-            let action = props.api?.resource.list() as QueryAPI<any, any>;
+            let action: ActionAPI;
+            if (props.api?.resource instanceof ActionAPI) {
+                action = props.api.resource;
+            } else {
+                action = (props.api?.resource as ResourceActions<'list'>).list();
+            }
             const getAct = props.api?.getAction;
             if (getAct) {
                 action = getAct(action) as QueryAPI<any, any>;
@@ -159,7 +166,6 @@ export default {
                 undefined, acMeta,
             );
         };
-        console.debug(props.toolset, 'toolset');
         let apiHandler = props.toolset as QuerySearchTableFluentAPI || makeApiToolset();
         const state = reactive({
             isToolsetMode: computed(() => !!props.toolset),

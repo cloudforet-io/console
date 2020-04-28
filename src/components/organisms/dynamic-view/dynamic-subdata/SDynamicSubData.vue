@@ -20,9 +20,9 @@
                 :is-show="isShow"
             />
         </transition>
-<!--        <p-empty v-if="layouts&&names.length == 0" class="my-8">-->
-<!--            No data-->
-<!--        </p-empty>-->
+        <!--        <p-empty v-if="layouts&&names.length == 0" class="my-8">-->
+        <!--            No data-->
+        <!--        </p-empty>-->
     </div>
 </template>
 
@@ -73,18 +73,23 @@ export default defineComponent({
             type: Boolean,
             default: true,
         },
+
     },
     setup(props: Props) {
         const state = reactive({
             names: computed(() => props.layouts?.map((layout: DLSchema) => layout.name) || []),
             layoutData: computed(() => _.zipObject(state.names, props.layouts)),
+            api: { resource: props.resourceApi },
         });
+
+
         const api = computed(() => {
+            const selectId = props.selectId; // do not remove this code!! this is required for tracking props.selectId
             return {
                 resource: props.resourceApi,
                 getAction: (action) => {
                     if (action.setId) {
-                        return action.clone().setId(props.selectId);
+                        return action.clone().setId(selectId);
                     }
                     return action.clone();
                 },
@@ -95,11 +100,12 @@ export default defineComponent({
         const buttons = computed(() => state.names.map(name => ({
             name, label: name, vbind: { styleType: 'gray900-hover', outline: selected.value !== name },
         })));
-        watch(() => state.names, (aft, bef) => {
-            if (aft && aft.length >= 1 && !_.isEqual(aft, bef) && !new Set(aft).has(selected.value)) {
+        watch(() => state.names, _.debounce((aft, bef) => {
+            if (aft && aft[0] && aft.indexOf(selected.value) === -1) {
                 selected.value = aft[0];
             }
-        });
+        }, 400));
+
 
         return {
             ...toRefs(state),
