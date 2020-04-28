@@ -195,8 +195,6 @@ export default {
             type: String,
             required: true,
         },
-
-
     },
     setup(props, context) {
         const vm = getCurrentInstance();
@@ -210,9 +208,9 @@ export default {
         };
 
         const state = reactive({
-            originDataSource: [],
+            originFields: [],
             mergeFields: computed(() => [
-                ...state.originDataSource,
+                ...state.originFields,
                 ...baseTable.options.fields,
             ]),
             fields: computed(() => state.mergeFields.map(field => filedMap[field.key] || field)),
@@ -226,6 +224,7 @@ export default {
             //     },
             // ]),
         });
+
         const singleItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
@@ -263,18 +262,20 @@ export default {
                 { key: 'cloud_service_type', operator: '=', value: props.name },
             );
 
-        const getDataSource = async (provider, group, name) => {
+        const getFields = async (provider, group, name) => {
             const resp = await fluentApi.inventory().cloudServiceType().list().setFilter(
                 { key: 'provider', operator: '=', value: provider },
                 { key: 'group', operator: '=', value: group },
                 { key: 'name', operator: '=', value: name },
             )
+                .setOnly('metadata.view.table.layout.options.fields')
                 .execute();
             if (resp.data.total_count !== 1) {
                 context.$router.push({ name: 'error' });
             }
-            // state.originDataSource = resp.data.results[0].data_source;
+            state.originFields = resp.data.results[0].metadata?.view?.table?.layout?.options?.fields || [];
         };
+        getFields(props.provider, props.group, props.name);
         const apiHandler = new QuerySearchTableFluentAPI(csListAction, {
             shadow: true,
             border: true,
@@ -292,7 +293,7 @@ export default {
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
-                await getDataSource(after[0], after[1], after[2]);
+                await getFields(after[0], after[1], after[2]);
                 apiHandler.action = csListAction.setFixFilter(
                     { key: 'provider', operator: '', value: after[0] },
                     { key: 'cloud_service_group', operator: '=', value: after[1] },
@@ -300,6 +301,7 @@ export default {
                 );
                 await apiHandler.getData();
                 console.debug(state.exportDataSource);
+                await getFields(after[0], after[1], after[2]);
                 // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
@@ -390,15 +392,15 @@ export default {
         });
 
         const cache = {};
-        const mainTableState = reactive({
-            layouts: null,
+        const dynamicLayoutState = reactive({
+            layouts: [],
             resourceApi: fluentApi.inventory().cloudService(),
-            mergeLayouts: computed(() => (state.layouts ? [baseInfoSchema, ...state.layouts, rawLayout] : [baseInfoSchema, rawLayout])),
+            mergeLayouts: computed(() => (dynamicLayoutState.layouts ? [baseInfoSchema, ...dynamicLayoutState.layouts, rawLayout] : [baseInfoSchema, rawLayout])),
         });
 
 
-        const getLayoutFunc = async () => {
-            mainTableState.layouts = null;
+        const getLayoutsFunc = async () => {
+            dynamicLayoutState.layouts = null;
             const selectId = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
             let layouts;
             if (cache[selectId]) {
@@ -411,24 +413,25 @@ export default {
                 layouts = _.get(resp.data, 'metadata.view.sub_data.layouts', []);
                 cache[selectId] = layouts;
             }
-            mainTableState.layouts = layouts;
+            console.debug(layouts);
+            dynamicLayoutState.layouts = layouts;
         };
-        const getLayout = _.debounce(getLayoutFunc, 50);
+        const getLayouts = _.debounce(getLayoutsFunc, 50);
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem?.cloud_service_id);
         const subDataIsShow = computed(() => singleItemTab.syncState.activeTab === 'detail');
         let watchStop = null as unknown as any;
         watch(subDataIsShow, (aft, bef) => {
             if (aft !== bef) {
                 if (aft) {
-                    getLayout();
+                    getLayouts();
                     watchStop = watch(selectId, (af, be) => {
                         if (af && af !== be) {
-                            getLayout();
+                            getLayouts();
                         }
                     });
                 } else if (watchStop) {
                     watchStop();
-                    mainTableState.layouts = null;
+                    dynamicLayoutState.layouts = null;
                     watchStop = null;
                 }
             }
@@ -443,7 +446,7 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(mainTableState),
+            ...toRefs(dynamicLayoutState),
             subDataIsShow,
             apiHandler,
             csDropdownMenu,
