@@ -27,6 +27,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
             filter: [],
             filterOr: [],
             fixFilter: [],
+            fixFilterOr: [],
             extraParameter: {},
             ...initState,
         };
@@ -118,6 +119,7 @@ export const getInitJoinState = (): JoinStateItem => ({
         filter: [],
         filterOr: [],
         fixFilter: [],
+        fixFilterOr: [],
         extraParameter: undefined,
     },
 });

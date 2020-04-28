@@ -37,7 +37,7 @@ const cloudService = (casual) => {
         // metadata: DefaultMetaData;
         reference: casual._reference,
         project_id: casual.make_id('project'),
-        cloud_service_type_id: casual.make_id('cs'),
+        cloud_service_id: casual.make_id('cs'),
         name: casual.word,
 
         // data_source: DataSourceItem[],

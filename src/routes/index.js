@@ -14,7 +14,9 @@ import managementRoute from '@/routes/management/management-route';
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
-import DynamicLayoutHelper from '@/views/common/helper/DynamicLayoutHelper.vue';
+
+const DynamicLayoutHelper = () => import('@/views/common/helper/DynamicLayoutHelper.vue');
+const QueryHelper = () => import('@/views/common/helper/QueryHelper.vue');
 
 Vue.use(VueRouter);
 
@@ -87,6 +89,12 @@ const router = new VueRouter({
             path: '/helper',
             name: 'Helper',
             component: DynamicLayoutHelper,
+
+        },
+        {
+            path: '/helper/query',
+            name: 'QueryHelper',
+            component: QueryHelper,
 
         },
         { path: '*', component: ErrorPage },

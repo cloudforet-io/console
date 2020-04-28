@@ -17,7 +17,7 @@ import { isNotEmpty } from '@/lib/util';
 import { ApiType } from '@/lib/fluent-api/type';
 
 
-class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
+export class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
     constructor(
         api: ApiType,
         baseUrl: string,
