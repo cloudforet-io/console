@@ -2,7 +2,7 @@ import { Location } from 'vue-router';
 import { colorset } from '@/lib/util';
 
 import { Stat } from '@/lib/fluent-api/statistics/resource';
-import {initReactive, StateToolSet} from "@/lib/toolset";
+import { initReactive, StateToolSet } from '@/lib/toolset';
 
 
 export const serviceSummaryProps = {

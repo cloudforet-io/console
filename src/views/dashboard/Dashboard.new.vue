@@ -57,7 +57,6 @@ export default defineComponent({
         TopProjects,
     },
     setup() {
-
         const projects = new ServiceSummaryWidgetState({
             title: 'projects',
             to: '/project',
