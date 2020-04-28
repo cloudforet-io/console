@@ -83,7 +83,7 @@ export default {
             options: {}, // _.get(props.collector, 'plugin_info.options', {}),
             selectedVersion: '1.0', // _.get(props.collector, 'plugin_info.version', '1.0'),
             confirmBtnBind: computed(() => {
-                const defaultStyle = { style: { padding: 0 } };
+                const defaultStyle: any = { style: { padding: 0 } };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),

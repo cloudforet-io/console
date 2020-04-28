@@ -140,6 +140,7 @@ import CloudServiceSD from '@/metadata-schema/view/inventory/cloud_service/sub_d
 import CloudServiceTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import { parser } from '@/lib/api/code-generater';
 
 const checkApi = (api: any, target: string, matches: string[]): boolean => {
     // eslint-disable-next-line no-proto
@@ -187,7 +188,115 @@ const serviceList = makeItem(getServerList());
 
 const tableSchemaSample = '{\n    "type":"query-search-table",\n    "name":"test",\n    "options":{\n        "fields":[\n            {\n                "type":"text",\n                "key":"name",\n                "name":"name"\n            }\n        ]\n    }\n}';
 
-
+const testSample = `
+{
+        "resource_type": "inventory.CloudServiceType",
+        "query": {
+            "aggregate": {
+                "group": {
+                    "keys": [
+                        {
+                            "key": "cloud_service_type_id",
+                            "name": "cloud_service_type_id"
+                        },
+                        {
+                            "key": "name",
+                            "name": "cloud_service_type"
+                        },
+                        {
+                            "key": "group",
+                            "name": "cloud_service_group"
+                        },
+                        {
+                            "key": "provider",
+                            "name": "provider"
+                        }
+                    ]
+                }
+            },
+            "sort": {
+                "name": "cloud_service_count",
+                "desc": true
+            }
+        },
+        "join": [
+            {
+                "keys": [
+                    "cloud_service_type",
+                    "cloud_service_group",
+                    "provider"
+                ],
+                "resource_type": "inventory.CloudService",
+                "query": {
+                    "aggregate": {
+                        "group": {
+                            "keys": [
+                                {
+                                    "key": "cloud_service_type",
+                                    "name": "cloud_service_type"
+                                },
+                                {
+                                    "key": "cloud_service_group",
+                                    "name": "cloud_service_group"
+                                },
+                                {
+                                    "key": "provider",
+                                    "name": "provider"
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "operator": "count",
+                                    "name": "cloud_service_count"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "keys": [
+                    "cloud_service_type",
+                    "cloud_service_group",
+                    "provider"
+                ],
+                "resource_type": "inventory.CloudService",
+                "query": {
+                    "filter": [
+                        {
+                            "key": "created_at",
+                            "value": "now/d",
+                            "operator": "timedelta_gte"
+                        }
+                    ],
+                    "aggregate": {
+                        "group": {
+                            "keys": [
+                                {
+                                    "key": "cloud_service_type",
+                                    "name": "cloud_service_type"
+                                },
+                                {
+                                    "key": "cloud_service_group",
+                                    "name": "cloud_service_group"
+                                },
+                                {
+                                    "key": "provider",
+                                    "name": "provider"
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "operator": "count",
+                                    "name": "yesterday_cloud_service_count"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ]
+    }`;
 export default defineComponent({
     name: 'DynamicLayoutHelper',
     components: {
@@ -313,6 +422,8 @@ export default defineComponent({
                 }
             }
         });
+
+        console.debug(parser(testSample));
         return {
             modeTab,
             typeTab,

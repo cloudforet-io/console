@@ -28,7 +28,6 @@
                             @click-delete="clickDelete"
                             @click-project="clickProject"
                             @click-link="apiHandler.tableTS.linkState.openLink()"
-                            @click-exportExcel="exportToolSet.getData()"
                         >
                             {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
@@ -463,7 +462,7 @@ export default {
         const historyApi = computed<DynamicLayoutApiProp>(() => {
             const selectIdForHistory = apiHandler.tableTS.selectState.firstSelectItem.server_id;
             return {
-                resource: fluentApi.inventory().server().getData().setId(selectIdForHistory),
+                resource: fluentApi.inventory().server(),
                 getAction: (act: any) => act.setId(selectIdForHistory),
             };
         });

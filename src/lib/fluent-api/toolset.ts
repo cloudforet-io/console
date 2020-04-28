@@ -87,6 +87,10 @@ export const OPERATOR_MAP = Object.freeze({
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
+    td_lt: 'timedelta_lt',
+    td_gt: 'timedelta_gt',
+    td_lte: 'timedelta_lte',
+    td_gte: 'timedelta_gte',
     '=': 'in', // merge operator
     '!=': 'not_in', // merge operator
     $: 'regex',
@@ -154,6 +158,7 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
             filter: [],
             filterOr: [],
             fixFilter: [],
+            fixFilterOr: [],
             extraParameter: {},
             ...initState,
         };
@@ -167,9 +172,9 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
             const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filter, apiState.fixFilter);
             if (newFilter) query.filter = newFilter;
         }
-        if (isNotEmpty(apiState.filterOr)) {
-            const newFilter = filterItemToQuery(apiState.filterOr);
-            if (newFilter) query.filter_or = newFilter;
+        if (this.apiState.filterOr.length > 0 || apiState.fixFilterOr.length > 0) {
+            const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filterOr, apiState.fixFilterOr);
+            if (newFilter) query.filter = newFilter;
         }
         return query as Q;
     }
@@ -194,6 +199,11 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
         this.apiState.filterOr = args;
         return this.clone();
     }
+
+    setFixFilterOr(...args: FilterItem[]): this {
+        this.apiState.fixFilterOr = args;
+        return this.clone();
+    }
 }
 
 
@@ -210,6 +220,8 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
         this.apiState = {
             filter: [] as unknown as FilterItem[],
             fixFilter: [] as unknown as FilterItem[],
+            filterOr: [] as unknown as FilterItem[],
+            fixFilterOr: [] as unknown as FilterItem[],
             only: [] as unknown as string[],
             thisPage: 1,
             pageSize: 15,
