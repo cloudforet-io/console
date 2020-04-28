@@ -4,13 +4,15 @@
                                 sm:col-end-6
                                 lg:col-end-5
                                 "
-                         title="servers" resourceType="inventory.Server"
+                         title="servers" resource-type="inventory.Server"
+                         :get-action="getProject"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-10"
-                         title="cloud services" resourceType="inventory.CloudService"
+                         title="cloud services" resource-type="inventory.CloudService"
+                         :get-action="getServer"
                          :color="cloudServices.color"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
@@ -24,6 +26,8 @@
                     <service-accounts
                         :title="'RESOURCES BY REGION'"
                         reverse
+                        resource-type="inventory.Server"
+                        :get-action="getServer"
                     />
                 </template>
                 <template #cloud_service>
@@ -48,7 +52,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
@@ -56,10 +60,14 @@ import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummar
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
-import { reactive, toRefs } from '@vue/composition-api';
-import { fluentApi } from '@/lib/fluent-api';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { fluentApi, Resource } from '@/lib/fluent-api';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { makeTrItems } from '@/lib/view-helper';
+import { Stat } from '@/lib/fluent-api/statistics/resource';
+import { api } from '@/lib/api/axios';
 
 export default {
     name: 'ProjectDashboard',
@@ -85,6 +93,8 @@ export default {
                 color: secondary1,
             },
         });
+        const vm = getCurrentInstance();
+        const projectId = computed<string>(() => context.root.$route.params.id as string);
 
         const tabData = reactive({
             tabs: makeTrItems([
@@ -98,6 +108,20 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(tabData),
+            getProject(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                });
+            },
+            getServer(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                });
+            },
         };
     },
 };
@@ -105,7 +129,7 @@ export default {
 
 <style scoped>
     .daily-updates {
-        height: 45rem;
+        height: 38rem;
     }
 
     .health-dashboard {

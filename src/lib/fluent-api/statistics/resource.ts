@@ -18,7 +18,7 @@ import { ApiType } from '@/lib/fluent-api/type';
 import _ from 'lodash';
 
 
-class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
+export class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
     constructor(
         api: ApiType,
         baseUrl: string,

@@ -65,16 +65,16 @@ export default defineComponent({
         interface Value {
             count: number;
         }
-        const countApi = fluentApi.statisticsTest().resource().stat<Value>()
+        const countApi = computed(() => props.getAction(fluentApi.statisticsTest().resource().stat<Value>()
             .setResourceType(props.resourceType)
-            .addGroupField('count', STAT_OPERATORS.count);
+            .addGroupField('count', STAT_OPERATORS.count)));
 
         // const trendApi = fluentApi.statisticsTest().history()
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
             try {
-                const res = await countApi.execute();
+                const res = await countApi.value.execute();
                 ts.state.count = res.data.results[0]?.count || 0;
                 // TODO: trends api
                 ts.state.data = _.fill(_.range(7), 0);

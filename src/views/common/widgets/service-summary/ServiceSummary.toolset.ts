@@ -1,6 +1,9 @@
 import { Location } from 'vue-router';
 import { colorset } from '@/lib/util';
 
+import { Stat } from '@/lib/fluent-api/statistics/resource';
+
+
 export const serviceSummaryProps = {
     title: {
         type: String,
@@ -19,6 +22,10 @@ export const serviceSummaryProps = {
         required: true,
         default: '',
     },
+    getAction: {
+        type: Function,
+        default: () => ({}),
+    },
 };
 
 export interface ServiceSummaryPropsType {
@@ -26,4 +33,5 @@ export interface ServiceSummaryPropsType {
     to: Location | string;
     color: string;
     resourceType: string;
+    getAction(api: Stat<any>): Stat<any>;
 }
