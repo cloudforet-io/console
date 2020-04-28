@@ -19,7 +19,7 @@
 </template>
 <script>
 
-import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion';
+import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion_origin';
 import ServersByType from '@/views/dashboard/modules/ServersByType';
 import ProjectSummary from '@/views/project/project/origin/ProjectSummary';
 

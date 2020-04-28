@@ -3,7 +3,7 @@ import { fluentApi } from '@/lib/fluent-api';
 const Plugin = () => import('@/views/plugin/plugin');
 const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
 
-const Collector = () => import('@/views/plugin/collector/pages/Collector.vue');
+const Collector = () => import('@/views/plugin/collector/pages/Collector.new.vue');
 
 const CollectorPlugins = () => import('@/views/plugin/collector/pages/CollectorPlugins.vue');
 const CollectorCreator = () => import('@/views/plugin/collector/pages/CollectorCreator.vue');

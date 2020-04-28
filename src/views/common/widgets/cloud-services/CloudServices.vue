@@ -165,11 +165,9 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .group-name {
     @apply text-base font-bold mb-1 truncate leading-tight;
-    font-family: theme('fontFamily.sans');
 }
 .name {
     @apply text-xs text-gray truncate leading-tight;
-    font-family: theme('fontFamily.serif');
 }
 .count {
     @apply text-lg font-bold ml-1;
