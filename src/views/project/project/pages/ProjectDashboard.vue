@@ -5,14 +5,14 @@
                                 lg:col-end-5
                                 "
                          title="servers" resource-type="inventory.Server"
-                         :get-action="getProject"
+                         :get-action="getProjectSummary"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-10"
                          title="cloud services" resource-type="inventory.CloudService"
-                         :get-action="getServer"
+                         :get-action="getServerSummary"
                          :color="cloudServices.color"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
@@ -23,17 +23,19 @@
         >
             <PTab :tabs="tabs" :active-tab.sync="activeTab">
                 <template #server>
-                    <service-accounts
+                    <resources-by-region
                         :title="'RESOURCES BY REGION'"
                         reverse
                         resource-type="inventory.Server"
-                        :get-action="getServer"
+                        :get-action="getServerResources"
                     />
                 </template>
                 <template #cloud_service>
-                    <service-accounts
+                    <resources-by-region
                         :title="'RESOURCES BY REGION'"
                         reverse
+                        resource-type="inventory.CloudService"
+                        :get-action="getCloudServiceResources"
                     />
                 </template>
             </PTab>
@@ -55,7 +57,6 @@
 <script lang="ts">
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
-import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
@@ -68,16 +69,17 @@ import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
 import { api } from '@/lib/api/axios';
+import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
 
 export default {
     name: 'ProjectDashboard',
     components: {
+        ResourcesByRegion,
         CloudServices,
         DailyUpdates,
         ServiceSummary,
         ServiceAccountsTable,
         PTab,
-        ServiceAccounts,
         HealthDashboard,
     },
     setup(props, context) {
@@ -105,22 +107,62 @@ export default {
             activeTab: 'server',
         });
 
+        // TODO: Refactor apiActions
         return {
             ...toRefs(state),
             ...toRefs(tabData),
-            getProject(apiAction: Stat<any>) {
+            getProjectSummary(apiAction: Stat<any>) {
                 return apiAction.setFilter({
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
                 }).setResourceType('identity.Project');
             },
-            getServer(apiAction: Stat<any>) {
+            getServerSummary(apiAction: Stat<any>) {
                 return apiAction.setFilter({
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
                 }).setResourceType('inventory.Server');
+            },
+            getServerResources(apiAction: Stat) {
+                return apiAction
+                    .addGroupKey('data.compute.region_name', 'region_name')
+                    .setFilter({
+                        key: 'project_id',
+                        value: projectId.value,
+                        operator: '=',
+                    }, {
+                        key: 'data.compute.region_name',
+                        value: null,
+                        operator: '!=',
+                    }).setResourceType('inventory.Server');
+            },
+            getCloudServiceResources(apiAction: Stat) {
+                return apiAction
+                    .addGroupKey('data.region_name', 'region_name')
+                    .setFilter({
+                        key: 'project_id',
+                        value: projectId.value,
+                        operator: '=',
+                    }, {
+                        key: 'data.region_name',
+                        value: null,
+                        operator: '!=',
+                    }).setResourceType('inventory.CloudService');
+            },
+            getCloudService(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                })
+                    .setJoinFilter([{
+                        key: 'project_id',
+                        value: projectId.value,
+                        operator: '=',
+                    }])
+                    .setResourceType('inventory.CloudService');
             },
         };
     },

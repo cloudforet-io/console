@@ -34,32 +34,32 @@
                 </template>
 
                 <!-- others -->
-                <template #col-service_provider-format="{value}">
+                <template #col-provider-format="{value}">
                     <div class="font-bold"
                          :style="{'padding-top':'0.5rem', 'padding-left':'1.04rem', 'vertical-align':'middle'}"
                     >
                         <span class="color" />
-                        {{ value }}
+                        {{ data.provider }}
                     </div>
                 </template>
                 <template #col-account_name="{value}">
                     <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ value }}
+                        {{ data.service_account_name }}
                     </p-td>
                 </template>
                 <template #col-servers-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        {{ value }}
+                        {{ data.server_count }}
                     </div>
                 </template>
                 <template #col-cloud_services-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        {{ value }}
+                        {{ data.cloud_service_count }}
                     </div>
                 </template>
                 <template #col-credentials-format="{value}">
                     <div class="text-center font-bold" :style="{color: colors.credentials}">
-                        {{ value }}
+                        {{ data.secret_count }}
                     </div>
                 </template>
             </p-data-table>
@@ -101,11 +101,11 @@ export default defineComponent({
         const vm: any = getCurrentInstance();
 
             interface DataType {
-                service_provider: string;
-                account_name: string;
-                servers: number;
-                cloud_services: number;
-                credentials: number;
+                provider: string;
+                service_account_name: string;
+                server_count: number;
+                cloud_service_count: number;
+                secret_count: number;
             }
 
             interface InitDataType {
@@ -128,11 +128,11 @@ export default defineComponent({
                     credentials: gray,
                 },
                 fields: computed(() => makeTrItems([
-                    ['service_provider', 'FIELD.SERVICE_PROVIDER'],
-                    ['account_name', 'FIELD.ACCOUNT_NAME'],
-                    ['servers', 'FIELD.SERVER'],
-                    ['cloud_services', 'FIELD.CLOUD_SERVICE'],
-                    ['credentials', 'FIELD.CREDENTIALS'],
+                    ['provider', 'FIELD.SERVICE_PROVIDER'],
+                    ['service_account_name', 'FIELD.ACCOUNT_NAME'],
+                    ['server_count', 'FIELD.SERVER'],
+                    ['cloud_service_count', 'FIELD.CLOUD_SERVICE'],
+                    ['secret_count', 'FIELD.CREDENTIALS'],
                 ])),
             });
 
@@ -147,7 +147,7 @@ export default defineComponent({
                 .addJoinUnwind({
                     path: 'collection_info.service_accounts',
                 })
-                .addJoinGroupKey('service_account_id', 'service_account_id')
+                .addJoinGroupKey('collection_info.service_accounts', 'service_account_id')
                 .addJoinGroupField('server_count', STAT_OPERATORS.count, undefined)
 
                 .addJoinKey('service_account_id', 1)
@@ -155,7 +155,7 @@ export default defineComponent({
                 .addJoinUnwind({
                     path: 'collection_info.service_accounts',
                 }, 1)
-                .addJoinGroupKey('service_account_id', 'service_account_id', 1)
+                .addJoinGroupKey('collection_info.service_accounts', 'service_account_id', 1)
                 .addJoinGroupField('cloud_service_count', STAT_OPERATORS.count, undefined, 1)
 
                 .setJoinResourceType('secret.Secret', 2)
@@ -167,16 +167,30 @@ export default defineComponent({
                 .setSort('resource_count');
 
 
-            const getData = async (): Promise<void> => {
+            const getData = async () => {
                 state.loading = true;
+                state.data = [];
                 try {
                     const res = await api.execute();
-                    state.data = res.data.results;
+                    // state.data = res.data.results.map((item) => {
+                    //     item.cloud_service_count = item?.cloud_service_count || 0;
+                    //     item.secret_count = item?.secret_count || 0;
+                    //     item.server_count = item?.server_count || 0;
+                    //     return item;
+                    // });
+                    res.data.results.forEach((item) => {
+                        item.cloud_service_count = item?.cloud_service_count || 0;
+                        item.server_count = item?.server_count || 0;
+                        item.secret_count = item?.secret_count || 0;
+                        state.data.push({...item});
+                    });
+
                 } catch (e) {
                     console.error(e);
                 } finally {
                     state.loading = false;
                 }
+                return state.data;
             };
 
             setTimeout(() => {
