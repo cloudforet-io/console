@@ -346,9 +346,8 @@ export default {
 
         .left{
             @apply flex items-center;
-            .title{
+            .title {
                 @apply ml-4 text-base;
-                font-family: "Noto Sans";
 
             }
         }
@@ -389,25 +388,23 @@ export default {
 
                 }
             }
-            .side-content{
+            .side-content {
                 @apply w-12 h-12 flex justify-around content-around;
             }
 
         }
-        .bottom{
+        .bottom {
             @apply flex items-center;
             .total-count {
                 @apply font-bold text-4xl;
-                font-family: "Noto Sans";
             }
-            .today-created{
+            .today-created {
                 @apply border-green-500 flex h-6 ml-2 justify-center items-center;
                 border-radius: 6.25rem;
                 border-width: 0.0625rem;
                 min-width: 2.5rem;
-                .number{
+                .number {
                     @apply font-bold text-sm text-green-500 w-auto h-4 text-right;
-                    font-family: "Noto Sans";
                     line-height: 1.0625rem;
                 }
             }

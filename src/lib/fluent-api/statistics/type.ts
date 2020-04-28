@@ -36,6 +36,7 @@ export interface UnwindItem {
 export interface Aggregate {
     group: Group;
     unwind?: UnwindItem[];
+    count?: {name: string};
 }
 
 export interface StatSort {

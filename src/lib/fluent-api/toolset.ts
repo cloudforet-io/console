@@ -183,8 +183,9 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     });
 
     setFilter(...args: FilterItem[]): this {
-        this.apiState.filter = args;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.filter = args;
+        return api;
     }
 
     setFixFilter(...args: FilterItem[]): this {
@@ -316,8 +317,9 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
 
 export abstract class SetParameterAction<parameter, resp> extends RawParameterAction<parameter, resp> {
     setParameter(parameter: parameter): this {
-        this.apiState.parameter = parameter;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter = parameter;
+        return api;
     }
 }
 

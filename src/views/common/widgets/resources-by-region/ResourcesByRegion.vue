@@ -58,7 +58,9 @@ import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SPieChart } from '@/lib/chart/pie-chart';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
-import { violet, yellow } from '@/styles/colors';
+import {
+    blue, coral, green, peacock, violet, yellow,
+} from '@/styles/colors';
 import _ from 'lodash';
 import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
@@ -90,90 +92,83 @@ export default defineComponent({
         } = useStore();
         const providerStore: ProviderStoreType = provider;
 
-        interface Value {
-            provider: string;
-            count: number;
-        }
+            interface Value {
+                provider: string;
+                count: number;
+                region_name: string;
+            }
 
-        const api = fluentApi.statisticsTest().resource().stat<Value>()
-            .addGroupKey('provider', 'provider')
-            .addGroupField('count', STAT_OPERATORS.count);
+            const api = fluentApi.statisticsTest().resource().stat<Value>()
+                .addGroupKey('provider', 'provider')
+                .addGroupField('count', STAT_OPERATORS.count);
 
-        interface Item {
-            provider: string;
-            name: string;
-            icon: string;
-            color: string;
-            count: number;
-        }
-        interface StateInterface {
-            loaderRef: HTMLCanvasElement | null;
-            data: Item[];
-            loading: boolean;
-        }
+            interface Item {
+                provider: string;
+                name: string;
+                icon: string;
+                color: string;
+                count: number;
+            }
+            interface StateInterface {
+                loaderRef: HTMLCanvasElement | null;
+                data: Item[];
+                loading: boolean;
+            }
 
-        const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
-            chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
-                .setLabels(_.map(ts.state.data, d => d.name))
-                .setColors(_.map(ts.state.data, d => d.color))
-                .apply(), {
-                loaderRef: null,
-                data: [],
-                loading: true,
+            const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
+            const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
+                chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
+                    .setLabels(_.map(ts.state.data, d => d.name))
+                    .setColors(colors)
+                    .apply(), {
+                    loaderRef: null,
+                    data: [],
+                    loading: true,
+                });
+
+            watch(() => ts.state.loaderRef, () => {
+                if (!ts.state.loaderRef) return;
+                new SPieChart(ts.state.loaderRef)
+                    .addData([8, 2], '').setTooltipEnabled(false)
+                    .setColors([violet[200], Color(violet[200]).alpha(0.5).toString()])
+                    .setBorderWidth(0)
+                    .setShowTotalCount(false)
+                    .setAnimationDuration(0)
+                    .apply();
             });
 
-        watch(() => ts.state.loaderRef, () => {
-            if (!ts.state.loaderRef) return;
-            new SPieChart(ts.state.loaderRef)
-                .addData([8, 2], '').setTooltipEnabled(false)
-                .setColors([violet[200], Color(violet[200]).alpha(0.5).toString()])
-                .setBorderWidth(0)
-                .setShowTotalCount(false)
-                .setAnimationDuration(0)
-                .apply();
-        });
+            const getData = async (): Promise<void> => {
+                ts.state.loading = true;
+                ts.state.data = [];
+                await providerStore.getProvider();
+                const providers: ProviderInfo = providerStore.state.providers;
+                try {
+                    const res = await props.getAction(api).execute();
+                    ts.state.data = res.data.results.map((item, index) => ({
+                        name: item.region_name,
+                        provider: item.provider,
+                        count: item.count,
+                        icon: providers[item.provider].icon,
+                        color: colors[index],
+                    }));
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    ts.state.loading = false;
+                }
+            };
 
-        const getData = async (): Promise<void> => {
-            ts.state.loading = true;
-            ts.state.data = [];
-            await providerStore.getProvider();
-            try {
-                const res = await props.getAction(api).execute();
-                const others: Item = {
-                    name: 'Others',
-                    icon: 'ic_provider_other',
-                    color: yellow[500],
-                    count: 0,
-                    provider: '',
-                };
-                _.forEach(res.data.results, (d: Value, i) => {
-                    const providers: ProviderInfo = providerStore.state.providers;
-                    if (providers[d.provider]) {
-                        ts.state.data.push({
-                            ...providers[d.provider],
-                            count: d.count,
-                        });
-                    } else others.count += d.count;
-                });
-                ts.state.data.push(others);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                ts.state.loading = false;
-            }
-        };
+            setTimeout(() => {
+                getData();
+            }, 1000);
 
-        setTimeout(() => {
-            getData();
-        }, 1000);
-
-        return {
-            ...toRefs(ts.state),
-            skeletons: _.range(4),
-            onSelected(item): void {
-                vm.$router.push('/identity/service-account');
-            },
-        };
+            return {
+                ...toRefs(ts.state),
+                skeletons: _.range(4),
+                onSelected(item): void {
+                    vm.$router.push('/identity/service-account');
+                },
+            };
     },
 });
 </script>
@@ -200,12 +195,12 @@ export default defineComponent({
     @screen md {
         .reverse {
             @apply flex flex-row-reverse;
-            .chart-container {
-                min-width: 40%;
-                .chart {
-                    height: 18rem;
-                }
-            }
+        .chart-container {
+            min-width: 40%;
+        .chart {
+            height: 18rem;
         }
+    }
+    }
     }
 </style>

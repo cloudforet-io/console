@@ -13,7 +13,7 @@ interface FilterFormat {
     object_key?: string;
 }
 
-interface PluginOptions {
+export interface PluginOptions {
     supported_resource_type: string[];
     filter_format: FilterFormat[];
 }

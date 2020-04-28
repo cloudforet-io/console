@@ -4,32 +4,39 @@
                                 sm:col-end-6
                                 lg:col-end-5
                                 "
-                         title="servers" :api="servers.api"
+                         title="servers" resource-type="inventory.Server"
+                         :get-action="getServerSummary"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-10"
-                         title="cloud services" :api="cloudServices.api"
+                         title="cloud services" resource-type="inventory.CloudService"
+                         :get-action="getCloudServiceSummary"
                          :color="cloudServices.color"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
                                sm:col-end-13 lg:row-start-2"
+                        :get-action="getCloudService"
         />
         <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
              lg:row-start-3 resources-tab"
         >
             <PTab :tabs="tabs" :active-tab.sync="activeTab">
                 <template #server>
-                    <service-accounts
+                    <resources-by-region
                         :title="'RESOURCES BY REGION'"
                         reverse
+                        resource-type="inventory.Server"
+                        :get-action="getServerResources"
                     />
                 </template>
                 <template #cloud_service>
-                    <service-accounts
+                    <resources-by-region
                         :title="'RESOURCES BY REGION'"
                         reverse
+                        resource-type="inventory.CloudService"
+                        :get-action="getCloudServiceResources"
                     />
                 </template>
             </PTab>
@@ -48,28 +55,32 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
-import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
-import { reactive, toRefs } from '@vue/composition-api';
-import { fluentApi } from '@/lib/fluent-api';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { fluentApi, Resource } from '@/lib/fluent-api';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { makeTrItems } from '@/lib/view-helper';
+import { Stat } from '@/lib/fluent-api/statistics/resource';
+import { api } from '@/lib/api/axios';
+import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
 
 export default {
     name: 'ProjectDashboard',
     components: {
+        ResourcesByRegion,
         CloudServices,
         DailyUpdates,
         ServiceSummary,
         ServiceAccountsTable,
         PTab,
-        ServiceAccounts,
         HealthDashboard,
     },
     setup(props, context) {
@@ -77,17 +88,16 @@ export default {
             projectName: '',
             projects: {
                 color: blue[600],
-                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
             servers: {
                 color: secondary,
-                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
             cloudServices: {
                 color: secondary1,
-                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
         });
+        const vm = getCurrentInstance();
+        const projectId = computed<string>(() => context.root.$route.params.id as string);
 
         const tabData = reactive({
             tabs: makeTrItems([
@@ -98,9 +108,63 @@ export default {
             activeTab: 'server',
         });
 
+        // TODO: Refactor apiActions
         return {
             ...toRefs(state),
             ...toRefs(tabData),
+            getServerSummary(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                }).setResourceType('inventory.Server');
+            },
+            getCloudServiceSummary(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                }).setResourceType('inventory.CloudService');
+            },
+            getServerResources(apiAction: Stat) {
+                return apiAction
+                    .addGroupKey('data.compute.region_name', 'region_name')
+                    .setFilter({
+                        key: 'project_id',
+                        value: projectId.value,
+                        operator: '=',
+                    }, {
+                        key: 'data.compute.region_name',
+                        value: null,
+                        operator: '!=',
+                    }).setResourceType('inventory.Server');
+            },
+            getCloudServiceResources(apiAction: Stat) {
+                return apiAction
+                    .addGroupKey('data.region_name', 'region_name')
+                    .setFilter({
+                        key: 'project_id',
+                        value: projectId.value,
+                        operator: '=',
+                    }, {
+                        key: 'data.region_name',
+                        value: null,
+                        operator: '!=',
+                    }).setResourceType('inventory.CloudService');
+            },
+            getCloudService(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                })
+                    .setJoinFilter([{
+                        key: 'project_id',
+                        value: projectId.value,
+                        operator: '=',
+                    }])
+                    .setResourceType('inventory.CloudService');
+            },
         };
     },
 };
@@ -108,7 +172,7 @@ export default {
 
 <style scoped>
     .daily-updates {
-        height: 45rem;
+        height: 38rem;
     }
 
     .health-dashboard {

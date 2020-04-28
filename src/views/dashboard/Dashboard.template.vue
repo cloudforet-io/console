@@ -28,7 +28,7 @@ import { toRefs, reactive } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import Summary from '@/views/dashboard/modules/Summary.vue';
 import ServerState from '@/views/dashboard/modules/ServerState.vue';
-import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion.vue';
+import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion_origin.vue';
 import ServersByType from '@/views/dashboard/modules/ServersByType.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';

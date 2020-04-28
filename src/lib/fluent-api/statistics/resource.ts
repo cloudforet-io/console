@@ -4,20 +4,21 @@ import { StatAction, getInitJoinState } from '@/lib/fluent-api/statistics/toolse
 import {
     Aggregate,
     FormulaItem,
-    Group,
+    Group, GroupFieldsItem, GroupKeyItem,
     JoinItem,
     JoinStateItem,
     ResourceStatParam,
     ResourceStatState, STAT_OPERATORS,
     StatQuery,
     StatQueryState,
-    StatResponse,
+    StatResponse, UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
 import { isNotEmpty } from '@/lib/util';
-import { ApiType } from '@/lib/fluent-api/type';
+import { ApiType, FilterItem } from '@/lib/fluent-api/type';
+import _ from 'lodash';
 
 
-export class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
+export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<value>> {
     constructor(
         api: ApiType,
         baseUrl: string,
@@ -27,10 +28,12 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
             aggregate: {
+                unwind: [],
                 group: {
                     keys: [],
                     fields: [],
                 },
+                count: undefined,
             },
             filter: [],
             filterOr: [],
@@ -88,76 +91,136 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
         return api;
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    protected initJoinState(api: this, joinIndex: number): void {
+        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+    }
+
     setJoinResourceType(type: string, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].resource_type = type;
         return api;
     }
 
     setJoinType(type: string, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].type = type;
         return api;
     }
 
     setJoinKeys(keys: string[], joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].keys = keys;
         return api;
     }
 
     addJoinKey(key: string, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].keys.push(key);
         return api;
     }
 
     setJoinQuery(query: StatQueryState<undefined>, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].query = query;
         return api;
     }
 
     setJoinAggregate(aggregate: Aggregate, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
-        return api.setAggregate(aggregate, `apiState.extraParameter.joinState[${joinIndex}].query.aggregate`);
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate = aggregate;
+        return api;
     }
 
     setJoinGroup(group: Group, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
-        return api.setGroup(group, `apiState.extraParameter.joinState[${joinIndex}].query.aggregate.group`);
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.group = group;
+        return api;
+    }
+
+    setJoinGroupKeys(keys: GroupKeyItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.group.keys = keys;
+        return api;
     }
 
     addJoinGroupKey(key: string, name: string, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
-        return api.addGroupKey(key, name, `apiState.extraParameter.joinState[${joinIndex}].query.aggregate.group.keys`);
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.group.keys.push({ key, name });
+        return api;
+    }
+
+    setJoinGroupFields(fields: GroupFieldsItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.group.fields = fields;
+        return api;
     }
 
     addJoinGroupField(name: string, operator: STAT_OPERATORS, key?: string, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
-        return api.addGroupField(name, operator, key, `apiState.extraParameter.joinState[${joinIndex}].query.aggregate.group.fields`);
+        this.initJoinState(api, joinIndex);
+        const item: GroupFieldsItem = { name, operator };
+        if (key) item.key = key;
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.group.fields.push(item);
+        return api;
     }
 
     setJoinSort(name: string, desc = true, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].query.sort = { name, desc };
         return api;
     }
 
     setJoinLimit(limit: number, joinIndex = 0): this {
         const api = this.clone();
-        if (!api.apiState.extraParameter.joinState[joinIndex]) api.apiState.extraParameter.joinState[joinIndex] = getInitJoinState();
+        this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].query.limit = limit;
+        return api;
+    }
+
+    setJoinUnwind(unwinds: UnwindItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.unwind = unwinds;
+        return api;
+    }
+
+    addJoinUnwind(unwind: UnwindItem, joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.unwind?.push(unwind);
+        return api;
+    }
+
+    setJoinFilter(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.filter = filters;
+        return api;
+    }
+
+    setJoinFilterOr(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.filterOr = filters;
+        return api;
+    }
+
+    setJoinFixFilter(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.fixFilter = filters;
         return api;
     }
 
@@ -191,5 +254,5 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
 export default class StatisticsResource extends Resource implements ResourceActions<'stat'> {
     name = 'resource'
 
-    stat<value>(): Stat<value> { return new Stat<value>(this.api, this.baseUrl); }
+    stat<value=any>(): Stat<value> { return new Stat<value>(this.api, this.baseUrl); }
 }

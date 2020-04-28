@@ -19,10 +19,12 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
             aggregate: {
+                unwind: [],
                 group: {
                     keys: [],
                     fields: [],
                 },
+                count: undefined,
             },
             filter: [],
             filterOr: [],
@@ -35,9 +37,19 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
     protected query = (): StatQuery => this.getStatisticsQuery<StatQuery>({} as StatQuery);
 
+    // eslint-disable-next-line class-methods-use-this
+    protected getAggregate(state: StatQueryState<any>): Aggregate {
+        const aggregate: Aggregate = {} as Aggregate;
+        if (state.aggregate.unwind && state.aggregate.unwind.length > 0) aggregate.unwind = state.aggregate.unwind;
+        if (state.aggregate.group?.keys.length > 0 || state.aggregate.group?.fields.length > 0) aggregate.group = state.aggregate.group;
+        if (state.aggregate.unwind && state.aggregate.unwind.length > 0) aggregate.unwind = state.aggregate.unwind;
+        if (state.aggregate.count) aggregate.count = state.aggregate.count;
+        return aggregate;
+    }
+
     protected getStatisticsQuery<Q extends StatQuery>(query: Q, state?: StatQueryState<any>): Q {
         const apiState = state || this.apiState;
-        query.aggregate = apiState.aggregate;
+        query.aggregate = this.getAggregate(apiState);
         if (isNotEmpty(apiState.sort)) query.sort = apiState.sort;
         if (isNotEmpty(apiState.limit)) query.limit = apiState.limit;
         return this.getBaseQuery<Q>(query, state) as Q;
@@ -48,47 +60,59 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         ...this.apiState.extraParameter,
     });
 
-    setAggregate(aggregate: Aggregate, path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate', aggregate);
+    setAggregate(aggregate: Aggregate): this {
+        const api = this.clone();
+        api.apiState.aggregate = aggregate;
         return api;
     }
 
-    setGroup(group: Group, path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.group', group);
+    setGroup(group: Group): this {
+        const api = this.clone();
+        api.apiState.aggregate.group = group;
         return api;
     }
 
-    setGroupKeys(keys: GroupKeyItem[], path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.group.keys', keys);
+    setGroupKeys(...args: GroupKeyItem[]): this {
+        const api = this.clone();
+        api.apiState.aggregate.group.keys = args;
         return api;
     }
 
-    addGroupKey(key: string, name: string, path?: string): this {
-        const api = path ? this : this.clone();
-        _.get(api, path || 'apiState.aggregate.group.keys', []).push({ key, name });
+    addGroupKey(key: string, name: string): this {
+        const api = this.clone();
+        api.apiState.aggregate.group.keys.push({ key, name });
         return api;
     }
 
-    setGroupFields(fields: GroupFieldsItem[], path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.group.fields', fields);
+    setGroupFields(...args: GroupFieldsItem[]): this {
+        const api = this.clone();
+        api.apiState.aggregate.group.fields = args;
         return api;
     }
 
-    addGroupField(name: string, operator: STAT_OPERATORS, key?: string, path?: string): this {
-        const api = path ? this : this.clone();
+    addGroupField(name: string, operator: STAT_OPERATORS, key?: string): this {
+        const api = this.clone();
         const item: GroupFieldsItem = { name, operator };
         if (key) item.key = key;
-        _.get(api, path || 'apiState.aggregate.group.fields', []).push(item);
+        api.apiState.aggregate.group.fields.push(item);
         return api;
     }
 
-    setUnwind(unwinds: UnwindItem[], path?: string): this {
-        const api = path ? this : this.clone();
-        _.set(api, path || 'apiState.aggregate.unwind', unwinds);
+    setUnwind(...args: UnwindItem[]): this {
+        const api = this.clone();
+        api.apiState.aggregate.unwind = args;
+        return api;
+    }
+
+    addUnwind(unwind: UnwindItem): this {
+        const api = this.clone();
+        api.apiState.aggregate.unwind?.push(unwind);
+        return api;
+    }
+
+    setCount(name: string): this {
+        const api = this.clone();
+        api.apiState.aggregate.count = { name };
         return api;
     }
 
@@ -105,23 +129,25 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
     }
 }
 
+export const getInitStatQueryState = (): StatQueryState<undefined> => ({
+    aggregate: {
+        unwind: [],
+        group: {
+            keys: [],
+            fields: [],
+        },
+        count: undefined,
+    },
+    filter: [],
+    filterOr: [],
+    fixFilter: [],
+} as unknown as StatQueryState<undefined>);
+
 export const getInitJoinState = (): JoinStateItem => ({
     keys: [],
     type: '',
     resource_type: '',
-    query: {
-        aggregate: {
-            group: {
-                keys: [],
-                fields: [],
-            },
-        },
-        filter: [],
-        filterOr: [],
-        fixFilter: [],
-        fixFilterOr: [],
-        extraParameter: undefined,
-    },
+    query: getInitStatQueryState(),
 });
 
 export abstract class StatAction<parameter, resp> extends StatQueryAPI<parameter, resp> {

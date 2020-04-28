@@ -138,7 +138,6 @@ export default defineComponent({
 .legend {
     @apply uppercase ml-6 inline-flex items-center float-right;
     font-size: 0.875rem;
-    font-family: theme('fontFamily.serif');
     font-weight: normal;
     .color {
         display: inline-block;

@@ -2,61 +2,54 @@
     <general-page-layout class="collector-page">
         <p-horizontal-layout :line="false">
             <template #container="{ height }">
-                <p-toolbox-table :items="items" :fields="fields"
-                                 :selectable="true"
-                                 :sortable="true"
-                                 :dragable="true"
-                                 :hover="true"
-                                 :responsive="true"
-                                 :sort-by.sync="sortBy"
-                                 :sort-desc.sync="sortDesc"
-                                 :all-page="allPage"
-                                 :this-page.sync="thisPage"
-                                 :select-index.sync="selectIndex"
-                                 :page-size.sync="pageSize"
-                                 :responsive-style="{'height': height+'px', 'overflow-y':'auto', 'overflow-x':'auto'}"
-                                 :setting-visible="false"
-                                 :loading="loading"
-                                 :use-cursor-loading="true"
-                                 @changePageSize="getCollectors"
-                                 @changePageNumber="getCollectors"
-                                 @clickRefresh="getCollectors"
-                                 @changeSort="getCollectors"
+                <p-toolbox-table v-bind="apiHandler.tableTS.state"
+                                 :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+                                 :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+                                 :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+                                 :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+                                 :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+                                 :loading.sync="apiHandler.tableTS.syncState.loading"
+                                 @changePageSize="apiHandler.action"
+                                 @changePageNumber="apiHandler.action"
+                                 @clickRefresh="apiHandler.action"
+                                 @changeSort="apiHandler.action"
                 >
-                    <template slot="toolbox-left">
-                        <PIconTextButton style-type="primary-dark"
-                                         name="ic_plus_bold"
-                                         @click="$router.push({path: '/plugin/collector/create/plugins'})"
+                    <!--                    @clickExcel="exportExcel"-->
+                    <template #toolbox-left>
+                        <p-icon-text-button style-type="primary-dark"
+                                            name="ic_plus_bold"
+                                            @click="$router.push({path: '/plugin/collector/create/plugins'})"
                         >
                             {{ $t('BTN.CREATE') }}
-                        </PIconTextButton>
+                        </p-icon-text-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
                                           :menu="dropdown"
                                           @click-update="onClickUpdate"
                                           @click-enable="onClickEnable"
                                           @click-disable="onClickDisable"
                                           @click-delete="onClickDelete"
-                                          @click-collectData="onClickCollectData"
+                                          @click-collectData="apiHandler.action"
                         >
                             {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-query-search-bar :search-text.sync="searchText"
-                                                :autocomplete-handler="AcHandler"
-                                                @newQuery="queryListTools.addTag"
+                            <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
+                                                :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
+                                                @newQuery="apiHandler.tableTS.querySearch.addTag"
                             />
                         </div>
                     </template>
-                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
-                        <p-col :col="12" style="margin-bottom: .5rem;">
-                            <p-hr style="width: 100%;" />
-                            <p-row style="margin-top: .5rem;">
-                                <div style="flex-grow: 0">
-                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
+                        <p-col :col="12" class="mb-2">
+                            <p-hr class="w-full" />
+                            <p-row class="mt-2">
+                                <div class="flex-grow-0">
+                                    <p-icon-button name="ic_delete" @click="apiHandler.tableTS.querySearch.deleteAllTags" />
                                 </div>
-                                <div style="flex-grow: 1;margin-left: 1rem;">
-                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                                           @delete="queryListTools.deleteTag(idx)"
+                                <div class="flex-grow ml-4">
+                                    <p-tag v-for="(tag, idx) in apiHandler.tableTS.querySearch.tags.value" :key="idx + tag"
+                                           style="margin-top: 0.375rem; margin-bottom: 0.37rem;"
+                                           @delete="apiHandler.tableTS.querySearch.deleteTag(idx)"
                                     >
                                         {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
                                     </p-tag>
@@ -93,26 +86,24 @@
             </template>
         </p-horizontal-layout>
 
-        <p-tab v-if="selectIndex.length === 1"
-               :tabs="tabs"
-               :active-tab.sync="activeTab"
+        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne"
+               :tabs="tabState.tabs"
+               :active-tab.sync="tabState.activeTab"
         >
             <template #detail>
-                <collector-detail :item="selectedItem" />
+                <collector-detail :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #tag>
-                <s-tags-panel :is-show="activeTab==='tag'"
-                              :resource-id="selectedItem.collector_id"
+                <s-tags-panel :is-show="tabState.activeTab==='tag'"
+                              :resource-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
                               tag-page-name="collectorTags"
                 />
             </template>
             <template #credentials>
-                <collector-credentials :collector="selectedItem"
-                                       @collectData="collectByCredential"
-                />
+                <collector-credentials :collector="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #schedules>
-                <collector-schedules :collector="selectedItem"
+                <collector-schedules :collector="apiHandler.tableTS.selectState.firstSelectItem"
                                      :items="scheduleState.items"
                                      :total-count="scheduleState.totalCount"
                                      :loading="scheduleState.loading"
@@ -122,13 +113,15 @@
                 />
             </template>
         </p-tab>
-        <p-tab v-else-if="selectIndex.length > 1" :tabs="multiTabs" :active-tab.sync="multiActiveTab">
-            <template #selected>
+        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
+               :tabs="tabState.multiTabs" :active-tab.sync="tabState.multiActiveTab"
+        >
+            <template #data>
                 <p-data-table
                     :fields="multiFields"
                     :sortable="false"
                     :selectable="false"
-                    :items="multiItems"
+                    :items="apiHandler.tableTS.selectState.selectItems"
                     col-copy
                 >
                     <template #col-name-format="data">
@@ -149,14 +142,14 @@
         <collector-update-modal v-if="updateModalState.visible"
                                 :visible.sync="updateModalState.visible"
                                 :loading="updateModalState.loading"
-                                :collector="selectedItem"
+                                :collector="apiHandler.tableTS.selectState.firstSelectItem"
                                 :plugin="updateModalState.plugin"
                                 :versions="updateModalState.versions"
         />
 
-        <collect-data-modal v-if="collectDataState.modalVisible"
-                            :visible.sync="collectDataState.modalVisible"
-                            :collector="selectedItem"
+        <collect-data-modal v-if="collectDataModalVisible"
+                            :visible.sync="collectDataModalVisible"
+                            :collector="apiHandler.tableTS.selectState.firstSelectItem"
         />
 
         <p-table-check-modal v-if="checkModalState.mode"
@@ -168,13 +161,15 @@
                              size="lg"
                              centered
                              :selectable="false"
-                             :items="multiItems"
+                             :items="apiHandler.tableTS.selectState.selectItems"
                              @confirm="checkModalState.checkModalConfirm"
         />
     </general-page-layout>
 </template>
 
-<script>
+<script lang="ts">
+/* eslint-disable class-methods-use-this */
+
 import {
     reactive, toRefs, computed, ref,
 } from '@vue/composition-api';
@@ -182,12 +177,12 @@ import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import collectorEventBus from '@/views/plugin/collector/CollectorEventBus';
 import { fluentApi } from '@/lib/fluent-api';
+import _ from 'lodash';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import config from '@/lib/config';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -196,131 +191,41 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import {
+    getEnumValues, makeValuesFetchHandler,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 
 
-const PTab = () => import('@/components/organisms/tabs/tab/Tab');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
+const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
 const PQuerySearchBar = () => import('@/components/organisms/search/query-search-bar/QuerySearchBar.vue');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
+const PTableCheckModal = () => import('@/components/organisms/modals/table-modal/TableCheckModal.vue');
 
 const CollectorUpdateModal = () => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue');
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
-const CollectorDetail = () => import('@/views/plugin/collector/modules/CollectorDetail');
-const CollectorCredentials = () => import('@/views/plugin/collector/modules/CollectorCredentials');
-const CollectorSchedules = () => import('@/views/plugin/collector/modules/CollectorSchedules');
+const CollectorDetail = () => import('@/views/plugin/collector/modules/CollectorDetail.vue');
+const CollectorCredentials = () => import('@/views/plugin/collector/modules/CollectorCredentials.vue');
+const CollectorSchedules = () => import('@/views/plugin/collector/modules/CollectorSchedules.vue');
 
-const collectorState = reactive({
-    selectIndex: [],
-    items: [],
-    sortSelectIndex: computed(() => {
-        const idxs = [...collectorState.selectIndex];
-        idxs.sort((a, b) => a - b);
-        return idxs;
-    }),
-    multiItems: computed(() => collectorState.sortSelectIndex.map(idx => collectorState.items[idx])),
-    loading: false,
-    getCollectors: () => {
-        collectorEventBus.$emit('getCollectorList');
-    },
-    selectedItem: computed(() => collectorState.items[collectorState.selectIndex[0]]),
-});
 
-const setTableData = (props, context) => {
-    const state = reactive({
-        sortBy: '',
-        sortDesc: true,
-        pageSize: 15,
-        allPage: 1,
-        thisPage: 1,
-        searchText: '',
-        fields: makeTrItems([
-            ['name', 'COMMON.NAME'],
-            ['state', 'COMMON.STATE'],
-            ['priority', 'COMMON.PRIORITY'],
-            ['plugin_info', 'COMMON.RESOURCE'],
-            ['last_collected_at', 'COMMON.LAST_COL'],
-            ['created_at', 'COMMON.CREATED'],
-        ],
-        context.parent),
-        multiFields: makeTrItems([
-            ['name', 'COMMON.NAME'],
-            ['state', 'COMMON.STATE'],
-            ['priority', 'COMMON.PRIORITY'],
-        ], context.parent),
-        timestampFormatter,
-        collectorStateFormatter,
-        defaultImg: config.get('COLLECTOR_IMG'),
-        getIcon: data => _.get(data, 'item.tags.icon', config.get('COLLECTOR_IMG')),
-        queryListTools: tagList(ref([]), true, collectorEventBus, 'getCollectorList'),
-    });
-
-    const nothingSelected = computed(() => collectorState.selectIndex.length === 0);
-    const onlyOneSelected = computed(() => collectorState.selectIndex.length !== 1);
-    const dropdown = reactive({
-        ...makeTrItems([
-            ['update', 'BTN.UPDATE', { disabled: onlyOneSelected }],
-            [null, null, { type: 'divider' }],
-            ['enable', 'BTN.ENABLE', { disabled: nothingSelected }],
-            ['disable', 'BTN.DISABLE', { disabled: nothingSelected }],
-            ['delete', 'BTN.DELETE', { disabled: nothingSelected }],
-            [null, null, { type: 'divider' }],
-            ['collectData', 'BTN.COLLECT_DATA', { disabled: onlyOneSelected }],
-        ],
-        context.parent,
-        { type: 'item' }),
-    });
-
-    return {
-        ...toRefs(state),
-        dropdown,
-    };
-};
-
-const setTabData = (props, context) => {
-    const state = reactive({
-        activeTab: 'detail',
-        tabs: makeTrItems([
-            ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-            ['tag', 'TAB.TAG'],
-            ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
-        ], context.parent),
-        multiActiveTab: 'selected',
-        multiTabs: makeTrItems([
-            ['selected', 'PANEL.SELECTED', { keepAlive: true }],
-        ], context.parent),
-    });
-
-    return {
-        ...toRefs(state),
-    };
-};
-
-const crdState = reactive({
-    items: [],
-    totalCount: 0,
-    loading: true,
-    query: undefined,
-    selectIndex: [],
-    verifyModalVisible: false,
-    sortSelectIndex: computed(() => {
-        const idxs = [...crdState.selectIndex];
-        idxs.sort((a, b) => a - b);
-        return idxs;
-    }),
-    selectedItems: computed(() => crdState.sortSelectIndex.map(idx => crdState.items[idx])),
-});
-
-const collectDataState = reactive({
-    loading: false,
-    credentials: [],
-    modalVisible: false,
-});
-
-const crdVerifyState = reactive({});
+const setTabData = (props, context) => (reactive({
+    activeTab: 'detail',
+    tabs: makeTrItems([
+        ['detail', 'PANEL.DETAILS', { keepAlive: true }],
+        ['tag', 'TAB.TAG'],
+        ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+        ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
+    ], context.parent),
+    multiActiveTab: 'data',
+    multiTabs: makeTrItems([
+        ['data', 'TAB.DATA', { keepAlive: true }],
+    ], context.parent),
+}));
 
 const checkModalState = reactive({
     visible: false,
@@ -353,18 +258,83 @@ const scheduleState = reactive({
     deleteVisible: false,
 });
 
-export const collectorSetup = (props, context, AcHandler) => {
+export const collectorSetup = (props, context) => {
+    class ACHandler extends QuerySearchTableACHandler {
+        get valuesFetchUrl(): string { return '/inventory/collector/list'; }
+
+        get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
+
+        constructor(args: QSTableACHandlerArgs) {
+            super(args);
+            this.handlerMap.value = [
+                ...makeValuesFetchHandler(
+                    context.parent,
+                    '/inventory/collector/list',
+                    ['collector_id', 'name'],
+                ),
+                getEnumValues('state', ['ENABLED', 'DISABLED']),
+                getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+            ];
+        }
+    }
+    const apiHandler = new QuerySearchTableFluentAPI(
+        fluentApi.inventory().collector().list(),
+        {
+            selectable: true,
+            sortable: true,
+            dragable: true,
+            hover: true,
+            responsive: true,
+            'setting-visible': false,
+            'use-cursor-loading': true,
+            'excel-visible': true,
+            fields: computed(() => makeTrItems([
+                ['name', 'COMMON.NAME'],
+                ['state', 'COMMON.STATE'],
+                ['priority', 'COMMON.PRIORITY'],
+                ['plugin_info', 'COMMON.RESOURCE'],
+                ['last_collected_at', 'COMMON.LAST_COL'],
+                ['created_at', 'COMMON.CREATED'],
+            ],
+            context.parent)),
+        },
+        undefined,
+        {
+            handlerClass: ACHandler,
+            args: {
+                keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
+                suggestKeys: ['collector_id', 'name'],
+            },
+        },
+    );
+    const dropdown = computed(() => (
+        makeTrItems([
+            ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectOne }],
+            [null, null, { type: 'divider' }],
+            ['enable', 'BTN.ENABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
+            ['disable', 'BTN.DISABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
+            ['delete', 'BTN.DELETE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
+            [null, null, { type: 'divider' }],
+            ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectOne }],
+        ],
+        context.parent,
+        { type: 'item' })));
+
+    const multiFields = computed(() => makeTrItems([
+        ['name', 'COMMON.NAME'],
+        ['state', 'COMMON.STATE'],
+        ['priority', 'COMMON.PRIORITY'],
+    ], context.parent));
+
+
     const state = reactive({
-        ...setTableData(props, context),
-        ...setTabData(props, context),
-        ...toRefs(collectorState),
-        crdState,
-        collectDataState,
-        crdVerifyState,
+        tabState: setTabData(props, context),
         checkModalState,
         updateModalState,
         scheduleState,
-        AcHandler,
+        dropdown,
+        multiFields,
+        collectDataModalVisible: false,
     });
 
     const onClickUpdate = () => {
@@ -404,24 +374,18 @@ export const collectorSetup = (props, context, AcHandler) => {
         state.checkModalState.visible = true;
     };
 
-    const onClickCollectData = () => {
-        collectDataState.credentials = [];
-        collectDataState.modalVisible = true;
-    };
-
-    const collectByCredential = (crd) => {
-        collectDataState.credentials = [crd];
-        collectDataState.modalVisible = true;
-    };
 
     return {
         ...toRefs(state),
+        ACHandler,
+        apiHandler,
+        timestampFormatter,
+        collectorStateFormatter,
+        getIcon: data => _.get(data, 'item.tags.icon', ''),
         onClickUpdate,
         onClickEnable,
         onClickDisable,
         onClickDelete,
-        onClickCollectData,
-        collectByCredential,
     };
 };
 
@@ -458,7 +422,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         margin-left: 1rem;
         &:last-child {
             flex-grow: 1;
