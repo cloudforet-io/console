@@ -117,14 +117,14 @@
                                 <p-dynamic-view
                                     view_type="table"
                                     :api-handler="adminApiHandler"
-                                    :data_source="adminApiHandler.dataSource"
+                                    :data_source="adminApiHandler.options"
                                 />
                             </template>
                             <template #history>
                                 <p-dynamic-view
                                     view_type="table"
                                     :api-handler="historyAPIHandler"
-                                    :data_source="historyAPIHandler.dataSource"
+                                    :data_source="historyAPIHandler.options"
                                 />
                             </template>
                         </PTab>
@@ -140,7 +140,7 @@
                                 <p-dynamic-view
                                     view_type="table"
                                     :api-handler="adminApiHandler"
-                                    :data_source="adminApiHandler.dataSource"
+                                    :data_source="adminApiHandler.options"
                                 />
                             </template>
                         </PTab>

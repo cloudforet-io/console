@@ -138,11 +138,14 @@ export default {
 
         const resetAction = async () => {
             let action;
-            if (props.options.root_path) {
+            if (props.api?.resource instanceof ActionAPI) {
+                action = props.api.resource;
+            } else if (props.options.root_path) {
                 action = (props.api?.resource.getData() as GetDataAction<any, any>).setKeyPath(props.options.root_path);
             } else {
                 action = props.api?.resource.list();
             }
+
 
             const getAction = props.api?.getAction;
             if (getAction) {

@@ -25,8 +25,8 @@ import {
     GetDataAction, ListType, MemberListAction, QueryAPI,
 } from '@/lib/fluent-api';
 
-interface DynamicTableDataSource{
-    dataSource: DataSource[];
+interface DynamicTableOptions{
+    options: any;
 }
 
 export abstract class BaseTableFluentAPI<
@@ -207,17 +207,26 @@ export class TabSearchTableFluentAPI<
     }
 }
 
-const defaultAdminDataSource = [
+export const defaultAdminFields = [
     { name: 'Resource Type', key: 'resource_type' },
     { name: 'Resource ID', key: 'resource_id' },
     { name: 'Resource Name', key: 'name' },
     {
-        name: 'labels', key: 'labels', view_type: 'list', view_option: { item: { view_type: 'badge' } },
+        name: 'labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
     },
     { name: 'User ID', key: 'user_info.user_id' },
     { name: 'Name', key: 'user_info.name' },
     { name: 'Email', key: 'user_info.email' },
 ];
+
+export const defaultAdminOptions = {
+    fields: defaultAdminFields,
+};
+
+export const defaultAdminLayout = {
+    type: 'table',
+    options: defaultAdminOptions,
+};
 
 export class AdminFluentAPI<
     parameter = any,
@@ -226,7 +235,7 @@ export class AdminFluentAPI<
     initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
     action extends MemberListAction<any, any> = MemberListAction<parameter, resp>,
-    > extends TabSearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements DynamicTableDataSource {
+    > extends TabSearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements DynamicTableOptions {
     getAction = () => this.getSearchTableDefaultAction()
         .setIds(this.target.tableTS.selectState.selectItems.map(item => item[this.idField]));
 
@@ -237,7 +246,7 @@ export class AdminFluentAPI<
         protected target: BaseTableFluentAPI,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
-        public dataSource: DataSource[] = defaultAdminDataSource,
+        public options = defaultAdminOptions,
     ) {
         super(
             action,
@@ -261,21 +270,29 @@ export class AdminFluentAPI<
     }
 }
 
-const defaultHistoryDataSource = [
+export const defaultHistoryFields = [
     { name: 'Update By', key: 'updated_by' },
     { name: 'Key', key: 'key' },
     {
         name: 'Update At',
         key: 'updated_at',
-        view_type: 'datetime',
-        view_option: {
+        type: 'datetime',
+        options: {
             source_type: 'timestamp',
             source_format: 'seconds',
         },
     },
 
 ];
+export const defaultHistoryOptions = {
+    fields: defaultHistoryFields,
+    root_path: 'collection_info.update_history',
+};
 
+export const defaultHistoryLayout = {
+    type: 'table',
+    options: defaultHistoryOptions,
+};
 
 export class HistoryFluentAPI<
     parameter = any,
@@ -284,7 +301,7 @@ export class HistoryFluentAPI<
     initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
     action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
-    > extends TabSearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements DynamicTableDataSource {
+    > extends TabSearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements DynamicTableOptions {
     getAction = () => this.getSearchTableDefaultAction()
         .setKeyPath('collection_info.update_history')
         .setId(this.resourceId.value);
@@ -296,7 +313,7 @@ export class HistoryFluentAPI<
         protected resourceId: forceRefArg<string>,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
-        public dataSource: DataSource[] = defaultHistoryDataSource,
+        public options: any = defaultHistoryOptions,
     ) {
         super(
             action,
@@ -544,7 +561,7 @@ export class AdminTableAPI<initData, initSyncData> extends TabSearchTableAPI<ini
         extraParams: forceRefArg<any>,
         fixSearchQuery: SearchQueryType[] = [],
         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
-        public dataSource: DataSource[] = defaultAdminDataSource,
+        public dataSource: DataSource[] = defaultAdminFields,
         isShow: forceRefArg<boolean>,
     ) {
         super(url, extraParams, fixSearchQuery, initData, initSyncData, dataSource, isShow);
@@ -578,7 +595,7 @@ export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTab
         idKey: string,
         private id: readonlyRefArg<cnaRefArgs<string>>,
         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
-        public dataSource: DataSource[] = defaultHistoryDataSource,
+        public dataSource: DataSource[] = defaultHistoryFields,
         isShow: forceRefArg<boolean>,
     ) {
         super(url, computed(() => ({})), undefined, initData, initSyncData, dataSource, isShow);

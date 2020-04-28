@@ -355,7 +355,7 @@ export default {
             this.checkTableModalState.themeColor = 'alert';
             this.checkTableModalState.item = [nodeData];
             this.checkTableModalState.visible = true;
-            this.checkTableModalState.fields = makeTrItems([
+            this.checkTableModalState.options = makeTrItems([
                 ['id', 'COMMON.ID', { style: { width: '400px' } }],
                 ['name', 'COMMON.NAME', { style: { width: '600px' } }],
             ],
