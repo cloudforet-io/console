@@ -25,7 +25,7 @@ import {
     DynamicFieldType,
     DynamicLayoutProps,
     makeDefs,
-    DynamicLayoutApiProp, checkCanGetData,
+    DynamicLayoutApiProp, checkCanGetData, changeSetOnlys,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import { ActionAPI, GetAction, ResourceActions } from '@/lib/fluent-api';
@@ -93,7 +93,8 @@ export default defineComponent({
                     action = props.api.getAction(action) as GetAction<any, any>;
                 }
                 if (onlyKeys.value.length) {
-                    action = action.setOnly(...onlyKeys.value);
+                    // @ts-ignore
+                    action = action.setOnly(...changeSetOnlys(onlyKeys.value));
                 }
                 const resp = await action.execute();
                 state.data = resp.data || {};

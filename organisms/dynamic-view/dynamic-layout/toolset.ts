@@ -73,5 +73,11 @@ export const makeDefs = (fields: ComputedOrRef<DynamicFieldType[]>, data: Comput
     }
     return [];
 });
+const matchMap = {
+    'created_at.seconds': 'created_at',
+    'updated_at.seconds': 'updated_at',
+    'deleted_at.seconds': 'deleted_at',
+};
 
+export const changeSetOnlys = (keys: string[]) => keys.map(k => matchMap[k] || k);
 export const checkCanGetData = (props: DynamicLayoutProps) => props.isShow && !props.isLoading;

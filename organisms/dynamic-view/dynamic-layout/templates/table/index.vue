@@ -121,8 +121,8 @@ export default {
         });
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
-        exportToolSet.action = exportAction.setDataSource(props.options.fields || []);
         const exportExcel = () => {
+            exportToolSet.action = exportAction.setDataSource(props.options.fields || []);
             exportToolSet.getData();
         };
         const debounceGetData = _.debounce(apiHandler.getData, 200);
