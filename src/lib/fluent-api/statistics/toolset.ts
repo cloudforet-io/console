@@ -103,6 +103,12 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         return api;
     }
 
+    addUnwind(unwind: UnwindItem): this {
+        const api = this.clone();
+        this.apiState.aggregate.unwind?.push(unwind);
+        return api;
+    }
+
     setCount(name: string): this {
         const api = this.clone();
         this.apiState.aggregate.count = { name };
@@ -122,22 +128,25 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
     }
 }
 
+export const getInitStatQueryState = (): StatQueryState<undefined> => ({
+    aggregate: {
+        unwind: [],
+        group: {
+            keys: [],
+            fields: [],
+        },
+        count: undefined,
+    },
+    filter: [],
+    filterOr: [],
+    fixFilter: [],
+} as unknown as StatQueryState<undefined>);
+
 export const getInitJoinState = (): JoinStateItem => ({
     keys: [],
     type: '',
     resource_type: '',
-    query: {
-        aggregate: {
-            group: {
-                keys: [],
-                fields: [],
-            },
-        },
-        filter: [],
-        filterOr: [],
-        fixFilter: [],
-        extraParameter: undefined,
-    },
+    query: getInitStatQueryState(),
 });
 
 export abstract class StatAction<parameter, resp> extends StatQueryAPI<parameter, resp> {
