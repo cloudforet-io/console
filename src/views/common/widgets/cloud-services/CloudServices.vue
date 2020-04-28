@@ -83,7 +83,13 @@ export default defineComponent({
         PSkeleton,
         PI,
     },
-    setup() {
+    props: {
+        getAction: {
+            type: Function,
+            default: api => api,
+        },
+    },
+    setup(props) {
         const vm: any = getCurrentInstance();
 
         const {
@@ -130,7 +136,7 @@ export default defineComponent({
             state.loading = true;
             await providerStore.getProvider();
             try {
-                const res = await api.execute();
+                const res = await props.getAction(api).execute();
                 state.data = res.data.results;
             } catch (e) {
                 console.error(e);

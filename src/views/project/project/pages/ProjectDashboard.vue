@@ -5,18 +5,19 @@
                                 lg:col-end-5
                                 "
                          title="servers" resource-type="inventory.Server"
-                         :get-action="getProjectSummary"
+                         :get-action="getServerSummary"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-10"
                          title="cloud services" resource-type="inventory.CloudService"
-                         :get-action="getServerSummary"
+                         :get-action="getCloudServiceSummary"
                          :color="cloudServices.color"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
                                sm:col-end-13 lg:row-start-2"
+                        :get-action="getCloudService"
         />
         <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
              lg:row-start-3 resources-tab"
@@ -111,19 +112,19 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(tabData),
-            getProjectSummary(apiAction: Stat<any>) {
-                return apiAction.setFilter({
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                }).setResourceType('identity.Project');
-            },
             getServerSummary(apiAction: Stat<any>) {
                 return apiAction.setFilter({
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
                 }).setResourceType('inventory.Server');
+            },
+            getCloudServiceSummary(apiAction: Stat<any>) {
+                return apiAction.setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                }).setResourceType('inventory.CloudService');
             },
             getServerResources(apiAction: Stat) {
                 return apiAction
