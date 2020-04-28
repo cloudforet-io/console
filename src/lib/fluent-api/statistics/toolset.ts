@@ -19,10 +19,12 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
             aggregate: {
+                unwind: [],
                 group: {
                     keys: [],
                     fields: [],
                 },
+                count: undefined,
             },
             filter: [],
             filterOr: [],
@@ -34,9 +36,19 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
     protected query = (): StatQuery => this.getStatisticsQuery<StatQuery>({} as StatQuery);
 
+    // eslint-disable-next-line class-methods-use-this
+    protected getAggregate(state: StatQueryState<any>): Aggregate {
+        const aggregate: Aggregate = {} as Aggregate;
+        if (state.aggregate.unwind && state.aggregate.unwind.length > 0) aggregate.unwind = state.aggregate.unwind;
+        if (state.aggregate.group?.keys.length > 0 || state.aggregate.group?.fields.length > 0) aggregate.group = state.aggregate.group;
+        if (state.aggregate.unwind && state.aggregate.unwind?.length > 0) aggregate.unwind = state.aggregate.unwind;
+        if (state.aggregate.count) aggregate.count = state.aggregate.count;
+        return aggregate;
+    }
+
     protected getStatisticsQuery<Q extends StatQuery>(query: Q, state?: StatQueryState<any>): Q {
         const apiState = state || this.apiState;
-        query.aggregate = apiState.aggregate;
+        query.aggregate = this.getAggregate(apiState);
         if (isNotEmpty(apiState.sort)) query.sort = apiState.sort;
         if (isNotEmpty(apiState.limit)) query.limit = apiState.limit;
         return this.getBaseQuery<Q>(query, state) as Q;
@@ -88,6 +100,12 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
     setUnwind(...args: UnwindItem[]): this {
         const api = this.clone();
         this.apiState.aggregate.unwind = args;
+        return api;
+    }
+
+    setCount(name: string): this {
+        const api = this.clone();
+        this.apiState.aggregate.count = { name };
         return api;
     }
 

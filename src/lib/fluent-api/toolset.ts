@@ -10,7 +10,7 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    BaseQueryState, BaseQuery, ApiType
+    BaseQueryState, BaseQuery, ApiType,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
@@ -180,8 +180,9 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     });
 
     setFilter(...args: FilterItem[]): this {
-        this.apiState.filter = args;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.filter = args;
+        return api;
     }
 
     setFixFilter(...args: FilterItem[]): this {

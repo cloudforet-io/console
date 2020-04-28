@@ -64,6 +64,7 @@ import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { Stat } from '@/lib/fluent-api/statistics/resource';
 
 export default defineComponent({
     name: 'ServiceAccounts',
@@ -89,16 +90,18 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
-        // getAction: {
-        //     type: Function,
-        //     default: action => action.setServiceType('identity.service-account')
-        //         .setGroupBy('provider')
-        //         .addField('provider', OPERATORS.value, 'provider')
-        //         .addField('service_account_id', OPERATORS.count, 'count')
-        //         .setSort('provider'),
-        // },
+        getAction: {
+            type: Function,
+            default: (action: Stat<any>): Stat<any> => action.setResourceType('inventory.Server')
+                .setSort('count')
+                .addGroupKey('data.compute.region_name', 'region')
+                .setFilter({ key: 'data.compute.region_name', value: null, operator: '!=' },
+                    { key: 'project_id', value: 'project-87925ea3ce65', operator: '=' })
+
+            ,
+        },
     },
-    setup(props) {
+    setup(props: any) {
         const vm: any = getCurrentInstance();
 
         const {
@@ -111,10 +114,10 @@ export default defineComponent({
             count: number;
         }
 
-        const api = fluentApi.statisticsTest().resource().stat<Value>()
-            .setResourceType('identity.ServiceAccount')
+        const api = computed(() => props.getAction(fluentApi.statisticsTest().resource().stat<Value>()
+            // .setResourceType('identity.ServiceAccount')
             .addGroupKey('provider', 'provider')
-            .addGroupField('count', STAT_OPERATORS.count);
+            .addGroupField('count', STAT_OPERATORS.count)));
 
         interface Item {
             provider: string;
@@ -155,7 +158,7 @@ export default defineComponent({
             ts.state.data = [];
             await providerStore.getProvider();
             try {
-                const res = await api.execute();
+                const res = await api.value.execute();
                 const others: Item = {
                     name: 'Others',
                     icon: 'ic_provider_other',
