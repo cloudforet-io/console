@@ -66,8 +66,7 @@ export default defineComponent({
             count: number;
         }
         const countApi = computed(() => props.getAction(fluentApi.statisticsTest().resource().stat<Value>()
-            .setResourceType(props.resourceType)
-            .addGroupField('count', STAT_OPERATORS.count)));
+            .setCount('count')));
 
         // const trendApi = fluentApi.statisticsTest().history()
         const getData = async (): Promise<void> => {

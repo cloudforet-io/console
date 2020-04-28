@@ -113,14 +113,14 @@ export default {
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
-                });
+                }).setResourceType('identity.Project');
             },
             getServer(apiAction: Stat<any>) {
                 return apiAction.setFilter({
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
-                });
+                }).setResourceType('inventory.Server');
             },
         };
     },

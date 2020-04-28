@@ -24,7 +24,7 @@ export const serviceSummaryProps = {
     },
     getAction: {
         type: Function,
-        default: () => ({}),
+        default: api => api,
     },
 };
 
