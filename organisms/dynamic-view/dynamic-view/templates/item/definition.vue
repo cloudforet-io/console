@@ -71,12 +71,10 @@ export default defineComponent({
         @apply py-2 px-4 text-sm font-bold max-w-xs;
         line-height: 1.0625rem;
         width: 18rem;
-        font-family: Noto Sans;
 
     }
     .value{
         @apply py-2 px-4;
-        font-family: Noto Sans;
         &.hover{
             @apply text-blue-500;
         }
