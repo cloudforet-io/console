@@ -89,6 +89,8 @@ export const OPERATOR_MAP = Object.freeze({
     '<=': 'lte',
     td_lt: 'timedelta_lt',
     td_gt: 'timedelta_gt',
+    td_lte: 'timedelta_lte',
+    td_gte: 'timedelta_gte',
     '=': 'in', // merge operator
     '!=': 'not_in', // merge operator
     $: 'regex',

@@ -117,7 +117,18 @@ const joinSimpleMap = {
     resource_type: 'setJoinResourceType',
     type: 'setJoinType',
 };
-
+export const OPERATOR_MAP = Object.freeze({
+    eq: '',
+    gt: '>',
+    gte: '>=',
+    lt: '<',
+    lte: '<=',
+    timedelta_lt: 'td_lt',
+    timedelta_gt: 'td_gt',
+    timedelta_gte:'td_gte',
+    timedelta_lte:'td_lte',
+    regx: '$',
+});
 
 const makeMethod = (name: string, value?: any, rawValue?: string) => `.${name}(${value ? JSON.stringify(value) : rawValue})`;
 const makeIndexMethod = (name: string, idx: number, value?: any, rawValue?: string) => `.${name}(${value ? JSON.stringify(value) : rawValue},${idx})`;
@@ -137,10 +148,16 @@ const addJoinGroupFieldParser = (fields: GroupFieldsItem[], idx: number) => {
     });
     return codes.join('\n');
 };
+const makeFilters = (filters: FilterItem[]) => filters.map((i) => {
+    if (OPERATOR_MAP[i.operator]) {
+        i.operator = OPERATOR_MAP[i.operator];
+    }
+    return JSON.stringify(i);
+});
 
-const setFilterParser = (filters: FilterItem[], method = 'setFilter'): string => {
-    const codes = filters.map(i => JSON.stringify(i));
-    return makeMethod(method, undefined, codes.join(','));
+const setJoinFilterParser = (filters: FilterItem[], idx: number, method = 'setJoinFilter'): string => {
+    const codes = makeFilters(filters);
+    return makeIndexMethod(method, idx, undefined, codes.join(','));
 };
 
 const joinParser = (joinQuery: any[]): string => {
@@ -160,6 +177,20 @@ const joinParser = (joinQuery: any[]): string => {
             if (fields) {
                 codeBlock.push(addJoinGroupFieldParser(fields, idx));
             }
+        }
+        const filter = q.query?.filter;
+        if (filter) {
+            codeBlock.push(setJoinFilterParser(filter, idx));
+        }
+        // @ts-ignore
+        const filter_or = q.query?.filter_or;
+        if (filter_or) {
+            codeBlock.push(setJoinFilterParser(filter_or, idx, 'setJoinFilterOr'));
+        }
+        const sort = q.query?.sort;
+        if (sort) {
+            const name = `${JSON.stringify(sort.name)}`;
+            codeBlock.push(makeIndexMethod('setJoinSort', idx, typeof sort.desc === 'boolean' ? `${name},${JSON.stringify(sort.desc)}` : name));
         }
 
         return `\n${codeBlock.join('\n')}`;
@@ -181,6 +212,10 @@ const addGroupFieldParser = (fields: GroupFieldsItem[]) => {
         return makeMethod('addGroupField', undefined, raw);
     });
     return codes.join('\n');
+};
+const setFilterParser = (filters: FilterItem[], method = 'setFilter'): string => {
+    const codes = makeFilters(filters);
+    return makeMethod(method, undefined, codes.join(','));
 };
 const queryParser = (query): string => {
     const codeBlock: string[] = [];
