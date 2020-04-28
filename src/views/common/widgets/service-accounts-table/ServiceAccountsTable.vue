@@ -69,25 +69,21 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import _ from 'lodash';
 import {
-    computed, defineComponent, getCurrentInstance, Ref, toRefs, reactive,
+    computed, defineComponent, getCurrentInstance, reactive, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import {
-    secondary, secondary1, gray,
-} from '@/styles/colors';
+import { gray, secondary, secondary1 } from '@/styles/colors';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
-import { SChartToolSet } from '@/lib/chart/toolset';
-import { SBarChart } from '@/lib/chart/bar-chart';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import casual, { arrayOf } from '@/lib/casual';
+import { fluentApi } from '@/lib/fluent-api';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
 export default defineComponent({
     name: 'ServiceAccountsTable',
@@ -140,21 +136,47 @@ export default defineComponent({
                 ])),
             });
 
-            const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-                resolve(arrayOf(5, () => ({
-                    service_provider: casual.integer(1, 3),
-                    account_name: casual.text,
-                    servers: casual.integer(0, 300),
-                    cloud_services: casual.integer(0, 300),
-                    credentials: casual.integer(0, 300),
-                })) as unknown as DataType[]);
-            });
+            const api = fluentApi.statisticsTest().resource().stat<DataType>()
+                .setResourceType('identity.ServiceAccount')
+                .addGroupKey('provider', 'provider')
+                .addGroupKey('service_account_id', 'service_account_id')
+                .addGroupKey('name', 'service_account_name')
+
+                .setJoinResourceType('inventory.Server')
+                .addJoinKey('service_account_id')
+                .addJoinUnwind({
+                    path: 'collection_info.service_accounts',
+                })
+                .addJoinGroupKey('service_account_id', 'service_account_id')
+                .addJoinGroupField('server_count', STAT_OPERATORS.count, undefined)
+
+                .addJoinKey('service_account_id', 1)
+                .setJoinResourceType('inventory.CloudService', 1)
+                .addJoinUnwind({
+                    path: 'collection_info.service_accounts',
+                }, 1)
+                .addJoinGroupKey('service_account_id', 'service_account_id', 1)
+                .addJoinGroupField('cloud_service_count', STAT_OPERATORS.count, undefined, 1)
+
+                .setJoinResourceType('secret.Secret', 2)
+                .addJoinKey('service_account_id', 2)
+                .addJoinGroupKey('service_account_id', 'service_account_id', 2)
+                .addJoinGroupField('secret_count', STAT_OPERATORS.count, undefined, 2)
+
+                .addFormula('resource_count', 'server_count + cloud_service_count')
+                .setSort('resource_count');
 
 
             const getData = async (): Promise<void> => {
                 state.loading = true;
-                state.data = await api();
-                state.loading = false;
+                try {
+                    const res = await api.execute();
+                    state.data = res.data.results;
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    state.loading = false;
+                }
             };
 
             setTimeout(() => {
