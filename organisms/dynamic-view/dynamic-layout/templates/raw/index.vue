@@ -16,7 +16,7 @@ import {
     DynamicLayoutProps,
     DynamicLayoutApiProp, checkCanGetData,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import { GetAction } from '@/lib/fluent-api';
+import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 
@@ -62,7 +62,12 @@ export default defineComponent({
 
         const getData = async () => {
             if (checkCanGetData(props)) {
-                let action: GetAction<any, any> = props.api?.resource.get() as GetAction<any, any>;
+                let action: GetAction<any, any>;
+                if (props.api?.resource instanceof GetAction) {
+                    action = props.api.resource;
+                } else {
+                    action = (props.api?.resource as ResourceActions<'get'>).get() as GetAction<any, any>;
+                }
                 if (props.api?.getAction) {
                     action = props.api.getAction(action) as GetAction<any, any>;
                 }
