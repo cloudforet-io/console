@@ -100,6 +100,7 @@ export const OPERATOR_MAP = Object.freeze({
     '=': 'in', // merge operator
     '!=': 'not_in', // merge operator
     $: 'regex',
+    sum: 'sum',
 });
 const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 

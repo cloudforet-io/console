@@ -10,7 +10,7 @@ export interface LongFilterType {
 }
 
 type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|
-    'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq';
+    'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq'|'sum';
 
 export interface FilterItem extends LongFilterType {
     key: string;
