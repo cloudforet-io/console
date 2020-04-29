@@ -168,11 +168,11 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
 
     protected getBaseQuery<Q extends BaseQuery>(query: Q, state?: BaseQueryState<any>): Q {
         const apiState = state || this.apiState;
-        if (this.apiState.filter.length > 0 || apiState.fixFilter.length > 0) {
+        if (apiState.filter?.length > 0 || apiState.fixFilter?.length > 0) {
             const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filter, apiState.fixFilter);
             if (newFilter) query.filter = newFilter;
         }
-        if (this.apiState.filterOr.length > 0 || apiState.fixFilterOr.length > 0) {
+        if (apiState.filterOr?.length > 0 || apiState.fixFilterOr?.length > 0) {
             const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filterOr, apiState.fixFilterOr);
             if (newFilter) query.filter = newFilter;
         }
