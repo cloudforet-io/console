@@ -69,16 +69,8 @@
                     />
                 </template>
                 <template #card="{item}">
-                    <div class="top">
-                        <div class="text-content">
-                            <div class="sub-title">
-                                {{ item.provider }} / {{ item.group }}
-                            </div>
-                            <div class="title">
-                                {{ item.name }}
-                            </div>
-                        </div>
-                        <div class="side-content">
+                    <div class="left">
+                        <div class="w-12 h-12">
                             <img v-if="item.tags['spaceone:icon']"
                                  width="48px" height="48px"
                                  :src="item.tags['spaceone:icon']"
@@ -93,19 +85,27 @@
                                  height="48px"
                             />
                         </div>
-                    </div>
-                    <div v-if="statData" class="bottom">
-                        <div class="total-count">
-                            {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
+                        <div class="text-content">
+                            <div class="sub-title">
+                                {{ item.provider }} / {{ item.group }}
+                            </div>
+                            <div class="title">
+                                {{ item.name }}
+                            </div>
                         </div>
+                    </div>
+                    <div v-if="statData" class="right">
                         <div v-if="statData[item.cloud_service_type_id][newResourceCountName]" class="today-created">
                             <p-i name="ic_list_increase" width="12px" height="12px" />
                             <div class="number">
                                 {{ statData[item.cloud_service_type_id][newResourceCountName] }}
                             </div>
                         </div>
+                        <div class="total-count">
+                            {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
+                        </div>
                     </div>
-                    <PSkeleton v-else class="bottom" />
+                    <PSkeleton v-else width="5rem" height="1.875rem" />
                 </template>
             </PToolboxGridLayout>
         </template>
@@ -256,8 +256,8 @@ export default {
             listAction,
             {
                 cardClass: () => ['card-item', 'cst-card-item'],
-                cardMinWidth: '19.125rem',
-                cardHeight: '9rem',
+                cardMinWidth: '28.5rem',
+                cardHeight: '8rem',
                 columnGap: '0.5rem',
                 excelVisible: true,
             },
@@ -364,11 +364,11 @@ export default {
     }
 
     >>> .cst-card-item{
-        @apply p-6 flex flex-col justify-between;
-
-        .top{
-            @apply flex justify-between;
+        @apply p-6 flex flex-row justify-between items-center;
+        .left{
+            @apply inline-flex items-center;
             .text-content{
+                @apply ml-4;
                 .sub-title{
                     @apply text-gray-500;
                     font-size: 0.875rem;
@@ -381,18 +381,14 @@ export default {
 
                 }
             }
-            .side-content {
-                @apply w-12 h-12 flex justify-around content-around;
-            }
-
         }
-        .bottom {
-            @apply flex items-center;
+        .right{
+            @apply inline-flex items-center ;
             .total-count {
-                @apply font-bold text-4xl;
+                @apply font-bold text-2xl;
             }
             .today-created {
-                @apply border-green-500 flex h-6 ml-2 justify-center items-center;
+                @apply border-green-500 flex h-6 ml-2 justify-center items-center mr-2;
                 border-radius: 6.25rem;
                 border-width: 0.0625rem;
                 min-width: 2.5rem;
@@ -401,9 +397,6 @@ export default {
                     line-height: 1.0625rem;
                 }
             }
-
-
         }
-
     }
 </style>
