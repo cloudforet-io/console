@@ -45,34 +45,29 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     isShow: boolean;
     isLoading: boolean;
     responsiveStyle?: any;
+    exportFields?: any[];
 }
 interface Field {
     name: string;
     label: string;
 }
 
-export const makeFields = (props: DynamicLayoutProps|any) => computed((): Field[] => (props.options.fields as DynamicFieldType[]).map((ds: DynamicFieldType): Field => ({
+export const makeFields = (props: DynamicLayoutProps|any) => computed((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({
     name: ds.key,
     label: ds.name,
-})));
+})) : []));
 
-export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicFieldType[] => (props.options.fields as DynamicFieldType[]).map(ds => ({
+export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicFieldType[] => (props.options.fields ? props.options.fields.map(ds => ({
     ...ds,
     name: `col-${ds.key}-format`,
-})));
+})) : []));
 
-export const makeDefs = (fields: ComputedOrRef<DynamicFieldType[]>, data: ComputedOrRef<any>) => computed<DynamicFieldBindType[]>(() => {
-    if (fields.value) {
-        // @ts-ignore
-        return fields.value.map(item => ({
-            name: item.name,
-            type: item.type,
-            options: item.options,
-            data: _.get(data.value, item.key, ''),
-        }));
-    }
-    return [];
-});
+export const makeDefs = (fields: ComputedOrRef<DynamicFieldType[]>, data: ComputedOrRef<any>) => computed<DynamicFieldBindType[]>(() => (fields.value ? (fields.value as DynamicFieldType[]).map(item => ({
+    name: item.name,
+    type: item.type,
+    options: item.options,
+    data: _.get(data.value, item.key, ''),
+})) : []));
 const matchMap = {
     'created_at.seconds': 'created_at',
     'updated_at.seconds': 'updated_at',

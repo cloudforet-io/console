@@ -20,7 +20,9 @@
                                   :options="options"
                                   :vbind="{
                                       responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
-                                      showTitle:false
+                                      showTitle:false,
+                                      exportFields:mergeFields,
+
                                   }"
                 >
                     <template #toolbox-left>
@@ -413,7 +415,6 @@ export default {
                 layouts = _.get(resp.data, 'metadata.view.sub_data.layouts', []);
                 cache[selectId] = layouts;
             }
-            console.debug(layouts);
             dynamicLayoutState.layouts = layouts;
         };
         const getLayouts = _.debounce(getLayoutsFunc, 50);

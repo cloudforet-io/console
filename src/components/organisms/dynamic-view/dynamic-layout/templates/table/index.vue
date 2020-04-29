@@ -105,6 +105,10 @@ export default {
             type: Boolean,
             required: true,
         },
+        exportFields: {
+            type: Array,
+            default: null,
+        },
     },
     setup(props: DynamicLayoutProps) {
         const defaultInitData = {
@@ -122,7 +126,7 @@ export default {
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
         const exportExcel = () => {
-            exportToolSet.action = exportAction.setDataSource(props.options.fields || []);
+            exportToolSet.action = exportAction.setDataSource(props.exportFields || props.options.fields || []);
             exportToolSet.getData();
         };
         const debounceGetData = _.debounce(apiHandler.getData, 200);
