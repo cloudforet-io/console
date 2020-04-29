@@ -29,6 +29,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
             filter: [],
             filterOr: [],
             fixFilter: [],
+            fixFilterOr: [],
             extraParameter: {},
             ...initState,
         };
@@ -41,7 +42,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         const aggregate: Aggregate = {} as Aggregate;
         if (state.aggregate.unwind && state.aggregate.unwind.length > 0) aggregate.unwind = state.aggregate.unwind;
         if (state.aggregate.group?.keys.length > 0 || state.aggregate.group?.fields.length > 0) aggregate.group = state.aggregate.group;
-        if (state.aggregate.unwind && state.aggregate.unwind?.length > 0) aggregate.unwind = state.aggregate.unwind;
+        if (state.aggregate.unwind && state.aggregate.unwind.length > 0) aggregate.unwind = state.aggregate.unwind;
         if (state.aggregate.count) aggregate.count = state.aggregate.count;
         return aggregate;
     }
@@ -61,31 +62,31 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
     setAggregate(aggregate: Aggregate): this {
         const api = this.clone();
-        this.apiState.aggregate = aggregate;
+        api.apiState.aggregate = aggregate;
         return api;
     }
 
     setGroup(group: Group): this {
         const api = this.clone();
-        this.apiState.aggregate.group = group;
+        api.apiState.aggregate.group = group;
         return api;
     }
 
     setGroupKeys(...args: GroupKeyItem[]): this {
         const api = this.clone();
-        this.apiState.aggregate.group.keys = args;
+        api.apiState.aggregate.group.keys = args;
         return api;
     }
 
     addGroupKey(key: string, name: string): this {
         const api = this.clone();
-        this.apiState.aggregate.group.keys.push({ key, name });
+        api.apiState.aggregate.group.keys.push({ key, name });
         return api;
     }
 
     setGroupFields(...args: GroupFieldsItem[]): this {
         const api = this.clone();
-        this.apiState.aggregate.group.fields = args;
+        api.apiState.aggregate.group.fields = args;
         return api;
     }
 
@@ -99,19 +100,19 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
     setUnwind(...args: UnwindItem[]): this {
         const api = this.clone();
-        this.apiState.aggregate.unwind = args;
+        api.apiState.aggregate.unwind = args;
         return api;
     }
 
     addUnwind(unwind: UnwindItem): this {
         const api = this.clone();
-        this.apiState.aggregate.unwind?.push(unwind);
+        api.apiState.aggregate.unwind?.push(unwind);
         return api;
     }
 
     setCount(name: string): this {
         const api = this.clone();
-        this.apiState.aggregate.count = { name };
+        api.apiState.aggregate.count = { name };
         return api;
     }
 

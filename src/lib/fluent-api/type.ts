@@ -9,7 +9,7 @@ export interface LongFilterType {
     operator: string;
 }
 
-type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$';
+type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|'td_lt'|'td_gt';
 
 export interface FilterItem extends LongFilterType {
     key: string;
@@ -53,6 +53,7 @@ export interface BaseQueryState<param> {
     filter: FilterItem[];
     filterOr: FilterItem[];
     fixFilter: FilterItem[];
+    fixFilterOr: FilterItem[];
     extraParameter: param;
     // query: () => StatQuery;
 }
@@ -67,8 +68,6 @@ export interface Query extends BaseQuery {
 }
 
 export interface QueryApiState<T=any> extends BaseQueryState<T> {
-    filter: FilterItem[];
-    fixFilter: FilterItem[];
     only: string[];
     thisPage: number;
     pageSize: number;

@@ -137,6 +137,8 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.v
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { Stat } from '@/lib/fluent-api/statistics/resource';
 
 export default {
     name: 'ServiceAccount',
@@ -203,6 +205,32 @@ export default {
             fixColumn: 1,
         });
 
+        const makeJoinQuery = (action: Stat<any>, name: string, idx: number) => action.setJoinResourceType('inventory.Server', idx)
+            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'], idx)
+            .addJoinGroupKey('cloud_service_type', 'cloud_service_type', idx)
+            .addJoinGroupKey('cloud_service_group', 'cloud_service_group', idx)
+            .addJoinGroupKey('provider', 'provider', idx)
+            .addJoinGroupField(name, STAT_OPERATORS.count);
+
+        const api = fluentApi.statisticsTest().resource().stat()
+            .setResourceType('inventory.CloudServiceType')
+            .addGroupKey('provider', 'provider')
+            .addGroupKey('name', 'cloud_service_type')
+            .addGroupKey('group', 'cloud_service_group')
+            .addGroupKey('tags.spaceone:icon', 'icon')
+
+            .setJoinResourceType('inventory.Server')
+            .addJoinKey('project_id')
+            .addJoinGroupKey('project_id', 'project_id')
+            .addJoinGroupField('servers', STAT_OPERATORS.count)
+            .setJoinResourceType('inventory.CloudService', 1)
+            .addJoinKey('project_id', 1)
+            .addJoinGroupKey('project_id', 'project_id', 1)
+            .addJoinGroupField('cloud_services', STAT_OPERATORS.count, undefined, 1)
+            .addFormula('total', 'cloud_services + servers')
+            .setSort('cloud_service_count')
+            .setLimit(5);
+
         const metricAPI = fluentApi.inventory().cloudService().list().setCountOnly();
         const createdData = reactive({});
         const todayCreated = ref(createdData);
@@ -218,6 +246,8 @@ export default {
                     { key: 'provider', operator: '=', value: item.provider },
                     { key: 'cloud_service_group', operator: '=', value: item.group },
                     { key: 'cloud_service_type', operator: '=', value: item.name },
+                    { key: 'created_at', operator: 'td_lt', value: 'now' },
+                    { key: 'created_at', operator: 'td_gt', value: 'now/d-1d' },
                 ).execute().then((rp) => {
                     if (rp.data.total_count) {
                         setMetric(rp.data.total_count);
@@ -226,6 +256,7 @@ export default {
             });
             return resp;
         };
+
         const listAction = fluentApi.inventory().cloudServiceType().list()
             .setOnly('provider', 'group', 'name', 'tags.icon', 'cloud_service_type_id')
             .setTransformer(getMetric)

@@ -14,11 +14,11 @@ import {
     StatResponse, UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
 import { isNotEmpty } from '@/lib/util';
-import { ApiType } from '@/lib/fluent-api/type';
+import { ApiType, FilterItem } from '@/lib/fluent-api/type';
 import _ from 'lodash';
 
 
-export class Stat<value> extends StatAction<ResourceStatState, StatResponse<value>> {
+export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<value>> {
     constructor(
         api: ApiType,
         baseUrl: string,
@@ -28,14 +28,17 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
             aggregate: {
+                unwind: [],
                 group: {
                     keys: [],
                     fields: [],
                 },
+                count: undefined,
             },
             filter: [],
             filterOr: [],
             fixFilter: [],
+            fixFilterOr: [],
             extraParameter: {
                 joinState: [],
             },
@@ -201,6 +204,27 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
         return api;
     }
 
+    setJoinFilter(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.filter = filters;
+        return api;
+    }
+
+    setJoinFilterOr(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.filterOr = filters;
+        return api;
+    }
+
+    setJoinFixFilter(filters: FilterItem[], joinIndex = 0): this {
+        const api = this.clone();
+        this.initJoinState(api, joinIndex);
+        api.apiState.extraParameter.joinState[joinIndex].query.fixFilter = filters;
+        return api;
+    }
+
     setFormula(formulas: FormulaItem[]): this {
         const api = this.clone();
         api.apiState.extraParameter.formulas = formulas;
@@ -231,5 +255,5 @@ export class Stat<value> extends StatAction<ResourceStatState, StatResponse<valu
 export default class StatisticsResource extends Resource implements ResourceActions<'stat'> {
     name = 'resource'
 
-    stat<value>(): Stat<value> { return new Stat<value>(this.api, this.baseUrl); }
+    stat<value=any>(): Stat<value> { return new Stat<value>(this.api, this.baseUrl); }
 }
