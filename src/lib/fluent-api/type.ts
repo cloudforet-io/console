@@ -129,6 +129,10 @@ export interface ListType<T> {
     total_count: number;
 }
 
+export interface LogListType<T> {
+    logs: T[];
+}
+
 export interface ReferenceInfo {
     resource_id?: string;
     external_link?: string;

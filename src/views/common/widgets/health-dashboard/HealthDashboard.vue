@@ -10,6 +10,12 @@
                     <p-skeleton width="100%" height="0.625rem" />
                 </div>
             </div>
+            <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
+                <img class="w-40 mx-auto mb-4" src="@/assets/images/illust_astronaut_walking2.svg">
+                <p class="no-issue-text">
+                    No Issue
+                </p>
+            </div>
             <p-grid-layout v-else :items="data"
                            row-gap="0.5rem" column-gap="0"
                            :fix-column="1" card-height="auto"
@@ -17,18 +23,23 @@
                            :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item :icon-url="iconUrl(item)" theme="card" @click="onItemClick(item, idx)">
+                    <p-selectable-item theme="card" @click="onItemClick(item.reference.external_link, idx)">
                         <template #side>
                             &zwnj;
                         </template>
                         <template #contents>
                             <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
-                                {{ item.group }}
+                                {{ item.eventTypeCode }}
                                 <p-i name="ic_external-link" width=".7rem" height=".7rem" />
                             </div>
                             <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
-                                <p-i name="common-gear" width=".8rem" height=".8rem" />
-                                {{ item.name }} / {{ item.name }}
+                                <p-i v-if="item.eventTypeCategory === 'issue' || item.eventTypeCategory === 'investigation'" name="ic_wrench" width=".8rem"
+                                     height=".8rem"
+                                />
+                                <p-i v-else name="ic_notification" width=".8rem"
+                                     height=".8rem"
+                                />
+                                {{ item.eventTypeCategory }} / {{ item.region }}
                             </div>
                         </template>
                         <template #extra>
@@ -60,6 +71,7 @@ import PSelectableItem from '@/components/molecules/selectable-item/SelectableIt
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
+import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 // import {
 //     DiffQueryAPI, DiffResponse, HistoryResponse, OPERATORS,
 // } from '@/lib/fluent-api/statistics/toolset_origin';
@@ -82,111 +94,52 @@ export default defineComponent({
         PSelectableItem,
         PSkeleton,
         PTooltipButton,
+        PLazyImg,
     },
-    setup() {
+    setup(props, context) {
         const vm: any = getCurrentInstance();
-
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
-
-        interface CloudService {
-            provider: string;
-            // eslint-disable-next-line camelcase
-            cloud_service_type: string;
-            // eslint-disable-next-line camelcase
-            cloud_service_group: string;
-            count: number;
-        }
-
-        interface Server {
-            count: number;
-        }
+        const projectId = computed<string>(() => context.root.$route.params.id as string);
 
         interface Data {
-            group: string;
-            name?: string;
+            eventTypeCode: string;
+            eventTypeCategory: string;
+            region: string;
             count: number;
-            provider?: string;
         }
 
         interface StateInterface {
-            serverData: Server[];
-            cloudServiceData: CloudService[];
             data: Data[];
             loading: boolean;
-            providers: ProviderInfo;
-            widgetRef: any;
+            // widgetRef: any;
         }
 
         const state: UnwrapRef<StateInterface> = reactive({
-            serverData: [],
-            cloudServiceData: [],
             data: [],
             loading: true,
-            providers: computed(() => providerStore.state.providers),
-            widgetRef: null,
+            // widgetRef: null,
         });
 
-
-        // const serverApi = fluentApi.statisticsTest().history().diff<Server>()
-        //     .setTopic('inventory_server_daily_diff')
-        //     .setFrom(getTimestamp(moment().subtract(1, 'day')))
-        //     .setField('count');
-
-        const getServerData = async (): Promise<void> => {
-            try {
-                // const res = await serverApi.execute();
-                // state.serverData = res.data.values;
-            } catch (e) {
-                state.serverData = [{
-                    count: casual.integer(-30, 30),
-                }];
-            }
-        };
-
-        // const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
-        //     .setTopic('inventory_cloud_service_daily_diff')
-        //     .setGroupBy('cloud_service_type', 'cloud_service_group', 'provider')
-        //     .setFrom(getTimestamp(moment().subtract(1, 'day')))
-        //     .setField('count');
-
-        const getCloudServiceData = async (): Promise<void> => {
-            try {
-                // const res = await cloudServiceApi.execute();
-                // state.cloudServiceData = res.data.values;
-            } catch (e) {
-                state.cloudServiceData = arrayOf(casual.integer(5, 15), () => ({
-                    provider: casual.random_element(['aws', 'azure', 'google_cloud']),
-                    // eslint-disable-next-line camelcase
-                    cloud_service_type: casual.title,
-                    // eslint-disable-next-line camelcase
-                    cloud_service_group: casual.full_name,
-                    count: casual.integer(-30, 30),
-                })) as CloudService[];
-            }
-        };
+        const api = fluentApi.addons().awsHealth().list().setId(projectId.value);
 
 
         const getData = async (): Promise<void> => {
             state.loading = true;
-            await providerStore.getProvider();
             state.data = [];
-            await Promise.all([getServerData(), getCloudServiceData()]);
-            state.data = [
-                ...state.serverData.map(d => ({
-                    group: 'Server',
-                    count: d.count,
-                })),
-                ...state.cloudServiceData.map(d => ({
-                    group: d.cloud_service_group,
-                    name: d.cloud_service_type,
-                    count: d.count,
-                    provider: d.provider,
-                })),
-            ];
-            state.loading = false;
+            try {
+                const res = await api.execute();
+                console.log('res test', res);
+                state.data = res.data.logs.map(item => ({
+                    eventTypeCode: item.eventTypeCode,
+                    eventTypeCategory: item.eventTypeCategory,
+                    region: item.region,
+                    count: item.count,
+                    ...item,
+                }));
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         setTimeout(() => {
@@ -199,11 +152,11 @@ export default defineComponent({
             onItemClick(item) {
                 vm.$router.push('/identity/service-account');
             },
-            iconUrl: (item: Data): string => _.get(
-                state.providers,
-                `state.providers[${item.provider}].icon`,
-                '',
-            ) as string,
+            // iconUrl: (item: Data): string => _.get(
+            //     state.providers,
+            //     `state.providers[${item.provider}].icon`,
+            //     '',
+            // ) as string,
         };
     },
 });
@@ -224,6 +177,11 @@ export default defineComponent({
 }
 .count {
     @apply text-lg text-center font-bold;
+}
+
+.no-issue-text {
+    @apply text-center text-gray-300;
+    font-size: 1.5rem;
 }
 
 .count-info {
