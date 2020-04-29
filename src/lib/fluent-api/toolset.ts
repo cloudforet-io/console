@@ -223,8 +223,8 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
             filterOr: [] as unknown as FilterItem[],
             fixFilterOr: [] as unknown as FilterItem[],
             only: [] as unknown as string[],
-            thisPage: 1,
-            pageSize: 15,
+            thisPage: 0,
+            pageSize: 0,
             sortBy: '',
             sortDesc: true,
             keyword: '',
@@ -236,7 +236,7 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
 
     protected query = (): Query => {
         const query: Query = {};
-        if (this.apiState.thisPage !== 0) {
+        if (this.apiState.thisPage !== 0 && this.apiState.pageSize !== 0) {
             query.page = {
                 start: ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1,
                 limit: this.apiState.pageSize,
