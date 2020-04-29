@@ -28,7 +28,7 @@
                             class="total-count"
                             :style="{'background-color': item.color||'#3C2C84','border-color': item.color||'#3C2C84'}"
                         >
-                            {{ providerTotalCount[item.provider] }}
+                            {{ providerTotalCount[item.provider]||0 }}
                         </div>
                     </div>
                 </template>
@@ -79,9 +79,9 @@
                             </div>
                         </div>
                         <div class="side-content">
-                            <img v-if="item.tags.icon"
+                            <img v-if="item.tags['spaceone:icon']"
                                  width="48px" height="48px"
-                                 :src="item.tags.icon"
+                                 :src="item.tags['spaceone:icon']"
                                  :alt="item.name"
                             >
                             <img v-else-if="providerStore.state.providers[item.provider]"
@@ -94,17 +94,18 @@
                             />
                         </div>
                     </div>
-                    <div class="bottom">
+                    <div v-if="statData" class="bottom">
                         <div class="total-count">
-                            {{ item.cloud_service_count }}
+                            {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
                         </div>
-                        <div v-if="todayCreated[item.cloud_service_type_id]" class="today-created">
+                        <div v-if="statData[item.cloud_service_type_id][newResourceCountName]" class="today-created">
                             <p-i name="ic_list_increase" width="12px" height="12px" />
                             <div class="number">
-                                {{ todayCreated[item.cloud_service_type_id] }}
+                                {{ statData[item.cloud_service_type_id][newResourceCountName] }}
                             </div>
                         </div>
                     </div>
+                    <PSkeleton v-else class="bottom" />
                 </template>
             </PToolboxGridLayout>
         </template>
@@ -115,12 +116,9 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
@@ -138,15 +136,12 @@ import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/tool
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import { Stat } from '@/lib/fluent-api/statistics/resource';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 
 export default {
     name: 'ServiceAccount',
     components: {
         PVerticalPageLayout2,
-        PButton,
-        PDropdownMenuBtn,
-        PEmpty,
         PCheckBox,
         PI,
         PHr,
@@ -154,30 +149,36 @@ export default {
         PQuerySearchTags,
         PToolboxGridLayout,
         PGridLayout,
+        PSkeleton,
     },
     setup(props, context) {
         const {
             provider,
         } = useStore();
         const providerStore: ProviderStoreType = provider;
+        providerStore.getProvider();
         const providerTotalCount = ref<any>(null);
-        const resourceCountAPI = fluentApi.inventory().cloudServiceType().list().setCountOnly();
-        onMounted(async () => {
-            await providerStore.getProvider();
-            const prs = Object.keys(providerStore.state.providers);
-            providerTotalCount.value = reactive<any>(_.zipObject(
-                ['all', ...prs],
-                Array(prs.length),
-            ));
+        const cstCountName = 'cloud_service_type_count';
+        const cstCountApi = fluentApi.statisticsTest().resource().stat()
+            .setResourceType('inventory.CloudServiceType')
 
-            resourceCountAPI.execute().then((resp) => {
-                providerTotalCount.value.all = resp.data.total_count;
+            .addGroupKey('provider', 'provider')
+
+            .setJoinKeys(['provider'], 0)
+            .setJoinResourceType('inventory.CloudServiceType', 0)
+            .addJoinGroupKey('provider', 'provider', 0)
+            .addJoinGroupField(cstCountName, STAT_OPERATORS.count, undefined, 0);
+        onMounted(async () => {
+            const resp = await cstCountApi.execute();
+            let total = 0;
+            const data: any = { };
+            resp.data.results.forEach((item) => {
+                const count = item[cstCountName];
+                total += count;
+                data[item.provider] = count;
             });
-            prs.forEach((key) => {
-                resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).execute().then((resp) => {
-                    providerTotalCount.value[key] = resp.data.total_count;
-                });
-            });
+            data.all = total;
+            providerTotalCount.value = data;
         });
         const vm = getCurrentInstance();
         const selectProvider = ref('all');
@@ -204,63 +205,52 @@ export default {
             rowGap: '0.5rem',
             fixColumn: 1,
         });
+        const totalResourceCountName = 'cloud_service_count';
 
-        const makeJoinQuery = (action: Stat<any>, name: string, idx: number) => action.setJoinResourceType('inventory.Server', idx)
-            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'], idx)
-            .addJoinGroupKey('cloud_service_type', 'cloud_service_type', idx)
-            .addJoinGroupKey('cloud_service_group', 'cloud_service_group', idx)
-            .addJoinGroupKey('provider', 'provider', idx)
-            .addJoinGroupField(name, STAT_OPERATORS.count);
-
-        const api = fluentApi.statisticsTest().resource().stat()
+        const newResourceCountName = 'yesterday_cloud_service_count';
+        const metricAPI = fluentApi.statisticsTest().resource().stat()
             .setResourceType('inventory.CloudServiceType')
-            .addGroupKey('provider', 'provider')
+
             .addGroupKey('name', 'cloud_service_type')
+            .addGroupKey('cloud_service_type_id', 'cloud_service_type_id')
             .addGroupKey('group', 'cloud_service_group')
-            .addGroupKey('tags.spaceone:icon', 'icon')
+            .addGroupKey('provider', 'provider')
 
-            .setJoinResourceType('inventory.Server')
-            .addJoinKey('project_id')
-            .addJoinGroupKey('project_id', 'project_id')
-            .addJoinGroupField('servers', STAT_OPERATORS.count)
+            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'], 0)
+            .setJoinResourceType('inventory.CloudService', 0)
+            .addJoinGroupKey('cloud_service_type', 'cloud_service_type', 0)
+            .addJoinGroupKey('cloud_service_group', 'cloud_service_group', 0)
+            .addJoinGroupKey('provider', 'provider', 0)
+            .addJoinGroupField(totalResourceCountName, STAT_OPERATORS.count, undefined, 0)
+
+            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'], 1)
             .setJoinResourceType('inventory.CloudService', 1)
-            .addJoinKey('project_id', 1)
-            .addJoinGroupKey('project_id', 'project_id', 1)
-            .addJoinGroupField('cloud_services', STAT_OPERATORS.count, undefined, 1)
-            .addFormula('total', 'cloud_services + servers')
-            .setSort('cloud_service_count')
-            .setLimit(5);
+            .addJoinGroupKey('cloud_service_type', 'cloud_service_type', 1)
+            .addJoinGroupKey('cloud_service_group', 'cloud_service_group', 1)
+            .addJoinGroupKey('provider', 'provider', 1)
+            .addJoinGroupField(newResourceCountName, STAT_OPERATORS.count, undefined, 1)
+            .setJoinFilter([{ key: 'created_at', value: 'now/d', operator: 'td_gte' }], 1);
 
-        const metricAPI = fluentApi.inventory().cloudService().list().setCountOnly();
-        const createdData = reactive({});
-        const todayCreated = ref(createdData);
+        const statData = ref<null|any>(null);
         const getMetric = (resp: AxiosResponse<CloudServiceTypeListResp>) => {
             const ids = resp.data.results.map(item => item.cloud_service_type_id);
-            todayCreated.value = reactive(_.zipObject(ids));
-            resp.data.results.forEach((item) => {
-                const id = item.cloud_service_type_id;
-                const setMetric = (count) => {
-                    todayCreated.value[id] = count;
-                };
-                metricAPI.setFilter(
-                    { key: 'provider', operator: '=', value: item.provider },
-                    { key: 'cloud_service_group', operator: '=', value: item.group },
-                    { key: 'cloud_service_type', operator: '=', value: item.name },
-                    { key: 'created_at', operator: 'td_lt', value: 'now' },
-                    { key: 'created_at', operator: 'td_gt', value: 'now/d-1d' },
-                ).execute().then((rp) => {
-                    if (rp.data.total_count) {
-                        setMetric(rp.data.total_count);
-                    }
+            statData.value = null;
+            metricAPI.setFilter(
+                { key: 'cloud_service_type_id', operator: 'in', value: ids },
+            ).execute().then((rp) => {
+                console.debug(rp);
+                const data = {};
+                rp.data.results.forEach((item) => {
+                    data[item.cloud_service_type_id] = item;
                 });
+                statData.value = data;
             });
             return resp;
         };
 
         const listAction = fluentApi.inventory().cloudServiceType().list()
-            .setOnly('provider', 'group', 'name', 'tags.icon', 'cloud_service_type_id')
-            .setTransformer(getMetric)
-            .setCloudServiceCount();
+            .setOnly('provider', 'group', 'name', 'tags.spaceone:icon', 'cloud_service_type_id')
+            .setTransformer(getMetric);
 
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
@@ -280,6 +270,7 @@ export default {
                 },
             },
         );
+        const getData = _.debounce(() => apiHandler.getData(), 50);
         watch(selectProvider, (after, before) => {
             if (after && after !== before) {
                 if (after === 'all') {
@@ -290,7 +281,7 @@ export default {
                     );
                 }
                 apiHandler.resetAll();
-                apiHandler.getData();
+                getData();
             }
         });
         const clickCard = (item) => {
@@ -316,10 +307,12 @@ export default {
             apiHandler,
             clickCard,
             providerStore,
-            todayCreated,
+            statData,
             providerListState,
             providerTotalCount,
             exportToolSet,
+            newResourceCountName,
+            totalResourceCountName,
         };
     },
 
