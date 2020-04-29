@@ -91,6 +91,12 @@ export const OPERATOR_MAP = Object.freeze({
     td_gt: 'timedelta_gt',
     td_lte: 'timedelta_lte',
     td_gte: 'timedelta_gte',
+    in: 'in', // merge operator
+    not_in: 'not_in', // merge operator
+    contain_in: 'contain_in', // merge operator
+    not_contain: 'not_contain', // merge operator
+    eq: 'in', // merge operator
+    not_eq: 'not_in', // merge operator
     '=': 'in', // merge operator
     '!=': 'not_in', // merge operator
     $: 'regex',
