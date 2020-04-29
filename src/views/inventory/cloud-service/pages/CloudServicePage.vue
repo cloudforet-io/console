@@ -46,10 +46,12 @@
         </p-horizontal-layout>
         <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
             <template #detail>
-                <!--                <SDynamicSubData-->
-                <!--                    :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"-->
-                <!--                    :data="apiHandler.tableTS.selectState.firstSelectItem"-->
-                <!--                />-->
+                <SDynamicSubData
+                    :layouts="mergeLayouts"
+                    :resource-api="resourceApi"
+                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id||''"
+                    :is-show="subDataIsShow"
+                />
             </template>
 
             <template #tag>
@@ -119,7 +121,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
+    reactive, toRefs, ref, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -127,8 +129,6 @@ import { makeTrItems } from '@/lib/view-helper';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
     defaultAdminLayout, defaultHistoryLayout,
@@ -138,26 +138,29 @@ import {
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi } from '@/lib/fluent-api';
-import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
-import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
-import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
+import baseTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import baseInfoSchema from '@/metadata-schema/view/inventory/cloud_service/sub_data/layouts/base_info.json';
+import _ from 'lodash';
 
+const rawLayout = {
+    name: 'Raw Data',
+    type: 'raw',
 
+};
 export default {
     name: 'CloudServicePage',
     filters: {
@@ -172,14 +175,11 @@ export default {
         PTab,
         SDynamicSubData,
         STagsPanel,
-        PRawData,
         PDropdownMenuBtn,
         // PTableCheckModal,
-        PDynamicDetails,
         PEmpty,
         SProjectTreeModal,
         SCollectModal,
-        PPanelTop,
         SMonitoring,
     },
     props: {
@@ -195,20 +195,25 @@ export default {
             type: String,
             required: true,
         },
-
-
     },
     setup(props, context) {
         const vm = getCurrentInstance();
 
+        const filedMap = {
+            project_id: {
+                key: 'console_force_data.project',
+                type: 'text',
+                name: 'Project',
+            },
+        };
+
         const state = reactive({
-            originDataSource: [],
-            fields: computed(() => [
-                ...state.originDataSource,
-                {
-                    name: 'project', key: 'console_force_data.project', type: 'text',
-                },
+            originFields: [],
+            mergeFields: computed(() => [
+                ...state.originFields,
+                ...baseTable.options.fields,
             ]),
+            fields: computed(() => state.mergeFields.map(field => filedMap[field.key] || field)),
             options: computed(() => ({
                 fields: state.fields,
             })),
@@ -219,6 +224,7 @@ export default {
             //     },
             // ]),
         });
+
         const singleItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
@@ -256,18 +262,20 @@ export default {
                 { key: 'cloud_service_type', operator: '=', value: props.name },
             );
 
-        const getDataSource = async (provider, group, name) => {
+        const getFields = async (provider, group, name) => {
             const resp = await fluentApi.inventory().cloudServiceType().list().setFilter(
                 { key: 'provider', operator: '=', value: provider },
                 { key: 'group', operator: '=', value: group },
                 { key: 'name', operator: '=', value: name },
             )
+                .setOnly('metadata.view.table.layout.options.fields')
                 .execute();
             if (resp.data.total_count !== 1) {
                 context.$router.push({ name: 'error' });
             }
-            // state.originDataSource = resp.data.results[0].data_source;
+            state.originFields = resp.data.results[0].metadata?.view?.table?.layout?.options?.fields || [];
         };
+        getFields(props.provider, props.group, props.name);
         const apiHandler = new QuerySearchTableFluentAPI(csListAction, {
             shadow: true,
             border: true,
@@ -285,7 +293,7 @@ export default {
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
-                await getDataSource(after[0], after[1], after[2]);
+                await getFields(after[0], after[1], after[2]);
                 apiHandler.action = csListAction.setFixFilter(
                     { key: 'provider', operator: '', value: after[0] },
                     { key: 'cloud_service_group', operator: '=', value: after[1] },
@@ -293,6 +301,7 @@ export default {
                 );
                 await apiHandler.getData();
                 console.debug(state.exportDataSource);
+                await getFields(after[0], after[1], after[2]);
                 // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
@@ -376,10 +385,56 @@ export default {
         const historyApi = computed<DynamicLayoutApiProp>(() => {
             const selectIdForHistory = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
             return {
-                resource: fluentApi.inventory().server(),
+                resource: fluentApi.inventory().cloudService(),
                 getAction: (act: any) => act.setId(selectIdForHistory),
 
             };
+        });
+
+        const cache = {};
+        const dynamicLayoutState = reactive({
+            layouts: [],
+            resourceApi: fluentApi.inventory().cloudService(),
+            mergeLayouts: computed(() => (dynamicLayoutState.layouts ? [baseInfoSchema, ...dynamicLayoutState.layouts, rawLayout] : [baseInfoSchema, rawLayout])),
+        });
+
+
+        const getLayoutsFunc = async () => {
+            dynamicLayoutState.layouts = null;
+            const selectId = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
+            let layouts;
+            if (cache[selectId]) {
+                console.debug(selectId, ' hit cache layout');
+                layouts = cache[selectId];
+            } else {
+                const resp = await fluentApi.inventory().cloudService().get().setId(selectId)
+                    .setOnly('metadata.view.sub_data.layouts')
+                    .execute();
+                layouts = _.get(resp.data, 'metadata.view.sub_data.layouts', []);
+                cache[selectId] = layouts;
+            }
+            console.debug(layouts);
+            dynamicLayoutState.layouts = layouts;
+        };
+        const getLayouts = _.debounce(getLayoutsFunc, 50);
+        const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem?.cloud_service_id);
+        const subDataIsShow = computed(() => singleItemTab.syncState.activeTab === 'detail');
+        let watchStop = null as unknown as any;
+        watch(subDataIsShow, (aft, bef) => {
+            if (aft !== bef) {
+                if (aft) {
+                    getLayouts();
+                    watchStop = watch(selectId, (af, be) => {
+                        if (af && af !== be) {
+                            getLayouts();
+                        }
+                    });
+                } else if (watchStop) {
+                    watchStop();
+                    dynamicLayoutState.layouts = null;
+                    watchStop = null;
+                }
+            }
         });
 
 
@@ -391,6 +446,8 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(dynamicLayoutState),
+            subDataIsShow,
             apiHandler,
             csDropdownMenu,
             projectModalVisible,

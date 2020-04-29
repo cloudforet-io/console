@@ -14,6 +14,7 @@ interface IdParameter {
     [idField]: string;
 }
 export interface CloudServiceTypeModel extends IdParameter, Tags {
+    metadata: any;
     provider: string;
     group: string;
     name: string;
