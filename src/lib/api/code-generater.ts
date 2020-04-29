@@ -142,7 +142,7 @@ const addJoinGroupFieldParser = (fields: GroupFieldsItem[], idx: number) => {
         if (f.key) {
             raw = `${JSON.stringify(f.name)},${JSON.stringify(f.operator)},${JSON.stringify(f.key)}`;
         } else {
-            raw = `${JSON.stringify(f.name)},${JSON.stringify(f.operator)}}`;
+            raw = `${JSON.stringify(f.name)},${JSON.stringify(f.operator)}`;
         }
         return makeIndexMethod('addJoinGroupField', idx, undefined, raw);
     });
@@ -157,7 +157,7 @@ const makeFilters = (filters: FilterItem[]) => filters.map((i) => {
 
 const setJoinFilterParser = (filters: FilterItem[], idx: number, method = 'setJoinFilter'): string => {
     const codes = makeFilters(filters);
-    return makeIndexMethod(method, idx, undefined, codes.join(','));
+    return makeIndexMethod(method, idx, undefined, `[${codes.join(',')}]`);
 };
 
 const joinParser = (joinQuery: any[]): string => {

@@ -3,7 +3,7 @@
         <p-panel-top
             v-if="showTitle"
             :use-total-count="true"
-            :total-count="items.length"
+            :total-count="items? items.length:0"
         >
             {{ name }}
         </p-panel-top>

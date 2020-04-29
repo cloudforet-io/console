@@ -7,7 +7,7 @@
                     :toolset="apiHandler"
                     :vbind="{
                         responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
-                        showTitle:false
+                        showTitle:false,
                     }"
                 >
                     <template #toolbox-left>
