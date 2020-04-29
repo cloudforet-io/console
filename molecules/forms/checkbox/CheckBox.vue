@@ -1,19 +1,22 @@
 <template>
     <span class="p-checkbox"
-          @mouseenter="onMouseover(true)"
-          @mouseleave="onMouseover(false)"
+          @mouseenter="mouseover=true"
+          @mouseleave="mouseover=false"
           @click.stop.prevent="onClick"
     >
         <input type="checkbox">
         <p-i class="check-icon" width="1.25rem" height="1.25rem"
-             v-bind="checkBoxBind"
+             :name="checkBoxBind"
         />
     </span>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
+import {
+    computed, reactive, ref, toRefs,
+} from '@vue/composition-api';
 
 export default {
     name: 'PCheckBox',
@@ -30,50 +33,44 @@ export default {
             default: false,
         },
     },
-    data() {
-        return {
+    setup(props, context) {
+        const state = reactive({
             mouseover: false,
+            isSelected: computed(() => {
+                if (typeof props.selected === 'boolean') {
+                    return props.selected;
+                }
+                return _.indexOf(props.selected, props.value) !== -1;
+            }),
+            checkBoxBind: computed(() => {
+                let name = 'ic_checkbox';
+                if (state.isSelected) {
+                    name = 'ic_checkbox--checked';
+                } else if (props.hovered || props.mouseover) {
+                    name = 'ic_checkbox--hover';
+                }
+                return name;
+            }),
+        });
+        const onClick = () => {
+            if (typeof props.selected === 'boolean') {
+                context.emit('change', !props.selected);
+            } else {
+                const newResult = [...props.selected];
+                if (state.isSelected) {
+                    _.pull(newResult, props.value);
+                } else { newResult.push(props.value); }
+                context.emit('change', newResult, state.isSelected);
+            }
+        };
+        return {
+            ...toRefs(state),
+            onClick,
+
         };
     },
-    computed: {
-        isSelected() {
-            if (typeof this.selected === 'boolean') {
-                return this.selected;
-            }
-            return _.indexOf(this.selected, this.value) !== -1;
-        },
-        checkBoxBind() {
-            let name = 'ic_checkbox';
-            let color;
-            let fill;
-            if (this.isSelected) {
-                name += '--checked';
-            } else if (this.hovered || this.mouseover) {
-                color = 'transparent inherit';
-                fill = false;
-            }
-            return {
-                name,
-                color,
-                fill,
-            };
-        },
-    },
     methods: {
-        onClick() {
-            if (typeof this.selected === 'boolean') {
-                this.$emit('change', !this.selected);
-                return;
-            }
-            const newResult = [...this.selected];
-            if (this.isSelected) {
-                _.pull(newResult, this.value);
-            } else { newResult.push(this.value); }
-            this.$emit('change', newResult, this.isSelected);
-        },
-        onMouseover(value) {
-            this.mouseover = value;
-        },
+
     },
 };
 </script>
