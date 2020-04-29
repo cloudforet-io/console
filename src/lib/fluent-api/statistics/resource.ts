@@ -38,6 +38,7 @@ export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<
             filter: [],
             filterOr: [],
             fixFilter: [],
+            fixFilterOr: [],
             extraParameter: {
                 joinState: [],
             },
