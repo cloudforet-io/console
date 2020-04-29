@@ -40,8 +40,15 @@ export default {
         },
     },
     setup(props: JsonSchemaFormProps, context) {
+        let buffer = {};
+        const emitData = _.debounce(() => {
+            context.emit('update:item', { ...props.item, ...buffer });
+            buffer = {};
+        }, 30);
+
         const updateData = (key, val) => {
-            context.emit('update:item', { ...props.item, [key]: val });
+            buffer[key] = val;
+            emitData();
         };
 
         return {
