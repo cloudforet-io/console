@@ -153,17 +153,13 @@ export default {
                     }).setResourceType('inventory.CloudService');
             },
             getCloudService(apiAction: Stat<any>) {
-                return apiAction.setFilter({
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                })
+                return apiAction
+                    .setJoinType('INNER')
                     .setJoinFilter([{
                         key: 'project_id',
                         value: projectId.value,
                         operator: '=',
                     }])
-                    .setResourceType('inventory.CloudService');
             },
         };
     },
