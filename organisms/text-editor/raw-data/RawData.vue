@@ -26,6 +26,10 @@ export default defineComponent({
             type: Object,
             default: () => ({}),
         },
+        raw: {
+            type: String,
+            default: null,
+        },
     },
     setup(props) {
         const monaco: Ref<MEComponent|null> = ref(null);
@@ -40,7 +44,7 @@ export default defineComponent({
 
         return {
             monaco,
-            code: computed(() => JSON.stringify(props.item, undefined, 4)),
+            code: computed(() => props.raw || JSON.stringify(props.item, undefined, 4)),
         };
     },
 
