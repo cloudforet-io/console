@@ -9,7 +9,8 @@ export interface LongFilterType {
     operator: string;
 }
 
-type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|'td_lt'|'td_gt';
+type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|
+    'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq'|'sum';
 
 export interface FilterItem extends LongFilterType {
     key: string;
@@ -127,6 +128,10 @@ export interface TimeStamp {
 export interface ListType<T> {
     results: T[];
     total_count: number;
+}
+
+export interface LogListType<T> {
+    logs: T[];
 }
 
 export interface ReferenceInfo {

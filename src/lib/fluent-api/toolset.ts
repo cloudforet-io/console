@@ -91,9 +91,16 @@ export const OPERATOR_MAP = Object.freeze({
     td_gt: 'timedelta_gt',
     td_lte: 'timedelta_lte',
     td_gte: 'timedelta_gte',
+    in: 'in', // merge operator
+    not_in: 'not_in', // merge operator
+    contain_in: 'contain_in', // merge operator
+    not_contain: 'not_contain', // merge operator
+    eq: 'in', // merge operator
+    not_eq: 'not_in', // merge operator
     '=': 'in', // merge operator
     '!=': 'not_in', // merge operator
     $: 'regex',
+    sum: 'sum',
 });
 const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
@@ -223,8 +230,8 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
             filterOr: [] as unknown as FilterItem[],
             fixFilterOr: [] as unknown as FilterItem[],
             only: [] as unknown as string[],
-            thisPage: 1,
-            pageSize: 15,
+            thisPage: 0,
+            pageSize: 0,
             sortBy: '',
             sortDesc: true,
             keyword: '',
@@ -236,7 +243,7 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
 
     protected query = (): Query => {
         const query: Query = {};
-        if (this.apiState.thisPage !== 0) {
+        if (this.apiState.thisPage !== 0 && this.apiState.pageSize !== 0) {
             query.page = {
                 start: ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1,
                 limit: this.apiState.pageSize,

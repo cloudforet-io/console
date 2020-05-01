@@ -71,10 +71,10 @@ export default defineComponent({
         scroll-snap-type: x mandatory;
         display: flex;
         justify-content: flex-start ;
-        -ms-overflow-style: none; /* scroll hide in IE */
-        &::-webkit-scrollbar {
-            display: none !important; /* scroll hide in window,chrome */
-        }
+        /*-ms-overflow-style: none; !* scroll hide in IE *!*/
+        /*&::-webkit-scrollbar {*/
+        /*    display: none !important; !* scroll hide in window,chrome *!*/
+        /*}*/
 
         .select-btn{
             margin-right: 0.5rem;

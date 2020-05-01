@@ -93,6 +93,7 @@
                             />
                         </div>
                         <div v-show="!hasChildProject" class="empty-project">
+                            <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
                             <p>Looks like you don't have any Project.</p>
                         </div>
                     </template>
@@ -146,7 +147,7 @@
                 </p-toolbox-grid-layout>
             </div>
             <div v-else class="empty">
-                <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
+                <img class="w-40 mx-auto mb-4 pt-8" src="@/assets/images/illust_astronaut_walking.svg">
                 <div class="empty-project-grp">
                     <p class="title">
                         Let's begin your <br>
@@ -718,8 +719,7 @@ export default {
     }
 
     .empty-project {
-        text-align: center;
-        padding-top: 11.2rem;
+        @apply text-gray-300 text-center;
         font-size: 1rem;
     }
 
