@@ -157,7 +157,7 @@ export default {
         } = useStore();
         const providerStore: ProviderStoreType = provider;
         providerStore.getProvider();
-        const providerTotalCount = ref<any>(null);
+        const providerTotalCount = ref<any>({ all: 0 });
         const cstCountName = 'cloud_service_type_count';
         const cstCountApi = fluentApi.statisticsTest().resource().stat()
             .setResourceType('inventory.CloudServiceType')

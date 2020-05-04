@@ -17,6 +17,7 @@
 import { Fragment } from 'vue-fragment';
 import { JsonSchemaFormProps, JsonSchemaProperty } from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaFieldGroup from '@/components/organisms/forms/json-schema-field-group/JsonSchemaFieldGroup.vue';
+import _ from 'lodash';
 
 export default {
     name: 'PJsonSchemaForm',
