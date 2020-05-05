@@ -11,18 +11,28 @@
                 label="Tags"
             >
                 <p-dict-input-group
-                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"
                     v-bind="tagsTS.state"
                     :items.sync="tagsTS.syncState.items"
+                    :show-header="true"
                     v-on="tagsTS.events"
-                />
+                >
+                    <template #addButton="scope">
+                        <p-icon-text-button
+                            outline style-type="primary" :disabled="scope.disabled"
+                            name="ic_plus_bold"
+                            @click="scope.addPair($event)"
+                        >
+                            {{ $t('BTN.ADD_TAG') }}
+                        </p-icon-text-button>
+                    </template>
+                </p-dict-input-group>
             </PFieldGroup>
         </p-pane-layout>
         <div class="buttons">
-            <p-button outline style-type="primary-dark" @click="goBack">
+            <p-button outline style-type="primary-dark" @click="onCancel">
                 {{ $t('BTN.CANCEL') }}
             </p-button>
-            <p-button style-type="primary" @click="onSave">
+            <p-button style-type="primary" @click="confirm">
                 {{ $t('BTN.SAVE') }}
             </p-button>
         </div>
@@ -44,13 +54,16 @@ import {
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
-import { watch } from '@vue/composition-api';
+import {
+    getCurrentInstance, onMounted, reactive, watch,
+} from '@vue/composition-api';
 import { AxiosResponse } from 'axios';
 import Ajv from 'ajv';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'SSecretCreateFormModal',
@@ -61,6 +74,8 @@ export default {
         PJsonSchemaForm,
         PPaneLayout,
         GeneralPageLayout,
+        PIconTextButton,
+
         PButton,
     },
     directives: {
@@ -80,7 +95,12 @@ export default {
         const tagsTS = new DictIGToolSet({
             showValidation: true,
         });
+        const vm = getCurrentInstance();
         const fixFormTS = new JsonSchemaFormToolSet();
+        const state = reactive({
+            schemaNames: [] as string[],
+            formSchema: {},
+        });
 
         const checkNameUnique = (...args: any[]) => fluentApi.secret().secret().list()
             .setFilter({ key: 'name', operator: '=', value: args[1] })
@@ -95,13 +115,14 @@ export default {
         const makeFixSchema = () => {
             const sch = new JsonSchemaObjectType(undefined, undefined, true);
             sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true });
-            sch.addEnumProperty('schemaName', 'Secret Type', props.schemaNames, true, { default: props.schemaNames[0] });
+            sch.addEnumProperty('schemaName', 'Secret Type', state.schemaNames, true, { default: state.schemaNames[0] });
             return sch;
         };
-        watch(() => props.schemaNames, (after, before) => {
+        watch(() => state.schemaNames, (after, before) => {
             if (after !== before) {
                 const sch = makeFixSchema();
                 fixFormTS.setProperty(sch, ['name', 'schemaName'], validation);
+                fixFormTS.syncState.item.schemaName = state.schemaNames[0];
             }
         });
 
@@ -114,14 +135,27 @@ export default {
                 jscTS.setProperty(resp.data.schema);
             }
         };
-        getSchema(props.schemaNames[0]);
 
         watch(() => fixFormTS.syncState.item, async (after, before) => {
             if (after.schemaName && after.schemaName !== before.schemaName) {
                 await getSchema(after.schemaName);
             }
         });
-
+        onMounted(async () => {
+            const resp = await fluentApi.identity().provider().get().setId(props.provider)
+                .setOnly('template.service_account.schema', 'capability.supported_schema')
+                .execute();
+            state.formSchema = resp.data.template.service_account.schema;
+            state.schemaNames = resp.data.capability.supported_schema;
+        });
+        const onCancel = () => {
+            const nextPath = vm?.$route.query.nextPath as string|undefined;
+            if (nextPath) {
+                vm?.$router.push(nextPath);
+            } else {
+                vm?.$router.back();
+            }
+        };
 
         const confirm = async () => {
             const fixFormValid = await fixFormTS.formState.validator();
@@ -137,11 +171,11 @@ export default {
         };
 
         return {
-            proxyVisible: makeProxy('visible', props, context.emit),
             tagsTS,
             jscTS,
             fixFormTS,
             confirm,
+            onCancel,
         };
     },
 };
