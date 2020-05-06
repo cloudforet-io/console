@@ -2,7 +2,7 @@ import {
     SChart, SettingsInterface, tooltips,
 } from '@/lib/chart/s-chart';
 import { Chart } from 'chart.js';
-import { black, white } from '@/styles/colors';
+import { black, white, gray } from '@/styles/colors';
 import _ from 'lodash';
 
 interface SPieChartInterface {
@@ -10,6 +10,7 @@ interface SPieChartInterface {
     showEmptyShape: boolean;
     setShowTotalCount: (...args) => SPieChartInterface;
     setShowEmptyShape: (...args) => SPieChartInterface;
+    setDefaultCount: (...args) => SPieChartInterface;
 }
 
 const pieChartSettings: SettingsInterface = {
@@ -87,6 +88,8 @@ export class SPieChart extends SChart implements SPieChartInterface {
 
     isNoData: boolean | undefined;
 
+    defaultCount = 1;
+
     constructor(canvas: HTMLCanvasElement, config: Chart.ChartConfiguration = {}) {
         super(canvas, SPieChart.initConfig('pie', pieChartSettings, config));
         this.metaDatasets = { ...this.metaDatasets, ...pieChartSettings.metaDatasets };
@@ -104,6 +107,11 @@ export class SPieChart extends SChart implements SPieChartInterface {
         return this;
     }
 
+    setDefaultCount(count: number): this {
+        this.defaultCount = count;
+        return this;
+    }
+
     protected setEmptyDatasets(): void {
         if (this.isNoData) {
             // disable tooltips
@@ -111,6 +119,7 @@ export class SPieChart extends SChart implements SPieChartInterface {
             else this.options.tooltips = { enabled: false };
 
             // datasets update
+            // eslint-disable-next-line no-unused-expressions
             this.data?.datasets?.forEach((ds, i, origin) => {
                 if (ds.data) origin[i].data = new Array(ds.data.length).fill(1);
             });
@@ -120,6 +129,13 @@ export class SPieChart extends SChart implements SPieChartInterface {
     apply(): this {
         this.data.datasets = this.data.datasets?.map((ds, i) => ({ ...ds, ...this.metaDatasets }));
         this.isNoData = this.data?.datasets?.every(ds => (ds.data ? ds.data.every(d => d === 0) : true));
+        if (this.isNoData) {
+            // eslint-disable-next-line no-unused-expressions
+            this.data.datasets?.forEach((ds, i, origin) => {
+                origin[i].data = _.range(this.defaultCount).fill(1);
+            });
+        }
+
         if (this.showEmptyShape) this.setEmptyDatasets();
         this.update();
         return this;

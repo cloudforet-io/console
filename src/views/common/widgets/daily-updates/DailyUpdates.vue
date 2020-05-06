@@ -181,7 +181,6 @@ export default defineComponent({
 
         setTimeout(() => {
             getData();
-            console.log(vm.$el);
         }, 1000);
 
         return {

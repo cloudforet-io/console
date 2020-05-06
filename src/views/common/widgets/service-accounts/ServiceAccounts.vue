@@ -116,6 +116,7 @@ export default defineComponent({
             chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
                 .setLabels(_.map(ts.state.data, d => d.name))
                 .setColors(_.map(ts.state.data, d => d.color))
+                .setDefaultCount(4)
                 .apply(), {
                 loaderRef: null,
                 data: [],
