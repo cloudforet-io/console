@@ -43,7 +43,9 @@ import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummar
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
-import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import { ServiceSummaryWidgetState, Value } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import { HistoryDiff } from '@/lib/fluent-api/statistics/history';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
 export default defineComponent({
     name: 'Dashboard',
@@ -61,21 +63,27 @@ export default defineComponent({
             title: 'projects',
             to: '/project',
             color: blue[600],
-            getAction: (api: Stat<any>) => api.setResourceType('identity.Project'),
+            getAction: api => api.setResourceType('identity.Project'),
+            getTrendAction: api => api.setTopic('daily_project_count')
+                .addGroupField('count', STAT_OPERATORS.sum, 'values.project_count'),
         });
 
         const servers = new ServiceSummaryWidgetState({
             title: 'servers',
             to: '/inventory/server',
             color: secondary,
-            getAction: (api: Stat<any>) => api.setResourceType('identity.Project'),
+            getAction: api => api.setResourceType('identity.Project'),
+            getTrendAction: api => api.setTopic('daily_server_count')
+                .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
         });
 
         const cloudServices = new ServiceSummaryWidgetState({
             title: 'cloud services',
             to: '/inventory/cloud-service',
             color: secondary1,
-            getAction: (api: Stat<any>) => api.setResourceType('identity.Project'),
+            getAction: api => api.setResourceType('identity.Project'),
+            getTrendAction: api => api.setTopic('daily_cloud_service_count')
+                .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });
 
         return {
