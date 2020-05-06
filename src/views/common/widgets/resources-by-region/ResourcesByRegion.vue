@@ -46,12 +46,12 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed,
-        defineComponent, getCurrentInstance, Ref, toRefs, watch,
-    } from '@vue/composition-api';
+import {
+    computed,
+    defineComponent, getCurrentInstance, Ref, toRefs, watch,
+} from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
@@ -120,6 +120,7 @@ export default defineComponent({
             const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
                 chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
                     .setLabels(_.map(ts.state.data, d => d.name))
+                    .setDefaultCount(4)
                     .setColors(colors)
                     .apply(), {
                     loaderRef: null,

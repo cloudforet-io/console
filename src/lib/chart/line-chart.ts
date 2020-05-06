@@ -9,6 +9,7 @@ import Color from 'color';
 interface SLineChartInterface extends SChartInterface {
     setGradientHeight: (...args) => SLineChartInterface;
     setBorderWidth: (...args) => SLineChartInterface;
+    setPointRadius: (...args) => SLineChartInterface;
     setFill: (...args) => SLineChartInterface;
     setMin: (...args) => SLineChartInterface;
     setMax: (...args) => SLineChartInterface;
@@ -40,8 +41,9 @@ export const lineChartSettings: SettingsInterface = {
                     display: false,
                 },
                 ticks: {
-                    min: -20,
-                    suggestedMax: 80,
+                    // min: -20,
+                    // suggestedMax: 80,
+                    // suggestedMin: 0,
                     display: false,
                 },
             }],
@@ -142,6 +144,11 @@ export class SLineChart extends SChart implements SLineChartInterface {
 
      setLineTension(tension: number): this {
          this.metaDatasets.lineTension = tension;
+         return this;
+     }
+
+     setPointRadius(radius: number): this {
+         this.metaDatasets.pointRadius = radius;
          return this;
      }
 

@@ -42,7 +42,7 @@ export type CollectorListResp = ListType<CollectorModel>
 interface CreateParameter extends Tags {
     name: string;
 }
-interface UpdateParameter extends Tags, IdParameter {
+export interface CollectorUpdateParameter extends Tags, IdParameter {
     name?: string;
     plugin_info?: CollectorPluginModel;
     priority?: number;
@@ -58,14 +58,20 @@ interface CollectParameter extends IdParameter {
 
 class Create extends CreateAction<CreateParameter, any> {}
 
-class Update extends UpdateAction<UpdateParameter, any> {
+class Update extends UpdateAction<CollectorUpdateParameter, any> {
     idField = idField;
 
-    // setParameter(parameter: UpdateParameter): this {
-    //     const api = this.clone();
-    //     api.apiState.parameter = parameter;
-    //     return api;
-    // }
+    setParameter(parameter: CollectorUpdateParameter): this {
+        const api = this.clone();
+        api.apiState.parameter = parameter;
+        return api;
+    }
+
+    setId(id: string): this {
+        const api = this.clone();
+        api.apiState.parameter[idField] = id;
+        return api;
+    }
 }
 
 class Delete extends SingleDeleteAction<IdParameter, any> {

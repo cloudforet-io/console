@@ -1,15 +1,15 @@
 <template>
     <div>
         <p-data-table
-            :items="schema"
+            :items="schemaItems"
             :fields="fields"
             :sortable="false"
             :selectable="false"
-            :loading="!(isLoadCount&&isLoadSchema)"
+            :loading="loading"
         >
             <template #col-count-format="{item}">
-                <div v-if="supportSchema.has(item.name)"
-                     :style="{color: colors.support,'font-weight':'bold'}"
+                <div v-if="supportedSchemaSet.has(item.name)"
+                     class="text-safe font-bold"
                 >
                     {{ countData[item.name] }}
                 </div>
@@ -18,8 +18,7 @@
                 </div>
             </template>
             <template #col-supported-format="{item}">
-                <div v-if="supportSchema.has(item.name)">
-                    <!--                    {{ supportSchema.has(item.name) }}-->
+                <div v-if="supportedSchemaSet.has(item.name)">
                     <p-i name="ic_state_active"
                          width="1.5rem"
                          height="1.5rem"
@@ -34,10 +33,9 @@
 import { makeTrItems } from '@/lib/view-helper';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { reactive, toRefs } from '@vue/composition-api';
 import {
-    safe,
-} from '@/styles/colors';
+    computed, onMounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
@@ -47,52 +45,57 @@ export default {
         PI,
     },
     props: {
-        items: Array,
         provider: String,
     },
     setup(props, context) {
         const state = reactive({
-            supportSchema: new Set(props.items),
-            schema: [] as any[],
-            isLoadSchema: false,
-            isLoadCount: true,
+            supportedSchemaSet: new Set(),
+            schemaItems: [] as any[],
+            loading: true,
             countData: {
                 // eslint-disable-next-line camelcase
                 aws_access_key: 32,
             },
-            supportedData: {
-                // eslint-disable-next-line camelcase
-                aws_access_key: 'no',
-            },
-            colors: {
-                support: safe,
-            },
+            fields: computed(() => makeTrItems([
+                ['name', 'COMMON.CREDENTIALS'],
+                ['count', 'COMMON.COUNT'],
+                ['supported', 'FIELD.SUPPORTED'],
+            ], context.parent)),
         });
 
-        const fields = makeTrItems([
-            ['name', 'COMMON.CREDENTIALS'],
-            ['count', 'COMMON.COUNT'],
-            ['supported', 'FIELD.SUPPORTED'],
-        ], context.parent);
 
-        const getProviderSchemaList = async () => {
-            await fluentApi.identity().provider().get().setId(props.provider)
-                .execute()
-                .then((res) => {
-                    state.schema = res.data.capability.supported_schema.map(name => ({ name }));
-                    state.isLoadSchema = true;
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
+        const providerApi = fluentApi.identity().provider();
+        const secretApi = fluentApi.secret().secret();
+
+        const listCredentials = async () => {
+            try {
+                const res = await secretApi.list().setProvider(props.provider).execute();
+                state.supportedSchemaSet = new Set(res.data.results.map(item => item.schema));
+            } catch (e) {
+                console.error(e);
+            }
         };
 
-        getProviderSchemaList();
+        const getProviderSchemaList = async () => {
+            try {
+                const res = await providerApi.get().setId(props.provider).execute();
+                state.schemaItems = res.data.capability.supported_schema.map(name => ({ name }));
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        watch(() => props.provider, async (val) => {
+            if (val) {
+                state.loading = true;
+                await listCredentials();
+                await getProviderSchemaList();
+                state.loading = false;
+            }
+        });
 
         return {
             ...toRefs(state),
-            fields,
-            getProviderSchemaList,
         };
     },
 };

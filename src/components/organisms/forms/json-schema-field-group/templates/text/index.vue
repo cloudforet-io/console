@@ -50,6 +50,9 @@ export default defineComponent({
         }
         return {
             proxyValue,
+            numberFilter(val) {
+                return props.schema.type === 'integer' ? Math.floor(val) : val;
+            },
         };
     },
 });

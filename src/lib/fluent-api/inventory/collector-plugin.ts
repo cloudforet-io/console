@@ -16,6 +16,7 @@ interface FilterFormat {
 export interface PluginOptions {
     supported_resource_type: string[];
     filter_format: FilterFormat[];
+    [key: string]: any;
 }
 
 

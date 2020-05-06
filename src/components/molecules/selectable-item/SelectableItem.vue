@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { selectableItemProps, SelectableItemPropsType } from '@/components/molecules/selectable-item/SelectableItem.toolset';
-import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default defineComponent({

@@ -5,7 +5,9 @@
         :menu="items"
         :auto-height="autoHeight"
         :disabled="disabled"
+        :loading="loading"
         @clickMenuEvent="changSelectItem"
+        @openMenu="$emit('openMenu')"
     >
         {{ selectItemLabel }}
     </PDropdownMenuBtn>
@@ -37,6 +39,10 @@ export default {
             default: false,
         },
         disabled: {
+            type: Boolean,
+            default: false,
+        },
+        loading: {
             type: Boolean,
             default: false,
         },

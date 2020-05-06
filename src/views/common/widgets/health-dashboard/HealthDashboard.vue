@@ -71,7 +71,7 @@ import PSelectableItem from '@/components/molecules/selectable-item/SelectableIt
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 // import {
 //     DiffQueryAPI, DiffResponse, HistoryResponse, OPERATORS,
 // } from '@/lib/fluent-api/statistics/toolset_origin';

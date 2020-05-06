@@ -1,12 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
+			"CLICK_ADD_BTN_MSG": "",
+			"HELPMSG": "",
 			"INVALID": {
 				"KEY_DUPL": "",
 				"KEY_EMPTY": "",
 				"VAL_EMPTY": ""
 			}
 		},
+		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
 		"SELECTED_OF": "",
 		"TIMEZONE_OF": ""
@@ -316,7 +319,9 @@
 		"SCHEDULE": "",
 		"SELECT_ARG": "",
 		"TAB": {
-			"None": ""
+			"ADD_TAG": "",
+			"CONFIRM_CRD": "",
+			"CONF_COLLECTOR": ""
 		},
 		"UPT_COL": "",
 		"UPT_FAIL_ARG": "",
@@ -348,6 +353,7 @@
 		"RAWDATA": "",
 		"SCHEDULE": "",
 		"TAG": "",
+		"TAGS": "",
 		"VM": ""
 	},
 	"PLUGIN": {

@@ -264,6 +264,15 @@ export default {
                 { key: 'cloud_service_type', operator: '=', value: props.name },
             );
 
+
+        const apiHandler = new QuerySearchTableFluentAPI(csListAction, {
+            shadow: true,
+            border: true,
+            padding: true,
+            selectable: true,
+            dragable: true,
+            excelVisible: true,
+        });
         const getFields = async (provider, group, name) => {
             const resp = await fluentApi.inventory().cloudServiceType().list().setFilter(
                 { key: 'provider', operator: '=', value: provider },
@@ -276,16 +285,11 @@ export default {
                 context.$router.push({ name: 'error' });
             }
             state.originFields = resp.data.results[0].metadata?.view?.table?.layout?.options?.fields || [];
+            const keys = state.originFields.map(i => i.key);
+            apiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
+            apiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
         };
         getFields(props.provider, props.group, props.name);
-        const apiHandler = new QuerySearchTableFluentAPI(csListAction, {
-            shadow: true,
-            border: true,
-            padding: true,
-            selectable: true,
-            dragable: true,
-            excelVisible: true,
-        });
         // const exportAction = fluentApi.addons().excel().export();
         // const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
         // onMounted(async () => {
