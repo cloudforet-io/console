@@ -236,7 +236,7 @@ export default {
             const ids = resp.data.results.map(item => item.cloud_service_type_id);
             statData.value = null;
             metricAPI.setFilter(
-                { key: 'cloud_service_type_id', operator: 'in', value: ids },
+                { key: 'cloud_service_type_id', operator: '=', value: ids },
             ).execute().then((rp) => {
                 console.debug(rp);
                 const data = {};

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { Resource, ResourceActions } from '@/lib/fluent-api/toolset';
-import { StatAction, getInitJoinState } from '@/lib/fluent-api/statistics/toolset';
+import {getBaseQueryApiState, Resource, ResourceActions} from '@/lib/fluent-api/toolset';
+import {StatAction, getInitJoinState, getInitStatQueryState} from '@/lib/fluent-api/statistics/toolset';
 import {
     Aggregate,
     FormulaItem,
@@ -27,18 +27,7 @@ export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            aggregate: {
-                unwind: [],
-                group: {
-                    keys: [],
-                    fields: [],
-                },
-                count: undefined,
-            },
-            filter: [],
-            filterOr: [],
-            fixFilter: [],
-            fixFilterOr: [],
+            ...getInitStatQueryState(),
             extraParameter: {
                 joinState: [],
             },

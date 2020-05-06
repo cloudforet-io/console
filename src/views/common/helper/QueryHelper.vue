@@ -115,7 +115,7 @@ const testSample = `
                     {
                         "key": "created_at",
                         "value": "now/d",
-                        "operator": "timedelta_gte"
+                        "operator": "timediff_gte"
                     }
                 ],
                 "aggregate": {

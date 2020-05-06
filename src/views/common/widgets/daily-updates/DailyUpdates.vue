@@ -11,8 +11,8 @@
                 </div>
             </div>
             <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
-                <img :src="'./images/illust_no-update.svg'" class="mb-4 flex-shrink-0 ">
-                <img :src="'./images/illust_list.svg'" class="hidden lg:block">
+                <img :src="'./images/illust_no-update.svg'" class="no-data-img">
+                <!--                <img :src="'./images/illust_list.svg'" class="no-data-img hidden lg:block">-->
             </div>
             <p-grid-layout v-else :items="data"
                            row-gap="0.5rem" column-gap="0"
@@ -21,13 +21,13 @@
                            :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item :icon-url="iconUrl(item)" theme="card" @click="onItemClick(item, idx)">
+                    <p-selectable-item :icon-url="item.icon" theme="card" @click="onItemClick(item, idx)">
                         <template #contents>
-                            <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
+                            <div v-tooltip.bottom.start="{content: item.group, delay: {show: 500}}" class="group">
                                 {{ item.group }}
                             </div>
-                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
-                                {{ item.name }}
+                            <div v-tooltip.bottom.start="{content: item.type, delay: {show: 500}}" class="type">
+                                {{ item.type }}
                             </div>
                         </template>
                         <template #extra>
@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
@@ -55,12 +55,48 @@ import PSelectableItem from '@/components/molecules/selectable-item/SelectableIt
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import moment from 'moment';
-import { getTimestamp } from '@/lib/util';
-import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
-import casual, { arrayOf } from '@/lib/casual';
+import { ProviderStoreType, useStore } from '@/store/toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import _ from 'lodash';
+import { HistoryDiff } from '@/lib/fluent-api/statistics/history';
+
+
+interface CloudService {
+    // eslint-disable-next-line camelcase
+    cloud_service_group: string;
+    // eslint-disable-next-line camelcase
+    cloud_service_type: string;
+    // eslint-disable-next-line camelcase
+    cloud_service_count: number;
+    provider: string;
+    icon: string;
+}
+
+interface Server {
+    // eslint-disable-next-line camelcase
+    server_type: string;
+    // eslint-disable-next-line camelcase
+    server_count: number;
+}
+
+interface Data {
+    group: string;
+    type: string;
+    count: number;
+    icon?: string;
+}
+
+interface Props {
+    getServerAction: (api: HistoryDiff<Server>) => HistoryDiff<Server>;
+    getCloudServiceAction: (api: HistoryDiff<CloudService>) => HistoryDiff<CloudService>;
+}
+
+interface State {
+    serverData: Server[];
+    cloudServiceData: CloudService[];
+    data: Data[];
+    loading: boolean;
+    widgetRef: any;
+}
 
 export default defineComponent({
     name: 'DailyUpdates',
@@ -73,7 +109,17 @@ export default defineComponent({
         PSkeleton,
         PTooltipButton,
     },
-    setup() {
+    props: {
+        getServerAction: {
+            type: Function,
+            default: api => api,
+        },
+        getCloudServiceAction: {
+            type: Function,
+            default: api => api,
+        },
+    },
+    setup(props: Props) {
         const vm: any = getCurrentInstance();
 
         const {
@@ -81,99 +127,63 @@ export default defineComponent({
         } = useStore();
         const providerStore: ProviderStoreType = provider;
 
-        interface CloudService {
-            provider: string;
-            // eslint-disable-next-line camelcase
-            cloud_service_type: string;
-            // eslint-disable-next-line camelcase
-            cloud_service_group: string;
-            count: number;
-        }
 
-        interface Server {
-            count: number;
-        }
-
-        interface Data {
-            group: string;
-            name?: string;
-            count: number;
-            provider?: string;
-        }
-
-        interface StateInterface {
-            serverData: Server[];
-            cloudServiceData: CloudService[];
-            data: Data[];
-            loading: boolean;
-            providers: ProviderInfo;
-            widgetRef: any;
-        }
-
-        const state: UnwrapRef<StateInterface> = reactive({
+        const state: UnwrapRef<State> = reactive({
             serverData: [],
             cloudServiceData: [],
             data: [],
             loading: true,
-            providers: computed(() => providerStore.state.providers),
             widgetRef: null,
         });
 
 
-        // const serverApi = fluentApi.statisticsTest().history().diff<Server>()
-        //     .setTopic('inventory_server_daily_diff')
-        //     .setFrom(getTimestamp(moment().subtract(1, 'day')))
-        //     .setField('count');
+        const serverApi = fluentApi.statisticsTest().history().diff<Server>()
+            .setTopic('daily_server_updates')
+            .setFrom('now/d - 2w')
+            .setDefaultFields('server_type')
+            .setDiffFields('server_count');
 
         const getServerData = async (): Promise<void> => {
             try {
-                // const res = await serverApi.execute();
-                // state.serverData = res.data.values;
+                const res = await props.getServerAction(serverApi).execute();
+                state.serverData = res.data.results;
             } catch (e) {
-                state.serverData = [{
-                    count: casual.integer(-30, 30),
-                }];
+                console.error(e);
             }
         };
 
-        // const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
-        //     .setTopic('inventory_cloud_service_daily_diff')
-        //     .setGroupBy('cloud_service_type', 'cloud_service_group', 'provider')
-        //     .setFrom(getTimestamp(moment().subtract(1, 'day')))
-        //     .setField('count');
+        const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
+            .setTopic('daily_cloud_service_updates')
+            .setFrom('now/d - 7d')
+            .setDefaultFields('cloud_service_type', 'cloud_service_group', 'provider', 'icon')
+            .setDiffFields('cloud_service_count');
 
         const getCloudServiceData = async (): Promise<void> => {
             try {
-                // const res = await cloudServiceApi.execute();
-                // state.cloudServiceData = res.data.values;
+                const res = await props.getCloudServiceAction(cloudServiceApi).execute();
+                state.cloudServiceData = res.data.results;
             } catch (e) {
-                state.cloudServiceData = arrayOf(casual.integer(5, 15), () => ({
-                    provider: casual.random_element(['aws', 'azure', 'google_cloud']),
-                    // eslint-disable-next-line camelcase
-                    cloud_service_type: casual.title,
-                    // eslint-disable-next-line camelcase
-                    cloud_service_group: casual.full_name,
-                    count: casual.integer(-30, 30),
-                })) as CloudService[];
+                console.error(e);
             }
         };
 
 
         const getData = async (): Promise<void> => {
             state.loading = true;
-            await providerStore.getProvider();
             state.data = [];
+            await providerStore.getProvider();
             await Promise.all([getServerData(), getCloudServiceData()]);
             state.data = [
                 ...state.serverData.map(d => ({
                     group: 'Server',
-                    count: d.count,
+                    type: d.server_type,
+                    count: d.server_count,
                 })),
                 ...state.cloudServiceData.map(d => ({
                     group: d.cloud_service_group,
-                    name: d.cloud_service_type,
-                    count: d.count,
-                    provider: d.provider,
+                    type: d.cloud_service_type,
+                    count: d.cloud_service_count,
+                    icon: d.icon || providerStore.state.providers[d.provider]?.icon,
                 })),
             ];
             state.loading = false;
@@ -188,11 +198,6 @@ export default defineComponent({
             onItemClick(item) {
                 vm.$router.push('/identity/service-account');
             },
-            iconUrl: (item: Data): string => _.get(
-                state.providers,
-                `state.providers[${item.provider}].icon`,
-                '',
-            ) as string,
             getIcon(count: number): string {
                 if (count > 0) return 'ic_list_increase';
                 if (count < 0) return 'ic_list_decrease';
@@ -210,10 +215,10 @@ export default defineComponent({
         overflow-y: auto;
     }
 }
-.group-name {
+.group {
     @apply text-base font-bold mb-1 truncate leading-tight;
 }
-.name {
+.type {
     @apply text-xs text-gray truncate leading-tight;
 }
 .count {
@@ -222,5 +227,9 @@ export default defineComponent({
 .help {
     display: inline-flex;
     cursor: help;
+}
+.no-data-img {
+    @apply mx-auto mb-4 flex-shrink-0;
+    max-width: 14rem;
 }
 </style>

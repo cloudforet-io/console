@@ -107,15 +107,14 @@ export interface HistoryListResp {
     created_at: TimeStamp;
 }
 
-export interface HistoryDiffParam {
+export interface HistoryDiffParam extends BaseQuery {
     topic: string;
-    start: TimeStamp;
-    end: TimeStamp;
+    from: string;
+    to?: string;
     default_fields: string[];
     diff_fields: string[];
 }
 
 export interface HistoryDiffResp<value> {
-    topic: string;
     results: value[];
 }
