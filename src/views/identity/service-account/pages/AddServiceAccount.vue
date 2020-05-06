@@ -374,6 +374,9 @@ export default {
         line-height: 120%;
     }
     .form-box{
-        @apply max-w-145;
+        @apply  w-full;
+        @screen lg{
+            @apply max-w-1/2;
+        }
     }
 </style>
