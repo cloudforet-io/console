@@ -1,6 +1,7 @@
 <template>
     <p-toolbox-table
         v-if="!isLoading"
+        class="table"
         v-bind="apiHandler.tableTS.state"
         :fields="fields"
         :all-page="apiHandler.tableTS.state.allPage"
@@ -35,22 +36,30 @@
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
-            <div class="left-toolbox-item">
+            <div class="left-toolbox-item xs:hidden lg:block">
                 <p-query-search-bar
                     :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
                     @newQuery="newQuery"
                 />
             </div>
         </template>
-        <template v-if="tags.length !==0" #toolbox-bottom>
-            <p-col :col="12">
-                <p-hr style="width: 100%;" />
-                <p-query-search-tags style="margin-top: .5rem;"
-                                     :tags="tags"
-                                     @deleteTag="deleteTag"
-                                     @deleteAllTags="deleteAllTags"
+        <template #toolbox-bottom>
+            <div class="dl-toolbox-bottom">
+                <p-query-search-bar
+                    class="lg:hidden mt-4"
+                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
+                    @newQuery="newQuery"
                 />
-            </p-col>
+                <div v-if="tags.length !==0" class="w-full mt-4 lg:mt-0">
+                    <p-hr class="w-full" />
+                    <p-query-search-tags
+                        style="margin-top: .5rem;"
+                        :tags="tags"
+                        @deleteTag="deleteTag"
+                        @deleteAllTags="deleteAllTags"
+                    />
+                </div>
+            </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
             <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
@@ -90,7 +99,6 @@ export default {
         PDynamicField,
         PToolboxTable,
         PQuerySearchBar,
-        PCol,
         PHr,
         PQuerySearchTags,
         PPanelTop,
@@ -274,6 +282,14 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
+
+    .dl-toolbox-bottom{
+        @apply w-full ;
+        margin-top: -16px;
+        @screen lg{
+            @apply mt-0;
+        }
+    }
     .left-toolbox-item{
         &:last-child {
             flex-grow: 1;
