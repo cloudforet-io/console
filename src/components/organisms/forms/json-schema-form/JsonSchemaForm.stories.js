@@ -37,6 +37,7 @@ const defaultSchema = {
         integer_field: {
             title: 'I am integer type',
             type: 'integer',
+            default: 1,
         },
         boolean_field: {
             title: 'I am boolean type',

@@ -18,7 +18,7 @@
             </template>
             <template #contents-conf="{tab}">
                 <configure-collector ref="conf"
-                                     :show-validation="tab.showValidation"
+                                     :enable-validation="tab.showValidation"
                                      :plugin-id="confState.pluginId"
                                      :plugin="confState.plugin"
                                      :versions="confState.versions"
@@ -43,15 +43,6 @@
                 </div>
             </template>
             <template #contents-credentials>
-<!--                                <choose-credentials ref="crd"-->
-<!--                                                    :items="crdState.items"-->
-<!--                                                    :plugin-id="confState.pluginId"-->
-<!--                                                    :total-count="crdState.totalCount"-->
-<!--                                                    :loading="crdState.loading"-->
-<!--                                                    :crd-type.sync="crdState.crdType"-->
-<!--                                                    :select-index.sync="crdState.selectIndex"-->
-<!--                                                    @changeValidState="updateTabInvalid(1, $event)"-->
-<!--                                />-->
                 <confirm-credentials ref="crd"
                                      :items="confState.pluginSchema"
                                      :provider="confState.provider"
@@ -131,7 +122,6 @@ export default {
         PI,
         PProgressWizard,
         ConfigureCollector,
-        ChooseCredentials,
         ConfirmCredentials,
         PDictInputGroup,
     },

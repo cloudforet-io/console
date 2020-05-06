@@ -36,7 +36,7 @@ import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/Dic
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
-import {fluentApi} from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     name: 'SServiceAccountFormModal',

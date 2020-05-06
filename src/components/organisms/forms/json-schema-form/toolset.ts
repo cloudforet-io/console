@@ -68,6 +68,7 @@ export interface CustomKeywords{
 export interface JSCFormState {
     objectSchema: any;
     validator: () => boolean;
+    fieldValidator: (key: string) => Promise<boolean>;
 }
 
 interface JSCFormTSType {
@@ -141,11 +142,9 @@ export const initJSCSetProperty = (_this: JSCFormTSType) => (schema: JsonSchemaO
         const ajv = new Ajv({ allErrors: true });
         if (keywords) {
             Object.entries(keywords).forEach(([k, v]) => {
-                console.debug('keyword', k);
                 ajv.addKeyword(k, v);
             });
         }
-        console.debug('schema', schema, _this.formState.objectSchema);
 
         let valid: boolean;
         if (_this.formState.objectSchema.$async) {
@@ -156,9 +155,43 @@ export const initJSCSetProperty = (_this: JSCFormTSType) => (schema: JsonSchemaO
             });
         } else {
             valid = ajv.validate(_this.formState.objectSchema, _this.syncState.item) as boolean;
-            console.debug(valid, ajv.errors);
             if (ajv.errors) {
                 updateErrors(ajv.errors);
+            }
+        }
+        return valid;
+    };
+
+    _this.formState.fieldValidator = async (key: string): Promise<boolean> => {
+        _this.state.invalidState[key] = false;
+        const fieldSchema = {
+            type: 'object',
+            properties: {
+                [key]: { ..._this.formState.objectSchema.properties[key] },
+            },
+            required: _this.formState.objectSchema.required.includes(key) ? [key] : [],
+        };
+
+        const ajv = new Ajv({ allErrors: true });
+
+        let valid = false;
+        if (_this.formState.objectSchema.$async) {
+            const validate: Ajv.ValidateFunction = ajv.compile(fieldSchema);
+            try {
+                valid = await validate({ [key]: _this.syncState.item[key] });
+                _this.state.invalidState[key] = false;
+            } catch (e) {
+                if (e.errors) {
+                    _this.state.invalidState[key] = true;
+                    _this.state.invalidText[key] = e.errors[0].message;
+                }
+            }
+        } else {
+            valid = ajv.validate(fieldSchema, _this.syncState.item) as boolean;
+            _this.state.invalidState[key] = false;
+            if (ajv.errors) {
+                _this.state.invalidState[key] = true;
+                _this.state.invalidText[key] = ajv.errors[0].message;
             }
         }
         return valid;
@@ -169,6 +202,7 @@ export const initJSCSetProperty = (_this: JSCFormTSType) => (schema: JsonSchemaO
 export const initFormState = () => reactive({
     objectSchema: {},
     validator: () => false,
+    fieldValidator: async (key: string) => false,
 });
 
 
@@ -198,7 +232,6 @@ export const makeCustomValidate = (
     {
         aysnc: true,
         validate: async (...args: any[]) => validateFunc(...args).then((result) => {
-            console.debug(args, result);
             if (!result) {
                 return Promise.reject(new Ajv.ValidationError([{
                     keyword: 'customError',

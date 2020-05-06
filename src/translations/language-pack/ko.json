@@ -316,7 +316,9 @@
 		"SCHEDULE": "Collecting Schedule",
 		"SELECT_ARG": "선택된 {0}",
 		"TAB": {
-			"None": ""
+			"ADD_TAG": "태그 추가",
+			"CONFIRM_CRD": "암호 확인",
+			"CONF_COLLECTOR": "컬렉터 구성"
 		},
 		"UPT_COL": "컬렉터 수정",
 		"UPT_FAIL_ARG": "{0} 을/를 갱신에 실패하였습니다.",

@@ -5,16 +5,17 @@
         </header>
         <slot name="top">
             <slot name="progress">
-                <p-progress-tab-bar :tabs="proxyTabs"
-                                    :labels="labels"
+                <p-progress-tab-bar :tabs="tabs"
                                     :active-idx.sync="proxyActiveIdx"
+                                    :invalid-state="invalidState"
+                                    :progress-state="progressState"
                                     @changeTab="onChangeTab"
                 >
-                    <template v-for="(tab) in tabs" :slot="`progress-${tab.key}`">
-                        <slot :name="`progress-${tab.key}`" />
+                    <template v-for="(tab) in tabs" :slot="`progress-${tab.name}`">
+                        <slot :name="`progress-${tab.name}`" />
                     </template>
-                    <template v-for="(tab) in tabs" :slot="`help-${tab.key}`">
-                        <slot :name="`help-${tab.key}`" />
+                    <template v-for="(tab) in tabs" :slot="`help-${tab.name}`">
+                        <slot :name="`help-${tab.name}`" />
                     </template>
                 </p-progress-tab-bar>
             </slot>
@@ -35,45 +36,43 @@
         <template v-if="activeTab">
             <p-panel-top class="step-title">
                 <template>
-                    Step {{ activeIdx + 1 }}. {{ labels[activeTab.key] || activeTab.key }}
+                    Step {{ proxyActiveIdx + 1 }}. {{ activeTab.label || activeTab.name }}
                     <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
                 </template>
                 <template #extra>
                     <div class="step-appendix">
-                        <slot :name="`step-append-${activeTab.key}`" :tab="activeTab" />
+                        <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />
                     </div>
                 </template>
             </p-panel-top>
             <div class="contents">
                 <keep-alive>
-                    <slot :name="`contents-${activeTab.key}`" :tab="activeTab" />
+                    <slot :name="`contents-${activeTab.name}`" :tab="activeTab" />
                 </keep-alive>
             </div>
         </template>
 
         <slot name="bottom">
             <div class="bottom">
-                <p-button outline style-type="gray900" size="lg"
+                <p-button v-bind="mergedCancelBtnBind"
                           class="txt-btn" @click="$emit('cancel', $event)"
                 >
                     {{ $t('BTN.CANCEL') }}
                 </p-button>
                 <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
-                              outline style-type="secondary" size="lg"
+                              v-bind="mergedNavBtnBind"
                               @click="onClickPrev"
                     >
                         <p-i name="ic_back" color="transparent inherit" />{{ $t('COMMON.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
-                              outline style-type="secondary"
-                              size="lg"
+                              v-bind="mergedNavBtnBind"
                               @click="onClickNext"
                     >
                         {{ $t('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
-                    <p-button style-type="secondary" size="lg"
-                              :disabled="!showConfirm"
+                    <p-button v-bind="mergedConfirmBtnBind"
                               class="txt-btn"
                               @click="$emit('confirm', tabs, $event)"
                     >
@@ -85,7 +84,7 @@
     </p-pane-layout>
 </template>
 
-<script>
+<script lang="ts">
 import {
     ref, toRefs, reactive, computed,
 } from '@vue/composition-api';
@@ -96,30 +95,29 @@ import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/Progre
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import {
+    ProgressWizardProps,
+    progressWizardProps,
+} from '@/components/organisms/wizards/progress-wizard/ProgressWizard.toolset';
 
 
 const setPagination = (props, state, emit) => {
     const isFirstTab = computed(() => state.proxyActiveIdx - 1 < 0);
-    const isLastTab = computed(() => state.proxyActiveIdx + 1 >= state.proxyTabs.length);
-
-    const changeStep = (idx) => {
-        state.proxyTabs.splice(idx, 1, { ...state.proxyTabs[idx], showValidation: true });
-        emit('changeStep', idx);
-    };
+    const isLastTab = computed(() => state.proxyActiveIdx + 1 >= props.tabs.length);
 
     const onClickPrev = () => {
         if (isFirstTab.value) return;
-        changeStep(state.proxyActiveIdx);
+        emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx - 1);
         state.proxyActiveIdx -= 1;
     };
     const onClickNext = () => {
         if (isLastTab.value) return;
-        changeStep(state.proxyActiveIdx);
+        emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx + 1);
         state.proxyActiveIdx += 1;
     };
 
     const onChangeTab = (now, beforeIdx) => {
-        changeStep(beforeIdx);
+        emit('changeStep', beforeIdx, now);
     };
 
     return {
@@ -133,7 +131,6 @@ const setPagination = (props, state, emit) => {
 
 export default {
     name: 'PProgressWizard',
-    events: ['update:tabs', 'cancel', 'confirm', 'changeStep'],
     components: {
         PPaneLayout,
         PProgressTabBar,
@@ -141,40 +138,32 @@ export default {
         PI,
         PButton,
     },
-    props: {
-        tabs: Array,
-        labels: {
-            type: Object,
-            default: () => ({}),
-        },
-        activeIdx: {
-            type: Number,
-            default: 0,
-        },
-        showConfirm: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }) {
+    props: progressWizardProps,
+    setup(props: ProgressWizardProps, { emit }) {
         const state = reactive({
-            proxyTabs: computed({
-                get: () => props.tabs,
-                set: (val) => {
-                    emit('update:tabs', val);
-                },
-            }),
             proxyActiveIdx: makeProxy('activeIdx', props, emit),
+            activeTab: computed(() => props.tabs[state.proxyActiveIdx]),
+            mergedCancelBtnBind: computed(() => ({
+                styleType: 'gray900',
+                size: 'lg',
+                outline: true,
+                ...props.cancelBtnBind,
+            })),
+            mergedNavBtnBind: computed(() => ({
+                styleType: 'secondary',
+                size: 'lg',
+                outline: true,
+                ...props.navigationBtnBind,
+            })),
+            mergedConfirmBtnBind: computed(() => ({
+                styleType: 'secondary',
+                size: 'lg',
+                ...props.confirmBtnBind,
+            })),
         });
 
-        const activeTab = computed(() => state.proxyTabs[state.proxyActiveIdx]);
         return {
             ...toRefs(state),
-            activeTab,
             ...setPagination(props, state, emit),
         };
     },
