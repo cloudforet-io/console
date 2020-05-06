@@ -319,7 +319,9 @@
 		"SCHEDULE": "",
 		"SELECT_ARG": "",
 		"TAB": {
-			"None": ""
+			"ADD_TAG": "",
+			"CONFIRM_CRD": "",
+			"CONF_COLLECTOR": ""
 		},
 		"UPT_COL": "",
 		"UPT_FAIL_ARG": "",
@@ -408,6 +410,7 @@
 	},
 	"TREE_TYPE": {
 		"CREATE": "",
+		"CREATE_GRP": "",
 		"DELETE": "",
 		"POOL": "",
 		"PROJ": "",

@@ -319,7 +319,9 @@
 		"SCHEDULE": "Collecting Schedule",
 		"SELECT_ARG": "Selected {0}",
 		"TAB": {
-			"None": ""
+			"ADD_TAG": "Add Tag",
+			"CONFIRM_CRD": "Confirm Credentials",
+			"CONF_COLLECTOR": "Configure Collector"
 		},
 		"UPT_COL": "Update Collector",
 		"UPT_FAIL_ARG": "Fail to delete {0}. Please, check your action.",
@@ -408,6 +410,7 @@
 	},
 	"TREE_TYPE": {
 		"CREATE": "Create {0}",
+		"CREATE_GRP": "Create Sub Project Group",
 		"DELETE": "Delete Selected",
 		"POOL": "Pool",
 		"PROJ": "Project",

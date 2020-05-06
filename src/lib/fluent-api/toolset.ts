@@ -52,7 +52,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         this.transformer = transformer;
     }
 
-    setTransformer(func: (resp: AxiosResponse<resp>) => any|Promise<any>): this {
+    setTransformer<returnType = any>(func: (resp: AxiosResponse<resp>) => returnType|Promise<returnType>): this {
         this.transformer = func;
         return this.clone();
     }
@@ -87,10 +87,10 @@ export const OPERATOR_MAP = Object.freeze({
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
-    td_lt: 'timedelta_lt',
-    td_gt: 'timedelta_gt',
-    td_lte: 'timedelta_lte',
-    td_gte: 'timedelta_gte',
+    td_lt: 'timediff_lt',
+    td_gt: 'timediff_gt',
+    td_lte: 'timediff_lte',
+    td_gte: 'timediff_gte',
     in: 'in', // merge operator
     not_in: 'not_in', // merge operator
     contain_in: 'contain_in', // merge operator
@@ -100,6 +100,7 @@ export const OPERATOR_MAP = Object.freeze({
     '=': 'in', // merge operator
     '!=': 'not_in', // merge operator
     $: 'regex',
+    sum: 'sum',
 });
 const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
@@ -149,11 +150,19 @@ function getQueryWithApiState<T>(keys: string[], apiState: any): T {
     return res;
 }
 
+export const getBaseQueryApiState = <parameter>(): BaseQueryState<parameter> => ({
+    filter: [],
+    filterOr: [],
+    fixFilter: [],
+    fixFilterOr: [],
+    extraParameter: {} as parameter,
+});
+
 
 export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
     protected apiState: BaseQueryState<parameter> ;
 
-    protected constructor(
+    constructor(
         api: ApiType,
         baseUrl: string,
         initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
@@ -161,11 +170,7 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            filter: [],
-            filterOr: [],
-            fixFilter: [],
-            fixFilterOr: [],
-            extraParameter: {},
+            ...getBaseQueryApiState<parameter>(),
             ...initState,
         };
     }
@@ -224,17 +229,13 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            filter: [] as unknown as FilterItem[],
-            fixFilter: [] as unknown as FilterItem[],
-            filterOr: [] as unknown as FilterItem[],
-            fixFilterOr: [] as unknown as FilterItem[],
+            ...getBaseQueryApiState<parameter>(),
             only: [] as unknown as string[],
-            thisPage: 1,
-            pageSize: 15,
+            thisPage: 0,
+            pageSize: 0,
             sortBy: '',
             sortDesc: true,
             keyword: '',
-            extraParameter: {},
             count_only: false,
             ...initState,
         };
@@ -242,7 +243,7 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
 
     protected query = (): Query => {
         const query: Query = {};
-        if (this.apiState.thisPage !== 0) {
+        if (this.apiState.thisPage !== 0 && this.apiState.pageSize !== 0) {
             query.page = {
                 start: ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1,
                 limit: this.apiState.pageSize,
@@ -335,6 +336,10 @@ export abstract class CreateAction<parameter, resp> extends SetParameterAction<p
     protected path = 'create'
 }
 
+export abstract class RegisterAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    protected path = 'register'
+}
+
 export abstract class UpdateAction<parameter, resp> extends SetParameterAction<parameter, resp> {
     protected path = 'update'
 }
@@ -344,8 +349,9 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
 
 
     setId(id: string): this {
-        this.apiState.parameter[this.idField] = id;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter[this.idField] = id;
+        return api;
     }
 }
 
@@ -442,6 +448,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
         };
     };
 }
+
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'get';
 
@@ -480,6 +487,10 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
 
 export abstract class SingleDeleteAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'delete';
+}
+
+export abstract class SingleDeregisterAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    protected path = 'deregister';
 }
 
 export abstract class SingleEnableAction<parameter, resp> extends SingleItemAction<parameter, resp> {

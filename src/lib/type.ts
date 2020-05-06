@@ -35,7 +35,22 @@ export const StringProperty = (label: string, required?, placeholder?: string, e
         result.examples = [placeholder];
     }
     if (required) {
-        result.minLength = 4;
+        result.minLength = 2;
+    }
+    return {
+        ...result,
+        ...extra,
+    };
+};
+
+
+export const IntegerProperty = (label: string, required?, placeholder?: string, extra?: any): JsonSchema<'integer'> => {
+    const result: any = {
+        type: 'integer',
+        title: label,
+    };
+    if (placeholder) {
+        result.examples = [placeholder];
     }
     return {
         ...result,
@@ -64,6 +79,13 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
             ...extra,
             enum: enumData,
         });
+        if (required) {
+            this.required.push(name);
+        }
+    }
+
+    addIntegerProperty(name: string, label: string, required?: boolean, placeHolder?: string, extra?: any) {
+        this.properties[name] = IntegerProperty(label, required, placeHolder, extra);
         if (required) {
             this.required.push(name);
         }

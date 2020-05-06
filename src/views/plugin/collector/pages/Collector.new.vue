@@ -9,6 +9,7 @@
                                  :page-size.sync="apiHandler.tableTS.syncState.pageSize"
                                  :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
                                  :loading.sync="apiHandler.tableTS.syncState.loading"
+                                 :style="{height: `${height}px`}"
                                  @changePageSize="apiHandler.action"
                                  @changePageNumber="apiHandler.action"
                                  @clickRefresh="apiHandler.action"
@@ -141,10 +142,7 @@
 
         <collector-update-modal v-if="updateModalState.visible"
                                 :visible.sync="updateModalState.visible"
-                                :loading="updateModalState.loading"
-                                :collector="apiHandler.tableTS.selectState.firstSelectItem"
-                                :plugin="updateModalState.plugin"
-                                :versions="updateModalState.versions"
+                                :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
         />
 
         <collect-data-modal v-if="collectDataModalVisible"
@@ -188,7 +186,7 @@ import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
@@ -297,6 +295,7 @@ export const collectorSetup = (props, context) => {
                 ['created_at', 'COMMON.CREATED'],
             ],
             context.parent)),
+            responsiveStyle: { overflow: 'auto' },
         },
         undefined,
         {
@@ -309,13 +308,13 @@ export const collectorSetup = (props, context) => {
     );
     const dropdown = computed(() => (
         makeTrItems([
-            ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectOne }],
+            ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
             [null, null, { type: 'divider' }],
             ['enable', 'BTN.ENABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
             ['disable', 'BTN.DISABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
             ['delete', 'BTN.DELETE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
             [null, null, { type: 'divider' }],
-            ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectOne }],
+            ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
         ],
         context.parent,
         { type: 'item' })));

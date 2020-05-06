@@ -11,21 +11,21 @@
                           @rowLeftClick="onRowClick"
             >
                 <!-- th -->
-                <template #th-servers="{field}">
+                <template #th-server_count="{field}">
                     <div class="text-center custom-th"
                          :style="{color: colors.servers}"
                     >
                         {{ field.label }}
                     </div>
                 </template>
-                <template #th-cloud_services="{field}">
+                <template #th-cloud_service_count="{field}">
                     <div class="text-center custom-th"
                          :style="{color: colors.cloud_services}"
                     >
                         {{ field.label }}
                     </div>
                 </template>
-                <template #th-credentials="{field}">
+                <template #th-secret_count="{field}">
                     <div class="text-center custom-th"
                          :style="{color: colors.credentials, 'font-weight': 'bold'}"
                     >
@@ -97,8 +97,9 @@ export default defineComponent({
         PChartLoader,
         PSkeleton,
     },
-    setup() {
+    setup(props, context) {
         const vm: any = getCurrentInstance();
+        const projectId = computed<string>(() => context.root.$route.params.id as string);
 
             interface DataType {
                 provider: string;
@@ -137,6 +138,11 @@ export default defineComponent({
             });
 
             const api = fluentApi.statisticsTest().resource().stat<DataType>()
+                .setFilter({
+                    key: 'project_id',
+                    value: projectId.value,
+                    operator: '=',
+                })
                 .setResourceType('identity.ServiceAccount')
                 .addGroupKey('provider', 'provider')
                 .addGroupKey('service_account_id', 'service_account_id')

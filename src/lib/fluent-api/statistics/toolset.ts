@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { BaseQueryAPI } from '@/lib/fluent-api/toolset';
+import { BaseQueryAPI, getBaseQueryApiState } from '@/lib/fluent-api/toolset';
 import { isNotEmpty } from '@/lib/util';
 import {
     Aggregate, Group, GroupFieldsItem, GroupKeyItem, JoinStateItem, STAT_OPERATORS, StatQuery, StatQueryState, UnwindItem,
@@ -26,11 +26,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
                 },
                 count: undefined,
             },
-            filter: [],
-            filterOr: [],
-            fixFilter: [],
-            fixFilterOr: [],
-            extraParameter: {},
+            ...getBaseQueryApiState<parameter>(),
             ...initState,
         };
     }
@@ -138,9 +134,7 @@ export const getInitStatQueryState = (): StatQueryState<undefined> => ({
         },
         count: undefined,
     },
-    filter: [],
-    filterOr: [],
-    fixFilter: [],
+    ...getBaseQueryApiState<undefined>(),
 } as unknown as StatQueryState<undefined>);
 
 export const getInitJoinState = (): JoinStateItem => ({

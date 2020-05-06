@@ -28,7 +28,6 @@ export default {
             state.confState.pluginSchema = pluginSchema;
         };
         listCredentials();
-        // mountBusEvent(CollectorEventBus, 'listCredentials', listCredentials);
 
 
         const getPlugin = async (params) => {

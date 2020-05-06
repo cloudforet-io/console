@@ -26,10 +26,20 @@ import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import { fluentApi } from '@/lib/fluent-api';
-import casual, { arrayOf } from '@/lib/casual';
-import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import moment from 'moment';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { HistoryStat } from '@/lib/fluent-api/statistics/history';
+
+interface Data {
+    date: string;
+    success: number;
+    failure: number;
+}
+
+interface Props {
+    getAction: (api: HistoryStat<Data>) => HistoryStat<Data>;
+}
 
 export default defineComponent({
     name: 'CollectionState',
@@ -38,7 +48,13 @@ export default defineComponent({
         PChartLoader,
         PSkeleton,
     },
-    setup() {
+    props: {
+        getAction: {
+            type: Function,
+            default: api => api,
+        },
+    },
+    setup(props: Props) {
         interface DataType {
             date: string;
             success: number;
@@ -57,7 +73,7 @@ export default defineComponent({
         const ts = new SChartToolSet<SBarChart, InitDataType>(SBarChart,
             (chart: SBarChart) => (chart.addData(ts.state.data.map(d => d.success), 'Success')
                 .addData(ts.state.data.map(d => d.failure), 'Failure')
-                .setLabels(ts.state.data.map(d => d.date))
+                .setLabels(ts.state.data.map(d => moment(d.date).format('MM/DD')))
                 .setColors(ts.state.colors)
                 .setTicksCount(5)
                 .apply()), {
@@ -66,51 +82,22 @@ export default defineComponent({
                 colors: computed(() => _.map(LEGEND_COLORS, v => (ts.state.loading ? gray[500] : v))),
             });
 
-        interface Data {
-            state: string;
-            count: number;
-            date: string;
-        }
-        // const api = fluentApi.statisticsTest().history().query<Data>()
-        //     .addField('state', OPERATORS.value, 'state')
-        //     .addField('created_at', OPERATORS.value, 'date')
-        //     .setLimit(7)
-        //     .setSort('created_at')
-        //     .setGroupBy('created_at')
-        //     .setFilterOr(
-        //         { key: 'state', operator: '=', value: 'FINISHED' },
-        //         { key: 'state', operator: '=', value: 'FAILURE' },
-        //     );
 
-        // ts.state.data = arrayOf(7, () => ({
-        //     date: casual.date('MM/DD'),
-        //     success: casual.integer(0, 100),
-        //     failure: casual.integer(0, 100),
-        // }));
+        const api = fluentApi.statisticsTest().history().stat<Data>()
+            .setTopic('daily_job_summary')
+            .addGroupKey('created_at', 'date')
+            .addGroupField('success', STAT_OPERATORS.sum, 'values.success_count')
+            .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
+            .setFilter({ key: 'created_at', value: 'now/d-8d', operator: FILTER_OPERATOR.gtTime });
+
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
             try {
-                // const res = await api.execute();
-                // res.data.results.forEach(v => {
-                //     ts.state.data.push({
-                //         date: v.created_at,
-                //         success: v.
-                //     })
-                // })
-                // TODO: api
-                ts.state.data = _.range(7).map((v, i) => ({
-                    date: moment().subtract(7 - i, 'd').format('MM/DD'),
-                    failure: 0,
-                    success: 0,
-                }));
+                const res = await props.getAction(api).execute();
+                ts.state.data = _.sortBy(res.data.results, 'date');
             } catch (e) {
                 console.error(e);
-                ts.state.data = _.range(7).map((v, i) => ({
-                    date: moment().subtract(7 - i, 'd').format('MM/DD'),
-                    failure: 0,
-                    success: 0,
-                }));
             } finally {
                 ts.state.loading = false;
             }

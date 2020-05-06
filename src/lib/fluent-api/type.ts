@@ -9,13 +9,30 @@ export interface LongFilterType {
     operator: string;
 }
 
+export enum FILTER_OPERATOR {
+    contain = '',
+    notContain = '!',
+    gt = '>',
+    gte = '>=',
+    lt = '<',
+    lte = '<=',
+    in = '=',
+    notIn = '!=',
+    regex = '$',
+    sum = 'sum',
+    ltTime = 'td_lt',
+    gtTime = 'td_gt',
+    lteTime = 'td_lte',
+    gteTime = 'td_gte',
+}
+
 type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|
-    'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq';
+    'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq'|'sum';
 
 export interface FilterItem extends LongFilterType {
     key: string;
     value: string | Array<string|null> | null;
-    operator: OperatorType;
+    operator: FILTER_OPERATOR | OperatorType;
 }
 
 export interface ShortFilterType {
@@ -128,6 +145,10 @@ export interface TimeStamp {
 export interface ListType<T> {
     results: T[];
     total_count: number;
+}
+
+export interface LogListType<T> {
+    logs: T[];
 }
 
 export interface ReferenceInfo {

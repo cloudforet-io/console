@@ -1,207 +1,234 @@
 <template>
-    <div>
-        <p-row class="all-container">
-            <p-col :flex-grow="0" flex-basis="50%" class="area collector-info">
-                <p-row>
-                    <p-col :flex-grow="0">
-                        <p-lottie v-if="imgLoading || !plugin"
-                                  name="spinner"
-                                  auto
-                                  :size="2"
-                                  class="img"
-                        />
-                        <img v-show="!imgLoading && plugin" class="img"
-                             :src="imgUrl"
-                             @load="imgLoading = false"
-                        >
-                    </p-col>
-                    <p-col>
-                        <p-field-group :label="$t('INVENTORY.COL_NAME')"
-                                       required
-                                       :invalid="showValidation && fieldVdApi.invalidState.name"
-                                       :invalid-text="$t('INVENTORY.COL_NAME_VD')"
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input v-model="fieldState.name"
-                                              v-focus
-                                              style="width: 100%;"
-                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm-sm"
-                                              :class="{'is-invalid': invalid}"
-                                              @input="onChangeFields('name')"
-                                />
-                            </template>
-                        </p-field-group>
-                        <p-field-group :label="$t('INVENTORY.VERSION')">
-                            <p-dropdown-menu-btn :menu="versionsInfo"
-                                                 :loading="versionsInfo ? false : true"
-                                                 block
-                                                 @clickMenuEvent="onSelectVersion"
-                            >
-                                {{ selectedVersion }}
-                            </p-dropdown-menu-btn>
-                        </p-field-group>
-                        <p-field-group :label="$t('INVENTORY.PRIORITY')"
-                                       :invalid="showValidation && fieldVdApi.invalidState.priority"
-                                       :invalid-text="$t('INVENTORY.COL_PRIORITY_VD')"
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input v-model.number="fieldState.priority"
-                                              type="number"
-                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                              :class="{'is-invalid': invalid}"
-                                              @input="onChangeFields('priority')"
-                                />
-                            </template>
-                        </p-field-group>
-                    </p-col>
-                </p-row>
-            </p-col>
-            <!--            <p-col v-if="pluginOptions.length > 0" class="container mx-auto options">-->
-            <p-col v-if="pluginOptions.length > 0" class="area options">
-                <p class="sub-title">
-                    {{ $t('INVENTORY.OPTIONS') }}
-                </p>
-                <p-dynamic-form v-for="(op) in pluginOptions" :key="op.key"
-                                v-model="proxyOptionsValue[op.key]"
-                                :form="op"
-                                :invalid="showValidation ? vdApi.invalidState[op.key] : false"
-                                :invalid-text="vdApi.invalidMsg[op.key]"
-                                @change="onChangeOption(op.key)"
+    <div class="all-container">
+        <div class="area collector-info">
+            <p-lazy-img class="flex-shrink-0 mr-8"
+                        :img-url="imgUrl"
+                        width="5.5rem" height="5.5rem"
+            />
+            <div class="flex-grow">
+                <p-json-schema-form v-bind="fixedFormTS.state"
+                                    :item.sync="fixedFormTS.syncState.item"
+                                    @change="onChangeFixedForm"
                 />
-            </p-col>
-        </p-row>
+            </div>
+        </div>
+        <div v-if="showOptions" class="area options">
+            <p class="sub-title">
+                {{ $t('INVENTORY.OPTIONS') }}
+            </p>
+            <p-json-schema-form v-bind="optionsFormTS.state"
+                                :item.sync="optionsFormTS.syncState.item"
+                                @change="onChangeOptionsForm"
+            />
+        </div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed, watch, Ref, defineComponent,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import config from '@/lib/config';
-import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
-import {
-    formValidation, makeProxy, requiredValidation, Validation,
-} from '@/lib/compostion-util';
+import { makeProxy } from '@/lib/compostion-util';
 
-import PCol from '@/components/atoms/grid/col/Col.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
+import { JsonSchemaObjectType } from '@/lib/type';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
-const init = (props, root) => {
-    const params = {
+const DEFAULT_PRIORITY = 10;
+export interface Form {
+    name: string;
+    priority: number;
+    // eslint-disable-next-line camelcase
+    plugin_info: {
         // eslint-disable-next-line camelcase
-        plugin_id: props.pluginId,
+        plugin_id: string;
+        options: any;
+        version: string;
     };
-    CollectorEventBus.$emit('getPlugin', params);
-    CollectorEventBus.$emit('listVersionsInfo', params);
-};
+}
+
+interface State {
+    showOptions: boolean;
+    proxyForm: Form;
+}
+
+interface Props {
+    enableValidation: boolean;
+    isValid: boolean;
+    pluginId: string;
+    form: Form;
+    imgUrl: string;
+    optionsSchema: any;
+}
 
 export default {
     name: 'ConfigureCollector',
-    directives: {
-        focus: {
-            inserted(el) {
-                el.focus();
-            },
-        },
-    },
     components: {
-        PLottie,
-        PCol,
-        PRow,
-        PFieldGroup,
-        PDropdownMenuBtn,
-        PTextInput,
-        PDynamicForm,
+        PJsonSchemaForm,
+        PLazyImg,
     },
     props: {
-        showValidation: {
+        enableValidation: {
             type: Boolean,
             default: false,
         },
-        pluginId: String,
-        plugin: Object,
-        versions: Array,
-        loading: Boolean,
+        pluginId: {
+            type: String,
+            required: true,
+        },
+        imgUrl: {
+            type: String,
+            default: '',
+        },
         /**
-         * sync prop
+         * sync
          */
-        name: String,
+        form: {
+            type: Object,
+            default: () => ({} as Form),
+        },
         /**
-         * sync prop
+         * sync
          */
-        selectedVersion: String,
-        /**
-         * sync prop
-         */
-        optionsValue: Object,
-        /**
-         * sync prop
-         */
-        priority: Number,
+        isValid: {
+            type: Boolean,
+            default: false,
+        },
+        optionsSchema: {
+            type: Object,
+            default: null,
+        },
     },
-    setup(props, { emit, root }) {
-        init(props, root);
+    setup(props: Props, { emit, root }) {
+        // set fixedFormTS
+        const fixedFormTS = new JsonSchemaFormToolSet();
+        const schema = new JsonSchemaObjectType();
+        schema.addStringProperty('name', 'Name', true);
+        schema.addIntegerProperty('priority', 'Priority', true, '1 ~ 10', {
+            default: props.form.priority || DEFAULT_PRIORITY,
+            minimum: 1,
+            maximum: 10,
+        });
+        schema.addEnumProperty('plugin_info.version', 'Version', [], true);
+        fixedFormTS.setProperty(schema, ['name', 'priority', 'plugin_info.version']);
 
-        const fieldState = reactive({
-            name: props.name,
-            priority: props.priority,
+        // set optionsFormTS
+        const optionsFormTS = new JsonSchemaFormToolSet();
+
+        const state: UnwrapRef<State> = reactive({
+            showOptions: computed<boolean>(() => optionsFormTS.state.properties.length > 0),
+            proxyForm: makeProxy<Form>('form', props, emit),
         });
 
-        const fieldValidation = {
-            name: [requiredValidation()],
-            priority: [new Validation(p => p > 0 && p <= 1000)],
+        const init = (initForm: Form): void => {
+            const newForm: Form = {
+                name: _.get(initForm, 'name', ''),
+                priority: _.get(initForm, 'priority', DEFAULT_PRIORITY),
+                // eslint-disable-next-line camelcase
+                plugin_info: {
+                    // eslint-disable-next-line camelcase
+                    plugin_id: _.get(initForm, 'plugin_info.plugin_id', ''),
+                    options: _.get(initForm, 'plugin_info.options', {}),
+                    version: _.get(initForm, 'plugin_info.version', ''),
+                },
+            };
+
+            // init fixedFormTS
+            fixedFormTS.syncState.item.name = newForm.name;
+            fixedFormTS.syncState.item.priority = newForm.priority;
+            fixedFormTS.syncState.item['plugin_info.version'] = newForm.plugin_info.version;
+            _.forEach(fixedFormTS.state.invalidState, (v, k, origin) => {
+                origin[k] = false;
+            });
+
+            // init optionsFormTS
+            optionsFormTS.syncState.item = newForm.plugin_info.options;
+            _.forEach(optionsFormTS.state.invalidState, (v, k, origin) => {
+                origin[k] = false;
+            });
+            state.proxyForm = newForm;
+        };
+        init(state.proxyForm);
+
+        const allValid: Readonly<Ref<boolean>> = computed(
+            () => _.every(fixedFormTS.state.invalidState, v => !v)
+                && _.every(optionsFormTS.state.invalidState, v => !v),
+        );
+
+
+        const updateFormAndValidateField = async (key: string, val: any, isOption = false): Promise<void> => {
+            const ts = isOption ? optionsFormTS : fixedFormTS;
+            const valueKey = isOption ? `plugin_info.options.${key}` : key;
+
+            _.set(props.form, valueKey, val);
+            state.proxyForm = { ...state.proxyForm };
+            if (props.enableValidation) {
+                await ts.formState.fieldValidator(key);
+                emit('update:isValid', allValid.value);
+            }
+        };
+        const validators = {
+            async validate(): Promise<void> {
+                await fixedFormTS.formState.validator();
+                await optionsFormTS.formState.validator();
+                emit('update:isValid', allValid.value);
+            },
+            onChangeFixedForm: _.debounce(async (key, val) => {
+                await updateFormAndValidateField(key, val);
+            }, 300),
+            onChangeOptionsForm: _.debounce(async (key, val) => {
+                await updateFormAndValidateField(key, val, true);
+            }, 300),
         };
 
-        const state = reactive({
-            pluginOptions: computed(() => _.get(props.plugin, 'template.options', [])),
-            proxyOptionsValue: makeProxy('optionsValue', props, emit),
-            proxySelectedVersion: makeProxy('selectedVersion', props, emit),
-            imgUrl: computed(() => _.get(props.plugin, 'tags.icon', config.get('COLLECTOR_IMG'))),
-            versionsInfo: computed(() => {
-                if (!props.selectedVersion) state.proxySelectedVersion = props.versions[0];
-                return props.versions.map(v => ({ type: 'item', label: v, name: v }));
-            }),
-            onSelectVersion: (item) => {
-                state.proxySelectedVersion = item;
-            },
-            vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
-            fieldState,
-            fieldVdApi: formValidation(fieldState, fieldValidation),
-            imgLoading: true,
-        });
+        const pluginApi = fluentApi.repository().plugin();
 
-        const actions = {
-            validate: async () => {
-                const options = await state.vdApi.allValidation();
-                const fields = await state.fieldVdApi.allValidation();
-                return options && fields;
-            },
-            onChangeFields: async (key) => {
-                emit(`update:${key}`, fieldState[key]);
-                if (!props.showValidation) return;
-                await state.fieldVdApi.fieldValidation(key);
-                emit('changeValidState', state.fieldVdApi.isAllValid);
-            },
-            onChangeOption: async (key) => {
-                if (!props.showValidation) return;
-                await state.vdApi.fieldValidation(key);
-                emit('changeValidState', state.vdApi.isAllValid);
-            },
+        const getVersions = async (): Promise<void> => {
+            try {
+                const res = await pluginApi.getVersions().setId(props.pluginId).execute();
+                fixedFormTS.formState.objectSchema.properties['plugin_info.version'].enum = res.data.results;
+                if (!fixedFormTS.syncState.item['plugin_info.version']) {
+                    fixedFormTS.syncState.item = {
+                        ...fixedFormTS.syncState.item,
+                        'plugin_info.version': res.data.results[res.data.total_count - 1],
+                    };
+                    await updateFormAndValidateField('plugin_info.version', res.data.results[res.data.total_count - 1]);
+                }
+            } catch (e) {
+                console.error(e);
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
         };
 
-        watch(() => props.plugin, (val) => {
-            state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
+        watch(() => props.pluginId, (val) => {
+            if (val) getVersions();
         });
+
+        watch(() => props.optionsSchema, (val) => {
+            if (val) {
+                optionsFormTS.setProperty(val);
+                init(state.proxyForm);
+            }
+        });
+
 
         return {
             ...toRefs(state),
-            ...actions,
+            fixedFormTS,
+            optionsFormTS,
+            ...validators,
+            init,
         };
     },
 };
@@ -209,30 +236,30 @@ export default {
 
 <style lang="postcss" scoped>
 .all-container {
+    @apply flex;
     padding: 2.4rem 0;
-    .area {
-        padding: 0 2.5rem;
-        margin: unset;
-        width: unset;
-    }
-    .collector-info {
-        @apply border-r border-gray-200;
-        .img {
-            height: 5.5rem;
-            width: 5.5rem;
-            margin-right: 2rem;
-        }
-        .name {
-            font-size: 1.125rem;
-            padding-bottom: 1rem;
-        }
-    }
-    .sub-title {
-        @apply text-gray-400;
-        font-weight: bold;
-        font-size: .875rem;
-        line-height: 1rem;
+}
+.area {
+    padding: 0 2.5rem;
+    margin: unset;
+    width: unset;
+}
+.collector-info {
+    @apply flex-grow-0 flex border-r border-gray-200;
+    flex-basis: 50%;
+    .name {
+        font-size: 1.125rem;
         padding-bottom: 1rem;
     }
+}
+.options {
+    @apply flex-grow;
+}
+.sub-title {
+    @apply text-gray-400;
+    font-weight: bold;
+    font-size: 0.875rem;
+    line-height: 1rem;
+    padding-bottom: 1rem;
 }
 </style>

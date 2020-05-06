@@ -16,7 +16,7 @@
                         <p-skeleton class="flex-grow" />
                     </div>
                 </template>
-                <p-grid-layout v-else :items="data" row-gap="0.5rem"
+                <p-grid-layout v-else :items="isNoData ? defaultItems : data" row-gap="0.5rem"
                                column-gap="0" :fix-column="1" card-min-width="0"
                                card-height="auto" :card-class="() => []"
                 >
@@ -47,10 +47,11 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, toRefs, watch,
+    computed,
+    defineComponent, getCurrentInstance, Ref, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
@@ -103,7 +104,6 @@ export default defineComponent({
                 .addGroupField('count', STAT_OPERATORS.count);
 
             interface Item {
-                provider: string;
                 name: string;
                 icon: string;
                 color: string;
@@ -113,17 +113,20 @@ export default defineComponent({
                 loaderRef: HTMLCanvasElement | null;
                 data: Item[];
                 loading: boolean;
+                isNoData: Ref<boolean>;
             }
 
             const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
             const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
                 chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
                     .setLabels(_.map(ts.state.data, d => d.name))
+                    .setDefaultCount(4)
                     .setColors(colors)
                     .apply(), {
                     loaderRef: null,
                     data: [],
                     loading: true,
+                    isNoData: computed(() => ts.state.data.length === 0),
                 });
 
             watch(() => ts.state.loaderRef, () => {
@@ -137,6 +140,13 @@ export default defineComponent({
                     .apply();
             });
 
+            const defaultItems = _.range(4).map((d, index) => ({
+                name: 'region',
+                color: colors[index],
+                count: 0,
+                icon: 'ic_provider_other',
+            }));
+
             const getData = async (): Promise<void> => {
                 ts.state.loading = true;
                 ts.state.data = [];
@@ -146,7 +156,6 @@ export default defineComponent({
                     const res = await props.getAction(api).execute();
                     ts.state.data = res.data.results.map((item, index) => ({
                         name: item.region_name,
-                        provider: item.provider,
                         count: item.count,
                         icon: providers[item.provider].icon,
                         color: colors[index],
@@ -168,6 +177,7 @@ export default defineComponent({
                 onSelected(item): void {
                     vm.$router.push('/identity/service-account');
                 },
+                defaultItems,
             };
     },
 });

@@ -15,13 +15,12 @@
     >
         <template #body>
             <configure-collector ref="confRef"
-                                 show-validation
+                                 :form.sync="collectorParam"
+                                 :enable-validation="enableValidation"
                                  :plugin-id="pluginId"
-                                 :name.sync="name"
-                                 :loading="loading"
-                                 :selected-version.sync="selectedVersion"
-                                 :options-value.sync="options"
-                                 :priority.sync="priority"
+                                 :options-schema="optionsSchema"
+                                 :img-url="collector ? collector.tags.icon : ''"
+                                 :is-valid.sync="isValid"
             />
         </template>
 
@@ -41,21 +40,32 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, watch,
+    toRefs, reactive, computed, watch, onMounted,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import config from '@/lib/config';
-import { makeTrItems } from '@/lib/view-helper';
-import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import ConfigureCollector from '@/views/plugin/collector/modules/ConfigureCollector.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { CollectorPluginModel, PluginOptions } from '@/lib/fluent-api/inventory/collector-plugin';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector';
+import { AxiosError } from 'axios';
+import { JsonSchemaObjectType } from '@/lib/type';
 
+interface State {
+    confRef: any;
+    loading: boolean;
+    proxyVisible: boolean;
+    enableValidation: boolean;
+    isValid: boolean;
+    collector: any;
+    pluginId: string;
+    optionsSchema: any;
+    confirmBtnBind: any;
+    collectorParam: CollectorUpdateParameter;
+}
 export default {
     name: 'CollectorUpdateModal',
     components: {
@@ -66,86 +76,116 @@ export default {
          * sync prop
          */
         visible: Boolean,
-        // loading: Boolean,
-        // versions: Array,
-        // plugin: Object,
-        // collector: Object,
         collectorId: String,
     },
-    setup(props, { emit, refs }) {
-        const state: any = reactive({
+    setup(props, { root, emit }) {
+        const state: UnwrapRef<State> = reactive({
+            confRef: null,
             loading: true,
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            enableValidation: false,
+            isValid: true,
             collector: null,
-            pluginId: '', // _.get(props.collector, 'plugin_info.plugin_id', ''),
-            name: '', // _.get(props.collector, 'name', ''),
-            priority: 10, // _.get(props.collector, 'priority', 10),
-            options: {}, // _.get(props.collector, 'plugin_info.options', {}),
-            selectedVersion: '1.0', // _.get(props.collector, 'plugin_info.version', '1.0'),
+            pluginId: computed<string>(() => _.get(state.collector, 'plugin_info.plugin_id', '')),
+            optionsSchema: null,
             confirmBtnBind: computed(() => {
-                const defaultStyle: any = { style: { padding: 0 } };
+                const defaultStyle: any = { style: { padding: 0 }, disabled: !state.isValid };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
+            collectorParam: {} as CollectorUpdateParameter,
         });
 
         const onClickReset = (): void => {
             if (state.loading) return;
-
-            state.options = _.get(state.collector, 'plugin_info.options', {});
-            state.priority = _.get(state.collector, 'priority', 10);
+            state.confRef.init(state.collector);
+            state.enableValidation = false;
+            state.isValid = true;
         };
 
         const collectorApi = fluentApi.inventory().collector();
 
         const onClickConfirm = async (): Promise<void> => {
-            if (await refs.confRef.validate()) {
+            state.enableValidation = true;
+            await state.confRef.validate();
+            if (state.isValid) {
                 state.loading = true;
                 try {
-                    const res = collectorApi.update().setParameter({
-                        name: state.name,
-                        // eslint-disable-next-line camelcase
-                        collector_id: props.collectorId,
-                        // eslint-disable-next-line camelcase
-                        plugin_info: {
-                            ..._.get(state.collector, 'plugin_info') as unknown as CollectorPluginModel,
-                            version: state.selectedVersion,
-                            options: {
-                                ..._.get(state.collector, 'plugin_info.options', {}),
-                                ...state.options,
-                            } as PluginOptions,
-                        },
-                        priority: state.priority,
+                    await collectorApi.update()
+                        .setParameter(state.collectorParam)
+                        .setId(props.collectorId)
+                        .execute();
+
+                    root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'success',
+                        text: 'Update Collector',
+                        duration: 2000,
+                        speed: 1000,
                     });
                 } catch (e) {
                     console.error(e);
+                    root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: e.message,
+                        duration: 2000,
+                        speed: 1000,
+                    });
                 } finally {
                     state.loading = false;
+                    state.proxyVisible = false;
                 }
-
-                // CollectorEventBus.$emit('updateCollector', params);
             }
         };
 
         const getCollector = async (id: string): Promise<void> => {
-            state.loading = true;
             try {
                 const res = await collectorApi.get().setId(id).execute();
                 state.collector = res.data;
-                state.pluginId = _.get(props.collector, 'plugin_info.plugin_id', '');
-                state.name = _.get(props.collector, 'name', '');
-                state.priority = _.get(props.collector, 'priority', 10);
-                state.options = _.get(props.collector, 'plugin_info.options', {});
+                state.confRef.init(res.data);
             } catch (e) {
                 console.error(e);
-            } finally {
-                state.loading = false;
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
             }
         };
 
-        watch(() => props.collectorId, (id) => {
-            if (id) getCollector(id);
-        }, { lazy: true });
+        const pluginApi = fluentApi.repository().plugin();
+
+        const getPlugin = async (): Promise<void> => {
+            try {
+                const res = await pluginApi.get().setId(state.pluginId).execute();
+                state.optionsSchema = _.get(res.data,
+                    'template.options.schema',
+                    new JsonSchemaObjectType());
+            } catch (e) {
+                console.error(e);
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+
+        onMounted(async () => {
+            state.loading = true;
+            await getCollector(props.collectorId);
+            await getPlugin();
+            state.loading = false;
+        });
 
 
         return {
@@ -168,7 +208,7 @@ export default {
         height: 100%;
         .spinner {
             display: inline-flex;
-            padding-right: .25rem;
+            padding-right: 0.25rem;
         }
     }
 </style>
