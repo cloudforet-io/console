@@ -420,6 +420,7 @@
 		"ZONE": "Zone"
 	},
 	"WORD": {
+		"BASE_INFO": "기본 정보",
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "클라우드 서비스",
 		"COLLECTOR": "컬렉",

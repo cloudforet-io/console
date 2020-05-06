@@ -29,7 +29,7 @@
                                           @click-enable="onClickEnable"
                                           @click-disable="onClickDisable"
                                           @click-delete="onClickDelete"
-                                          @click-collectData="apiHandler.action"
+                                          @click-collectData="onClickCollectData"
                         >
                             {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
@@ -92,7 +92,7 @@
                :active-tab.sync="tabState.activeTab"
         >
             <template #detail>
-                <collector-detail :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                <collector-detail :data="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #tag>
                 <s-tags-panel :is-show="tabState.activeTab==='tag'"
@@ -145,8 +145,8 @@
                                 :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
         />
 
-        <collect-data-modal v-if="collectDataModalVisible"
-                            :visible.sync="collectDataModalVisible"
+        <collect-data-modal v-if="collectDataState.visible"
+                            :visible.sync="collectDataState.visible"
                             :collector="apiHandler.tableTS.selectState.firstSelectItem"
         />
 
@@ -178,10 +178,8 @@ import { fluentApi } from '@/lib/fluent-api';
 import _ from 'lodash';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -194,7 +192,7 @@ import {
     getEnumValues, makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-
+import { CollectorModel } from '@/lib/fluent-api/inventory/collector';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
@@ -211,20 +209,6 @@ const CollectorCredentials = () => import('@/views/plugin/collector/modules/Coll
 const CollectorSchedules = () => import('@/views/plugin/collector/modules/CollectorSchedules.vue');
 
 
-const setTabData = (props, context) => (reactive({
-    activeTab: 'detail',
-    tabs: makeTrItems([
-        ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-        ['tag', 'TAB.TAG'],
-        ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-        ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
-    ], context.parent),
-    multiActiveTab: 'data',
-    multiTabs: makeTrItems([
-        ['data', 'TAB.DATA', { keepAlive: true }],
-    ], context.parent),
-}));
-
 const checkModalState = reactive({
     visible: false,
     mode: '',
@@ -240,9 +224,10 @@ const checkModalState = reactive({
 
 const updateModalState = reactive({
     visible: false,
-    loading: false,
-    versions: [],
-    plugin: {},
+});
+
+const collectDataState = reactive({
+    visible: false,
 });
 
 const scheduleState = reactive({
@@ -325,19 +310,29 @@ export const collectorSetup = (props, context) => {
         ['priority', 'COMMON.PRIORITY'],
     ], context.parent));
 
+    const tabState = reactive({
+        activeTab: 'detail',
+        tabs: makeTrItems([
+            ['detail', 'PANEL.DETAILS', { keepAlive: true }],
+            ['tag', 'TAB.TAG'],
+            ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
+        ], context.parent),
+        multiActiveTab: 'data',
+        multiTabs: makeTrItems([
+            ['data', 'TAB.DATA', { keepAlive: true }],
+        ], context.parent),
+    });
 
     const state = reactive({
-        tabState: setTabData(props, context),
         checkModalState,
-        updateModalState,
         scheduleState,
         dropdown,
         multiFields,
-        collectDataModalVisible: false,
     });
 
     const onClickUpdate = () => {
-        state.updateModalState.visible = true;
+        updateModalState.visible = true;
     };
     const onClickEnable = () => {
         state.checkModalState.mode = 'enable';
@@ -373,9 +368,16 @@ export const collectorSetup = (props, context) => {
         state.checkModalState.visible = true;
     };
 
+    const onClickCollectData = () => {
+        collectDataState.visible = true;
+    };
+
 
     return {
         ...toRefs(state),
+        tabState,
+        updateModalState,
+        collectDataState,
         ACHandler,
         apiHandler,
         timestampFormatter,
@@ -385,6 +387,7 @@ export const collectorSetup = (props, context) => {
         onClickEnable,
         onClickDisable,
         onClickDelete,
+        onClickCollectData,
     };
 };
 
