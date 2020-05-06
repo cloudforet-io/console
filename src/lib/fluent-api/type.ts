@@ -32,7 +32,7 @@ type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|
 export interface FilterItem extends LongFilterType {
     key: string;
     value: string | Array<string|null> | null;
-    operator: FILTER_OPERATOR;// OperatorType;
+    operator: FILTER_OPERATOR | OperatorType;
 }
 
 export interface ShortFilterType {
