@@ -1,4 +1,4 @@
-import {Ref, ref, watch} from '@vue/composition-api';
+import {ref, watch} from '@vue/composition-api';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -21,12 +21,9 @@ export abstract class BaseGridFluentAPI<
     > extends DynamicFluentAPIToolSet<parameter, resp, action> {
     gridTS: T;
 
-    totalCount: Ref<number>;
-
 
     protected constructor(action: action) {
         super(action);
-        this.totalCount = ref(0);
         this.gridTS = new ToolboxGridLayoutToolSet<initData, initSyncData>() as T;
     }
 
@@ -45,7 +42,6 @@ export abstract class BaseGridFluentAPI<
         try {
             res = await this.getAction().execute();
             this.gridTS.state.items = res.data.results;
-            this.totalCount.value = res.data.total_count;
             this.gridTS.setAllPage(res.data.total_count);
         } catch (e) {
             this.gridTS.state.items = [];

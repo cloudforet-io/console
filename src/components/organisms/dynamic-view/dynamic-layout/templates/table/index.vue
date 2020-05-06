@@ -32,16 +32,8 @@
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
-            <div class="left-toolbox-item xs:hidden lg:block w-1/2">
+            <div class="left-toolbox-item w-1/2">
                 <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
-            </div>
-        </template>
-        <template #toolbox-bottom>
-            <div class="dl-toolbox-bottom">
-                <p-search
-                    class="search"
-                    :search-text.sync="proxySearchText" @onSearch="getData"
-                />
             </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
@@ -229,17 +221,6 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .dl-toolbox-bottom{
-        @apply w-full h-auto;
-        margin-top: -1rem;
-        .search{
-            @apply mt-4;
-            @screen lg{
-                display: none !important;
-            }
-        }
-    }
-    >>> .
     .left-toolbox-item{
     &:last-child {
          flex-grow: 1;
