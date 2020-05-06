@@ -67,7 +67,7 @@ export default {
             background-repeat: no-repeat;
             background-clip: padding-box;
             color: $opposite-color;
-            text-decoration: underline;
+            text-decoration: none;
         }
     }
 }
