@@ -1,12 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
+			"CLICK_ADD_BTN_MSG": "아래 버튼을 눌러 태그를 추가할 수 있습니다.",
+			"HELPMSG": "Key - Value 페어는 필수 항목이고 Key는 문자로 시작하여 문자, 숫자, 밑줄만을 포함할 수 있습니다.",
 			"INVALID": {
 				"KEY_DUPL": "키는 중복될 수 없습니다.",
 				"KEY_EMPTY": "키를 입력해주세요.",
 				"VAL_EMPTY": "값을 입력해주세요."
 			}
 		},
+		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "{itemName} {limitCount}개 제한",
 		"SELECTED_OF": "{totalCount}개 중 {selectedCount}개 선택",
 		"TIMEZONE_OF": "모두 {timezone}으로 보여집니다."
@@ -350,6 +353,7 @@
 		"RAWDATA": "원본 데이터",
 		"SCHEDULE": "스케줄",
 		"TAG": "태그",
+		"TAGS": "태그",
 		"VM": "VM"
 	},
 	"PLUGIN": {

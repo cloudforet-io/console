@@ -57,7 +57,7 @@
                                 <template #toolbox-left>
                                     <PIconTextButton style-type="primary-dark"
                                                      name="ic_plus_bold"
-                                                     @click="clickOpenForm('add')"
+                                                     @click="addServiceAccount"
                                     >
                                         {{ $t('BTN.ADD') }}
                                     </PIconTextButton>
@@ -82,7 +82,6 @@
                                 :details="accountDetails"
                                 :data="apiHandler.tableTS.selectState.firstSelectItem"
                             />
-
                         </template>
                         <template #tag>
                             <s-tags-panel
@@ -166,9 +165,7 @@
                 @confirm="deleteConfirm"
             />
             <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
-            <SServiceAccountFormModal v-if="formVisible" :visible.sync="formVisible" :schema="formSchema"
-                                      @confirm="formConfirm($event)"
-            />
+
             <SSecretCreateFormModal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
                                     @confirm="secretFormConfirm($event)"
             />
@@ -200,7 +197,7 @@ import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/
 import { ProjectNode } from '@/lib/api/tree';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
-import {  useStore } from '@/store/toolset';
+import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
@@ -227,7 +224,6 @@ export default {
         PEmpty,
         SProjectTreeModal,
         PDoubleCheckModal,
-        SServiceAccountFormModal,
         SSecretCreateFormModal,
         PIconTextButton,
         PPanelTop,
@@ -248,6 +244,7 @@ export default {
             'template.service_account.schema',
             'capability.supported_schema',
         );
+        const vm = getCurrentInstance();
 
 
         const selectProvider = ref<string>('');
@@ -309,7 +306,7 @@ export default {
         const accountDataSource = computed<any[]>(() => [
             ...originDataSource.value,
             {
-                name: 'project', key: 'console_force_data.project', view_type: 'text', view_option: {},
+                name: 'project', key: 'console_force_data.project', type: 'text', option: {},
             },
             createAtVF,
         ]);
@@ -562,62 +559,21 @@ export default {
                 });
             secretFormState.secretFormVisible = false;
         };
-
-
-        const formState = reactive({
-            mode: 'add' as 'add'|'update',
-            formVisible: false,
-            formSchema: {} as any,
-        });
-
-
-        const clickOpenForm = (mode: 'add'|'update') => {
-            formState.mode = mode;
-            formState.formSchema = selectProviderItem.value.template.service_account.schema;
-            formState.formVisible = true;
-        };
-        const formConfirm = (item) => {
-            if (formState.mode === 'add') {
-                const param = {
-                    provider: selectProvider.value,
-                    ...item,
-                };
-                fluentApi.identity().serviceAccount().create().setParameter(param)
-                    .execute()
-                    .then(() => {
-                        context.root.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'success',
-                            title: 'Add Success',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                    })
-                    .catch(() => {
-                        context.root.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'alert',
-                            title: 'Add Fail',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                    })
-                    .finally(() => {
-                        apiHandler.getData();
-                    });
-            }
-            formState.formVisible = false;
+        const addServiceAccount = () => {
+            vm?.$router.push({
+                name: 'addServiceAccount',
+                params: { provider: selectProvider.value },
+                query: { nextPath: vm.$route.fullPath },
+            });
         };
 
-
+        apiHandler.getData();
         const clickLink = () => {
             const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
             const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
             console.debug(linkTemplate, link);
             window.open(link);
         };
-        apiHandler.getData();
-
         return {
             apiHandler,
             accountDataSource,
@@ -636,16 +592,14 @@ export default {
             projectModalVisible,
             exportToolSet,
             adminApiHandler,
-            clickOpenForm,
-            formConfirm,
             clickSecretAddForm,
-            ...toRefs(formState),
             ...toRefs(secretFormState),
             secretFormConfirm,
-            clickLink,
             providerListState,
             selectProvider,
             providerTotalCount,
+            addServiceAccount,
+            clickLink,
         };
     },
 };
