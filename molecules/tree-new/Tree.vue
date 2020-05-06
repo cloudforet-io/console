@@ -111,16 +111,17 @@ export default defineComponent({
         type addType = 'append' | 'prepend' | 'before' | 'after';
         const addNode = (node, newItem: string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
             if (state.tree) {
-                console.log('node test', node)
                 if (!node) {
                     state.tree[type](newItem);
                 }
-                // if (node) {
-                //     state.tree[type](node, newItem);
-                // } else {
-                //     state.tree[type](newItem);
-                // }
+                if (node) {
+                    state.tree[type](node, newItem);
+                }
             }
+        };
+
+        const find = (...args: any[]) => {
+            state.tree.find(...args);
         };
 
         const onFetch = (node) => {
@@ -150,6 +151,7 @@ export default defineComponent({
             onNodeRightClick,
             deleteNode,
             addNode,
+            find,
             treeListeners,
         };
     },
