@@ -5,6 +5,7 @@
                        @click="$emit('goBack',$event)"
         />
         <div class="title" :class="{child}">
+            <slot name="before-title" />
             <slot name="title">
                 {{ title }}
             </slot>
