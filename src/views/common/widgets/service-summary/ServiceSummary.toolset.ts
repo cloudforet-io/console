@@ -3,6 +3,7 @@ import { colorset } from '@/lib/util';
 
 import { Stat } from '@/lib/fluent-api/statistics/resource';
 import { initReactive, StateToolSet } from '@/lib/toolset';
+import { HistoryStat } from '@/lib/fluent-api/statistics/history';
 
 
 export const serviceSummaryProps = {
@@ -22,13 +23,27 @@ export const serviceSummaryProps = {
         type: Function,
         default: api => api,
     },
+    getTrendAction: {
+        type: Function,
+        default: api => api,
+    },
 };
+
+export interface Value {
+    count: number;
+}
+
+export interface Trend {
+    count: string;
+    date: number;
+}
 
 export interface ServiceSummaryPropsType {
     title: string;
     to: Location | string;
     color: string;
-    getAction(api: Stat<any>): Stat<any>;
+    getAction(api: Stat<Value>): Stat<Value>;
+    getTrendAction(api: HistoryStat<Trend>): HistoryStat<Trend>;
 }
 
 
@@ -42,6 +57,7 @@ export class ServiceSummaryWidgetState {
             to: '/dashboard',
             color: colorset[0],
             getAction: action => action,
+            getTrendAction: action => action,
         };
     }
 
