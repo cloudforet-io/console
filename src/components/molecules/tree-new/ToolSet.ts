@@ -151,8 +151,8 @@ export const treeProps = {
 };
 
 export interface TreeMetaState {
-    selectedNode: any[];
-    firstSelectedNode: any;
+    selectedNode: any[]|null;
+    firstSelectedNode: Ref<any>;
 }
 
 @HelperToolSet()

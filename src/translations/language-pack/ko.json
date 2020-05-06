@@ -410,6 +410,7 @@
 	},
 	"TREE_TYPE": {
 		"CREATE": "{0} 생성하기",
+		"CREATE_GRP": "하위 프로젝트 그룹 생성",
 		"DELETE": "삭제하기",
 		"POOL": "Pool",
 		"PROJ": "프로젝트",
