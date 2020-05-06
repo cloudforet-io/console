@@ -165,9 +165,7 @@
                 @confirm="deleteConfirm"
             />
             <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
-            <SServiceAccountFormModal v-if="formVisible" :visible.sync="formVisible" :schema="formSchema"
-                                      @confirm="formConfirm($event)"
-            />
+
             <SSecretCreateFormModal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
                                     @confirm="secretFormConfirm($event)"
             />
@@ -226,7 +224,6 @@ export default {
         PEmpty,
         SProjectTreeModal,
         PDoubleCheckModal,
-        SServiceAccountFormModal,
         SSecretCreateFormModal,
         PIconTextButton,
         PPanelTop,
@@ -309,7 +306,7 @@ export default {
         const accountDataSource = computed<any[]>(() => [
             ...originDataSource.value,
             {
-                name: 'project', key: 'console_force_data.project', view_type: 'text', view_option: {},
+                name: 'project', key: 'console_force_data.project', type: 'text', option: {},
             },
             createAtVF,
         ]);
@@ -571,7 +568,12 @@ export default {
         };
 
         apiHandler.getData();
-
+        const clickLink = () => {
+            const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
+            const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
+            console.debug(linkTemplate, link);
+            window.open(link);
+        };
         return {
             apiHandler,
             accountDataSource,
@@ -597,6 +599,7 @@ export default {
             selectProvider,
             providerTotalCount,
             addServiceAccount,
+            clickLink,
         };
     },
 };

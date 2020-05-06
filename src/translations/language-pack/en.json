@@ -1,12 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
+			"CLICK_ADD_BTN_MSG": "Tap the button below to add a tag.",
+			"HELPMSG": "The Key - Value pair is a required entry and the Key can start with a letter and contain only letters, numbers, and underscores.",
 			"INVALID": {
 				"KEY_DUPL": "Keys cannot be duplicated.",
 				"KEY_EMPTY": "Enter the Key.",
 				"VAL_EMPTY": "Enter the Value."
 			}
 		},
+		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "Limit {limitCount} {itemName}",
 		"SELECTED_OF": "{selectedCount} selected of {totalCount}",
 		"TIMEZONE_OF": "All times shown are in {timezone}."
@@ -347,7 +350,8 @@
 		"LOCAL": "Local",
 		"RAWDATA": "Raw Data",
 		"SCHEDULE": "Schedules",
-		"TAG": "Tags",
+		"TAG": "Tag",
+		"TAGS": "Tags",
 		"VM": "VM"
 	},
 	"PLUGIN": {
