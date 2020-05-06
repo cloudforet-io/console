@@ -118,14 +118,9 @@
                             </p-dynamic-view>
                         </template>
                         <template #admin>
-                            <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
-                                {{ $t('TAB.ADMIN') }}
-                            </PPanelTop>
-                            <p-dynamic-view
-                                view_type="table"
-                                :api-handler="adminApiHandler"
-                                :data_source="adminApiHandler.dataSource"
-                                :data="null"
+                            <s-dynamic-layout :api="adminApiHandler"
+                                              :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                              v-bind="defaultAdminLayout"
                             />
                         </template>
                     </PTab>
@@ -134,20 +129,17 @@
                           :active-tab.sync="multiItemTab.syncState.activeTab"
                     >
                         <template #data>
-                            <p-dynamic-view
-                                view_type="simple-table"
-                                :data_source="accountDataSource"
+                            <s-dynamic-layout
+                                type="simple-table"
+                                :options="{fields:accountDataSource}"
                                 :data="apiHandler.tableTS.selectState.selectItems"
+                                :vbind="{showTitle:false}"
                             />
                         </template>
                         <template #admin>
-                            <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
-                                {{ $t('TAB.ADMIN') }}
-                            </PPanelTop>
-                            <p-dynamic-view
-                                view_type="table"
-                                :api-handler="adminApiHandler"
-                                :data_source="adminApiHandler.dataSource"
+                            <s-dynamic-layout :api="adminApiHandler"
+                                              :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                              v-bind="defaultAdminLayout"
                             />
                         </template>
                     </PTab>
@@ -181,6 +173,7 @@ import {
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -189,7 +182,11 @@ import { makeTrItems } from '@/lib/view-helper/index';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
-import { AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI } from '@/lib/api/table';
+import {
+    AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI,
+    defaultAdminLayout,
+
+} from '@/lib/api/table';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
@@ -200,7 +197,6 @@ import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluen
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
-import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
@@ -230,6 +226,7 @@ export default {
         PGridLayout,
         PPageTitle,
         STagsPanel,
+        SDynamicLayout,
     },
     setup(props, context) {
         const { project } = useStore();
@@ -447,14 +444,8 @@ export default {
             adminIsShow,
             serviceAccountID,
             apiHandler,
-            {
-                striped: true,
-                border: false,
-                shadow: false,
-                padding: false,
-                multiSelect: false,
-            },
         );
+
 
         const deleteTS = new DoubleCheckModalState();
         const deleteAction = ref<any>(null);
@@ -506,7 +497,6 @@ export default {
                 });
             deleteTS.syncState.visible = false;
         };
-
 
         const secretDataSource: DataSourceItem[] = [
             { name: 'Secret', key: 'secret_id' },
@@ -600,6 +590,8 @@ export default {
             providerTotalCount,
             addServiceAccount,
             clickLink,
+            adminIsShow,
+            defaultAdminLayout,
         };
     },
 };
