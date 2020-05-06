@@ -19,10 +19,12 @@ import { computed, defineComponent } from '@vue/composition-api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
+import { DataSourceItem } from '@/lib/fluent-api';
 
-interface DV{
+interface DV {
+    name: string;
     // eslint-disable-next-line camelcase
-    data_source: any[];
+    data_source: DataSourceItem[];
     // eslint-disable-next-line camelcase
     view_type?: string;
     // eslint-disable-next-line camelcase
