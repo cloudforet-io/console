@@ -1,5 +1,12 @@
 <template>
-    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
+    <div :class="{
+        'toolbox-table': true,
+        background:toolboxBackground,
+        'no-padding':!padding,
+        'toolbox-shadow':shadow,
+        'toolbox-border': border,
+    }"
+    >
         <div class="toolbox">
             <p-row v-if="$slots['toolbox-top']" class="toolbox-top">
                 <slot name="toolbox-top" />

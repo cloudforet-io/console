@@ -1,6 +1,5 @@
 <template>
     <p-button v-bind="buttonBind"
-              :disabled="loading || disabled"
               v-on="$listeners"
     >
         <div class="loading-btn">
@@ -14,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { computed, defineComponent, reactive } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
@@ -37,6 +36,20 @@ export default defineComponent({
         },
     },
     components: { PLottie, PButton },
+    setup(props) {
+        const state = reactive({
+            mergedButtonBind: computed(() => {
+                const res = {
+                    disabled: props.loading || props.disabled,
+                    ...props.buttonBind,
+                };
+                return res;
+            }),
+        });
+        return {
+
+        };
+    },
 });
 </script>
 
@@ -48,7 +61,7 @@ export default defineComponent({
     height: 100%;
     .spinner {
         display: inline-flex;
-        padding-right: .25rem;
+        padding-right: 0.25rem;
     }
 }
 </style>
