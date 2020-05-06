@@ -200,7 +200,7 @@ export default {
             border-top-style: solid;
         }
 
-        @mixin context-menu-color secondary, theme('colors.secondary2'), theme('colors.secondary');
+        @mixin context-menu-color secondary, theme('colors.white'), theme('colors.secondary');
         @mixin context-menu-color gray900, theme('colors.white'), theme('colors.gray.900');
 
         .context-content {
@@ -228,7 +228,7 @@ export default {
             }
             white-space: nowrap;
 
-            @mixin context-item-them secondary, theme('colors.secondary'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
+            @mixin context-item-them secondary, theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
                                      theme('colors.secondary'), theme('colors.gray.200');
             @mixin context-item-them gray900, theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'), theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
         }
