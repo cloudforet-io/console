@@ -15,11 +15,11 @@
         <p-pane-layout class="w-full px-4 py-8">
             <div v-if="items.length == 0" class="comment">
                 <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그가 없습니다.<br>
-                아래 버튼을 눌러 태그를 추가할 수 있습니다.
+                {{ $t('ACTION.DICT.CLICK_ADD_BTN_MSG') }}
             </div>
             <div v-else class="comment">
                 <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그를 추가합니다.<br>
-                키-값 페어는 필수 항목이며, 키는 문자로 시작해야하고 문자, 숫자, 밑줄만 포함할 수 있습니다.
+                {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
 
             <p-dict-input-group

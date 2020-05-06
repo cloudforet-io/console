@@ -151,7 +151,7 @@ export const treeProps = {
 };
 
 export interface TreeMetaState {
-    selectedNode: any[];
+    selectedNode: any[]|null;
     firstSelectedNode: Ref<any>;
 }
 

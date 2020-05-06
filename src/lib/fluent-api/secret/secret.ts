@@ -30,9 +30,13 @@ export type SecretListResp = ListType<SecretModel>
 
 interface CreateParameter extends Tags {
     name: string;
+    data: any;
+    secret_type: string;
+    service_account_id?: string;
 }
 interface UpdateParameter extends Tags, IdParameter {
     name: string;
+    data: any;
 }
 
 class Create extends CreateAction<CreateParameter, any> {}
