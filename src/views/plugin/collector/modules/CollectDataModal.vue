@@ -189,14 +189,17 @@ export default defineComponent({
                         speed: 1000,
                     });
                 } catch (e) {
+                    console.error(e);
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Fail',
-                        text: 'Request Fail',
+                        text: e.message,
                         duration: 2000,
                         speed: 1000,
                     });
+                } finally {
+                    state.proxyVisible = false;
                 }
             }
             state.loading = false;

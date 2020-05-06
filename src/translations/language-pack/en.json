@@ -420,6 +420,7 @@
 		"ZONE": "Zone"
 	},
 	"WORD": {
+		"BASE_INFO": "Base Information",
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "cloud service",
 		"COLLECTOR": "Collector",
