@@ -1,5 +1,7 @@
 import { fluentApi } from '@/lib/fluent-api';
 
+const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount.vue');
+
 const Identity = () => import('@/views/identity/Identity');
 
 const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
@@ -61,6 +63,13 @@ export default {
                     meta: { label: 'tags' },
                     props: true,
                     component: TagsPage,
+                },
+                {
+                    path: 'add/:provider',
+                    name: 'addServiceAccount',
+                    meta: { label: 'Add Service Account' },
+                    props: true,
+                    component: AddServiceAccount,
                 },
             ],
         },

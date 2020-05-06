@@ -228,7 +228,6 @@ export default defineComponent({
             ts.state.loading = true;
             try {
                 const res = await api.execute();
-                console.debug('top project > get data', res);
                 ts.state.data = res.data.results;
             } catch (e) {
                 console.error(e);

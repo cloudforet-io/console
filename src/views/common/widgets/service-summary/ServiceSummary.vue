@@ -25,7 +25,7 @@ import { computed, defineComponent, toRefs } from '@vue/composition-api';
 import numeral from 'numeral';
 import {
     serviceSummaryProps,
-    ServiceSummaryPropsType,
+    ServiceSummaryPropsType, Trend, Value,
 } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 import AnimatedNumber from 'animated-number-vue';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
@@ -33,23 +33,24 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader
 import { SLineChart } from '@/lib/chart/line-chart';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { gray } from '@/styles/colors';
-import { fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import _ from 'lodash';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import moment from 'moment';
 
 export default defineComponent({
     name: 'ServiceSummary',
     components: { PWidgetLayout, PChartLoader, AnimatedNumber },
     props: serviceSummaryProps,
     setup(props: ServiceSummaryPropsType) {
-        interface Data {count: number}
         interface StateInterface {
-            data: Data[];
+            data: Trend[];
             loading: boolean;
             count: number;
         }
         const ts = new SChartToolSet<SLineChart, StateInterface>(SLineChart,
-            (chart: SLineChart) => chart.addData(ts.state.data, props.title)
-                .setLabels(new Array(ts.state.data.length).fill(''))
+            (chart: SLineChart) => chart.addData(ts.state.data.map(d => d.count), props.title)
+                .setLabels(ts.state.data.map(d => moment(d.date).format('MM/DD')))
                 .setGradientHeight(100)
                 .setLineTension(0.02)
                 .setColors([props.color])
@@ -60,24 +61,39 @@ export default defineComponent({
             });
 
 
-        interface Value {
-            count: number;
-        }
-        const api = fluentApi.statisticsTest().resource().stat<Value>().setCount('count');
+        const countApi = fluentApi.statisticsTest().resource().stat<Value>().setCount('count');
 
-        // const trendApi = fluentApi.statisticsTest().history()
+        const trendApi = fluentApi.statisticsTest().history().stat<Trend>()
+            .addGroupKey('created_at', 'date')
+            .setFilter({ key: 'created_at', value: 'now/d-8d', operator: FILTER_OPERATOR.gtTime });
+
+        const getCount = async (): Promise<void> => {
+            try {
+                const res = await props.getAction(countApi).execute();
+                ts.state.count = res.data.results[0]?.count || 0;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getTrend = async (): Promise<void> => {
+            try {
+                const res = await props.getTrendAction(trendApi).execute();
+                ts.state.data = _.sortBy(res.data.results, 'date');
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
+            ts.state.count = 0;
             try {
-                const res = await props.getAction(api).execute();
-                ts.state.count = res.data.results[0]?.count || 0;
-                // TODO: trends api
-                ts.state.data = _.map(_.range(7), (v, i) => ts.state.count);
+                await Promise.all([getTrend(), getCount()]);
             } catch (e) {
                 console.error(e);
-                ts.state.count = 0;
-                ts.state.data = _.fill(_.range(7), 0);
             } finally {
                 ts.state.loading = false;
             }

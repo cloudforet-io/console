@@ -79,7 +79,7 @@ const sample = {
                     {
                         key: 'created_at',
                         value: 'now/d',
-                        operator: 'timedelta_gte',
+                        operator: 'timediff_gte',
                     },
                 ],
                 aggregate: {
@@ -123,10 +123,10 @@ export const OPERATOR_MAP = Object.freeze({
     gte: '>=',
     lt: '<',
     lte: '<=',
-    timedelta_lt: 'td_lt',
-    timedelta_gt: 'td_gt',
-    timedelta_gte:'td_gte',
-    timedelta_lte:'td_lte',
+    timediff_lt: 'td_lt',
+    timediff_gt: 'td_gt',
+    timediff_gte:'td_gte',
+    timediff_lte:'td_lte',
     regx: '$',
 });
 

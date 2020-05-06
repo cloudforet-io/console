@@ -52,7 +52,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         this.transformer = transformer;
     }
 
-    setTransformer(func: (resp: AxiosResponse<resp>) => any|Promise<any>): this {
+    setTransformer<returnType = any>(func: (resp: AxiosResponse<resp>) => returnType|Promise<returnType>): this {
         this.transformer = func;
         return this.clone();
     }
@@ -87,10 +87,10 @@ export const OPERATOR_MAP = Object.freeze({
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
-    td_lt: 'timedelta_lt',
-    td_gt: 'timedelta_gt',
-    td_lte: 'timedelta_lte',
-    td_gte: 'timedelta_gte',
+    td_lt: 'timediff_lt',
+    td_gt: 'timediff_gt',
+    td_lte: 'timediff_lte',
+    td_gte: 'timediff_gte',
     in: 'in', // merge operator
     not_in: 'not_in', // merge operator
     contain_in: 'contain_in', // merge operator
@@ -150,11 +150,19 @@ function getQueryWithApiState<T>(keys: string[], apiState: any): T {
     return res;
 }
 
+export const getBaseQueryApiState = <parameter>(): BaseQueryState<parameter> => ({
+    filter: [],
+    filterOr: [],
+    fixFilter: [],
+    fixFilterOr: [],
+    extraParameter: {} as parameter,
+});
+
 
 export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
     protected apiState: BaseQueryState<parameter> ;
 
-    protected constructor(
+    constructor(
         api: ApiType,
         baseUrl: string,
         initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
@@ -162,11 +170,7 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            filter: [],
-            filterOr: [],
-            fixFilter: [],
-            fixFilterOr: [],
-            extraParameter: {},
+            ...getBaseQueryApiState<parameter>(),
             ...initState,
         };
     }
@@ -225,17 +229,13 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            filter: [] as unknown as FilterItem[],
-            fixFilter: [] as unknown as FilterItem[],
-            filterOr: [] as unknown as FilterItem[],
-            fixFilterOr: [] as unknown as FilterItem[],
+            ...getBaseQueryApiState<parameter>(),
             only: [] as unknown as string[],
             thisPage: 0,
             pageSize: 0,
             sortBy: '',
             sortDesc: true,
             keyword: '',
-            extraParameter: {},
             count_only: false,
             ...initState,
         };

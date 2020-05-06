@@ -1,18 +1,23 @@
 /* eslint-disable camelcase */
 import {
+    BaseQueryAPI,
     ListAction, Resource, ResourceActions, SetParameterAction,
 } from '@/lib/fluent-api/toolset';
 import {
     HistoryDiffParam, HistoryDiffResp, HistoryParam, HistoryListResp, StatResponse,
 } from '@/lib/fluent-api/statistics/type';
-import { ListType, TimeStamp } from '@/lib/fluent-api/type';
+import {
+    ApiType, BaseQuery, ListType, TimeStamp,
+} from '@/lib/fluent-api/type';
 import { StatAction, StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 
 class List extends ListAction<HistoryParam, ListType<HistoryListResp>> {
 }
 
-class Diff<value> extends StatQueryAPI<HistoryDiffParam, HistoryDiffResp<value>> {
+export class HistoryDiff<value> extends BaseQueryAPI<HistoryDiffParam, HistoryDiffResp<value>> {
     path = 'diff'
+
+    protected query = (): BaseQuery => this.getBaseQuery<BaseQuery>({} as BaseQuery);
 
     setTopic(topic: string): this {
         const api = this.clone();
@@ -20,15 +25,15 @@ class Diff<value> extends StatQueryAPI<HistoryDiffParam, HistoryDiffResp<value>>
         return api;
     }
 
-    setStart(start: TimeStamp): this {
+    setFrom(from: string): this {
         const api = this.clone();
-        api.apiState.extraParameter.start = start;
+        api.apiState.extraParameter.from = from;
         return api;
     }
 
-    setEnd(end: TimeStamp): this {
+    setTo(to: string): this {
         const api = this.clone();
-        api.apiState.extraParameter.end = end;
+        api.apiState.extraParameter.to = to;
         return api;
     }
 
@@ -47,7 +52,7 @@ class Diff<value> extends StatQueryAPI<HistoryDiffParam, HistoryDiffResp<value>>
     }
 }
 
-class Stat<value> extends StatAction<HistoryParam, StatResponse<value>> {
+export class HistoryStat<value> extends StatAction<HistoryParam, StatResponse<value>> {
     setTopic(topic: string): this {
         const api = this.clone();
         api.apiState.extraParameter.topic = topic;
@@ -60,7 +65,7 @@ export default class History extends Resource implements ResourceActions<'list'|
 
     list(): List { return new List(this.api, this.baseUrl); }
 
-    diff<value>(): Diff<value> { return new Diff<value>(this.api, this.baseUrl); }
+    diff<value>(): HistoryDiff<value> { return new HistoryDiff<value>(this.api, this.baseUrl); }
 
-    stat<value>(): Stat<value> { return new Stat<value>(this.api, this.baseUrl); }
+    stat<value>(): HistoryStat<value> { return new HistoryStat<value>(this.api, this.baseUrl); }
 }

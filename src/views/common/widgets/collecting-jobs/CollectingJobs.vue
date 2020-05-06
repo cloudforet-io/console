@@ -41,16 +41,15 @@
 
 <script lang="ts">
 import {
-    defineComponent, reactive, toRefs, computed, getCurrentInstance,
+    computed, defineComponent, getCurrentInstance, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-import casual, { arrayOf } from '@/lib/casual';
 import { makeTrItems } from '@/lib/view-helper';
 import { getTimezone } from '@/lib/util';
 import moment from 'moment';
-import { fluentApi, TimeStamp } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi, TimeStamp } from '@/lib/fluent-api';
 import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PTr from '@/components/atoms/table/Tr.vue';
@@ -90,8 +89,9 @@ export default defineComponent({
         }
 
 
-        const api = fluentApi.inventory().jobs().list().setOnly('job_id', 'collector', 'created_at')
-            .setFilter({ key: 'state', value: [JOB_STATE.created, JOB_STATE.progress], operator: '' })
+        const api = fluentApi.inventory().jobs().list()
+            .setOnly('job_id', 'collector', 'created_at')
+            .setFilter({ key: 'state', value: [JOB_STATE.created, JOB_STATE.progress], operator: FILTER_OPERATOR.contain })
             .setSortBy('created_at')
             .setPageSize(5)
             .setThisPage(1);

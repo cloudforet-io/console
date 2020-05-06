@@ -157,7 +157,7 @@ export default {
         } = useStore();
         const providerStore: ProviderStoreType = provider;
         providerStore.getProvider();
-        const providerTotalCount = ref<any>(null);
+        const providerTotalCount = ref<any>({ all: 0 });
         const cstCountName = 'cloud_service_type_count';
         const cstCountApi = fluentApi.statisticsTest().resource().stat()
             .setResourceType('inventory.CloudServiceType')
@@ -236,7 +236,7 @@ export default {
             const ids = resp.data.results.map(item => item.cloud_service_type_id);
             statData.value = null;
             metricAPI.setFilter(
-                { key: 'cloud_service_type_id', operator: 'in', value: ids },
+                { key: 'cloud_service_type_id', operator: '=', value: ids },
             ).execute().then((rp) => {
                 console.debug(rp);
                 const data = {};

@@ -1,12 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
+			"CLICK_ADD_BTN_MSG": "",
+			"HELPMSG": "",
 			"INVALID": {
 				"KEY_DUPL": "",
 				"KEY_EMPTY": "",
 				"VAL_EMPTY": ""
 			}
 		},
+		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
 		"SELECTED_OF": "",
 		"TIMEZONE_OF": ""
@@ -350,6 +353,7 @@
 		"RAWDATA": "",
 		"SCHEDULE": "",
 		"TAG": "",
+		"TAGS": "",
 		"VM": ""
 	},
 	"PLUGIN": {
@@ -406,6 +410,7 @@
 	},
 	"TREE_TYPE": {
 		"CREATE": "",
+		"CREATE_GRP": "",
 		"DELETE": "",
 		"POOL": "",
 		"PROJ": "",
