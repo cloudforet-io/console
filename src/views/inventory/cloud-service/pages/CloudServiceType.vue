@@ -35,6 +35,10 @@
             </p-grid-layout>
         </template>
         <template #default>
+            <div class="text-xs text-gray-500" style="line-height: 120%">
+                Cloud Service Provider
+            </div>
+            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value" />
             <PToolboxGridLayout
                 v-bind="apiHandler.gridTS.state"
                 :this-page.sync="apiHandler.gridTS.syncState.thisPage"
@@ -45,23 +49,22 @@
                 @card:click="clickCard"
                 @clickExcel="exportToolSet.getData()"
             >
-                <template #toolbox-top>
-                    <div class="cst-toolbox-top">
-                        <div style="user-select: none">
-                            <PCheckBox :value="false" :disabled="true" />  search all resource
+                <template slot="toolbox-bottom">
+                    <div class="cst-toolbox-bottom">
+                        <p-query-search-bar
+                            class="search-bar"
+                            :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
+                            :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
+                            @newQuery="apiHandler.gridTS.querySearch.addTag"
+                        />
+                        <div class="checkbox" style="user-select: none;">
+                            <PCheckBox :value="false" :disabled="true" />  <span>search all resource</span>
                         </div>
                     </div>
-                </template>
-                <template #toolbox-left>
-                    <p-query-search-bar
-                        :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
-                        :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
-                        @newQuery="apiHandler.gridTS.querySearch.addTag"
-                    />
-                </template>
-                <template v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
-                    <p-hr style="width: 100%;" />
+
+                    <p-hr v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" style="width: 100%;" />
                     <p-query-search-tags
+                        v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0"
                         class="py-2"
                         :tags="apiHandler.gridTS.querySearch.tags.value"
                         @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
@@ -137,6 +140,7 @@ import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -150,6 +154,7 @@ export default {
         PToolboxGridLayout,
         PGridLayout,
         PSkeleton,
+        PPageTitle,
     },
     setup(props, context) {
         const {
@@ -205,6 +210,7 @@ export default {
             rowGap: '0.5rem',
             fixColumn: 1,
         });
+        const selectProviderName = computed(() => _.find(providerListState.state.items, { provider: selectProvider.value }).name);
         const totalResourceCountName = 'cloud_service_count';
 
         const newResourceCountName = 'yesterday_cloud_service_count';
@@ -256,7 +262,7 @@ export default {
             listAction,
             {
                 cardClass: () => ['card-item', 'cst-card-item'],
-                cardMinWidth: '28.5rem',
+                cardMinWidth: '23rem',
                 cardHeight: '8rem',
                 columnGap: '0.5rem',
                 excelVisible: true,
@@ -304,6 +310,7 @@ export default {
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
         return {
             selectProvider,
+            selectProviderName,
             apiHandler,
             clickCard,
             providerStore,
@@ -321,14 +328,21 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item{
-        margin-left: 1rem;
-        &:last-child {
-            flex-grow: 1;
+    .cst-toolbox-bottom{
+        @apply flex flex-col-reverse items-start justify-between  w-full mb-4;
+        @screen lg {
+            @apply flex-row items-center;
         }
-    }
-    .cst-toolbox-top{
-        @apply flex justify-between items-center w-full mb-4;
+        .search-bar{
+            @apply flex-1;
+            @screen lg{
+                @apply max-w-1/2;
+            }
+        }
+        .checkbox{
+            @apply whitespace-no-wrap;
+
+        }
     }
     .provider-list{
         @apply w-full px-4 pt-4;
