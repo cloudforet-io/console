@@ -87,7 +87,10 @@ export default {
 
 <style lang="postcss" scoped>
     .tree{
-        @apply min-h-56 max-w-145 max-h-56 overflow-auto border-gray-200 rounded-b-sm border;
+        @apply min-h-56 max-h-56 overflow-auto border-gray-200 rounded-b-sm border;
+        @screen lg{
+            @apply w-1/2;
+        }
     }
     .title{
         @apply text-2xl mb-8;
