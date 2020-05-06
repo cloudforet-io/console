@@ -132,7 +132,7 @@ export class Validation {
      * @param func validation func, if invalid return false
      * @param invalidMessage
      */
-    constructor(public func: validationFunction, public invalidMessage: message) { }
+    constructor(public func: validationFunction, public invalidMessage?: message) { }
 }
 
 /**

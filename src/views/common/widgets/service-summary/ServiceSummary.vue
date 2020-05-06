@@ -73,7 +73,7 @@ export default defineComponent({
                 const res = await props.getAction(api).execute();
                 ts.state.count = res.data.results[0]?.count || 0;
                 // TODO: trends api
-                ts.state.data = _.fill(_.range(7), 0);
+                ts.state.data = _.map(_.range(7), (v, i) => ts.state.count);
             } catch (e) {
                 console.error(e);
                 ts.state.count = 0;

@@ -6,7 +6,7 @@ const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
 const Collector = () => import('@/views/plugin/collector/pages/Collector.new.vue');
 
 const CollectorPlugins = () => import('@/views/plugin/collector/pages/CollectorPlugins.vue');
-const CollectorCreator = () => import('@/views/plugin/collector/pages/CollectorCreator.vue');
+const CollectorCreator = () => import('@/views/plugin/collector/pages/CollectorCreator.new.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {

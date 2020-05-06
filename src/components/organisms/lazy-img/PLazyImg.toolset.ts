@@ -15,6 +15,10 @@ export const lazyImgProps = {
         type: String,
         default: 'ic_collector_tags',
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 export interface LazyImgPropsType {
@@ -22,4 +26,5 @@ export interface LazyImgPropsType {
     width?: string;
     imgUrl: string;
     errorIcon?: string;
+    loading?: boolean;
 }

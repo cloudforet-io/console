@@ -3,7 +3,7 @@ export type ButtonStyleType =
     'secondary'| 'secondary1'| 'secondary2'|
     'coral'| 'yellow'|
     'gray'| 'gray200'| 'gray100'|
-    'alert'| 'safe'| 'gray900'|
+    'alert'| 'safe'| 'gray900'| 'gray900-hover' |
     'black'
 
 

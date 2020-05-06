@@ -336,6 +336,10 @@ export abstract class CreateAction<parameter, resp> extends SetParameterAction<p
     protected path = 'create'
 }
 
+export abstract class RegisterAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    protected path = 'register'
+}
+
 export abstract class UpdateAction<parameter, resp> extends SetParameterAction<parameter, resp> {
     protected path = 'update'
 }
@@ -345,8 +349,9 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
 
 
     setId(id: string): this {
-        this.apiState.parameter[this.idField] = id;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter[this.idField] = id;
+        return api;
     }
 }
 
@@ -443,6 +448,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
         };
     };
 }
+
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'get';
 
@@ -481,6 +487,10 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
 
 export abstract class SingleDeleteAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'delete';
+}
+
+export abstract class SingleDeregisterAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    protected path = 'deregister';
 }
 
 export abstract class SingleEnableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
