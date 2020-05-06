@@ -46,7 +46,7 @@
             </div>
         </template>
         <template #extra>
-            <router-link to="inventory/cloud-service" class="more">
+            <router-link to="/inventory/cloud-service" class="more">
                 MORE
                 <p-i name="ic_arrow_right" width="1rem" height="1rem"
                      color="transparent currentColor" class="ml-1"

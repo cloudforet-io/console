@@ -404,6 +404,7 @@
 	},
 	"TREE_TYPE": {
 		"CREATE": "Create {0}",
+		"CREATE_GRP": "Create Sub Project Group",
 		"DELETE": "Delete Selected",
 		"POOL": "Pool",
 		"PROJ": "Project",

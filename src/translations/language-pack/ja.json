@@ -404,6 +404,7 @@
 	},
 	"TREE_TYPE": {
 		"CREATE": "",
+		"CREATE_GRP": "",
 		"DELETE": "",
 		"POOL": "",
 		"PROJ": "",

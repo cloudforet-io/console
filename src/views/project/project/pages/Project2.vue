@@ -230,7 +230,6 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import { tree } from '@/lib/api';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -327,7 +326,7 @@ export default {
         const createdData = reactive({});
         const cardSummary = ref(createdData);
         const projectSummary = ref(createdData);
-        //@ts-ignore
+        // @ts-ignore
         const getSubProject = (action: any) => action.setFilter({ key: 'project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id });
 
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
@@ -364,12 +363,12 @@ export default {
             return resp;
         };
 
-        const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
-
         /**
          * QuerySearch Grid Fluent API Declaration
          * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
          */
+        const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
+
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
@@ -404,10 +403,6 @@ export default {
         });
 
         /**
-         * Dec Child Project Group or Child Project
-         */
-
-        /**
          * Click or Hover Tree Item
          */
         const selected = async (item) => {
@@ -415,11 +410,11 @@ export default {
             treeApiHandler.ts.getSelectedNode(item);
             projectState.currentGroup = item.data.name;
             if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
-            state.hasChildProjectGroup = true;
-            //@ts-ignore
-            const res = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
-            if (res.data.total_count === 0) state.hasChildProjectGroup = false;
-            else state.hasChildProjectGroup = true;
+            // state.hasChildProjectGroup = true;
+            // @ts-ignore
+            const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
+            if (resp.data.total_count > 0) state.hasChildProjectGroup = true;
+            else state.hasChildProjectGroup = false;
             state.items = [];
         };
 
@@ -507,7 +502,6 @@ export default {
             })
                 .execute()
                 .then((resp) => {
-                    console.debug('success resp', resp);
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'success',
@@ -523,7 +517,6 @@ export default {
                     if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
                 })
                 .catch((resp) => {
-                    console.debug(resp);
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'alert',
@@ -541,7 +534,7 @@ export default {
         };
         const projectFormConfirm = (item) => {
             fluentApi.identity().project().create().setParameter({
-                //@ts-ignore
+                // @ts-ignore
                 project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.data.id,
                 ...item,
             })
