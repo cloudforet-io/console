@@ -185,7 +185,6 @@ export default defineComponent({
         });
 
         const listMetrics = async (): Promise<MetricListResp> => {
-            console.debug('execute list metric info');
             state.metricsLoading = true;
             try {
                 const res = await state.metricListApi.execute();
@@ -235,7 +234,6 @@ export default defineComponent({
 
         const listChartMetrics = _.debounce(async (start = 0): Promise<void> => {
             if (state.availableResources.length === 0) return;
-            console.debug('execute list chartMetrics from', start, 'to', state.chartMetrics.length - 1);
             try {
                 const api = getChartMetricApi();
 
@@ -267,7 +265,6 @@ export default defineComponent({
             let endIdx = start + LOAD_LIMIT;
             if (endIdx > state.metrics.length) endIdx = state.metrics.length;
 
-            console.debug('init chart metrics from', start, 'to', endIdx - 1);
             _.range(start, endIdx).forEach((current) => {
                 state.chartMetrics[current] = {
                     dataset: {},
@@ -293,7 +290,6 @@ export default defineComponent({
         };
 
         const listAll = _.debounce(async (): Promise<void> => {
-            console.debug('execute list chartMetrics');
             reset();
 
             const metricInfo = await listMetrics();
