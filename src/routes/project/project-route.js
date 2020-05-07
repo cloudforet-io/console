@@ -5,6 +5,9 @@ const Project = () => import('@//views/project/project/pages/Project2');
 const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
+export const PROJECT_MAIN_PAGE_NAME = 'projectMain';
+export const PROJECT_DETAIL_PAGE_NAME = 'projectDetail';
+export const PROJECT_TAG_PAGE_NAME = 'projectTags';
 export default {
     path: 'project',
     meta: { label: 'Project', breadcrumb: true, api: fluentApi.identity().project() },
@@ -15,18 +18,18 @@ export default {
     children: [
         {
             path: '/',
-            name: 'projectMain',
+            name: PROJECT_MAIN_PAGE_NAME,
             component: Project,
         },
         {
             path: ':id',
-            name: 'projectDetail',
+            name: PROJECT_DETAIL_PAGE_NAME,
             props: true,
             component: ProjectDetail,
         },
         {
             path: ':resourceId/tags',
-            name: 'projectTags',
+            name: PROJECT_TAG_PAGE_NAME,
             meta: { label: 'tags' },
             props: true,
             component: TagsPage,

@@ -32,7 +32,6 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { ResourceActions } from '@/lib/fluent-api';
@@ -54,7 +53,7 @@ interface Props{
 export default defineComponent({
     name: 'SDynamicSubData',
     components: {
-        PSelectBtnGroup, PDynamicView, PEmpty, PButton, PPanelTop, SDynamicLayout, SkePSelectBtnGroup, PSkeleton,
+        PSelectBtnGroup, PEmpty, PButton, PPanelTop, SDynamicLayout, SkePSelectBtnGroup, PSkeleton,
     },
     props: {
         resourceApi: {

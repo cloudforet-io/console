@@ -41,7 +41,7 @@
                         <template #container="{ height }">
                             <PPageTitle
                                 class="mb-6 mt-2"
-                                :use-selected-count="true" :use-total-count="true" title="Cloud Service"
+                                :use-selected-count="true" :use-total-count="true" :title="selectProviderItem.name+' Account'"
                                 :total-count="apiHandler.totalCount.value"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                             />
@@ -76,8 +76,9 @@
                     </p-horizontal-layout>
                     <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
                         <template #detail>
-                            <PDynamicDetails
-                                :details="accountDetails"
+                            <s-dynamic-layout
+                                class="mb-8"
+                                v-bind="saLayout"
                                 :data="apiHandler.tableTS.selectState.firstSelectItem"
                             />
                         </template>
@@ -172,7 +173,6 @@ import {
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
@@ -198,7 +198,6 @@ import { createAtVF } from '@/lib/data-source';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import _ from 'lodash';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
@@ -214,7 +213,6 @@ export default {
         PTab,
         PButton,
         PDropdownMenuBtn,
-        PDynamicDetails,
         PEmpty,
         SProjectTreeModal,
         PDoubleCheckModal,
@@ -389,13 +387,6 @@ export default {
         };
 
 
-        const accountDetails = computed(() => [
-            {
-                name: 'Base Information',
-                data_source: accountFields.value,
-            },
-        ]);
-
         const secretIsShow = computed(() => apiHandler.tableTS.selectState.isSelectOne && singleItemTab.syncState.activeTab === 'credentials');
 
         const secretListAction = fluentApi.secret().secret().list();
@@ -566,14 +557,31 @@ export default {
             console.debug(linkTemplate, link);
             window.open(link);
         };
+
+        const saLayout = computed(() => {
+            const fields = accountFields.value;
+            return {
+                name: 'Base Information',
+                type: 'item',
+                options: {
+                    fields,
+                },
+            };
+        });
+        // const saApi = computed(() => {
+        //     const id = apiHandler.tableTS.selectState.firstSelectItem.service_account_id;
+        //     return {
+        //         resource: fluentApi.identity().serviceAccount().get().setId(id),
+        //     };
+        // });
         return {
             apiHandler,
             accountFields,
             singleItemTab,
             multiItemTab,
-            accountDetails,
             secretApiHandler,
             secretDataSource,
+            selectProviderItem,
             deleteTS,
             accountDeleteClick,
             deleteConfirm,
@@ -593,6 +601,8 @@ export default {
             clickLink,
             adminIsShow,
             defaultAdminLayout,
+            // saApi,
+            saLayout,
         };
     },
 };
