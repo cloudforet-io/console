@@ -492,20 +492,20 @@ export default defineComponent({
     thead {
         tr {
             th {
+                vertical-align: middle;
                 white-space: nowrap;
                 .th-contents {
                     @apply flex justify-between pl-4 py-1 text-black;
                 }
                 .sort-icon {
-                    @apply text-gray-500 float-right my-px;
-                    &:hover { cursor:pointer; }
+                    @apply text-gray-500 float-right;
                 }
                 &.fix-width {
                     @apply min-w-19;
                 }
                 &:last-child {
                     .th-contents {
-                        @apply pr-2;
+                        @apply pr-4;
                     }
                 }
                 &.all-select {

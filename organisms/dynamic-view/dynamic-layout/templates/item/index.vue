@@ -144,14 +144,12 @@ export default defineComponent({
 
 .content-table {
     @apply w-full ;
-    /* border-spacing: 2px; */
+    border-spacing: 2px;
     tbody{
         >>>.def-row:nth-child(2n+1) {
             td{
-                @apply bg-violet-100;
-                &:first-child{
-                    @apply border-r-2 border-white
-                }
+                @apply bg-violet-100 border-l-2 border-white;
+
             }
 
         }

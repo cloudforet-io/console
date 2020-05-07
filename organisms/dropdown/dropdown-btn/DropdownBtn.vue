@@ -98,7 +98,6 @@ export default defineComponent({
     border-bottom-width: 1px;
     border-style: solid;
     min-width: 2rem;
-    font-weight:normal;
     &:hover {
         @apply text-secondary;
     }

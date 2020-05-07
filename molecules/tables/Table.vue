@@ -137,8 +137,7 @@ export default defineComponent({
             position: sticky;
             z-index: 1;
             top: 0;
-            line-height: 2;
-            font-size: .875rem;
+            line-height: 1.5rem;
             text-align: left;
             letter-spacing: 0;
         }
