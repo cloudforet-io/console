@@ -92,7 +92,7 @@
                         <template #credentials>
                             <s-dynamic-layout
                                 type="table"
-                                :name="$t('TAB.SECRET')"
+                                :name="$t('TAB.CREDENTIALS')"
                                 :toolset="secretApiHandler"
                                 :options="{fields: secretDataSource}"
                                 :vbind="{
@@ -307,7 +307,7 @@ export default {
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['tag', 'TAB.TAG'],
-                ['credentials', 'TAB.SECRET'],
+                ['credentials', 'TAB.CREDENTIALS'],
                 ['admin', 'TAB.ADMIN'],
             ]),
         });
