@@ -75,6 +75,7 @@ export default {
         cursor: default;
         .page-number-text {
             line-height: 1.2rem;
+            font-size: 0.875rem;
             .this-page {
                 font-weight: bold;
             }
