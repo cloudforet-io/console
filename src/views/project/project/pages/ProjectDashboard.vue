@@ -67,6 +67,7 @@ import { fluentApi, Resource } from '@/lib/fluent-api';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
+import { HistoryDiff } from '@/lib/fluent-api/statistics/history';
 import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
 import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
@@ -118,6 +119,11 @@ export default {
                     operator: '=',
                 }).setResourceType('inventory.Server'),
             getTrendAction: api => api.setTopic('daily_server_count')
+                .setFilter({
+                    key: 'values.project_id',
+                    value: projectId.value,
+                    operator: '=',
+                })
                 .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
         });
 
@@ -132,6 +138,11 @@ export default {
                     operator: '=',
                 }).setResourceType('inventory.CloudService'),
             getTrendAction: api => api.setTopic('daily_cloud_service_count')
+                .setFilter({
+                    key: 'values.project_id',
+                    value: projectId.value,
+                    operator: '=',
+                })
                 .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });
 
@@ -147,7 +158,7 @@ export default {
                 value: projectId.value,
                 operator: '=',
             })
-                .setTopic('daily_cloud_service_updates'),
+                .setTopic('daily_cloud_service_updates_by_project'),
         });
 
         const resources = ({
