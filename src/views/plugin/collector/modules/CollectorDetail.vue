@@ -9,6 +9,7 @@ import {
     computed, reactive, toRefs, defineComponent, getCurrentInstance,
 } from '@vue/composition-api';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { dateTimeViewType } from '@/lib/data-source';
 
 
@@ -37,6 +38,9 @@ export default defineComponent({
                     key: 'plugin_info.options.supported_resource_type',
                     type: 'list',
                     options: {
+                        item: {
+                            type: 'badge',
+                        },
                         delimiter: ', ',
                     },
                 },

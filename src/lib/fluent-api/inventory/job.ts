@@ -6,7 +6,7 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { CollectorModel, COLLECT_MODE } from '@/lib/fluent-api/inventory/collector';
+import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 
 const idField = 'job_id';
 

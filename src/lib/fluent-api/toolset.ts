@@ -332,6 +332,10 @@ export abstract class SetParameterAction<parameter, resp> extends RawParameterAc
     }
 }
 
+export abstract class AddAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    protected path = 'add'
+}
+
 export abstract class CreateAction<parameter, resp> extends SetParameterAction<parameter, resp> {
     protected path = 'create'
 }

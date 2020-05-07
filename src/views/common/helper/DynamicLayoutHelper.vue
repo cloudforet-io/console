@@ -181,6 +181,7 @@ const defaultSchema = {
             subData: CloudServiceSD,
             table: CloudServiceTable,
         },
+
     },
 };
 const makeItem = (names: string[]) => names.map(s => ({ type: 'item', name: s, label: s }));
