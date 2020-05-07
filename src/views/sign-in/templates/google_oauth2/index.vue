@@ -1,12 +1,10 @@
 <template>
-    <div>
-    <p class="subtitle">Multicloud Managed Service</p> 
     <div class="user-info">
         <div class="g-signin2">
             <div id="g-signin-btn" class="w-full" />
         </div>
         <div class="btn-divider">
-            <span>OR</span>
+            OR
         </div>
         <div class="flex flex-col mb-4 md:w-full">
             <p-button outline
@@ -15,10 +13,9 @@
                       size="lg"
                       @click="goToAdmin"
             >
-                Sign in using root account credentials
+                Sign-in using root account credentials
             </p-button>
         </div>
-    </div>
     </div>
 </template>
 
@@ -44,7 +41,7 @@ export default defineComponent({
             const response = await vm.$http.post('/identity/token/issue', {
                 credentials: param,
                 domain_id: vm.$ls.domain.state.domainId,
-            }, { skipAuthRefresh: true });
+            },{ skipAuthRefresh: true });
             context.emit('onLogin', userId, response.data);
         };
         const onLogIn = async (googleUser) => {
@@ -76,8 +73,8 @@ export default defineComponent({
 
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
-                    height: 48,
-                    width: 'auto',
+                    height: 50,
+                    width: 330,
                     longtitle: true,
                     theme: 'dark',
                     onsuccess: onLogIn,
@@ -94,33 +91,22 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .subtitle {
-        padding-top: 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    .btn.btn-outline-gray { 
-        font-size:.875rem;
-        font-weight: normal;
-    }
 
     #g-signin-btn {
-        padding-top: 1.5rem;
+        padding-top: 3.5rem;
         padding-bottom: 3.5rem;
     }
 
     .btn-divider {
-      display: flex;
-      flex-basis: 100%;
-      align-items: center;
-      color:#DCDDE2;
-      font-style: normal;
-      font-weight: bold;
-      font-size: 0.875rem;
-      margin-bottom:1em; 
-    }
-    .btn-divider > span {
-        margin:.5rem;
+        display: flex;
+        flex-basis: 100%;
+        align-items: center;
+        color: #DCDDE2;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 14px;
+        /*padding-top: 41px;*/
+        margin-bottom: 1.5rem;
     }
     .btn-divider::before,
     .btn-divider::after {

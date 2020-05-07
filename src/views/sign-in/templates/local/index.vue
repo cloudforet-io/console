@@ -58,7 +58,7 @@
             </p-button>
         </div>
         <div class="btn-divider">
-            <span>OR</span>
+            OR
         </div>
         <div class="flex flex-col mb-4 w-full">
             <p-button
@@ -68,7 +68,7 @@
                 size="lg"
                 @click="goToAdmin"
             >
-                Sign in using root account credentials
+                Sign-in using root account credentials
             </p-button>
         </div>
     </div>
@@ -158,11 +158,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .btn.btn-outline-gray { 
-        font-size:.875rem;
-        font-weight:normal;
-    }
-
     .input-title {
       font-size: 0.875rem;
       font-weight: bold;
@@ -187,11 +182,9 @@ export default defineComponent({
       color: #dcdde2;
       font-style: normal;
       font-weight: bold;
-      font-size: 0.875rem;
-      margin-bottom:1em; 
-    }
-    .btn-divider > span {
-        margin:.5rem;
+      font-size: 14px;
+      /*padding-top: 41px;*/
+      margin-bottom: 1.5rem;
     }
     .btn-divider::before,
     .btn-divider::after {
@@ -199,5 +192,6 @@ export default defineComponent({
       flex-grow: 1;
       background: #dcdde2;
       height: 1px;
+      margin: 0px 8px;
     }
 </style>

@@ -1,22 +1,22 @@
 <template>
-    <div class="user-info md:min-w-72">
+    <div class="user-info">
         <p v-if="!loginFail" class="subtitle">
-           Multicloud Managed Service 
+            Welcome to SPACEONE Console
         </p>
         <p v-else-if="loginFail" id="errorMsg" class="subtitle">
             Please Confirm your ID or Password.
         </p>
         <div id="login-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
-            <form class="form w-full">
-                <div class="flex flex-col form">
+            <form class="form">
+                <div class="flex flex-col md:w-full form">
                     <p class="input-title">
-                        Admin ID
+                        Admin User ID
                     </p>
                     <PFieldGroup :invalid-text="invalidMsg.userId" :invalid="invalidState.userId">
                         <template #default="{invalid}">
                             <p-text-input
                                 v-model="userId"
-                                placeholder="Admin ID"
+                                placeholder="User ID"
                                 class="w-full"
                                 autocomplete="username"
                                 :class="{
@@ -54,7 +54,7 @@
             <p-button style-type="primary" type="submit" size="lg"
                       @click="login"
             >
-               Admin Sign in
+                Login
             </p-button>
         </div>
     </div>
@@ -153,11 +153,14 @@ export default defineComponent({
         padding-top: 0.5rem;
         font-weight: normal;
         font-size: 0.875rem;
-        padding-bottom: 1.5rem;
+        padding-bottom: 24px;
     }
 
     #errorMsg {
         color: red;
     }
 
+    .w-full {
+        width: 22rem;
+    }
 </style>
