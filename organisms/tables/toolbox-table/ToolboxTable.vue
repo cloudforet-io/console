@@ -3,7 +3,6 @@
         'toolbox-table': true,
         background:toolboxBackground,
         'no-padding':!padding,
-        'toolbox-shadow':shadow,
         'toolbox-border': border,
     }"
     >
@@ -223,12 +222,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .toolbox-shadow {
-        box-shadow: 0px 0px 8px #4D49B614;
-    }
-
     .toolbox-border {
-        border: 1px solid #F2F2F2;
+        border: 1px solid #DCDDE2; 
+        border-radius: .125rem;
     }
 
     .toolbox-table {
