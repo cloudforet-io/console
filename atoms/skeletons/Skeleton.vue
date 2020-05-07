@@ -30,8 +30,8 @@ export default {
 
         if (showLoading) {
             style.backgroundColor = color;
-            style.width = width;
-            style.height = height;
+            if (width) style.width = width;
+            if (height) style.height = height;
 
             if (animation) {
                 style.backgroundImage = `linear-gradient(90deg, ${color}, ${highlight}, ${color})`;
@@ -62,7 +62,7 @@ export default {
 <style lang="postcss">
     .p-skeleton {
         @apply rounded-sm inline-block w-full;
-        height: inherit;
+        height: 0.875rem;
         line-height: inherit;
         background-repeat: no-repeat;
         background-size: 200px 100%;

@@ -19,11 +19,11 @@ export const skeletonProps = {
     },
     width: {
         type: String,
-        default: '100%',
+        default: null,
     },
     height: {
         type: String,
-        default: '0.875rem',
+        default: null,
     },
     tag: {
         type: String,
