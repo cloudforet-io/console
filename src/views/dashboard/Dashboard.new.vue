@@ -22,6 +22,8 @@
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
+                       :get-server-action="topics.server"
+                       :get-cloud-service-action="topics.cloudService"
         />
         <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
                              lg:row-start-2"
@@ -86,10 +88,16 @@ export default defineComponent({
                 .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });
 
+        const topics = ({
+            server: api => api.setTopic('daily_server_updates'),
+            cloudService: api => api.setTopic('daily_cloud_service_updates'),
+        });
+
         return {
             projects,
             servers,
             cloudServices,
+            topics,
         };
     },
 });

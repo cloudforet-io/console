@@ -1,8 +1,8 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <div class="treeSidebar" :style="{width:width+'px'}">
-                <div id="tree-header">
+            <div class="h-full treeSidebar" :style="{width:width+'px'}">
+                <div class="tree-header">
                     Project Group
                     <p-i name="ic_plus" color="transparent inherit"
                          width="1rem" height="1rem" class="add-btn"
@@ -24,15 +24,15 @@
                         />
                     </template>
                     <template #extra="{node, hoveredNode}">
-                        <span v-show="node===hoveredNode"
+                        <span v-if="node===hoveredNode"
                               @mouseenter.stop="hovered(node)"
                               @click.stop="openProjectGroupForm(false)"
                         >
-                            <div v-tooltip.bottom="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 300}}"
+                            <div v-tooltip.bottom="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"
                                  class="text-base truncate leading-tight"
                             >
                                 <p-i :name="'ic_plus'" color="transparent inherit"
-                                     width="1rem" height="1rem" class="mt-1"
+                                     width="1rem" height="1rem"
                                 />
                             </div>
                         </span>
@@ -41,7 +41,7 @@
             </div>
         </template>
         <template #default>
-            <div v-if="treeApiHandler.ts.metaState.firstSelectedNode">
+            <div v-if="treeApiHandler.ts.metaState.firstSelectedNode" class="pb-8 grid-layout">
                 <p-toolbox-grid-layout
                     v-bind="apiHandler.gridTS.state"
                     card-height="16rem"
@@ -53,17 +53,17 @@
                     @card:click.self="clickCard"
                 >
                     <template #toolbox-top>
-                        <div>
-                            <p id="parent-project-grp">
+                        <div class="project-group">
+                            <p>
                                 {{ parentGroup }}
                             </p>
-                            <p id="current-project-grp">
+                            <span>
                                 {{ currentGroup }}
-                                <p-i v-if="!hasChildProjectGroup && !hasChildProject " name="ic_transhcan" color="transparent inherit"
-                                     width="1.5rem" height="1.5rem" class="delete-btn"
-                                     @click="openProjectGroupDeleteForm"
-                                />
-                            </p>
+                            </span>
+                            <p-i v-if="!hasChildProject && !hasChildProjectGroup " name="ic_transhcan"
+                                 width="1.5rem" height="1.5rem" class="delete-btn"
+                                 @click="openProjectGroupDeleteForm"
+                            />
                         </div>
                     </template>
                     <template #toolbox-bottom>
@@ -159,8 +159,7 @@
                     </p>
                     <p class="content-order">
                         1. Name your project group first. <br>
-                        2. Register your project. <br>
-                        3. Integrate with your resources.
+                        2. Register your project.
                     </p>
                     <p-button style-type="primary-dark"
                               @click="openProjectGroupForm"
@@ -214,6 +213,7 @@ import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
@@ -256,6 +256,7 @@ export default {
         PTree,
         PButton,
         PI,
+        PIconButton,
         PQuerySearchBar,
         PQuerySearchTags,
         PSkeleton,
@@ -396,6 +397,7 @@ export default {
                 });
                 apiHandler.resetAll();
                 const resp = await apiHandler.getData();
+                state.hasChildProject = true;
                 const projectTotal = resp?.data?.total_count;
                 if (projectTotal > 0) state.hasChildProject = true;
                 else state.hasChildProject = false;
@@ -410,7 +412,7 @@ export default {
             treeApiHandler.ts.getSelectedNode(item);
             projectState.currentGroup = item.data.name;
             if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
-            // state.hasChildProjectGroup = true;
+            state.hasChildProjectGroup = true;
             // @ts-ignore
             const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
             if (resp.data.total_count > 0) state.hasChildProjectGroup = true;
@@ -593,139 +595,94 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .treeSidebar {
-        height: 100%;
-    }
-
-    #tree-header {
-        @apply text-gray-500;
-        margin-left: 1.25rem;
-        margin-top: 1.5rem;
-        margin-bottom: .8rem;
-        font-weight: bold;
-        font-size: 0.88rem;
+    .tree-header {
+        @apply text-xs font-bold text-gray-500 ml-5 mt-6 mb-4;
         overflow-x: hidden;
         .add-btn {
             cursor: pointer;
         }
     }
 
-    #parent-project-grp {
-        font-size: .75rem;
-        padding-top: .5rem;
-    }
-
-    #current-project-grp {
-        padding-top: .7rem;
-        padding-bottom: .5rem;
-        font-size: 1.5rem;
-        font-weight: bold;
+    .project-group {
+        & p {
+            @apply text-xs pt-2 pb-3;
+        }
+        & span {
+            @apply text-2xl font-bold pb-2;
+        }
         .delete-btn {
+            @apply text-black -mt-2;
             cursor: pointer;
         }
     }
 
     .empty {
-        flex-direction: column;
-        text-align: center;
-        justify-content: flex-start;
+        @apply flex-col text-center justify-start;
     }
 
     .project-description {
-        margin-left: 1.5rem;
-        margin-right: 1.5rem;
-        margin-top: 1.5rem;
+        @apply mx-6 mt-6;
         .project-group-name {
-            @apply text-gray-500;
-            font-size: .75rem;
-            margin-bottom: .25rem;
+            @apply text-gray-500 text-xs mb-1;
         }
         #project-name {
-            font-size: 1.12rem;
-            font-weight: bold;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            padding-bottom: 1.3rem;
+            @apply text-lg font-bold truncate pb-5 overflow-hidden;
         }
         .provider-icon {
+            @apply mr-2 inline;
             max-width: 1.5rem;
             max-height: 1.5rem;
-            display: inline;
-            margin-right: .5rem;
         }
 
         .empty-providers {
             p {
-                @apply text-secondary;
-                font-size: 0.87rem;
+                @apply text-secondary text-sm;
             }
             .btn_circle_plus_blue {
-                margin-right: 0.5rem;
+                @apply mr-2;
             }
         }
     }
 
     .solid {
-        @apply border-l border-gray-100;
-        margin-top: 1.2rem;
-        margin-left: 0px;
+        @apply border-l border-gray-100 mt-5 ml-0;
     }
 
     .project-summary {
-        margin-top: 0.87rem;
-        margin-left: 1.5rem;
-        margin-right: 1.5rem;
+        @apply mt-4 mx-6;
         .summary-item-text {
-            display: inline-block;
-            font-size: 0.88rem;
-            text-align: left;
-            margin-bottom: .9rem;
+            @apply text-sm text-left mb-4 inline-block;
         }
 
         .summary-item-num {
-            @apply text-gray-500;
-            display: inline-block;
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 0.75rem;
-            text-align: right;
-            float: right;
+            @apply text-gray-500 text-base font-bold text-right mb-3 inline-block float-right;
         }
     }
 
     .tool {
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
+        @apply mb-6 justify-between;
         .tool-left {
             .tool-left-btn {
-                margin-right: 1rem;
+                @apply mr-4;
             }
         }
     }
 
     .empty-project {
-        @apply text-gray-300 text-center;
-        font-size: 1rem;
+        @apply text-gray-300 text-center text-base;
     }
 
     .empty-project-grp {
         .title {
-            @apply text-primary-dark;
-            font-weight: bold;
-            font-size: 1.5rem;
-            padding-top: 2rem;
-            padding-bottom: 1rem;
+            @apply text-primary-dark font-bold text-2xl pt-8 pb-4;
             line-height: 120%;
         }
         .content {
-            font-size: .9rem;
-            padding-bottom: 1rem;
+            @apply text-sm font-hairline pb-4;
             line-height: 150%;
         }
         .content-order {
-            font-size: .9rem;
-            padding-bottom: 2.5rem;
+            @apply text-base pb-10;
             line-height: 180%;
         }
     }

@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout :title="title">
+    <p-widget-layout :title="title" class="resources-by-region">
         <div :class="{reverse:reverse}">
             <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
@@ -184,6 +184,11 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+    .resources-by-region {
+    &::v-deep .widget-contents {
+         overflow-y: auto;
+     }
+    }
     .chart {
         height: 11.25rem;
     }

@@ -138,7 +138,7 @@ export default defineComponent({
 
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
-            .setTopic('daily_server_updates')
+            // .setTopic('daily_server_updates')
             .setFrom('now/d - 2w')
             .setDefaultFields('server_type')
             .setDiffFields('server_count');
@@ -153,7 +153,7 @@ export default defineComponent({
         };
 
         const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
-            .setTopic('daily_cloud_service_updates')
+            // .setTopic('daily_cloud_service_updates')
             .setFrom('now/d - 7d')
             .setDefaultFields('cloud_service_type', 'cloud_service_group', 'provider', 'icon')
             .setDiffFields('cloud_service_count');
