@@ -228,9 +228,7 @@ export default defineComponent({
             &.selected > .tree-content {
                 @mixin tree-selected theme('colors.blue.200'), theme('colors.secondary'), theme('colors.secondary');
             }
-            &:hover > .tree-content {
-             @mixin tree-selected transparent, theme('colors.secondary'), transparent;
-             }
+
 
         }
     }
