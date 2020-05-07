@@ -1,6 +1,7 @@
 <template>
     <p-toolbox-table
         v-if="!isLoading"
+        class="s-dynamic-layout-table"
         v-bind="apiHandler.tableTS.state"
         :fields="fields"
         :all-page="apiHandler.tableTS.state.allPage"
@@ -10,6 +11,7 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+        :responsive-style="responsiveStyle"
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
@@ -32,9 +34,15 @@
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
-            <div class="left-toolbox-item w-1/2">
+            <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
                 <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
             </div>
+        </template>
+        <template #toolbox-bottom>
+            <div class="flex-1 2xs:block lg:hidden mt-4" :class="{'mb-4':$scopedSlots['toolbox-bottom']}">
+                <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
+            </div>
+            <slot name="toolbox-bottom" />
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
             <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
@@ -50,10 +58,10 @@ import {
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-import { SearchTableAPI, SearchTableFluentAPI } from '@/lib/api/table';
+import { SearchTableFluentAPI } from '@/lib/api/table';
 import {
     DynamicLayoutProps,
-    makeFields, makeTableSlots, GetAction, checkCanGetData,
+    makeFields, makeTableSlots, checkCanGetData,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import {
     ActionAPI, QueryAPI, GetDataAction, fluentApi,
@@ -105,6 +113,10 @@ export default {
             type: Boolean,
             required: true,
         },
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
+        },
         exportFields: {
             type: Array,
             default: null,
@@ -116,7 +128,6 @@ export default {
             excelVisible: true,
             shadow: false,
             border: false,
-            responsiveStyle: { height: '24rem', 'overflow-y': 'auto' },
         };
         let apiHandler: SearchTableFluentAPI = props.toolset as SearchTableFluentAPI
             || new SearchTableFluentAPI(null as unknown as QueryAPI<any, any>, defaultInitData);
@@ -226,5 +237,11 @@ export default {
          flex-grow: 1;
      }
     }
-
+.s-dynamic-layout-table{
+    >>> .toolbox{
+        .toolbox-bottom{
+            @apply mt-0;
+        }
+    }
+}
 </style>

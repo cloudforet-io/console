@@ -222,7 +222,7 @@ export default {
 
 <style lang="postcss" scoped>
     .toolbox-border {
-        border: 1px solid #DCDDE2; 
+        border: 1px solid #DCDDE2;
         border-radius: .125rem;
     }
 
@@ -245,17 +245,12 @@ export default {
                 flex-wrap: nowrap;
                 align-items: center;
                 .left{
-                    display: flex;
-                    flex-wrap: wrap;
+                    @apply flex flex-wrap justify-start ;
                     width: auto;
-                    justify-content: flex-start;
+
                 }
                 .center{
-                    display: flex;
-                    flex-wrap:nowrap;
-                    width: 100%;
-                    justify-content: center;
-
+                    @apply flex w-full flex-no-wrap justify-center;
                 }
                 .right{
                     display: flex;
