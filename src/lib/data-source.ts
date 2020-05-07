@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 export const dateTimeViewType = {
-    view_type: 'datetime',
-    view_option: {
+    type: 'datetime',
+    options: {
         source_type: 'timestamp',
         source_format: 'seconds',
     },
