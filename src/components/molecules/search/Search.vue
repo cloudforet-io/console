@@ -83,13 +83,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-search {
-        @apply border border-gray-300 bg-white;
-        position: relative;
-        display: inline-flex;
-        flex-wrap: nowrap;
-        width: 100%;
-        height: 2rem;
-        border-radius: 2px;
+        @apply border border-gray-300 bg-white flex-no-wrap inline-flex w-full h-8 relative rounded-sm;
         &.hovered {
             @apply border-gray-900;
         }
@@ -97,15 +91,13 @@ export default {
             @apply text-gray-900 border-gray-900;
         }
         .p-search-input {
-            width: 100%;
-            flex-grow: 1;
-            border: 0;
+            @apply w-full flex-grow border-0;
             background: transparent;
         }
         .p-search-btn {
-            flex-grow: 0;
+            @apply flex-grow-0;
             .search-btn {
-                min-width: 2rem;
+                @apply min-w-8;
             }
         }
     }

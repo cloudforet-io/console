@@ -31,6 +31,7 @@ export type SecretListResp = ListType<SecretModel>
 interface CreateParameter extends Tags {
     name: string;
     data: any;
+    schema?: string;
     secret_type: string;
     service_account_id?: string;
 }

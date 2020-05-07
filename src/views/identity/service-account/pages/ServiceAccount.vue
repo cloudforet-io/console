@@ -45,14 +45,13 @@
                                 :total-count="apiHandler.totalCount.value"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                             />
-                            <p-dynamic-view view_type="table"
-                                            :api-handler="apiHandler"
-                                            :data_source="accountDataSource"
-                                            :vbind="{
-                                                responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}
-                                            }"
-                                            :data="null"
-                                            @clickExcel="exportToolSet.getData()"
+                            <s-dynamic-layout type="table"
+                                              :toolset="apiHandler"
+                                              :options="{fields: accountFields}"
+                                              :vbind="{
+                                                  responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
+                                                  showTitle:false,
+                                              }"
                             >
                                 <template #toolbox-left>
                                     <PIconTextButton style-type="primary-dark"
@@ -68,12 +67,11 @@
                                         @click-delete="accountDeleteClick"
                                         @click-project="clickProject"
                                         @click-link="clickLink"
-                                        @click-exportExcel="exportToolSet.getData()"
                                     >
                                         Action
                                     </PDropdownMenuBtn>
                                 </template>
-                            </p-dynamic-view>
+                            </s-dynamic-layout>
                         </template>
                     </p-horizontal-layout>
                     <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
@@ -91,13 +89,14 @@
                             />
                         </template>
                         <template #credentials>
-                            <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="secretApiHandler.totalCount.value">
-                                {{ $t('TAB.SECRET') }}
-                            </PPanelTop>
-                            <p-dynamic-view view_type="table"
-                                            :api-handler="secretApiHandler"
-                                            :data_source="secretDataSource"
-                                            :data="null"
+                            <s-dynamic-layout
+                                type="table"
+                                :name="$t('TAB.SECRET')"
+                                :toolset="secretApiHandler"
+                                :options="{fields: secretDataSource}"
+                                :vbind="{
+                                    responsiveStyle:{ 'overflow-y':'auto','overflow-x':'auto'},
+                                }"
                             >
                                 <template #toolbox-left>
                                     <p-button
@@ -115,10 +114,10 @@
                                         {{ $t('BTN.DELETE') }}
                                     </p-button>
                                 </template>
-                            </p-dynamic-view>
+                            </s-dynamic-layout>
                         </template>
                         <template #admin>
-                            <s-dynamic-layout :api="adminApiHandler"
+                            <s-dynamic-layout :api="adminApi"
                                               :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
                                               v-bind="defaultAdminLayout"
                             />
@@ -131,13 +130,13 @@
                         <template #data>
                             <s-dynamic-layout
                                 type="simple-table"
-                                :options="{fields:accountDataSource}"
+                                :options="{fields:accountFields}"
                                 :data="apiHandler.tableTS.selectState.selectItems"
                                 :vbind="{showTitle:false}"
                             />
                         </template>
                         <template #admin>
-                            <s-dynamic-layout :api="adminApiHandler"
+                            <s-dynamic-layout :api="adminApi"
                                               :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
                                               v-bind="defaultAdminLayout"
                             />
@@ -172,7 +171,6 @@ import {
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -183,7 +181,7 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import {
-    AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI,
+    SearchTableFluentAPI, TabSearchTableFluentAPI,
     defaultAdminLayout,
 
 } from '@/lib/api/table';
@@ -206,13 +204,13 @@ import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/tool
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 
 export default {
     name: 'ServiceAccount',
     components: {
         PVerticalPageLayout2,
         PHorizontalLayout,
-        PDynamicView,
         PTab,
         PButton,
         PDropdownMenuBtn,
@@ -222,7 +220,6 @@ export default {
         PDoubleCheckModal,
         SSecretCreateFormModal,
         PIconTextButton,
-        PPanelTop,
         PGridLayout,
         PPageTitle,
         STagsPanel,
@@ -300,7 +297,7 @@ export default {
             return [] as DataSourceItem[];
         });
 
-        const accountDataSource = computed<any[]>(() => [
+        const accountFields = computed<any[]>(() => [
             ...originDataSource.value,
             {
                 name: 'project', key: 'console_force_data.project', type: 'text', option: {},
@@ -342,7 +339,6 @@ export default {
             border: true,
             padding: true,
             selectable: true,
-            dragable: true,
             excelVisible: true,
         });
         const exportAction = fluentApi.addons().excel().export();
@@ -396,7 +392,7 @@ export default {
         const accountDetails = computed(() => [
             {
                 name: 'Base Information',
-                data_source: accountDataSource.value,
+                data_source: accountFields.value,
             },
         ]);
 
@@ -439,12 +435,17 @@ export default {
             }
             return result;
         });
-        const adminApiHandler = new AdminFluentAPI(
-            fluentApi.identity().serviceAccount().memberList(),
-            adminIsShow,
-            serviceAccountID,
-            apiHandler,
-        );
+        const adminApi = computed<DynamicLayoutApiProp>(() => {
+            let ids: string[] = [];
+            if (apiHandler.tableTS.selectState.isSelectOne) {
+                ids = [apiHandler.tableTS.selectState.firstSelectItem[serviceAccountID]];
+            } else {
+                ids = apiHandler.tableTS.selectState.selectItems.map(it => it[serviceAccountID]);
+            }
+            return {
+                resource: fluentApi.identity().serviceAccount().memberList().setIds(ids),
+            };
+        });
 
 
         const deleteTS = new DoubleCheckModalState();
@@ -501,6 +502,7 @@ export default {
         const secretDataSource: DataSourceItem[] = [
             { name: 'Secret', key: 'secret_id' },
             { name: 'Name', key: 'name' },
+            { name: 'Schema', key: 'schema' },
             {
                 name: 'Created at',
                 key: 'created_at.seconds',
@@ -566,7 +568,7 @@ export default {
         };
         return {
             apiHandler,
-            accountDataSource,
+            accountFields,
             singleItemTab,
             multiItemTab,
             accountDetails,
@@ -580,8 +582,7 @@ export default {
             clickProject,
             changeProject,
             projectModalVisible,
-            exportToolSet,
-            adminApiHandler,
+            adminApi,
             clickSecretAddForm,
             ...toRefs(secretFormState),
             secretFormConfirm,

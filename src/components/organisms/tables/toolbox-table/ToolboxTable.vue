@@ -3,15 +3,14 @@
         'toolbox-table': true,
         background:toolboxBackground,
         'no-padding':!padding,
-        'toolbox-shadow':shadow,
         'toolbox-border': border,
     }"
     >
         <div class="toolbox">
-            <p-row v-if="$slots['toolbox-top']" class="toolbox-top">
+            <div v-if="$slots['toolbox-top']" class="toolbox-block toolbox-top">
                 <slot name="toolbox-top" />
-            </p-row>
-            <p-row class="toolbox-middle">
+            </div>
+            <div class="toolbox-block toolbox-middle">
                 <div class="left" :style="{width:$slots['toolbox-center'] ? 'auto' : '100%'}">
                     <slot name="toolbox-left" />
                 </div>
@@ -27,7 +26,7 @@
                             @pageChange="changePageNumber"
                         />
                     </div>
-                    <div v-if="pageSizeVisible" class="tool">
+                    <div v-if="pageSizeVisible" class="tool md-hide-tool">
                         <PDropdownMenuBtn
                             class="page-size-dropdown"
                             :menu="pageSizeOptions"
@@ -55,10 +54,10 @@
                         />
                     </div>
                 </div>
-            </p-row>
-            <p-row v-if="$slots['toolbox-bottom']" class="toolbox-bottom">
+            </div>
+            <div v-if="$slots['toolbox-bottom']" class="toolbox-block toolbox-bottom">
                 <slot name="toolbox-bottom" />
-            </p-row>
+            </div>
         </div>
         <p-data-table
             ref="table"
@@ -110,7 +109,6 @@ import { dataTableProps } from '@/components/organisms/tables/data-table/toolset
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
 import { makeProxy } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
 import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
@@ -119,7 +117,7 @@ import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-ta
 export default {
     name: 'PToolboxTable',
     components: {
-        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn, PRow,
+        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
     },
     props: {
         ...dataTableProps,
@@ -223,12 +221,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .toolbox-shadow {
-        box-shadow: 0px 0px 8px #4D49B614;
-    }
-
     .toolbox-border {
-        border: 1px solid #F2F2F2;
+        @apply border border-gray-200 rounded-sm;
     }
 
     .toolbox-table {
@@ -237,34 +231,25 @@ export default {
         }
 
         .toolbox {
-            @apply px-4 py-6;
+            @apply px-4 py-6 flex-col;
             /*margin-top: 0.5rem;*/
+            .toolbox-block{
+                @apply flex w-full;
+            }
             .toolbox-top{
-                @apply w-full mb-4;
+                @apply mb-4;
             }
             .toolbox-middle{
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: nowrap;
-                align-items: center;
+                @apply justify-between flex-no-wrap items-center;
+
                 .left{
-                    display: flex;
-                    flex-wrap: wrap;
-                    width: auto;
-                    justify-content: flex-start;
+                    @apply flex flex-wrap justify-start w-auto;
                 }
                 .center{
-                    display: inline-flex;
-                    flex-wrap:nowrap;
-                    width: 100%;
-                    justify-content: center;
-
+                    @apply flex w-full flex-no-wrap justify-center;
                 }
                 .right{
-                    display: inline-flex;
-                    flex-wrap:nowrap;
-                    width: auto;
-                    justify-content: flex-end;
+                    @apply flex flex-no-wrap w-auto justify-end;
                     .page-size-dropdown{
                         &::v-deep .menu-btn{
                             min-width: 4rem;
@@ -273,7 +258,7 @@ export default {
                 }
             }
             .toolbox-bottom{
-                @apply w-full mt-4;
+                @apply mt-4;
 
             }
 
@@ -284,8 +269,17 @@ export default {
     }
 
     .tool{
-        margin-left: 1rem;
-        display: inline;
-    }
+        @apply inline;
+        @screen md{
+            @apply ml-4;
+        }
 
+    }
+    .md-hide-tool{
+        @apply hidden;
+        @screen md{
+            @apply inline;
+        }
+
+    }
 </style>

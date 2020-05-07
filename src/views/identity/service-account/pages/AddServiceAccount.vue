@@ -297,6 +297,7 @@ export default {
                         await fluentApi.secret().secret().create().setParameter({
                             name: crdFixFormTS.syncState.item.name,
                             data: crdFormTS.syncState.item,
+                            schema: selectSchema.value,
                             // eslint-disable-next-line camelcase
                             secret_type: 'CREDENTIALS',
                             // eslint-disable-next-line camelcase

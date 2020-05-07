@@ -19,6 +19,11 @@ export class HistoryDiff<value> extends BaseQueryAPI<HistoryDiffParam, HistoryDi
 
     protected query = (): BaseQuery => this.getBaseQuery<BaseQuery>({} as BaseQuery);
 
+    getParameter = (): any => ({
+        ...this.query(),
+        ...this.apiState.extraParameter,
+    });
+
     setTopic(topic: string): this {
         const api = this.clone();
         api.apiState.extraParameter.topic = topic;
