@@ -76,8 +76,10 @@
                     </div>
                 </div>
             </PFieldGroup>
-            <div class="form-box">
-                <PJsonSchemaForm v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
+            <div class="custom-schema-box">
+                <div class="form-box">
+                    <PJsonSchemaForm v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
+                </div>
             </div>
         </p-pane-layout>
         <SProjectTreePanel ref="projectRef" class="panel">
@@ -379,5 +381,9 @@ export default {
         @screen lg{
             @apply max-w-1/2;
         }
+    }
+    .custom-schema-box{
+        @apply border rounded-sm border-gray-200 border-l-4 px-8 py-5;
+
     }
 </style>
