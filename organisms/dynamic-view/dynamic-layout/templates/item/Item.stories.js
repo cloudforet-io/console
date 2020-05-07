@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicLayoutItem from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/index.vue';
-
 import { object } from '@storybook/addon-knobs';
 import { ref } from '@vue/composition-api';
 import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/item.md';
@@ -224,6 +223,29 @@ export const defaultCase = () => ({
             default: object('data', data, 'data'),
         },
 
+    },
+
+});
+
+
+export const slotCase = () => ({
+    components: { SDynamicLayout },
+    template: `<div class="w-screen bg-white">
+        <SDynamicLayout v-bind="layout" :data="data">
+            <template #data-data.compute.instance_name="data">
+                <span class="text-primary bg-red">This is Slot!</span>
+            </template>
+        </SDynamicLayout>
+    </div>`,
+    props: {
+        layout: {
+            type: Object,
+            default: object('layout', defaultLayout, 'layout'),
+        },
+        data: {
+            type: Object,
+            default: object('data', data, 'data'),
+        },
     },
 
 });
