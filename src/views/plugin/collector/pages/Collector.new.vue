@@ -104,13 +104,8 @@
                 <collector-credentials :collector="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #schedules>
-                <collector-schedules :collector="apiHandler.tableTS.selectState.firstSelectItem"
-                                     :items="scheduleState.items"
-                                     :total-count="scheduleState.totalCount"
-                                     :loading="scheduleState.loading"
-                                     :edit-visible.sync="scheduleState.editVisible"
-                                     :delete-visible.sync="scheduleState.deleteVisible"
-                                     :select-index.sync="scheduleState.selectIndex"
+                <collector-schedules v-if="tabState.activeTab === 'schedules'"
+                                     :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
                 />
             </template>
         </p-tab>
@@ -192,7 +187,6 @@ import {
     getEnumValues, makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { CollectorModel } from '@/lib/fluent-api/inventory/collector';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');

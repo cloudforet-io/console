@@ -52,8 +52,10 @@
                 />
             </p-col>
         </template>
-        <template v-for="slot of slots" v-slot:[slot.name]="{value}">
-            <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
+        <template v-for="slot of slots" v-slot:[slot.name]="data">
+            <slot :name="slot.name" v-bind="data">
+                <p-dynamic-field :key="slot.key" v-bind="slot" :data="data.value" />
+            </slot>
         </template>
     </p-toolbox-table>
 </template>

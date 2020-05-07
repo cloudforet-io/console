@@ -50,9 +50,9 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import ConfigureCollector from '@/views/plugin/collector/modules/ConfigureCollector.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector';
 import { AxiosError } from 'axios';
 import { JsonSchemaObjectType } from '@/lib/type';
+import { CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 
 interface State {
     confRef: any;

@@ -96,7 +96,7 @@ import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { COLLECT_MODE } from '@/lib/fluent-api/inventory/collector';
+import { COLLECT_MODE } from '@/lib/fluent-api/inventory/collector.type';
 
 
 export default defineComponent({

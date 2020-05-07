@@ -1,8 +1,9 @@
 <template>
-    <p-button-modal :header-title="schedule ?$t('INVENTORY.UPT_SCHEDULE') :$t('INVENTORY.ADD_SCHEDULE')"
+    <p-button-modal :header-title="scheduleId ?$t('INVENTORY.UPT_SCHEDULE') :$t('INVENTORY.ADD_SCHEDULE')"
                     centered
                     fade
                     backdrop
+                    size="lg"
                     :loading="loading"
                     :visible.sync="proxyVisible"
                     @confirm="onClickEditConfirm"
@@ -10,11 +11,11 @@
         <template #body>
             <p-field-group :label="$t('COMMON.NAME')">
                 <br>
-                <p-text-input v-model="name" />
+                <p-text-input v-model="name" class="w-3/5" />
             </p-field-group>
             <p-field-group :label="$t('COMMON.TIMEZONE')">
                 <p-select-dropdown v-model="timezone" :items="timezones"
-                                   class="timezone-selector"
+                                   class="w-3/5"
                                    @input="changeTimezone"
                 />
             </p-field-group>
@@ -23,7 +24,7 @@
                            :invalid="showValidation && !isValid"
                            invalid-text="Please select time"
             >
-                <div>
+                <div class="time-block-container">
                     <span v-for="(hour) in hoursMatrix" :key="hour"
                           class="time-block"
                           :class="{active: selectedHours[hour] }"
@@ -31,7 +32,7 @@
                     >
                         {{ hour }}
                     </span>
-                    <p-button style-type="gray900" :outline="!isAllHours"
+                    <p-button style-type="gray" :outline="!isAllHours"
                               class="all-btn"
                               @click="onClickAllHours"
                     >
@@ -43,22 +44,35 @@
     </p-button-modal>
 </template>
 
-<script>
+<script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import moment from 'moment';
 import { makeProxy } from '@/lib/compostion-util';
-import { MenuItem } from '@/lib/util';
-import collectorEventBus from '@/views/plugin/collector/CollectorEventBus';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 
+class MenuItem {
+    name: string;
+
+    label: string;
+
+    type: string;
+
+    constructor(name, label?) {
+        this.name = name;
+        this.label = label || name;
+        this.type = 'item';
+    }
+}
 
 export default {
     name: 'EditScheduleModal',
@@ -70,19 +84,26 @@ export default {
         PButtonModal,
     },
     props: {
-        loading: Boolean,
         /**
              * sync prop
              */
         visible: Boolean,
-        collectorId: String,
-        schedule: Object,
+        collectorId: {
+            type: String,
+            default: '',
+        },
+        scheduleId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance();
-        const state = reactive({
+        const vm: any = getCurrentInstance();
+        const state: any = reactive({
+            loading: false,
+            schedule: null,
             proxyVisible: makeProxy('visible', props, emit),
-            name: _.get(props, 'schedule.name', ''),
+            name: '',
             timezone: vm.$ls.user.state.timezone || 'UTC',
             hoursMatrix: _.range(24),
             selectedHours: {},
@@ -92,7 +113,7 @@ export default {
             isValid: computed(() => state.selectedUTCHoursList.length !== 0),
         });
 
-        const timezones = state.timezone === 'UTC'
+        const timezones: any = state.timezone === 'UTC'
             ? [new MenuItem(state.timezone)] : [
                 new MenuItem(state.timezone),
                 new MenuItem('UTC'),
@@ -100,7 +121,7 @@ export default {
 
         const initSelectedHours = () => {
             const res = {};
-            _.get(props, 'schedule.schedule.hours', []).forEach((hour) => {
+            _.get(state, 'schedule.schedule.hours', []).forEach((hour) => {
                 const time = moment.tz(moment.utc({ hour }), state.timezone);
                 res[time.hour()] = time;
             });
@@ -133,26 +154,112 @@ export default {
             }
         };
 
-        const onClickEditConfirm = () => {
+        const addSchedule = async () => {
+            try {
+                const params: ScheduleAddParameter = {
+                    // eslint-disable-next-line camelcase
+                    collector_id: props.collectorId,
+                    name: state.name,
+                    schedule: {
+                        hours: state.selectedUTCHoursList,
+                    },
+                };
+                await fluentApi.inventory().collector().schedule().add()
+                    .setParameter(params)
+                    .execute();
+
+                emit('success');
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Add Schedule',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+
+        const updateSchedule = async () => {
+            try {
+                const params: ScheduleUpdateParameter = {
+                    // eslint-disable-next-line camelcase
+                    schedule_id: props.scheduleId,
+                    // eslint-disable-next-line camelcase
+                    collector_id: props.collectorId,
+                    name: state.name,
+                    schedule: {
+                        ...state.schedule?.schedule,
+                        hours: state.selectedUTCHoursList,
+                    },
+                };
+
+                await fluentApi.inventory().collector().schedule().update()
+                    .setParameter(params)
+                    .execute();
+
+                emit('success');
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Schedule',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+
+        const onClickEditConfirm = async () => {
             state.showValidation = true;
             if (!state.isValid) return;
 
-            const params = {
-                // eslint-disable-next-line camelcase
-                collector_id: props.collectorId,
-                name: state.name,
-                schedule: {
-                    ..._.get(props, 'schedule.schedule', null),
-                    hours: state.selectedUTCHoursList,
-                },
-            };
-
-            if (props.schedule) {
-                // eslint-disable-next-line camelcase
-                params.scheduler_id = props.schedule.scheduler_id;
-                collectorEventBus.$emit('updateCollectorSchedule', params);
-            } else { collectorEventBus.$emit('addCollectorSchedule', params); }
+            state.loading = true;
+            if (props.scheduleId) await updateSchedule();
+            else await addSchedule();
+            state.loading = false;
+            state.proxyVisible = false;
         };
+
+        const getSchedule = async (): Promise<void> => {
+            state.loading = true;
+            try {
+                const res = await fluentApi.inventory().collector().schedule().get()
+                    .setId(props.scheduleId)
+                    .setCollectorId(props.collectorId)
+                    .execute();
+                state.schedule = res.data;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        watch([() => props.collectorId, () => props.scheduleId],
+            async ([collectorId, scheduleId]) => {
+                if (collectorId && scheduleId) await getSchedule();
+            });
 
 
         return {
@@ -168,26 +275,29 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .timezone-selector {
-        width: 30%;
-        min-width: 260px;
-    }
     .all-btn {
-        margin-right: .5rem;
-        margin-bottom: .5rem;
+        @apply text-black border-gray-300;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
         vertical-align: unset;
+        &:hover {
+            background-color: theme('colors.black') !important;
+        }
+    }
+    .time-block-container {
+        @apply grid;
+        gap: 0.5rem;
+        grid-template-columns: repeat(12, 2rem);
+        grid-template-rows: auto;
     }
     .time-block {
-        @apply border border-gray-200;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
+        @apply border border-gray-300;
+        display: inline-block;
         height: 2rem;
+        line-height: 2rem;
+        text-align: center;
         border-radius: 2px;
-        margin-right: .5rem;
-        margin-bottom: .5rem;
-        font-size: .875rem;
+        font-size: 0.875rem;
         cursor: pointer;
         &:hover {
             @apply bg-green-600 text-white;

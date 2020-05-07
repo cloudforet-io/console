@@ -2,61 +2,22 @@
 import {
     CollectAction,
     CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, SingleDeleteAction, UpdateAction,
+    ResourceActions, ServiceResources, SingleDeleteAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType, Tags, TimeStamp,
-} from '@/lib/fluent-api/type';
-import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
+    COLLECT_MODE, CollectorModel, CollectorUpdateParameter,
+    CollectorCollectParameter, CollectorCreateParameter, CollectorListResp,
+} from '@/lib/fluent-api/inventory/collector.type';
+import CollectorSchedule from '@/lib/fluent-api/inventory/collector-schedule';
 
 const idField = 'collector_id';
-
-export enum COLLECT_MODE {
-    all = 'ALL',
-    create = 'CREATE',
-    update = 'UPDATE'
-}
 
 interface IdParameter {
     [idField]: string;
 }
 
-export enum COLLECTOR_STATE {
-    enabled = 'ENABLED',
-    disabled = 'DISABLED'
-}
 
-export interface CollectorModel extends IdParameter, Tags {
-    name: string;
-    state: COLLECTOR_STATE;
-    provider: string;
-    capability: object;
-    plugin_info: CollectorPluginModel;
-    priority: number;
-    created_at: TimeStamp;
-    last_collected_at: TimeStamp | null;
-}
-
-export type CollectorListResp = ListType<CollectorModel>
-
-interface CreateParameter extends Tags {
-    name: string;
-}
-export interface CollectorUpdateParameter extends Tags, IdParameter {
-    name?: string;
-    plugin_info?: CollectorPluginModel;
-    priority?: number;
-}
-
-interface CollectParameter extends IdParameter {
-    collect_mode?: string;
-    filter?: any;
-    credential_id?: string;
-    credential_group_id?: string;
-}
-
-
-class Create extends CreateAction<CreateParameter, any> {}
+class Create extends CreateAction<CollectorCreateParameter, any> {}
 
 class Update extends UpdateAction<CollectorUpdateParameter, any> {
     idField = idField;
@@ -84,7 +45,7 @@ class Get extends GetAction<IdParameter, CollectorModel> {
 
 class List extends ListAction<any, CollectorListResp> {}
 
-class Collect extends CollectAction<CollectParameter, any> {
+class Collect extends CollectAction<CollectorCollectParameter, any> {
     idField = idField;
 
     setId(id: string): this {
@@ -118,18 +79,25 @@ class Collect extends CollectAction<CollectParameter, any> {
     }
 }
 
-export default class Collector extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
+export default class Collector extends Resource implements
+    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'>,
+    ServiceResources<'schedule'> {
     protected name = 'collector';
 
-    create() { return new Create(this.api, this.baseUrl); }
+    create(): Create { return new Create(this.api, this.baseUrl); }
 
-    update() { return new Update(this.api, this.baseUrl); }
+    update(): Update { return new Update(this.api, this.baseUrl); }
 
-    delete() { return new Delete(this.api, this.baseUrl); }
+    delete(): Delete { return new Delete(this.api, this.baseUrl); }
 
-    get() { return new Get(this.api, this.baseUrl); }
+    get(): Get { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.api, this.baseUrl); }
+    list(): List { return new List(this.api, this.baseUrl); }
 
-    collect() { return new Collect(this.api, this.baseUrl); }
+    collect(): Collect { return new Collect(this.api, this.baseUrl); }
+
+    schedule(): CollectorSchedule {
+        const baseUrl = this.baseUrl.substring(1, this.baseUrl.length - 1);
+        return new CollectorSchedule(this.api, baseUrl);
+    }
 }
