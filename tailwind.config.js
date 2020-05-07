@@ -69,7 +69,7 @@ module.exports = {
             '3xl': { min: '2560px' },
         },
     },
-    variants: ['responsive', 'important'],
+    variants: ['responsive', 'important', 'hover'],
     plugins: [
         plugin(({ addVariant }) => {
             addVariant('important', ({ container }) => {

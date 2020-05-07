@@ -1,16 +1,21 @@
 <template>
     <div v-if="!isLoading">
         <p-panel-top>{{ name }}</p-panel-top>
-        <table v-if="!noData" class="content-table">
-            <tbody>
-                <Definition v-for="(bind, idx) in defs" :key="idx" class="def-row"
-                            v-bind="bind"
-                />
-            </tbody>
-        </table>
-        <p-empty v-else class="py-8">
-            No Data
-        </p-empty>
+        <!--        <table v-if="!noData" class="content-table">-->
+        <!--            <tbody>-->
+        <!--                <Definition v-for="(bind, idx) in defs" :key="idx" class="def-row"-->
+        <!--                            v-bind="bind"-->
+        <!--                />-->
+        <!--            </tbody>-->
+        <!--        </table>-->
+        <!--        <p-empty v-else class="py-8">-->
+        <!--            No Data-->
+        <!--        </p-empty>-->
+        <p-definition-table :items="defs">
+            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <slot :name="slot" v-bind="scope" />
+            </template>
+        </p-definition-table>
     </div>
 </template>
 
@@ -29,6 +34,7 @@ import {
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import { ActionAPI, GetAction, ResourceActions } from '@/lib/fluent-api';
+import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import Definition from './definition.vue';
 
 export default defineComponent({
@@ -38,6 +44,7 @@ export default defineComponent({
         Definition,
         PEmpty,
         PPanelTop,
+        PDefinitionTable,
     },
     props: {
         name: {
