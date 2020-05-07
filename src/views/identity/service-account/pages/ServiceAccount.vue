@@ -502,6 +502,7 @@ export default {
         const secretDataSource: DataSourceItem[] = [
             { name: 'Secret', key: 'secret_id' },
             { name: 'Name', key: 'name' },
+            { name: 'Schema', key: 'schema' },
             {
                 name: 'Created at',
                 key: 'created_at.seconds',
