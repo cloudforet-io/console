@@ -92,9 +92,6 @@ export const stateType = () => ({
                 {
                     option: {
                         text_color: '#60B731',
-                        icon: {
-                            image: 'ic_round',
-                        },
                     },
                     raw: 'active',
                 },
