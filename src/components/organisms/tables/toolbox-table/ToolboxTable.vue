@@ -7,10 +7,10 @@
     }"
     >
         <div class="toolbox">
-            <p-row v-if="$slots['toolbox-top']" class="toolbox-top">
+            <div v-if="$slots['toolbox-top']" class="toolbox-block toolbox-top">
                 <slot name="toolbox-top" />
-            </p-row>
-            <p-row class="toolbox-middle">
+            </div>
+            <div class="toolbox-block toolbox-middle">
                 <div class="left" :style="{width:$slots['toolbox-center'] ? 'auto' : '100%'}">
                     <slot name="toolbox-left" />
                 </div>
@@ -54,10 +54,10 @@
                         />
                     </div>
                 </div>
-            </p-row>
-            <p-row v-if="$slots['toolbox-bottom']" class="toolbox-bottom">
+            </div>
+            <div v-if="$slots['toolbox-bottom']" class="toolbox-block toolbox-bottom">
                 <slot name="toolbox-bottom" />
-            </p-row>
+            </div>
         </div>
         <p-data-table
             ref="table"
@@ -109,7 +109,6 @@ import { dataTableProps } from '@/components/organisms/tables/data-table/toolset
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
 import { makeProxy } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
 import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
@@ -118,7 +117,7 @@ import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-ta
 export default {
     name: 'PToolboxTable',
     components: {
-        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn, PRow,
+        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
     },
     props: {
         ...dataTableProps,
@@ -233,13 +232,15 @@ export default {
         }
 
         .toolbox {
-            @apply px-4 py-6;
+            @apply px-4 py-6 flex-col;
             /*margin-top: 0.5rem;*/
+            .toolbox-block{
+                @apply flex w-full;
+            }
             .toolbox-top{
-                @apply w-full mb-4;
+                @apply mb-4;
             }
             .toolbox-middle{
-                display: flex;
                 justify-content: space-between;
                 flex-wrap: nowrap;
                 align-items: center;
@@ -250,14 +251,14 @@ export default {
                     justify-content: flex-start;
                 }
                 .center{
-                    display: inline-flex;
+                    display: flex;
                     flex-wrap:nowrap;
                     width: 100%;
                     justify-content: center;
 
                 }
                 .right{
-                    display: inline-flex;
+                    display: flex;
                     flex-wrap:nowrap;
                     width: auto;
                     justify-content: flex-end;
@@ -269,7 +270,7 @@ export default {
                 }
             }
             .toolbox-bottom{
-                @apply w-full mt-4;
+                @apply mt-4;
 
             }
 

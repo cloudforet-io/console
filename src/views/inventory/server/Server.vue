@@ -1,5 +1,11 @@
 <template>
     <general-page-layout>
+        <PPageTitle title="Server"
+                    class="ml-4"
+                    use-total-count use-selected-count
+                    :total-count="apiHandler.totalCount.value"
+                    :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+        />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <SDynamicLayout
@@ -165,7 +171,7 @@ import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 export default {
     name: 'Server',
@@ -187,6 +193,7 @@ export default {
         SMonitoring,
         SDynamicLayout,
         STagsPanel,
+        PPageTitle,
     },
     setup(props, context) {
         const mainTableLayout = computed<any>(() => ({
@@ -267,9 +274,9 @@ export default {
                 dragable: true,
                 hover: true,
                 responsive: true,
-                'setting-visible': false,
-                'use-cursor-loading': true,
-                'excel-visible': true,
+                settingVisible: false,
+                useCursorLoading: true,
+                excelVisible: true,
             },
             undefined,
             { handlerClass: ACHandler, args },
