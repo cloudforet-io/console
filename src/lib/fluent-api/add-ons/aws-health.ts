@@ -30,6 +30,11 @@ class List extends ListAction<any, AwsHealthListResp> {
         this.apiState.extraParameter.project_id = id;
         return this.clone();
     }
+
+    setDateSubtractor(date: number): this {
+        this.apiState.extraParameter.date_subtractor = date;
+        return this.clone();
+    }
 }
 
 export default class AwsHealth extends Resource implements ResourceActions<'list'> {

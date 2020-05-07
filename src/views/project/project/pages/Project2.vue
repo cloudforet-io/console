@@ -5,7 +5,7 @@
                 <div class="tree-header">
                     Project Group
                     <p-i name="ic_plus" color="transparent inherit"
-                         width="1rem" height="1rem" class="add-btn"
+                         width="1rem" height="1rem" class="cursor-pointer add-btn"
                          @click="openProjectGroupForm(true)"
                     />
                 </div>
@@ -17,8 +17,7 @@
                     @node:selected="selected"
                 >
                     <template #icon="{node,isExpanded}">
-                        <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' :
-                                 isExpanded ? 'ic_tree_folder--opened' : 'ic_tree_folder'"
+                        <p-i :name="'ic_tree_folder'"
                              color="transparent inherit"
                              width="1rem" height="1rem"
                         />
@@ -57,12 +56,10 @@
                             <p>
                                 {{ parentGroup }}
                             </p>
-                            <span>
-                                {{ currentGroup }}
-                            </span>
-                            <p-i v-if="!hasChildProject && !hasChildProjectGroup " name="ic_transhcan"
-                                 width="1.5rem" height="1.5rem" class="delete-btn"
-                                 @click="openProjectGroupDeleteForm"
+                            <PPageTitle :title="currentGroup" use-total-count :total-count="apiHandler.totalCount.value" />
+                            <p-icon-button v-if="!hasChildProject && !hasChildProjectGroup" name="ic_transhcan"
+                                           width="1.5rem" height="1.5rem" class="delete-btn"
+                                           @click="openProjectGroupDeleteForm"
                             />
                         </div>
                     </template>
@@ -74,7 +71,7 @@
                                         {{ $t('INVENTORY.CRT_PROJ') }}
                                     </p-button>
                                 </div>
-                                <div class="w-1/2 tool-left-search">
+                                <div class="tool-left-search">
                                     <p-query-search-bar
                                         :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
                                         :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
@@ -136,9 +133,9 @@
                                     <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].member_count }}</span>
                                 </div>
                                 <div v-else class="loading">
-                                    <div v-for="v in skeletons" :key="v" class="flex items-center p-2">
-                                        <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                                    <div v-for="v in skeletons" :key="v" class="flex items-center pb-2">
                                         <p-skeleton class="flex-grow" />
+                                        <p-skeleton width="1.5rem" height="1.5rem" class="ml-5 flex-shrink-0" />
                                     </div>
                                 </div>
                             </div>
@@ -165,7 +162,7 @@
                               @click="openProjectGroupForm"
                     >
                         <p-i name="ic_plus" color="transparent inherit"
-                             width="1rem" height="1rem" class="add-btn"
+                             width="1rem" height="1rem" class="mt-1 cursor-pointer add-btn"
                         />
                         Create Project Group
                     </p-button>
@@ -214,6 +211,7 @@ import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layo
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
@@ -257,6 +255,7 @@ export default {
         PButton,
         PI,
         PIconButton,
+        PPageTitle,
         PQuerySearchBar,
         PQuerySearchTags,
         PSkeleton,
@@ -368,6 +367,7 @@ export default {
          * QuerySearch Grid Fluent API Declaration
          * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
          */
+
         const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
 
         const apiHandler = new QuerySearchGridFluentAPI(
@@ -598,9 +598,6 @@ export default {
     .tree-header {
         @apply text-xs font-bold text-gray-500 ml-5 mt-6 mb-4;
         overflow-x: hidden;
-        .add-btn {
-            cursor: pointer;
-        }
     }
 
     .project-group {
@@ -664,6 +661,12 @@ export default {
         .tool-left {
             .tool-left-btn {
                 @apply mr-4;
+            }
+            .tool-left-search {
+                @apply flex-1;
+                @screen lg {
+                    @apply max-w-lg;
+                }
             }
         }
     }

@@ -23,7 +23,7 @@
                            :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item theme="card" @click="onItemClick(item.reference.external_link, idx)">
+                    <p-selectable-item theme="card" @click="onItemClick(item.reference.external_link)">
                         <template #side>
                             &zwnj;
                         </template>
@@ -83,6 +83,7 @@ import casual, { arrayOf } from '@/lib/casual';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import _ from 'lodash';
 import { VTooltip } from 'v-tooltip';
+import router from '@/routes';
 
 export default defineComponent({
     name: 'HealthDashboard',
@@ -119,7 +120,8 @@ export default defineComponent({
             // widgetRef: null,
         });
 
-        const api = fluentApi.addons().awsHealth().list().setId(projectId.value);
+        const api = fluentApi.addons().awsHealth().list().setId(projectId.value)
+            .setDateSubtractor(15);
 
 
         const getData = async (): Promise<void> => {
@@ -127,7 +129,6 @@ export default defineComponent({
             state.data = [];
             try {
                 const res = await api.execute();
-                console.log('res test', res);
                 state.data = res.data.logs.map(item => ({
                     eventTypeCode: item.eventTypeCode,
                     eventTypeCategory: item.eventTypeCategory,
@@ -150,7 +151,8 @@ export default defineComponent({
         return {
             ...toRefs(state),
             onItemClick(item) {
-                vm.$router.push('/identity/service-account');
+                console.log('item test', item)
+                window.location.href = item;
             },
             // iconUrl: (item: Data): string => _.get(
             //     state.providers,
