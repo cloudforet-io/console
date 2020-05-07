@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
+    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding, 'toolbox-border': border}">
         <div class="toolbox">
             <p-row v-if="$slots['toolbox-top']" class="toolbox-top">
                 <slot name="toolbox-top" />
@@ -221,7 +221,8 @@ export default {
     }
 
     .toolbox-border {
-        border: 1px solid #F2F2F2;
+        border: 1px solid #DCDDE2;
+        border-radius:.125rem;
     }
 
     .toolbox-table {

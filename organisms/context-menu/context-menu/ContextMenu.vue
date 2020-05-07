@@ -140,13 +140,17 @@ export default {
             &:focus {
                 background-color: $hover-bg-color;
                 color: $hover-color !important;
-            }
+            } 
             &:active {
                 background-color: $active-bg-color;
                 color: $active-color !important;
             }
             &.disabled {
                 color: $disabled-color !important;
+                &:hover, &:focus {
+                    background-color: transparent;
+                    color: $disabled-color !important;
+                }
             }
             &.empty {
                 color: $disabled-color !important;
@@ -182,10 +186,10 @@ export default {
         padding: 0;
         border-radius: 2px;
         margin: 0;
-        min-width: 8.5rem;
+        min-width: 8.25rem;
         cursor: default;
         position: absolute;
-        top: 95%;
+        top: 98%;
         left: 0;
         z-index: 1000;
         float: left;
@@ -224,7 +228,7 @@ export default {
             font-size: 0.875rem;
             cursor: pointer;
             &:active {
-                font-weight: bold;
+                /* font-weight: bold; */
             }
             white-space: nowrap;
 
