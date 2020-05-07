@@ -1,6 +1,7 @@
 <template>
     <p-toolbox-table
         v-if="!isLoading"
+        class="s-dynamic-layout-query-search-table"
         v-bind="apiHandler.tableTS.state"
         :fields="fields"
         :all-page="apiHandler.tableTS.state.allPage"
@@ -35,22 +36,31 @@
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
-            <div class="left-toolbox-item">
+            <div class="left-toolbox-item hidden lg:block">
                 <p-query-search-bar
                     :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
                     @newQuery="newQuery"
                 />
             </div>
         </template>
-        <template v-if="tags.length !==0" #toolbox-bottom>
-            <p-col :col="12">
-                <p-hr style="width: 100%;" />
-                <p-query-search-tags style="margin-top: .5rem;"
-                                     :tags="tags"
-                                     @deleteTag="deleteTag"
-                                     @deleteAllTags="deleteAllTags"
+        <template #toolbox-bottom>
+            <div class="flex flex-col flex-1">
+                <p-query-search-bar
+                    class="block lg:hidden mt-4 "
+                    :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
+                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
+                    @newQuery="newQuery"
                 />
-            </p-col>
+                <div v-if="tags.length !==0" class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
+                    <p-hr style="width: 100%;" />
+                    <p-query-search-tags style="margin-top: .5rem;"
+                                         :tags="tags"
+                                         @deleteTag="deleteTag"
+                                         @deleteAllTags="deleteAllTags"
+                    />
+                </div>
+                <slot name="toolbox-bottom" />
+            </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
             <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
@@ -279,5 +289,11 @@ export default {
             flex-grow: 1;
         }
     }
-
+    .s-dynamic-layout-query-search-table{
+        >>> .toolbox{
+            .toolbox-bottom{
+                @apply mt-0;
+            }
+        }
+    }
 </style>

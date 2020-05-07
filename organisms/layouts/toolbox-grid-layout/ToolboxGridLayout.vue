@@ -20,7 +20,7 @@
                             @pageChange="changePageNumber"
                         />
                     </div>
-                    <div v-if="pageSizeVisible" class="tool" >
+                    <div v-if="pageSizeVisible" class="tool page-size-dropdown">
                         <PDropdownMenuBtn
                             class="page-size-dropdown"
                             :menu="pageSizeOptions"
@@ -161,30 +161,22 @@ export default {
 
 <style lang="postcss" scoped>
     .grid-list-container {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
+        @apply flex flex-col w-full h-full;
     }
     /*.toolbox {*/
     /*    margin-top: 0.5rem;*/
         .toolbox-middle{
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-            align-items: center;
-            margin-bottom: 1rem;
+            @apply flex flex-no-wrap justify-between items-center mb-4;
             .left{
-                    display: inline-flex;
-                    flex-wrap: wrap;
-                    width: auto;
-                    justify-content: flex-start;
+                @apply inline-flex flex-wrap w-auto justify-start;
             }
             .right{
-                    display: inline-flex;
-                    flex-wrap:nowrap;
-                    width: auto;
-                    justify-content: flex-end;
+                @apply inline-flex flex-no-wrap w-auto justify-end;
+                .page-size-dropdown{
+                    &::v-deep .menu-btn{
+                        min-width: 4rem;
+                    }
+                }
                 .tool{
                     @apply ml-4;
                 }
