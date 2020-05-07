@@ -72,9 +72,9 @@ class Collect extends CollectAction<CollectorCollectParameter, any> {
         return api;
     }
 
-    setFilters(...args: any): this {
+    setFilters(filters: any): this {
         const api = this.clone();
-        api.apiState.parameter.filter = args;
+        api.apiState.parameter.filter = filters;
         return api;
     }
 }
