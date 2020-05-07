@@ -133,7 +133,7 @@ export default defineComponent({
         border-collapse: separate;
         border-spacing: 0;
         th {
-            @apply text-gray;
+            /* @apply text-gray; */
             position: sticky;
             z-index: 1;
             top: 0;
