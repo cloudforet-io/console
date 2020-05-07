@@ -72,7 +72,7 @@ export default defineComponent({
             title: 'servers',
             to: '/inventory/server',
             color: secondary,
-            getAction: api => api.setResourceType('identity.Project'),
+            getAction: api => api.setResourceType('inventory.Server'),
             getTrendAction: api => api.setTopic('daily_server_count')
                 .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
         });
@@ -81,7 +81,7 @@ export default defineComponent({
             title: 'cloud services',
             to: '/inventory/cloud-service',
             color: secondary1,
-            getAction: api => api.setResourceType('identity.Project'),
+            getAction: api => api.setResourceType('inventory.CloudService'),
             getTrendAction: api => api.setTopic('daily_cloud_service_count')
                 .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });

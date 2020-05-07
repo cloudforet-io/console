@@ -24,7 +24,7 @@
                 />
             </template>
             <template #contents-credentials>
-                <confirm-credentials :provider="provider" />
+                <confirm-credentials :provider="provider" :supported-schema="supportedSchema" />
             </template>
             <template #contents-tags>
                 <p-dict-input-group :dict.sync="tags" show-empty-input
@@ -100,6 +100,7 @@ export default {
             pluginId: _.get(root, '$route.params.pluginId', ''),
             provider: '',
             tags: {},
+            supportedSchema: [],
         });
 
 
@@ -115,6 +116,7 @@ export default {
                 state.imgUrl = _.get(res.data, 'tags.icon', '');
                 state.tags = {};
                 if (res.data.tags?.icon) state.tags.icon = res.data.tags.icon;
+                state.supportedSchema = res.data.capability.supported_schema;
             } catch (e) {
                 console.error(e);
                 root.$notify({

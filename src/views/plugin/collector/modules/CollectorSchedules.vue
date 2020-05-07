@@ -87,6 +87,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     name: 'CollectorSchedules',
@@ -101,7 +102,7 @@ export default {
         items: Array,
         totalCount: Number,
         collector: Object,
-        loading: Boolean,
+        // loading: Boolean,
         /**
          * sync prop
          */
@@ -119,6 +120,7 @@ export default {
     setup(props, { root, parent, emit }) {
         const vm = getCurrentInstance();
         const state = reactive({
+            loading: true,
             proxyEditVisible: makeProxy('editVisible', props, emit),
             proxyDeleteVisible: makeProxy('deleteVisible', props, emit),
             proxySelectIndex: makeProxy('selectIndex', props, emit),
@@ -154,9 +156,10 @@ export default {
             state.proxyEditVisible = true;
         };
 
-        const listSchedules = () => {
+        const listSchedules = async () => {
             // eslint-disable-next-line camelcase
             collectorEventBus.$emit('listSchedules', { collector_id: props.collector.collector_id });
+            // await fluentApi.inventory().collector().s
         };
 
         const onConfirmDelete = () => {
