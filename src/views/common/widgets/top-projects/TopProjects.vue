@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects" class="top-projects">
+    <p-widget-layout title="Top 5 Resource Managing Projects" help="Top 5 Projects" class="top-projects">
         <div class="flex justify-center">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
