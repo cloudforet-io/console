@@ -102,7 +102,6 @@ export default {
         PDynamicField,
         PToolboxTable,
         PQuerySearchBar,
-        PCol,
         PHr,
         PQuerySearchTags,
         PPanelTop,
