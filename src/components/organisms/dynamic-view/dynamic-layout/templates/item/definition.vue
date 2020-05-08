@@ -75,6 +75,7 @@ export default defineComponent({
     }
     .value{
         @apply py-2 px-4;
+        font-size: 0.875rem;
         &.hover{
             @apply text-blue-500;
         }
