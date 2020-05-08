@@ -140,13 +140,17 @@ export default {
             &:focus {
                 background-color: $hover-bg-color;
                 color: $hover-color !important;
-            }
+            } 
             &:active {
                 background-color: $active-bg-color;
                 color: $active-color !important;
             }
             &.disabled {
                 color: $disabled-color !important;
+                &:hover, &:focus {
+                    background-color: transparent;
+                    color: $disabled-color !important;
+                }
             }
             &.empty {
                 color: $disabled-color !important;
@@ -182,10 +186,10 @@ export default {
         padding: 0;
         border-radius: 2px;
         margin: 0;
-        min-width: 8.5rem;
+        min-width: 8.25rem;
         cursor: default;
         position: absolute;
-        top: 95%;
+        top: 98%;
         left: 0;
         z-index: 1000;
         float: left;
@@ -200,7 +204,7 @@ export default {
             border-top-style: solid;
         }
 
-        @mixin context-menu-color secondary, theme('colors.secondary2'), theme('colors.secondary');
+        @mixin context-menu-color secondary, theme('colors.white'), theme('colors.secondary');
         @mixin context-menu-color gray900, theme('colors.white'), theme('colors.gray.900');
 
         .context-content {
@@ -224,11 +228,11 @@ export default {
             font-size: 0.875rem;
             cursor: pointer;
             &:active {
-                font-weight: bold;
+                /* font-weight: bold; */
             }
             white-space: nowrap;
 
-            @mixin context-item-them secondary, theme('colors.secondary'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
+            @mixin context-item-them secondary, theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
                                      theme('colors.secondary'), theme('colors.gray.200');
             @mixin context-item-them gray900, theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'), theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
         }
