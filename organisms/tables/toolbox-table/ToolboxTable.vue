@@ -1,11 +1,5 @@
 <template>
-    <div :class="{
-        'toolbox-table': true,
-        background:toolboxBackground,
-        'no-padding':!padding,
-        'toolbox-border': border,
-    }"
-    >
+    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding, 'toolbox-border': border}">
         <div class="toolbox">
             <div v-if="$slots['toolbox-top']" class="toolbox-block toolbox-top">
                 <slot name="toolbox-top" />
@@ -223,7 +217,7 @@ export default {
 <style lang="postcss" scoped>
     .toolbox-border {
         border: 1px solid #DCDDE2;
-        border-radius: .125rem;
+        border-radius:.125rem;
     }
 
     .toolbox-table {
