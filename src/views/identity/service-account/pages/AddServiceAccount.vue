@@ -76,8 +76,10 @@
                     </div>
                 </div>
             </PFieldGroup>
-            <div class="form-box">
-                <PJsonSchemaForm v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
+            <div class="custom-schema-box">
+                <div class="form-box">
+                    <PJsonSchemaForm v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
+                </div>
             </div>
         </p-pane-layout>
         <SProjectTreePanel ref="projectRef" class="panel">
@@ -297,6 +299,7 @@ export default {
                         await fluentApi.secret().secret().create().setParameter({
                             name: crdFixFormTS.syncState.item.name,
                             data: crdFormTS.syncState.item,
+                            schema: selectSchema.value,
                             // eslint-disable-next-line camelcase
                             secret_type: 'CREDENTIALS',
                             // eslint-disable-next-line camelcase
@@ -378,5 +381,9 @@ export default {
         @screen lg{
             @apply max-w-1/2;
         }
+    }
+    .custom-schema-box{
+        @apply border rounded-sm border-gray-200 border-l-4 px-8 py-5;
+
     }
 </style>

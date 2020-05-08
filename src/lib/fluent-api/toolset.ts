@@ -10,12 +10,12 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    BaseQueryState, BaseQuery, ApiType,
+    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
 
-export abstract class ActionAPI<parameter=any, resp=any> {
+export abstract class ActionAPI<parameter=any, resp=any> implements ActionAPIInterface<parameter, resp> {
     protected abstract path: string;
 
     protected method: ApiMethods = 'post';

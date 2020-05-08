@@ -5,6 +5,7 @@ import {
 import _ from 'lodash';
 import { Computed, ComputedOrRef } from '@/lib/type';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
+import { DefinitionProps } from '@/components/organisms/definition/PDefinition.toolset';
 
 
 export interface DynamicFieldType {
@@ -12,12 +13,6 @@ export interface DynamicFieldType {
     key: string;
     name: string;
     options: any;
-}
-export interface DynamicFieldBindType {
-    name: string;
-    type: string;
-    options: any;
-    data: any;
 }
 
 interface BaseOptions {
@@ -62,16 +57,23 @@ export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): Dy
     name: `col-${ds.key}-format`,
 })) : []));
 
-export const makeDefs = (fields: ComputedOrRef<DynamicFieldType[]>, data: ComputedOrRef<any>) => computed<DynamicFieldBindType[]>(() => (fields.value ? (fields.value as DynamicFieldType[]).map(item => ({
-    name: item.name,
-    type: item.type,
-    options: item.options,
-    data: _.get(data.value, item.key, ''),
-})) : []));
+export const makeDefs = (
+    fields: ComputedOrRef<DynamicFieldType[]>,
+    data: ComputedOrRef<any>,
+) => computed<DefinitionProps[]>(() => (
+    fields.value
+        ? (fields.value as DynamicFieldType[]).map(item => ({
+            name: item.key,
+            label: item.name,
+            type: item.type,
+            options: item.options,
+            data: _.get(data.value, item.key, ''),
+        })) : []));
 const matchMap = {
     'created_at.seconds': 'created_at',
     'updated_at.seconds': 'updated_at',
     'deleted_at.seconds': 'deleted_at',
+    'last_collected_at.seconds': 'last_collected_at',
 };
 
 export const changeSetOnlys = (keys: string[]) => keys.map(k => matchMap[k] || k);

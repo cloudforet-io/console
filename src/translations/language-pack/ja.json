@@ -11,6 +11,9 @@
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
+		"PROJECT": {
+			"NO_PROJECT": ""
+		},
 		"SELECTED_OF": "",
 		"TIMEZONE_OF": ""
 	},
@@ -26,6 +29,7 @@
 		"CONFIRM": "",
 		"COPY": "",
 		"CREATE": "",
+		"CREATE_PROJECT": "",
 		"DELETE": "",
 		"DISABLE": "",
 		"EDIT": "",
@@ -34,6 +38,7 @@
 		"FIND": "",
 		"NO": "",
 		"OK": "",
+		"REFRESH": "",
 		"RESET": "",
 		"SAVE": "",
 		"UPDATE": "",
@@ -379,6 +384,7 @@
 		"IDENTITY": "",
 		"INVENTORY": "",
 		"PLUGIN": "",
+		"PROVIDER": "",
 		"REPOSITORY": "",
 		"SECRET": "",
 		"SUPERVISOR": ""

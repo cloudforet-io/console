@@ -175,10 +175,9 @@ class ProjectStore extends Store<ProjectState> {
         return result;
     }
 
-    getProject= async () => {
-        console.debug('isEXP?', this.isExpiration());
+    getProject= async (force = false) => {
         const projectAPI = fluentApi.identity().project();
-        if (this.isExpiration()) {
+        if (this.isExpiration() || force) {
             const result = {};
             try {
                 console.debug('request project names');
@@ -292,5 +291,10 @@ export default {
 
 export const useStore = () => {
     const vm = getCurrentInstance() as any;
-    return vm.$ls;
+    return vm.$ls as {
+        user: UserStore;
+        domain: DomainStore;
+        project: ProjectStore;
+        provider: ProviderStore;
+    };
 };

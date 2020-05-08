@@ -20,7 +20,7 @@
                             @pageChange="changePageNumber"
                         />
                     </div>
-                    <div v-if="pageSizeVisible" class="tool">
+                    <div v-if="pageSizeVisible" class="tool md-hide-tool">
                         <PDropdownMenuBtn
                             class="page-size-dropdown"
                             :menu="pageSizeOptions"
@@ -216,12 +216,12 @@ export default {
 
 <style lang="postcss" scoped>
     .toolbox-border {
-        border: 1px solid #DCDDE2;
-        border-radius:.125rem;
+        @apply border border-gray-200 rounded-sm;
     }
 
     .toolbox-table {
-        &.background{
+        @apply overflow-y-auto;
+        &.background {
             @apply bg-white;
         }
 
@@ -235,22 +235,16 @@ export default {
                 @apply mb-4;
             }
             .toolbox-middle{
-                justify-content: space-between;
-                flex-wrap: nowrap;
-                align-items: center;
-                .left{
-                    @apply flex flex-wrap justify-start ;
-                    width: auto;
+                @apply justify-between flex-no-wrap items-center;
 
+                .left{
+                    @apply flex flex-wrap justify-start w-auto;
                 }
                 .center{
                     @apply flex w-full flex-no-wrap justify-center;
                 }
                 .right{
-                    display: flex;
-                    flex-wrap:nowrap;
-                    width: auto;
-                    justify-content: flex-end;
+                    @apply flex flex-no-wrap w-auto justify-end;
                     .page-size-dropdown{
                         &::v-deep .menu-btn{
                             min-width: 4rem;
@@ -270,8 +264,17 @@ export default {
     }
 
     .tool{
-        margin-left: 1rem;
-        display: inline;
-    }
+        @apply inline;
+        @screen md{
+            @apply ml-4;
+        }
 
+    }
+    .md-hide-tool{
+        @apply hidden;
+        @screen md{
+            @apply inline;
+        }
+
+    }
 </style>

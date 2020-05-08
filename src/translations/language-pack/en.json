@@ -11,6 +11,9 @@
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "Limit {limitCount} {itemName}",
+		"PROJECT": {
+			"NO_PROJECT": "There is no project"
+		},
 		"SELECTED_OF": "{selectedCount} selected of {totalCount}",
 		"TIMEZONE_OF": "All times shown are in {timezone}."
 	},
@@ -26,6 +29,7 @@
 		"CONFIRM": "Confirm",
 		"COPY": "Copy",
 		"CREATE": "Create",
+		"CREATE_PROJECT": "Create Project",
 		"DELETE": "Delete",
 		"DISABLE": "Disable",
 		"EDIT": "Edit",
@@ -34,6 +38,7 @@
 		"FIND": "Find",
 		"NO": "No",
 		"OK": "OK",
+		"REFRESH": "Refresh",
 		"RESET": "Reset",
 		"SAVE": "Save",
 		"UPDATE": "Update",
@@ -379,6 +384,7 @@
 		"IDENTITY": "Identity",
 		"INVENTORY": "Inventory",
 		"PLUGIN": "Plugin",
+		"PROVIDER": "Provider",
 		"REPOSITORY": "Repository",
 		"SECRET": "Secret",
 		"SUPERVISOR": "Supervisor"

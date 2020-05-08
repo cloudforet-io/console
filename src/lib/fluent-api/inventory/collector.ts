@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import {
     CollectAction,
-    CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, ServiceResources, SingleDeleteAction, UpdateAction,
+    CreateAction, GetAction, ListAction, MultiDeleteAction, MultiDisableAction, MultiEnableAction, Resource,
+    ResourceActions, ServiceResources, SingleDeleteAction, SingleDisableAction, SingleEnableAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     COLLECT_MODE, CollectorModel, CollectorUpdateParameter,
@@ -35,8 +35,8 @@ class Update extends UpdateAction<CollectorUpdateParameter, any> {
     }
 }
 
-class Delete extends SingleDeleteAction<IdParameter, any> {
-    idField = idField;
+class Delete extends MultiDeleteAction<IdParameter, any> {
+    idsField = 'collectors';
 }
 
 class Get extends GetAction<IdParameter, CollectorModel> {
@@ -72,15 +72,23 @@ class Collect extends CollectAction<CollectorCollectParameter, any> {
         return api;
     }
 
-    setFilters(...args: any): this {
+    setFilters(filters: any): this {
         const api = this.clone();
-        api.apiState.parameter.filter = args;
+        api.apiState.parameter.filter = filters;
         return api;
     }
 }
 
+class Enable extends MultiEnableAction<IdParameter, CollectorModel> {
+    idsField = 'collectors'
+}
+
+class Disable extends MultiDisableAction<IdParameter, CollectorModel> {
+    idsField = 'collectors'
+}
+
 export default class Collector extends Resource implements
-    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'>,
+    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'|'enable'|'disable'>,
     ServiceResources<'schedule'> {
     protected name = 'collector';
 
@@ -95,6 +103,10 @@ export default class Collector extends Resource implements
     list(): List { return new List(this.api, this.baseUrl); }
 
     collect(): Collect { return new Collect(this.api, this.baseUrl); }
+
+    enable(): Enable { return new Enable(this.api, this.baseUrl); }
+
+    disable(): Disable { return new Disable(this.api, this.baseUrl); }
 
     schedule(): CollectorSchedule {
         const baseUrl = this.baseUrl.substring(1, this.baseUrl.length - 1);
