@@ -15,7 +15,7 @@ export default {
             default: '100%',
         },
     },
-};
+};//
 </script>
 
 <style lang="postcss" scoped>

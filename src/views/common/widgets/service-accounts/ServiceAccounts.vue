@@ -23,7 +23,7 @@
                     <template #card="{item, index}">
                         <p-selectable-item :icon-url="item.icon" theme="card"
                                            default-icon="ic_provider_other"
-                                           @click="onItemClick(item, idx)"
+                                           @click="onSelected(item)"
                         >
                             <template #contents>
                                 <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"

@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects" class="top-projects">
+    <p-widget-layout title="Top 5 Resource Managing Projects" help="Top 5 Projects" class="top-projects">
         <div class="flex justify-center">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
@@ -73,7 +73,7 @@
 
                 <!-- top 1 row -->
                 <template #row-0="{index, fields, item}">
-                    <p-tr @click="onRowClick">
+                    <p-tr @click="onRowClick(item)">
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
                         </p-td>
@@ -242,8 +242,8 @@ export default defineComponent({
 
         return {
             ...toRefs(ts.state),
-            onRowClick(): void {
-                vm.$router.push('/project');
+            onRowClick(item) {
+                vm.$router.push(`/project/${item.project_id}`);
             },
         };
     },
