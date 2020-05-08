@@ -17,7 +17,7 @@
                 :width="width"
                 :height="height"
                 :scale="scale"
-                :color="iconColor"
+                :color="iconColor || defaultIconColor"
             />
         </slot>
         <slot v-if="iconDirection === 'left'" name="default" />
@@ -81,6 +81,12 @@ export default {
             type: String,
             default: undefined,
         },
+        /** @type {string} */
+        iconColor: {
+            type: String,
+            default: undefined,
+        },
+        /** @type {string} */
         iconDirection: {
             type: String,
             default: 'left',
@@ -94,7 +100,7 @@ export default {
             isHover: false,
             classObject: computed(() => [props.buttonStyle]),
         });
-        const iconColor = computed(() => {
+        const defaultIconColor = computed(() => {
             if (props.disabled) {
                 return color.gray['400'];
             } if (state.isHover) {
@@ -120,7 +126,7 @@ export default {
         });
         return {
             ...toRefs(state),
-            iconColor,
+            defaultIconColor,
             onHover,
             iconStyleClass,
 
