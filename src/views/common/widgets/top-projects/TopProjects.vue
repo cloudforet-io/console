@@ -1,51 +1,47 @@
 <template>
     <p-widget-layout title="Top 5 Resource Managing Projects" help="Top 5 Projects" class="top-projects">
-        <div class="flex justify-center">
+        <div class="flex flex-col h-full">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
                     <p-skeleton width="100%" height="100%" />
                 </template>
                 <canvas ref="chartRef" />
             </p-chart-loader>
-        </div>
-        <div class="mt-4 overflow-auto">
-            <p-data-table :fields="fields"
+            <div v-if="!loading && data.length === 0"
+                 class="flex flex-col h-full justify-center items-center"
+            >
+                <p class="text-2xl font-bold capitalize mb-4 text-primary">
+                    {{ $t('DASHBOARD.ACTION.CRT_DBD') }}
+                </p>
+                <p class="w-2/5 text-primary1 text-sm capitalize mb-4 text-center leading-normal">
+                    {{ $t('DASHBOARD.ACTION.CRT_GUIDE') }}
+                </p>
+                <router-link to="/project" tag="div" class="w-1/3">
+                    <p-icon-text-button name="ic_back" icon-direction="right"
+                                        size="lg" dir="down"
+                                        style-type="primary" icon-color="transparent inherit"
+                                        width="1.5rem" height="1.5rem"
+                    >
+                        {{ $t('DASHBOARD.BTN.GET_START') }}
+                    </p-icon-text-button>
+                </router-link>
+            </div>
+            <p-data-table v-else
+                          :fields="fields"
                           :sortable="false"
                           :selectable="false"
                           :loading="loading"
                           :items="data"
                           :top-border="false"
+                          :responsive-style="{
+                              overflow: 'auto',
+                              marginTop: '1rem'
+                          }"
                           class="data-table"
                           @rowLeftClick="onRowClick"
             >
                 <template #skeleton-rank>
                     <p-skeleton width="1.5rem" height="1.5rem" />
-                </template>
-                <template #no-data="{fields}">
-                    <p-tr key="noData" class="bg-primary3">
-                        <p-td :colspan="3" class="rounded-l-sm" />
-                        <p-td class="text-center">
-                            <p-badge :background-color="colors.servers">
-                                0
-                            </p-badge>
-                        </p-td>
-                        <p-td class="text-center rounded-r-sm">
-                            <p-badge :background-color="colors.cloud_services">
-                                0
-                            </p-badge>
-                        </p-td>
-                    </p-tr>
-                    <p-tr key="blank" class="!bg-white h-2" />
-                    <p-tr key="create-project" class="!bg-gray-100 cursor-pointer">
-                        <router-link to="/project" tag="td" :colspan="fields.length"
-                                     class="rounded-sm text-center"
-                        >
-                            <p-i name="ic_plus_square" width="1rem" height="1rem"
-                                 class="mr-4"
-                            />
-                            Create a Project
-                        </router-link>
-                    </p-tr>
                 </template>
 
                 <!-- th -->
@@ -147,10 +143,12 @@ import { SBarChart } from '@/lib/chart/bar-chart';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default defineComponent({
     name: 'TopProjects',
     components: {
+        PIconTextButton,
         PWidgetLayout,
         PBadge,
         PDataTable,
@@ -228,7 +226,7 @@ export default defineComponent({
             ts.state.loading = true;
             try {
                 const res = await api.execute();
-                ts.state.data = res.data.results;
+                ts.state.data = [];// res.data.results;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -257,6 +255,7 @@ export default defineComponent({
 .chart {
     height: 180px;
     width: 100%;
+    flex-shrink: 0;
 }
 .color {
     display: inline-block;

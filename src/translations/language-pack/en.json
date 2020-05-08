@@ -219,6 +219,14 @@
 		"ZONE": "Zone"
 	},
 	"DASHBOARD": {
+		"ACTION": {
+			"CRT_DBD": "create your dashboard!",
+			"CRT_GUIDE": "Create Project Group first & Register Service Account",
+			"NO_RUN": "No Recent Collecting Run"
+		},
+		"BTN": {
+			"GET_START": "Get Started"
+		},
 		"RES_REGION": "Resources by Region",
 		"SERVER_STATE": "Server States",
 		"SERVER_TYPE": "Servers by Type",

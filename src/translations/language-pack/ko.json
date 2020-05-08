@@ -219,6 +219,14 @@
 		"ZONE": "Zone"
 	},
 	"DASHBOARD": {
+		"ACTION": {
+			"CRT_DBD": "대시보드를 만드세요!",
+			"CRT_GUIDE": "프로젝트 그룹을 먼저 만들고 서비스 계정을 등록하세요",
+			"NO_RUN": "최근 수집작업이 없습니다"
+		},
+		"BTN": {
+			"GET_START": "시작하기"
+		},
 		"RES_REGION": "지역별 리소스",
 		"SERVER_STATE": "서버 상태",
 		"SERVER_TYPE": "유형별 서버",
