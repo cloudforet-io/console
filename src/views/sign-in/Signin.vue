@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="p-4 flex items-center text-center h-screen w-full wrapper default-theme">
-            <div id="login-container" class="max-w-md m-auto justify-center bg-white lg sm:max-w-xl md:max-w-sm md:mx-auto">
+            <div id="login-container" class="m-auto justify-center bg-white lg rounded-lg p-8 md:p-16 ">
                 <img id="logo" src="@/assets/images/brand/brand_logo.png">
                 <div class="header">
                     <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
@@ -113,11 +113,11 @@ export default defineComponent({
     }
 
     #login-container {
-        background-color: white;
-        /*max-width: 328px;*/
+        /* background-color: white; */
+        /* max-width: 24.5rem; */
         /*width: 100%;*/
         /*margin: 1rem;*/
-        padding: 1.5rem 1rem 0.62rem;
+        /* padding: 1.5rem 1rem 0.62rem; */
     }
 
     #logo {
@@ -133,7 +133,7 @@ export default defineComponent({
         text-align: center;
         margin: 0 auto;
         width: 217px;
-        height: 27px;
+        height: auto;
     }
 
     .header{
