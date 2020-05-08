@@ -119,5 +119,3 @@ export interface DLSFieldsOptions extends DLSBaseOptions{
 }
 
 export type DLItemType = DLSchema<'item', DLSFieldsOptions>
-
-export type VueFileImport = Promise<typeof import('*.vue')>;

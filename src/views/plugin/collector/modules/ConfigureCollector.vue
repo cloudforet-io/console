@@ -46,6 +46,7 @@ export interface Form {
     plugin_info: {
         // eslint-disable-next-line camelcase
         plugin_id: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         options: any;
         version: string;
     };
@@ -62,10 +63,10 @@ interface Props {
     pluginId: string;
     form: Form;
     imgUrl: string;
-    optionsSchema: any;
+    optionsSchema: JsonSchemaObjectType;
 }
 
-export default {
+export default defineComponent({
     name: 'ConfigureCollector',
     components: {
         PJsonSchemaForm,
@@ -89,7 +90,7 @@ export default {
          */
         form: {
             type: Object,
-            default: () => ({} as Form),
+            default: (): Form => ({} as Form),
         },
         /**
          * sync
@@ -103,6 +104,7 @@ export default {
             default: null,
         },
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props: Props, { emit, root }) {
         // set fixedFormTS
         const fixedFormTS = new JsonSchemaFormToolSet();
@@ -160,6 +162,7 @@ export default {
         );
 
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateFormAndValidateField = async (key: string, val: any, isOption = false): Promise<void> => {
             const ts = isOption ? optionsFormTS : fixedFormTS;
             const valueKey = isOption ? `plugin_info.options.${key}` : key;
@@ -231,7 +234,7 @@ export default {
             init,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

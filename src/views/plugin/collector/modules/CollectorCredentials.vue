@@ -41,7 +41,7 @@
 
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
-                            :collector="collector"
+                            :collectorId="collectorId"
                             :credential-id="targetCredentialId"
         />
     </div>
@@ -75,9 +75,9 @@ export default {
         CredentialVerifyModal,
     },
     props: {
-        collector: Object,
+        collectorId: String,
     },
-    setup(props, { parent }) {
+    setup(props) {
         const state = reactive({
             items: [],
             totalCount: 0,
@@ -88,14 +88,14 @@ export default {
                 ...makeTrItems([
                     ['name', 'COMMON.NAME', { size: '400px' }],
                     ['created_at', 'COMMON.CREATED', { size: '300px' }],
-                ], parent),
+                ], null),
                 { name: 'collect', label: ' ', sortable: false },
             ]),
             sortBy: '',
             sortDesc: '',
             pageSize: 10,
             thisPage: 1,
-            allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
+            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             verifyModalVisible: false,
             collectDataVisible: false,
             targetCredentialId: null,
@@ -124,7 +124,7 @@ export default {
 
         listCredentials();
 
-        watch(() => props.collector, () => {
+        watch(() => props.collectorId, () => {
             listCredentials();
         }, {
             lazy: true,
