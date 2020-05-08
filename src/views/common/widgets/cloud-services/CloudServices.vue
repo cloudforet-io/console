@@ -158,8 +158,9 @@ export default defineComponent({
                 '',
             ) as string,
             onSelected(item: Value): void {
+                console.log('cloud service item', item);
                 vm.$router.push({
-                    path: '/identity/service-account',
+                    path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
                     query: { provider: item.provider },
                 });
             },

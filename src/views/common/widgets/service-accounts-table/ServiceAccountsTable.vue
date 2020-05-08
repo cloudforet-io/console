@@ -8,7 +8,6 @@
                           :items="data"
                           :top-border="false"
                           class="data-table"
-                          @rowLeftClick="onRowClick"
             >
                 <!-- th -->
                 <template #th-server_count="{field}">
@@ -198,9 +197,6 @@ export default defineComponent({
 
             return {
                 ...toRefs(state),
-                onRowClick() {
-                    vm.$router.push('/plugin/project');
-                },
             };
     },
 });

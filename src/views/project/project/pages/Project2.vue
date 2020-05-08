@@ -630,6 +630,9 @@ export default {
             max-width: 1.5rem;
             max-height: 1.5rem;
         }
+        .providers {
+            padding-bottom: 7px;
+        }
 
         .empty-providers {
             p {
