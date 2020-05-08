@@ -2,16 +2,10 @@
     <general-page-layout>
         <div class="top">
             <div class="project-info">
-                <span>
-                    <p-i name="ic_back" width="2rem" height="2rem"
-                         cursor="pointer" margin-top="-10px"
-                         @click="$router.push({name:'projectMain'})"
-                    />
-                </span>
-                <span>{{ item.name || 'Project' }}</span>
-                <p-i name="ic_transhcan" color="transparent inherit"
-                     width="1.5rem" height="1.5rem" class="delete-btn"
-                     @click="openProjectDeleteForm()"
+                <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
+                <p-icon-button name="ic_transhcan"
+                               width="1.5rem" height="1.5rem" class="-mt-5 ml-3 delete-btn"
+                               @click="openProjectDeleteForm"
                 />
             </div>
         </div>
@@ -92,8 +86,10 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 
@@ -124,8 +120,10 @@ export default {
         GeneralPageLayout,
         PDynamicView,
         STagsPanel,
+        PPageTitle,
         PTab,
         PI,
+        PIconButton,
         PButton,
         SProjectMemberAddModal,
     },
@@ -254,12 +252,10 @@ export default {
             formState.projectDeleteFormVisible = false;
         };
         const openMemberAddForm = () => {
-            console.log('open member add form');
             formState.memberAddFormVisible = true;
         };
 
         const addMember = async () => {
-            console.log('add member');
             await apiHandler.getData();
         };
 
@@ -341,14 +337,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .project-info {
-        padding-bottom: 36px;
-        span {
-            padding-right: 14.6px;
-            font-weight: bold;
-            font-size: 24px;
-        }
-    }
     .toolbox-left {
         .add-btn {
             margin-right: 1rem;

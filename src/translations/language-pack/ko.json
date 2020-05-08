@@ -11,6 +11,9 @@
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "{itemName} {limitCount}개 제한",
+		"PROJECT": {
+			"NO_PROJECT": "갖고 있는 프로젝트가 없습니다"
+		},
 		"SELECTED_OF": "{totalCount}개 중 {selectedCount}개 선택",
 		"TIMEZONE_OF": "모두 {timezone}으로 보여집니다."
 	},
@@ -26,6 +29,7 @@
 		"CONFIRM": "확인",
 		"COPY": "복사하기",
 		"CREATE": "생성",
+		"CREATE_PROJECT": "프로젝트 만들기",
 		"DELETE": "삭제",
 		"DISABLE": "비활성화",
 		"EDIT": "수정",
@@ -34,6 +38,7 @@
 		"FIND": "찾기",
 		"NO": "아니오",
 		"OK": "확인",
+		"REFRESH": "갱신하기",
 		"RESET": "초기화",
 		"SAVE": "저장",
 		"UPDATE": "업데이트",

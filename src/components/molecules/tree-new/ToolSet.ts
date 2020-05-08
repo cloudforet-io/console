@@ -178,7 +178,7 @@ export class TreeToolSet<initDataType> extends TreeState<initDataType> {
         });
         _this.tree = computed(() => _.get(_this, treePath));
         _this.getSelectedNode = (event?: any) => {
-            console.debug('getSelectedNode', event, _this.tree.value.selected());
+            // console.debug('getSelectedNode', event, _this.tree.value.selected());
             _this.metaState.selectedNode = event ? [event] : [];
         };
     }
