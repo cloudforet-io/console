@@ -8,7 +8,7 @@ import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/ite
 import { fluentApi } from '@/lib/fluent-api';
 
 export default {
-    title: 'organisms/dynamic-view/dynamic-layout/item',
+    title: 'organisms/dynamic-view/dynamic-layout/list',
     component: SDynamicLayoutItem,
     parameters: {
         notes: md,
