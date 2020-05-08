@@ -20,6 +20,9 @@
                                 :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
                                 :data="null"
                 >
+                    <template #toolbox-top>
+                        <PPageTitle :title="'Member'" use-total-count :total-count="apiHandler.totalCount.value" />
+                    </template>
                     <template #toolbox-left>
                         <div class="toolbox-left">
                             <p-button class="add-btn"
@@ -337,6 +340,15 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    .p-page-title{
+        &::v-deep .title {
+            @apply text-2xl;
+        }
+         &::v-deep .extra {
+            @apply text-base text-gray-400 mt-1;
+          }
+
+    }
     .toolbox-left {
         .add-btn {
             margin-right: 1rem;

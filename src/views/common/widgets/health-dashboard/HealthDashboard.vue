@@ -121,7 +121,7 @@ export default defineComponent({
         });
 
         const api = fluentApi.addons().awsHealth().list().setId(projectId.value)
-            .setDateSubtractor(15);
+            .setDateSubtractor(10);
 
 
         const getData = async (): Promise<void> => {

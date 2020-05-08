@@ -3,7 +3,7 @@
         <template #sidebar="{width}">
             <div class="h-full treeSidebar" :style="{width:width+'px'}">
                 <div class="tree-header">
-                    Project Group
+                    PROJECT GROUP
                     <p-i name="ic_plus" color="transparent inherit"
                          width="1rem" height="1rem" class="cursor-pointer add-btn"
                          @click="openProjectGroupForm(true)"
@@ -30,7 +30,7 @@
                             <div v-tooltip.bottom="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"
                                  class="text-base truncate leading-tight"
                             >
-                                <p-i :name="'ic_plus'" color="transparent inherit"
+                                <p-icon-button :name="'ic_plus'" class="group-add-btn"
                                      width="1rem" height="1rem"
                                 />
                             </div>
@@ -108,11 +108,13 @@
                                         {{ item.name }}
                                     </p>
                                     <div v-if="item.force_console_data.providers.length == 0" class="empty-providers"
-                                         @click="clickServiceAccount"
+                                         @click.stop="clickServiceAccount"
                                     >
                                         <p>
-                                            <p-i :name="'btn_circle_plus_blue'"
-                                                 width="24px" height="24px" class="btn_circle_plus_blue"
+                                            <p-simple-icon-button :normal-icon-name="'btn_circle_plus_blue'"
+                                                                  :hovered-icon-name="'btn_circle_plus_blue--hover'"
+                                                                  width="24px" height="24px"
+                                                                  class="add-service-account-btn"
                                             />
                                             Add Service Account
                                         </p>
@@ -210,6 +212,7 @@ import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PSimpleIconButton from '@/components/molecules/buttons/SimpleIconButton.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -255,6 +258,7 @@ export default {
         PButton,
         PI,
         PIconButton,
+        PSimpleIconButton,
         PPageTitle,
         PQuerySearchBar,
         PQuerySearchTags,
@@ -596,8 +600,21 @@ export default {
 
 <style lang="postcss" scoped>
     .tree-header {
-        @apply text-xs font-bold text-gray-500 ml-5 mt-6 mb-4;
+        @apply text-sm font-semibold text-gray-500 ml-5 mt-6 mb-4;
         overflow-x: hidden;
+    }
+
+    ::v-deep .group-add-btn {
+        max-width: 1.5rem;
+        max-height: 1.5rem;
+        min-width: 1.5rem;
+        min-height: 1.5rem;
+        &:hover {
+             color: inherit;
+         }
+        &:not(:disabled):not(.disabled):hover {
+            @apply bg-blue-300 border-blue-300;
+         }
     }
 
     .project-group {
@@ -608,8 +625,11 @@ export default {
             @apply text-2xl font-bold pb-2;
         }
         .delete-btn {
-            @apply text-black -mt-2;
+            @apply text-black -mt-2 ml-2;
             cursor: pointer;
+            &:hover {
+                @apply text-white;
+             }
         }
     }
 
@@ -636,10 +656,13 @@ export default {
 
         .empty-providers {
             p {
-                @apply text-secondary text-sm;
-            }
-            .btn_circle_plus_blue {
-                @apply mr-2;
+                @apply relative z-10 text-secondary text-sm;
+                .add-service-account-btn {
+                    @apply relative z-10 mr-2;
+                }
+                &:hover {
+                     @apply font-bold;
+                 }
             }
         }
     }
@@ -655,7 +678,7 @@ export default {
         }
 
         .summary-item-num {
-            @apply text-gray-500 text-base font-bold text-right mb-3 inline-block float-right;
+            @apply text-blue-600 text-base font-bold text-right mb-3 inline-block float-right;
         }
     }
 

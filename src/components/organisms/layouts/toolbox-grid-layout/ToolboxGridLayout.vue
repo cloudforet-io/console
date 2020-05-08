@@ -52,17 +52,6 @@
                 <slot :name="slot" v-bind="scope" />
             </template>
         </p-grid-layout>
-
-        <!--        <div class="bottom">-->
-        <!--            <slot name="bottom">-->
-        <!--                <div class="bottom-page">-->
-        <!--                    <p-text-pagenation :this-page.sync="proxyThisPage"-->
-        <!--                                       :all-page="allPage"-->
-        <!--                                       @pageChange="changePageNumber"-->
-        <!--                    />-->
-        <!--                </div>-->
-        <!--            </slot>-->
-        <!--        </div>-->
     </div>
 </template>
 
@@ -183,16 +172,4 @@ export default {
             }
         }
 
-    /*}*/
-    .grid-card-container {
-        display: flex;
-        flex-grow: 1;
-        height: 100%;
-    }
-
-    .bottom {
-        /*margin-top: 1.6rem;*/
-        margin-top: auto;
-        text-align: center;
-    }
 </style>

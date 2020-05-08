@@ -1,6 +1,7 @@
 {
 	"ACTION": {
 		"DICT": {
+			"ADD_TAG_BY": "Add tags associated with {name}.",
 			"CLICK_ADD_BTN_MSG": "Tap the button below to add a tag.",
 			"HELPMSG": "The Key - Value pair is a required entry and the Key can start with a letter and contain only letters, numbers, and underscores.",
 			"INVALID": {
@@ -12,7 +13,10 @@
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "Limit {limitCount} {itemName}",
 		"PROJECT": {
-			"NO_PROJECT": "There is no project"
+			"ITEM_WILL_SELECT_FOR": "The {item} is included in the {project}.",
+			"NO_PROJECT": "There is no project",
+			"SELECT_PROJECT_FOR": "Lets you select a Project to include this {resource}.",
+			"SELECT_PROJECT_OR_RELEASE": "Please select a project or release the project"
 		},
 		"SELECTED_OF": "{selectedCount} selected of {totalCount}",
 		"TIMEZONE_OF": "All times shown are in {timezone}."
@@ -435,6 +439,7 @@
 		"LOCAL_TIME": "Local Time",
 		"RESOURCE": "Resource",
 		"SERVER": "server",
+		"SERVICE_ACCOUNT": "Service Account",
 		"STATISTICS": "Statistics",
 		"TAG": "tag",
 		"TAGS": "Tags",
