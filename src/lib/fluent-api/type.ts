@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 
 export type ApiMethods = 'post' | 'get' | 'delete' | 'put';
 
@@ -174,4 +174,13 @@ export interface ProjectGroupInfo extends Tags {
 
 export interface ApiType {
     instance: AxiosInstance;
+}
+
+export interface ActionAPIInterface<parameter=any, resp=any> {
+    url: string;
+    getParameter: () => parameter;
+    execute: () => Promise<AxiosResponse<resp>>;
+    setTransformer<returnType = any>(func: (resp: AxiosResponse<resp>) => returnType|Promise<returnType>): this;
+    debug(...args: string[]): void;
+    clone(): this;
 }

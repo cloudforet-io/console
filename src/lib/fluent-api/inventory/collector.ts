@@ -2,7 +2,7 @@
 import {
     CollectAction,
     CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, ServiceResources, SingleDeleteAction, UpdateAction,
+    ResourceActions, ServiceResources, SingleDeleteAction, SingleDisableAction, SingleEnableAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     COLLECT_MODE, CollectorModel, CollectorUpdateParameter,
@@ -79,8 +79,16 @@ class Collect extends CollectAction<CollectorCollectParameter, any> {
     }
 }
 
+class Enable extends SingleEnableAction<IdParameter, CollectorModel> {
+    idField = idField
+}
+
+class Disable extends SingleDisableAction<IdParameter, CollectorModel> {
+    idField = idField
+}
+
 export default class Collector extends Resource implements
-    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'>,
+    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'|'enable'|'disable'>,
     ServiceResources<'schedule'> {
     protected name = 'collector';
 
@@ -95,6 +103,10 @@ export default class Collector extends Resource implements
     list(): List { return new List(this.api, this.baseUrl); }
 
     collect(): Collect { return new Collect(this.api, this.baseUrl); }
+
+    enable(): Enable { return new Enable(this.api, this.baseUrl); }
+
+    disable(): Disable { return new Disable(this.api, this.baseUrl); }
 
     schedule(): CollectorSchedule {
         const baseUrl = this.baseUrl.substring(1, this.baseUrl.length - 1);

@@ -2,6 +2,7 @@
     <s-dynamic-layout :key="layout.name" :layout="layout"
                       v-bind="layout"
                       :api="api"
+                      :vbind="{colCopy: true}"
     />
 </template>
 
