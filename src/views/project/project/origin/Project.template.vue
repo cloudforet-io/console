@@ -26,14 +26,14 @@
                 <p-horizontal-layout>
                     <template #container="{ height }">
                         <PTab :tabs="tabsData.tabs" :active-tab.sync="tabsData.activeTab">
-                            <template #details="{tabName}">
+                            <template #details>
                                 <keep-alive>
                                     <project-summary-top
                                         :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                     />
                                 </keep-alive>
                             </template>
-                            <template #member="{tabName}">
+                            <template #member>
                                 <project-member />
                             </template>
                         </PTab>

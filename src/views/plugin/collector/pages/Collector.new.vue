@@ -1,21 +1,16 @@
 <template>
     <general-page-layout class="collector-page">
-        <p-horizontal-layout :line="false">
+        <p-page-title :title="$t('WORD.COLLECTOR')"
+                      class="ml-4"
+                      use-total-count use-selected-count
+                      :total-count="apiHandler.totalCount.value"
+                      :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+        />
+        <p-horizontal-layout>
             <template #container="{ height }">
-                <p-toolbox-table v-bind="apiHandler.tableTS.state"
-                                 :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
-                                 :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
-                                 :this-page.sync="apiHandler.tableTS.syncState.thisPage"
-                                 :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-                                 :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
-                                 :loading.sync="apiHandler.tableTS.syncState.loading"
-                                 :style="{height: `${height}px`}"
-                                 @changePageSize="apiHandler.action"
-                                 @changePageNumber="apiHandler.action"
-                                 @clickRefresh="apiHandler.action"
-                                 @changeSort="apiHandler.action"
+                <s-dynamic-layout v-bind="mainTableLayout" :toolset="apiHandler"
+                                  :vbind="{responsiveStyle: { height: `${height}px`, overflow: 'auto' }, showTitle: false}"
                 >
-                    <!--                    @clickExcel="exportExcel"-->
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
                                             name="ic_plus_bold"
@@ -33,30 +28,6 @@
                         >
                             {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
-                        <div class="left-toolbox-item">
-                            <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
-                                                :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
-                                                @newQuery="apiHandler.tableTS.querySearch.addTag"
-                            />
-                        </div>
-                    </template>
-                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
-                        <p-col :col="12" class="mb-2">
-                            <p-hr class="w-full" />
-                            <p-row class="mt-2">
-                                <div class="flex-grow-0">
-                                    <p-icon-button name="ic_delete" @click="apiHandler.tableTS.querySearch.deleteAllTags" />
-                                </div>
-                                <div class="flex-grow ml-4">
-                                    <p-tag v-for="(tag, idx) in apiHandler.tableTS.querySearch.tags.value" :key="idx + tag"
-                                           style="margin-top: 0.375rem; margin-bottom: 0.37rem;"
-                                           @delete="apiHandler.tableTS.querySearch.deleteTag(idx)"
-                                    >
-                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
-                                    </p-tag>
-                                </div>
-                            </p-row>
-                        </p-col>
                     </template>
                     <template #col-name-format="data">
                         <span class="name">
@@ -66,24 +37,7 @@
                             {{ data.value }}
                         </span>
                     </template>
-                    <template #col-state-format="{value}">
-                        <p-status v-bind="collectorStateFormatter(value)" />
-                    </template>
-                    <template #col-last_collected_at-format="{value}">
-                        {{ value ? timestampFormatter(value) : '' }}
-                    </template>
-                    <template #col-created_at-format="{value}">
-                        {{ timestampFormatter(value) }}
-                    </template>
-                    <template #col-plugin_info-format="{value}">
-                        <template v-if="value.options && value.options.supported_resource_type">
-                            <div v-for="(d, i) in value.options.supported_resource_type" :key="i">
-                                {{ d }}
-                            </div>
-                        </template>
-                        <span v-else />
-                    </template>
-                </p-toolbox-table>
+                </s-dynamic-layout>
             </template>
         </p-horizontal-layout>
 
@@ -92,7 +46,7 @@
                :active-tab.sync="tabState.activeTab"
         >
             <template #detail>
-                <collector-detail :data="apiHandler.tableTS.selectState.firstSelectItem" />
+                <collector-detail :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
             </template>
             <template #tag>
                 <s-tags-panel :is-show="tabState.activeTab==='tag'"
@@ -104,34 +58,17 @@
                 <collector-credentials :collector="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #schedules>
-                <collector-schedules v-if="tabState.activeTab === 'schedules'"
-                                     :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
-                />
+                <collector-schedules :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
             </template>
         </p-tab>
         <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
                :tabs="tabState.multiTabs" :active-tab.sync="tabState.multiActiveTab"
         >
             <template #data>
-                <p-data-table
-                    :fields="multiFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="apiHandler.tableTS.selectState.selectItems"
-                    col-copy
-                >
-                    <template #col-name-format="data">
-                        <span class="name">
-                            <p-lazy-img :img-url="getIcon(data)"
-                                        width="1.5rem" height="1.5rem"
-                            />
-                            {{ data.value }}
-                        </span>
-                    </template>
-                    <template #col-state-format="{value}">
-                        <p-status v-bind="collectorStateFormatter(value)" />
-                    </template>
-                </p-data-table>
+                <s-dynamic-layout v-bind="multiDataLayout"
+                                  :data="apiHandler.tableTS.selectState.selectItems"
+                                  :vbind="{colCopy: true}"
+                />
             </template>
         </p-tab>
 
@@ -145,12 +82,12 @@
                             :collector="apiHandler.tableTS.selectState.firstSelectItem"
         />
 
-        <p-table-check-modal v-if="checkModalState.mode"
+        <p-table-check-modal v-if="checkModalState.visible"
                              :visible.sync="checkModalState.visible"
                              :header-title="checkModalState.title"
                              :sub-title="checkModalState.subTitle"
                              :theme-color="checkModalState.themeColor"
-                             :fields="multiFields"
+                             :fields="checkModalState.tableCheckFields"
                              size="lg"
                              centered
                              :selectable="false"
@@ -164,56 +101,54 @@
 /* eslint-disable class-methods-use-this */
 
 import {
-    reactive, toRefs, computed, ref,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
-import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import collectorEventBus from '@/views/plugin/collector/CollectorEventBus';
-import { fluentApi } from '@/lib/fluent-api';
+import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
 import _ from 'lodash';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PStatus from '@/components/molecules/status/Status.vue';
-import PTag from '@/components/molecules/tags/Tag.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
     getEnumValues, makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { VueFileImport } from '@/lib/type';
+import { dateTimeViewType } from '@/lib/data-source';
 
-const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
-const PQuerySearchBar = () => import('@/components/organisms/search/query-search-bar/QuerySearchBar.vue');
-const PTableCheckModal = () => import('@/components/organisms/modals/table-modal/TableCheckModal.vue');
+const PTab = (): VueFileImport => import('@/components/organisms/tabs/tab/Tab.vue');
+const PTableCheckModal = (): VueFileImport => import('@/components/organisms/modals/table-modal/TableCheckModal.vue');
+const STagsPanel = (): VueFileImport => import('@/components/organisms/panels/tag-panel/STagsPanel.vue');
+const CollectorUpdateModal = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue');
+const CollectDataModal = (): VueFileImport => import('@/views/plugin/collector/modules/CollectDataModal.vue');
+const CollectorDetail = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorDetail.vue');
+const CollectorCredentials = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorCredentials.vue');
+const CollectorSchedules = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorSchedules.vue');
 
-const CollectorUpdateModal = () => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue');
-const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
-const CollectorDetail = () => import('@/views/plugin/collector/modules/CollectorDetail.vue');
-const CollectorCredentials = () => import('@/views/plugin/collector/modules/CollectorCredentials.vue');
-const CollectorSchedules = () => import('@/views/plugin/collector/modules/CollectorSchedules.vue');
+const collectorApi = fluentApi.inventory().collector();
 
-
-const checkModalState = reactive({
+const checkModalState: UnwrapRef<{
+    visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api: ActionAPIInterface;
+}> = reactive({
     visible: false,
     mode: '',
-    item: null,
-    confirmEventName: '',
     title: '',
     subTitle: '',
     themeColor: '',
-    checkModalConfirm: () => {
-        collectorEventBus.$emit(checkModalState.confirmEventName);
-    },
+    api: collectorApi.enable(),
+    tableCheckFields: computed(() => makeTrItems([
+        ['name', 'COMMON.NAME'],
+        ['state', 'COMMON.STATE'],
+        ['priority', 'COMMON.PRIORITY'],
+    ])),
 });
 
 const updateModalState = reactive({
@@ -224,185 +159,16 @@ const collectDataState = reactive({
     visible: false,
 });
 
-const scheduleState = reactive({
-    items: [],
-    selectIndex: [],
-    totalCount: 0,
-    collector: null,
-    loading: true,
-    editLoading: true,
-    editVisible: false,
-    deleteVisible: false,
-});
-
-export const collectorSetup = (props, context) => {
-    class ACHandler extends QuerySearchTableACHandler {
-        get valuesFetchUrl(): string { return '/inventory/collector/list'; }
-
-        get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
-
-        constructor(args: QSTableACHandlerArgs) {
-            super(args);
-            this.handlerMap.value = [
-                ...makeValuesFetchHandler(
-                    context.parent,
-                    '/inventory/collector/list',
-                    ['collector_id', 'name'],
-                ),
-                getEnumValues('state', ['ENABLED', 'DISABLED']),
-                getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
-            ];
-        }
-    }
-    const apiHandler = new QuerySearchTableFluentAPI(
-        fluentApi.inventory().collector().list(),
-        {
-            selectable: true,
-            sortable: true,
-            dragable: true,
-            hover: true,
-            responsive: true,
-            'setting-visible': false,
-            'use-cursor-loading': true,
-            'excel-visible': true,
-            fields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
-                ['priority', 'COMMON.PRIORITY'],
-                ['plugin_info', 'COMMON.RESOURCE'],
-                ['last_collected_at', 'COMMON.LAST_COL'],
-                ['created_at', 'COMMON.CREATED'],
-            ],
-            context.parent)),
-            responsiveStyle: { overflow: 'auto' },
-        },
-        undefined,
-        {
-            handlerClass: ACHandler,
-            args: {
-                keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
-                suggestKeys: ['collector_id', 'name'],
-            },
-        },
-    );
-    const dropdown = computed(() => (
-        makeTrItems([
-            ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
-            [null, null, { type: 'divider' }],
-            ['enable', 'BTN.ENABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
-            ['disable', 'BTN.DISABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
-            ['delete', 'BTN.DELETE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
-            [null, null, { type: 'divider' }],
-            ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
-        ],
-        context.parent,
-        { type: 'item' })));
-
-    const multiFields = computed(() => makeTrItems([
-        ['name', 'COMMON.NAME'],
-        ['state', 'COMMON.STATE'],
-        ['priority', 'COMMON.PRIORITY'],
-    ], context.parent));
-
-    const tabState = reactive({
-        activeTab: 'detail',
-        tabs: makeTrItems([
-            ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-            ['tag', 'TAB.TAG'],
-            ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
-        ], context.parent),
-        multiActiveTab: 'data',
-        multiTabs: makeTrItems([
-            ['data', 'TAB.DATA', { keepAlive: true }],
-        ], context.parent),
-    });
-
-    const state = reactive({
-        checkModalState,
-        scheduleState,
-        dropdown,
-        multiFields,
-    });
-
-    const onClickUpdate = () => {
-        updateModalState.visible = true;
-    };
-    const onClickEnable = () => {
-        state.checkModalState.mode = 'enable';
-        state.checkModalState.confirmEventName = 'enableCollectors';
-        /**
-             * TODO: translation
-             */
-        state.checkModalState.title = 'Enable Collector';
-        state.checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
-        state.checkModalState.themeColor = 'primary';
-        state.checkModalState.visible = true;
-    };
-    const onClickDisable = () => {
-        state.checkModalState.mode = 'disable';
-        state.checkModalState.confirmEventName = 'disableCollectors';
-        /**
-             * TODO: translation
-             */
-        state.checkModalState.title = 'Disable Collector';
-        state.checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
-        state.checkModalState.themeColor = 'primary';
-        state.checkModalState.visible = true;
-    };
-    const onClickDelete = () => {
-        state.checkModalState.mode = 'delete';
-        state.checkModalState.confirmEventName = 'deleteCollectors';
-        /**
-             * TODO: translation
-             */
-        state.checkModalState.title = 'Delete Collector';
-        state.checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
-        state.checkModalState.themeColor = 'alert';
-        state.checkModalState.visible = true;
-    };
-
-    const onClickCollectData = () => {
-        collectDataState.visible = true;
-    };
-
-
-    return {
-        ...toRefs(state),
-        tabState,
-        updateModalState,
-        collectDataState,
-        ACHandler,
-        apiHandler,
-        timestampFormatter,
-        collectorStateFormatter,
-        getIcon: data => _.get(data, 'item.tags.icon', ''),
-        onClickUpdate,
-        onClickEnable,
-        onClickDisable,
-        onClickDelete,
-        onClickCollectData,
-    };
-};
-
 export default {
     name: 'Collector',
     components: {
+        PPageTitle,
         GeneralPageLayout,
-        PStatus,
         PLazyImg,
         PHorizontalLayout,
-        PToolboxTable,
-        PDataTable,
         PIconTextButton,
-        PTag,
-        PRow,
-        PCol,
-        PHr,
-        PIconButton,
         PDropdownMenuBtn,
         PTab,
-        PQuerySearchBar,
         CollectorUpdateModal,
         PTableCheckModal,
         CollectDataModal,
@@ -410,16 +176,212 @@ export default {
         CollectorCredentials,
         CollectorSchedules,
         STagsPanel,
+        SDynamicLayout,
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
-        return collectorSetup(props, context);
+        const vm: any = getCurrentInstance();
+        class ACHandler extends QuerySearchTableACHandler {
+            get valuesFetchUrl(): string { return '/inventory/collector/list'; }
+
+            get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
+
+            constructor(args: QSTableACHandlerArgs) {
+                super(args);
+                this.handlerMap.value = [
+                    ...makeValuesFetchHandler(
+                        context.parent,
+                        '/inventory/collector/list',
+                        ['collector_id', 'name'],
+                    ),
+                    getEnumValues('state', ['ENABLED', 'DISABLED']),
+                    getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+                ];
+            }
+        }
+        const apiHandler = new QuerySearchTableFluentAPI(
+            collectorApi.list(),
+            {
+                selectable: true,
+                sortable: true,
+                dragable: true,
+                hover: true,
+                responsive: true,
+                settingVisible: false,
+                useCursorLoading: true,
+                excelVisible: true,
+            },
+            undefined,
+            {
+                handlerClass: ACHandler,
+                args: {
+                    keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
+                    suggestKeys: ['collector_id', 'name'],
+                },
+            },
+        );
+
+
+        const tabState = reactive({
+            activeTab: 'detail',
+            tabs: computed(() => makeTrItems([
+                ['detail', 'PANEL.DETAILS', { keepAlive: true }],
+                ['tag', 'TAB.TAG', { keepAlive: true }],
+                ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+                ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
+            ])),
+            multiActiveTab: 'data',
+            multiTabs: computed(() => makeTrItems([
+                ['data', 'TAB.DATA', { keepAlive: true }],
+            ])),
+        });
+        const state = reactive({
+            dropdown: computed(() => (
+                makeTrItems([
+                    ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
+                    [null, null, { type: 'divider' }],
+                    ['enable', 'BTN.ENABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
+                    ['disable', 'BTN.DISABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
+                    ['delete', 'BTN.DELETE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
+                    [null, null, { type: 'divider' }],
+                    ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
+                ], null, { type: 'item' }))),
+            mainTableLayout: computed<any>(() => ({
+                name: vm.$t('WORD.COLLECTOR'),
+                type: 'query-search-table',
+                options: {
+                    fields: [
+                        { key: 'name', name: vm.$t('COMMON.NAME') },
+                        {
+                            key: 'state',
+                            name: vm.$t('COMMON.STATE'),
+                            type: 'enum',
+                            options: {
+                                ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
+                                DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
+                            },
+                        },
+                        { key: 'priority', name: vm.$t('COMMON.PRIORITY') },
+                        {
+                            key: 'plugin_info.options.supported_resource_type',
+                            name: vm.$t('COMMON.RESOURCE'),
+                            type: 'list',
+                            options: {
+                                item: { type: 'badge' }, delimiter: ', ',
+                            },
+                        },
+                        { key: 'last_collected_at.seconds', name: vm.$t('COMMON.LAST_COL'), ...dateTimeViewType },
+                        { key: 'created_at.seconds', name: vm.$t('COMMON.CREATED'), ...dateTimeViewType },
+                    ],
+                },
+            })),
+            multiDataLayout: computed<any>(() => ({
+                name: vm.$t('TAB.DATA'),
+                type: 'simple-table',
+                options: {
+                    fields: [
+                        { key: 'name', name: vm.$t('COMMON.NAME') },
+                        {
+                            key: 'state',
+                            name: vm.$t('COMMON.STATE'),
+                            type: 'enum',
+                            options: {
+                                ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
+                                DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
+                            },
+                        },
+                        { key: 'priority', name: vm.$t('COMMON.PRIORITY') },
+                    ],
+                },
+            })),
+        });
+
+        const onClickUpdate = (): void => {
+            updateModalState.visible = true;
+        };
+
+        const checkModalConfirm = async (): Promise<void> => {
+            try {
+                await checkModalState.api.execute();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: checkModalState.title,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                checkModalState.visible = false;
+            }
+        };
+
+        const onClickEnable = (): void => {
+            checkModalState.mode = 'enable';
+            checkModalState.api = collectorApi.enable()
+                .setId(apiHandler.tableTS.selectState.firstSelectItem.collector_id);
+            checkModalState.title = 'Enable Collector';
+            checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
+            checkModalState.themeColor = 'primary';
+            checkModalState.visible = true;
+        };
+        const onClickDisable = (): void => {
+            checkModalState.mode = 'disable';
+            checkModalState.api = collectorApi.disable()
+                .setId(apiHandler.tableTS.selectState.firstSelectItem.collector_id);
+            checkModalState.title = 'Disable Collector';
+            checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
+            checkModalState.themeColor = 'primary';
+            checkModalState.visible = true;
+        };
+        const onClickDelete = (): void => {
+            checkModalState.mode = 'delete';
+            checkModalState.api = collectorApi.delete()
+                .setId(apiHandler.tableTS.selectState.firstSelectItem.collector_id);
+            checkModalState.title = 'Delete Collector';
+            checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
+            checkModalState.themeColor = 'alert';
+            checkModalState.visible = true;
+        };
+
+        const onClickCollectData = (): void => {
+            collectDataState.visible = true;
+        };
+
+
+        return {
+            ...toRefs(state),
+            tabState,
+            updateModalState,
+            collectDataState,
+            checkModalState,
+            ACHandler,
+            apiHandler,
+            getIcon: (data): void => _.get(data, 'item.tags.icon', ''),
+            onClickUpdate,
+            onClickEnable,
+            onClickDisable,
+            onClickDelete,
+            onClickCollectData,
+            checkModalConfirm,
+        };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
     .left-toolbox-item {
-        margin-left: 1rem;
+        @apply mx-4;
         &:last-child {
             flex-grow: 1;
         }

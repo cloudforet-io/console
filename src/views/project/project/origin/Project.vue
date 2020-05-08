@@ -41,13 +41,13 @@
                 <horizontal-layout>
                     <template #container="{ height }">
                         <PTab :tabs="tabsData.tabs" :active-tab.sync="tabsData.activeTab">
-                            <template #details="{tabName}">
+                            <template #details>
                                 <project-summary-top ref="detailsTop"
                                                      :selected-node="getSelectedNodeAndTree"
                                                      :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                 />
                             </template>
-                            <template #member="{tabName}">
+                            <template #member>
                                 <project-member :tab-basic-height="height"
                                                 :selected-node="getSelectedNodeAndTree"
                                 />

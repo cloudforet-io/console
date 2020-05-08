@@ -58,7 +58,7 @@
             </template>
         </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
-            <template #detail="{tabName}">
+            <template #detail>
                 <p-credentials-detail ref="credentialsDetail"
                                       :item="items[selectIndex[0]]"
                                       :tag-confirm-event="tagConfirmEvent"
@@ -67,7 +67,7 @@
             </template>
         </PTab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #data="{tabName}">
+            <template #data>
                 <p-data-table
                     :fields="multiSelectFields"
                     :sortable="false"

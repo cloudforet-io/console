@@ -142,7 +142,7 @@ export default defineComponent({
             filterFormats: computed(() => _.get(props.collector, 'plugin_info.options.filter_format', [])),
             filters: {},
             confirmBtnStyle: computed(() => {
-                const defaultStyle: any = { style: { padding: 0 } };
+                const defaultStyle: any = {};
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),

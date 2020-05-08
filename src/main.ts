@@ -17,9 +17,10 @@ import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Skeleton from 'vue-loading-skeleton';
 import Fragment from 'vue-fragment';
+import VTooltip from 'v-tooltip';
 import App from './App.vue';
 import '@/styles/style.scss';
-import VTooltip from 'v-tooltip';
+
 
 Vue.mixin(Util);
 Vue.use(VueCookies);
