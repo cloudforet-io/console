@@ -1,11 +1,5 @@
 <template>
-    <div :class="{
-        'toolbox-table': true,
-        background:toolboxBackground,
-        'no-padding':!padding,
-        'toolbox-border': border,
-    }"
-    >
+    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding, 'toolbox-border': border}">
         <div class="toolbox">
             <div v-if="$slots['toolbox-top']" class="toolbox-block toolbox-top">
                 <slot name="toolbox-top" />
