@@ -73,7 +73,7 @@
 
                 <!-- top 1 row -->
                 <template #row-0="{index, fields, item}">
-                    <p-tr @click="onRowClick">
+                    <p-tr @click="onRowClick(item)">
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
                         </p-td>
@@ -242,8 +242,8 @@ export default defineComponent({
 
         return {
             ...toRefs(ts.state),
-            onRowClick(): void {
-                vm.$router.push('/project');
+            onRowClick(item) {
+                vm.$router.push(`/project/${item.project_id}`);
             },
         };
     },
