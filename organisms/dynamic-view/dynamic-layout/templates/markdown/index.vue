@@ -44,7 +44,8 @@ export default {
         },
     },
     setup(props) {
-        const regx = new RegExp('<pre(?:.|\\n)*(?<codeblock><code.*>(?<code>(?:.|\\n)*)</code>)(?:.|\\n)*</pre>');
+        // const regx = new RegExp('<pre(?:.|\\n)*(?<codeblock><code.*>(?<code>(?:.|\\n)*)</code>)(?:.|\\n)*</pre>');
+
         const md = computed(() => {
             if (props.options.markdown) {
                 let doc = props.options.markdown;
@@ -52,13 +53,15 @@ export default {
                     doc = nunjucks.renderString(doc, props.data);
                 }
                 const renderMD = marked(doc);
+                // console.debug(renderMD);
+                // const toHljs = renderMD.replace(regx, (...args) => {
+                //     const group = args[args.length - 1];
+                //     console.debug(hljs.highlightAuto(group.code));
+                //     return `<pre class="hljs">${group.codeblock}</pre>`;
+                // });
+                // return toHljs;
                 console.debug(renderMD);
-                const toHljs = renderMD.replace(regx, (...args) => {
-                    const group = args[args.length - 1];
-                    console.debug(hljs.highlightAuto(group.code));
-                    return `<pre class="hljs">${group.codeblock}</pre>`;
-                });
-
+                const toHljs = renderMD.replace(/<pre>/g, () => '<pre class="hljs">');
                 return toHljs;
             }
             return '';
@@ -77,6 +80,31 @@ export default {
         /*pre{*/
         /*    @apply bg-gray-500 text-white;*/
         /*}*/
+        table{
+            @apply border border-black;
+            thead{
+                tr{
+                    th {
+                        @apply border border-black;
+                    }
+                    td{
+                        @apply border border-black;
+                    }
+                }
+            }
+            tbody{
+                tr{
+                    td{
+                        @apply border border-black;
+                    }
+                    th{
+                        @apply border border-black;
+                    }
+                }
+
+            }
+
+        }
 
         h1{
             @apply text-4xl font-bold mt-8 mb-1;
@@ -103,5 +131,6 @@ export default {
         }
     }
     }
+
 
 </style>
