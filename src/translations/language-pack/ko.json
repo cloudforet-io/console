@@ -379,6 +379,7 @@
 		"IDENTITY": "아이덴티티",
 		"INVENTORY": "인벤토리",
 		"PLUGIN": "플러그인",
+		"PROVIDER": "프로바이더",
 		"REPOSITORY": "저장소",
 		"SECRET": "시크릿",
 		"SUPERVISOR": "슈퍼바이저"

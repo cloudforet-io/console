@@ -379,6 +379,7 @@
 		"IDENTITY": "",
 		"INVENTORY": "",
 		"PLUGIN": "",
+		"PROVIDER": "",
 		"REPOSITORY": "",
 		"SECRET": "",
 		"SUPERVISOR": ""
