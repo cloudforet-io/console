@@ -66,7 +66,7 @@ interface Props {
     optionsSchema: JsonSchemaObjectType;
 }
 
-export default defineComponent({
+export default {
     name: 'ConfigureCollector',
     components: {
         PJsonSchemaForm,
@@ -234,7 +234,7 @@ export default defineComponent({
             init,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -249,7 +249,7 @@ export default defineComponent({
 }
 .collector-info {
     @apply flex-grow-0 flex border-r border-gray-200;
-    flex-basis: 50%;
+    flex-basis: 50% ;
     .name {
         font-size: 1.125rem;
         padding-bottom: 1rem;
