@@ -1,28 +1,22 @@
+
+
+import icon from 'vue-svgicon';
 import PSimpleIconButton from './SimpleIconButton.vue';
-import md from './SimpleIconButton.md';
-import {autoProps} from '@/setup/storybook-util';
-import {toRefs, reactive, ref, computed} from '@vue/composition-api';
-import {action} from '@storybook/addon-actions';
+
+const icons = Object.keys(icon.icons);
+
 
 export default {
-    title: '$3Title$',
+    title: 'molecules/buttons',
     component: PSimpleIconButton,
-    parameters: {
-        notes: md,
-        info: {
-            summary: md,
-            components: {PSimpleIconButton}
-        }
-    }
 };
-const actions = {};
-const getState = () => reactive({});
-export const defaultCase = () => ({
-    components: {PSimpleIconButton},
-    template: "<PSimpleIconButton $END$></PSimpleIconButton>",
-    setup(props, context) {
-        return {
-            ...actions,
-        };
+export const simpleIconButton = () => ({
+    components: { PSimpleIconButton },
+    template: ` <div> 
+                    <p-simple-icon-button :normal-icon-name="'btn_circle_plus_blue'" :hovered-icon-name="'btn_circle_plus_blue--hover'"></p-simple-icon-button>
+                </div>`,
+    props: {
+    },
+    methods: {
     },
 });
