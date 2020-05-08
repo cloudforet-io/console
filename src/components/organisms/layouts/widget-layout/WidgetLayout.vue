@@ -54,7 +54,7 @@ export default defineComponent({
         width: 100%;
 
         .title {
-            @apply flex items-center uppercase leading-tight font-bold;
+            @apply flex items-center capitalize leading-tight font-bold;
             font-size: 1.125rem;
             margin: 1.5rem 1.5rem 1rem 1.5rem;
         }
