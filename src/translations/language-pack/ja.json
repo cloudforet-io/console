@@ -1,6 +1,7 @@
 {
 	"ACTION": {
 		"DICT": {
+			"ADD_TAG_BY": "",
 			"CLICK_ADD_BTN_MSG": "",
 			"HELPMSG": "",
 			"INVALID": {
@@ -12,7 +13,10 @@
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
 		"PROJECT": {
-			"NO_PROJECT": ""
+			"ITEM_WILL_SELECT_FOR": "",
+			"NO_PROJECT": "",
+			"SELECT_PROJECT_FOR": "",
+			"SELECT_PROJECT_OR_RELEASE": ""
 		},
 		"SELECTED_OF": "",
 		"TIMEZONE_OF": ""
@@ -435,6 +439,7 @@
 		"LOCAL_TIME": "",
 		"RESOURCE": "",
 		"SERVER": "",
+		"SERVICE_ACCOUNT": "",
 		"STATISTICS": "",
 		"TAG": "",
 		"TAGS": "",

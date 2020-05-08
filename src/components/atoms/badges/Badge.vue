@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 import { getBindClass } from '@/lib/functional';
+import { BadgeShape } from '@/components/atoms/badges/toolset';
 
 export default {
     name: 'PBadge',
@@ -27,6 +28,10 @@ export default {
             type: String,
             default: undefined,
         },
+        shape: {
+            type: String,
+            default: BadgeShape.ROUND,
+        },
         outline: {
             type: Boolean,
             default: false,
@@ -40,13 +45,21 @@ export default {
             },
         };
         newData.class['p-badge'] = true;
+        newData.class[`badge-${props.shape}`] = true;
         if (props.backgroundColor || props.textColor) {
             newData.staticStyle = data.staticStyle || {};
-            if (props.backgroundColor) {
-                newData.staticStyle['background-color'] = props.backgroundColor;
-            }
-            if (props.textColor) {
-                newData.staticStyle.color = props.textColor;
+            if (!props.outline) {
+                if (props.backgroundColor) {
+                    newData.staticStyle['background-color'] = props.backgroundColor;
+                }
+                if (props.textColor) {
+                    newData.staticStyle.color = props.textColor;
+                }
+            } else {
+                newData.staticStyle['background-color'] = 'transparent';
+                newData.staticStyle['border-color'] = props.backgroundColor;
+                newData.staticStyle['border-width'] = '1px';
+                newData.staticStyle.color = props.backgroundColor;
             }
         } else {
             newData.class[`badge-${props.styleType}`] = true;
@@ -60,7 +73,6 @@ export default {
 <style lang="postcss">
 .p-badge {
     display: inline-block;
-    border-radius: 100px;
     background-clip: padding-box;
     text-align: center;
     font-size: 0.75rem;
@@ -68,7 +80,15 @@ export default {
     letter-spacing: 0;
     padding: 0.1875rem 0.5rem 0.1875rem 0.5rem;
     @apply text-white bg-gray;
+    &.badge-round{
+        border-radius: 100px;
+    }
+    &.badge-square{
+        border-radius: 2px;
+    }
+
 }
+
 
 @define-mixin badge-color $theme, $color, $opposite-color {
     .badge-$(theme) {

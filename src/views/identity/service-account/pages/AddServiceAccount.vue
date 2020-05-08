@@ -29,11 +29,17 @@
                 <PJsonSchemaForm v-bind="actFixFormTS.state" :item.sync="actFixFormTS.syncState.item" />
                 <PJsonSchemaForm v-bind="actJscTS.state" :item.sync="actJscTS.syncState.item" />
             </div>
-            <div class="text-lg font-bold my-2" style="line-height: 120%;">
+            <div class="text-lg font-bold mb-2 mt-8" style="line-height: 120%;">
                 {{ $t('PANEL.TAG') }}
             </div>
-            <div class="text-sm mb-4" style="line-height: 150%;">
-                <span class="font-bold">[{{ actFixFormTS.syncState.item.name }}]</span> 과 관련된 태그를 추가합니다. <br>
+            <div class="text-sm mb-6" style="line-height: 150%;">
+                <i18n path="ACTION.DICT.ADD_TAG_BY">
+                    <template #name>
+                        <span v-if="actFixFormTS.syncState.item.name" class="font-bold">[{{ actFixFormTS.syncState.item.name }}]</span>
+                        <span v-else class="font-bold"> Account</span>
+                    </template>
+                </i18n>
+                <br>
                 {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
 
@@ -82,7 +88,10 @@
                 </div>
             </div>
         </p-pane-layout>
-        <SProjectTreePanel ref="projectRef" class="panel">
+        <SProjectTreePanel ref="projectRef" class="panel"
+                           :resource-name="$t('WORD.SERVICE_ACCOUNT')"
+                           :target-name="actFixFormTS.syncState.item.name"
+        >
             <template #top>
                 <div class="mb-6">
                     <span class="title">Project</span><span>  (optional)</span>
