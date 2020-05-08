@@ -171,5 +171,5 @@ export default {
                 }
             }
         }
-    }
+
 </style>
