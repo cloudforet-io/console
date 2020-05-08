@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
-import { select, boolean, text } from '@storybook/addon-knobs';
+import {
+    select, boolean, text, object,
+} from '@storybook/addon-knobs';
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import { BadgeShape } from '@/components/atoms/badges/toolset';
 import PDynamicField from './DynamicField.vue';
 import md from './DynamicField.md';
 
@@ -15,6 +15,79 @@ export default {
         notes: md,
     },
 };
+export const playground = () => ({
+    components: { PDynamicField },
+    template: `<div class="flex">
+        <div>
+            <h2 class="font-bold">Example</h2>
+            <table class="border">
+                <thead>
+                    <tr>
+                        <th class="w-30 border">name</th>
+                        <th class="w-60 border">schema</th>
+                        <th class="w-30 border">result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="exp in samples">
+                        <td class="font-bold border">{{exp.name}}</td>
+                        <td class="border"><pre>{{exp.schema}}</pre></td>
+                        <td class="border">
+                            <PDynamicField v-bind="exp.schema" :data="exp.data" ></PDynamicField>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="ml-8">
+            <h2 class="font-bold">Playground</h2>
+            <div class="p-4 border border-black flex justify-center items-center"><PDynamicField v-bind="schema" :data="value.data"/></div>
+        </div>
+    </div>`,
+    props: {
+        schema: {
+            default: object('schema', {
+                type: 'state',
+                options: {
+                    text_color: 'red.300',
+                    icon: {
+                        image: 'fab fa-aws fa-spin',
+                        color: 'red.500',
+                    },
+                },
+            }),
+        },
+        value: {
+            default: object('value', { data: 'text' }),
+        },
+    },
+    setup() {
+        return {
+            samples: [
+                {
+                    name: 'text',
+                    schema: {},
+                    data: 'test',
+                },
+                {
+                    name: 'font-awsome icon',
+                    schema: {
+                        type: 'state',
+                        options: {
+                            text_color: 'red.300',
+                            icon: {
+                                image: 'fab fa-aws fa-spin',
+                                color: 'red.500',
+                            },
+                        },
+                    },
+                    data: 'spin',
+                },
+
+            ],
+        };
+    },
+});
 
 
 export const defaultCase = () => ({
