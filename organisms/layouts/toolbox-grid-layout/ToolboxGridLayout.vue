@@ -20,7 +20,7 @@
                             @pageChange="changePageNumber"
                         />
                     </div>
-                    <div v-if="pageSizeVisible" class="tool" >
+                    <div v-if="pageSizeVisible" class="tool">
                         <PDropdownMenuBtn
                             class="page-size-dropdown"
                             :menu="pageSizeOptions"
@@ -52,17 +52,6 @@
                 <slot :name="slot" v-bind="scope" />
             </template>
         </p-grid-layout>
-
-        <!--        <div class="bottom">-->
-        <!--            <slot name="bottom">-->
-        <!--                <div class="bottom-page">-->
-        <!--                    <p-text-pagenation :this-page.sync="proxyThisPage"-->
-        <!--                                       :all-page="allPage"-->
-        <!--                                       @pageChange="changePageNumber"-->
-        <!--                    />-->
-        <!--                </div>-->
-        <!--            </slot>-->
-        <!--        </div>-->
     </div>
 </template>
 
@@ -161,46 +150,19 @@ export default {
 
 <style lang="postcss" scoped>
     .grid-list-container {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
+        @apply w-full h-full flex flex-col;
     }
-    /*.toolbox {*/
-    /*    margin-top: 0.5rem;*/
-        .toolbox-middle{
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-            align-items: center;
-            margin-bottom: 1rem;
-            .left{
-                    display: inline-flex;
-                    flex-wrap: wrap;
-                    width: auto;
-                    justify-content: flex-start;
-            }
-            .right{
-                    display: inline-flex;
-                    flex-wrap:nowrap;
-                    width: auto;
-                    justify-content: flex-end;
-                .tool{
-                    @apply ml-4;
-                }
+
+    .toolbox-middle{
+        @apply flex justify-between flex-no-wrap items-center mb-4;
+        .left{
+            @apply w-auto inline-flex flex-wrap justify-start;
+        }
+        .right{
+            @apply w-auto inline-flex flex-no-wrap justify-end;
+        .tool{
+            @apply ml-4;
             }
         }
-
-    /*}*/
-    .grid-card-container {
-        display: flex;
-        flex-grow: 1;
-        height: 100%;
-    }
-
-    .bottom {
-        /*margin-top: 1.6rem;*/
-        margin-top: auto;
-        text-align: center;
     }
 </style>
