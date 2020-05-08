@@ -384,6 +384,7 @@
 		"IDENTITY": "Identity",
 		"INVENTORY": "Inventory",
 		"PLUGIN": "Plugin",
+		"PROVIDER": "Provider",
 		"REPOSITORY": "Repository",
 		"SECRET": "Secret",
 		"SUPERVISOR": "Supervisor"
