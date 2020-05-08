@@ -7,7 +7,9 @@
         >
             {{ name }}
         </p-panel-top>
-        <p-data-table :items="items" :fields="fields" v-on="$listeners">
+        <p-data-table :items="items" :fields="fields" :col-copy="colCopy"
+                      v-on="$listeners"
+        >
             <template v-for="slot of slots" v-slot:[slot.name]="{value}">
                 <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
             </template>
@@ -68,6 +70,10 @@ export default defineComponent({
         showTitle: {
             type: Boolean,
             default: true,
+        },
+        colCopy: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DynamicLayoutProps) {

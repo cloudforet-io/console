@@ -1,10 +1,12 @@
 <template>
-    <span @mousedown="click=true" @mouseleave="mouseOut()"
+    <span class="hover:cursor-pointer" @mousedown="click=true"
+          @mouseleave="mouseOut()"
           @mouseenter="onMouseOver()"
           @mouseup="copyText()"
           v-on="$listeners"
     ><p-i width="1rem" height="1rem" :name="icon"
-          :color="color" @click="copyText"
+          :color="color"
+          @click="copyText"
     /></span>
 </template>
 
@@ -62,3 +64,6 @@ export default {
 
 };
 </script>
+
+<style lang="postcss" scoped>
+</style>

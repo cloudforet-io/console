@@ -19,39 +19,9 @@
 </template>
 
 <script lang="ts">
-import { computed } from '@vue/composition-api';
-import { TabItem } from '@/components/molecules/tabs/tab-bar/toolset';
-
-export const tabBarProps = {
-    props: {
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-        },
-    },
-};
-
-
-export const tabData = props => computed<TabItem[]>(() => props.tabs.map((value: string|TabItem) => {
-    if (typeof value === 'string') {
-        return { name: value, label: value };
-    }
-    value.label = value.label || value.name;
-    return value;
-}));
-export const isOne = props => computed(() => props.tabs.length === 1);
-
-export const tabClick = (props, emit) => (name) => {
-    if (props.activeTab !== name) {
-        emit('update:activeTab', name);
-        emit('changeTab', name);
-    }
-};
-
-export const isActive = props => name => props.activeTab === name;
+import {
+    isActive, isOne, tabBarProps, tabClick, tabData,
+} from '@/components/molecules/tabs/tab-bar/toolset';
 
 export default {
     name: 'PTabBar',

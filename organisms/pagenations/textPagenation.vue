@@ -54,31 +54,32 @@ export default {
 
 <style lang="postcss" scoped>
     .text-pagenation {
+        @apply min-w-12;
         display: inline-flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap:nowrap;
-        min-width: 64px;
         .text {
             color: inherit;
             &:hover {
                 color: theme('colors.secondary1')
             }
         }
+        @screen lg{
+            @apply min-w-16;
+        }
     }
     .page-number {
-        display: inline-flex;
-        justify-content: center;
-        min-width: 64px;
-        min-height: 32px;
-        align-items: center;
-        cursor: default;
+        @apply  min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
         .page-number-text {
             line-height: 1.2rem;
             font-size: 0.875rem;
             .this-page {
                 font-weight: bold;
             }
+        }
+        @screen lg{
+            @apply min-w-16;
         }
 
     }
