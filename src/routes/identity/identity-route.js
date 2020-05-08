@@ -12,37 +12,13 @@ const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 export default {
     path: 'identity',
     name: 'identity',
-    redirect: '/identity/user',
+    redirect: '/identity/service-account',
     meta: { label: 'Identity', breadcrumb: true },
     components: {
         lnb: IdentityNavBar,
         main: Identity,
     },
     children: [
-        {
-            path: 'user',
-            name: 'user',
-            meta: {
-                label: 'User',
-                breadcrumb: true,
-                api: fluentApi.identity().user(),
-            },
-            redirect: '/identity/user',
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: '/',
-                    name: 'userMain',
-                    component: User,
-                },
-                {
-                    path: ':resourceId/tags',
-                    name: 'userTags',
-                    props: true,
-                    component: TagsPage,
-                },
-            ],
-        },
         {
             path: 'service-account',
             meta: {
@@ -70,6 +46,30 @@ export default {
                     meta: { label: 'Add Service Account' },
                     props: true,
                     component: AddServiceAccount,
+                },
+            ],
+        },
+        {
+            path: 'user',
+            name: 'user',
+            meta: {
+                label: 'User',
+                breadcrumb: true,
+                api: fluentApi.identity().user(),
+            },
+            redirect: '/identity/user',
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'userMain',
+                    component: User,
+                },
+                {
+                    path: ':resourceId/tags',
+                    name: 'userTags',
+                    props: true,
+                    component: TagsPage,
                 },
             ],
         },
