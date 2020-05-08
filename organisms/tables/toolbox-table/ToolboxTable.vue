@@ -226,7 +226,8 @@ export default {
     }
 
     .toolbox-table {
-        &.background{
+        @apply overflow-y-auto;
+        &.background {
             @apply bg-white;
         }
 
