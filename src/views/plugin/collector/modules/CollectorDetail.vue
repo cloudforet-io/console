@@ -14,7 +14,7 @@ import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
-
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default defineComponent({
     name: 'CollectorDetail',
@@ -28,8 +28,8 @@ export default defineComponent({
             required: true,
         },
     },
-    setup(props, { parent }) {
-        const vm: any = getCurrentInstance();
+    setup(props) {
+        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
         const state = reactive({
             baseInfoFields: computed(() => [
                 { name: vm.$t('WORD.ID'), key: 'collector_id' },

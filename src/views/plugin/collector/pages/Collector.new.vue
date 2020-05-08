@@ -55,7 +55,7 @@
                 />
             </template>
             <template #credentials>
-                <collector-credentials :collector="apiHandler.tableTS.selectState.firstSelectItem" />
+                <collector-credentials :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
             </template>
             <template #schedules>
                 <collector-schedules :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
@@ -79,7 +79,7 @@
 
         <collect-data-modal v-if="collectDataState.visible"
                             :visible.sync="collectDataState.visible"
-                            :collector="apiHandler.tableTS.selectState.firstSelectItem"
+                            :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
         />
 
         <p-table-check-modal v-if="checkModalState.visible"
@@ -92,7 +92,7 @@
                              centered
                              :selectable="false"
                              :items="apiHandler.tableTS.selectState.selectItems"
-                             @confirm="checkModalState.checkModalConfirm"
+                             @confirm="checkModalConfirm"
         />
     </general-page-layout>
 </template>
@@ -121,43 +121,18 @@ import {
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { VueFileImport } from '@/lib/type';
 import { dateTimeViewType } from '@/lib/data-source';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { Component } from 'vue/types/umd';
 
-const PTab = (): VueFileImport => import('@/components/organisms/tabs/tab/Tab.vue');
-const PTableCheckModal = (): VueFileImport => import('@/components/organisms/modals/table-modal/TableCheckModal.vue');
-const STagsPanel = (): VueFileImport => import('@/components/organisms/panels/tag-panel/STagsPanel.vue');
-const CollectorUpdateModal = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue');
-const CollectDataModal = (): VueFileImport => import('@/views/plugin/collector/modules/CollectDataModal.vue');
-const CollectorDetail = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorDetail.vue');
-const CollectorCredentials = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorCredentials.vue');
-const CollectorSchedules = (): VueFileImport => import('@/views/plugin/collector/modules/CollectorSchedules.vue');
-
-const collectorApi = fluentApi.inventory().collector();
-
-const checkModalState: UnwrapRef<{
-    visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api: ActionAPIInterface;
-}> = reactive({
-    visible: false,
-    mode: '',
-    title: '',
-    subTitle: '',
-    themeColor: '',
-    api: collectorApi.enable(),
-    tableCheckFields: computed(() => makeTrItems([
-        ['name', 'COMMON.NAME'],
-        ['state', 'COMMON.STATE'],
-        ['priority', 'COMMON.PRIORITY'],
-    ])),
-});
-
-const updateModalState = reactive({
-    visible: false,
-});
-
-const collectDataState = reactive({
-    visible: false,
-});
+const PTab = (): Component => import('@/components/organisms/tabs/tab/Tab.vue') as Component;
+const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/TableCheckModal.vue') as Component;
+const STagsPanel = (): Component => import('@/components/organisms/panels/tag-panel/STagsPanel.vue') as Component;
+const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
+const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
+const CollectorDetail = (): Component => import('@/views/plugin/collector/modules/CollectorDetail.vue') as Component;
+const CollectorCredentials = (): Component => import('@/views/plugin/collector/modules/CollectorCredentials.vue') as Component;
+const CollectorSchedules = (): Component => import('@/views/plugin/collector/modules/CollectorSchedules.vue') as Component;
 
 export default {
     name: 'Collector',
@@ -180,7 +155,9 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
-        const vm: any = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
+        const collectorApi = fluentApi.inventory().collector();
+
         class ACHandler extends QuerySearchTableACHandler {
             get valuesFetchUrl(): string { return '/inventory/collector/list'; }
 
@@ -221,6 +198,29 @@ export default {
             },
         );
 
+        const checkModalState: UnwrapRef<{
+            visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api: ActionAPIInterface;
+        }> = reactive({
+            visible: false,
+            mode: '',
+            title: '',
+            subTitle: '',
+            themeColor: '',
+            api: collectorApi.enable(),
+            tableCheckFields: computed(() => makeTrItems([
+                ['name', 'COMMON.NAME'],
+                ['state', 'COMMON.STATE'],
+                ['priority', 'COMMON.PRIORITY'],
+            ])),
+        });
+
+        const updateModalState = reactive({
+            visible: false,
+        });
+
+        const collectDataState = reactive({
+            visible: false,
+        });
 
         const tabState = reactive({
             activeTab: 'detail',
@@ -235,6 +235,7 @@ export default {
                 ['data', 'TAB.DATA', { keepAlive: true }],
             ])),
         });
+
         const state = reactive({
             dropdown: computed(() => (
                 makeTrItems([
@@ -246,7 +247,7 @@ export default {
                     [null, null, { type: 'divider' }],
                     ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
                 ], null, { type: 'item' }))),
-            mainTableLayout: computed<any>(() => ({
+            mainTableLayout: computed(() => ({
                 name: vm.$t('WORD.COLLECTOR'),
                 type: 'query-search-table',
                 options: {
@@ -275,7 +276,7 @@ export default {
                     ],
                 },
             })),
-            multiDataLayout: computed<any>(() => ({
+            multiDataLayout: computed(() => ({
                 name: vm.$t('TAB.DATA'),
                 type: 'simple-table',
                 options: {
@@ -323,13 +324,14 @@ export default {
                 });
             } finally {
                 checkModalState.visible = false;
+                await apiHandler.getData();
             }
         };
 
         const onClickEnable = (): void => {
             checkModalState.mode = 'enable';
             checkModalState.api = collectorApi.enable()
-                .setId(apiHandler.tableTS.selectState.firstSelectItem.collector_id);
+                .setIds(apiHandler.tableTS.selectState.selectItems.map(d => d.collector_id));
             checkModalState.title = 'Enable Collector';
             checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
             checkModalState.themeColor = 'primary';
@@ -338,7 +340,7 @@ export default {
         const onClickDisable = (): void => {
             checkModalState.mode = 'disable';
             checkModalState.api = collectorApi.disable()
-                .setId(apiHandler.tableTS.selectState.firstSelectItem.collector_id);
+                .setIds(apiHandler.tableTS.selectState.selectItems.map(d => d.collector_id));
             checkModalState.title = 'Disable Collector';
             checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
             checkModalState.themeColor = 'primary';
@@ -347,7 +349,7 @@ export default {
         const onClickDelete = (): void => {
             checkModalState.mode = 'delete';
             checkModalState.api = collectorApi.delete()
-                .setId(apiHandler.tableTS.selectState.firstSelectItem.collector_id);
+                .setIds(apiHandler.tableTS.selectState.selectItems.map(d => d.collector_id));
             checkModalState.title = 'Delete Collector';
             checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
             checkModalState.themeColor = 'alert';

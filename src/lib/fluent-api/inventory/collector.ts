@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {
     CollectAction,
-    CreateAction, GetAction, ListAction, Resource,
+    CreateAction, GetAction, ListAction, MultiDeleteAction, MultiDisableAction, MultiEnableAction, Resource,
     ResourceActions, ServiceResources, SingleDeleteAction, SingleDisableAction, SingleEnableAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
@@ -35,8 +35,8 @@ class Update extends UpdateAction<CollectorUpdateParameter, any> {
     }
 }
 
-class Delete extends SingleDeleteAction<IdParameter, any> {
-    idField = idField;
+class Delete extends MultiDeleteAction<IdParameter, any> {
+    idsField = 'collectors';
 }
 
 class Get extends GetAction<IdParameter, CollectorModel> {
@@ -79,12 +79,12 @@ class Collect extends CollectAction<CollectorCollectParameter, any> {
     }
 }
 
-class Enable extends SingleEnableAction<IdParameter, CollectorModel> {
-    idField = idField
+class Enable extends MultiEnableAction<IdParameter, CollectorModel> {
+    idsField = 'collectors'
 }
 
-class Disable extends SingleDisableAction<IdParameter, CollectorModel> {
-    idField = idField
+class Disable extends MultiDisableAction<IdParameter, CollectorModel> {
+    idsField = 'collectors'
 }
 
 export default class Collector extends Resource implements
