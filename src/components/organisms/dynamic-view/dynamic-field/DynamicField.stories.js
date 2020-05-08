@@ -4,6 +4,7 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
+import { BadgeShape } from '@/components/atoms/badges/toolset';
 import PDynamicField from './DynamicField.vue';
 import md from './DynamicField.md';
 
@@ -85,18 +86,18 @@ export const unSupportType = () => ({
 
 export const stateType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="{option,raw} in data"><PDynamicField type="state"  :options="option" :data="raw"/></li></div>',
+    template: '<div><li v-for="{options,raw} in data"><PDynamicField type="state"  :options="options" :data="raw"/></li></div>',
     setup() {
         return {
             data: [
                 {
-                    option: {
+                    options: {
                         text_color: '#60B731',
                     },
                     raw: 'active',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: 'red.300',
                         icon: {
                             image: 'fas fa-address-book fa-spin',
@@ -106,7 +107,7 @@ export const stateType = () => ({
                     raw: 'deactive',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: 'yellow',
                         icon: {
                             image: 'aws-ec2',
@@ -123,51 +124,70 @@ export const stateType = () => ({
 
 export const badgeType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="ex in data"><PDynamicField type="badge"  :options="ex.option" :data="ex.raw"/></li></div>',
+    template: '<div><li v-for="ex in data"><PDynamicField type="badge"  :options="ex.options" :data="ex.raw"/></li></div>',
     setup() {
         return {
             data: [
                 {
-                    option: { },
+                    options: { },
                     raw: 'no option',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: '#60B731',
                     },
                     raw: 'test',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: 'peacock',
                     },
                     raw: 'named color',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: 'green.300',
                         background_color: 'green.800',
                     },
                     raw: 'named color2',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: 'green.600',
                     },
                     raw: 'named color3',
                 },
                 {
-                    option: {
+                    options: {
                         background_color: '#60B731',
                     },
                     raw: 'sample',
                 },
                 {
-                    option: {
+                    options: {
                         text_color: 'yellow',
                         background_color: '#000000',
                     },
                     raw: '펭수',
+                },
+                {
+                    options: {
+                        outline_color: 'blue.600',
+                    },
+                    raw: 'outline',
+                },
+                {
+                    options: {
+                        shape: 'SQUARE',
+                    },
+                    raw: 'square badge',
+                },
+                {
+                    options: {
+                        shape: 'SQUARE',
+                        outline_color: 'blue.600',
+                    },
+                    raw: 'square badge outline',
                 },
 
             ],

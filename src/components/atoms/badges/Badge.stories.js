@@ -1,6 +1,7 @@
 import {
     select, text, color, boolean,
 } from '@storybook/addon-knobs/vue';
+import { BadgeShape } from '@/components/atoms/badges/toolset';
 import PBadge from './Badge.vue';
 
 export default {
@@ -23,6 +24,7 @@ export const DefaultCase = () => ({
                        :text-color="textColor"
                        :backgroundColor="backgroundColor"
                        :outline="outline"
+                       :shape="shape"
     >{{text}}</PBadge>`,
     props: {
         styleType: {
@@ -36,6 +38,9 @@ export const DefaultCase = () => ({
         text: {
             default: text('text', 'badge'),
         },
+        shape: {
+            default: select('shape', [BadgeShape.ROUND, BadgeShape.SQUARE], BadgeShape.ROUND),
+        },
         textColor: {
             default: color('textColor', ''),
         },
@@ -43,7 +48,7 @@ export const DefaultCase = () => ({
             default: color('backgroundColor', ''),
         },
         outline: {
-            default: boolean('outline', true),
+            default: boolean('outline', false),
         },
     },
     data() {
