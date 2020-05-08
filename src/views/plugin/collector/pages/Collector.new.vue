@@ -92,7 +92,8 @@
                :active-tab.sync="tabState.activeTab"
         >
             <template #detail>
-                <collector-detail :data="apiHandler.tableTS.selectState.firstSelectItem" />
+                <collector-detail :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
+                />
             </template>
             <template #tag>
                 <s-tags-panel :is-show="tabState.activeTab==='tag'"
@@ -266,7 +267,7 @@ export const collectorSetup = (props, context) => {
             'use-cursor-loading': true,
             'excel-visible': true,
             fields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
+                ['name', 'COMMON.NAME', { keepAlive: true }],
                 ['state', 'COMMON.STATE'],
                 ['priority', 'COMMON.PRIORITY'],
                 ['plugin_info', 'COMMON.RESOURCE'],
@@ -285,6 +286,7 @@ export const collectorSetup = (props, context) => {
             },
         },
     );
+
     const dropdown = computed(() => (
         makeTrItems([
             ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
@@ -309,8 +311,8 @@ export const collectorSetup = (props, context) => {
         tabs: makeTrItems([
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
             ['tag', 'TAB.TAG'],
-            ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
+            ['credentials', 'PANEL.CREDENTIAL'],
+            ['schedules', 'PANEL.SCHEDULE'],
         ], context.parent),
         multiActiveTab: 'data',
         multiTabs: makeTrItems([

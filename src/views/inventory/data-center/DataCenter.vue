@@ -62,13 +62,13 @@
                 <horizontal-layout>
                     <template #container="{ height }">
                         <PTab :tabs="tabsData.tabs" :active-tab.sync="tabsData.activeTab">
-                            <template #details="{tabName}">
+                            <template #details>
                                 <data-center-summary-top ref="detailsTop"
                                                          :selected-node="getSelectedNodeAndTree"
                                                          :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                 />
                             </template>
-                            <template #member="{tabName}">
+                            <template #member>
                                 <data-center-admin :tab-basic-height="height"
                                                    :selected-node="getSelectedNodeAndTree"
                                 />

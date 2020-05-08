@@ -1,7 +1,38 @@
 import {
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
-import { DataTablePropsType } from '@/components/organisms/tables/data-table/toolset';
+import { computed } from '@vue/composition-api';
+
+export const tabBarProps = {
+    props: {
+        tabs: {
+            type: Array,
+            default: () => [],
+        },
+        activeTab: {
+            type: String,
+        },
+    },
+};
+
+export const isActive = props => name => props.activeTab === name;
+
+export const tabData = props => computed<TabItem[]>(() => props.tabs.map((value: string|TabItem) => {
+    if (typeof value === 'string') {
+        return { name: value, label: value };
+    }
+    value.label = value.label || value.name;
+    return value;
+}));
+
+export const isOne = props => computed(() => props.tabs.length === 1);
+
+export const tabClick = (props, emit) => (name) => {
+    if (props.activeTab !== name) {
+        emit('update:activeTab', name);
+        emit('changeTab', name);
+    }
+};
 
 export interface TabBarSyncType {
     activeTab: string;
@@ -10,13 +41,16 @@ export interface TabBarSyncType {
 export interface TabItem {
     name: string;
     label?: string;
+    keepAlive?: boolean;
 }
 
-export type TabsType = string[]| TabItem[]
+export type TabsType = Array<string|TabItem>;
 
 export interface TabBarStateType {
     tabs: TabsType;
 }
+
+export interface TabBarProps extends TabBarStateType, TabBarSyncType {}
 
 @StateToolSet<TabBarStateType>()
 @SyncStateToolSet<TabBarSyncType>()

@@ -70,14 +70,14 @@
             </template>
         </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
-            <template #detail="{tabName}">
+            <template #detail>
                 <p-cdg-detail ref="cdgDetail"
                               :item="items[selectIndex[0]]"
                               :tag-confirm-event="tagConfirmEvent"
                               :tag-reset-event="tagResetEvent"
                 />
             </template>
-            <template #credential="{tabName}">
+            <template #credential>
                 <PCdgCredential ref="cdgCredential"
                                 :items="cdgData.items"
                                 :sort-by.sync="cdgData.sortBy"
@@ -94,7 +94,7 @@
             </template>
         </PTab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #data="{tabName}">
+            <template #data>
                 <p-data-table
                     :fields="multiSelectFields"
                     :sortable="false"

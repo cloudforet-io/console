@@ -73,6 +73,7 @@ const matchMap = {
     'created_at.seconds': 'created_at',
     'updated_at.seconds': 'updated_at',
     'deleted_at.seconds': 'deleted_at',
+    'last_collected_at.seconds': 'last_collected_at',
 };
 
 export const changeSetOnlys = (keys: string[]) => keys.map(k => matchMap[k] || k);
