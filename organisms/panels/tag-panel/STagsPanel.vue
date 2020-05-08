@@ -73,11 +73,11 @@ export default defineComponent({
                 },
             });
         };
-        const getTagData = async () => {
+        const getTagData = _.debounce(async () => {
             state.tags = {};
             const resp = await state.api.get().setId(props.resourceId).setOnly('tags').execute();
             state.tags = resp.data.tags;
-        };
+        }, 200);
 
         onMounted(async () => {
             if (props.isShow && props.resourceId) {
