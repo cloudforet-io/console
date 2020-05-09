@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicLayoutMarkdown from '@/components/organisms/dynamic-view/dynamic-layout/templates/markdown/index.vue';
-import { boolean, object, text } from '@storybook/addon-knobs';
+import {
+    boolean, object, text, select,
+} from '@storybook/addon-knobs';
 
 export default {
     title: 'organisms/dynamic-view/dynamic-layout/markdown',
@@ -359,6 +361,91 @@ export const templateMode = () => ({
             type: Object,
             default: object('data', data),
         },
+    },
+
+});
+
+
+const i18nDoc = {
+    en: '### Support English',
+    ko: '### 한국어 지원',
+
+};
+
+export const i18nMode = () => ({
+    components: { SDynamicLayout },
+    template: '<div class="w-screen bg-white"><SDynamicLayout :name="name" type="markdown" :options="{markdown:md}" :data="data" :vbind="{showTitle,language}"/></div>',
+    props: {
+        showTitle: {
+            type: Boolean,
+            default: boolean('show title', true),
+        },
+        language: {
+            type: String,
+            default: select('language', ['en', 'ko'], 'ko'),
+        },
+        name: {
+            type: String,
+            default: text('name', 'I18n Mode'),
+        },
+        md: {
+            type: Object,
+            default: object('markdown', i18nDoc),
+        },
+    },
+
+});
+export const unSupportLanguage = () => ({
+    components: { SDynamicLayout },
+    template: '<div class="w-screen bg-white"><SDynamicLayout :name="name" type="markdown" :options="{markdown:md}" :data="data" :vbind="{showTitle,language}"/></div>',
+    props: {
+        showTitle: {
+            type: Boolean,
+            default: boolean('show title', true),
+        },
+        name: {
+            type: String,
+            default: text('name', 'Un Support Language'),
+        },
+        md: {
+            type: Object,
+            default: object('markdown', i18nDoc),
+        },
+    },
+    setup() {
+        return {
+            language: 'ch',
+        };
+    },
+
+});
+
+const i18nNoMatchDoc = {
+    ko: '## 매칭 언어 없을경우 \n 본인 언어, 기본 언어(en)도 없을 경우 첫번째 언어의 마크다운으로 렌더링',
+};
+
+export const noMatchLanguage = () => ({
+    components: { SDynamicLayout },
+    template: '<div class="w-screen bg-white"><SDynamicLayout :name="name" type="markdown" :options="{markdown:md}" :data="data" :vbind="{showTitle,language}"/></div>',
+    props: {
+        showTitle: {
+            type: Boolean,
+            default: boolean('show title', true),
+        },
+        name: {
+            type: String,
+            default: text('name', 'No Match Language'),
+        },
+        md: {
+            type: Object,
+            default: object('markdown', i18nNoMatchDoc),
+        },
+
+    },
+    setup() {
+        return {
+            language: 'en',
+        };
     },
 
 });
