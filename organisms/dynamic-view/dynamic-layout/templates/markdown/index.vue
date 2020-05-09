@@ -38,8 +38,16 @@ export default {
             default: () => ({}),
         },
         data: {
+            type: [Object, Array],
+            default: null,
+        },
+        api: {
             type: Object,
             default: null,
+        },
+        isShow: {
+            type: Boolean,
+            default: true,
         },
         isLoading: {
             type: Boolean,
@@ -58,7 +66,7 @@ export default {
         // const regx = new RegExp('<pre(?:.|\\n)*(?<codeblock><code.*>(?<code>(?:.|\\n)*)</code>)(?:.|\\n)*</pre>');
         const state = reactive({
             isApiMode: computed(() => !!props.api),
-            data: null,
+            data: {},
         });
 
 
@@ -77,6 +85,7 @@ export default {
                     action = action.setOnly(props.options.root_path);
                 }
                 const resp = await action.execute();
+                console.debug('resp', resp);
                 state.data = resp.data || {};
             }
         };
@@ -127,7 +136,7 @@ export default {
                 }
                 console.debug(rootData.value, 'root data');
                 if (rootData.value) {
-                    doc = nunjucks.renderString(doc, props.data);
+                    doc = nunjucks.renderString(doc, rootData.value);
                 }
                 const renderMD = marked(doc);
                 // console.debug(renderMD);
