@@ -412,7 +412,7 @@ export default defineComponent({
         });
         watch(() => state.resourceApi, async (after, before) => {
             if (after && after !== before) {
-                const resp = await state.resourceApi.list().execute();
+                const resp = await state.resourceApi.list().setPageSize(1).execute();
                 const idField: string = state.resourceApi.get().idField;
                 state.selectedId = resp.data.results && resp.data.results.length ? resp.data.results[0][idField] : '';
                 state.data = resp.data.results;
