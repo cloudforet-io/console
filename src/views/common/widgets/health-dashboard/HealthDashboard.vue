@@ -151,14 +151,8 @@ export default defineComponent({
         return {
             ...toRefs(state),
             onItemClick(item) {
-                console.log('item test', item)
-                window.location.href = item;
+                window.open(item);
             },
-            // iconUrl: (item: Data): string => _.get(
-            //     state.providers,
-            //     `state.providers[${item.provider}].icon`,
-            //     '',
-            // ) as string,
         };
     },
 });
