@@ -4,7 +4,7 @@
             <div class="project-info">
                 <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
                 <p-icon-button name="ic_transhcan"
-                               width="1.5rem" height="1.5rem" class="-mt-5 ml-3 delete-btn"
+                               width="1.5rem" height="1.5rem" class="ml-3 cursor-pointer delete-btn"
                                @click="openProjectDeleteForm"
                 />
             </div>
@@ -24,8 +24,8 @@
                         <PPageTitle :title="'Member'" use-total-count :total-count="apiHandler.totalCount.value" />
                     </template>
                     <template #toolbox-left>
-                        <div class="toolbox-left">
-                            <p-button class="add-btn"
+                        <div class="pr-4 toolbox-left">
+                            <p-button class="mr-4 add-btn"
                                       style-type="primary-dark"
                                       @click="openMemberAddForm()"
                             >
@@ -348,21 +348,5 @@ export default {
             @apply text-base text-gray-400 mt-1;
           }
 
-    }
-    .toolbox-left {
-        .add-btn {
-            margin-right: 1rem;
-        }
-        padding-right: 1rem;
-    }
-
-    .delete-btn {
-        margin-top: -10px;
-        cursor: pointer;
-    }
-
-    .tags {
-        padding-top: 1rem;
-        min-height: 560px;
     }
 </style>

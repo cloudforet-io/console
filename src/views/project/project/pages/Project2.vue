@@ -31,7 +31,7 @@
                                  class="text-base truncate leading-tight"
                             >
                                 <p-icon-button :name="'ic_plus'" class="group-add-btn"
-                                     width="1rem" height="1rem"
+                                               width="1rem" height="1rem"
                                 />
                             </div>
                         </span>
@@ -600,8 +600,7 @@ export default {
 
 <style lang="postcss" scoped>
     .tree-header {
-        @apply text-sm font-semibold text-gray-500 ml-5 mt-6 mb-4;
-        overflow-x: hidden;
+        @apply text-sm font-semibold text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
     }
 
     ::v-deep .group-add-btn {
@@ -625,8 +624,7 @@ export default {
             @apply text-2xl font-bold pb-2;
         }
         .delete-btn {
-            @apply text-black -mt-2 ml-2;
-            cursor: pointer;
+            @apply text-black -mt-2 ml-2 cursor-pointer;
             &:hover {
                 @apply text-white;
              }
@@ -651,12 +649,15 @@ export default {
             max-height: 1.5rem;
         }
         .providers {
-            padding-bottom: 7px;
+            max-height: 1.5rem;
+            min-height: 1.5rem;
         }
 
         .empty-providers {
             p {
                 @apply relative z-10 text-secondary text-sm;
+                max-height: 1.5rem;
+                min-height: 1.5rem;
                 .add-service-account-btn {
                     @apply relative z-10 mr-2;
                 }
