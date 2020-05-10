@@ -1,13 +1,11 @@
 <template>
-    <p-widget-layout class="collecting-jobs" title="Collecting Jobs" help="Collecting Jobs">
+    <p-widget-layout class="collecting-jobs" title="Recent Collecting Runs" help="Recent Collecting Runs">
         <template #extra>
             <div class="flex justify-end">
                 <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
             </div>
         </template>
         <p-data-table :items="items" :loading="loading" :fields="fields"
-                      :responsive-style="responsiveStyle"
-                      :table-style="tableStyle"
                       :top-border="false"
                       :striped="false"
                       bordered
@@ -23,7 +21,9 @@
             </template>
             <template #no-data="{fields}">
                 <p-tr key="noData" class="bg-primary3">
-                    <p-td class="no-data" :colspan="fields.length" />
+                    <p-td :colspan="fields.length" class="text-gray">
+                        {{ $t('DASHBOARD.ACTION.NO_RUN') }}
+                    </p-td>
                 </p-tr>
             </template>
             <template #col-name-format="{value}">
@@ -73,12 +73,6 @@ export default defineComponent({
                 ['name', 'FIELD.COLLECTOR'],
                 ['start', 'FIELD.START_TIME'],
             ])),
-            responsiveStyle: {
-                height: '100%',
-            },
-            tableStyle: computed(() => (!ts.syncState.loading && ts.state.items.length === 0 ? {
-                height: '100%',
-            } : {})),
         }, {
             loading: true,
         });

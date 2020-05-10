@@ -49,7 +49,7 @@ import { ServiceSummaryWidgetState, Value } from '@/views/common/widgets/service
 import { HistoryDiff } from '@/lib/fluent-api/statistics/history';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
-export default defineComponent({
+export default {
     name: 'Dashboard',
     components: {
         CloudServices,
@@ -100,7 +100,7 @@ export default defineComponent({
             topics,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">

@@ -219,6 +219,14 @@
 		"ZONE": ""
 	},
 	"DASHBOARD": {
+		"ACTION": {
+			"CRT_DBD": "",
+			"CRT_GUIDE": "",
+			"NO_RUN": ""
+		},
+		"BTN": {
+			"GET_START": ""
+		},
 		"RES_REGION": "",
 		"SERVER_STATE": "",
 		"SERVER_TYPE": "",

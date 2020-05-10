@@ -30,12 +30,10 @@
                         </PDropdownMenuBtn>
                     </template>
                     <template #col-name-format="data">
-                        <span class="name">
-                            <p-lazy-img :img-url="getIcon(data)"
-                                        width="1.5rem" height="1.5rem"
-                            />
-                            {{ data.value }}
-                        </span>
+                        <p-lazy-img :img-url="getIcon(data)"
+                                    width="1.5rem" height="1.5rem" class="mr-2"
+                        />
+                        {{ data.value }}
                     </template>
                 </s-dynamic-layout>
             </template>
@@ -386,12 +384,6 @@ export default {
         @apply mx-4;
         &:last-child {
             flex-grow: 1;
-        }
-    }
-
-    .name {
-        .icon {
-            margin-right: 0.5rem;
         }
     }
 
