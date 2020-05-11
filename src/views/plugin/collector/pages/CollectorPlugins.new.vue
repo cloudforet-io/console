@@ -90,7 +90,7 @@ import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
-import {defaultQuery} from "@/lib/api/query";
+import { defaultQuery } from '@/lib/api/query';
 
 const repoState = reactive({
     repositories: [],
@@ -220,7 +220,7 @@ export const setup = (props, { root }) => {
 };
 
 export default {
-    name: 'CollectorPluginsTemplate',
+    name: 'CollectorPlugins',
     components: {
         PVerticalPageLayout2,
         PRow,
