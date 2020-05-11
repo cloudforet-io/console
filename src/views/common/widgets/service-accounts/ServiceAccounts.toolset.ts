@@ -2,14 +2,6 @@ import { Stat } from '@/lib/fluent-api/statistics/resource';
 import { initReactive, StateToolSet } from '@/lib/toolset';
 
 export const serviceAccountsProps = {
-    title: {
-        type: String,
-        default: '',
-    },
-    reverse: {
-        type: Boolean,
-        default: false,
-    },
     getAction: {
         type: Function,
         default: (action: Stat<any>) => action.setResourceType('identity.ServiceAccount'),
@@ -17,8 +9,6 @@ export const serviceAccountsProps = {
 };
 
 export interface ServiceAccountsPropsType {
-    title: string;
-    reverse?: boolean;
     getAction(api: Stat<any>): Stat<any>;
 }
 
@@ -28,8 +18,6 @@ export class ServiceAccountsWidgetState {
 
     static initState(): ServiceAccountsPropsType {
         return {
-            title: '',
-            reverse: false,
             getAction: action => action.setResourceType('identity.ServiceAccount'),
         };
     }

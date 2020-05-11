@@ -27,7 +27,7 @@
                 </router-link>
                 <template v-else>
                     <p-selectable-item v-for="(item, index) in data" :key="index"
-                                       :icon-url="item.icon" theme="card"
+                                       :icon-url="iconUrl(item)" theme="card"
                                        @click="onSelected(item, index)"
                     >
                         <template #contents>
@@ -153,11 +153,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             skeletons: _.range(12),
-            // iconUrl: (item: Value): string => _.get(
-            //     item,
-            //     item.icon,
-            //     '',
-            // ) as string,
+            iconUrl: (item: Value): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
             onSelected(item: Value): void {
                 vm.$router.push({
                     path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
