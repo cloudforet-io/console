@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Collection State">
+    <p-widget-layout title="History">
         <p-chart-loader :loading="loading" class="chart">
             <template #loader>
                 <p-skeleton width="100%" height="100%" />
@@ -42,7 +42,7 @@ interface Props {
 }
 
 export default defineComponent({
-    name: 'CollectionState',
+    name: 'SCollectionHistory',
     components: {
         PWidgetLayout,
         PChartLoader,
