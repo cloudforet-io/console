@@ -5,10 +5,6 @@ import {
 
 export const progressWizardProps = {
     ...progressTabBarProps,
-    title: {
-        type: String,
-        default: undefined,
-    },
     cancelBtnBind: {
         type: Object,
         default: () => ({}),
@@ -24,7 +20,6 @@ export const progressWizardProps = {
 };
 
 export interface ProgressWizardProps extends ProgressTabBarProps {
-    title: string;
     cancelBtnBind: any;
     navigationBtnBind: any;
     confirmBtnBind: any;

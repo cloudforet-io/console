@@ -1,32 +1,30 @@
 <template>
-    <div>
-        <p-data-table
-            :items="schemaItems"
-            :fields="fields"
-            :sortable="false"
-            :selectable="false"
-            :loading="loading"
-        >
-            <template #col-count-format="{item}">
-                <div v-if="supportedSchemaSet.has(item.name)"
-                     class="text-safe font-bold"
-                >
-                    {{ secretCount[item.name] || 0 }}
-                </div>
-                <div v-else>
-                    {{ secretCount[item.name] || 0 }}
-                </div>
-            </template>
-            <template #col-supported-format="{item}">
-                <div v-if="supportedSchemaSet.has(item.name)">
-                    <p-i name="ic_state_active"
-                         width="1.5rem"
-                         height="1.5rem"
-                    />
-                </div>
-            </template>
-        </p-data-table>
-    </div>
+    <p-data-table
+        :items="schemaItems"
+        :fields="fields"
+        :sortable="false"
+        :selectable="false"
+        :loading="loading"
+    >
+        <template #col-count-format="{item}">
+            <div v-if="supportedSchemaSet.has(item.name)"
+                 class="text-safe font-bold"
+            >
+                {{ secretCount[item.name] || 0 }}
+            </div>
+            <div v-else>
+                {{ secretCount[item.name] || 0 }}
+            </div>
+        </template>
+        <template #col-supported-format="{item}">
+            <div v-if="supportedSchemaSet.has(item.name)">
+                <p-i name="ic_state_active"
+                     width="1.5rem"
+                     height="1.5rem"
+                />
+            </div>
+        </template>
+    </p-data-table>
 </template>
 
 <script lang="ts">
