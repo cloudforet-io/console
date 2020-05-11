@@ -145,7 +145,7 @@ import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
-export default defineComponent({
+export default {
     name: 'TopProjects',
     components: {
         PIconTextButton,
@@ -245,7 +245,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

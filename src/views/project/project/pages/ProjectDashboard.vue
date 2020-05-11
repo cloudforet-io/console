@@ -54,22 +54,24 @@
 </template>
 
 <script lang="ts">
-    import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
-    import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
-    import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
-    import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
-    import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
-    import {blue, secondary, secondary1} from '@/styles/colors';
-    import {computed, getCurrentInstance, reactive, toRefs,} from '@vue/composition-api';
-    import {FILTER_OPERATOR} from '@/lib/fluent-api';
-    import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-    import {makeTrItems} from '@/lib/view-helper';
-    import {Stat} from '@/lib/fluent-api/statistics/resource';
-    import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
-    import {ServiceSummaryWidgetState} from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
-    import {STAT_OPERATORS} from '@/lib/fluent-api/statistics/type';
+import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
+import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
+import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
+import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
+import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
+import { blue, secondary, secondary1 } from '@/styles/colors';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { FILTER_OPERATOR } from '@/lib/fluent-api';
+import PTab from '@/components/organisms/tabs/tab/Tab.vue';
+import { makeTrItems } from '@/lib/view-helper';
+import { Stat } from '@/lib/fluent-api/statistics/resource';
+import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
+import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
-    export default {
+export default {
     name: 'ProjectDashboard',
     components: {
         ResourcesByRegion,
@@ -162,9 +164,9 @@
             server: api => api.addGroupKey('data.compute.region_name', 'region_name')
                 .setFilter({
                     key: 'data.compute.region_name',
-                    value: [null, ""],
+                    value: [null, ''],
                     operator: FILTER_OPERATOR.notIn,
-                },{
+                }, {
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
@@ -176,7 +178,7 @@
                     operator: '=',
                 }, {
                     key: 'data.region_name',
-                    value: [null, ""],
+                    value: [null, ''],
                     operator: FILTER_OPERATOR.notIn,
                 }).setResourceType('inventory.CloudService'),
         });
