@@ -21,6 +21,7 @@ export default {
 <style lang="postcss" scoped>
     .fnb {
         @apply text-gray-200;
+        background-color: inherit;
         height: 40px;
         .fnb-contents {
             @apply border-t border-primary3;
