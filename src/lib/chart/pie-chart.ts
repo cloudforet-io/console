@@ -22,10 +22,10 @@ const pieChartSettings: SettingsInterface = {
         maintainAspectRatio: false,
         layout: {
             padding: {
-                left: 0,
-                right: 10,
-                top: 10,
-                bottom: 0,
+                left: -10,
+                // right: 10,
+                // top: 10,
+                bottom: -10,
             },
         },
         legend: {
@@ -55,7 +55,7 @@ const pieChartSettings: SettingsInterface = {
             },
         },
         responsive: true,
-        cutoutPercentage: 65,
+        cutoutPercentage: 70,
         aspectRatio: 1,
         tooltips,
     },

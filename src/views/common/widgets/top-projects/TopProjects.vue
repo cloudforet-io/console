@@ -226,7 +226,7 @@ export default {
             ts.state.loading = true;
             try {
                 const res = await api.execute();
-                ts.state.data = [];// res.data.results;
+                ts.state.data = res.data.results;
             } catch (e) {
                 console.error(e);
             } finally {

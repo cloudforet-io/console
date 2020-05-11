@@ -36,7 +36,7 @@
                 </div>
                 <div class="right-container">
                     <p class="sub-title">
-                        Server List
+                        Resource List
                     </p>
                     <p-data-table :fields="fields"
                                   :sortable="false"

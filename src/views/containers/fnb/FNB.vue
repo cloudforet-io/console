@@ -49,6 +49,7 @@ export default {
 <style lang="postcss" scoped>
     .fnb {
         @apply text-gray-200 h-10 text-xs;
+        background-color: inherit;
         .fnb-contents {
             @apply border-t border-gray-200 h-full py-2 px-0 my-0 mx-6;
         }
