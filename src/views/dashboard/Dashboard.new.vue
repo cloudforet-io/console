@@ -30,7 +30,6 @@
         <collection-state class="col-start-1 col-end-13 lg:col-end-7" />
         <collecting-jobs class="col-start-1 col-end-13 lg:col-start-7" />
         <cloud-services class="col-start-1 col-end-13" />
-        </div>
     </general-page-layout>
 </template>
 
