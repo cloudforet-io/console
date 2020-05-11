@@ -1,8 +1,10 @@
 <template>
     <p-pane-layout class="widget-layout">
-        <slot name="title">
-            <div class="title">
-                <span class="mr-2">{{ title }}</span>
+        <slot name="top">
+            <div class="top">
+                <slot name="title">
+                    <span class="title" :style="titleStyle">{{ title }}</span>
+                </slot>
                 <slot name="help" :help="help">
                     <p-tooltip-button v-if="help"
                                       class="help" :tooltip="help"
@@ -53,14 +55,17 @@ export default defineComponent({
         flex-direction: column;
         width: 100%;
 
+        .top {
+            @apply flex items-center mx-6 mt-8 mb-6;
+        }
+
         .title {
-            @apply flex items-center capitalize leading-tight font-bold;
-            font-size: 1.125rem;
-            margin: 1.5rem 1.5rem 1rem 1.5rem;
+            @apply text-lg capitalize font-bold mr-2;
+            line-height: 120%;
         }
 
         .help {
-            @apply text-gray-400;
+            @apply text-gray-300;
             display: inline-flex;
             cursor: help;
         }

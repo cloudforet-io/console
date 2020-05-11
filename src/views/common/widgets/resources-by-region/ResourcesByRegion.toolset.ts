@@ -1,28 +1,28 @@
 import { Stat } from '@/lib/fluent-api/statistics/resource';
 import { initReactive, StateToolSet } from '@/lib/toolset';
 
-export const serviceAccountsProps = {
+export const resourceByRegionProps = {
     getAction: {
         type: Function,
         default: (action: Stat<any>) => action.setResourceType('identity.ServiceAccount'),
     },
 };
 
-export interface ServiceAccountsPropsType {
+export interface ResourcesByRegionProps {
     getAction(api: Stat<any>): Stat<any>;
 }
 
-@StateToolSet<ServiceAccountsPropsType>()
+@StateToolSet<ResourcesByRegionProps>()
 export class ServiceAccountsWidgetState {
-    state: ServiceAccountsPropsType;
+    state: ResourcesByRegionProps;
 
-    static initState(): ServiceAccountsPropsType {
+    static initState(): ResourcesByRegionProps {
         return {
             getAction: action => action.setResourceType('identity.ServiceAccount'),
         };
     }
 
-    constructor(initData: ServiceAccountsPropsType = {} as ServiceAccountsPropsType, lazy = false) {
-        this.state = initReactive<ServiceAccountsPropsType>(lazy, ServiceAccountsWidgetState.initState(), initData);
+    constructor(initData: ResourcesByRegionProps = {} as ResourcesByRegionProps, lazy = false) {
+        this.state = initReactive<ResourcesByRegionProps>(lazy, ServiceAccountsWidgetState.initState(), initData);
     }
 }
