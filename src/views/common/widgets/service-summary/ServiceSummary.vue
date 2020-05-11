@@ -115,13 +115,21 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.service-summary::v-deep .widget-contents {
-    padding: 0;
+.service-summary::v-deep {
+    .widget-contents {
+        padding: 0;
+    }
+    .top {
+        @apply mt-6 mb-2;
+    }
+    .title {
+        @apply text-sm leading-normal;
+    }
 }
 .count {
     display: inline-block;
-    line-height: 3rem;
-    font-size: 2.5rem;
+    line-height: 120%;
+    font-size: 2rem;
     font-weight: bold;
     margin-left: 1.5rem;
     border-bottom-width: 1px;

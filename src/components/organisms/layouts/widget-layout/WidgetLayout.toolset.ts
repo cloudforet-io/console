@@ -7,9 +7,15 @@ export const widgetLayoutProps = {
         type: String,
         default: '',
     },
+    titleStyle: {
+        type: Object,
+        default: () => ({}),
+    },
 };
 
 export interface WidgetLayoutPropsType {
     title: string;
     help?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    titleStyle?: any;
 }
