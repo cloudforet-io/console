@@ -1,6 +1,6 @@
 <template>
-    <p-widget-layout :title="title" class="resources-by-region">
-        <div :class="{reverse:reverse}">
+    <p-widget-layout title="Resources By Region" class="resources-by-region">
+        <div class="reverse">
             <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
                     <template #loader>
@@ -68,9 +68,9 @@ import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
 import {
-    serviceAccountsProps,
-    ServiceAccountsPropsType,
-} from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
+    resourceByRegionProps,
+    ResourcesByRegionProps,
+} from '@/views/common/widgets/resources-by-region/ResourcesByRegion.toolset';
 
 export default defineComponent({
     name: 'ServiceAccounts',
@@ -83,8 +83,8 @@ export default defineComponent({
         PSkeleton,
         PChartLoader,
     },
-    props: serviceAccountsProps,
-    setup(props: ServiceAccountsPropsType) {
+    props: resourceByRegionProps,
+    setup(props: ResourcesByRegionProps) {
         const vm: any = getCurrentInstance();
 
         const {
