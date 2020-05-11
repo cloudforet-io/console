@@ -39,78 +39,80 @@
                 Cloud Service Provider
             </div>
             <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value" />
-            <PToolboxGridLayout
-                v-bind="apiHandler.gridTS.state"
-                :this-page.sync="apiHandler.gridTS.syncState.thisPage"
-                :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                @changePageNumber="apiHandler.getData()"
-                @changePageSize="apiHandler.getData()"
-                @clickRefresh="apiHandler.getData()"
-                @card:click="clickCard"
-                @clickExcel="exportToolSet.getData()"
-            >
-                <template slot="toolbox-bottom">
-                    <div class="cst-toolbox-bottom">
-                        <p-query-search-bar
-                            class="search-bar"
-                            :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
-                            :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
-                            @newQuery="apiHandler.gridTS.querySearch.addTag"
-                        />
-                        <div class="checkbox" style="user-select: none;">
-                            <PCheckBox :value="false" :disabled="true" />  <span>search all resource</span>
-                        </div>
-                    </div>
-
-                    <p-hr v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" style="width: 100%;" />
-                    <p-query-search-tags
-                        v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0"
-                        class="py-2"
-                        :tags="apiHandler.gridTS.querySearch.tags.value"
-                        @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
-                        @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
-                    />
-                </template>
-                <template #card="{item}">
-                    <div class="left">
-                        <div class="w-12 h-12">
-                            <img v-if="item.tags['spaceone:icon']"
-                                 width="48px" height="48px"
-                                 :src="item.tags['spaceone:icon']"
-                                 :alt="item.name"
-                            >
-                            <img v-else-if="providerStore.state.providers[item.provider]"
-                                 width="48px" height="48px"
-                                 :src="providerStore.state.providers[item.provider].icon"
-                                 :alt="item.provider"
-                            >
-                            <p-i v-else name="ic_provider_other" width="48px"
-                                 height="48px"
+            <div class="pb-8 cloud-services">
+                <PToolboxGridLayout
+                    v-bind="apiHandler.gridTS.state"
+                    :this-page.sync="apiHandler.gridTS.syncState.thisPage"
+                    :page-size.sync="apiHandler.gridTS.syncState.pageSize"
+                    @changePageNumber="apiHandler.getData()"
+                    @changePageSize="apiHandler.getData()"
+                    @clickRefresh="apiHandler.getData()"
+                    @card:click="clickCard"
+                    @clickExcel="exportToolSet.getData()"
+                >
+                    <template slot="toolbox-bottom">
+                        <div class="cst-toolbox-bottom">
+                            <p-query-search-bar
+                                class="search-bar"
+                                :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
+                                :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
+                                @newQuery="apiHandler.gridTS.querySearch.addTag"
                             />
-                        </div>
-                        <div class="text-content">
-                            <div class="sub-title">
-                                {{ item.provider }} / {{ item.group }}
-                            </div>
-                            <div class="title">
-                                {{ item.name }}
+                            <div class="checkbox" style="user-select: none;">
+                                <PCheckBox :value="false" :disabled="true" />  <span>search all resource</span>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="statData" class="right">
-                        <div v-if="statData[item.cloud_service_type_id][newResourceCountName]" class="today-created">
-                            <p-i name="ic_list_increase" width="12px" height="12px" />
-                            <div class="number">
-                                {{ statData[item.cloud_service_type_id][newResourceCountName] }}
+
+                        <p-hr v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" style="width: 100%;" />
+                        <p-query-search-tags
+                            v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0"
+                            class="py-2"
+                            :tags="apiHandler.gridTS.querySearch.tags.value"
+                            @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
+                            @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
+                        />
+                    </template>
+                    <template #card="{item}">
+                        <div class="left">
+                            <div class="w-12 h-12">
+                                <img v-if="item.tags['spaceone:icon']"
+                                     width="48px" height="48px"
+                                     :src="item.tags['spaceone:icon']"
+                                     :alt="item.name"
+                                >
+                                <img v-else-if="providerStore.state.providers[item.provider]"
+                                     width="48px" height="48px"
+                                     :src="providerStore.state.providers[item.provider].icon"
+                                     :alt="item.provider"
+                                >
+                                <p-i v-else name="ic_provider_other" width="48px"
+                                     height="48px"
+                                />
+                            </div>
+                            <div class="text-content">
+                                <div class="sub-title">
+                                    {{ item.provider }} / {{ item.group }}
+                                </div>
+                                <div class="title">
+                                    {{ item.name }}
+                                </div>
                             </div>
                         </div>
-                        <div class="total-count">
-                            {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
+                        <div v-if="statData" class="right">
+                            <div v-if="statData[item.cloud_service_type_id][newResourceCountName]" class="today-created">
+                                <p-i name="ic_list_increase" width="12px" height="12px" />
+                                <div class="number">
+                                    {{ statData[item.cloud_service_type_id][newResourceCountName] }}
+                                </div>
+                            </div>
+                            <div class="total-count">
+                                {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
+                            </div>
                         </div>
-                    </div>
-                    <PSkeleton v-else width="5rem" height="1.875rem" />
-                </template>
-            </PToolboxGridLayout>
+                        <PSkeleton v-else width="5rem" height="1.875rem" />
+                    </template>
+                </PToolboxGridLayout>
+            </div>
         </template>
     </p-vertical-page-layout2>
 </template>

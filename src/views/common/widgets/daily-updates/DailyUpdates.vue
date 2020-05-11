@@ -210,11 +210,28 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .daily-updates {
-    background-color: rgba(theme('colors.white'), 0.8);
-    &::v-deep .widget-contents {
-        overflow-y: auto;
+    @apply bg-white;
+    &::v-deep {
+        .widget-contents {
+            overflow-y: auto;
+        }
     }
 }
+
+@screen lg {
+    .daily-updates {
+        background-color: rgba(theme('colors.white'), 0.8);
+        &::v-deep {
+            .title {
+                @apply text-sm leading-normal;
+            }
+            .top {
+                @apply mt-6;
+            }
+        }
+    }
+}
+
 .group {
     @apply text-base font-bold mb-1 truncate leading-tight;
 }
@@ -223,10 +240,6 @@ export default defineComponent({
 }
 .count {
     @apply text-lg font-bold ml-1;
-}
-.help {
-    display: inline-flex;
-    cursor: help;
 }
 .no-data-img {
     @apply mx-auto mb-4 flex-shrink-0;

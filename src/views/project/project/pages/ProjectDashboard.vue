@@ -21,17 +21,11 @@
             <PTab :tabs="tabs" :active-tab.sync="activeTab">
                 <template #server>
                     <resources-by-region
-                        :title="'RESOURCES BY REGION'"
-                        reverse
-                        resource-type="inventory.Server"
                         :get-action="resources.server"
                     />
                 </template>
                 <template #cloud_service>
                     <resources-by-region
-                        :title="'RESOURCES BY REGION'"
-                        reverse
-                        resource-type="inventory.CloudService"
                         :get-action="resources.cloudService"
                     />
                 </template>
