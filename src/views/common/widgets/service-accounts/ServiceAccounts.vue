@@ -1,44 +1,46 @@
 <template>
-    <p-widget-layout title="Service Accounts">
-        <div class="chart-container">
-            <p-chart-loader :loading="loading" class="chart">
-                <template #loader>
-                    <canvas ref="loaderRef" />
+    <p-widget-layout title="title">
+        <div :class="{reverse:reverse}">
+            <div class="chart-container">
+                <p-chart-loader :loading="loading" class="chart">
+                    <template #loader>
+                        <canvas ref="loaderRef" />
+                    </template>
+                    <canvas ref="chartRef" />
+                </p-chart-loader>
+            </div>
+            <div class="legends">
+                <template v-if="loading">
+                    <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
+                        <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                        <p-skeleton class="flex-grow" />
+                    </div>
                 </template>
-                <canvas ref="chartRef" />
-            </p-chart-loader>
-        </div>
-        <div class="legends">
-            <template v-if="loading">
-                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
-                    <p-skeleton class="flex-grow" />
-                </div>
-            </template>
-            <p-grid-layout v-else :items="data" row-gap="0.5rem"
-                           column-gap="0" :fix-column="1" card-min-width="0"
-                           card-height="auto" :card-class="() => []"
-            >
-                <template #card="{item, index}">
-                    <p-selectable-item :icon-url="item.icon" theme="card"
-                                       default-icon="ic_provider_other"
-                                       @click="onSelected(item)"
-                    >
-                        <template #contents>
-                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
-                                 class="mx-2 text-base truncate leading-tight"
-                            >
-                                {{ item.name }}
-                            </div>
-                        </template>
-                        <template #extra>
-                            <p-badge :background-color="item.color" class="count">
-                                {{ item.count }}
-                            </p-badge>
-                        </template>
-                    </p-selectable-item>
-                </template>
-            </p-grid-layout>
+                <p-grid-layout v-else :items="data" row-gap="0.5rem"
+                               column-gap="0" :fix-column="1" card-min-width="0"
+                               card-height="auto" :card-class="() => []"
+                >
+                    <template #card="{item, index}">
+                        <p-selectable-item :icon-url="item.icon" theme="card"
+                                           default-icon="ic_provider_other"
+                                           @click="onSelected(item)"
+                        >
+                            <template #contents>
+                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
+                                     class="mx-2 text-base truncate leading-tight"
+                                >
+                                    {{ item.name }}
+                                </div>
+                            </template>
+                            <template #extra>
+                                <p-badge :background-color="item.color" class="count">
+                                    {{ item.count }}
+                                </p-badge>
+                            </template>
+                        </p-selectable-item>
+                    </template>
+                </p-grid-layout>
+            </div>
         </div>
     </p-widget-layout>
 </template>
@@ -190,5 +192,21 @@ export default defineComponent({
     }
     .chart-container {
         @apply flex justify-center items-center mb-4;
+    }
+    .reverse {
+        @apply block mb-0;
+        height: 24rem;
+    }
+
+    @screen md {
+        .reverse {
+            @apply flex flex-row-reverse;
+            .chart-container {
+                min-width: 40%;
+                .chart {
+                    height: 18rem;
+                }
+            }
+        }
     }
 </style>
