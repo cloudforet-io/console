@@ -8,7 +8,7 @@
                 <canvas ref="chartRef" />
             </p-chart-loader>
             <div v-if="!loading && data.length === 0"
-                 class="flex flex-col h-full justify-center items-center"
+                 class="flex flex-col h-full justify-center items-center pt-16 pb-10"
             >
                 <p class="text-2xl font-bold capitalize mb-4 text-primary">
                     {{ $t('DASHBOARD.ACTION.CRT_DBD') }}
@@ -21,6 +21,7 @@
                                         size="lg" dir="down"
                                         style-type="primary" icon-color="transparent inherit"
                                         width="1.5rem" height="1.5rem"
+                                        class="w-full"
                     >
                         {{ $t('DASHBOARD.BTN.GET_START') }}
                     </p-icon-text-button>
@@ -33,6 +34,7 @@
                           :loading="loading"
                           :items="data"
                           :top-border="false"
+                          :bordered="false"
                           :responsive-style="{
                               overflow: 'auto',
                               marginTop: '1rem'
@@ -46,7 +48,7 @@
 
                 <!-- th -->
                 <template #th-rank="{field}">
-                    <div class="text-center">
+                    <div class="text-center text-gray">
                         {{ field.label }}
                     </div>
                 </template>
@@ -278,6 +280,11 @@ export default {
         table-layout: fixed;
         font-size: 0.875rem;
     }
+    tr {
+        &:nth-child(2n+1) {
+            @apply bg-primary4;
+        }
+    }
     td {
         @apply truncate cursor-pointer;
         &:first-child {
@@ -285,6 +292,9 @@ export default {
         }
     }
     th {
+        .th-contents {
+            @apply text-gray;
+        }
         &:first-child {
             width: 2.75rem;
         }

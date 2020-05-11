@@ -39,7 +39,7 @@
                             </div>
                         </template>
                         <template #extra>
-                            <span class="count">{{ item.count }}</span>
+                            <span class="count">{{ item.count || 0 }}</span>
                         </template>
                     </p-selectable-item>
                 </template>
