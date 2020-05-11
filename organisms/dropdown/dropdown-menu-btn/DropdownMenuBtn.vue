@@ -2,20 +2,20 @@
     <div v-click-outside="outsideClick"
          class="p-dropdown-menu-btn"
     >
-        <PDropdownBtn :popup.sync="popup"
-                      :block="block"
-                      :disabled="disabled"
-                      @click="$emit('openMenu')"
+        <p-dropdown-btn :popup.sync="popup"
+                        :block="block"
+                        :disabled="disabled"
+                        @click="$emit('openMenu')"
         >
             <slot />
-        </PDropdownBtn>
-        <PContextMenu v-if="popup"
-                      class="menu-ctx"
-                      :class="{block}"
-                      :menu="menu"
-                      :loading="loading"
-                      :auto-height="autoHeight"
-                      @clickMenuEvent="clickMenuEvent"
+        </p-dropdown-btn>
+        <p-context-menu v-if="popup"
+                        class="menu-ctx"
+                        :class="{block}"
+                        :menu="menu"
+                        :loading="loading"
+                        :auto-height="autoHeight"
+                        @clickMenuEvent="clickMenuEvent"
         />
     </div>
 </template>
@@ -25,6 +25,7 @@ import vClickOutside from 'v-click-outside';
 import { defineComponent, ref } from '@vue/composition-api';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
 import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn.vue';
+import { dropdownMenuBtnProps } from './PDropdownMenuBtn.toolset';
 
 export default defineComponent({
     name: 'PDropdownMenuBtn',
@@ -32,32 +33,11 @@ export default defineComponent({
         clickOutside: vClickOutside.directive,
     },
     components: { PDropdownBtn, PContextMenu },
-    props: {
-        menu: {
-            type: [Array, Object],
-            default: () => [],
-        },
-        block: {
-            type: Boolean,
-            default: false,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        autoHeight: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
+    props: dropdownMenuBtnProps,
     setup(props, { emit }) {
         const popup = ref(false);
-        const outsideClick = ():void => { popup.value = false; };
-        const clickMenuEvent = (eventName:string, idx:number) => {
+        const outsideClick = (): void => { popup.value = false; };
+        const clickMenuEvent = (eventName: string, idx: number) => {
             emit('clickMenuEvent', eventName, idx);
             emit(`click-${eventName}`, idx);
             popup.value = false;
@@ -72,7 +52,7 @@ export default defineComponent({
 });
 </script>
 <style lang="postcss" scoped>
-    .p-dropdown-menu-btn{
+    .p-dropdown-menu-btn {
         position: relative;
     }
     .menu-ctx.block {

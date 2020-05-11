@@ -13,7 +13,10 @@
                        :class="btnClassObject"
                        :name="popup ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                        :disabled="disabled"
-                       :color="`transparent ${ disabled ? colorSets.disabled : popup||mouseover ? colorSets.popup : colorSets.mouseover}`"
+                       :color="`transparent ${ disabled ?
+                           colorSets.disabled :
+                           (popup || mouseover ? colorSets.popup : colorSets.mouseover)
+                       }`"
                        :hover-color="iconHoverColor"
                        button-style="white"
                        @click="onClick"
@@ -23,28 +26,18 @@
     </div>
 </template>
 
-<script>
-import { defineComponent } from '@vue/composition-api';
+<script lang="ts">
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import { DropdownBtnProps, dropdownBtnProps } from './PDropdownBtn.toolset';
 
 export default defineComponent({
     name: 'PDropdownBtn',
     components: { PButton, PIconButton },
-    props: {
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        popup: {
-            type: Boolean,
-            default: false,
-        },
-        block: {
-            type: Boolean,
-            default: false,
-        },
-    },
+    props: dropdownBtnProps,
     data() {
         return {
             // Consider to specify color according to Jenny's
@@ -57,32 +50,35 @@ export default defineComponent({
             iconHoverColor: 'transparent inherit',
         };
     },
-    computed: {
-        btnClassObject() {
-            return {
-                'dropdown-opened': this.popup,
-                'dropdown-mouseover': this.mouseover,
-                block: this.block,
-            };
-        },
+    setup(props: DropdownBtnProps, { emit }) {
+        const state = reactive({
+            mouseover: false,
+            iconHoverColor: 'transparent inherit',
+            colorSets: {
+                disabled: '#A7A9B2',
+                popup: '#0080FB',
+                mouseover: '#222532',
+            },
+        });
+        return {
+            ...toRefs(state),
+            btnClassObject: computed(() => ({
+                'dropdown-opened': props.popup,
+                'dropdown-mouseover': state.mouseover,
+                block: props.block,
+            })),
+            onClick(event): void {
+                emit('click', event);
+                emit('update:popup', !props.popup);
+            },
+            onMouseOver(): void {
+                if (!props.disabled) state.mouseover = true;
+            },
+            onMouseOut(): void {
+                if (!props.disabled) state.mouseover = false;
+            },
+        };
     },
-    methods: {
-        onClick(event) {
-            this.$emit('click', event);
-            this.$emit('update:popup', !this.popup);
-        },
-        onMouseOver() {
-            if (!this.disabled) {
-                this.mouseover = true;
-            }
-        },
-        onMouseOut() {
-            if (!this.disabled) {
-                this.mouseover = false;
-            }
-        },
-    },
-
 });
 </script>
 
@@ -93,34 +89,34 @@ export default defineComponent({
         display: flex;
     }
 }
-.dropdown-btn{
+.dropdown-btn {
     @apply bg-white border-gray-300;
     border-bottom-width: 1px;
     border-style: solid;
     min-width: 2rem;
-    font-weight:normal;
+    font-weight: normal;
     &:hover {
         @apply text-secondary;
     }
-    &.disabled{
+    &.disabled {
         @apply border-gray-300 bg-gray-200 text-gray-400;
     }
-    &:not(:disabled):not(.disabled):hover{
+    &:not(:disabled):not(.disabled):hover {
         @apply border-secondary bg-white text-secondary;
     }
 }
-.dropdown-toggle-split{
-    min-width:2rem;
-    max-width:2rem;
-    border-radius: 0px 2px 2px 0px;
+.dropdown-toggle-split {
+    min-width: 2rem;
+    max-width: 2rem;
+    border-radius: 0 2px 2px 0;
 }
-.menu-btn{
+.menu-btn {
     @apply text-gray-900 border-gray-300;
     min-width: 6.5rem;
     width: auto;
     padding-left: 1rem;
     padding-right: 1rem;
-    border-radius: 2px 0px 0px 2px;
+    border-radius: 2px 0 0 2px;
     text-align: left;
     justify-content: flex-start;
     margin-right: -4px;
@@ -129,10 +125,9 @@ export default defineComponent({
     }
 }
 
-.dropdown-mouseover, .dropdown-opened{
+.dropdown-mouseover, .dropdown-opened {
     border-color: theme('colors.secondary') !important;
     color: theme('colors.secondary') !important;
 }
-
 
 </style>
