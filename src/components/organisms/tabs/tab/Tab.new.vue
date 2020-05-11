@@ -24,7 +24,9 @@ import { makeProxy } from '@/lib/compostion-util';
 import {
     computed, defineComponent,
 } from '@vue/composition-api';
-import { isOne, tabBarProps, TabBarProps } from '@/components/molecules/tabs/tab-bar/toolset';
+import {
+    isOne, tabBarProps, TabBarProps, TabItem,
+} from '@/components/molecules/tabs/tab-bar/toolset';
 
 export default defineComponent({
     name: 'PTab',
@@ -34,7 +36,11 @@ export default defineComponent({
         return {
             proxyActiveTab: makeProxy('activeTab'),
             isOne: isOne(props),
-            nonKeepTabs: computed(() => props.tabs.filter(tab => (typeof tab === 'string' ? true : !tab.keepAlive))),
+            nonKeepTabs: computed(() => props.tabs.reduce<TabItem[]>((results, current, idx) => {
+                if (typeof current === 'string') results.push({ name: current, label: current, keepAlive: false });
+                else if (!current.keepAlive) results.push(current);
+                return results;
+            }, [])),
             keepTabs: computed(() => props.tabs.filter(tab => (typeof tab === 'string' ? false : tab.keepAlive))),
         };
     },
