@@ -50,17 +50,21 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+
 .key {
-    @apply py-2 px-4 text-sm font-bold max-w-xs;
-    line-height: 1.0625rem;
+    @apply font-bold;
     width: 18rem;
-    cursor: unset;
 }
 .value {
-    @apply py-2 px-4 cursor-text;
-    cursor: unset;
+    @apply cursor-text;
     &.hover {
         @apply text-blue-500;
     }
 }
+.key, .value{
+    @apply py-2 px-4 text-sm;
+    line-height: 1.0625rem;
+    cursor: unset;
+}
+
 </style>
