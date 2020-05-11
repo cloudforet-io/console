@@ -53,7 +53,7 @@
 ## 🚀 Usage  
   
   ### Demo Server  
-```  
+```
  npm run serve 
 ```  
 &nbsp;  
@@ -71,13 +71,12 @@ If you want real server, you can change the mode.
 You can log in with any ID/PW in no server mode. (ex. ID: admin, PW: admin)
   
 &nbsp;  
-  
+For Server mode,
+  please copy public/config/development.json.sample file
+  and rename public/config/development.json
 ```  
-please copy public/config/development.json.sample file
-and rename public/config/development.json
-
 (public/config/development.json)  
-  
+ 
 "NO_SERVER_MODE": false  
 ```  
 &nbsp;  
@@ -85,19 +84,45 @@ and rename public/config/development.json
 
 ## ✨ Demo
 
- - Dashboard
+- Dashboard
 
-![Dashboard](https://user-images.githubusercontent.com/35549653/76824528-bfa79e00-685a-11ea-8045-d334b3854b48.png)
+![Dashboard](https://user-images.githubusercontent.com/35549653/81525247-07e0c980-938f-11ea-8845-d3db6d3ff13c.png)
 &nbsp; 
- - Collector Market place 
 
-![Collector](https://user-images.githubusercontent.com/35549653/76824520-bb7b8080-685a-11ea-91fc-400ac470391d.png)
+- Project
 
+![Project](https://user-images.githubusercontent.com/35549653/81525272-1d55f380-938f-11ea-8237-3682f157f083.png)
 &nbsp; 
- - Server
 
-![Server](https://user-images.githubusercontent.com/35549653/76824531-c1716180-685a-11ea-8a0e-fc8210c68b4e.png)
-  
+- Project Dashboard
+
+![ProjectDashboard](https://user-images.githubusercontent.com/35549653/81525303-35c60e00-938f-11ea-9eba-c6b8c21da9ca.png)
+&nbsp; 
+
+- Collector Market place 
+
+![Collector](https://user-images.githubusercontent.com/35549653/81525333-4e362880-938f-11ea-8382-94cd3f13bba2.png)
+&nbsp; 
+
+- Collector Wizard
+
+![CollectorWizard](https://user-images.githubusercontent.com/35549653/81525488-d87e8c80-938f-11ea-818b-a3f8f4d6e7b6.png)
+&nbsp; 
+
+- Server
+
+![Server](https://user-images.githubusercontent.com/35549653/81525377-745bc880-938f-11ea-95c2-bc10db8740a7.png)
+&nbsp;  
+ 
+- Cloud Service
+
+![CloudService](https://user-images.githubusercontent.com/35549653/81525412-90f80080-938f-11ea-8d73-be22e660f7c9.png)
+&nbsp;  
+ 
+- Service Account
+
+![ServiceAccount](https://user-images.githubusercontent.com/35549653/81525520-f4822e00-938f-11ea-8988-2aa651d61950.png)
+
 &nbsp;  
 &nbsp;
   
