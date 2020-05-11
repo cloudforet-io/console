@@ -5,15 +5,15 @@ import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import PCollectionState from './CollectionState.vue';
+import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
 
 export default {
-    title: 'views/widgets/CollectionState',
-    component: PCollectionState,
+    title: 'views/widgets/CollectionHistory',
+    component: SCollectionHistory,
     parameters: {
         info: {
             summary: '',
-            components: { PCollectionState },
+            components: { SCollectionHistory },
         },
         knobs: { escapeHTML: false },
     },
@@ -33,11 +33,11 @@ const getState = (props, context) => {
 };
 
 export const defaultCase = () => ({
-    components: { PCollectionState },
+    components: { SCollectionHistory },
     props: getProps(),
     template: `
     <div style="width: 80vw;">
-        <PCollectionState v-bind="$props"></PCollectionState>
+        <SCollectionHistory v-bind="$props"></SCollectionHistory>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);

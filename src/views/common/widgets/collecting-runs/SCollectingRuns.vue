@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout class="collecting-jobs" title="Recent Collecting Runs" help="Recent Collecting Runs">
+    <p-widget-layout title="Recent Collecting Runs" help="Recent Collecting Runs">
         <template #extra>
             <div class="flex justify-end">
                 <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
@@ -57,7 +57,7 @@ import PTd from '@/components/atoms/table/Td.vue';
 import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
 
 export default defineComponent({
-    name: 'CollectingJobs',
+    name: 'SCollectingRuns',
     components: {
         PTd,
         PTr,
@@ -106,9 +106,7 @@ export default defineComponent({
             }
         };
 
-        setTimeout(() => {
-            getData();
-        }, 1000);
+        getData();
 
         return {
             ...toRefs(ts.state),
@@ -137,6 +135,9 @@ export default defineComponent({
     overflow-y: auto;
     td:first-child {
         @apply cursor-pointer;
+    }
+    th .th-contents {
+        @apply text-gray;
     }
 }
 

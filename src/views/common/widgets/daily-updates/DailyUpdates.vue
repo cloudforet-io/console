@@ -189,9 +189,7 @@ export default defineComponent({
             state.loading = false;
         };
 
-        setTimeout(() => {
-            getData();
-        }, 1000);
+        getData();
 
         return {
             ...toRefs(state),

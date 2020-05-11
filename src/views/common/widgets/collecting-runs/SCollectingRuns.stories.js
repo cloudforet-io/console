@@ -5,15 +5,15 @@ import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import PCollectingJobs from './CollectingJobs.vue';
+import PCollectingRuns from '@/views/common/widgets/collecting-runs/SCollectingRuns.vue';
 
 export default {
-    title: 'views/widgets/CollectingJobs',
-    component: PCollectingJobs,
+    title: 'views/widgets/CollectingRuns',
+    component: PCollectingRuns,
     parameters: {
         info: {
             summary: '',
-            components: { PCollectingJobs },
+            components: { PCollectingRuns },
         },
         knobs: { escapeHTML: false },
     },
@@ -33,11 +33,11 @@ const getState = (props, context) => {
 };
 
 export const defaultCase = () => ({
-    components: { PCollectingJobs },
+    components: { PCollectingRuns },
     props: getProps(),
     template: `
     <div style="width: 80vw;">
-        <PCollectingJobs v-bind="$props"></PCollectingJobs>
+        <PCollectingRuns v-bind="$props"></PCollectingRuns>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);
