@@ -3,7 +3,11 @@
         <p-row class="p-card-item">
             <p-col :flex-grow="0">
                 <slot name="side">
-                    <img :src="icon" class="icon">
+                    <p-lazy-img :img-url="icon"
+                                :error-icon="defaultIcon"
+                                width="4.5rem" height="4.5rem"
+                    />
+                    <!--                    <img :src="icon" class="icon">-->
                 </slot>
             </p-col>
             <p-col class="p-card-body">
@@ -29,65 +33,50 @@
     </p-pane-layout>
 </template>
 
-<script>
-import config from '@/lib/config';
+<script lang="ts">
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import { cardItemProps } from '@/components/molecules/cards/PCardItem.toolset';
+import { defineComponent } from '@vue/composition-api';
 
-export default {
-    name: 'CardItem',
+export default defineComponent({
+    name: 'PCardItem',
     components: {
-        PRow, PCol, PPaneLayout,
+        PRow, PCol, PPaneLayout, PLazyImg,
     },
-    props: {
-        icon: {
-            type: String,
-            default: config.get('COLLECTOR_IMG'),
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        contents: {
-            type: String,
-            default: '',
-        },
-    },
+    props: cardItemProps,
     setup() {
         return {};
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
 .p-card-item-container {
     &:hover {
-        box-shadow: 0px 0px 8px rgba(theme('colors.primary'), .22);
+        box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.22);
     }
 }
 .p-card-item {
     padding: 1rem;
     height: 126px;
-    .icon {
-        width: 4.5rem;
-        height: 4.5rem;
-    }
     .p-card-body {
         all: unset;
         width: 100%;
         padding-left: 1.5rem;
-        >div {
+        > div {
             height: 100%;
         }
         .title {
             font-size: 1rem;
             font-weight: bold;
             line-height: 1.125rem;
-            padding-bottom: .5rem;
+            padding-bottom: 0.5rem;
         }
         .contents {
-            font-size: .875rem;
+            font-size: 0.875rem;
         }
     }
 }

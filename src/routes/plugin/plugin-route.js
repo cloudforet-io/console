@@ -3,10 +3,10 @@ import { fluentApi } from '@/lib/fluent-api';
 const Plugin = () => import('@/views/plugin/plugin');
 const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
 
-const Collector = () => import('@/views/plugin/collector/pages/Collector.new.vue');
+const Collector = () => import('@/views/plugin/collector/pages/Collector.vue');
 
 const CollectorPlugins = () => import('@/views/plugin/collector/pages/CollectorPlugins.vue');
-const CollectorCreator = () => import('@/views/plugin/collector/pages/CollectorCreator.new.vue');
+const CollectorCreator = () => import('@/views/plugin/collector/pages/CollectorCreator.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {
