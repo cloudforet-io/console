@@ -77,15 +77,15 @@ export default {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 0 .875rem;
-    cursor:pointer;
+    padding: 0 0.875rem;
+    cursor: pointer;
     border-radius: 2px;
     opacity: 1;
-    min-width:6rem;
+    min-width: 6rem;
     height: 2rem;
     text-align: center;
     letter-spacing: 0;
-    font-size: .875rem;
+    font-size: 0.875rem;
     line-height: 2rem;
     border: 1px solid transparent;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -97,7 +97,7 @@ export default {
     &.disabled {
         @apply bg-gray-200 text-gray-400 border-gray-100;
         background-color: theme('colors.gray.100') !important;
-        border-color: theme('colors.gray.300') !important;
+        border-color: theme('colors.gray.200') !important;
         color: theme('colors.gray.400') !important;
         background-repeat: no-repeat;
         background-clip: padding-box;
