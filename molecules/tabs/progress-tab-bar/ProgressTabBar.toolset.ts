@@ -12,10 +12,6 @@ export const progressTabBarProps = {
         type: Object,
         default: () => ({}),
     },
-    progressState: {
-        type: Object,
-        default: () => ({}),
-    },
 };
 
 export interface ProgressTab {
@@ -32,5 +28,4 @@ export interface ProgressTabBarProps {
     tabs: ProgressTab[];
     activeIdx: number;
     invalidState: State;
-    progressState: State;
 }

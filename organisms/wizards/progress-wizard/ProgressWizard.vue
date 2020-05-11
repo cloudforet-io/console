@@ -1,14 +1,10 @@
 <template>
     <p-pane-layout class="p-progress-wizard">
-        <header v-if="title" class="title">
-            {{ title }}
-        </header>
         <slot name="top">
             <slot name="progress">
                 <p-progress-tab-bar :tabs="tabs"
                                     :active-idx.sync="proxyActiveIdx"
                                     :invalid-state="invalidState"
-                                    :progress-state="progressState"
                                     @changeTab="onChangeTab"
                 >
                     <template v-for="(tab) in tabs" :slot="`progress-${tab.name}`">
@@ -34,17 +30,16 @@
         </slot>
 
         <template v-if="activeTab">
-            <p-panel-top class="step-title">
-                <template>
-                    Step {{ proxyActiveIdx + 1 }}. {{ activeTab.label || activeTab.name }}
+            <div class="step-head">
+                <div class="step-title">
+                    <span class="step">Step {{ proxyActiveIdx + 1 }}.</span>
+                    <span>{{ activeTab.label || activeTab.name }}</span>
                     <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
-                </template>
-                <template #extra>
-                    <div class="step-appendix">
-                        <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />
-                    </div>
-                </template>
-            </p-panel-top>
+                </div>
+                <div class="step-appendix">
+                    <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />
+                </div>
+            </div>
             <div class="contents">
                 <keep-alive>
                     <slot :name="`contents-${activeTab.name}`" :tab="activeTab" />
@@ -86,13 +81,12 @@
 
 <script lang="ts">
 import {
-    ref, toRefs, reactive, computed,
+    toRefs, reactive, computed,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import {
@@ -134,7 +128,6 @@ export default {
     components: {
         PPaneLayout,
         PProgressTabBar,
-        PPanelTop,
         PI,
         PButton,
     },
@@ -173,23 +166,32 @@ export default {
 <style lang="postcss" scoped>
 .p-progress-wizard {
     padding: 1.5rem 1rem 1rem 1rem;
-    .title {
-        font-size: 1.5rem;
-        padding-bottom: 1rem;
-    }
-    .step-title {
+    .step-head {
+        @apply flex w-full border-b border-gray-200 pb-3;
         margin-top: 2.375rem;
+        .step-title {
+            @apply font-bold text-lg;
+            line-height: 120%;
+        }
+        .step {
+            @apply font-normal mr-4;
+        }
         .optional {
             font-style: italic;
         }
     }
+    .step-appendix {
+        display: flex;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
     .caution {
         display: flex;
         align-items: center;
-        font-size: .875rem;
+        font-size: 0.875rem;
         padding-top: 1rem;
         .p-i-icon {
-            margin-right: .5rem;
+            margin-right: 0.5rem;
         }
         &.warning {
             @apply text-coral;
@@ -200,11 +202,6 @@ export default {
     }
     .contents {
         min-height: 360px;
-    }
-    .step-appendix {
-        display: flex;
-        flex-grow: 1;
-        justify-content: flex-end;
     }
     .bottom {
         display: flex;
