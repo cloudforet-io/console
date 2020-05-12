@@ -3,8 +3,8 @@
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
-                               :repositories="repositories"
-                               :selected-repo-id.sync="selectedRepoId"
+                               :repositories="repoState.repositories"
+                               :selected-repo-id.sync="repoState.selectedRepoId"
                                @goBack="goBack"
                                @search="search"
                                @repoChange="listPlugins"
@@ -14,15 +14,15 @@
         </template>
         <template #default>
             <p-toolbox-card-list class="card-list"
-                                 :items="plugins"
-                                 :mapper="pluginMapper"
-                                 :loading="loading"
-                                 title="Plugins"
-                                 :sort-menu="sortMenu"
-                                 :sort-by-idx.sync="sortByIdx"
-                                 :this-page.sync="thisPage"
-                                 :page-size="pageSize"
-                                 :total-count="totalCount"
+                                 :items="cardListTS.state.items"
+                                 :mapper="cardListTS.state.mapper"
+                                 :loading="cardListTS.state.loading"
+                                 :title="cardListTS.state.title"
+                                 :sort-menu="cardListTS.state.sortMenu"
+                                 :sort-by.sync="cardListTS.syncState.sortBy"
+                                 :this-page.sync="cardListTS.syncState.thisPage"
+                                 :page-size="cardListTS.state.pageSize"
+                                 :total-count="cardListTS.state.totalCount"
                                  @pageChange="listPlugins"
                                  @sortChange="listPlugins"
             >
@@ -37,20 +37,18 @@
                     <span class="plugin-name">{{ item.name }}</span><span class="beta">{{ isBeta(item) ? 'BETA': '' }}</span>
                 </template>
                 <template #card-extra="{item}">
-                    <p-row style="height: 100%;">
-                        <p-col>
-                            <template v-if="item.labels">
-                                <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray100"
-                                         style="margin-right: .5rem;"
-                                >
-                                    {{ label }}
-                                </p-badge>
-                            </template>
-                        </p-col>
-                        <p-col :flex-grow="0" align-self="flex-end">
-                            <p-row>
+                    <div class="flex h-full w-full">
+                        <div v-if="item.labels" class="flex-grow">
+                            <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray100"
+                                     class="mr-2"
+                            >
+                                {{ label }}
+                            </p-badge>
+                        </div>
+                        <div class="flex-grow-0 self-end">
+                            <div class="flex">
                                 <p-dropdown-menu-btn :menu="versionsMenu[item.plugin_id]"
-                                                     style="margin-right: 1.25rem;"
+                                                     class="mr-5"
                                                      :loading="versionsMenu[item.plugin_id] ? false : true"
                                                      @openMenu="listVersions(item.plugin_id)"
                                                      @clickMenuEvent="onSelectVersion(item.plugin_id, $event)"
@@ -63,159 +61,161 @@
                                     />
                                     {{ $t('BTN.CREATE') }}
                                 </p-button>
-                            </p-row>
-                        </p-col>
-                    </p-row>
+                            </div>
+                        </div>
+                    </div>
                 </template>
             </p-toolbox-card-list>
         </template>
     </p-vertical-page-layout2>
 </template>
 
-<script>
+<script lang="ts">
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
-import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import _ from 'lodash';
 
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PToolboxCardList from '@/components/organisms/lists/toolbox-card-list/PToolboxCardList.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { tagList } from '@/components/molecules/tags/toolset';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
-import { defaultQuery } from '@/lib/api/query';
+import { ToolboxCardListToolSet } from '@/components/organisms/lists/toolbox-card-list/PToolboxCardList.toolset';
+import { FilterItem, fluentApi } from '@/lib/fluent-api';
+import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
 
 const repoState = reactive({
-    repositories: [],
-    selectedRepoId: undefined,
+    repositories: [] as unknown as RepositoryModel[],
+    selectedRepoId: undefined as unknown as string,
 });
 
-const setPluginList = (router) => {
+const makeVersionMenu = v => (typeof v === 'object' ? v : { type: 'item', label: v, name: v });
+
+
+export const setup = (props, { root }) => {
+    const filterTools = tagList();
+
     const state = reactive({
-        plugins: [],
-        loading: true,
-        pluginMapper: {
+        versions: {},
+        selectedVersions: {},
+        versionsMenu: computed(() => {
+            const res = {};
+            _.forEach(state.versions, (versionList: string[], pid) => {
+                res[pid] = versionList.map(v => makeVersionMenu(v));
+            });
+            return res;
+        }),
+        searchText: '',
+        searchQueries: computed<FilterItem[]>(() => filterTools.tags.map(filter => ({ key: 'labels', operator: '=', value: filter }))),
+    });
+
+    const cardListTS = new ToolboxCardListToolSet({
+        sortMenu: [
+            { type: 'item', label: 'Name', name: 'name' },
+            { type: 'item', label: 'Recent', name: 'created_at' },
+        ],
+        mapper: {
             key: 'plugin_id',
             icon: 'tags.icon',
             title: 'name',
             contents: 'tags.description',
         },
-        totalCount: 0,
-        thisPage: 1,
-        pageSize: 10,
-        sortMenu: [
-            { type: 'item', label: 'Name', name: 'name' },
-            { type: 'item', label: 'Recent', name: 'created_at' },
-        ],
-        sortByIdx: 0,
-        sortBy: undefined,
-        versions: {},
-        selectedVersions: {},
+        title: 'Plugins',
+    }, {
+        sortBy: 'name',
     });
 
-    const isBeta = item => _.get(item, 'tags.beta', '');
+    const pluginApi = fluentApi.repository().plugin();
 
-    const makeVersionMenu = v => (typeof v === 'object' ? v : { type: 'item', label: v, name: v });
-    const versionsMenu = computed(() => {
-        const res = {};
-        _.forEach(state.versions, (vlist, pid) => {
-            res[pid] = vlist.map(v => makeVersionMenu(v));
-        });
-        return res;
-    });
+    const listPlugins = async () => {
+        cardListTS.state.loading = true;
+        try {
+            const res = await pluginApi.list()
+                .setRepositoryId(repoState.selectedRepoId)
+                .setServiceType('inventory.Collector')
+                .setSortBy(cardListTS.syncState.sortBy as string)
+                .setPageSize(cardListTS.state.pageSize)
+                .setThisPage(cardListTS.syncState.thisPage)
+                .setKeyword(state.searchText)
+                .setFilter(...state.searchQueries as unknown as FilterItem[])
+                .execute();
 
-    const listPlugins = () => {
-        CollectorEventBus.$emit('listPlugins');
+            cardListTS.state.items = res.data.results;
+            cardListTS.state.totalCount = res.data.total_count;
+            state.versions = {};
+            state.selectedVersions = {};
+        } catch (e) {
+            console.error(e);
+        } finally {
+            cardListTS.state.loading = false;
+        }
+    };
+
+    const listRepositories = async () => {
+        try {
+            const res = await fluentApi.repository().repository().list()
+                .setSortBy('repository_type')
+                .execute();
+            repoState.repositories = res.data.results;
+            repoState.selectedRepoId = res.data.results[0].repository_id;
+            await listPlugins();
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const onPluginCreate = (item) => {
         let path = `./collector-creator/${item.plugin_id}`;
         if (state.selectedVersions[item.plugin_id]) path += `?version=${state.selectedVersions[item.plugin_id]}`;
 
-        router.push({ path });
+        root.$router.push({ path });
     };
 
-    const listVersions = (pluginId) => {
+    const listVersions = async (pluginId: string) => {
         if (state.versions[pluginId]) return;
-        CollectorEventBus.$emit('listVersions', pluginId);
+        try {
+            const res = await pluginApi.getVersions()
+                .setId(pluginId)
+                .execute();
+            state.versions = { ...state.versions, [pluginId]: res.data.results };
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const onSelectVersion = (pluginId, e) => {
         state.selectedVersions = { ...state.selectedVersions, [pluginId]: e };
     };
 
-    CollectorEventBus.$emit('listPluginsInit');
+    listRepositories();
 
     return {
         ...toRefs(state),
-        isBeta,
-        versionsMenu,
+        repoState,
         listPlugins,
         onPluginCreate,
         listVersions,
         onSelectVersion,
-    };
-};
-
-
-const setFilters = (pluginListState, router) => {
-    const filterTools = tagList();
-    const searchText = ref('');
-
-    return {
+        cardListTS,
         filterTools,
-        searchText,
         goBack: () => {
-            router.push('/plugin/collector');
+            root.$router.push('/plugin/collector');
         },
         search: (val) => {
-            searchText.value = val;
-            pluginListState.listPlugins();
+            state.searchText = val;
+            listPlugins();
         },
         onDeleteTag: (idx) => {
             filterTools.deleteTag(idx);
-            pluginListState.listPlugins();
+            listPlugins();
         },
-    };
-};
-
-const setQueryState = (state) => {
-    const queryState = reactive({
-        query: computed(() => (defaultQuery(
-            state.thisPage, state.pageSize,
-            state.sortBy, true,
-            state.searchText, queryState.searchQueries,
-        ))),
-        searchQueries: computed(() => state.filterTools.tags.map(filter => new SearchQuery('labels', '=', filter))),
-        sortBy: computed(() => state.sortMenu[state.sortByIdx].name),
-    });
-
-    return queryState;
-};
-
-export const setup = (props, { root }) => {
-    const pluginListState = setPluginList(root.$router);
-    const filterState = setFilters(pluginListState, root.$router);
-
-    const allState = reactive({
-        ...filterState,
-        ...pluginListState,
-    });
-
-    const queryState = setQueryState(allState);
-
-    return {
-        ...toRefs(allState),
-        ...toRefs(queryState),
-        ...toRefs(repoState),
-
+        isBeta: item => _.get(item, 'tags.beta', ''),
     };
 };
 
@@ -223,8 +223,6 @@ export default {
     name: 'CollectorPlugins',
     components: {
         PVerticalPageLayout2,
-        PRow,
-        PCol,
         PToolboxCardList,
         PBadge,
         PButton,
@@ -246,10 +244,10 @@ export default {
     padding-bottom: 2.25rem;
     .beta {
         @apply text-coral;
-        font-size: .5rem;
+        font-size: 0.5rem;
         font-weight: bold;
         vertical-align: super;
-        margin-left: .2rem;
+        margin-left: 0.2rem;
     }
 }
 </style>
