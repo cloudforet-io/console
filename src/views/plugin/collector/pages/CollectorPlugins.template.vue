@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="200" :init-width="260">
+    <p-vertical-page-layout :min-width="200" :init-width="260">
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -69,7 +69,7 @@
                 </template>
             </p-toolbox-card-list>
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script>
@@ -90,7 +90,7 @@ import PTag from '@/components/molecules/tags/Tag.vue';
 import { tagList } from '@/components/molecules/tags/toolset';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import {defaultQuery} from "@/lib/api/query";
 
 const repoState = reactive({
@@ -223,7 +223,7 @@ export const setup = (props, { root }) => {
 export default {
     name: 'CollectorPluginsTemplate',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PRow,
         PCol,
         PToolboxCardList,

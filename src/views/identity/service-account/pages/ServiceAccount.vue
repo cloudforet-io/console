@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
+    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <p-grid-layout
                 class="provider-list"
@@ -162,7 +162,7 @@
                                     @confirm="secretFormConfirm($event)"
             />
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
@@ -170,7 +170,7 @@
 import {
     computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -208,7 +208,7 @@ import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynami
 export default {
     name: 'ServiceAccount',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PHorizontalLayout,
         PTab,
         PButton,

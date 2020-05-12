@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
+    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <p-grid-layout
                 class="provider-list"
@@ -114,7 +114,7 @@
                 </PToolboxGridLayout>
             </div>
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
@@ -123,7 +123,7 @@
 import {
     computed, getCurrentInstance, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
@@ -147,7 +147,7 @@ import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 export default {
     name: 'ServiceAccount',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PCheckBox,
         PI,
         PHr,
