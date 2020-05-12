@@ -1,11 +1,11 @@
 import { action } from '@storybook/addon-actions';
 import { autoProps } from '@sb/storybook-util';
 import { ref, reactive, toRefs } from '@vue/composition-api';
-import mockup from '@/components/molecules/tree/Tree.mockup';
-import PTree from '@/components/molecules/tree/Tree';
+import mockup from '@/components/molecules/tree_origin/Tree.mockup';
+import PTree from '@/components/molecules/tree_origin/Tree_origin';
 
 export default {
-    title: 'molecules/tree',
+    title: 'molecules/tree_origin',
     component: PTree,
     parameters: {
         info: {
@@ -28,10 +28,10 @@ const actions = context => ({
         tree.insert(path, { data: { title: 'test!', isLeaf: true, data: { visible: false } } });
         //
         // childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');
-        // tree.updateNode(path, { data: dataParam });
+        // tree_origin.updateNode(path, { data: dataParam });
         // if (!this.isEmpty(childrenNode)) {
         //     childrenNode.forEach((curItem) => {
-        //         tree.insert({ node: selected, placement: 'inside' }, curItem);
+        //         tree_origin.insert({ node: selected, placement: 'inside' }, curItem);
         //     });
         // }
         // action('toggle')
