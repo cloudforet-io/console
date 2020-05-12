@@ -73,7 +73,7 @@ import {
 } from '@/views/common/widgets/resources-by-region/ResourcesByRegion.toolset';
 
 export default defineComponent({
-    name: 'ServiceAccounts',
+    name: 'ResourcesByRegion',
     components: {
         PWidgetLayout,
         PLazyImg,
