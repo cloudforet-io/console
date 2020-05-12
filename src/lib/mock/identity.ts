@@ -2,6 +2,7 @@
 import { makeArrayResults, MockData } from '@/lib/mock/toolset';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/lib/mock/casual';
+import _ from 'lodash';
 
 export const DOMAIN_INFO = {
     domain_id: 'domain_test_id',
@@ -21,17 +22,17 @@ const providerList = [
         template: {
             service_account: {
                 schema: {
-                    properties: {
-                        account_id: {
-                            minLength: 4,
-                            type: 'string',
-                            title: 'Account ID',
-                        },
-                    },
-                    type: 'object',
                     required: [
                         'account_id',
                     ],
+                    properties: {
+                        account_id: {
+                            title: 'Account ID',
+                            minLength: 4,
+                            type: 'string',
+                        },
+                    },
+                    type: 'object',
                 },
             },
         },
@@ -42,13 +43,30 @@ const providerList = [
             ],
         },
         tags: {
+            external_link_template: 'https://{{data.account_id}}.signin.aws.amazon.com/console',
             color: '#FF9900',
             icon: 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws.svg',
-            external_link_template: 'https://{{data.account_id}}.signin.aws.amazon.com/console',
+        },
+        metadata: {
+            view: {
+                layouts: {
+                    'help:service_account:create': {
+                        name: 'Creation Help',
+                        type: 'markdown',
+                        options: {
+                            markdown: {
+                                // eslint-disable-next-line max-len
+                                en: '### Finding Your AWS Account ID\nYou can find your account ID in the AWS Management Console, or using the AWS CLI or AWS API.\n### Finding your account ID (Console)\nIn the navigation bar, choose **Support**, and then **Support Center**. Your currently signed-in 12-digit account number (ID) appears in the **Support Center** title bar.\n### Finding your account ID (AWS CLI)\nTo view your user ID, account ID, and your user ARN:* [aws sts get-caller-identity](https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html)\n### Finding your account ID (AWS API)\nTo view your user ID, account ID, and your user ARN:* [GetCallerIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html)\n### References\n* [AWS Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html)',
+                            },
+                        },
+                    },
+
+                },
+            },
         },
         created_at: {
-            seconds: '1585897816',
-            nanos: 960000000,
+            seconds: '1589165566',
+            nanos: 858000000,
         },
     },
     {
@@ -79,7 +97,8 @@ const providerList = [
         },
         capability: {
             supported_schema: [
-                'google_application_credentials',
+                'google_api_key',
+                'google_oauth_client_id',
             ],
         },
         tags: {
@@ -87,8 +106,8 @@ const providerList = [
             icon: 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/google_cloud.svg',
         },
         created_at: {
-            seconds: '1585897816',
-            nanos: 966000000,
+            seconds: '1589165566',
+            nanos: 864000000,
         },
     },
     {
@@ -98,14 +117,20 @@ const providerList = [
             service_account: {
                 schema: {
                     properties: {
-                        subscription_id: {
-                            title: 'Subscription ID',
+                        tenant_id: {
                             minLength: 4,
                             type: 'string',
+                            title: 'Tenant ID',
+                        },
+                        subscription_id: {
+                            minLength: 4,
+                            type: 'string',
+                            title: 'Subscription ID',
                         },
                     },
                     type: 'object',
                     required: [
+                        'tenant_id',
                         'subscription_id',
                     ],
                 },
@@ -117,12 +142,12 @@ const providerList = [
             ],
         },
         tags: {
-            icon: 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/azure.svg',
             color: '#00BCF2',
+            icon: 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/azure.svg',
         },
         created_at: {
-            seconds: '1585897816',
-            nanos: 972000000,
+            seconds: '1589165566',
+            nanos: 870000000,
         },
     },
 ];
@@ -131,7 +156,12 @@ export default [
     new MockData('/identity/domain/list', () => (makeArrayResults([DOMAIN_INFO]))),
     new MockData('/identity/service-account/list', () => makeArrayResults(arrayOf(15, casual._serviceAccount), 20)),
     new MockData('/identity/provider/list', () => makeArrayResults(providerList)),
-
+    new MockData('/identity/provider/get', (req) => {
+        console.debug(req);
+        const params: any = JSON.parse(req.data);
+        const provider: any = _.get(params, 'provider');
+        return _.find(providerList, { provider });
+    }),
     new MockData('/identity/user/get', () => USER_INFO),
     new MockData('/identity/domain-owner/get', () => USER_INFO),
     new MockData('/identity/token/issue', () => ({

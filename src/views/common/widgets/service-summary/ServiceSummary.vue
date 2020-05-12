@@ -99,9 +99,7 @@ export default defineComponent({
             }
         };
 
-        setTimeout(() => {
-            getData();
-        }, 1000);
+        getData();
 
         return {
             ...toRefs(ts.state),

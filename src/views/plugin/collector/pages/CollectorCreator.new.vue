@@ -1,12 +1,14 @@
 <template>
     <general-page-layout>
-        <p-button class="back-btn" @click="goBackToCollectors">
-            <p-i name="ic_back" color="transparent inherit" />
-            {{ $t('INVENTORY.BACK_COL') }}
-        </p-button>
+        <p-icon-text-button name="ic_back" class="text-2xl mb-6 p-0"
+                            icon-color="transparent inherit"
+                            width="1.5rem" height="1.5rem"
+                            @click="goBackToCollectors"
+        >
+            {{ $t('INVENTORY.CRT_COLL') }}
+        </p-icon-text-button>
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
-                           :title="$t('INVENTORY.CRT_COLL')"
                            :confirm-btn-bind="tabState.confirmBtnBind"
                            :invalid-state="tabState.invalidState"
                            @cancel="onCancel"
@@ -24,11 +26,11 @@
                 />
             </template>
             <template #contents-credentials>
-                <confirm-credentials :provider="provider" :supported-schema="supportedSchema" />
+                <confirm-credentials :provider="provider" :supported-schema="supportedSchema" class="mt-8" />
             </template>
             <template #contents-tags>
                 <p-dict-input-group :dict.sync="tags" show-empty-input
-                                    edit-mode
+                                    edit-mode class="mt-8"
                 />
             </template>
         </p-progress-wizard>
@@ -47,44 +49,19 @@ import PProgressWizard from '@/components/organisms/wizards/progress-wizard/Prog
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { JsonSchemaObjectType } from '@/lib/type';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue');
 const ConfigureCollector = () => import('@/views/plugin/collector/modules/ConfigureCollector.vue');
 const ChooseCredentials = () => import('@/views/plugin/collector/modules/ChooseCredentials.vue');
 const ConfirmCredentials = () => import('@/views/plugin/collector/modules/ConfirmCredentials.vue');
 
-
-// const getConfState = root => reactive({
-//     pluginId: _.get(root, '$route.params.pluginId', ''),
-//     plugin: null,
-//     loading: true,
-//     name: '',
-//     versions: [],
-//     selectedVersion: _.get(root, '$route.query.version', ''),
-//     priority: 10,
-//     optionsValue: {},
-//     provider: '',
-//     pluginSchema: [],
-// });
-
-// export const setDataState = (root) => {
-//     const state = reactive({
-//         tags: {},
-//         confState: getConfState(root),
-//     });
-//     watch(() => state.confState.plugin, (plugin) => {
-//         const icon = _.get(plugin, 'tags.icon');
-//         if (icon) state.tags.icon = icon;
-//     });
-//     return state;
-// };
-
 export default {
     name: 'CollectorCreator',
     components: {
+        PIconTextButton,
         GeneralPageLayout,
-        PButton,
-        PI,
         PProgressWizard,
         ConfigureCollector,
         ConfirmCredentials,
@@ -224,12 +201,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-    .back-btn {
-        @apply text-primary2;
-        margin-bottom: 0.75rem;
-        text-align: left;
-        padding-left: 0;
-    }
-</style>
