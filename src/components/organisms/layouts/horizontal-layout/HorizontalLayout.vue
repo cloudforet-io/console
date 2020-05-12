@@ -105,35 +105,25 @@ export default {
 
 <style lang="postcss" scoped>
     .dragger-container {
-        position: relative;
-        margin-top: 13px;
-        padding-bottom: 30px;
+        @apply relative mt-4 pb-7;
         .line {
-            position: absolute;
-            display: inline-block;
-            border-bottom: 1px solid;
+            @apply absolute inline-block border-b;
             border-color: transparent;
             &.colored {
                 @apply border-gray;
             }
             &.left {
-                left: 0;
+                @apply left-0;
             }
         }
         .dragger {
-            position: absolute;
-            top: 1px;
+            @apply absolute inline-block text-gray-300 top-0 text-2xl items-center;
             left: 50%;
             transform: translate(-50%, -50%);
-            display: inline-block;
-            font-size: 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            cursor: row-resize;
-            color: inherit;
-        }
-        &:active {
-            cursor: row-resize;
+            &:hover, &:active{
+                @apply text-gray-900;
+                cursor: row-resize;
+            }
         }
     }
 </style>

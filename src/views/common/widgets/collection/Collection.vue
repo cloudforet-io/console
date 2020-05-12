@@ -13,13 +13,13 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLa
 import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
 import SCollectingRuns from '@/views/common/widgets/collecting-runs/SCollectingRuns.vue';
 
-export default defineComponent({
+export default {
     name: 'Collection',
     components: { PWidgetLayout, SCollectionHistory, SCollectingRuns },
     setup() {
         return {};
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

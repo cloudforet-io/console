@@ -60,8 +60,8 @@ export interface CollectorCollectParameter {
     collect_mode?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filter?: any;
-    credential_id?: string;
-    credential_group_id?: string;
+    secret_id?: string;
+    secret_group_id?: string;
 }
 
 export interface CollectorCreateParameter extends Tags {

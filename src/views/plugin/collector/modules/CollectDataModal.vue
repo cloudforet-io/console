@@ -206,7 +206,7 @@ export default defineComponent({
                 .setId(props.collectorId)
                 .setCollectMode(state.selectedCollectMode as COLLECT_MODE);
             // if (!_.isEmpty(state.filters)) api.setFilters(state.filters);
-            if (props.credentialId) api.setCredentialId(props.credentialId);
+            if (props.credentialId) api.setSecretId(props.credentialId);
             return api;
         });
 
