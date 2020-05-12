@@ -79,6 +79,13 @@
                                     />
                                 </div>
                             </div>
+                            <div class="tool-right-checkbox">
+                                <div v-tooltip.bottom="{content: 'Show All Projects of Sub Project Groups', delay: {show: 500}}"
+                                     class="text-base truncate leading-tight"
+                                >
+                                    <PCheckBox v-model="showAllProjects" />  <span class="ml-3 leading-relaxed">Show All Projects</span>
+                                </div>
+                            </div>
                         </div>
                         <div v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
                             <p-hr style="width: 100%;" />
@@ -215,9 +222,10 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PSimpleIconButton from '@/components/molecules/buttons/SimpleIconButton.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import { fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
@@ -242,12 +250,12 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
     }
 
     interface State {
-        // item: any;
         items: ProjectCardData[];
         hoveredId: string;
         hoveredNode: any;
         hasChildProject: boolean;
         hasChildProjectGroup: boolean;
+        showAllProjects: boolean;
     }
 
 export default {
@@ -260,6 +268,7 @@ export default {
         PIconButton,
         PSimpleIconButton,
         PPageTitle,
+        PCheckBox,
         PQuerySearchBar,
         PQuerySearchTags,
         PSkeleton,
@@ -274,8 +283,10 @@ export default {
             items: [],
             hoveredId: '',
             hoveredNode: {},
+            selectedGroupId: '',
             hasChildProject: true,
             hasChildProjectGroup: true,
+            showAllProjects: ref(false),
         });
         const projectState = reactive({
             parentGroup: '',
@@ -330,8 +341,21 @@ export default {
         const createdData = reactive({});
         const cardSummary = ref(createdData);
         const projectSummary = ref(createdData);
-        // @ts-ignore
-        const getSubProject = (action: any) => action.setFilter({ key: 'project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id });
+
+        const setProvider = (resp) => {
+            const temp = resp.data.results.map((it) => {
+                const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
+                const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
+                return {
+                    ...it,
+                    force_console_data: {
+                        extraProviders,
+                        providers: providers.splice(0, 5),
+                    },
+                };
+            });
+            return temp;
+        };
 
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
             if (resp.data.results.length !== 0) {
@@ -345,24 +369,17 @@ export default {
                         cardSummary.value[project_id] = item;
                     });
                 };
-                getSubProject(statisticsAPI).execute().then((rp) => {
+                statisticsAPI.setFilter({
+                    key: 'project_id',
+                    value: ids,
+                    operator: FILTER_OPERATOR.in,
+                }).execute().then((rp) => {
                     if (rp.data?.results) {
                         setCard(rp.data.results);
                     }
                 });
             }
-            const temp = resp.data.results.map((it) => {
-                const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
-                const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
-                return {
-                    ...it,
-                    force_console_data: {
-                        extraProviders,
-                        providers: providers.splice(0, 5),
-                    },
-                };
-            });
-            resp.data.results = temp;
+            resp.data.results = setProvider(resp);
             projectSummary.value = resp.data.results;
             return resp;
         };
@@ -371,8 +388,9 @@ export default {
          * QuerySearch Grid Fluent API Declaration
          * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
          */
+        const listAction = projectGroupAPI.listProjects().setTransformer(getCard).setIncludeProvider();
 
-        const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
+        const isShow = computed(() => treeApiHandler.ts.metaState.firstSelectedNode);
 
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
@@ -389,24 +407,31 @@ export default {
                     suggestKeys: [],
                 },
             },
-            computed(() => treeApiHandler.ts.metaState.firstSelectedNode),
+            isShow,
         );
 
-        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
-            if ((after && !before) || (after && after.data.id !== before.data.id)) {
-                apiHandler.action = listAction.setFixFilter({
-                    key: 'project_group_id',
-                    value: after.data.id,
-                    operator: '=',
-                });
-                apiHandler.resetAll();
-                const resp = await apiHandler.getData();
-                state.hasChildProject = true;
-                const projectTotal = resp?.data?.total_count;
-                if (projectTotal > 0) state.hasChildProject = true;
-                else state.hasChildProject = false;
-            }
-        });
+        /**
+         * Check Child Project(Group)
+         * */
+        const checkChildProject = (resp) => {
+            const projectTotal = resp?.data?.total_count;
+            if (projectTotal > 0) state.hasChildProject = true;
+            else state.hasChildProject = false;
+        };
+
+        const checkChildProjectGroup = async () => {
+            const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
+            if (resp.data.total_count > 0) state.hasChildProjectGroup = true;
+            else state.hasChildProjectGroup = false;
+        };
+
+        /**
+         * Set Page Title
+         * */
+        const setProjectState = (item) => {
+            projectState.currentGroup = item.data.name;
+            if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
+        };
 
         /**
          * Click or Hover Tree Item
@@ -414,15 +439,28 @@ export default {
         const selected = async (item) => {
             formState.isRoot = false;
             treeApiHandler.ts.getSelectedNode(item);
-            projectState.currentGroup = item.data.name;
-            if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
-            state.hasChildProjectGroup = true;
-            // @ts-ignore
-            const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
-            if (resp.data.total_count > 0) state.hasChildProjectGroup = true;
-            else state.hasChildProjectGroup = false;
-            state.items = [];
+            setProjectState(item);
+            await checkChildProjectGroup();
         };
+
+        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
+            state.showAllProjects = false;
+            if ((after && !before) || (after && after.data.id !== before.data.id)) {
+                apiHandler.action = listAction.setId(after.data.id);
+                apiHandler.resetAll();
+                const resp = await apiHandler.getData();
+                checkChildProject(resp);
+            }
+        });
+
+        watch(() => state.showAllProjects, async (after: boolean, before: boolean) => {
+            if (isShow.value && after !== before) {
+                apiHandler.action = apiHandler.action.setRecursive(after);
+                apiHandler.resetAll();
+                const resp = await apiHandler.getData();
+                checkChildProject(resp);
+            }
+        });
 
         const hovered = async (item) => {
             formState.isRoot = false;
@@ -501,7 +539,6 @@ export default {
             let projectGroupId;
             if (formState.isRoot) projectGroupId = null;
             else projectGroupId = state.hoveredId;
-            // treeApiHandler.ts.metaState.firstSelectedNode.data.id
             fluentApi.identity().projectGroup().create().setParameter({
                 parent_project_group_id: projectGroupId,
                 ...item,
@@ -695,6 +732,9 @@ export default {
                     @apply max-w-lg;
                 }
             }
+        }
+        .tool-right-checkbox {
+            @apply whitespace-no-wrap self-end;
         }
     }
 
