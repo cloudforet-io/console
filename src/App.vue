@@ -47,13 +47,13 @@ export default defineComponent({
             try {
                 await configInit();
                 if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), vm);
+                setGtagUserID(vm);
             } catch (e) {
                 console.error(e);
                 if (!config.config.NO_SERVER_MODE) {
                     vm.$router.push({ path: '/error-page' });
                 }
             }
-            setGtagUserID(vm.$gtag);
             state.loading = false;
         };
         preparationTo();
