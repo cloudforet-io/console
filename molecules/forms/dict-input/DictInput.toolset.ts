@@ -1,14 +1,12 @@
 import {
-    computed, Ref,
+     Ref,
 } from '@vue/composition-api';
 import VueI18n from 'vue-i18n';
 
-import _ from 'lodash';
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
-import { i18n } from '@/translations';
 
 interface DictInputType {
     keyInvalid?: boolean;
