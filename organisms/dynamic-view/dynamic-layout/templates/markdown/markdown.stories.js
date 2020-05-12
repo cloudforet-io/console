@@ -170,17 +170,7 @@ const data = {
     },
 };
 const doc = `
----
-__Advertisement :)__
-
-- __[pica](https://nodeca.github.io/pica/demo/)__ - high quality and fast image
-  resize in browser.
-- __[babelfish](https://github.com/nodeca/babelfish/)__ - developer friendly
-  i18n with plurals support and easy syntax.
-
-You will like those projects!
-
----
+## Header
 
 # h1 Heading 8-)
 ## h2 Heading
@@ -192,9 +182,15 @@ You will like those projects!
 
 ## Horizontal Rules
 
+bar 1
+
 ___
 
+bar 2
+
 ---
+
+bar 3
 
 ***
 
@@ -215,9 +211,9 @@ _This is italic text_
 
 ## Blockquotes
 
+> Blockquotes!!!
 
-> Blockquotes can also be nested...
-
+> > nested Blockquotes
 
 
 ## Lists
@@ -302,7 +298,7 @@ Right aligned columns
 
 ![Minion](https://octodex.github.com/images/minion.png)
 
-![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat")
+![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg)
 
 
 `;
