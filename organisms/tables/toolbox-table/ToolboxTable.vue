@@ -220,7 +220,7 @@ export default {
     }
 
     .toolbox-table {
-        @apply overflow-y-auto;
+        @apply overflow-visible;
         &.background {
             @apply bg-white;
         }

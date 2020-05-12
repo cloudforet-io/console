@@ -60,7 +60,7 @@ export default {
 
 <style lang="postcss">
 .p-mark-down{
-    @apply w-full border-black;
+    @apply w-full border-black text-gray-900 ;
     table{
         td,th{
             @apply px-4 py-2;
@@ -83,26 +83,25 @@ export default {
         }
     }
     a {
-        @apply text-blue-600 underline;
+        @apply text-blue-600;
+        &:hover{ @apply underline; }
     }
     code{
         @apply bg-gray-200 rounded-sm px-1;
         font-family: courier, monospace;
-
     }
     pre{
         code{
             all: inherit;
         }
-
     }
     ul{
         @apply list-disc block;
-        margin-block-start: 1em;
-        margin-block-end: 1em;
+        margin-block-start: .5rem;
+        margin-block-end: .5rem;
         margin-inline-start: 0px;
         margin-inline-end: 0px;
-        padding-inline-start: 40px;
+        padding-inline-start: 2rem;
 
         ul{
             list-style: circle;
@@ -110,35 +109,34 @@ export default {
     }
     ol{
         @apply block list-decimal ;
-        margin-block-start: 1em;
-        margin-block-end: 1em;
+        margin-block-start: .5rem;
+        margin-block-end: .5rem;
         margin-inline-start: 0px;
         margin-inline-end: 0px;
-        padding-inline-start: 40px;
+        padding-inline-start: 2rem;
     }
-    h1, h2, h3, h4, h5, h6{
-        @apply font-bold mb-1;
-        line-height: 100%;
+    h1, h2, h3, h4 {
+        @apply font-bold ;
     }
     h1{
-        @apply text-3xl  mt-8 ;
+        @apply text-3xl mb-4 mt-8;
     }
     h2{
-        @apply text-2xl  mt-6 ;
+        @apply text-2xl mb-3 mt-8;
     }
     h3{
-        @apply text-xl  mt-4 ;
+        @apply text-xl mb-2 mt-8;
     }
     h4{
-        @apply text-sm  mt-2 ;
+        @apply text-base mb-2 mt-5;
     }
-    h5,h6{
-        @apply text-xs ;
+    h5, h6{
+        @apply text-base mb-2 mt-5 ;
+    }
+    p, ul > li, ol >li{
+        @apply text-sm leading-tight ;
     }
 
-    p{
-        @apply my-2;
-    }
 }
 
 

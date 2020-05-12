@@ -98,7 +98,7 @@ export default defineComponent({
     width: auto;
     overflow: hidden;
     margin: 2rem;
-    min-height: 480px;
+    min-height: 30rem;
     max-height: calc(100vh - 4rem);
     width: 100vw;
     &.scrollable {
