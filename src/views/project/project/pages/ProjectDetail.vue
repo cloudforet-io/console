@@ -1,13 +1,11 @@
 <template>
     <general-page-layout>
         <div class="top">
-            <div class="project-info">
-                <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
-                <p-icon-button name="ic_transhcan"
-                               width="1.5rem" height="1.5rem" class="ml-3 cursor-pointer delete-btn"
-                               @click="openProjectDeleteForm"
-                />
-            </div>
+            <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})"/>
+            <p-icon-button name="ic_transhcan"
+                           width="1.5rem" height="1.5rem" class="delete-btn"
+                           @click="openProjectDeleteForm"
+            />
         </div>
         <PTab :tabs="tabs" :active-tab.sync="activeTab" :style="{'background':'#f8f8fc', 'border-width':0+'px'}">
             <template #summary>
@@ -345,8 +343,11 @@ export default {
             @apply text-2xl;
         }
          &::v-deep .extra {
-            @apply text-base text-gray-400 mt-1;
+              @apply text-base text-gray-400 mt-1;
           }
+    }
 
+    .delete-btn {
+        @apply ml-3 -mt-3 cursor-pointer;
     }
 </style>
