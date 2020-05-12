@@ -173,17 +173,18 @@ export default {
         padding: 0;
         border-radius: 2px;
         margin: 0;
-        min-width: 8.25rem;
+        min-width:100%;
         cursor: default;
         position: absolute;
-        top: 98%;
-        left: 0;
+        margin-top:-1px;
         z-index: 1000;
         float: left;
         text-align: left;
         list-style: none;
         background-clip: padding-box;
         display: block;
+        max-height:32rem;
+        overflow-y: auto;
 
         .context-divider {
             margin: 0;
@@ -224,4 +225,5 @@ export default {
             @mixin context-item-them gray900, theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'), theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
         }
     }
+
 </style>

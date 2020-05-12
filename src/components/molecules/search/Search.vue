@@ -91,7 +91,10 @@ export default {
         .p-search-btn {
             @apply flex-grow-0;
             .search-btn {
-                @apply min-w-8 p-2 h-full;
+                @apply min-w-8 p-0 h-full;
+                &:hover{
+                    @apply bg-blue-300;
+                }
             }
         }
         
