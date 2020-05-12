@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="200" :init-width="260">
+    <p-vertical-page-layout :min-width="200" :init-width="260">
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -67,7 +67,7 @@
                 </template>
             </p-toolbox-card-list>
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
@@ -85,7 +85,7 @@ import PTag from '@/components/molecules/tags/Tag.vue';
 import { tagList } from '@/components/molecules/tags/toolset';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { ToolboxCardListToolSet } from '@/components/organisms/lists/toolbox-card-list/PToolboxCardList.toolset';
 import { FilterItem, fluentApi } from '@/lib/fluent-api';
 import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
@@ -222,7 +222,7 @@ export const setup = (props, { root }) => {
 export default {
     name: 'CollectorPlugins',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PToolboxCardList,
         PBadge,
         PButton,

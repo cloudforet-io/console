@@ -1,7 +1,7 @@
 import { withKnobs, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '@sb/storybook-util';
-import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
+import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 
 export default {
     title: 'organisms/layouts/vertical-layout',
@@ -18,27 +18,55 @@ export default {
 export const defaultCase = () => ({
     components: { PVerticalLayout },
     props: {
-        ...autoProps(PVerticalLayout, {
-            height: {
-                default: text('height', '100vh'),
-            },
-        }),
     },
-    template: `<div style="border: 1px solid red; height: 100vh;">
-                   <p-vertical-layout v-bind="$props" >
-                        <template #leftContainer="{width}">
-                            <div :style="{width: width}">
-                                This is left Container.
-                            </div>
-                        </template>
-                        <template #rightContainer>
-                            This is right Container.
-                        </template>
-                    </p-vertical-layout>
-                </div>`,
-    methods: {
-        start: action('start'),
-        move: action('move'),
-        stop: action('stop'),
+    template: `<div style="width: 100vw; border: 1px solid gray;">
+        <p-vertical-layout>
+            <template #sidebar>
+                Left Layout
+            </template>
+            <template #default>
+                Right Layout
+            </template>
+        </p-vertical-layout>
+    </div>`,
+    setup() {
+
+    },
+});
+
+export const tableCase = () => ({
+    components: { PVerticalLayout, PToolboxTable },
+    props: {
+    },
+    template: `
+        <div style="width: 100vw; border: 1px solid gray;">
+            <p-vertical-layout :minWidth="435" :max-width="700" :initWidth="500">
+                <template #sidebar={width}>
+                    <p-toolbox-table
+                            style="width:100%;"
+                            :items="[]"
+                            :fields="['test','hellow']"
+                            :selectable="true"
+                            :shadow="false"
+                            :border="false"
+                            :padding="true"
+                            :dragable="false"
+                            :multi-select="false"
+                            :setting-visible="false"
+                            :sortable="true"
+                            :background="true"
+                            :toolbox-background="false"
+                    />
+                </template>
+                <template #default>
+                    Right Layout
+                </template>
+
+            </p-vertical-layout>
+        </div>`,
+    setup() {
+        return {
+
+        };
     },
 });

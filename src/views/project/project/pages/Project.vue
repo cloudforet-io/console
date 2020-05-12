@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
+    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <div class="h-full treeSidebar" :style="{width:width+'px'}">
                 <div class="tree-header">
@@ -203,7 +203,7 @@
                 </template>
             </p-button-modal>
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
@@ -211,7 +211,7 @@
 import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree';
 import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
@@ -259,9 +259,9 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
     }
 
 export default {
-    name: 'Project2',
+    name: 'Project',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PTree,
         PButton,
         PI,
