@@ -20,7 +20,7 @@ import { api } from '@/lib/api/axios';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
-import { GTag } from '@/lib/gtag';
+import { GTag, setGtagUserID } from '@/lib/gtag';
 
 export default defineComponent({
     name: 'App',
@@ -53,6 +53,7 @@ export default defineComponent({
                     vm.$router.push({ path: '/error-page' });
                 }
             }
+            setGtagUserID(vm.$gtag);
             state.loading = false;
         };
         preparationTo();
