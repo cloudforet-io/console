@@ -17,6 +17,7 @@ import ErrorPage from '@/views/common/error/ErrorPage.vue';
 
 const DynamicLayoutHelper = () => import('@/views/common/helper/DynamicLayoutHelper.vue');
 const QueryHelper = () => import('@/views/common/helper/QueryHelper.vue');
+const ApiMaker = () => import('@/views/common/helper/ApiMaker.vue');
 
 Vue.use(VueRouter);
 
@@ -95,6 +96,12 @@ const router = new VueRouter({
             path: '/helper/query',
             name: 'QueryHelper',
             component: QueryHelper,
+
+        },
+        {
+            path: '/helper/api',
+            name: 'ApiMaker',
+            component: ApiMaker,
 
         },
         { path: '*', component: ErrorPage },
