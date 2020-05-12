@@ -2,14 +2,15 @@ import { withKnobs, object, text } from '@storybook/addon-knobs/vue';
 import { ref, toRefs, reactive } from '@vue/composition-api';
 import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
-import PToolboxCardList from './ToolboxCardList';
-import PBadge from '@/components/atoms/badges/Badge';
-import PCol from '@/components/atoms/grid/col/Col';
-import PRow from '@/components/atoms/grid/row/Row';
-import PButton from '@/components/atoms/buttons/Button';
-import PI from '@/components/atoms/icons/PI';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
-import PTag, { tagList } from '@/components/molecules/tags/Tag';
+import PToolboxCardList from '@/components/organisms/lists/toolbox-card-list/PToolboxCardList.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { tagList } from '@/components/molecules/tags/toolset';
 
 export default {
     title: 'organisms/lists/ToolboxCardList',

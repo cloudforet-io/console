@@ -14,12 +14,10 @@
                                                @pageChange="onPageChange"
                             />
                         </span>
-                        <p-dropdown-menu-btn class="sort"
-                                             :menu="sortMenu"
-                                             @clickMenuEvent="onClickSortMenu"
-                        >
-                            Sort by {{ sortMenu[sortByIdx].label }}
-                        </p-dropdown-menu-btn>
+                        <p-select-dropdown class="sort" :select-item="sortBy" :items="sortMenu"
+                                           @input="updateSortBy"
+                                           @onSelected="onClickSortMenu"
+                        />
                     </div>
                 </slot>
             </slot>
@@ -50,19 +48,22 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
     computed, toRefs, reactive,
 } from '@vue/composition-api';
-import PCardList from '@/components/organisms/lists/card-list/CardList.vue';
+import PCardList from '@/components/organisms/lists/card-list/PCardList.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { makeProxy } from '@/lib/compostion-util';
+import _ from 'lodash';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import { toolboxCardListProps } from './PToolboxCardList.toolset';
 
 const setTools = (props, context) => {
     const state = reactive({
         allPage: computed(() => Math.ceil((props.totalCount || 1) / props.pageSize)),
         proxyThisPage: makeProxy('thisPage', props, context.emit),
+        proxySortBy: makeProxy('sortBy', props, context.emit),
     });
 
     const onPageChange = (page) => {
@@ -70,15 +71,21 @@ const setTools = (props, context) => {
         context.emit('pageChange', page);
     };
 
+    const updateSortBy = _.debounce((val) => {
+        context.emit('update:sortBy', val);
+    }, 200);
+
     const onClickSortMenu = (menu, idx) => {
-        context.emit('update:sortByIdx', idx);
-        context.emit('sortChange', idx);
+        // context.emit('update:sortByIdx', idx);
+        updateSortBy(menu);
+        context.emit('sortChange', menu);
     };
 
     return {
         ...toRefs(state),
         onPageChange,
         onClickSortMenu,
+        updateSortBy,
     };
 };
 
@@ -99,45 +106,14 @@ const setCardItems = (props, context) => {
 };
 
 export default {
-    name: 'ToolboxCardList',
+    name: 'PToolboxCardList',
     events: ['pageChange', 'sortChange'],
     components: {
+        PSelectDropdown,
         PCardList,
         PTextPagenation,
-        PDropdownMenuBtn,
     },
-    props: {
-        items: Array,
-        mapper: Object,
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        totalCount: {
-            type: Number,
-            default: 0,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        sortMenu: {
-            type: Array,
-            default: null,
-        },
-        thisPage: {
-            type: Number,
-            default: 1,
-        },
-        pageSize: {
-            type: Number,
-            default: 10,
-        },
-        sortByIdx: {
-            type: Number,
-            default: 0,
-        },
-    },
+    props: toolboxCardListProps,
     setup(props, context) {
         const toolState = setTools(props, context);
         const cardItemState = setCardItems(props, context);

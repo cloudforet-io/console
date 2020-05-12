@@ -19,59 +19,6 @@ import {
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-/**
- * @description Generate tools for using tag badge as a list
- * @param proxyTags {Array<String>}
- * @param checkDuplicate {Boolean}
- * @param eventBus {EventBus}
- * @param eventName {string}
- * @returns {UnwrapRef<{deleteTag: *, tags: *, addTag: *}>}
- */
-export const tagList = (proxyTags:Ref<string[]>|null|undefined, checkDuplicate:boolean = true, eventBus?:any, eventName?:string, addTagCallBack?:any) => {
-    const tags:Ref<any[]> = proxyTags || ref([]);
-    if (!tags.value) tags.value = [];
-
-    /**
-     * @param idx {Number}
-     */
-    const deleteTag = (idx:number) => {
-        const updatedTags = [...tags.value];
-        updatedTags.splice(idx, 1);
-        tags.value = updatedTags;
-        if (eventBus) { eventBus.$emit(eventName, tags.value); }
-        if (addTagCallBack) { addTagCallBack(tags.value); }
-    };
-
-    const deleteAllTags = () => {
-        tags.value = [];
-        if (eventBus) { eventBus.$emit(eventName, tags.value); }
-        if (addTagCallBack) { addTagCallBack(tags.value); }
-    };
-
-    const validation = value => tags.value.every(tag => !_.isEqual(tag, value));
-
-    /**
-     * @param value {String}
-     */
-    const addTag = (value) => {
-        const val = (typeof value === 'string') ? value.trim() : value;
-        if (!val || val === '') return;
-        if (checkDuplicate && !validation(val)) return;
-        const updatedTags = [...tags.value];
-        updatedTags.push(val);
-        tags.value = updatedTags;
-        if (eventBus) { eventBus.$emit(eventName, tags.value); }
-        if (addTagCallBack) { addTagCallBack(tags.value); }
-    };
-
-    return reactive({
-        tags,
-        deleteTag,
-        addTag,
-        deleteAllTags,
-    });
-};
-
 export default defineComponent({
     name: 'PTag',
     components: {
@@ -92,7 +39,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .p-tag {
-        margin-right: .5rem;
+        margin-right: 0.5rem;
         vertical-align: middle;
         white-space: nowrap;
         color: inherit;
