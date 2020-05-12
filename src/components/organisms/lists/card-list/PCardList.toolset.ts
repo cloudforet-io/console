@@ -1,4 +1,5 @@
 import { initReactive, optionalType, StateToolSet } from '@/lib/toolset';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export interface Mapper {
     key?: string;
@@ -44,7 +45,7 @@ export type CardListStateType = CardListProps;
 
 @StateToolSet<CardListStateType>()
 export class CardListState<D = CardListStateType, S extends CardListStateType = CardListStateType> {
-    state: optionalType<S, D>
+    state: UnwrapRef<optionalType<S, D>>
 
     static initState(): CardListStateType {
         return {

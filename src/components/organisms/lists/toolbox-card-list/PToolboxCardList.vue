@@ -14,13 +14,8 @@
                                                @pageChange="onPageChange"
                             />
                         </span>
-                        <!--                        <p-dropdown-menu-btn class="sort"-->
-                        <!--                                             :menu="sortMenu"-->
-                        <!--                                             @clickMenuEvent="onClickSortMenu"-->
-                        <!--                        >-->
-                        <!--                            Sort by {{ sortMenu[sortByIdx].label }}-->
-                        <!--                        </p-dropdown-menu-btn>-->
                         <p-select-dropdown class="sort" :select-item="sortBy" :items="sortMenu"
+                                           @input="updateSortBy"
                                            @onSelected="onClickSortMenu"
                         />
                     </div>
@@ -59,9 +54,9 @@ import {
 } from '@vue/composition-api';
 import PCardList from '@/components/organisms/lists/card-list/PCardList.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { makeProxy } from '@/lib/compostion-util';
-import PSelectDropdown from '../../dropdown/select-dropdown/SelectDropdown.vue';
+import _ from 'lodash';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import { toolboxCardListProps } from './PToolboxCardList.toolset';
 
 const setTools = (props, context) => {
@@ -76,9 +71,13 @@ const setTools = (props, context) => {
         context.emit('pageChange', page);
     };
 
+    const updateSortBy = _.debounce((val) => {
+        context.emit('update:sortBy', val);
+    }, 200);
+
     const onClickSortMenu = (menu, idx) => {
         // context.emit('update:sortByIdx', idx);
-        context.emit('update:sortBy', menu);
+        updateSortBy(menu);
         context.emit('sortChange', menu);
     };
 
@@ -86,6 +85,7 @@ const setTools = (props, context) => {
         ...toRefs(state),
         onPageChange,
         onClickSortMenu,
+        updateSortBy,
     };
 };
 
@@ -112,7 +112,6 @@ export default {
         PSelectDropdown,
         PCardList,
         PTextPagenation,
-        PDropdownMenuBtn,
     },
     props: toolboxCardListProps,
     setup(props, context) {
