@@ -60,7 +60,7 @@ export default {
 
 @define-mixin setInput {
     &.p-text-input {
-        @apply border border-gray-200 bg-white text-gray-900;
+        @apply border bg-white text-gray-900;
         min-height: 2rem;
         height: 2rem;
         padding-left: 1rem;
