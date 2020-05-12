@@ -109,7 +109,7 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.v
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
-export default defineComponent({
+export default {
     name: 'SMonitoring',
     components: {
         PButton,
@@ -334,7 +334,7 @@ export default defineComponent({
             loadChartMetrics,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
