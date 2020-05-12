@@ -61,11 +61,13 @@ export default defineComponent({
 <style lang="postcss" scoped>
 table {
     @apply w-full;
-    border-spacing: 2px;
 }
 .def-row:nth-child(2n+1)::v-deep {
     td {
-        @apply bg-violet-100 border-l-2 border-white;
+        &:first-child {
+            @apply border-r-2 border-white;
+        }
+        @apply bg-violet-100;
     }
 }
 </style>

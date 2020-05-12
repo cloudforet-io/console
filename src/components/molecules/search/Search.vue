@@ -22,8 +22,8 @@
                       @click="onSearch"
             >
                 <p-i color="transparent inherit"
-                     width="1.3rem"
-                     height="1.3rem"
+                     width="1.5rem"
+                     height="1.5rem"
                      name="ic_search"
                 />
             </p-button>
@@ -84,12 +84,6 @@ export default {
 <style lang="postcss" scoped>
     .p-search {
         @apply border border-gray-300 bg-white flex-no-wrap inline-flex w-full h-8 relative rounded-sm;
-        &.hovered {
-            @apply border-gray-900;
-        }
-        &.focused {
-            @apply text-gray-900 border-gray-900;
-        }
         .p-search-input {
             @apply w-full flex-grow border-0;
             background: transparent;
@@ -97,9 +91,20 @@ export default {
         .p-search-btn {
             @apply flex-grow-0;
             .search-btn {
-                @apply min-w-8;
+                @apply min-w-8 p-2 h-full;
             }
         }
+        
+        &.hovered {
+            @apply border-secondary text-secondary;
+        }
+        &.focused {
+            @apply border-secondary text-secondary bg-secondary2 ;
+            .p-search-input {
+                @apply text-secondary;
+            }
+        }
+        
     }
 
 
