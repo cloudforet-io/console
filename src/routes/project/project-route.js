@@ -1,7 +1,7 @@
 import { fluentApi } from '@/lib/fluent-api';
 
 const ProjectNavBar = () => import('@/views/project/ProjectNavBar');
-const Project = () => import('@//views/project/project/pages/Project2');
+const Project = () => import('@//views/project/project/pages/Project');
 const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 

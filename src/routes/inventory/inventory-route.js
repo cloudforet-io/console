@@ -4,9 +4,7 @@ const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/Clo
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
-// const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
-// const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
@@ -20,12 +18,6 @@ export default {
         main: Inventory,
     },
     children: [
-        // {
-        //     path: 'data-center',
-        //     name: 'dataCenter',
-        //     meta: { label: 'Data Center', breadcrumb: true },
-        //     component: DataCenter,
-        // },
         {
             path: 'server',
             meta: {
