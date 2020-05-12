@@ -192,7 +192,7 @@ export default {
             z-index: 99;
             cursor: col-resize;
             > span {
-                margin-right: 26px;
+                margin-right: 1.5rem;
                 cursor: pointer;
             }
         }

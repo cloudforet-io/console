@@ -50,7 +50,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-
 .key {
     @apply font-bold;
     width: 18rem;
