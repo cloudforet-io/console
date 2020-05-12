@@ -13,9 +13,14 @@
     </PDropdownMenuBtn>
 </template>
 
-<script>
+<script lang="ts">
 import { computed } from '@vue/composition-api';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import {
+    SelectDropdownProps,
+    selectDropdownProps,
+} from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.toolset';
+import _ from 'lodash';
 
 export default {
     name: 'PSelectDropdown',
@@ -23,31 +28,8 @@ export default {
     model: {
         prop: 'selectItem',
     },
-    props: {
-        items: {
-            type: Array,
-        },
-        selectItem: {
-            type: [String, Number],
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-        autoHeight: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
+    props: selectDropdownProps,
+    setup(props: SelectDropdownProps, { emit }) {
         const items = computed(() => _.groupBy(props.items, 'name'));
         const selectItemLabel = computed(() => {
             const data = items.value[props.selectItem];
@@ -71,18 +53,18 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-select-dropdown::v-deep{
-    &.is-invalid-btn{
-        div{
-            .dropdown-btn{
-                @apply border border-alert;
-            }
+.p-select-dropdown::v-deep {
+    div {
+        width: 100%;
+        .dropdown-btn {
+            width: 100%;
         }
     }
-    div{
-        width: 100%;
-        .dropdown-btn{
-            width: 100%;
+    &.is-invalid-btn {
+        div {
+            .dropdown-btn {
+                @apply border border-alert;
+            }
         }
     }
 }

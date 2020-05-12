@@ -288,8 +288,9 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     }
 
     setSortBy(sortBy: string): this {
-        this.apiState.sortBy = sortBy;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.sortBy = sortBy;
+        return api;
     }
 
     setSortDesc(sortDesc: boolean): this {
