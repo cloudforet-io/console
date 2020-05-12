@@ -16,8 +16,8 @@
                 <span @click="hideSidebar">
                     <slot name="hide-button">
                         <p-i class="btn-vertical-hide"
-                             width="1rem"
-                             height="1rem"
+                             width="1.25rem"
+                             height="1.25rem"
                              :name="hide ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
                              :color="hide ? undefined : 'white primary3'"
                         />
@@ -192,7 +192,7 @@ export default {
             z-index: 99;
             cursor: col-resize;
             > span {
-                margin-right: 26px;
+                margin-right: 1.5rem;
                 cursor: pointer;
             }
         }

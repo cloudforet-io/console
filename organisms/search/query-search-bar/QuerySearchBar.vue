@@ -11,7 +11,7 @@
             @onEscKey="focusOut"
         />
         <p-context-menu v-if="showAC" ref="contextMenuRef"
-                        theme="gray900"
+                        theme="secondary"
                         :menu="acState.items"
                         @clickMenuEvent="clickMenuEvent"
                         @onEndOfUpKey="searchFocused=true"
