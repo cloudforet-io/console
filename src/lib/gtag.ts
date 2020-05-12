@@ -1,13 +1,19 @@
 import Vue from 'vue';
 import VueGtag from 'vue-gtag';
-import { useStore } from '@/store/toolset';
+import Hashids from 'hashids';
 
 export const setGtagUserID = (vm: any) => {
     if (vm.$ls && vm.$gtag) {
         try {
-            if (vm.$ls.user.state.userId) {
+            if (vm.$ls.doamin.state.domainId && vm.$ls.user.state.userId) {
+                const hashids = new Hashids(vm.$ls.user.state.userId);
+
                 // eslint-disable-next-line camelcase
-                vm.$gtag.set({ user_id: vm.$ls.user.state.userId });
+                vm.$gtag.set({
+                    // eslint-disable-next-line camelcase
+                    user_id: `${vm.$ls.domain.state.domainId}:${hashids.encode(1)}`,
+                    domain_id: vm.$ls.domain.state.domainId,
+                });
             }
         } catch (e) {
             console.error('init gtag userid fail', e);
