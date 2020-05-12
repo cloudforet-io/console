@@ -7,7 +7,7 @@ export const setGtagUserID = (vm: any) => {
         try {
             if (vm.$ls.user.state.userId) {
                 // eslint-disable-next-line camelcase
-                vm.$gtag('set', { user_id: vm.$ls.user.state.userId });
+                vm.$gtag.set({ user_id: vm.$ls.user.state.userId });
             }
         } catch (e) {
             console.error('init gtag userid fail', e);
