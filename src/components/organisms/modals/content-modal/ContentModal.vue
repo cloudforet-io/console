@@ -136,6 +136,7 @@ export default defineComponent({
         overflow: hidden;
         &.scrollable {
             overflow: auto;
+            min-height:30rem;
         }
         .modal-body {
             margin: 2rem 1.5rem;
