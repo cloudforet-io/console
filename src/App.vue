@@ -20,7 +20,7 @@ import { api } from '@/lib/api/axios';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
-import { GTag } from '@/lib/gtag';
+import { GTag, setGtagUserID } from '@/lib/gtag';
 
 export default defineComponent({
     name: 'App',
@@ -47,6 +47,7 @@ export default defineComponent({
             try {
                 await configInit();
                 if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), vm);
+                setGtagUserID(vm);
             } catch (e) {
                 console.error(e);
                 if (!config.config.NO_SERVER_MODE) {

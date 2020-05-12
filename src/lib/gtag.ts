@@ -2,11 +2,18 @@ import Vue from 'vue';
 import VueGtag from 'vue-gtag';
 import { useStore } from '@/store/toolset';
 
-export const setGtagUserID = (gtag: any) => {
-    const { user: userStore } = useStore();
-    if (userStore.state.userId) {
-        // eslint-disable-next-line camelcase
-        gtag('set', { user_id: userStore.state.userId });
+export const setGtagUserID = (vm: any) => {
+    if (vm.$ls && vm.$gtag) {
+        try {
+            if (vm.$ls.user.state.userId) {
+                // eslint-disable-next-line camelcase
+                vm.$gtag('set', { user_id: vm.$ls.user.state.userId });
+            }
+        } catch (e) {
+            console.error('init gtag userid fail', e);
+        }
+    } else {
+        console.error('not set $ls or $gtag');
     }
 };
 
@@ -21,7 +28,6 @@ export class GTag {
             config: { id: gtagId },
         });
         this.gtag = vm.$gtag;
-        setGtagUserID(this.gtag);
 
         vm.$router.afterEach((to, from) => {
             this.gtag.pageview({
