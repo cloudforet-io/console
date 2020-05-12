@@ -22,12 +22,12 @@
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
-import { defineComponent, ref } from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
 import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn.vue';
 import { dropdownMenuBtnProps } from './PDropdownMenuBtn.toolset';
 
-export default defineComponent({
+export default {
     name: 'PDropdownMenuBtn',
     directives: {
         clickOutside: vClickOutside.directive,
@@ -49,7 +49,7 @@ export default defineComponent({
             clickMenuEvent,
         };
     },
-});
+};
 </script>
 <style lang="postcss" scoped>
     .p-dropdown-menu-btn {

@@ -5,7 +5,7 @@ import Hashids from 'hashids';
 export const setGtagUserID = (vm: any) => {
     if (vm.$ls && vm.$gtag) {
         try {
-            if (vm.$ls.doamin.state.domainId && vm.$ls.user.state.userId) {
+            if (vm.$ls.domain?.state?.domainId && vm.$ls.user?.state?.userId) {
                 const hashids = new Hashids(vm.$ls.user.state.userId);
 
                 // eslint-disable-next-line camelcase

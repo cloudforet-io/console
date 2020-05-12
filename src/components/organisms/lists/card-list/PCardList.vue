@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <fragment>
         <div v-if="loading" class="card-list-spinner-container">
             <!-- TODO: Skeletons -->
             <p-lottie name="spinner" auto :size="1.5" />
@@ -24,7 +24,7 @@
                 No Data
             </p-empty>
         </slot>
-    </div>
+    </fragment>
 </template>
 
 <script lang="ts">

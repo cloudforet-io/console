@@ -102,13 +102,12 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import moment from 'moment-timezone';
 import {
     makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
 } from '@/lib/compostion-util';
-import GNBEventBus from '@/views/containers/gnb/GNBEventBus';
 import { LANGUAGES } from '@/lib/global-enums';
 import { MenuItem } from '@/lib/util';
 
@@ -213,7 +212,7 @@ export const profileSetup = (props, context) => {
                     duration: 2000,
                     speed: 1000,
                 });
-            })
+            });
     };
 
     const updateUser = async (parameters) => {
@@ -239,7 +238,7 @@ export const profileSetup = (props, context) => {
                     duration: 2000,
                     speed: 1000,
                 });
-            })
+            });
     };
 
     if (state.isDomainOwner) {
@@ -283,7 +282,7 @@ export const profileSetup = (props, context) => {
     };
 };
 
-export default defineComponent({
+export default {
     name: 'ProfileModalTemplate',
     components: {
         PSelectDropdown,
@@ -300,7 +299,7 @@ export default defineComponent({
     setup(props, context) {
         return profileSetup(props, context);
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
