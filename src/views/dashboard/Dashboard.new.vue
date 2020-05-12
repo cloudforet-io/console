@@ -33,7 +33,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
@@ -45,7 +44,7 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import SCollection from '@/views/common/widgets/collection/Collection.vue';
 
-export default defineComponent({
+export default {
     name: 'Dashboard',
     components: {
         GeneralPageLayout,
@@ -96,7 +95,7 @@ export default defineComponent({
             topics,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">
