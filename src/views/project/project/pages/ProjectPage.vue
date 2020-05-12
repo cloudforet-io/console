@@ -83,7 +83,7 @@
                                 <div v-tooltip.bottom="{content: 'Show All Projects of Sub Project Groups', delay: {show: 500}}"
                                      class="text-base truncate leading-tight"
                                 >
-                                    <PCheckBox v-model="showAllProjects" />  <span class="ml-3 leading-relaxed">Show All Projects</span>
+                                    <PCheckBox v-model="showAllProjects" />  <span class="mx-3 leading-relaxed">Show All Projects</span>
                                 </div>
                             </div>
                         </div>
@@ -259,7 +259,7 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
     }
 
 export default {
-    name: 'Project',
+    name: 'ProjectPage',
     components: {
         PVerticalPageLayout,
         PTree,
@@ -279,11 +279,9 @@ export default {
     },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
-            // item: [],
             items: [],
             hoveredId: '',
             hoveredNode: {},
-            selectedGroupId: '',
             hasChildProject: true,
             hasChildProjectGroup: true,
             showAllProjects: ref(false),
@@ -650,6 +648,16 @@ export default {
          }
         &:not(:disabled):not(.disabled):hover {
             @apply bg-blue-300 border-blue-300;
+         }
+    }
+
+    ::v-deep .card-item {
+        @apply bg-white border border-gray-200;
+        border-radius: 2px;
+        cursor: pointer;
+        &:hover {
+             @apply border-l border-secondary bg-blue-200;
+             cursor: pointer;
          }
     }
 
