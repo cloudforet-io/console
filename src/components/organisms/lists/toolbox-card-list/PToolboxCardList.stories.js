@@ -9,7 +9,8 @@ import PRow from '@/components/atoms/grid/row/Row.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { tagList } from '@/components/molecules/tags/toolset';
 
 export default {
     title: 'organisms/lists/ToolboxCardList',

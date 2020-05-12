@@ -86,7 +86,8 @@ import PBadge from '@/components/atoms/badges/Badge.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { tagList } from '@/components/molecules/tags/toolset';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
