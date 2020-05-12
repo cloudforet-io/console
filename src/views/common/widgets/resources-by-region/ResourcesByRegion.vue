@@ -115,7 +115,10 @@ export default defineComponent({
                 isNoData: Ref<boolean>;
             }
 
-            const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
+            const colors = [coral[500], blue[500], violet[500], yellow[500], green[400],
+                coral[400], peacock[600], coral[200], peacock[400], green[200],
+                coral[300], peacock[700], coral[300], peacock[300], green[300],
+            ];
             const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
                 chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
                     .setLabels(_.map(ts.state.data, d => d.name))
@@ -183,6 +186,7 @@ export default defineComponent({
     .resources-by-region {
     &::v-deep .widget-contents {
          overflow-y: auto;
+         margin-bottom: 2rem;
      }
     }
     .chart {
