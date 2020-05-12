@@ -314,6 +314,7 @@ export default defineComponent({
 .sub-header {
     @apply text-gray-400;
     margin-bottom: 0.875rem;
+    margin-top: 0.875rem;
     font-size: 0.875rem;
     font-weight: bold;
 }

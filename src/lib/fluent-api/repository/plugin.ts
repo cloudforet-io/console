@@ -135,6 +135,12 @@ class List extends ListAction<ListParameter, PluginListResp> {
         this.apiState.extraParameter.repository_id = repositoryId;
         return api;
     }
+
+    setServiceType(type: string): this {
+        const api = this.clone();
+        this.apiState.extraParameter.service_type = type;
+        return api;
+    }
 }
 
 export default class Plugin extends Resource implements ResourceActions<
