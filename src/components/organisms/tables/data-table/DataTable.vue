@@ -494,11 +494,11 @@ export default defineComponent({
             th {
                 white-space: nowrap;
                 .th-contents {
-                    @apply flex justify-between pl-4 py-1 text-black;
+                    @apply flex justify-between pl-4 py-1;
                 }
                 .sort-icon {
                     @apply text-gray-500 float-right my-px;
-                    &:hover { cursor:pointer; }
+                    &:hover { cursor: pointer; }
                 }
                 &.fix-width {
                     @apply min-w-19;
@@ -526,7 +526,7 @@ export default defineComponent({
         /*}*/
         .no-data {
             @apply text-primary2 border-0 text-center py-12 text-2xl;
-            &:hover{
+            &:hover {
                 @apply bg-white;
             }
             line-height: 120%;

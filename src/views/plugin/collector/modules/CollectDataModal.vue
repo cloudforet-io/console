@@ -1,7 +1,7 @@
 <template>
     <p-button-modal :header-title="$t('COMMON.COL_DATA')"
                     centered
-                    size="lg"
+                    size="md"
                     fade
                     backdrop
                     :loading="loading"
@@ -14,55 +14,55 @@
                     @confirm="onClickCollectConfirm"
     >
         <template #body>
-            <div class="flex w-full">
-                <div class="left-container">
-                    <div class="flex">
-                        <p-lazy-img :img-url="image"
-                                    width="5.5rem" height="5.5rem"
-                                    class="mr-10 flex-grow-0"
-                        />
-                        <div>
-                            <p class="name">
-                                {{ collector ? collector.name : '' }}
-                            </p>
-                            <p class="info">
-                                {{ $t('WORD.COLLECTOR') }} {{ $t('WORD.ID') }}: {{ collectorId }}
-                            </p>
-                            <p class="info">
-                                {{ $t('WORD.VERSION') }}: {{ version }}
-                            </p>
-                        </div>
-                    </div>
-                    <p class="desc">
-                        {{ description }}
-                    </p>
-                    <p class="sub-header">
-                        {{ $t('INVENTORY.COL_OPS') }}
-                    </p>
-                    <p-field-group :label="$t('COMMON.CREDENTIAL')">
-                        <p-text-input :value="credential ? credential.name : $t('COMMON.ALL')"
-                                      disabled
-                                      class="w-full"
-                        />
-                    </p-field-group>
-                    <p-field-group :label="$t('COMMON.COL_MODE')">
-                        <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
-                    </p-field-group>
-                </div>
-                <div class="right-container">
-                    <p class="sub-header">
-                        {{ $t('INVENTORY.FILTERS') }}
-                    </p>
-                    <p-dynamic-form v-for="(form, idx) in filterFormats" :key="idx"
-                                    v-model="filters[form.key]"
-                                    :form="form"
-                                    :invalid="showValidation ? vdApi.invalidState[form.key] : false"
-                                    :invalid-text="vdApi.invalidMsg[form.key]"
+            <div class="w-full">
+                <!--                <div class="left-container">-->
+                <div class="flex w-full">
+                    <p-lazy-img :img-url="image"
+                                width="5.5rem" height="5.5rem"
+                                class="mr-10 flex-grow-0"
                     />
-                    <p-empty v-if="filterFormats.length === 0">
-                        No Filters
-                    </p-empty>
+                    <div>
+                        <p class="name">
+                            {{ collector ? collector.name : '' }}
+                        </p>
+                        <p class="info">
+                            {{ $t('WORD.COLLECTOR') }} {{ $t('WORD.ID') }}: {{ collectorId }}
+                        </p>
+                        <p class="info">
+                            {{ $t('WORD.VERSION') }}: {{ version }}
+                        </p>
+                    </div>
                 </div>
+                <p class="desc">
+                    {{ description }}
+                </p>
+                <p class="sub-header">
+                    {{ $t('INVENTORY.COL_OPS') }}
+                </p>
+                <p-field-group :label="$t('COMMON.CREDENTIAL')">
+                    <p-text-input :value="credential ? credential.name : $t('COMMON.ALL')"
+                                  disabled
+                                  class="w-full"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('COMMON.COL_MODE')">
+                    <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
+                </p-field-group>
+                <!--                </div>-->
+                <!--                <div class="right-container">-->
+                <!--                    <p class="sub-header">-->
+                <!--                        {{ $t('INVENTORY.FILTERS') }}-->
+                <!--                    </p>-->
+                <!--                    <p-dynamic-form v-for="(form, idx) in filterFormats" :key="idx"-->
+                <!--                                    v-model="filters[form.key]"-->
+                <!--                                    :form="form"-->
+                <!--                                    :invalid="showValidation ? vdApi.invalidState[form.key] : false"-->
+                <!--                                    :invalid-text="vdApi.invalidMsg[form.key]"-->
+                <!--                    />-->
+                <!--                    <p-empty v-if="filterFormats.length === 0">-->
+                <!--                        No Filters-->
+                <!--                    </p-empty>-->
+                <!--                </div>-->
             </div>
         </template>
 
@@ -205,7 +205,7 @@ export default defineComponent({
             const api = collectorApi.collect()
                 .setId(props.collectorId)
                 .setCollectMode(state.selectedCollectMode as COLLECT_MODE);
-            if (!_.isEmpty(state.filters)) api.setFilters(state.filters);
+            // if (!_.isEmpty(state.filters)) api.setFilters(state.filters);
             if (props.credentialId) api.setCredentialId(props.credentialId);
             return api;
         });
@@ -213,31 +213,31 @@ export default defineComponent({
         const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
             state.showValidation = true;
-            if (await vdApi.allValidation()) {
-                try {
-                    await collectApi.value.execute();
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'success',
-                        title: 'success',
-                        text: 'Collect Data',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                } catch (e) {
-                    console.error(e);
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: e.message,
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                } finally {
-                    state.proxyVisible = false;
-                }
+            // if (await vdApi.allValidation()) {
+            try {
+                await collectApi.value.execute();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Collect Data',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: e.message,
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                state.proxyVisible = false;
             }
+            // }
             state.loading = false;
         };
 

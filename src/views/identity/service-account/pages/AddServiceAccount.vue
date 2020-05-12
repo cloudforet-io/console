@@ -21,6 +21,13 @@
                 </div>
             </template>
         </PPageTitle>
+        <p-pane-layout v-if="description" class="panel">
+            <div class="title">
+                Help
+            </div>
+            <SDynamicLayout v-bind="description" :vbind="{showTitle:false}" />
+        </p-pane-layout>
+
         <p-pane-layout class="panel">
             <div class="title">
                 Base Information
@@ -138,6 +145,8 @@ import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 import SProjectTreePanel from '@/components/organisms/panels/project-tree-panel/SProjectTreePanel.vue';
 import { useStore } from '@/store/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
+import _ from 'lodash';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 
 const accountFormSetup = (props) => {
     const actFixFormTS = new JsonSchemaFormToolSet();
@@ -163,6 +172,7 @@ const credentialsFormSetup = (props) => {
     const crdFixFormTS = new JsonSchemaFormToolSet();
     const schemaNames = ref<string[]>([]);
     const selectSchema = ref<string>('');
+    const description = ref<string|undefined>(null);
     const crdState = reactive({
         formSchema: {},
     });
@@ -206,17 +216,21 @@ const credentialsFormSetup = (props) => {
         }
     });
     onMounted(async () => {
+        const descriptionPath = 'metadata.view.layouts.help:service_account:create';
         const resp = await fluentApi.identity().provider().get().setId(props.provider)
-            .setOnly('template.service_account.schema', 'capability.supported_schema')
+            .setOnly('template.service_account.schema', 'capability.supported_schema', descriptionPath)
             .execute();
         crdState.formSchema = resp.data.template.service_account.schema;
         schemaNames.value = resp.data.capability.supported_schema;
+        // eslint-disable-next-line camelcase
+        description.value = _.get(resp.data, descriptionPath);
     });
     return {
         crdFormTS,
         crdFixFormTS,
         selectSchema,
         schemaNames,
+        description,
     };
 };
 
@@ -234,6 +248,7 @@ export default {
         PRadio,
         SProjectTreePanel,
         PI,
+        SDynamicLayout,
     },
     directives: {
         focus: {
@@ -265,6 +280,7 @@ export default {
             crdFixFormTS,
             selectSchema,
             schemaNames,
+            description,
         } = credentialsFormSetup(props);
 
         const goBack = () => {
@@ -362,6 +378,7 @@ export default {
             actJscTS,
             providerIcon,
             projectRef,
+            description,
         };
     },
 };

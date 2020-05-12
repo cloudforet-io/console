@@ -27,40 +27,34 @@
         <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
                              lg:row-start-2"
         />
-        <collection-state class="col-start-1 col-end-13 lg:col-end-7" />
-        <collecting-jobs class="col-start-1 col-end-13 lg:col-start-7" />
+        <s-collection class="col-start-1 col-end-13" />
         <cloud-services class="col-start-1 col-end-13" />
-        </div>
     </general-page-layout>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
-import CollectingJobs from '@/views/common/widgets/collecting-jobs/CollectingJobs.vue';
-import CollectionState from '@/views/common/widgets/collection-state/CollectionState.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
-import { Stat } from '@/lib/fluent-api/statistics/resource';
-import { ServiceSummaryWidgetState, Value } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
-import { HistoryDiff } from '@/lib/fluent-api/statistics/history';
+import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import SCollection from '@/views/common/widgets/collection/Collection.vue';
 
-export default {
+export default defineComponent({
     name: 'Dashboard',
     components: {
         GeneralPageLayout,
         CloudServices,
-        CollectingJobs,
-        CollectionState,
         DailyUpdates,
         ServiceAccounts,
         ServiceSummary,
         TopProjects,
+        SCollection,
     },
     setup() {
         const projects = new ServiceSummaryWidgetState({
@@ -102,7 +96,7 @@ export default {
             topics,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
