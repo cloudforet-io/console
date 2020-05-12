@@ -16,7 +16,10 @@
 <script lang="ts">
 import { computed } from '@vue/composition-api';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import { selectDropdownProps } from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.toolset';
+import {
+    SelectDropdownProps,
+    selectDropdownProps,
+} from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.toolset';
 import _ from 'lodash';
 
 export default {
@@ -26,7 +29,7 @@ export default {
         prop: 'selectItem',
     },
     props: selectDropdownProps,
-    setup(props, { emit }) {
+    setup(props: SelectDropdownProps, { emit }) {
         const items = computed(() => _.groupBy(props.items, 'name'));
         const selectItemLabel = computed(() => {
             const data = items.value[props.selectItem];
