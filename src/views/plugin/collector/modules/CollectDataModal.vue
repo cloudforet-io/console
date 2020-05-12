@@ -131,7 +131,7 @@ interface Props {
     collectorId: string;
 }
 
-export default defineComponent({
+export default {
     name: 'CollectDataModal',
     components: {
         PEmpty,
@@ -288,7 +288,7 @@ export default defineComponent({
             onClickCollectConfirm,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
