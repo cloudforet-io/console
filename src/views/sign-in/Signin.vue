@@ -77,7 +77,7 @@ export default defineComponent({
         const login = async (userId: string, credentials: Credentials) => {
             vm.$ls.user.setToken(credentials.refresh_token, credentials.access_token);
             await vm.$ls.user.setUser(state.userType, userId, vm);
-            setGtagUserID(vm.$gtag);
+            setGtagUserID(vm);
             await vm.$router.push(props.nextPath);
         };
         return {
