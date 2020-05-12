@@ -7,7 +7,7 @@ import {
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
 import PDictInput from '@/components/molecules/forms/dict-input/DictInput.vue';
-import { DictInputState, DictInputToolSet, dictInputProps } from '@/components/molecules/forms/dict-input/DictInput.toolset';
+import { DictInputState, dictInputProps } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 
 export default {
     title: 'molecules/forms/DictInput',
@@ -67,20 +67,20 @@ export const useState = () => ({
     },
 });
 
-export const useToolSet = () => ({
-    components: { PDictInput },
-    template: `
-    <div style="width: 80vw;">
-        <p-dict-input v-bind="ts.state"
-                      v-bind.sync="ts.syncState"
-                v-on="actions"></p-dict-input>
-    </div>`,
-    setup() {
-        const ts = new DictInputToolSet();
-
-        return {
-            ts,
-            actions,
-        };
-    },
-});
+// export const useToolSet = () => ({
+//     components: { PDictInput },
+//     template: `
+//     <div style="width: 80vw;">
+//         <p-dict-input v-bind="ts.state"
+//                       v-bind.sync="ts.syncState"
+//                 v-on="actions"></p-dict-input>
+//     </div>`,
+//     setup() {
+//         const ts = new DictInputToolSet();
+//
+//         return {
+//             ts,
+//             actions,
+//         };
+//     },
+// });

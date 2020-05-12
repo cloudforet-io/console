@@ -13,7 +13,7 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/Sel
 import { makeVModelProxy } from '@/lib/compostion-util';
 
 
-export default defineComponent({
+export default {
     name: 'EnumForm',
     components: { PSelectDropdown },
     model: {
@@ -41,5 +41,5 @@ export default defineComponent({
             items,
         };
     },
-});
+};
 </script>

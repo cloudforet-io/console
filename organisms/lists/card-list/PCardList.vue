@@ -1,13 +1,11 @@
 <template>
-    <div>
+    <fragment>
         <div v-if="loading" class="card-list-spinner-container">
-            <p-lottie name="spinner"
-                      auto
-                      :size="1.5"
-            />
+            <!-- TODO: Skeletons -->
+            <p-lottie name="spinner" auto :size="1.5" />
         </div>
         <template v-else-if="items.length > 0">
-            <p-card-item v-for="(item, idx) in items" :key="getItem(item, mapper.key)"
+            <p-card-item v-for="(item, idx) in items" :key="getItem(item, mapper.key, idx)"
                          :icon="getItem(item, mapper.icon)"
                          :title="getItem(item, mapper.title)"
                          :contents="getItem(item, mapper.contents)"
@@ -21,48 +19,38 @@
                 </template>
             </p-card-item>
         </template>
-        <p-empty v-else>
-            No Plugins
-        </p-empty>
-    </div>
+        <slot v-else name="no-data">
+            <p-empty>
+                No Data
+            </p-empty>
+        </slot>
+    </fragment>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
-import PCardItem from '@/components/molecules/cards/CardItem.vue';
+import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
+import { defineComponent } from '@vue/composition-api';
+import { cardListProps } from '@/components/organisms/lists/card-list/PCardList.toolset';
 
-export default {
-    name: 'CardList',
-    slots: ['side', 'body', 'extra'],
-    events: ['itemClick'],
+export default defineComponent({
+    name: 'PCardList',
     components: {
         PCardItem,
         PLottie,
         PEmpty,
     },
-    props: {
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        mapper: {
-            type: Object,
-            default: () => ({}),
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-    },
+    props: cardListProps,
     setup() {
-        const getItem = (item, key) => _.get(item, key);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getItem = (item, key: string|undefined, defaultValue: any = ''): any => _.get(item, key || '', defaultValue);
         return {
             getItem,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

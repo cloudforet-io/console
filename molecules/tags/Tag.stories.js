@@ -2,8 +2,8 @@ import { withKnobs } from '@storybook/addon-knobs/vue';
 import { ref } from '@vue/composition-api';
 import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
-import PTag, { tagList } from './Tag.vue';
-
+import PTag from './Tag.vue';
+import { tagList } from './toolset';
 
 export default {
     title: 'molecules/tags/Tag',

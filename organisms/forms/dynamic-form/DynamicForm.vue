@@ -48,7 +48,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    computed, reactive, toRefs, defineComponent,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import {
     formValidation, requiredValidation,
@@ -159,7 +159,7 @@ export const setValidation = (forms, values) => {
     };
 };
 
-export default defineComponent({
+export default {
     name: 'PDynamicForm',
     components: {
         PFieldGroup,
@@ -197,7 +197,7 @@ export default defineComponent({
             ...changeActions,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

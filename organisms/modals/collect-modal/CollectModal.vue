@@ -88,8 +88,8 @@ import {
     collectModalProps, CollectModalPropsType,
 } from '@/components/organisms/modals/collect-modal/CollectModal.toolset';
 
-export default defineComponent({
-    name: 'CollectDataModal',
+export default {
+    name: 'CollectModal',
     components: {
         PButtonModal,
         PButton,
@@ -241,7 +241,7 @@ export default defineComponent({
             getBadgeType,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
