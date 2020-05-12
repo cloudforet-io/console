@@ -73,7 +73,7 @@ const setTools = (props, context) => {
     });
     const changePageNumber = (page) => {
         state.proxyThisPage = page;
-        context.emit('pageChange', page);
+        context.emit('changePageNumber', page);
     };
     const changePageSize = (size) => {
         const sizeNum = Number(size);
@@ -119,9 +119,9 @@ export default {
         },
         thisPage: {
             type: Number,
-            // validator(value) {
-            //     return value > 0;
-            // },
+            validator(value) {
+                return value > 0;
+            },
             default: 1,
         },
         pageSize: {
@@ -134,6 +134,9 @@ export default {
         },
         allPage: {
             type: Number,
+            validator(value) {
+                return value > 0;
+            },
             default: 1,
         },
     },

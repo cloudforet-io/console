@@ -120,7 +120,7 @@
 </template>
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
@@ -298,7 +298,7 @@ const testSample = `
             }
         ]
     }`;
-export default defineComponent({
+export default {
     name: 'DynamicLayoutHelper',
     components: {
         PPaneLayout,
@@ -435,7 +435,7 @@ export default defineComponent({
             forceRefresh,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

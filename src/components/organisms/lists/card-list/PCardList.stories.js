@@ -1,10 +1,10 @@
 import { withKnobs, text, object } from '@storybook/addon-knobs/vue';
 import { toRefs, reactive } from '@vue/composition-api';
 import { autoProps } from '@sb/storybook-util';
-import PCardList from './CardList';
-import PBadge from '@/components/atoms/badges/Badge';
-import PCol from '@/components/atoms/grid/col/Col';
-import PRow from '@/components/atoms/grid/row/Row';
+import PCardList from '@/components/organisms/lists/card-list/PCardList.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
 
 export default {
     title: 'organisms/lists/CardList',

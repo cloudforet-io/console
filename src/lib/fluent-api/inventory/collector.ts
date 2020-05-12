@@ -60,15 +60,15 @@ class Collect extends CollectAction<CollectorCollectParameter, any> {
         return api;
     }
 
-    setCredentialId(credentialId: string): this {
+    setSecretId(credentialId: string): this {
         const api = this.clone();
-        api.apiState.parameter.credential_id = credentialId;
+        api.apiState.parameter.secret_id = credentialId;
         return api;
     }
 
-    setCredentialGroupId(credentialGroupId: string): this {
+    setSecretGroupId(credentialGroupId: string): this {
         const api = this.clone();
-        api.apiState.parameter.credential_group_id = credentialGroupId;
+        api.apiState.parameter.secret_group_id = credentialGroupId;
         return api;
     }
 

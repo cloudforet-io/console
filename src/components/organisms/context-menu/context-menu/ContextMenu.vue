@@ -34,12 +34,18 @@
     </div>
 </template>
 
-<script>
-import { computed, ref, onMounted } from '@vue/composition-api';
+<script lang="ts">
+import {
+    computed, ref, onMounted, Ref,
+} from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import {
+    ContextMenuProps,
+    contextMenuProps,
+} from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
 
 const setAutoHeight = (props) => {
-    const contextMenu = ref(null);
+    const contextMenu = ref(null) as Ref<HTMLElement>;
     const contextMenuHeight = ref(0);
     const autoHeightStyle = computed(() => {
         if (props.autoHeight && contextMenuHeight.value) {
@@ -65,28 +71,8 @@ export default {
     name: 'PContextMenu',
     events: ['clickMenuEvent', 'onEndOfUpKey', 'onEndOfDownKey', 'onEscKey'],
     components: { PLottie },
-    props: {
-        menu: {
-            type: [Array, Object],
-            default: () => [],
-        },
-        theme: {
-            type: String,
-            default: 'secondary',
-            validator(theme) {
-                return ['secondary', 'gray900'].includes(theme);
-            },
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        autoHeight: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, context) {
+    props: contextMenuProps,
+    setup(props: ContextMenuProps, context) {
         const uuid = `${Math.random()}`.slice(2);
         const menuClick = (eventName, index, event) => {
             if (!props.menu[index].disabled) {
@@ -94,8 +80,8 @@ export default {
                 context.emit('clickMenuEvent', eventName, index);
             }
         };
-        const itemsIndex = computed(() => {
-            const idxs = [];
+        const itemsIndex = computed<number[]>(() => {
+            const idxs: number[] = [];
             for (let i = 0; i < Object.keys(props.menu).length; i++) {
                 if (props.menu[i].type === 'item') idxs.push(i);
             }
@@ -104,9 +90,10 @@ export default {
         const focus = (position) => {
             const pos = position || 0;
             const idx = itemsIndex.value[pos];
-            document.getElementById(`context-item-${idx}-${uuid}`).focus();
+            // eslint-disable-next-line no-unused-expressions
+            document.getElementById(`context-item-${idx}-${uuid}`)?.focus();
         };
-        const onUpKey = (idx) => {
+        const onUpKey = (idx: number) => {
             const pos = itemsIndex.value.indexOf(idx);
             if (pos !== 0) { focus(pos - 1); } else { context.emit('onEndOfUpKey'); }
         };
@@ -140,7 +127,7 @@ export default {
             &:focus {
                 background-color: $hover-bg-color;
                 color: $hover-color !important;
-            } 
+            }
             &:active {
                 background-color: $active-bg-color;
                 color: $active-color !important;

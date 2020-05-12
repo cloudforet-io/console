@@ -21,18 +21,19 @@ import {
 import { Route } from 'vue-router';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import { setGtagUserID } from '@/lib/gtag';
 
 
 interface State {
-        component: any,
-        loader: () => Promise<any>
+        component: any;
+        loader: () => Promise<any>;
 }
 
 interface Credentials {
     // eslint-disable-next-line camelcase
-        access_token:string;
+        access_token: string;
     // eslint-disable-next-line camelcase
-        refresh_token:string;
+        refresh_token: string;
 }
 export default defineComponent({
     name: 'Login',
@@ -50,7 +51,7 @@ export default defineComponent({
             default: '/',
         },
     },
-    setup(props:any, context:any) {
+    setup(props: any, context: any) {
         console.debug('login!!');
         const vm = (getCurrentInstance() as any);
         vm.$ls.domain.getDomain(vm);
@@ -73,10 +74,11 @@ export default defineComponent({
                 return component;
             }),
         });
-        const login = async (userId:string, credentials:Credentials) => {
+        const login = async (userId: string, credentials: Credentials) => {
             vm.$ls.user.setToken(credentials.refresh_token, credentials.access_token);
             await vm.$ls.user.setUser(state.userType, userId, vm);
-            vm.$router.push(props.nextPath);
+            setGtagUserID(vm);
+            await vm.$router.push(props.nextPath);
         };
         return {
             ...toRefs(state),

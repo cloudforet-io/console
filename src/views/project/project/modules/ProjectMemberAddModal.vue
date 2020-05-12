@@ -34,7 +34,8 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import {
     makeProxy, requiredValidation,
 } from '@/lib/compostion-util';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { tagList } from '@/components/molecules/tags/toolset';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';

@@ -91,7 +91,8 @@ import PSearch from '@/components/molecules/search/Search.vue';
 import PTagsInput from '@/components/organisms/forms/tags-input/TagsInput.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PLabel from '@/components/atoms/labels/Label.vue';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { tagList } from '@/components/molecules/tags/toolset';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import {defaultQuery} from "@/lib/api/query";
 

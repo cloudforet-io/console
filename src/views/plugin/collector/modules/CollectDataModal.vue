@@ -82,7 +82,7 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, defineComponent, SetupContext, watch,
+    toRefs, reactive, computed, SetupContext, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
@@ -91,17 +91,13 @@ import { makeProxy } from '@/lib/compostion-util';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 // @ts-ignore
-import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
@@ -131,18 +127,13 @@ interface Props {
     collectorId: string;
 }
 
-export default defineComponent({
+export default {
     name: 'CollectDataModal',
     components: {
-        PEmpty,
         PButtonModal,
         PButton,
-        PDynamicForm,
         PFieldGroup,
-        PRow,
-        PCol,
         PTextInput,
-        PDropdownMenuBtn,
         PSelectDropdown,
         PLazyImg,
     },
@@ -206,7 +197,7 @@ export default defineComponent({
                 .setId(props.collectorId)
                 .setCollectMode(state.selectedCollectMode as COLLECT_MODE);
             // if (!_.isEmpty(state.filters)) api.setFilters(state.filters);
-            if (props.credentialId) api.setCredentialId(props.credentialId);
+            if (props.credentialId) api.setSecretId(props.credentialId);
             return api;
         });
 
@@ -288,7 +279,7 @@ export default defineComponent({
             onClickCollectConfirm,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -314,6 +305,7 @@ export default defineComponent({
 .sub-header {
     @apply text-gray-400;
     margin-bottom: 0.875rem;
+    margin-top: 0.875rem;
     font-size: 0.875rem;
     font-weight: bold;
 }

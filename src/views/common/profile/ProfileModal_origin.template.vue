@@ -102,7 +102,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import moment from 'moment-timezone';
 import {
@@ -195,7 +195,7 @@ export const profileSetup = (props, context) => {
     };
 };
 
-export default defineComponent({
+export default {
     name: 'ProfileModalTemplate',
     components: {
         PSelectDropdown,
@@ -212,7 +212,7 @@ export default defineComponent({
     setup(props, context) {
         return profileSetup(props, context);
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
