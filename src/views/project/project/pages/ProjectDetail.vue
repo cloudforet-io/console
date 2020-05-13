@@ -52,6 +52,7 @@
         <p-button-modal
             :header-title="headerTitle"
             :centered="true"
+            :scrollable="false"
             size="md"
             :fade="true"
             :backdrop="true"
