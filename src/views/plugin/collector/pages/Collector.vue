@@ -122,6 +122,7 @@ import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { dateTimeViewType } from '@/lib/data-source';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Component } from 'vue/types/umd';
+import { showErrorMessage } from '@/lib/util';
 
 const PTab = (): Component => import('@/components/organisms/tabs/tab/Tab.vue') as Component;
 const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/TableCheckModal.vue') as Component;
@@ -312,14 +313,7 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage(`Fail to ${checkModalState.title}`, e, context.root);
             } finally {
                 checkModalState.visible = false;
                 await apiHandler.getData();

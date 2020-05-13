@@ -204,6 +204,7 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.v
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'ServiceAccount',
@@ -377,9 +378,33 @@ export default {
             const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
             if (node) {
-                await action.setId(node.data.id).execute();
+                await action.setId(node.data.id).execute()
+                    .then(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Success',
+                            text: 'Change Project Success',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                    }).catch((e) => {
+                        showErrorMessage('Fail to Change Project', e, context.root);
+                    });
             } else {
-                await action.setReleaseProject().execute();
+                await action.setReleaseProject().execute()
+                    .then(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Success',
+                            text: 'Release Project Success',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                    }).catch((e) => {
+                        showErrorMessage('Fail to Release Project', e, context.root);
+                    });
             }
 
             await apiHandler.getData();
@@ -472,17 +497,12 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Deleted Success',
+                        text: 'Delete Secret Success',
                         duration: 2000,
                         speed: 1000,
                     });
-                }).catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Deleted Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                }).catch((e) => {
+                    showErrorMessage('Delete Failed', e, context.root);
                 })
                 .finally(() => {
                     deleteTargetHandler.value.getData();
@@ -524,18 +544,13 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Add Success',
+                        text: 'Add Secret Success',
                         duration: 2000,
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Add Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Add Credentials', e, context.root);
                 })
                 .finally(() => {
                     secretApiHandler.getData();

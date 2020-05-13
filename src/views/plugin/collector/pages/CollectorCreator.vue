@@ -51,6 +51,7 @@ import { fluentApi } from '@/lib/fluent-api';
 import { JsonSchemaObjectType } from '@/lib/type';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import { showErrorMessage } from '@/lib/util';
 
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue');
 const ConfigureCollector = () => import('@/views/plugin/collector/modules/ConfigureCollector.vue');
@@ -96,14 +97,7 @@ export default {
                 state.supportedSchema = res.data.capability.supported_schema;
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Get Plugin', e, root);
             }
         };
         getPlugin();
@@ -168,14 +162,7 @@ export default {
                 await root.$router.push('/plugin/collector');
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Create Collector', e, root);
             }
         };
 

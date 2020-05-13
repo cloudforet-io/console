@@ -87,6 +87,7 @@ import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
     collectModalProps, CollectModalPropsType,
 } from '@/components/organisms/modals/collect-modal/CollectModal.toolset';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'CollectModal',
@@ -202,14 +203,7 @@ export default {
                     speed: 1000,
                 });
             } catch (e) {
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'Request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Collect Data', e, context.root);
             } finally {
                 state.proxyVisible = false;
             }

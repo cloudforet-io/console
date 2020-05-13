@@ -6,7 +6,8 @@ import {
 import CredentialsTemplate, { credentialsSetup, eventNames } from '@/views/secret/credentials/Credentials.template.vue';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import {defaultQuery} from "@/lib/api/query";
+import { defaultQuery } from '@/lib/api/query';
+import { showErrorMessage } from '@/lib/util';
 
 
 export default {
@@ -94,14 +95,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Delete Credentials', error, context.root);
             });
         };
 
@@ -118,14 +112,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail to create secrets',
-                    text: 'Request to create secrets has failed.',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Create Credentials', e, context.root);
             });
         };
 

@@ -37,6 +37,7 @@ import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonS
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { showErrorMessage } from '@/lib/util';
 
 const DEFAULT_PRIORITY = 10;
 export interface Form {
@@ -203,14 +204,7 @@ export default {
                 }
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Get Versions', e, root);
             }
         };
 

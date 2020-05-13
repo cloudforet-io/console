@@ -1,7 +1,7 @@
 <template>
     <general-page-layout>
         <div class="top">
-            <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})"/>
+            <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
@@ -111,6 +111,7 @@ import PTableCheckModal from '@/components/organisms/modals/table-modal/TableChe
 import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'ProjectDetail',
@@ -235,20 +236,8 @@ export default {
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'Delete Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                })
-                .finally(() => {
-                    vm?.$router.push({
-                        name: 'projectMain',
-                    });
+                .catch((e) => {
+                    showErrorMessage('Delete Project Fail', e, context.root);
                 });
             formState.projectDeleteFormVisible = false;
         };
@@ -300,15 +289,8 @@ export default {
                         duration: 2000,
                         speed: 1000,
                     });
-                }).catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'Delete Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                }).catch((e) => {
+                    showErrorMessage('Fail to Delete Member', e, context.root);
                 })
                 .finally(() => {
                     apiHandler.getData();
