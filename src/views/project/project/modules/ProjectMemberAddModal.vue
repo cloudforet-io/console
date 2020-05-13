@@ -40,9 +40,10 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import {computed, reactive, toRefs} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { api } from '@/lib/api/axios';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'ProjectMemberAddModal',
@@ -126,15 +127,8 @@ export default {
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Add Fail',
-                        text: 'Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Add Member', e, context.root);
                 })
                 .finally(() => {
                     context.emit('confirm');

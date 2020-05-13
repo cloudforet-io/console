@@ -25,7 +25,7 @@
                 <p-dict-panel :dict.sync="apiHandler.tableTS.selectState.firstSelectItem.tags" />
             </template>
             <template #rawData>
-                <p-raw-data  class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
@@ -76,6 +76,7 @@ import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'Supervisor',
@@ -168,15 +169,8 @@ export default {
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to recover plugin', e, context.root);
                 })
                 .finally(() => {
                     apiHandler.getData();

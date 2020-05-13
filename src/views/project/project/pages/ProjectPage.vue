@@ -239,6 +239,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { showErrorMessage } from '@/lib/util';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -513,15 +514,8 @@ export default {
                     treeApiHandler.ts.treeRef.value.deleteNode(treeApiHandler.ts.metaState.firstSelectedNode);
                     treeApiHandler.ts.metaState.selectedNode = null;
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'Delete Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Delete Project Group', e, context.root);
                 });
             formState.projectGroupDeleteFormVisible = false;
         };
@@ -557,15 +551,8 @@ export default {
                     if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
                     if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
                 })
-                .catch((resp) => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Add Fail',
-                        text: 'Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Create Project Group', e, context.root);
                 });
             formState.projectGroupFormVisible = false;
         };
@@ -590,15 +577,8 @@ export default {
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Create a Project', e, context.root);
                 })
                 .finally(() => {
                     state.hasChildProject = true;

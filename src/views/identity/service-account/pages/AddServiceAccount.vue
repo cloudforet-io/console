@@ -147,6 +147,7 @@ import { useStore } from '@/store/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import _ from 'lodash';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import { showErrorMessage } from '@/lib/util';
 
 const accountFormSetup = (props) => {
     const actFixFormTS = new JsonSchemaFormToolSet();
@@ -344,24 +345,26 @@ export default {
                             .catch(async (errorResp) => {
                                 console.debug(errorResp);
                                 await deleteAccount(resp.data.service_account_id);
-                                vm?.$notify({
-                                    group: 'noticeBottomRight',
-                                    type: 'alert',
-                                    title: 'Add Fail',
-                                    duration: 2000,
-                                    speed: 1000,
-                                });
+                                // vm?.$notify({
+                                //     group: 'noticeBottomRight',
+                                //     type: 'alert',
+                                //     title: 'Add Fail',
+                                //     duration: 2000,
+                                //     speed: 1000,
+                                // });
+                                showErrorMessage('Fail to Add Account', errorResp, context.root);
                             });
                     })
                     .catch((eResp) => {
-                        console.debug(eResp);
-                        vm?.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'alert',
-                            title: 'Add Fail',
-                            duration: 2000,
-                            speed: 1000,
-                        });
+                        // console.debug(eResp);
+                        // vm?.$notify({
+                        //     group: 'noticeBottomRight',
+                        //     type: 'alert',
+                        //     title: 'Add Fail',
+                        //     duration: 2000,
+                        //     speed: 1000,
+                        // });
+                        showErrorMessage('Request Fail', eResp, context.root);
                     });
             }
         };

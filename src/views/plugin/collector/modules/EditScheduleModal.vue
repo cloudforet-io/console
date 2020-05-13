@@ -59,6 +59,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
+import { showErrorMessage } from '@/lib/util';
 
 class MenuItem {
     name: string;
@@ -179,14 +180,7 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Add Schedule', e, root);
             }
         };
 
@@ -219,14 +213,7 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Update Schedule', e, root);
             }
         };
 

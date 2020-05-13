@@ -53,6 +53,7 @@ import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { AxiosError } from 'axios';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
+import { showErrorMessage } from '@/lib/util';
 
 interface State {
     confRef: any;
@@ -126,14 +127,7 @@ export default {
                     });
                 } catch (e) {
                     console.error(e);
-                    root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: e.message,
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                    showErrorMessage('Fail to Update Collector', e, root);
                 } finally {
                     state.loading = false;
                     state.proxyVisible = false;
@@ -148,14 +142,7 @@ export default {
                 state.confRef.init(res.data);
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Get Collector', e, root);
             }
         };
 
@@ -169,14 +156,7 @@ export default {
                     new JsonSchemaObjectType());
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Get Plugin', e, root);
             }
         };
 
