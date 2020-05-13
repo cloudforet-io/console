@@ -181,7 +181,7 @@ export default defineComponent({
                     group: 'Server',
                     type: d.server_type,
                     count: d.server_count,
-                    defaultIcon: 'ic_list_increase',
+                    defaultIcon: 'ic_server',
                 })),
                 ...state.cloudServiceData.map(d => ({
                     group: d.cloud_service_group,

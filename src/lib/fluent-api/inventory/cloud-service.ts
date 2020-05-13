@@ -61,6 +61,8 @@ class MemberList extends MemberListAction<any, any> {
 }
 
 class ChangeProject extends SubMultiItemAction<any, any> {
+    isMutationApi = true
+
     path = 'change-project'
 
     idField = 'project_id'

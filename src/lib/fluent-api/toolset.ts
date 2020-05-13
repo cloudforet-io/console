@@ -28,6 +28,8 @@ export abstract class ActionAPI<parameter=any, resp=any> implements ActionAPIInt
 
     public abstract getParameter: () => parameter
 
+    isMutationApi = false
+
     async execute(): Promise<AxiosResponse<resp>> {
         let resp: AxiosResponse<resp> | any;
         if (this.method === 'get') {
@@ -334,18 +336,26 @@ export abstract class SetParameterAction<parameter, resp> extends RawParameterAc
 }
 
 export abstract class AddAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'add'
 }
 
 export abstract class CreateAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'create'
 }
 
 export abstract class RegisterAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'register'
 }
 
 export abstract class UpdateAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'update'
 }
 
@@ -491,18 +501,26 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
 }
 
 export abstract class SingleDeleteAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'delete';
 }
 
 export abstract class SingleDeregisterAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'deregister';
 }
 
 export abstract class SingleEnableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'enable';
 }
 
 export abstract class SingleDisableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'disable';
 }
 
@@ -518,10 +536,14 @@ export abstract class SubMultiItemAction<parameter, resp> extends SingleItemActi
 }
 
 export abstract class SubMultiItemAddAction<parameter, resp> extends SubMultiItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'add'
 }
 
 export abstract class SubMultiItemRemoveAction<parameter, resp> extends SubMultiItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'remove'
 }
 
@@ -561,13 +583,19 @@ export abstract class SingleItemMemberListAction<parameter, resp> extends Single
 }
 
 export abstract class MultiEnableAction<parameter, resp> extends MultiItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'enable';
 }
 export abstract class MultiDisableAction<parameter, resp> extends MultiItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'disable';
 }
 
 export abstract class MultiDeleteAction<parameter, resp> extends MultiItemAction<parameter, resp> {
+    isMutationApi = true;
+
     protected path = 'delete';
 }
 

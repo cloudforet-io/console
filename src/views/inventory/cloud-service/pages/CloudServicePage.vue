@@ -63,9 +63,9 @@
                     tag-page-name="cloudServicePageTags"
                 />
             </template>
-            <template #admin>
+            <template #member>
                 <s-dynamic-layout :api="adminApi"
-                                  :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                  :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                   v-bind="defaultAdminLayout"
                 />
             </template>
@@ -94,9 +94,9 @@
                     :data="apiHandler.tableTS.selectState.selectItems"
                 />
             </template>
-            <template #admin>
+            <template #member>
                 <s-dynamic-layout :api="adminApi"
-                                  :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                  :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                   v-bind="defaultAdminLayout"
                 />
             </template>
@@ -231,7 +231,7 @@ export default {
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['tag', 'TAB.TAG'],
-                ['admin', 'TAB.ADMIN'],
+                ['member', 'TAB.MEMBER'],
                 ['history', 'TAB.HISTORY'],
                 ['monitoring', 'TAB.MONITORING'],
             ]),
@@ -241,7 +241,7 @@ export default {
         const multiItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['data', 'TAB.DATA'],
-                ['admin', 'TAB.ADMIN'],
+                ['member', 'TAB.MEMBER'],
                 ['monitoring', 'TAB.MONITORING'],
             ]),
         });
@@ -361,11 +361,11 @@ export default {
         const adminIsShow = computed(() => {
             let result = false;
             if (apiHandler.tableTS.selectState.isSelectOne) {
-                result = singleItemTab.syncState.activeTab === 'admin';
+                result = singleItemTab.syncState.activeTab === 'member';
             }
 
             if (apiHandler.tableTS.selectState.isSelectMulti) {
-                result = multiItemTab.syncState.activeTab === 'admin';
+                result = multiItemTab.syncState.activeTab === 'member';
             }
             return result;
         });
