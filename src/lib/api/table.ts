@@ -209,15 +209,12 @@ export class TabSearchTableFluentAPI<
 }
 
 export const defaultAdminFields = [
-    { name: 'Resource Type', key: 'resource_type' },
-    { name: 'Resource ID', key: 'resource_id' },
-    { name: 'Resource Name', key: 'name' },
-    {
-        name: 'labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
-    },
     { name: 'User ID', key: 'user_info.user_id' },
     { name: 'Name', key: 'user_info.name' },
     { name: 'Email', key: 'user_info.email' },
+    {
+        name: 'labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
+    },
 ];
 
 export const defaultAdminOptions = {
