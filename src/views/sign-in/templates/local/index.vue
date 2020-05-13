@@ -54,7 +54,7 @@
             <p-button style-type="primary" type="submit" size="lg"
                       @click="login"
             >
-                Login
+                Sign in
             </p-button>
         </div>
         <div class="btn-divider">
