@@ -258,6 +258,7 @@
 			"GROUP": "Group",
 			"LANG": "Language",
 			"NAME": "Name",
+			"NEW_PWD": "New Password",
 			"PHONE": "Phone",
 			"PWD": "Password",
 			"PWD_CHECK": "Password Check",

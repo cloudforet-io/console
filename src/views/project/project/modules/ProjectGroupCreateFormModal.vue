@@ -2,6 +2,7 @@
     <p-button-modal
         header-title="Create Project Group"
         :centered="true"
+        :scrollable="false"
         size="lg"
         :fade="true"
         :backdrop="true"

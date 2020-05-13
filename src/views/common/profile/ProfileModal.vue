@@ -28,7 +28,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.email"
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
+                                          class="disabled block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -45,7 +45,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="$t('FORM.LABEL.PWD')"
+                                   :label="$t('FORM.LABEL.NEW_PWD')"
                                    :invalid-text="invalidMsg.password"
                                    :invalid="invalidState.password"
                     >

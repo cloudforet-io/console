@@ -4,6 +4,7 @@
         :centered="true"
         size="lg"
         :fade="true"
+        :scrollable="false"
         :backdrop="true"
         :visible.sync="proxyVisible"
         @confirm="confirm"
