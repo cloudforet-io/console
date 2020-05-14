@@ -1,10 +1,5 @@
 <template>
     <div>
-        <p-panel-top>
-            <template>
-                {{ $t('PANEL.CREDENTIAL') }}
-            </template>
-        </p-panel-top>
         <p-toolbox-table :items="items"
                          :fields="fields"
                          sortable
@@ -25,6 +20,13 @@
                          @clickRefresh="listCredentials"
                          @changeSort="listCredentials"
         >
+            <template #toolbox-left>
+                <p-panel-top use-total-count
+                             :total-count="totalCount"
+                >
+                    {{ $t('PANEL.CREDENTIAL') }}
+                </p-panel-top>
+            </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
             </template>
@@ -41,7 +43,7 @@
 
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
-                            :collectorId="collectorId"
+                            :collector-id="collectorId"
                             :credential-id="targetCredentialId"
         />
     </div>
@@ -146,5 +148,8 @@ export default {
 <style lang="postcss" scoped>
 .credential-btn {
     float: right;
+}
+.p-panel-top {
+    margin: 0;
 }
 </style>
