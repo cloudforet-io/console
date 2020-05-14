@@ -9,11 +9,16 @@ import { DefinitionProps } from '@/components/organisms/definition/PDefinition.t
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/toolset';
 
 
-export interface DynamicFieldType {
+export interface DynamicFieldType<options=any> {
     type: string;
     key: string;
     name: string;
-    options: any;
+    options?: {
+        link?: string;
+        sortable?: boolean;
+        // eslint-disable-next-line camelcase
+        sort_key?: string;
+    }&options;
 }
 
 interface BaseOptions {
@@ -48,12 +53,12 @@ interface Field extends DataTableFieldType{
     sortable: boolean;
 }
 
-export const makeFields = (props: DynamicLayoutProps|any) => computed<Field[]>((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({
+export const makeFields = (props: DynamicLayoutProps|any) => computed<DataTableFieldType[]>((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({
     name: ds.key,
     label: ds.name,
     sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
     // eslint-disable-next-line camelcase
-    sortKey: ds.type === 'list' && ds.options?.sub_key ? `${ds.key}.${ds.options.sub_key}` : undefined,
+    sortKey: ds.options?.sort_key,
 })) : []));
 
 export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicFieldType[] => (props.options.fields ? props.options.fields.map(ds => ({
