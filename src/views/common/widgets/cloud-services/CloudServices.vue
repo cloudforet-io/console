@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Cloud Services">
+    <p-widget-layout title="Cloud Services" help="Major services on management">
         <template #default>
             <div class="grid gap-2
                         grid-cols-1

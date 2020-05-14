@@ -1,6 +1,6 @@
 <template>
-    <p-widget-layout title="Top 5 Resource Managing Projects" help="Top 5 Projects" class="top-projects">
-        <div class="flex flex-col h-full">
+    <p-widget-layout title="Top 5 Resource Managing Projects" help="Check project ranking with most resources and service." class="top-projects">
+        <div class="flex flex-col h-full">=
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
                     <p-skeleton width="100%" height="100%" />
