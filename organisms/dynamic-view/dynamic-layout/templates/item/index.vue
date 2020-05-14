@@ -1,16 +1,6 @@
 <template>
     <div v-if="!isLoading">
         <p-panel-top>{{ name }}</p-panel-top>
-        <!--        <table v-if="!noData" class="content-table">-->
-        <!--            <tbody>-->
-        <!--                <Definition v-for="(bind, idx) in defs" :key="idx" class="def-row"-->
-        <!--                            v-bind="bind"-->
-        <!--                />-->
-        <!--            </tbody>-->
-        <!--        </table>-->
-        <!--        <p-empty v-else class="py-8">-->
-        <!--            No Data-->
-        <!--        </p-empty>-->
         <p-definition-table :items="defs">
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -21,7 +11,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, computed, reactive, watch, onMounted, ref,
+    defineComponent, computed, reactive, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
@@ -33,7 +23,7 @@ import {
     DynamicLayoutApiProp, checkCanGetData, changeSetOnlys,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import { ActionAPI, GetAction, ResourceActions } from '@/lib/fluent-api';
+import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import Definition from './definition.vue';
 
@@ -146,23 +136,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style lang="postcss" scoped>
-
-.content-table {
-    @apply w-full ;
-    /* border-spacing: 2px; */
-    tbody{
-        >>>.def-row:nth-child(2n+1) {
-            td{
-                @apply bg-violet-100;
-                &:first-child{
-                    @apply border-r-2 border-white
-                }
-            }
-
-        }
-    }
-}
-
-</style>

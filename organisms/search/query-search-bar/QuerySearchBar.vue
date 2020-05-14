@@ -36,7 +36,7 @@ const keyRegx = new RegExp('^(?<key>.+?):');
 const operatorRegx = new RegExp('^.+?:(?<operator>[=|<|>|!|$]=?)?');
 // const valueRegx = new RegExp('^.+?:(?:[=|<|>|!]=?)?(?<value>.+)');
 
-export default defineComponent({
+export default {
     name: 'PQuerySearchBar',
     components: { PSearch, PContextMenu },
     props: {
@@ -169,7 +169,7 @@ export default defineComponent({
             clickMenuEvent,
         };
     },
-});
+};
 
 </script>
 
