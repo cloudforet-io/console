@@ -31,7 +31,7 @@
             <p-button class="add-btn" style-type="primary-dark"
                       @click="addPair"
             >
-                <p-i name="ic_plus" color="transparent inherit"
+                <p-i name="ic_plus_bold" color="inherit"
                      width="1rem" height="1rem"
                 />
                 {{ $t('BTN.ADD') }}
