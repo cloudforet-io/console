@@ -69,9 +69,11 @@ export default {
         font-size: .875rem;
         line-height: 1.75rem;
         appearance: none;
-
+        &:hover{
+            @apply border-secondary;
+        }
         &:focus {
-            @apply border-gray-900 text-gray-900;
+            @apply border-secondary text-secondary bg-secondary2;
         }
         &:disabled {
             @apply border-gray-200 bg-gray-100;
