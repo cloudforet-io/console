@@ -72,7 +72,8 @@ export default {
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
                 height: '100%',
-                overflow: 'hidden',
+                'overflow-y': 'auto',
+                'overflow-x': 'hidden',
             })),
             sbStyle: computed(() => ({
                 width: 'auto',
@@ -119,7 +120,7 @@ export default {
             if (!state.hide) {
                 state.hide = true;
                 state.transition = true;
-                state.width = 16;
+                state.width = 10;
                 setTimeout(offTransition, 500);
             } else {
                 state.width = props.initWidth;
