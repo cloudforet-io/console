@@ -1,9 +1,15 @@
 <template>
-    <s-dynamic-layout :key="layout.name" :layout="layout"
-                      v-bind="layout"
-                      :api="api"
-                      :vbind="{colCopy: true}"
-    />
+    <div>
+        <s-dynamic-layout v-bind="layout"
+                          :api="api"
+                          :vbind="{colCopy: true}"
+        >
+            <!--            <template v-slot:[slotName]="{data, items, index}">-->
+            <!--                <p-lazy-img :img-url="items[index].tags.icon" />-->
+            <!--                <span class="ml-2">{{ data }}</span>-->
+            <!--            </template>-->
+        </s-dynamic-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -15,10 +21,12 @@ import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/S
 import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default defineComponent({
     name: 'CollectorDetail',
     components: {
+        PLazyImg,
         PDynamicDetails,
         SDynamicLayout,
     },
@@ -84,6 +92,7 @@ export default defineComponent({
             api: computed(() => ({
                 resource: fluentApi.inventory().collector().get().setId(props.collectorId),
             })),
+            slotName: computed(() => `${vm.$t('WORD.BASE_INFO')}-data-name`),
         });
         return {
             ...toRefs(state),

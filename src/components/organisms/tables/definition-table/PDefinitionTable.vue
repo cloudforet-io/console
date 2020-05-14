@@ -21,7 +21,7 @@
                     <p-definition v-for="(bind, idx) in items" :key="idx"
                                   class="def-row" v-bind="bind"
                     >
-                        <slot :name="`data-${bind.name}`" v-bind="bind" />
+                        <slot :name="`data-${bind.name}`" v-bind="{...bind, index: idx, items}" />
                     </p-definition>
                 </template>
             </tbody>
