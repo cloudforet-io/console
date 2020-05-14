@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { Computed, ComputedOrRef } from '@/lib/type';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { DefinitionProps } from '@/components/organisms/definition/PDefinition.toolset';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/toolset';
 
 
 export interface DynamicFieldType {
@@ -42,14 +43,17 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     responsiveStyle?: any;
     exportFields?: any[];
 }
-interface Field {
-    name: string;
+interface Field extends DataTableFieldType{
     label: string;
+    sortable: boolean;
 }
 
-export const makeFields = (props: DynamicLayoutProps|any) => computed((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({
+export const makeFields = (props: DynamicLayoutProps|any) => computed<Field[]>((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({
     name: ds.key,
     label: ds.name,
+    sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
+    // eslint-disable-next-line camelcase
+    sortKey: ds.type === 'list' && ds.options?.sub_key ? `${ds.key}.${ds.options.sub_key}` : undefined,
 })) : []));
 
 export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicFieldType[] => (props.options.fields ? props.options.fields.map(ds => ({

@@ -151,7 +151,6 @@ export default {
         };
         const fields = makeFields(props);
         const slots = makeTableSlots(props);
-
         const getAction = () => {
             let action: ActionAPI;
             if (props.api?.resource instanceof ActionAPI) {
