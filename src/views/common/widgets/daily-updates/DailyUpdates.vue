@@ -1,6 +1,6 @@
 <template>
     <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
-                     help="Daily Updates"
+                     help="Check your resource updates of daily usage."
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">

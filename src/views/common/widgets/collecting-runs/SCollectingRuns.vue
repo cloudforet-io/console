@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Recent Collecting Runs" help="Recent Collecting Runs">
+    <p-widget-layout title="Recent Collecting Runs" help="Check your collecting history with plugins list.">
         <template #extra>
             <div class="flex justify-end">
                 <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
