@@ -9,8 +9,9 @@
         </p-icon-text-button>
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
-                           :confirm-btn-bind="tabState.confirmBtnBind"
                            :invalid-state="tabState.invalidState"
+                           :loading="tabState.loading"
+                           :disabled="tabState.disabled"
                            @cancel="onCancel"
                            @confirm="onConfirm"
                            @changeStep="onChangeStep"
@@ -115,24 +116,38 @@ export default {
                 {
                     name: 'tags',
                     label: parent.$t('INVENTORY.TAB.ADD_TAG'),
-                    // optional: true,
+                    optional: true,
                 },
             ]),
             activeIdx: 0,
-            confirmBtnBind: computed(() => ({
-                disabled: !state.enableValidation || !state.isValid,
-            })),
+            loading: false,
             invalidState: computed(() => ({
                 conf: state.enableValidation && !state.isValid,
                 credentials: false,
                 tags: false,
             })),
+            disabled: computed(() => _.some(tabState.invalidState, v => v === true)),
         });
 
         const onCancel = () => {
             root.$router.go(-1);
         };
+
+        const onChangeStep = async (beforeIdx) => {
+            if (beforeIdx === 0) {
+                state.enableValidation = true;
+                await refs.conf.validate();
+            }
+        };
+
         const onConfirm = async () => {
+            if (!state.enableValidation) {
+                state.enableValidation = true;
+                await onChangeStep(0);
+                if (tabState.disabled) return;
+            }
+
+            tabState.loading = true;
             const params = {
                 name: state.form.name,
                 priority: state.form.priority,
@@ -163,13 +178,8 @@ export default {
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Create Collector', e, root);
-            }
-        };
-
-        const onChangeStep = async (beforeIdx) => {
-            if (beforeIdx === 0) {
-                state.enableValidation = true;
-                const res = await refs.conf.validate();
+            } finally {
+                tabState.loading = false;
             }
         };
 

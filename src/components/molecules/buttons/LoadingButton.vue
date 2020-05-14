@@ -1,5 +1,5 @@
 <template>
-    <p-button v-bind="buttonBind"
+    <p-button v-bind="mergedButtonBind"
               v-on="$listeners"
     >
         <div class="loading-btn">
@@ -13,12 +13,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
-export default defineComponent({
+export default {
     name: 'PLoadingButton',
+    components: { PLottie, PButton },
     props: {
         disabled: {
             type: Boolean,
@@ -35,22 +38,18 @@ export default defineComponent({
             }),
         },
     },
-    components: { PLottie, PButton },
     setup(props) {
         const state = reactive({
-            mergedButtonBind: computed(() => {
-                const res = {
-                    disabled: props.loading || props.disabled,
-                    ...props.buttonBind,
-                };
-                return res;
-            }),
+            mergedButtonBind: computed(() => ({
+                disabled: props.loading || props.disabled,
+                ...props.buttonBind,
+            })),
         });
         return {
-
+            ...toRefs(state),
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
