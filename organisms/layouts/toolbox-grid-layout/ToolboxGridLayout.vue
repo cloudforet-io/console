@@ -171,9 +171,10 @@ export default {
         @apply relative h-full w-full;
     }
     .transition-item {
-        @apply absolute w-full h-full;
+        @apply w-full h-full;
     }
     .fade-in-leave-active, .fade-in-enter-active {
+        @apply absolute;
         transition: opacity 0.25s;
     }
     .fade-in-leave-to, .fade-in-enter {
