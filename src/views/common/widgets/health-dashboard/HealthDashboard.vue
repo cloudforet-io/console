@@ -1,6 +1,6 @@
 <template>
     <p-widget-layout ref="widgetRef" class="health-dashboard" title="HEALTH DASHBOARD"
-                     help="Health Dashboard"
+                     help="Get a notice the status of AWS services."
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
@@ -44,11 +44,13 @@
                         </template>
                         <template #extra>
                             <div class="items-center">
-                                <p class="count">
-                                    {{ Math.abs(item.count) }}
-                                </p>
+                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="Affected Resource Entities">
+                                    <p class="count">
+                                        {{ Math.abs(item.count) }}
+                                    </p>
+                                </div>
                                 <p class="count-info">
-                                    entities
+                                    affected
                                 </p>
                             </div>
                         </template>

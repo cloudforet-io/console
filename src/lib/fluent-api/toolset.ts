@@ -108,11 +108,11 @@ const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_i
 
 type MergeQueryType = {[k: string]: ShortFilterType};
 
-const mergeQuery = (targetQuery: MergeQueryType, q: FilterItem, op: string): void => {
+const mergeQuery = (targetQuery: MergeQueryType, q: FilterItem, op: string): MergeQueryType => {
     const prefix = `${q.key}:${op}`;
     const vals = Array.isArray(q.value) ? q.value : [q.value];
     if (targetQuery[prefix]) {
-        targetQuery[prefix].v = _.merge(targetQuery[prefix].v, vals);
+        targetQuery[prefix].v = [...targetQuery[prefix].v as string[], ...vals];
     } else {
         targetQuery[prefix] = {
             k: q.key,
@@ -120,26 +120,28 @@ const mergeQuery = (targetQuery: MergeQueryType, q: FilterItem, op: string): voi
             o: op,
         };
     }
+    return targetQuery;
 };
 
-export const filterItemToQuery = (filters: FilterItem[], fixedFilters: FilterItem[] = []): FilterType[] | undefined => {
-    const filter: FilterType[] = [];
-
-    const mergeOpQuery: MergeQueryType = {};
+export const filterItemToQuery = (filters: FilterItem[] = [], fixedFilters: FilterItem[] = []): FilterType[] | undefined => {
     const rawFilters: FilterItem[] = [...fixedFilters, ...filters];
+    if (rawFilters.length === 0) return undefined;
+
+    const newFilters: FilterType[] = [];
+    let mergeOpQuery: MergeQueryType = {};
 
     rawFilters.forEach((q: FilterItem) => {
         const op = OPERATOR_MAP[q.operator];
 
         if (MERGE_OPERATOR_SET.has(op)) {
-            mergeQuery(mergeOpQuery, q, op);
+            mergeOpQuery = mergeQuery(mergeOpQuery, q, op);
         } else {
-            filter.push({ k: q.key, v: q.value, o: op });
+            newFilters.push({ k: q.key, v: q.value, o: op });
         }
     });
 
-    if (filter.length > 0 || !_.isEmpty(mergeOpQuery)) {
-        return [...filter, ...Object.values(mergeOpQuery)];
+    if (newFilters.length > 0 || !_.isEmpty(mergeOpQuery)) {
+        return [...newFilters, ...Object.values(mergeOpQuery)];
     }
     return undefined;
 };
@@ -181,13 +183,13 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
 
     protected getBaseQuery<Q extends BaseQuery>(query: Q, state?: BaseQueryState<any>): Q {
         const apiState = state || this.apiState;
-        if (apiState.filter?.length > 0 || apiState.fixFilter?.length > 0) {
+        if (Array.isArray(apiState.filter) || Array.isArray(apiState.fixFilter)) {
             const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filter, apiState.fixFilter);
             if (newFilter) query.filter = newFilter;
         }
-        if (apiState.filterOr?.length > 0 || apiState.fixFilterOr?.length > 0) {
-            const newFilter: FilterType[] | undefined = filterItemToQuery(apiState.filterOr, apiState.fixFilterOr);
-            if (newFilter) query.filter = newFilter;
+        if (Array.isArray(apiState.filterOr) || Array.isArray(apiState.fixFilterOr)) {
+            const newFilterOr: FilterType[] | undefined = filterItemToQuery(apiState.filterOr, apiState.fixFilterOr);
+            if (newFilterOr) query.filter_or = newFilterOr;
         }
         return query as Q;
     }
@@ -204,8 +206,9 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     }
 
     setFixFilter(...args: FilterItem[]): this {
-        this.apiState.fixFilter = args;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.fixFilter = args;
+        return api;
     }
 
     setFilterOr(...args: FilterItem[]): this {
@@ -301,8 +304,9 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     }
 
     setKeyword(keyword: string): this {
-        this.apiState.keyword = keyword;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.keyword = keyword;
+        return api;
     }
 }
 

@@ -28,7 +28,7 @@
                     {{ $t('BTN.ADD') }}
                 </p-button>
                 <p-dropdown-menu-btn :menu="dropdown"
-                                     class="left-toolbox-item"
+                                     class="ml-4"
                                      @click-update="openEditModal(items[selectIndex[0]])"
                                      @click-delete="deleteVisible = true"
                 >
@@ -199,12 +199,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-    .left-toolbox-item {
-        margin-left: 1rem;
-        &:last-child {
-            flex-grow: 1;
-        }
-    }
-</style>
