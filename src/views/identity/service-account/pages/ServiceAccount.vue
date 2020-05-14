@@ -517,8 +517,8 @@ export default {
             {
                 name: 'Created at',
                 key: 'created_at.seconds',
-                view_type: 'datetime',
-                view_option: {
+                type: 'datetime',
+                options: {
                     source_type: 'timestamp',
                     source_format: 'seconds',
                 },
