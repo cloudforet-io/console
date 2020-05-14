@@ -134,11 +134,11 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, reactive, ref, toRefs,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import {
-    getValue, platformBadgeFormatter, serverStateFormatter, showErrorMessage, timestampFormatter,
+    platformBadgeFormatter, serverStateFormatter, showErrorMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -149,7 +149,11 @@ import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
-    defaultAdminLayout, defaultHistoryLayout, QuerySearchTableFluentAPI,
+    defaultAdminLayout,
+    defaultHistoryLayout,
+    DefaultQSTableQSProps,
+    QuerySearchTableFluentAPI,
+    RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
@@ -172,12 +176,25 @@ import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/S
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import { Vue } from 'vue/types/vue';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
+const routerProps = {
+    selectItems: {
+        type: Array,
+        default: () => ([]),
+    },
+    filters: {
+        type: Array,
+        default: () => ([]),
+    },
+    selectTab: {
+        type: String,
+        default: '',
+    },
+};
 export default {
     name: 'Server',
-    filters: {
-        getValue,
-    },
     components: {
         GeneralPageLayout,
         PStatus,
@@ -195,7 +212,11 @@ export default {
         STagsPanel,
         PPageTitle,
     },
+    props: {
+        ...DefaultQSTableQSProps,
+    },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentInstance;
         const mainTableLayout = computed<any>(() => ({
             name: 'Server',
             type: baseTable.type as any,
@@ -266,7 +287,7 @@ export default {
 
                 return result;
             });
-        const apiHandler = new QuerySearchTableFluentAPI(
+        const apiHandler = new RouteQuerySearchTableFluentAPI(
             action,
             {
                 selectable: true,
@@ -280,6 +301,7 @@ export default {
             },
             undefined,
             { handlerClass: ACHandler, args },
+            vm,
         );
 
         const fields = makeTrItems([
@@ -486,6 +508,11 @@ export default {
             apiHandler,
         );
 
+        onMounted(async () => {
+            apiHandler.routerQuerySync(props);
+            console.debug(apiHandler.tableTS.querySearch.tags.value, 'before query');
+            await apiHandler.getData();
+        });
 
         return {
             ...toRefs(tabData),

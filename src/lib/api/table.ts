@@ -24,6 +24,12 @@ import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import {
     GetDataAction, ListType, MemberListAction, QueryAPI,
 } from '@/lib/fluent-api';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import _ from 'lodash';
+import { cleanQuery, pushRouterQuery } from '@/lib/api/router';
+import { makeSearchText, makeSearchQuery } from '@/components/organisms/search/query-search-bar/toolset';
+import { assert } from '@vue/composition-api/dist/utils';
+import { isNotEmpty } from '@/lib/util';
 
 interface DynamicTableOptions{
     options: any;
@@ -57,7 +63,7 @@ export abstract class BaseTableFluentAPI<
 
     getAction = () => this.getDefaultAction()
 
-    getData = async () => {
+    defaultGetData = async () => {
         this.tableTS.syncState.loading = true;
         this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
@@ -74,6 +80,10 @@ export abstract class BaseTableFluentAPI<
             this.tableTS.syncState.loading = false;
         }
     };
+
+    getData = async () => {
+        await this.defaultGetData();
+    }
 
     protected defaultReset = () => {
         this.tableTS.state.allPage = 1;
@@ -387,6 +397,108 @@ export class QuerySearchTableFluentAPI<
     resetAll = () => {
         this.defaultReset();
         this.tableTS.querySearch.state.searchText = '';
+    };
+}
+interface QuerySearchQSNameType{
+    selectItems: string;
+    filters: string;
+    sortBy: string;
+    sortDesc: string;
+    thisPage: string;
+    pageSize: string;
+}
+
+export enum DefaultQSTableQSName {
+    selectItems= 'selects',
+    filters= 'f',
+    sortBy='sb',
+    sortDesc= 'sd',
+    thisPage= 'p',
+    pageSize= 'ps',
+}
+export const DefaultQSTableQSProps = {
+    [DefaultQSTableQSName.selectItems]: {
+        type: [Array, String],
+        default: null,
+    },
+    [DefaultQSTableQSName.filters]: {
+        type: [Array, String],
+        default: null,
+    },
+    [DefaultQSTableQSName.sortBy]: {
+        type: String,
+        default: null,
+    },
+    [DefaultQSTableQSName.sortDesc]: {
+        type: String,
+        default: null,
+    },
+    [DefaultQSTableQSName.thisPage]: {
+        type: [String, Number],
+        default: null,
+    },
+    [DefaultQSTableQSName.pageSize]: {
+        type: [String, Number],
+        default: null,
+    },
+};
+export class RouteQuerySearchTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
+    > extends QuerySearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
+    constructor(
+        action: action,
+        initData: initData = undefined as unknown as initData,
+        initSyncData: initSyncData = undefined as unknown as initSyncData,
+        acHandlerMeta: ACHandlerMeta = defaultACHandler,
+        public vm: Vue|ComponentInstance,
+        public routerName: QuerySearchQSNameType = DefaultQSTableQSName,
+        public isReady = false,
+    ) {
+        super(action, initData, initSyncData, acHandlerMeta);
+    }
+
+    routerQuerySync = (props: any, getData = true) => {
+        console.debug(props);
+
+        if (isNotEmpty(props[this.routerName.pageSize])) {
+            this.tableTS.syncState.pageSize = Number(props[this.routerName.pageSize]);
+        }
+        if (isNotEmpty(props[this.routerName.thisPage])) {
+            this.tableTS.syncState.thisPage = Number(props[this.routerName.thisPage]);
+        }
+        const filters = props[this.routerName.filters];
+        if (isNotEmpty(filters)) {
+            this.tableTS.querySearch.tags.value = Array.isArray(filters) ? props[this.routerName.filters].map(v => makeSearchQuery(v)) : [makeSearchQuery(filters)];
+            console.debug(this.tableTS.querySearch.tags.value);
+        }
+        this.isReady = true;
+    };
+
+    routerGetData = async () => {
+        const query = {
+            ...this.vm.$route.query,
+            [this.routerName.sortBy]: this.tableTS.syncState.sortBy,
+            [this.routerName.sortDesc]: String(this.tableTS.syncState.sortDesc),
+            [this.routerName.filters]: this.tableTS.querySearch.tags.value?.map(t => makeSearchText(t.key, t.operator, t.value)),
+            [this.routerName.thisPage]: this.tableTS.syncState.thisPage,
+            [this.routerName.pageSize]: this.tableTS.syncState.pageSize,
+        };
+        if (!query[this.routerName.sortBy]) {
+            delete query[this.routerName.sortDesc];
+        }
+        await pushRouterQuery(this.vm, query);
+    }
+
+    getData = async () => {
+        if (this.isReady) {
+            await this.defaultGetData();
+            await this.routerGetData();
+        }
     };
 }
 
