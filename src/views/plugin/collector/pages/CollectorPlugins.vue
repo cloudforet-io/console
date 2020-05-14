@@ -150,6 +150,9 @@ export const setup = (props, { root }) => {
     );
 
     const listPlugins = _.debounce(async () => {
+        apiHandler.action = apiHandler.action
+            .setRepositoryId(repoState.selectedRepoId)
+            .setSortBy(state.sortBy);
         await apiHandler.getData();
     }, 100);
 
@@ -160,7 +163,6 @@ export const setup = (props, { root }) => {
                 .execute();
             repoState.repositories = res.data.results;
             repoState.selectedRepoId = res.data.results[0].repository_id;
-            apiHandler.action.setRepositoryId(repoState.selectedRepoId);
             await listPlugins();
         } catch (e) {
             console.error(e);
@@ -175,14 +177,12 @@ export const setup = (props, { root }) => {
 
     watch(() => repoState.selectedRepoId, (repoId, _repoId) => {
         if (repoId && repoId !== _repoId) {
-            apiHandler.action = listApi.setRepositoryId(repoState.selectedRepoId);
             listPlugins();
         }
     });
 
     watch(() => state.sortBy, (sortBy, _sortBy) => {
         if (sortBy && sortBy !== _sortBy) {
-            apiHandler.action = apiHandler.action.setSortBy(sortBy);
             listPlugins();
         }
     });
