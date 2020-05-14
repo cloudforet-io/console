@@ -28,8 +28,7 @@
                     <li>
                         <router-link class="group" to="/dashboard">
                             <span class="icon">
-                                <p-i name="ic_dashboard" width="2rem" height="2rem"
-                                     color="transparent inherit"
+                                <p-i name="ic_dashboard"
                                 />
                             </span>
                             <span class="name">Dashboard</span>
@@ -257,7 +256,7 @@ export default {
         .service {
             padding: 0.5rem  0 0.5rem 4.5rem;
             &.last {
-                margin-bottom: 1rem;
+                margin-bottom: .5rem;
             }
         }
     }
