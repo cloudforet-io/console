@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
+    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <p-grid-layout
                 class="provider-list"
@@ -117,9 +117,9 @@
                                 </template>
                             </s-dynamic-layout>
                         </template>
-                        <template #admin>
+                        <template #member>
                             <s-dynamic-layout :api="adminApi"
-                                              :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                              :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                               v-bind="defaultAdminLayout"
                             />
                         </template>
@@ -136,9 +136,9 @@
                                 :vbind="{showTitle:false}"
                             />
                         </template>
-                        <template #admin>
+                        <template #member>
                             <s-dynamic-layout :api="adminApi"
-                                              :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                              :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                               v-bind="defaultAdminLayout"
                             />
                         </template>
@@ -162,7 +162,7 @@
                                     @confirm="secretFormConfirm($event)"
             />
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
@@ -170,7 +170,7 @@
 import {
     computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -204,11 +204,12 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.v
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'ServiceAccount',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PHorizontalLayout,
         PTab,
         PButton,
@@ -308,7 +309,7 @@ export default {
                 ['detail', 'TAB.DETAILS'],
                 ['tag', 'TAB.TAG'],
                 ['credentials', 'TAB.CREDENTIALS'],
-                ['admin', 'TAB.ADMIN'],
+                ['member', 'TAB.MEMBER'],
             ]),
         });
         singleItemTab.syncState.activeTab = 'detail';
@@ -316,7 +317,7 @@ export default {
         const multiItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['data', 'TAB.DATA'],
-                ['admin', 'TAB.ADMIN'],
+                ['member', 'TAB.MEMBER'],
             ]),
         });
         multiItemTab.syncState.activeTab = 'data';
@@ -377,9 +378,33 @@ export default {
             const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
             if (node) {
-                await action.setId(node.data.id).execute();
+                await action.setId(node.data.id).execute()
+                    .then(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Success',
+                            text: 'Change Project Success',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                    }).catch((e) => {
+                        showErrorMessage('Fail to Change Project', e, context.root);
+                    });
             } else {
-                await action.setReleaseProject().execute();
+                await action.setReleaseProject().execute()
+                    .then(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Success',
+                            text: 'Release Project Success',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                    }).catch((e) => {
+                        showErrorMessage('Fail to Release Project', e, context.root);
+                    });
             }
 
             await apiHandler.getData();
@@ -417,11 +442,11 @@ export default {
             let result = false;
             if (selectProvider.value) {
                 if (apiHandler.tableTS.selectState.isSelectOne) {
-                    result = singleItemTab.syncState.activeTab === 'admin';
+                    result = singleItemTab.syncState.activeTab === 'member';
                 }
 
                 if (apiHandler.tableTS.selectState.isSelectMulti) {
-                    result = multiItemTab.syncState.activeTab === 'admin';
+                    result = multiItemTab.syncState.activeTab === 'member';
                 }
             }
             return result;
@@ -472,17 +497,12 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Deleted Success',
+                        text: 'Delete Secret Success',
                         duration: 2000,
                         speed: 1000,
                     });
-                }).catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Deleted Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                }).catch((e) => {
+                    showErrorMessage('Delete Failed', e, context.root);
                 })
                 .finally(() => {
                     deleteTargetHandler.value.getData();
@@ -524,18 +544,13 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Add Success',
+                        text: 'Add Secret Success',
                         duration: 2000,
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Add Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Add Credentials', e, context.root);
                 })
                 .finally(() => {
                     secretApiHandler.getData();

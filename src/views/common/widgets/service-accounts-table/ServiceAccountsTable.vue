@@ -4,6 +4,7 @@
             <p-data-table :fields="fields"
                           :sortable="false"
                           :selectable="false"
+                          :bordered="false"
                           :loading="loading"
                           :items="data"
                           :top-border="false"
@@ -220,6 +221,11 @@ export default defineComponent({
             table-layout: fixed;
             font-size: 0.875rem;
         }
+        tr {
+            &:nth-child(2n+1) {
+                 @apply bg-primary4;
+             }
+        }
         td {
             @apply truncate cursor-pointer;
             &:first-child {
@@ -231,16 +237,16 @@ export default defineComponent({
                  width: 5.6rem;
              }
             &:nth-child(2) {
-                 width: 6.6rem;
+                 width: 5.6rem;
              }
             &:nth-child(3) {
-                 width: 7.6rem;
+                 width: 4.6rem;
              }
             &:nth-child(4) {
-                 width: 7.6rem;
+                 width: 4.6rem;
              }
             &:last-child {
-                 width: 7.6rem;
+                 width: 4.6rem;
              }
         }
     }

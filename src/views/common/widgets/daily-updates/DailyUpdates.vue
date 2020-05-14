@@ -21,7 +21,9 @@
                            :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item :icon-url="item.icon" theme="card" @click="onItemClick(item, idx)">
+                    <p-selectable-item :icon-url="item.icon" :default-icon="item.defaultIcon" theme="card"
+                                       @click="onItemClick(item, idx)"
+                    >
                         <template #contents>
                             <div v-tooltip.bottom.start="{content: item.group, delay: {show: 500}}" class="group">
                                 {{ item.group }}
@@ -83,6 +85,7 @@ interface Data {
     type: string;
     count: number;
     icon?: string;
+    defaultIcon?: string;
 }
 
 interface Props {
@@ -178,6 +181,7 @@ export default defineComponent({
                     group: 'Server',
                     type: d.server_type,
                     count: d.server_count,
+                    defaultIcon: 'ic_server',
                 })),
                 ...state.cloudServiceData.map(d => ({
                     group: d.cloud_service_group,

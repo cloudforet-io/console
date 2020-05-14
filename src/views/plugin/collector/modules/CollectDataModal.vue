@@ -101,6 +101,7 @@ import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collect
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { showErrorMessage } from '@/lib/util';
 
 interface State {
     loading: boolean;
@@ -217,14 +218,7 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Collect Data', e, context.root);
             } finally {
                 state.proxyVisible = false;
             }

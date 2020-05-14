@@ -58,6 +58,28 @@ export const IntegerProperty = (label: string, required?, placeholder?: string, 
     };
 };
 
+export const ArrayProperty = (label: string, required?, placeholder?: string, itemType?: JsonSchemaType, extra?: any): JsonSchema<'array'> => {
+    const result: any = {
+        type: 'array',
+        title: label,
+    };
+    if (placeholder) {
+        result.examples = [placeholder];
+    }
+    if (required) {
+        result.minLength = 2;
+    }
+    if (itemType) {
+        result.items = {
+            type: itemType,
+        };
+    }
+    return {
+        ...result,
+        ...extra,
+    };
+};
+
 export class JsonSchemaObjectType implements JsonSchema<'object'> {
     type: 'object'='object';
 
@@ -78,6 +100,15 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
         this.properties[name] = StringProperty(label, required, undefined, {
             ...extra,
             enum: enumData,
+        });
+        if (required) {
+            this.required.push(name);
+        }
+    }
+
+    addArrayProperty(name: string, label: string, required?: boolean, itemType?: JsonSchemaType, extra?: any) {
+        this.properties[name] = ArrayProperty(label, required, undefined, itemType, {
+            ...extra,
         });
         if (required) {
             this.required.push(name);

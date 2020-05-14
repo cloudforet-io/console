@@ -124,9 +124,6 @@ import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
-import SchemaFilter from '@/views/secret/credentials/modules/SchemaFilter.vue';
-import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');

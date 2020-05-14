@@ -6,7 +6,7 @@ import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/tools
 import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
 
 export default {
-    title: 'organisms/modals/tree-modal',
+    title: 'organisms/modals/tree_origin-modal',
     component: PTreeModal,
     parameters: {
         info: {

@@ -28,7 +28,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.email"
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
+                                          class="disabled block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -45,7 +45,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="$t('FORM.LABEL.PWD')"
+                                   :label="$t('FORM.LABEL.NEW_PWD')"
                                    :invalid-text="invalidMsg.password"
                                    :invalid="invalidState.password"
                     >
@@ -109,7 +109,7 @@ import {
     makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
 } from '@/lib/compostion-util';
 import { LANGUAGES } from '@/lib/global-enums';
-import { MenuItem } from '@/lib/util';
+import { MenuItem, showErrorMessage } from '@/lib/util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
@@ -203,15 +203,8 @@ export const profileSetup = (props, context) => {
                 });
                 state.proxyVisible = false;
             })
-            .catch(() => {
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'Update Request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+            .catch((e) => {
+                showErrorMessage('Fail to Update Owner', e, context.root);
             });
     };
 
@@ -229,15 +222,8 @@ export const profileSetup = (props, context) => {
                 });
                 state.proxyVisible = false;
             })
-            .catch(() => {
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'Update Request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+            .catch((e) => {
+                showErrorMessage('Fail to Update User', e, context.root);
             });
     };
 

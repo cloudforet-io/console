@@ -1,32 +1,25 @@
-<template>
-    <div>
-        <p-vertical-layout v-bind="$props" v-on="$listeners">
-            <template #leftContainer="prop">
-                <slot name="leftContainer"
-                      :width="prop.width"
-                      :widthRaw="prop.widthRaw"
-                />
-            </template>
-            <template #dragger>
-                <slot name="dragger" />
-            </template>
-            <template #rightContainer="prop">
-                <div class="right-container" :style="{height: prop.height}">
-                    <div class="page-contents">
-                        <slot name="rightContainer" />
-                    </div>
-                    <div class="fnb">
-                        <FNB />
-                    </div>
+'<template>
+    <p-vertical-layout v-bind="$props" v-on="$listeners">
+        <template #sidebar="prop">
+            <slot name="sidebar"
+                  :width="prop.width"
+            />
+        </template>
+        <template #default>
+            <div class="right-container">
+                <div class="page-contents">
+                    <slot name="default" />
                 </div>
-            </template>
-        </p-vertical-layout>
-    </div>
+                <div class="fnb">
+                    <FNB />
+                </div>
+            </div>
+        </template>
+    </p-vertical-layout>
 </template>
 
 <script>
 import styles from '@/styles/variables';
-
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import FNB from '@/views/containers/fnb/FNB.vue';
 
@@ -36,54 +29,45 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles['lnb-height']})`,
+            default: '100%',
         },
-        line: {
-            type: Boolean,
-            default: true,
-        },
-        leftWidth: {
+        initWidth: {
             type: Number,
-            default: 278,
+            default: 450,
         },
-        minLeftWidth: {
+        minWidth: {
             type: Number,
-            default: 150,
+            default: 100,
         },
-        maxLeftWidth: {
+        maxWidth: {
             type: Number,
-            default: 600,
-        },
-        totalWidth: {
-            type: String,
-            default: `calc(100vw -${styles['gnb-width']})`,
-        },
-        autoSaveLeftWidth: {
-            type: Boolean,
-            default: true,
-        },
-        minLeftSize: {
-            type: Number,
-            default: 16,
+            default: 500,
         },
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.right-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
-    .page-contents {
-        width: 100%;
-        flex-grow: 1;
-        padding-top: 1.5625rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
+    .right-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+
+        .page-contents {
+            width: 100%;
+            flex-grow: 1;
+            /*padding: 1.5625rem 2rem 2rem;*/
+            padding-top: 1rem;
+            padding-right: 1rem;
+        }
+
+        .fnb {
+            width: 100%;
+        }
+
     }
     .fnb {
         width: 100%;
     }
-}
 </style>

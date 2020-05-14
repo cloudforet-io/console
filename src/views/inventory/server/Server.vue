@@ -138,7 +138,7 @@ import {
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import {
-    getValue, platformBadgeFormatter, serverStateFormatter, timestampFormatter,
+    getValue, platformBadgeFormatter, serverStateFormatter, showErrorMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -389,15 +389,8 @@ export default {
                     duration: 2000,
                     speed: 1000,
                 });
-            }).catch(() => {
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+            }).catch((e) => {
+                showErrorMessage('Request Fail', e, context.root);
             })
                 .finally(() => {
                     apiHandler.getData();

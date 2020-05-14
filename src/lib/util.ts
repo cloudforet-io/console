@@ -4,6 +4,9 @@ import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
 import { ColorBindFactory } from '@/lib/view-helper';
+import { getCurrentInstance } from '@vue/composition-api';
+import { getCurrentVM } from '@vue/composition-api/dist/runtimeContext';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 // color set
 /**
@@ -74,16 +77,16 @@ export const userStateColor = Object.freeze({
     },
 });
 
-export const cdgStateColor = Object.freeze({
-    ENABLED: {
-        iconColor: styles.safe,
-        textColor: styles.gray[900],
-    },
-    DISABLED: {
-        iconColor: styles.alert,
-        textColor: styles.alert,
-    },
-});
+// export const cdgStateColor = Object.freeze({
+//     ENABLED: {
+//         iconColor: styles.safe,
+//         textColor: styles.gray[900],
+//     },
+//     DISABLED: {
+//         iconColor: styles.alert,
+//         textColor: styles.alert,
+//     },
+// });
 
 export const platformBadgeColor = Object.freeze({
     BAREMETAL: { backgroundColor: styles.gray[900] },
@@ -139,27 +142,27 @@ export const getValue = (scope, paths, defaultValue) => {
 };
 
 
-export const isSelectedType = (d, t) => {
-    if (t.toUpperCase() === 'N') {
-        // eslint-disable-next-line no-restricted-globals
-        return (Number.isInteger(d) && !isNaN(d));
-    } if (t.toUpperCase() === 'D' || t.toUpperCase() === 'F') {
-        // eslint-disable-next-line no-restricted-globals
-        return (!isNaN(parseFloat(d)));
-    } if (t.toUpperCase() === 'B') {
-        return ['1', '0', 1, 0, true, false].includes(d);
-    } if (t.toUpperCase() === 'LIST') {
-        const splitString = d.split(',');
-        return !splitString.includes('');
-    } if (t.toUpperCase() === 'S' || t.toUpperCase() === 'STR') {
-        return (typeof d === 'string' || d instanceof String);
-    } if (t.toUpperCase() === 'O') {
-        return (typeof d === 'object' && d !== null && !Array.isArray(d));
-    } if (t.toUpperCase() === 'A') {
-        return Array.isArray(d);
-    }
-    throw new Error('Please, Check data type');
-};
+// export const isSelectedType = (d, t) => {
+//     if (t.toUpperCase() === 'N') {
+//         // eslint-disable-next-line no-restricted-globals
+//         return (Number.isInteger(d) && !isNaN(d));
+//     } if (t.toUpperCase() === 'D' || t.toUpperCase() === 'F') {
+//         // eslint-disable-next-line no-restricted-globals
+//         return (!isNaN(parseFloat(d)));
+//     } if (t.toUpperCase() === 'B') {
+//         return ['1', '0', 1, 0, true, false].includes(d);
+//     } if (t.toUpperCase() === 'LIST') {
+//         const splitString = d.split(',');
+//         return !splitString.includes('');
+//     } if (t.toUpperCase() === 'S' || t.toUpperCase() === 'STR') {
+//         return (typeof d === 'string' || d instanceof String);
+//     } if (t.toUpperCase() === 'O') {
+//         return (typeof d === 'object' && d !== null && !Array.isArray(d));
+//     } if (t.toUpperCase() === 'A') {
+//         return Array.isArray(d);
+//     }
+//     throw new Error('Please, Check data type');
+// };
 
 /** @function
  * @name selectToCopyToClipboard
@@ -192,6 +195,28 @@ export const isNotEmpty = (value): boolean => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
+};
+
+/** * @function
+ *   @name showErrorMessage
+ *   @param error
+ *   @param root
+ *   @returns
+ */
+export const showErrorMessage = (errorTitle, error, root) => {
+    const vm = getCurrentInstance();
+    const vmRoot = root || vm;
+    const errorMsg = error.response.data.error.message;
+    if (vmRoot) {
+        vmRoot.$notify({
+            group: 'noticeBottomRight',
+            type: 'alert',
+            title: errorTitle,
+            text: errorMsg,
+            duration: 2000,
+            speed: 1000,
+        });
+    }
 };
 
 /**

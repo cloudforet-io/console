@@ -12,6 +12,7 @@ import {
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { defaultQuery } from '@/lib/api/query';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'User',
@@ -133,14 +134,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Enable User', error, context.root);
             });
         };
         const disableUser = async (items) => {
@@ -156,14 +150,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Disable User', e, context.root);
             });
         };
 
@@ -180,14 +167,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Delete User', e, context.root);
             });
         };
 
@@ -204,14 +184,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Add User', e, context.root);
             });
         };
 
@@ -228,14 +201,7 @@ export default {
                 });
             }).catch((error) => {
                 console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Update User', e, context.root);
             });
         };
         mountBusEvent(userEventBus, userEventNames.getUserList, requestUserList);

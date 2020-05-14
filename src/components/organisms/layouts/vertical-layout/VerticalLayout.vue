@@ -1,249 +1,175 @@
 <template>
-    <div class="box-container" :style="{height: `calc(${height} - 1rem`}"
-         tabindex="0"
-         @keyup="setMinimizeAndRevertByKey"
-    >
-        <div :style="{height: height}"
-             :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true}"
+    <div class="vertical-container" :style="{height: height}">
+        <div class="sidebar-container" :style="sbContainerStyle"
+             :class="{transition:transition}"
         >
-            <slot name="leftContainer" :width="`${leftContainerWidth}px`" :widthRaw="leftContainerWidth" />
+            <div :style="sbStyle">
+                <slot name="sidebar" :width="width" />
+            </div>
         </div>
-
-        <div class="dragger-container" :class="{ line: lineCass, 'prohibit-line': blockHover }" :style="{
-                 height: height,
-                 width: `${draggerWidth}px`,
-             }"
-             @mousedown="onMousedown"
+        <div class="resizer-container line"
+             @mousedown="startResizing"
+             @mousemove="isResizing"
+             @mouseup="endResizing"
         >
-            <span class="dragger">
-                <span @mouseenter="mouseOnOver(true)" @mouseleave="mouseOnOver(false)">
-                    <slot name="dragger">
-                        <p-i v-if="!isMinimized"
-                             class="btn-vertical-dragger"
-                             :width="'1rem'"
-                             :height="'1rem'"
-                             color="white inherit"
-                             :name="'btn_ic_tree_hidden'"
-                             @click="setMinimizeAndRevert(true)"
-                        />
-                        <p-i v-else
-                             class="btn-vertical-dragger"
-                             :width="'1rem'"
-                             :height="'1rem'"
-                             color="white inherit"
-                             :name="'btn_ic_tree_hidden—folded'"
-                             @click="setMinimizeAndRevert(false)"
+            <span class="resizer">
+                <span @click="hideSidebar">
+                    <slot name="hide-button">
+                        <p-i class="btn-vertical-hide"
+                             width="1.25rem"
+                             height="1.25rem"
+                             :name="hide ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
+                             :color="hide ? undefined : 'white primary3'"
                         />
                     </slot>
                 </span>
             </span>
         </div>
-
-        <div class="content-container right"
-             :style="{
-                 height: height,
-                 width: rightContainerWidth
-             }"
-        >
-            <div>
-                <slot name="rightContainer" :height="height" />
-            </div>
+        <div class="main" :style="mainStyle">
+            <slot />
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
-import { defineComponent } from '@vue/composition-api';
-import styles from '@/styles/variables';
+import {
+    toRefs, reactive, ref, computed,
+} from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
+import { documentEventMount } from '@/lib/compostion-util';
+import styles from '@/styles/variables';
 
-export default defineComponent({
+export default {
     name: 'VerticalLayout',
-    components: { PI },
-    events: ['start', 'move', 'stop'],
+    components: {
+        PI,
+    },
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles['lnb-height']})`,
+            default: '100%',
         },
-        line: {
-            type: Boolean,
-            default: true,
-        },
-        leftWidth: {
+        initWidth: {
             type: Number,
             default: 300,
         },
-        minLeftWidth: {
+        minWidth: {
             type: Number,
-            default: 150,
+            default: 100,
         },
-        maxLeftWidth: {
+        maxWidth: {
             type: Number,
-            default: 600,
-        },
-        totalWidth: {
-            type: String,
-            default: `calc(100vw -${styles['gnb-width']})`,
-        },
-        autoSaveLeftWidth: {
-            type: Boolean,
-            default: true,
-        },
-        minLeftSize: {
-            type: Number,
-            default: 16,
+            default: 500,
         },
     },
-    data() {
+    setup(props, context) {
+        const state = reactive({
+            width: props.initWidth,
+            resizing: false,
+            clientX: null,
+            hide: false,
+            transition: false,
+            sbContainerStyle: computed(() => ({
+                width: `${state.width}px`,
+                height: '100%',
+                overflow: 'hidden',
+            })),
+            sbStyle: computed(() => ({
+                width: 'auto',
+                // height: '100%',
+                minWidth: `${props.minWidth}px`,
+                maxWidth: `${props.maxWidth}px`,
+                opacity: state.hide && !state.transition ? 0 : 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+            })),
+            mainStyle: computed(() => ({
+                width: `calc( 100% - ${state.width}px )`,
+                height: props.height,
+            })),
+        });
+
+        /* Resizing */
+        const isResizing = (event) => {
+            if (state.resizing) {
+                if (state.clientX === null) {
+                    state.clientX = event.clientX;
+                    return;
+                }
+                const delta = state.clientX - event.clientX;
+                const width = state.width - delta;
+                if (!(width <= props.minWidth || width > props.maxWidth)) {
+                    state.width = width;
+                }
+                state.clientX = event.clientX;
+            }
+            event.preventDefault();
+        };
+        const endResizing = () => {
+            state.resizing = false;
+            state.clientX = null;
+        };
+        const startResizing = () => {
+            state.resizing = true;
+        };
+
+        /* Toggle hide Sidebar */
+        const offTransition = () => { state.transition = false; };
+        const hideSidebar = () => {
+            if (!state.hide) {
+                state.hide = true;
+                state.transition = true;
+                state.width = 16;
+                setTimeout(offTransition, 500);
+            } else {
+                state.width = props.initWidth;
+                state.transition = true;
+                state.hide = false;
+                setTimeout(offTransition, 500);
+            }
+        };
+        documentEventMount('mousemove', isResizing);
+        documentEventMount('mouseup', endResizing);
         return {
-            lineCass: this.line,
-            transitionEffect: true,
-            leftContainerWidth: parseFloat(this.leftWidth),
-            isMinimized: false,
-            draggerWidth: 10,
-            blockHover: false,
-            previousWidth: null,
-            dragging: false,
-            mouseOver: false,
-            pageX: null,
+            ...toRefs(state),
+            hideSidebar,
+            startResizing,
+            isResizing,
+            endResizing,
         };
     },
-    computed: {
-        rightContainerWidth() {
-            console.debug(`calc(100vw - ${styles['gnb-width']} - ${this.leftContainerWidth + this.draggerWidth}px)`);
-            return `calc(100vw - ${styles['gnb-width']} - ${this.leftContainerWidth + this.draggerWidth}px)`;
-        },
-    },
-    created() {
-        this.initDefaultLeftWidth();
-    },
-    beforeDestroy() {
-        this.finalizeDefaultLeftWidth();
-    },
-    methods: {
-        // ...mapActions('layout', [
-        //     'setVerticalLeftWidth',
-        // ]),
-        mouseOnOver(flag) {
-            if (this.isMinimized) {
-                this.lineCass = false;
-                this.blockHover = !this.lineCass;
-            } else {
-                this.lineCass = true;
-                this.blockHover = !this.lineCass;
-                this.mouseOver = flag;
-            }
-        },
-        initDefaultLeftWidth() {
-            if (this.autoSaveLeftWidth) {
-                const width = parseFloat(this.leftWidth);
-                this.leftContainerWidth = width > this.minLeftWidth ? width : this.minLeftWidth;
-            }
-        },
-        finalizeDefaultLeftWidth() {
-            if (this.autoSaveLeftWidth) {
-            //     if (this.isMinimized) this.setVerticalLeftWidth(`${this.previousWidth}px`);
-            // else this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
-            }
-        },
-        onMousedown() {
-            this.dragging = true;
-            this.transitionEffect = false;
-            this.$emit('start', this.leftContainerWidth);
-            window.document.addEventListener('mousemove', this.onMousemove);
-            window.document.addEventListener('mouseup', this.onMouseup);
-        },
-        onMousemove(e) {
-            if (this.dragging) {
-                if (this.pageX === null) {
-                    this.pageX = e.pageX;
-                    return;
-                }
-                const diff = this.pageX - e.pageX;
-                const newWidth = this.leftContainerWidth - diff;
-                if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) {
-                    return;
-                }
-                this.leftContainerWidth = newWidth;
-                this.pageX = e.pageX;
-                this.$emit('move', this.leftContainerWidth, e);
-            }
-        },
-        onMouseup() {
-            if (this.dragging) {
-                this.dragging = false;
-                this.transitionEffect = true;
-                this.pageX = null;
-                window.document.removeEventListener('mousemove', this.onMousemove);
-                window.document.removeEventListener('mouseup', this.onMouseup);
-                this.$emit('stop', this.leftContainerWidth);
-            }
-        },
-        setMinimizeAndRevertByKey(e) {
-            if (e.key === '[' || e.key === '{') {
-                this.setMinimizeAndRevert(!this.isMinimized);
-            }
-        },
-        setMinimizeAndRevert(flag) {
-            if (flag) {
-                this.previousWidth = this.leftContainerWidth;
-                this.leftContainerWidth = this.minLeftSize;
-                // this.setVerticalLeftWidth(`${this.previousWidth}px`);
-                this.mouseOver = false;
-            } else {
-                this.leftContainerWidth = this.previousWidth;
-                this.mouseOver = false;
-                this.previousWidth = null;
-            }
-            this.isMinimized = flag;
-            this.$emit('minimize', flag);
-        },
-    },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
-    .box-container {
+    .vertical-container {
         display: flex;
-        flex-grow: 1;
+        width: 100%;
+        flex-direction: row;
+        z-index: 1;
+        padding: 0;
+        margin: unset;
     }
-    .content-container {
-        overflow: auto;
-        &.right {
-            display: inline-flex;
-            flex-direction: column;
-            justify-content: space-between;
-            .fnb {
-                min-height: $(fnb-height);
-                max-height: $(fnb-height);
-            }
-        }
-        &.left{
-            overflow:auto;
-            > div {
-                transition:  width 0.5s;
-                > div {
-                    transition:  inherit;
-                }
-            }
+    .sidebar-container {
+        &.transition {
+            transition: width 0.5s;
         }
     }
-    .overflow-effect{
-        > div {
-            > div {
-                overflow-y: auto;
-                overflow-x: hidden;
-            }
-        }
+    .main {
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+        /*flex-grow: 1;*/
+        overflow-x: hidden;
+        overflow-y: auto;
     }
-    .dragger-container {
+    .resizer-container {
         display: flex;
         align-items: flex-start;
         justify-content: center;
+        width: 1rem;
         &.line {
-            @apply border-l border-gray-400;
+            @apply border-l border-gray-200;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
@@ -251,33 +177,29 @@ export default defineComponent({
             }
         }
         &.prohibit-line {
-            @apply border-l border-gray;
+            @apply border-l  border-gray-200;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
             }
         }
-
-        .dragger {
-            @apply text-gray-900;
+        .resizer {
+            @apply text-gray-400;
             display: inline-block;
-            cursor: pointer;
-            height: 30px;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
             z-index: 99;
             cursor: col-resize;
             > span {
-                margin-right: 26px;
+                margin-right: 1.5rem;
                 cursor: pointer;
             }
         }
-        .btn-vertical-dragger{
+        .btn-vertical-hide {
             margin-top: 1rem;
-            margin-left: 1rem;
+            margin-left: 0.5rem;
             justify-content: center;
-            @apply text-gray-400;
             &:hover {
                 @apply text-secondary;
             }

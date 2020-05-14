@@ -77,7 +77,7 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 import moment from 'moment';
-import { timestampFormatter } from '@/lib/util';
+import { showErrorMessage, timestampFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -177,14 +177,7 @@ export default {
                 await listSchedules();
             } catch (e) {
                 console.error(e);
-                root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: e.message,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showErrorMessage('Fail to Delete Schedule(s)', e, root);
             } finally {
                 state.deleteVisible = false;
             }

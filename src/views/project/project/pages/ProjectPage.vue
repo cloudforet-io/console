@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
+    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <div class="h-full treeSidebar" :style="{width:width+'px'}">
                 <div class="tree-header">
@@ -83,7 +83,7 @@
                                 <div v-tooltip.bottom="{content: 'Show All Projects of Sub Project Groups', delay: {show: 500}}"
                                      class="text-base truncate leading-tight"
                                 >
-                                    <PCheckBox v-model="showAllProjects" />  <span class="ml-3 leading-relaxed">Show All Projects</span>
+                                    <PCheckBox v-model="showAllProjects" />  <span class="mx-3 leading-relaxed">Show All Projects</span>
                                 </div>
                             </div>
                         </div>
@@ -186,6 +186,7 @@
             <p-button-modal
                 :header-title="headerTitle"
                 :centered="true"
+                :scrollable="false"
                 size="md"
                 :fade="true"
                 :backdrop="true"
@@ -203,7 +204,7 @@
                 </template>
             </p-button-modal>
         </template>
-    </p-vertical-page-layout2>
+    </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
@@ -211,7 +212,7 @@
 import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree';
 import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
@@ -239,6 +240,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { showErrorMessage } from '@/lib/util';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -259,9 +261,9 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
     }
 
 export default {
-    name: 'Project2',
+    name: 'ProjectPage',
     components: {
-        PVerticalPageLayout2,
+        PVerticalPageLayout,
         PTree,
         PButton,
         PI,
@@ -279,11 +281,9 @@ export default {
     },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
-            // item: [],
             items: [],
             hoveredId: '',
             hoveredNode: {},
-            selectedGroupId: '',
             hasChildProject: true,
             hasChildProjectGroup: true,
             showAllProjects: ref(false),
@@ -515,15 +515,8 @@ export default {
                     treeApiHandler.ts.treeRef.value.deleteNode(treeApiHandler.ts.metaState.firstSelectedNode);
                     treeApiHandler.ts.metaState.selectedNode = null;
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'Delete Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Delete Project Group', e, context.root);
                 });
             formState.projectGroupDeleteFormVisible = false;
         };
@@ -559,15 +552,8 @@ export default {
                     if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
                     if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
                 })
-                .catch((resp) => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Add Fail',
-                        text: 'Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Create Project Group', e, context.root);
                 });
             formState.projectGroupFormVisible = false;
         };
@@ -592,15 +578,8 @@ export default {
                         speed: 1000,
                     });
                 })
-                .catch(() => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'alert',
-                        title: 'Fail',
-                        text: 'Request Fail',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                .catch((e) => {
+                    showErrorMessage('Fail to Create a Project', e, context.root);
                 })
                 .finally(() => {
                     state.hasChildProject = true;
@@ -650,6 +629,16 @@ export default {
          }
         &:not(:disabled):not(.disabled):hover {
             @apply bg-blue-300 border-blue-300;
+         }
+    }
+
+    ::v-deep .card-item {
+        @apply bg-white border border-gray-200;
+        border-radius: 2px;
+        cursor: pointer;
+        &:hover {
+             @apply border-l border-secondary bg-blue-200;
+             cursor: pointer;
          }
     }
 

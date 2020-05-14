@@ -129,8 +129,7 @@ export default defineComponent({
             .addJoinGroupKey('cloud_service_group', 'group')
             .addJoinGroupKey('provider', 'provider')
             .addJoinGroupField('count', STAT_OPERATORS.count)
-            .setSort('count')
-            .setLimit(12);
+            .setSort('count');
 
 
         const getData = async (): Promise<void> => {
