@@ -17,10 +17,20 @@ export const progressWizardProps = {
         type: Object,
         default: () => ({}),
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 export interface ProgressWizardProps extends ProgressTabBarProps {
     cancelBtnBind: any;
     navigationBtnBind: any;
     confirmBtnBind: any;
+    loading: boolean;
+    disabled: boolean;
 }

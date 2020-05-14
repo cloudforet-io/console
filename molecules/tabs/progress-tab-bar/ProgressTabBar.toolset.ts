@@ -18,6 +18,7 @@ export interface ProgressTab {
     name: string;
     label?: string;
     help?: string;
+    optional?: string;
 }
 
 interface State {
