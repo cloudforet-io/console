@@ -5,7 +5,7 @@
                       :disabled="disabled"
                       @click="addPair"
             >
-                <p-i name="ic_plus" color="transparent inherit"
+                <p-i name="ic_plus_bold" color="transparent inherit"
                      width="1rem" height="1rem"
                 />
                 {{ $t('BTN.ADD') }}
