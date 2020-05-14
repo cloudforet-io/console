@@ -55,7 +55,7 @@
 
                                 <template v-if="sortable&&field.sortable">
                                     <p-i
-                                        v-if="sortable&&field.name==sortBy"
+                                        v-if="sortable&&(field.sortKey|| field.name)===sortBy"
                                         :name="sortIcon"
                                         class="sort-icon"
                                     />
@@ -342,8 +342,9 @@ export default defineComponent({
         };
         const theadClick = (field, index, event) => {
             if (props.sortable && field.sortable) {
-                if (props.sortBy !== field.name) {
-                    context.emit('update:sortBy', field.name);
+                const sortBy = field.sortKey || field.name;
+                if (props.sortBy !== sortBy) {
+                    context.emit('update:sortBy', sortBy);
                     if (!props.sortDesc) {
                         context.emit('update:sortDesc', true);
                     }

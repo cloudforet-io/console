@@ -258,7 +258,6 @@
 			"GROUP": "그룹",
 			"LANG": "언어",
 			"NAME": "이름",
-			"NEW_PWD": "새로운 비밀번호",
 			"PHONE": "전화번호",
 			"PWD": "비밀번호",
 			"PWD_CHECK": "비밀번호 확인",
@@ -296,6 +295,10 @@
 		"UPT_SUCC_ARG": "{0} 을/를 갱신였습니다."
 	},
 	"INVENTORY": {
+		"ACTION": {
+			"COLLECT_ALL": "모든 리소스 가져오기",
+			"COLLECT_CREATE": "추가된 리소스 가져오기"
+		},
 		"ADD_SCHEDULE": "스케줄 추가",
 		"ADD_TAG": "태그 추가하기",
 		"BACK_COL": "컬렉터로 돌아가기",
@@ -422,7 +425,6 @@
 		"DATA": "데이터",
 		"DETAILS": "상세 정보",
 		"HISTORY": "수집 기록",
-		"MEMBER": "팀원",
 		"MONITORING": "모니터링",
 		"RAW_DATA": "원본 데이터",
 		"SECRET": "암호",
