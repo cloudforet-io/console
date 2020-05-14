@@ -131,7 +131,6 @@ export default {
         .label {
             @apply text-gray-400;
             float: left;
-            overflow: hidden;
             clear: left;
             text-align: left;
             word-break: break-word;

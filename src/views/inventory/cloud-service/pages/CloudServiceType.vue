@@ -52,25 +52,8 @@
                 >
                     <template slot="toolbox-bottom">
                         <div class="cst-toolbox-bottom">
-                            <p-query-search-bar
-                                class="search-bar"
-                                :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
-                                :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
-                                @newQuery="apiHandler.gridTS.querySearch.addTag"
-                            />
-                            <div class="checkbox" style="user-select: none;">
-                                <PCheckBox :value="false" :disabled="true" />  <span>search all resource</span>
-                            </div>
+                            <PSearch :search-text.sync="apiHandler.gridTS.searchText.value" @onSearch="apiHandler.getData()" />
                         </div>
-
-                        <p-hr v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" style="width: 100%;" />
-                        <p-query-search-tags
-                            v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0"
-                            class="py-2"
-                            :tags="apiHandler.gridTS.querySearch.tags.value"
-                            @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
-                            @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
-                        />
                     </template>
                     <template #card="{item}">
                         <div class="left">
@@ -129,8 +112,7 @@ import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
-import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { SearchGridFluentAPI } from '@/lib/api/grid';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import { AxiosResponse } from 'axios';
 import { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
@@ -138,21 +120,18 @@ import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PSearch from '@/components/molecules/search/Search.vue';
 
 export default {
     name: 'ServiceAccount',
     components: {
         PVerticalPageLayout,
-        PCheckBox,
+        PSearch,
         PI,
-        PHr,
-        PQuerySearchBar,
-        PQuerySearchTags,
         PToolboxGridLayout,
         PGridLayout,
         PSkeleton,
@@ -260,23 +239,16 @@ export default {
             .setOnly('provider', 'group', 'name', 'tags.spaceone:icon', 'cloud_service_type_id')
             .setTransformer(getMetric);
 
-        const apiHandler = new QuerySearchGridFluentAPI(
+        const apiHandler = new SearchGridFluentAPI(
             listAction,
             {
                 cardClass: () => ['card-item', 'cst-card-item'],
                 cardMinWidth: '23rem',
                 cardHeight: '8rem',
                 columnGap: '0.5rem',
-                excelVisible: true,
+                excelVisible: false,
             },
             undefined,
-            {
-                handlerClass: QuerySearchTableACHandler,
-                args: {
-                    keys: ['name', 'group'],
-                    suggestKeys: [],
-                },
-            },
         );
         const getData = _.debounce(() => apiHandler.getData(), 50);
         watch(selectProvider, (after, before) => {

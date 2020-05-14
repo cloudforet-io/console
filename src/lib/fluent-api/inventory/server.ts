@@ -45,6 +45,8 @@ class GetData extends GetDataAction<any, ListType<any>> {
 }
 
 class ChangeProject extends SubMultiItemAction<any, any> {
+    isMutationApi=true
+
     path = 'change-project'
 
     idField = 'project_id'

@@ -2,7 +2,7 @@
     <general-page-layout class="h-screen">
         <PPageTitle class="mt-4">
             <template #title>
-                <i class="fas fa-database text-blue-400 " /> Choice Action
+                <i class="fas fa-database text-blue-400 " /> Choose Action
             </template>
         </PPageTitle>
         <PPaneLayout>
@@ -65,11 +65,12 @@
                             @deleteAllTags="querySearch.deleteAllTags"
                         />
                     </PFieldGroup>
-                    <p-button class="ml-4" style-type="primary" outline
-                              @click="execute"
+                    <PLoadingButton class="ml-4" style-type="primary" outline
+                                    :loading="loading" :disabled="loading"
+                                    @click="execute"
                     >
                         Execute
-                    </p-button>
+                    </PLoadingButton>
                 </PPaneLayout>
             </div>
             <div class="w-1/2">
@@ -89,7 +90,10 @@
             </template>
         </PPageTitle>
         <PPaneLayout>
-            <RawData :item="result.data" />
+            <RawData
+                :item="typeof result === 'object'?result.data:undefined"
+                :raw="typeof result === 'string'?result:undefined"
+            />
         </PPaneLayout>
     </general-page-layout>
 </template>
@@ -101,13 +105,11 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import {
+    ActionAPI,
     fluentApi, QueryAPI, Resource, SingleItemAction,
 } from '@/lib/fluent-api';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
 import RawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType, JsonSchemaType } from '@/lib/type';
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
@@ -117,6 +119,7 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
 import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
 
 const checkApi = (api: any, target: string, matches: string[]): boolean => {
     // eslint-disable-next-line no-proto
@@ -131,7 +134,7 @@ const checkApi = (api: any, target: string, matches: string[]): boolean => {
 };
 
 
-const getServerList = () => {
+const getServiceList = () => {
     const list: string[] = [];
     Object.keys(fluentApi).forEach((sevc) => {
         if (sevc !== 'api') {
@@ -151,8 +154,8 @@ const getServerList = () => {
 };
 
 const makeItem = (names: string[]) => names.map(s => ({ type: 'item', name: s, label: s }));
-const serviceList = makeItem(getServerList());
-const SUPPORT_ACTIONS = [QueryAPI, SingleItemAction];
+const serviceList = makeItem(getServiceList());
+const SUPPORT_ACTIONS: typeof ActionAPI[] = [QueryAPI, SingleItemAction];
 interface MethodFormOption {
     property: 'addArrayProperty'|'addIntegerProperty'|'addStringProperty';
     label: string;
@@ -190,12 +193,12 @@ export default {
         PSelectDropdown,
         PPageTitle,
         RawData,
-        PButton,
         PJsonSchemaForm,
         PHr,
         PQuerySearchBar,
         PQuerySearchTags,
         PFieldGroup,
+        PLoadingButton,
 
     },
     setup() {
@@ -207,6 +210,7 @@ export default {
             noData: false,
             refresh: true,
             hasFilter: false,
+            loading: false,
             resourceList: computed(() => {
                 if (state.selectService) {
                     const list: string[] = [];
@@ -228,7 +232,7 @@ export default {
                                 }
                                 try {
                                     const act = checkResource[name]();
-                                    if (act instanceof action) {
+                                    if (act instanceof action && !act.isMutationApi) {
                                         list.push(res);
                                     }
                                 } catch (e) {
@@ -251,7 +255,7 @@ export default {
                         for (const action of SUPPORT_ACTIONS) {
                             try {
                                 const act = api[name]();
-                                if (act instanceof action) {
+                                if (act instanceof action && !act.isMutationApi) {
                                     actions.push(name);
                                 }
                             } catch (e) {
@@ -356,8 +360,14 @@ export default {
             if (state.hasFilter && querySearch.tags.value.length > 0) {
                 act = act.setFilter(...querySearch.tags.value);
             }
-
-            state.result = await act.execute();
+            state.loading = true;
+            try {
+                state.result = await act.execute();
+            } catch (e) {
+                state.result = String(e);
+            } finally {
+                state.loading = false;
+            }
         };
         const onResourceSelect = () => {
             state.selectAction = '';

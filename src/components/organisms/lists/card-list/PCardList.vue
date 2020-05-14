@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <div v-if="loading" class="card-list-spinner-container">
+        <div v-if="loading" class="-spinner-container">
             <!-- TODO: Skeletons -->
             <p-lottie name="spinner" auto :size="1.5" />
         </div>
