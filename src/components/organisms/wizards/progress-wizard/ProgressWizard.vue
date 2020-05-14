@@ -33,7 +33,7 @@
             <div class="step-head">
                 <div class="step-title">
                     <span class="step">Step {{ proxyActiveIdx + 1 }}.</span>
-                    <span>{{ activeTab.label || activeTab.name }}</span>
+                    <span class="title">{{ activeTab.label || activeTab.name }}</span>
                     <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
                 </div>
                 <div class="step-appendix">
@@ -67,12 +67,14 @@
                     >
                         {{ $t('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
-                    <p-button v-bind="mergedConfirmBtnBind"
-                              class="txt-btn"
-                              @click="$emit('confirm', tabs, $event)"
+                    <p-loading-button :button-bind="mergedConfirmBtnBind"
+                                      :loading="loading"
+                                      :disabled="disabled"
+                                      class="txt-btn"
+                                      @click="$emit('confirm', tabs, $event)"
                     >
                         {{ $t('BTN.CONFIRM') }}
-                    </p-button>
+                    </p-loading-button>
                 </div>
             </div>
         </slot>
@@ -93,6 +95,7 @@ import {
     ProgressWizardProps,
     progressWizardProps,
 } from '@/components/organisms/wizards/progress-wizard/ProgressWizard.toolset';
+import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
 
 
 const setPagination = (props, state, emit) => {
@@ -126,6 +129,7 @@ const setPagination = (props, state, emit) => {
 export default {
     name: 'PProgressWizard',
     components: {
+        PLoadingButton,
         PPaneLayout,
         PProgressTabBar,
         PI,
@@ -170,11 +174,14 @@ export default {
         @apply flex w-full border-b border-gray-200 pb-3;
         margin-top: 2.375rem;
         .step-title {
-            @apply font-bold text-lg;
+            @apply text-lg;
             line-height: 120%;
         }
         .step {
-            @apply font-normal mr-4;
+            @apply mr-4;
+        }
+        .title {
+            @apply font-bold;
         }
         .optional {
             font-style: italic;
