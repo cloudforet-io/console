@@ -258,7 +258,6 @@
 			"GROUP": "",
 			"LANG": "",
 			"NAME": "",
-			"NEW_PWD": "",
 			"PHONE": "",
 			"PWD": "",
 			"PWD_CHECK": "",
@@ -296,6 +295,10 @@
 		"UPT_SUCC_ARG": ""
 	},
 	"INVENTORY": {
+		"ACTION": {
+			"COLLECT_ALL": "",
+			"COLLECT_CREATE": ""
+		},
 		"ADD_SCHEDULE": "",
 		"ADD_TAG": "",
 		"BACK_COL": "",
@@ -422,7 +425,6 @@
 		"DATA": "",
 		"DETAILS": "",
 		"HISTORY": "",
-		"MEMBER": "",
 		"MONITORING": "",
 		"RAW_DATA": "",
 		"SECRET": "",
