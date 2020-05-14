@@ -1,90 +1,256 @@
-<script>
+<template>
+    <p-vertical-page-layout :min-width="200" :init-width="260">
+        <template #sidebar="{width}">
+            <div :style="{width: width}">
+                <plugin-filter :query-tag-tool="apiHandler.gridTS.querySearch"
+                               :repositories="repoState.repositories"
+                               :selected-repo-id.sync="repoState.selectedRepoId"
+                               @search="search"
+                />
+            </div>
+        </template>
+        <template #default>
+            <p-toolbox-grid-layout v-bind="apiHandler.gridTS.state"
+                                   :this-page.sync="apiHandler.gridTS.syncState.thisPage"
+                                   :page-size.sync="apiHandler.gridTS.syncState.pageSize"
+                                   :loading.sync="apiHandler.gridTS.syncState.loading"
+                                   class="plugin-list"
+                                   @changePageNumber="listPlugins"
+                                   @changePageSize="listPlugins"
+                                   @clickRefresh="listPlugins"
+            >
+                <template #toolbox-left>
+                    <p-page-title title="Plugins" use-total-count :total-count="apiHandler.totalCount.value" />
+                </template>
+                <template #page-size>
+                    <p-select-dropdown v-model="sortBy" :items="sortMenu" @onSelected="listPlugins" />
+                </template>
+                <template #toolbox-bottom>
+                    <p v-if="apiHandler.gridTS.querySearch.tags.value.length > 0" class="mb-4">
+                        <p-badge v-for="(tag, idx) in apiHandler.gridTS.querySearch.tags.value" :key="idx"
+                                 style-type="primary" outline class="filter-tag"
+                        >
+                            <span>{{ tag.value }}</span>
+                            <p-i name="ic_delete" width="1rem"
+                                 height="1rem" color="transparent inherit"
+                                 class="cursor-pointer"
+                                 @click="onDeleteTag(idx)"
+                            />
+                        </p-badge>
+                    </p>
+                    <p v-if="keyword" class="mb-2 text-sm">
+                        {{ apiHandler.totalCount.value }} plugins for <strong>[{{ keyword }}]</strong>
+                    </p>
+                </template>
+                <template #loading>
+                    <div v-for="s in skeletons" :key="s" class="flex w-full mb-4">
+                        <p-skeleton width="4rem" height="4rem" class="flex-shrink-0 mr-4" />
+                        <div class="w-full">
+                            <p-skeleton width="40%" height="1.5rem" class="mt-2 mb-2" />
+                            <p-skeleton height="1rem" width="90%" />
+                        </div>
+                    </div>
+                </template>
+                <template #no-data>
+                    <p-empty class="w-full h-full">
+                        No Data
+                    </p-empty>
+                </template>
+                <template #card="{item}">
+                    <p-card-item :icon="item.tags.icon"
+                                 :title="item.name"
+                                 :contents="item.tags.description"
+                    >
+                        <template #title>
+                            <span class="plugin-name">{{ item.name }}</span><span class="beta">{{ isBeta(item) ? 'BETA': '' }}</span>
+                        </template>
+                        <template #extra>
+                            <div class="card-bottom">
+                                <div v-if="item.labels">
+                                    <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray"
+                                             outline class="mr-2 mb-2"
+                                    >
+                                        {{ label }}
+                                    </p-badge>
+                                </div>
+                                <div class="btns">
+                                    <p-button style-type="primary-dark" @click="onPluginCreate(item)">
+                                        <p-i name="ic_plus" color="transparent inherit"
+                                             width="1rem" height="1rem"
+                                        />
+                                        {{ $t('BTN.CREATE') }}
+                                    </p-button>
+                                </div>
+                            </div>
+                        </template>
+                    </p-card-item>
+                </template>
+            </p-toolbox-grid-layout>
+        </template>
+    </p-vertical-page-layout>
+</template>
+
+<script lang="ts">
 import {
-    ref, toRefs, computed, reactive, onMounted,
+    toRefs, reactive, watch,
 } from '@vue/composition-api';
-import CollectorPluginsTemplate, { setup } from '@/views/plugin/collector/pages/CollectorPlugins.template.vue';
-import { mountBusEvent } from '@/lib/compostion-util';
-import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
-import { defaultQuery } from '@/lib/api/query';
+import _ from 'lodash';
+
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+
+import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
+import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
+import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import PCardItem from '@/components/molecules/cards/PCardItem.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+
+const repoState = reactive({
+    repositories: [] as unknown as RepositoryModel[],
+    selectedRepoId: undefined as unknown as string,
+});
+
+
+export const setup = (props, { root }) => {
+    const state = reactive({
+        keyword: '',
+        sortMenu: [
+            { type: 'item', label: 'Name', name: 'name' },
+            { type: 'item', label: 'Recent', name: 'created_at' },
+        ],
+        sortBy: 'name',
+    });
+
+    const listApi = fluentApi.repository().plugin().list().setServiceType('inventory.Collector');
+
+    const apiHandler = new QuerySearchGridFluentAPI(
+        listApi,
+        {
+            cardClass: () => [],
+            fixColumn: 1,
+            cardMinWidth: '23.75rem',
+            cardHeight: 'auto',
+        },
+        undefined,
+        {
+            handlerClass: QuerySearchTableACHandler,
+            args: {
+                keys: ['labels'],
+                suggestKeys: ['labels'],
+            },
+        },
+    );
+
+    const listPlugins = _.debounce(async () => {
+        await apiHandler.getData();
+    }, 100);
+
+    const listRepositories = async () => {
+        try {
+            const res = await fluentApi.repository().repository().list()
+                .setSortBy('repository_type')
+                .execute();
+            repoState.repositories = res.data.results;
+            repoState.selectedRepoId = res.data.results[0].repository_id;
+            apiHandler.action.setRepositoryId(repoState.selectedRepoId);
+            await listPlugins();
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const onPluginCreate = (item) => {
+        root.$router.push({ path: `./collector-creator/${item.plugin_id}` });
+    };
+
+    listRepositories();
+
+    watch(() => repoState.selectedRepoId, (repoId, _repoId) => {
+        if (repoId && repoId !== _repoId) {
+            apiHandler.action = listApi.setRepositoryId(repoState.selectedRepoId);
+            listPlugins();
+        }
+    });
+
+    watch(() => state.sortBy, (sortBy, _sortBy) => {
+        if (sortBy && sortBy !== _sortBy) {
+            apiHandler.action = apiHandler.action.setSortBy(sortBy);
+            listPlugins();
+        }
+    });
+
+
+    return {
+        apiHandler,
+        ...toRefs(state),
+        repoState,
+        listPlugins,
+        onPluginCreate,
+        goBack: () => {
+            root.$router.push('/plugin/collector');
+        },
+        search: (val) => {
+            state.keyword = val;
+            apiHandler.action = apiHandler.action.setKeyword(val);
+            listPlugins();
+        },
+        onDeleteTag: (idx) => {
+            apiHandler.gridTS.querySearch.deleteTag(idx);
+            listPlugins();
+        },
+        isBeta: item => _.get(item, 'tags.beta', ''),
+        skeletons: _.range(5),
+    };
+};
 
 export default {
     name: 'CollectorPlugins',
-    extends: CollectorPluginsTemplate,
+    components: {
+        PVerticalPageLayout,
+        PSkeleton,
+        PEmpty,
+        PCardItem,
+        PSelectDropdown,
+        PPageTitle,
+        PToolboxGridLayout,
+        PBadge,
+        PButton,
+        PI,
+        PluginFilter,
+    },
     setup(props, context) {
-        const state = reactive({
-            ...setup(props, context),
-        });
-
-        const listRepositories = async () => {
-            state.repositories = [];
-            try {
-                const res = await context.parent.$http.post('/repository/repository/list', {
-                    query: {
-                        sort: {
-                            key: 'repository_type',
-                            desc: true,
-                        },
-                    },
-                });
-                state.repositories = res.data.results;
-                if (!state.selectedRepoId) {
-                    state.selectedRepoId = state.repositories[0].repository_id;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        const listPlugins = async () => {
-            state.loading = true;
-
-            const params = {
-                // eslint-disable-next-line camelcase
-                repository_id: state.selectedRepoId,
-                // eslint-disable-next-line camelcase
-                service_type: 'inventory.collector',
-                query: state.query,
-            };
-
-            state.plugins = [];
-            try {
-                const res = await context.parent.$http.post('/repository/plugin/list', params);
-                state.totalCount = res.data.total_count;
-                state.plugins = res.data.results;
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const listPluginsInit = async () => {
-            await listRepositories();
-            await listPlugins();
-        };
-
-        mountBusEvent(CollectorEventBus, 'listPluginsInit', listPluginsInit);
-        mountBusEvent(CollectorEventBus, 'listPlugins', listPlugins);
-
-
-        const listVersions = async (pluginId) => {
-            try {
-                const res = await context.parent.$http.post('/repository/plugin/get-versions', {
-                    // eslint-disable-next-line camelcase
-                    plugin_id: pluginId,
-                });
-                state.versions = { ...state.versions, [pluginId]: res.data.version };
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        mountBusEvent(CollectorEventBus, 'listVersions', listVersions);
-        onMounted(async () => {
-            await listPluginsInit();
-        });
-        return {
-            ...toRefs(state),
-        };
+        return setup(props, context);
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+.filter-tag::v-deep {
+    @apply inline-flex items-center mb-2 mr-2;
+}
+.plugin-list {
+    max-width: 1280px;
+    margin: auto;
+}
+.beta {
+    @apply text-coral;
+    font-size: 0.5rem;
+    font-weight: bold;
+    vertical-align: super;
+    margin-left: 0.2rem;
+}
+.card-bottom {
+    @apply flex w-full mt-4 overflow-hidden flex-wrap justify-between;
+}
+.btns {
+    @apply flex-grow inline-flex justify-end;
+}
+</style>
