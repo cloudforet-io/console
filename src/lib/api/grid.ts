@@ -1,4 +1,4 @@
-import {Ref, ref, watch} from '@vue/composition-api';
+import { Ref, ref, watch } from '@vue/composition-api';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -130,6 +130,7 @@ export class QuerySearchGridFluentAPI<
         this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
             if (isShow.value && tags !== preTags) {
+                console.table('this.gridTS.querySearch.tags.value', this.gridTS.querySearch.tags.value);
                 await this.getData();
             }
         });

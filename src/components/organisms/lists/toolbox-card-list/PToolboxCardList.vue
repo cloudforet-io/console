@@ -133,7 +133,6 @@ export default {
     height: 100%;
     padding-right: 1rem;
     padding-left: 1rem;
-    max-width: 916px;
 }
 .top {
     display: flex;
@@ -156,6 +155,7 @@ export default {
 .card-container {
     flex-grow: 1;
     margin-top: 1.5rem;
+    width: 100%;
 }
 .bottom {
     margin-top: 1rem;

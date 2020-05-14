@@ -100,8 +100,8 @@ export interface QueryApiState<T=any> extends BaseQueryState<T> {
 export interface DataSourceItem {
     name: string;
     key: string;
-    view_type?: string;
-    view_option?: any;
+    type?: string;
+    options?: any;
 }
 
 export interface DynamicFormItem {

@@ -96,7 +96,9 @@
                                 @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
                             />
                         </div>
-                        <div v-show="!hasChildProject" class="empty-project">
+                    </template>
+                    <template #no-data>
+                        <div class="empty-project">
                             <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
                             <p>Looks like you don't have any Project.</p>
                         </div>

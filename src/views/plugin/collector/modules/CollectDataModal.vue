@@ -45,7 +45,7 @@
                                   class="w-full"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('COMMON.COL_MODE')">
+                <p-field-group label="Action type">
                     <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
                 </p-field-group>
                 <!--                </div>-->
@@ -66,17 +66,17 @@
             </div>
         </template>
 
-        <template #footer-extra>
-            <p-button class="reset-btn"
-                      style-type="primary-dark"
-                      outline
-                      size="lg"
-                      :disabled="loading"
-                      @click="onClickReset"
-            >
-                {{ $t('BTN.RESET') }}
-            </p-button>
-        </template>
+        <!--        <template #footer-extra>-->
+        <!--            <p-button class="reset-btn"-->
+        <!--                      style-type="primary-dark"-->
+        <!--                      outline-->
+        <!--                      size="lg"-->
+        <!--                      :disabled="loading"-->
+        <!--                      @click="onClickReset"-->
+        <!--            >-->
+        <!--                {{ $t('BTN.RESET') }}-->
+        <!--            </p-button>-->
+        <!--        </template>-->
     </p-button-modal>
 </template>
 
@@ -158,9 +158,8 @@ export default {
             credential: null,
             showValidation: false,
             collectModeMenu: computed<MenuItem[]>(() => makeTrItems([
-                [COLLECT_MODE.all, 'COMMON.ALL'],
-                [COLLECT_MODE.create, 'BTN.CREATE'],
-                [COLLECT_MODE.update, 'BTN.UPDATE'],
+                [COLLECT_MODE.all, 'INVENTORY.ACTION.COLLECT_ALL'],
+                [COLLECT_MODE.create, 'INVENTORY.ACTION.COLLECT_CREATE'],
             ], null, { type: 'item' })),
             selectedCollectMode: COLLECT_MODE.all,
             image: computed<string>(() => _.get(state.collector, 'tags.icon', '')),

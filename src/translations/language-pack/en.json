@@ -258,7 +258,6 @@
 			"GROUP": "Group",
 			"LANG": "Language",
 			"NAME": "Name",
-			"NEW_PWD": "New Password",
 			"PHONE": "Phone",
 			"PWD": "Password",
 			"PWD_CHECK": "Password Check",
@@ -296,6 +295,10 @@
 		"UPT_SUCC_ARG": "{0} has been successfully updated."
 	},
 	"INVENTORY": {
+		"ACTION": {
+			"COLLECT_ALL": "Get all resources",
+			"COLLECT_CREATE": "Get newly updated"
+		},
 		"ADD_SCHEDULE": "Add Schedule",
 		"ADD_TAG": "Add Tags",
 		"BACK_COL": "Back to Collectors",
@@ -422,7 +425,6 @@
 		"DATA": "Data",
 		"DETAILS": "Details",
 		"HISTORY": "History",
-		"MEMBER": "Member",
 		"MONITORING": "Monitoring",
 		"RAW_DATA": "Raw Data",
 		"SECRET": "Secret",
