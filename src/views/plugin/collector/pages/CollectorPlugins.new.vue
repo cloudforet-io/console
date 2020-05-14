@@ -37,7 +37,7 @@
                             />
                         </p-badge>
                     </p>
-                    <p class="mb-2 text-sm">{{ apiHandler.totalCount.value }} plugins for <strong>[{{ keyword }}]</strong></p>
+                    <p v-if="keyword" class="mb-2 text-sm">{{ apiHandler.totalCount.value }} plugins for <strong>[{{ keyword }}]</strong></p>
                 </template>
                 <template #loading>
                     <div v-for="s in skeletons" :key="s" class="flex w-full mb-4">
