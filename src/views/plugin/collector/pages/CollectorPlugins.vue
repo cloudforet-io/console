@@ -92,7 +92,7 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, watch,
+    toRefs, reactive, watch, onMounted, ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
 
@@ -129,6 +129,8 @@ export const setup = (props, { root }) => {
         sortBy: 'name',
     });
 
+    const isShow = ref(false);
+
     const listApi = fluentApi.repository().plugin().list().setServiceType('inventory.Collector');
 
     const apiHandler = new QuerySearchGridFluentAPI(
@@ -147,9 +149,11 @@ export const setup = (props, { root }) => {
                 suggestKeys: ['labels'],
             },
         },
+        isShow,
     );
 
     const listPlugins = _.debounce(async () => {
+        console.debug('listPlugins');
         apiHandler.action = apiHandler.action
             .setRepositoryId(repoState.selectedRepoId)
             .setSortBy(state.sortBy);
@@ -181,12 +185,7 @@ export const setup = (props, { root }) => {
         }
     });
 
-    watch(() => state.sortBy, (sortBy, _sortBy) => {
-        if (sortBy && sortBy !== _sortBy) {
-            listPlugins();
-        }
-    });
-
+    onMounted(() => { isShow.value = true; });
 
     return {
         apiHandler,
