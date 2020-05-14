@@ -2,7 +2,7 @@
     <general-page-layout class="h-screen">
         <PPageTitle class="mt-4">
             <template #title>
-                <i class="fas fa-database text-blue-400 " /> Choice Action
+                <i class="fas fa-database text-blue-400 " /> Choose Action
             </template>
         </PPageTitle>
         <PPaneLayout>
@@ -134,7 +134,7 @@ const checkApi = (api: any, target: string, matches: string[]): boolean => {
 };
 
 
-const getServerList = () => {
+const getServiceList = () => {
     const list: string[] = [];
     Object.keys(fluentApi).forEach((sevc) => {
         if (sevc !== 'api') {
@@ -154,7 +154,7 @@ const getServerList = () => {
 };
 
 const makeItem = (names: string[]) => names.map(s => ({ type: 'item', name: s, label: s }));
-const serviceList = makeItem(getServerList());
+const serviceList = makeItem(getServiceList());
 const SUPPORT_ACTIONS: typeof ActionAPI[] = [QueryAPI, SingleItemAction];
 interface MethodFormOption {
     property: 'addArrayProperty'|'addIntegerProperty'|'addStringProperty';

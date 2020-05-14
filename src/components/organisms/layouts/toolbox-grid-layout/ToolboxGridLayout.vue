@@ -20,15 +20,17 @@
                             @pageChange="changePageNumber"
                         />
                     </div>
-                    <div v-if="pageSizeVisible" class="tool page-size-dropdown">
-                        <PDropdownMenuBtn
-                            class="page-size-dropdown"
-                            :menu="pageSizeOptions"
-                            @clickMenuEvent="changePageSize"
-                        >
-                            {{ proxyPageSize }}
-                        </PDropdownMenuBtn>
-                    </div>
+                    <slot v-if="pageSizeVisible" name="page-size">
+                        <div class="tool page-size-dropdown">
+                            <PDropdownMenuBtn
+                                class="page-size-dropdown"
+                                :menu="pageSizeOptions"
+                                @clickMenuEvent="changePageSize"
+                            >
+                                {{ proxyPageSize }}
+                            </PDropdownMenuBtn>
+                        </div>
+                    </slot>
                     <div v-if="excelVisible" class="tool">
                         <p-icon-button
                             name="ic_excel"
@@ -47,11 +49,21 @@
                 <slot name="toolbox-bottom" />
             </div>
         </div>
-        <p-grid-layout v-bind="$props" v-on="$listeners">
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="scope" />
-            </template>
-        </p-grid-layout>
+        <transition-group name="fade-in" tag="div" class="transition-group">
+            <div v-if="loading" key="loading" class="transition-item">
+                <slot name="loading" />
+            </div>
+            <div v-else-if="items.length === 0" key="no-data" class="transition-item">
+                <slot name="no-data" />
+            </div>
+            <div v-else key="grid-layout" class="transition-item">
+                <p-grid-layout v-bind="$props" v-on="$listeners">
+                    <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                        <slot :name="slot" v-bind="scope" />
+                    </template>
+                </p-grid-layout>
+            </div>
+        </transition-group>
     </div>
 </template>
 
@@ -154,6 +166,21 @@ export default {
 <style lang="postcss" scoped>
     .grid-list-container {
         @apply flex flex-col w-full h-full;
+    }
+    .transition-group {
+        @apply relative h-full w-full;
+    }
+    .transition-item {
+        @apply absolute w-full h-full;
+    }
+    .fade-in-leave-active, .fade-in-enter-active {
+        transition: opacity 0.25s;
+    }
+    .fade-in-leave-to, .fade-in-enter {
+        opacity: 0;
+    }
+    .fade-in-enter-to, .fade-in-leave {
+        opacity: 1;
     }
     /*.toolbox {*/
     /*    margin-top: 0.5rem;*/
