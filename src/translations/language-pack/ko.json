@@ -1,14 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
-			"ADD_TAG_BY": "{name} 과 관련된 태그를 추가합니다.",
+			"ADD_TAG": "관련된 태그를 추가합니다.",
 			"CLICK_ADD_BTN_MSG": "아래 버튼을 눌러 태그를 추가할 수 있습니다.",
 			"HELPMSG": "Key - Value 페어는 필수 항목이고 Key는 문자로 시작하여 문자, 숫자, 밑줄만을 포함할 수 있습니다.",
 			"INVALID": {
 				"KEY_DUPL": "키는 중복될 수 없습니다.",
 				"KEY_EMPTY": "키를 입력해주세요.",
 				"VAL_EMPTY": "값을 입력해주세요."
-			}
+			},
+			"NO_TAG": "관련된 태그가 없습니다."
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "{itemName} {limitCount}개 제한",

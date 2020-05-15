@@ -1,14 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
-			"ADD_TAG_BY": "Add tags associated with {name}.",
+			"ADD_TAG": "Add associated tags.",
 			"CLICK_ADD_BTN_MSG": "Tap the button below to add a tag.",
 			"HELPMSG": "The Key - Value pair is a required entry and the Key can start with a letter and contain only letters, numbers, and underscores.",
 			"INVALID": {
 				"KEY_DUPL": "Keys cannot be duplicated.",
 				"KEY_EMPTY": "Enter the Key.",
 				"VAL_EMPTY": "Enter the Value."
-			}
+			},
+			"NO_TAG": "No associated tags found."
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "Limit {limitCount} {itemName}",

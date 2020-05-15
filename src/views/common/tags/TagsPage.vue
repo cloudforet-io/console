@@ -13,11 +13,11 @@
         </div>
         <p-pane-layout class="w-full px-4 py-8">
             <div v-if="items.length == 0" class="comment">
-                <span class="highlight">관련된 태그가 없습니다.</span><br>
+                <span class="highlight">{{ $t('ACTION.DICT.NO_TAG') }}</span><br>
                 {{ $t('ACTION.DICT.CLICK_ADD_BTN_MSG') }}
             </div>
             <div v-else class="comment">
-                <span class="highlight">관련된 태그를 추가합니다.</span><br>
+                <span class="highlight">{{ $t('ACTION.DICT.ADD_TAG') }}</span><br>
                 {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
 

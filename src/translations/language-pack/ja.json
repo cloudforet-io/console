@@ -1,14 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
-			"ADD_TAG_BY": "",
+			"ADD_TAG": "",
 			"CLICK_ADD_BTN_MSG": "",
 			"HELPMSG": "",
 			"INVALID": {
 				"KEY_DUPL": "",
 				"KEY_EMPTY": "",
 				"VAL_EMPTY": ""
-			}
+			},
+			"NO_TAG": ""
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
