@@ -1,7 +1,7 @@
 <template>
     <div class="mb-8">
         <p-panel-top :use-total-count="true" :total-count="items.length">
-            <template>{{ $t('WORD.TAGS') }}</template>
+            <template>{{ $t('WORD.TAG') }}</template>
             <template #extra>
                 <p-button style-type="primary-dark"
                           @click="editTag"
