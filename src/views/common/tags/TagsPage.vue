@@ -3,7 +3,7 @@
         <div class="page-nav">
             <div class="left">
                 <p-icon-button name="ic_back" width="2rem" height="2rem" class="mr-2"
-                               @click="onSave()"
+                               @click="goBack()"
                 />
                 <div class="title">
                     Tags
