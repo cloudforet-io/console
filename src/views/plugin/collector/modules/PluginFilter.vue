@@ -93,7 +93,6 @@ export default {
             if (itemIdx > -1) {
                 props.queryTagTool.deleteTag(itemIdx);
             } else props.queryTagTool.addTag({ key: 'labels', value: val, operator: '=' });
-            console.debug('onClickResourceText', props.queryTagTool.tags.value);
         };
 
 

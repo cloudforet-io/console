@@ -1,15 +1,16 @@
 <template>
-    <div>
-        <s-dynamic-layout v-bind="layout"
-                          :api="api"
-                          :vbind="{colCopy: true}"
-        >
-            <!--            <template v-slot:[slotName]="{data, items, index}">-->
-            <!--                <p-lazy-img :img-url="items[index].tags.icon" />-->
-            <!--                <span class="ml-2">{{ data }}</span>-->
-            <!--            </template>-->
-        </s-dynamic-layout>
-    </div>
+    <s-dynamic-layout v-bind="layout"
+                      :api="api"
+                      :vbind="{colCopy: true}"
+                      @copy:name="onCopyName"
+    >
+        <template v-slot:[slotName]="{data, rootData}">
+            <span class="inline-flex items-center">
+                <p-lazy-img :img-url="rootData.tags.icon" width="1rem" height="1rem" />
+                <span class="ml-2 leading-none">{{ data }}</span>
+            </span>
+        </template>
+    </s-dynamic-layout>
 </template>
 
 <script lang="ts">
@@ -22,6 +23,7 @@ import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import { copyAnyData } from '@/lib/util';
 
 export default defineComponent({
     name: 'CollectorDetail',
@@ -50,7 +52,7 @@ export default defineComponent({
                     type: 'list',
                     options: {
                         item: {
-                            type: 'badge',
+                            // type: 'badge',
                         },
                         delimiter: ', ',
                     },
@@ -90,12 +92,16 @@ export default defineComponent({
                 },
             })),
             api: computed(() => ({
-                resource: fluentApi.inventory().collector().get().setId(props.collectorId),
+                resource: fluentApi.inventory().collector().get().setId(props.collectorId)
+                    .setFixOnly('tags'),
             })),
             slotName: computed(() => `${vm.$t('WORD.BASE_INFO')}-data-name`),
         });
         return {
             ...toRefs(state),
+            onCopyName(item) {
+                copyAnyData(item.data);
+            },
         };
     },
 });
