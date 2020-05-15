@@ -58,7 +58,7 @@
                                     {{ selectedVersions[item.plugin_id] || 'Version' }}
                                 </p-dropdown-menu-btn>
                                 <p-button style-type="primary-dark" @click="onPluginCreate(item)">
-                                    <p-i name="ic_plus_bold" color="inherit"
+                                    <p-i name="ic_plus" color="transparent inherit"
                                          width="1rem" height="1rem"
                                     />
                                     {{ $t('BTN.CREATE') }}
