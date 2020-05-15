@@ -284,7 +284,7 @@ export default {
                 const properties = selectProviderItem.value.template.service_account.schema.properties || {};
                 if (selectProviderItem) {
                     return [
-                        { name: 'name', key: 'name' },
+                        { name: 'Name', key: 'name' },
                         ...Object.entries(properties).map(([key, item]) => ({
                             key: `data.${key}`,
                             name: item.title,
@@ -299,7 +299,7 @@ export default {
         const accountFields = computed<any[]>(() => [
             ...originDataSource.value,
             {
-                name: 'project', key: 'console_force_data.project', type: 'text', option: {},
+                name: 'Project', key: 'console_force_data.project', type: 'text', option: {},
             },
             createAtVF,
         ]);
@@ -515,7 +515,7 @@ export default {
             { name: 'Name', key: 'name' },
             { name: 'Schema', key: 'schema' },
             {
-                name: 'Created at',
+                name: 'Created',
                 key: 'created_at.seconds',
                 type: 'datetime',
                 options: {

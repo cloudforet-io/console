@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout ref="widgetRef" class="health-dashboard" title="HEALTH DASHBOARD"
+    <p-widget-layout ref="widgetRef" class="health-dashboard" title="Health Dashboard"
                      help="Get a notice the status of AWS services."
     >
         <template #default>
