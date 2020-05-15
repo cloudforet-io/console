@@ -2,9 +2,8 @@
     <general-page-layout class="collector-page">
         <p-page-title :title="$t('WORD.COLLECTOR')"
                       class="ml-4"
-                      use-total-count use-selected-count
+                      use-total-count
                       :total-count="apiHandler.totalCount.value"
-                      :selected-count="apiHandler.tableTS.selectState.selectItems.length"
         />
         <p-horizontal-layout>
             <template #container="{ height }">
@@ -267,7 +266,7 @@ export default {
                             name: vm.$t('COMMON.RESOURCE'),
                             type: 'list',
                             options: {
-                                item: { type: 'badge' }, delimiter: ', ',
+                                delimiter: ', ',
                             },
                         },
                         { key: 'last_collected_at.seconds', name: vm.$t('COMMON.LAST_COL'), ...dateTimeViewType },

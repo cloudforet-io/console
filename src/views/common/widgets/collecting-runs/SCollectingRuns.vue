@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Recent Collecting Runs" help="Recent Collecting Runs">
+    <p-widget-layout title="Recent Collecting Runs" help="Check your collecting history with plugins list.">
         <template #extra>
             <div class="flex justify-end">
                 <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, toRefs,
+    computed, getCurrentInstance, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -56,7 +56,7 @@ import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
 
-export default defineComponent({
+export default {
     name: 'SCollectingRuns',
     components: {
         PTd,
@@ -120,7 +120,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

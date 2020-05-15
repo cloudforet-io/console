@@ -2,6 +2,7 @@
     <p-button-modal
         :header-title="headerTitle"
         :centered="true"
+        :scrollable="true"
         size="lg"
         :fade="true"
         :backdrop="true"
@@ -186,7 +187,7 @@ const setup = (props, context) => {
         email: '',
         mobile: '',
         group: '',
-        language: 'ko',
+        language: 'en',
         timezone: 'UTC',
         tags: {},
         isLastCheck: false,
@@ -195,8 +196,8 @@ const setup = (props, context) => {
         ...props.item,
     });
     const languageSelectItems = [
-        { type: 'item', label: '한국어', name: 'ko' },
         { type: 'item', label: 'English', name: 'en' },
+        { type: 'item', label: '한국어', name: 'ko', disabled: true },
     ];
     const timezoneSelectItems = [
         { type: 'item', label: 'UTC', name: 'UTC' },

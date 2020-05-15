@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, toRefs } from '@vue/composition-api';
+import { computed, toRefs } from '@vue/composition-api';
 import numeral from 'numeral';
 import {
     serviceSummaryProps,
@@ -38,7 +38,7 @@ import _ from 'lodash';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import moment from 'moment';
 
-export default defineComponent({
+export default {
     name: 'ServiceSummary',
     components: { PWidgetLayout, PChartLoader, AnimatedNumber },
     props: serviceSummaryProps,
@@ -79,7 +79,12 @@ export default defineComponent({
         const getTrend = async (): Promise<void> => {
             try {
                 const res = await props.getTrendAction(trendApi).execute();
-                ts.state.data = _.sortBy(res.data.results, 'date');
+                if (res.data.results.length === 0) {
+                    ts.state.data = [{ count: 0, date: new Date() }, { count: 0, date: new Date() }];
+                } else if (res.data.results.length === 1) {
+                    ts.state.data = res.data.results;
+                    ts.sate.data.push(res.data.results[0]);
+                } else ts.state.data = _.sortBy(res.data.results, 'date');
             } catch (e) {
                 console.error(e);
             }
@@ -109,7 +114,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

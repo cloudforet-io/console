@@ -19,9 +19,9 @@
                 </template>
                 <template v-else>
                     <p-definition v-for="(bind, idx) in items" :key="idx"
-                                  class="def-row" v-bind="bind"
+                                  class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
                     >
-                        <slot :name="`data-${bind.name}`" v-bind="bind" />
+                        <slot :name="`data-${bind.name}`" v-bind="{...bind, index: idx, items}" />
                     </p-definition>
                 </template>
             </tbody>
@@ -46,13 +46,17 @@ export default defineComponent({
     name: 'PDefinitionTable',
     components: { PSkeleton, PEmpty, PDefinition },
     props: definitionTableProps,
-    setup(props: DefinitionTableProps) {
+    setup(props: DefinitionTableProps, { emit }) {
         const state = reactive({
             isNoData: computed(() => _.every(props.items, def => !def.data)),
             skeletons: computed(() => _.range(props.skeletonRows)),
         });
         return {
             ...toRefs(state),
+            onCopy(bind, idx) {
+                emit('copy', bind, idx);
+                emit(`copy:${bind.name}`, bind, idx);
+            },
         };
     },
 });

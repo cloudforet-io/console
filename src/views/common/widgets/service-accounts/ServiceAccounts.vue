@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, toRefs, watch,
+    getCurrentInstance, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
@@ -68,11 +68,10 @@ import {
     ServiceAccountsPropsType,
 } from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
 
-export default defineComponent({
+export default {
     name: 'ServiceAccounts',
     components: {
         PWidgetLayout,
-        PLazyImg,
         PBadge,
         PGridLayout,
         PSelectableItem,
@@ -145,15 +144,20 @@ export default defineComponent({
                     count: 0,
                     provider: '',
                 };
-                _.forEach(res.data.results, (d: Value, i) => {
-                    const providers: ProviderInfo = providerStore.state.providers;
-                    if (providers[d.provider]) {
-                        ts.state.data.push({
-                            ...providers[d.provider],
-                            count: d.count,
-                        });
-                    } else others.count += d.count;
-                });
+                const providers: ProviderInfo = providerStore.state.providers;
+
+                if (res.data.results.length > 0) {
+                    _.forEach(res.data.results, (d: Value, i) => {
+                        if (providers[d.provider]) {
+                            ts.state.data.push({
+                                ...providers[d.provider],
+                                count: d.count,
+                            });
+                        } else others.count += d.count;
+                    });
+                } else {
+                    ts.state.data = _.map(providers, p => ({ ...p, count: 0 }));
+                }
                 ts.state.data.push(others);
             } catch (e) {
                 console.error(e);
@@ -172,7 +176,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

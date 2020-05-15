@@ -96,7 +96,9 @@
                                 @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
                             />
                         </div>
-                        <div v-show="!hasChildProject" class="empty-project">
+                    </template>
+                    <template #no-data>
+                        <div class="empty-project">
                             <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
                             <p class="text-primary2" >Looks like you don't have any Project.</p>
                         </div>
@@ -444,7 +446,6 @@ export default {
         };
 
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
-            state.showAllProjects = false;
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
                 apiHandler.action = listAction.setId(after.data.id);
                 apiHandler.resetAll();

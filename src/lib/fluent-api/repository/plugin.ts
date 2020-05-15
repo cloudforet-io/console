@@ -84,7 +84,7 @@ export type PluginVersionsResp = {
     total_count: number;
 };
 
-export interface ListParameter {
+export interface RepositoryPluginListParameter {
     repository_id: string;
     plugin_id?: string;
     name?: string;
@@ -129,7 +129,7 @@ class GetVersions extends SingleItemAction<PluginGetParameter, PluginVersionsRes
     }
 }
 
-class List extends ListAction<ListParameter, PluginListResp> {
+class List extends ListAction<RepositoryPluginListParameter, PluginListResp> {
     setRepositoryId(repositoryId: string): this {
         const api = this.clone();
         this.apiState.extraParameter.repository_id = repositoryId;

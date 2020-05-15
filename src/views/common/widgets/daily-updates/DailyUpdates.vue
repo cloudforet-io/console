@@ -1,6 +1,6 @@
 <template>
     <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
-                     help="Daily Updates"
+                     help="Check your resource updates of daily usage."
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
@@ -22,7 +22,7 @@
             >
                 <template #card="{item, index}">
                     <p-selectable-item :icon-url="item.icon" :default-icon="item.defaultIcon" theme="card"
-                                       @click="onItemClick(item, idx)"
+                                       @click="onItemClick(item)"
                     >
                         <template #contents>
                             <div v-tooltip.bottom.start="{content: item.group, delay: {show: 500}}" class="group">
@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
@@ -85,6 +85,7 @@ interface Data {
     type: string;
     count: number;
     icon?: string;
+    provider?: string;
     defaultIcon?: string;
 }
 
@@ -101,7 +102,7 @@ interface State {
     widgetRef: any;
 }
 
-export default defineComponent({
+export default {
     name: 'DailyUpdates',
     components: {
         PWidgetLayout,
@@ -187,6 +188,7 @@ export default defineComponent({
                     group: d.cloud_service_group,
                     type: d.cloud_service_type,
                     count: d.cloud_service_count,
+                    provider: d.provider,
                     icon: d.icon || providerStore.state.providers[d.provider]?.icon,
                 })),
             ];
@@ -198,7 +200,11 @@ export default defineComponent({
         return {
             ...toRefs(state),
             onItemClick(item) {
-                vm.$router.push('/identity/service-account');
+                console.log(item)
+                vm.$router.push({
+                    // path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
+                    path: '/inventory/cloud-service',
+                });
             },
             getIcon(count: number): string {
                 if (count > 0) return 'ic_list_increase';
@@ -207,7 +213,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

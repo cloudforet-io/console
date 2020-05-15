@@ -84,8 +84,16 @@ export interface DataTableSyncType {
     selectIndex: any[]|number;
     loading: boolean;
 }
+export interface DataTableFieldType {
+    name: string;
+    label?: string;
+    sortable?: boolean;
+    sortKey?: string;
+}
+
+export type DataTableField = string|DataTableFieldType
 export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncType{
-    fields: any[];
+    fields: DataTableField[];
     items: any[];
     sortable: boolean;
     dragable: boolean;

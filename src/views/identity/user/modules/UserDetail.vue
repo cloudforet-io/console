@@ -35,7 +35,7 @@ export default {
     },
     setup(props, { parent }) {
         const baseDefs = makeTrItems([
-            ['user_id', 'COMMON.ID'],
+            ['user_id', 'COMMON.USER_ID'],
             ['name', 'COMMON.NAME'],
             ['email', 'COMMON.EMAIL'],
             ['state', 'COMMON.STATE'],

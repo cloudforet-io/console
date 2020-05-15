@@ -50,6 +50,7 @@ export interface RawParameterActionState<T> {
 export interface GetActionState<T> {
     parameter: T;
     only: string[];
+    fixOnly: string[];
 }
 
 export interface Sort {
@@ -87,6 +88,7 @@ export interface Query extends BaseQuery {
 
 export interface QueryApiState<T=any> extends BaseQueryState<T> {
     only: string[];
+    fixOnly: string[];
     thisPage: number;
     pageSize: number;
     sortBy: string;
@@ -100,8 +102,8 @@ export interface QueryApiState<T=any> extends BaseQueryState<T> {
 export interface DataSourceItem {
     name: string;
     key: string;
-    view_type?: string;
-    view_option?: any;
+    type?: string;
+    options?: any;
 }
 
 export interface DynamicFormItem {

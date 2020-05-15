@@ -1,4 +1,4 @@
-import {Ref, ref, watch} from '@vue/composition-api';
+import { Ref, ref, watch } from '@vue/composition-api';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';

@@ -1,6 +1,6 @@
 <template>
     <p-widget-layout ref="widgetRef" class="health-dashboard" title="HEALTH DASHBOARD"
-                     help="Health Dashboard"
+                     help="Get a notice the status of AWS services."
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
@@ -44,11 +44,13 @@
                         </template>
                         <template #extra>
                             <div class="items-center">
-                                <p class="count">
-                                    {{ Math.abs(item.count) }}
-                                </p>
+                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="Affected Resource Entities">
+                                    <p class="count">
+                                        {{ Math.abs(item.count) }}
+                                    </p>
+                                </div>
                                 <p class="count-info">
-                                    entities
+                                    affected
                                 </p>
                             </div>
                         </template>
@@ -61,7 +63,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
@@ -85,7 +87,7 @@ import _ from 'lodash';
 import { VTooltip } from 'v-tooltip';
 import router from '@/routes';
 
-export default defineComponent({
+export default {
     name: 'HealthDashboard',
     components: {
         PWidgetLayout,
@@ -154,7 +156,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

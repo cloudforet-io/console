@@ -172,18 +172,17 @@ export default {
     .p-context-menu {
         padding: 0;
         border-radius: 2px;
-        margin: 0;
-        min-width:100%;
+        margin: -1px 0 0 0;
+        min-width: 100%;
         cursor: default;
         position: absolute;
-        margin-top:-1px;
         z-index: 1000;
         float: left;
         text-align: left;
         list-style: none;
         background-clip: padding-box;
         display: block;
-        max-height:32rem;
+        max-height: 32rem;
         overflow-y: auto;
 
         .context-divider {

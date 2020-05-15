@@ -194,7 +194,7 @@
 		"SRC_DEST": "Source / Destination",
 		"STATE": "State",
 		"STATUS": "Status",
-		"SUMMARY": "SUMMARY",
+		"SUMMARY": "Summary",
 		"TAG": "Tags",
 		"TIMEZONE": "Timezone",
 		"TITLE": "{0} {1}",
@@ -209,6 +209,7 @@
 		"UPT_COUNT": "Updated Count",
 		"UPT_PAST": "Updated",
 		"USER": "User",
+		"USER_ID": "User ID",
 		"VERIFIED": "Verified",
 		"VERIFY": "Verify",
 		"VERSION": "Version",
@@ -258,7 +259,6 @@
 			"GROUP": "Group",
 			"LANG": "Language",
 			"NAME": "Name",
-			"NEW_PWD": "New Password",
 			"PHONE": "Phone",
 			"PWD": "Password",
 			"PWD_CHECK": "Password Check",
@@ -296,6 +296,10 @@
 		"UPT_SUCC_ARG": "{0} has been successfully updated."
 	},
 	"INVENTORY": {
+		"ACTION": {
+			"COLLECT_ALL": "Get all resources",
+			"COLLECT_CREATE": "Get newly updated"
+		},
 		"ADD_SCHEDULE": "Add Schedule",
 		"ADD_TAG": "Add Tags",
 		"BACK_COL": "Back to Collectors",

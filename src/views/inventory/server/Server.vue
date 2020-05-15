@@ -407,7 +407,7 @@ export default {
                 ['closed', 'INVENTORY.BTN.SET_CLOSE'],
                 [null, null, { type: 'divider' }],
                 ['project', 'COMMON.CHG_PRO'],
-                ['pool', 'BTN.CHG_POOL', { disabled: true }],
+                // ['pool', 'BTN.CHG_POOL', { disabled: true }],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
             ],
