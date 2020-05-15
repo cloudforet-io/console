@@ -316,7 +316,7 @@ export default {
             context.parent)),
             activeTab: 'detail',
             multiSelectTabs: makeTrItems([
-                ['data', 'TAB.DATA', { keepAlive: true }],
+                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
                 ['admin', 'TAB.ADMIN'],
                 ['monitoring', 'TAB.MONITORING'],
             ], context.parent),

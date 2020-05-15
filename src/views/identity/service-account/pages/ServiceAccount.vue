@@ -316,7 +316,7 @@ export default {
 
         const multiItemTab = new TabBarState({
             tabs: makeTrItems([
-                ['data', 'TAB.DATA'],
+                ['data', 'TAB.SELECTED_DATA'],
                 ['member', 'TAB.MEMBER'],
             ]),
         });

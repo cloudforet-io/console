@@ -230,7 +230,7 @@ export default {
             ])),
             multiActiveTab: 'data',
             multiTabs: computed(() => makeTrItems([
-                ['data', 'TAB.DATA', { keepAlive: true }],
+                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
             ])),
         });
 
@@ -275,7 +275,7 @@ export default {
                 },
             })),
             multiDataLayout: computed(() => ({
-                name: vm.$t('TAB.DATA'),
+                name: vm.$t('TAB.SELECTED_DATA'),
                 type: 'simple-table',
                 options: {
                     fields: [

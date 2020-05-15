@@ -620,6 +620,15 @@ export default {
         @apply text-sm font-semibold text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
     }
 
+    ::v-deep .tree > .tree-root {
+        @apply overflow-x-hidden;
+    }
+
+    ::v-deep .scope-content {
+        @apply truncate;
+        max-width: 13rem;
+    }
+
     ::v-deep .group-add-btn {
         max-width: 1.5rem;
         max-height: 1.5rem;
