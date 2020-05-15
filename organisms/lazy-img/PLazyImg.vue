@@ -48,7 +48,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { lazyImgProps, LazyImgPropsType } from '@/components/organisms/lazy-img/PLazyImg.toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 
-export default defineComponent({
+export default {
     name: 'PLazyImg',
     components: {
         PLottie,
@@ -77,7 +77,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

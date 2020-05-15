@@ -34,11 +34,12 @@ export default defineComponent({
     name: 'PDefinition',
     components: { PCopyButton, PDynamicField },
     props: definitionProps,
-    setup() {
+    setup(props, { emit }) {
         const field = ref<HTMLFormElement>(null);
 
         const copy = (): void => {
             copyAnyData(field.value?.$el.innerText);
+            emit('copy');
         };
         return {
             field,
