@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+    reactive, toRefs, computed, getCurrentInstance, defineComponent, watch,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
@@ -31,25 +31,23 @@ export default defineComponent({
     setup() {
         const vm: any = getCurrentInstance();
         const state = reactive({
-            language: computed({
-                set(val) { vm.$ls.user.state.language = val; },
-                get() {
-                    return vm.$ls.user.state.language;
-                },
-            }),
             languages: computed(() => vm.$i18n.availableLocales.map(lang => ({
                 key: lang,
                 contents: LANGUAGES[lang],
-                selected: state.language === lang,
+                selected: vm.$ls.user.state.language === lang,
             }))),
-            tooltip: computed(() => `Language: ${LANGUAGES[state.language]}`),
+            tooltip: computed(() => `Language: ${LANGUAGES[vm.$ls.user.state.language]}`),
         });
 
-        const changeLanguage = (item?: any) => {
-            state.language = item ? item.key : state.language;
-            vm.$i18n.locale = state.language;
-            document.getElementsByTagName('HTML')[0].setAttribute('lang', state.language);
+        const changeLanguage = async (item?: any) => {
+            const lang = item ? item.key : vm.$ls.user.state.language;
+            vm.$i18n.locale = lang;
+            if (vm.$ls.user.state.language !== lang) {
+                await vm.$ls.user.setLanguage(lang);
+            }
+            // document.getElementsByTagName('HTML')[0].setAttribute('lang', state.language);
         };
+
 
         changeLanguage();
 

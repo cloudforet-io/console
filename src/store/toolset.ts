@@ -106,6 +106,25 @@ class UserStore extends Store<UserState> {
         this.state.language = data.language || 'en';
         this.state.timezone = data.timezone || 'UTC';
     }
+
+    async setLanguage(lang: string) {
+        try {
+            if (this.state.isDomainOwner) {
+                await fluentApi.identity().domainOwner().update()
+                    .setOnwerId(this.state.userId as string)
+                    .setLanguage(lang)
+                    .execute();
+            } else {
+                await fluentApi.identity().user().update()
+                    .setId(this.state.userId as string)
+                    .setLanguage(lang)
+                    .execute();
+            }
+            localStorage.setItem('user/language', lang);
+        } catch (e) {
+            console.error(e);
+        }
+    }
 }
 
 interface DomainState {
