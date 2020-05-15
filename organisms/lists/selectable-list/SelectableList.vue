@@ -28,7 +28,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    reactive, toRefs,
 } from '@vue/composition-api';
 import { selectableListProps, SelectableListPropsType, MapperKeyType } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
@@ -36,7 +36,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
 
-export default defineComponent({
+export default {
     name: 'SelectableList',
     components: { PSelectableItem, PLottie },
     props: selectableListProps,
@@ -71,7 +71,7 @@ export default defineComponent({
             onItemClick,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

@@ -49,8 +49,10 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     exportFields?: any[];
 }
 interface Field extends DataTableFieldType{
+    name: string;
     label: string;
     sortable: boolean;
+    sortKey?: string;
 }
 
 export const makeFields = (props: DynamicLayoutProps|any) => computed<DataTableFieldType[]>((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({
