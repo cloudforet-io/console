@@ -57,7 +57,7 @@
             </template>
             <template #admin>
                 <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                 v-bind="defaultAdminLayout"
                 />
             </template>
@@ -92,7 +92,7 @@
             </template>
             <template #admin>
                 <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                 v-bind="defaultAdminLayout"
                 />
             </template>
@@ -309,7 +309,7 @@ export default {
             tabs: computed(() => makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['tag', 'TAB.TAG'],
-                ['admin', 'TAB.ADMIN'],
+                ['admin', 'TAB.MEMBER'],
                 ['history', 'TAB.HISTORY'],
                 ['monitoring', 'TAB.MONITORING'],
             ],
@@ -317,7 +317,7 @@ export default {
             activeTab: 'detail',
             multiSelectTabs: makeTrItems([
                 ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
-                ['admin', 'TAB.ADMIN'],
+                ['admin', 'TAB.MEMBER'],
                 ['monitoring', 'TAB.MONITORING'],
             ], context.parent),
             multiSelectActiveTab: 'data',
