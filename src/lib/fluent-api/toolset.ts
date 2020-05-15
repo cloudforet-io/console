@@ -235,7 +235,8 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
             ...getBaseQueryApiState<parameter>(),
-            only: [] as unknown as string[],
+            only: [] as string[],
+            fixOnly: [] as string[],
             thisPage: 0,
             pageSize: 0,
             sortBy: '',
@@ -260,8 +261,8 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
                 desc: this.apiState.sortDesc,
             };
         }
-        if (this.apiState.only.length > 0) {
-            query.only = this.apiState.only;
+        if (this.apiState.only.length > 0 || this.apiState.fixOnly.length > 0) {
+            query.only = [...this.apiState.fixOnly, ...this.apiState.only];
         }
         if (this.apiState.count_only) {
             query.count_only = this.apiState.count_only;
@@ -275,6 +276,12 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     setOnly(...args: string[]): this {
         this.apiState.only = args;
         return this.clone();
+    }
+
+    setFixOnly(...args: string[]): this {
+        const api = this.clone();
+        api.apiState.fixOnly = args;
+        return api;
     }
 
     setCountOnly(value = true): this {
@@ -479,6 +486,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         apiState: GetActionState<parameter> = {
             parameter: {} as parameter,
             only: [] as string[],
+            fixOnly: [] as string[],
         },
         transformer: ((any) => any | Promise<any>) | null = null,
     ) {
@@ -488,8 +496,8 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
 
     getParameter = (): { only?: string[] } & parameter => {
         const parms: any = { ...this.apiState.parameter };
-        if (this.apiState.only.length) {
-            parms.only = this.apiState.only;
+        if (this.apiState.only.length || this.apiState.fixOnly.length) {
+            parms.only = [...this.apiState.fixOnly, ...this.apiState.only];
         }
         return parms;
     };
@@ -497,6 +505,12 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
     setOnly(...args: string[]): this {
         this.apiState.only = args;
         return this.clone();
+    }
+
+    setFixOnly(...args: string[]): this {
+        const api = this.clone();
+        api.apiState.fixOnly = args;
+        return api;
     }
 
     getIdField(): string {
