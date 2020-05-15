@@ -6,18 +6,18 @@
                                @click="goBack()"
                 />
                 <div class="title">
-                    {{ resourceId }} / Tags
+                    Tags
                 </div>
             </div>
             <div class="right" />
         </div>
         <p-pane-layout class="w-full px-4 py-8">
             <div v-if="items.length == 0" class="comment">
-                <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그가 없습니다.<br>
+                <span class="highlight">관련된 태그가 없습니다.</span><br>
                 {{ $t('ACTION.DICT.CLICK_ADD_BTN_MSG') }}
             </div>
             <div v-else class="comment">
-                <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그를 추가합니다.<br>
+                <span class="highlight">관련된 태그를 추가합니다.</span><br>
                 {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
 

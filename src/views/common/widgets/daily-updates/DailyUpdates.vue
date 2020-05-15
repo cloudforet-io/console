@@ -202,8 +202,8 @@ export default defineComponent({
             onItemClick(item) {
                 console.log(item)
                 vm.$router.push({
-                    // path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
-                    path: '/inventory/cloud-service',
+                    path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
+                    // path: '/inventory/cloud-service',
                 });
             },
             getIcon(count: number): string {
