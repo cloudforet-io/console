@@ -6,7 +6,7 @@
                                @click="goBack()"
                 />
                 <div class="title">
-                    Tags
+                    {{ resourceId }} / Tags
                 </div>
             </div>
             <div class="right" />
