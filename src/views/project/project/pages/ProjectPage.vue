@@ -83,7 +83,7 @@
                                 <div v-tooltip.bottom="{content: 'Show All Projects of Sub Project Groups', delay: {show: 500}}"
                                      class="text-base truncate leading-tight"
                                 >
-                                    <PCheckBox v-model="showAllProjects" />  <span class="mx-3 leading-relaxed">Show All Projects</span>
+                                    <PCheckBox v-model="showAllProjects" />  <span class="text-sm ml-2 leading-relaxed ">Show All Projects</span>
                                 </div>
                             </div>
                         </div>
@@ -100,7 +100,7 @@
                     <template #no-data>
                         <div class="empty-project">
                             <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
-                            <p>Looks like you don't have any Project.</p>
+                            <p class="text-primary2" >Looks like you don't have any Project.</p>
                         </div>
                     </template>
                     <template #card="{item}">
