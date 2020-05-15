@@ -4,10 +4,8 @@
             <div class="flex-1 sm:flex-auto"><span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2020 Megazone Cloud Inc.</span></div>
             <div class="sm:flex-col-reverse ">
                 <span class="email">
-                    <p-i name="ic_footer_email" width="1rem" height="1rem" />
-                    <a href="mailto:support@spaceone.dev">
-                        support@spaceone.dev
-                    </a>
+                    <p-i name="ic_footer_email" width="1rem" height="1rem" color="gray-200" />
+                    <a href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                 </span>
                 <span class="divider"></span>
                 <span class="policy" @click="showTemp">Privacy Policy</span>
@@ -51,13 +49,13 @@ export default {
 
 <style lang="postcss" scoped>
     .fnb {
-        @apply text-gray-200 text-xs;
+        @apply text-gray-300 text-xs;
         background-color: inherit;
         .fnb-contents {
-            @apply border-t border-gray-200 h-full py-2 px-0 my-0 mx-6;
+            @apply border-t border-gray-300 h-full py-2 px-0 my-0 mx-6;
         }
         .divider{
-            @apply border-l border-gray-200 mx-2
+            @apply border-l border-gray-300 mx-2
         }
         .email, .policy{
             @apply underline cursor-pointer;
