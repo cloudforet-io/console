@@ -430,6 +430,7 @@
 		"MONITORING": "",
 		"RAW_DATA": "",
 		"SECRET": "",
+		"SELECTED_DATA": "",
 		"TAG": ""
 	},
 	"TREE_TYPE": {

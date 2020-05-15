@@ -213,7 +213,7 @@ export const defaultAdminFields = [
     { name: 'Name', key: 'user_info.name' },
     { name: 'Email', key: 'user_info.email' },
     {
-        name: 'labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
+        name: 'Labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
     },
 ];
 
