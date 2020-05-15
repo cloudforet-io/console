@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
@@ -87,7 +87,7 @@ import _ from 'lodash';
 import { VTooltip } from 'v-tooltip';
 import router from '@/routes';
 
-export default defineComponent({
+export default {
     name: 'HealthDashboard',
     components: {
         PWidgetLayout,
@@ -156,7 +156,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

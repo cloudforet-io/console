@@ -15,9 +15,8 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, defineComponent, getCurrentInstance,
+    computed, reactive, toRefs, getCurrentInstance,
 } from '@vue/composition-api';
-import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
@@ -25,11 +24,10 @@ import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { copyAnyData } from '@/lib/util';
 
-export default defineComponent({
+export default {
     name: 'CollectorDetail',
     components: {
         PLazyImg,
-        PDynamicDetails,
         SDynamicLayout,
     },
     props: {
@@ -104,5 +102,5 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>

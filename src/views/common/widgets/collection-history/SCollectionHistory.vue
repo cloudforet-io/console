@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, Ref, toRefs,
+    computed, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import { coral, gray, primary } from '@/styles/colors';
@@ -41,7 +41,7 @@ interface Props {
     getAction: (api: HistoryStat<Data>) => HistoryStat<Data>;
 }
 
-export default defineComponent({
+export default {
     name: 'SCollectionHistory',
     components: {
         PWidgetLayout,
@@ -113,7 +113,7 @@ export default defineComponent({
                 .value()),
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

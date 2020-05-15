@@ -29,7 +29,7 @@ import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
-export default defineComponent({
+export default {
     name: 'STagsPanel',
     components: { PDataTable, PPanelTop, PButton },
     props: {
@@ -95,7 +95,7 @@ export default defineComponent({
 
         };
     },
-});
+};
 </script>
 
 <style scoped>
