@@ -73,7 +73,7 @@ export default {
             @apply border-secondary;
         }
         &:focus {
-            @apply border-secondary text-secondary bg-secondary2;
+            @apply border-secondary;
         }
         &:disabled {
             @apply border-gray-200 bg-gray-100;
