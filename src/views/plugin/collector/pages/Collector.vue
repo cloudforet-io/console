@@ -266,7 +266,7 @@ export default {
                             name: vm.$t('COMMON.RESOURCE'),
                             type: 'list',
                             options: {
-                                delimiter: ', ',
+                                item: { type: 'badge' }, delimiter: ' ',
                             },
                         },
                         { key: 'last_collected_at.seconds', name: vm.$t('COMMON.LAST_COL'), ...dateTimeViewType },
