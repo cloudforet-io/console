@@ -19,49 +19,18 @@ export const cleanQuery = (query: any) => {
     return copy;
 };
 
-export const LAZY_ROUTER_PROP_NAME = 'lazyRouter';
-
-export const BaseRouterProps = {
-    [LAZY_ROUTER_PROP_NAME]: {
-        type: [String, Boolean],
-        default: false,
-    },
-};
-
-export const isNotLazy = (props: any) => {
-    const value = props[LAZY_ROUTER_PROP_NAME];
-    if (isNotEmpty(value)) {
-        if (String(value) === 'true') {
-            return false;
-        }
-    }
-    return true;
-};
-
-export interface RouterAPIToolsetInterface {
+export interface RouterAPIToolsetInterface<qsName=any> {
     isReady?: boolean;
     applyAPIRouter?: (...args: any[]) => void;
     applyDisplayRouter?: (...args: any[]) => void;
-
+    qsName: qsName;
     routerPush: () => Promise<void>;
 }
 
 export const pushRouterQuery = async (vm: Vue|ComponentInstance, query: any) => {
-    const route: any = { };
-
     const q = cleanQuery(query);
-    if (!_.isEmpty(q)) {
-        route.query = {
-            ...q,
-            [LAZY_ROUTER_PROP_NAME]: true,
-        };
-    }
-    console.debug(!_.isEqual(vm.$route.query, route.query), JSON.parse(JSON.stringify(vm.$route.query)), JSON.parse(JSON.stringify(route.query)));
-
-    if (!_.isEqual(vm.$route.query, route.query)) {
-        console.debug('push');
-        // @ts-ignor
-        await vm.$router.replace(route);
+    if (!_.isEqual(vm.$route.query, q)) {
+        await vm.$router.replace({ query: q });
     }
 };
 
@@ -78,14 +47,4 @@ export const getArrayQueryString = (data: any[]|string, transform: null| ((any) 
     return [data];
 };
 
-export const removeLazyRouterQueryString = async (vm: Vue|ComponentInstance) => {
-    if (!_.isEmpty(vm.$route.query) && vm.$route.query[LAZY_ROUTER_PROP_NAME]) {
-        const query = _.clone(vm.$route.query);
-        console.debug('before', query);
-        delete query[LAZY_ROUTER_PROP_NAME];
-        // eslint-disable-next-line no-empty-function
-        await vm.$router.replace({ query });
-        console.debug('replace');
-    }
-};
 export const propsCopy = (props: any) => JSON.parse(JSON.stringify(props));

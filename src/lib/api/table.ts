@@ -416,7 +416,7 @@ interface QuerySearchQSNameType{
     pageSize: string;
 }
 
-export enum DefaultQSTableRouterPropsName {
+export enum DefaultQSTableQSPropsName {
     selectItems= 'sl',
     filters= 'f',
     sortBy='sb',
@@ -424,7 +424,7 @@ export enum DefaultQSTableRouterPropsName {
     thisPage= 'p',
     pageSize= 'ps',
 }
-export const makeQSTableRouterProps = (names: QuerySearchQSNameType) => ({
+export const makeQSTableQSProps = (names: QuerySearchQSNameType) => ({
     [names.selectItems]: {
         type: [Array, String, Number],
         default: null,
@@ -451,7 +451,7 @@ export const makeQSTableRouterProps = (names: QuerySearchQSNameType) => ({
     },
 });
 
-export const DefaultQSTableRouterProps = makeQSTableRouterProps(DefaultQSTableRouterPropsName);
+export const DefaultQSTableQSProps = makeQSTableQSProps(DefaultQSTableQSPropsName);
 export class RouteQuerySearchTableFluentAPI<
     parameter = any,
     resp extends ListType<any> = ListType<any>,
@@ -466,7 +466,7 @@ export class RouteQuerySearchTableFluentAPI<
         initSyncData: initSyncData = undefined as unknown as initSyncData,
         acHandlerMeta: ACHandlerMeta = defaultACHandler,
         public vm: Vue|ComponentInstance,
-        public routerName: QuerySearchQSNameType = DefaultQSTableRouterPropsName,
+        public qsName: QuerySearchQSNameType = DefaultQSTableQSPropsName,
         public isReady = false,
         initLazy = false,
     ) {
@@ -482,13 +482,13 @@ export class RouteQuerySearchTableFluentAPI<
     }
 
     applyAPIRouter = (props: any) => {
-        if (isNotEmpty(props[this.routerName.pageSize])) {
-            this.tableTS.syncState.pageSize = Number(props[this.routerName.pageSize]);
+        if (isNotEmpty(props[this.qsName.pageSize])) {
+            this.tableTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
         }
-        if (isNotEmpty(props[this.routerName.thisPage])) {
-            this.tableTS.syncState.thisPage = Number(props[this.routerName.thisPage]);
+        if (isNotEmpty(props[this.qsName.thisPage])) {
+            this.tableTS.syncState.thisPage = Number(props[this.qsName.thisPage]);
         }
-        const filters = props[this.routerName.filters];
+        const filters = props[this.qsName.filters];
         if (isNotEmpty(filters)) {
             this.tableTS.querySearch.tags.value = getArrayQueryString(filters, makeSearchQuery);
             console.debug(this.tableTS.querySearch.tags.value);
@@ -498,7 +498,7 @@ export class RouteQuerySearchTableFluentAPI<
     };
 
     applyDisplayRouter =(props: any) => {
-        const selectItems = props[this.routerName.selectItems];
+        const selectItems = props[this.qsName.selectItems];
         console.debug(selectItems);
         if (isNotEmpty(selectItems)) {
             this.tableTS.syncState.selectIndex = getArrayQueryString(selectItems, Number);
@@ -509,15 +509,15 @@ export class RouteQuerySearchTableFluentAPI<
     routerPush = async () => {
         const query = {
             ...this.vm.$route.query,
-            [this.routerName.sortBy]: this.tableTS.syncState.sortBy,
-            [this.routerName.sortDesc]: String(this.tableTS.syncState.sortDesc),
-            [this.routerName.filters]: this.tableTS.querySearch.tags.value?.map(t => makeSearchText(t.key, t.operator, t.value)),
-            [this.routerName.thisPage]: this.tableTS.syncState.thisPage,
-            [this.routerName.pageSize]: this.tableTS.syncState.pageSize,
-            [this.routerName.selectItems]: this.tableTS.syncState.selectIndex,
+            [this.qsName.sortBy]: this.tableTS.syncState.sortBy,
+            [this.qsName.sortDesc]: String(this.tableTS.syncState.sortDesc),
+            [this.qsName.filters]: this.tableTS.querySearch.tags.value?.map(t => makeSearchText(t.key, t.operator, t.value)),
+            [this.qsName.thisPage]: this.tableTS.syncState.thisPage,
+            [this.qsName.pageSize]: this.tableTS.syncState.pageSize,
+            [this.qsName.selectItems]: this.tableTS.syncState.selectIndex,
         };
-        if (!query[this.routerName.sortBy]) {
-            delete query[this.routerName.sortDesc];
+        if (!query[this.qsName.sortBy]) {
+            delete query[this.qsName.sortDesc];
         }
         await pushRouterQuery(this.vm, query);
     }
