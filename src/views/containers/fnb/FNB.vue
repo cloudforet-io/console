@@ -4,7 +4,7 @@
             <div class="flex-1 sm:flex-auto"><span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2020 Megazone Cloud Inc.</span></div>
             <div class="sm:flex-col-reverse ">
                 <span class="email">
-                    <p-i name="ic_footer_email" width="1rem" height="1rem" /> 
+                    <p-i name="ic_footer_email" width="1rem" height="1rem" />
                     <a href="mailto:support@spaceone.dev">
                         support@spaceone.dev
                     </a>
@@ -64,7 +64,6 @@ export default {
             transition: color 0.3s ease-in-out;
             &:hover {
                 @apply text-gray-500;
-                p-i { @apply text-gray-500; }
             }
         }
         .footerMsg{

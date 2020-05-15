@@ -25,10 +25,7 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark" @click="openEditModal(null)">
-                    <p-i name="ic_plus_bold" color="inherit"
-                        width="1rem" height="1rem"
-                    />
-                    {{ $t('BTN.ADD') }} 
+                    {{ $t('BTN.ADD') }}
                 </p-button>
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="left-toolbox-item"
@@ -84,7 +81,6 @@ import { showErrorMessage, timestampFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
@@ -99,7 +95,6 @@ export default {
         PToolboxTable,
         PButton,
         EditScheduleModal,
-        PI,
     },
     props: {
         collectorId: {
