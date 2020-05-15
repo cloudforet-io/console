@@ -134,7 +134,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import {
@@ -151,7 +151,7 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import {
     defaultAdminLayout,
     defaultHistoryLayout,
-    DefaultQSTableQSProps,
+    DefaultQSTableRouterProps,
     QuerySearchTableFluentAPI,
     RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
@@ -176,23 +176,12 @@ import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/S
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import { Vue } from 'vue/types/vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import {
+    BaseRouterProps, isNotLazy, propsCopy, removeLazyRouterQueryString,
+} from '@/lib/router-query-string';
 
-const routerProps = {
-    selectItems: {
-        type: Array,
-        default: () => ([]),
-    },
-    filters: {
-        type: Array,
-        default: () => ([]),
-    },
-    selectTab: {
-        type: String,
-        default: '',
-    },
-};
+
 export default {
     name: 'Server',
     components: {
@@ -213,7 +202,8 @@ export default {
         PPageTitle,
     },
     props: {
-        ...DefaultQSTableQSProps,
+        ...DefaultQSTableRouterProps,
+        ...BaseRouterProps,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -507,11 +497,21 @@ export default {
             'server_id',
             apiHandler,
         );
-
+        const routerHandler = async () => {
+            if (isNotLazy(props)) {
+                const prop = propsCopy(props);
+                apiHandler.applyAPIRouter(prop);
+                await apiHandler.getData();
+                apiHandler.applyDisplayRouter(prop);
+            } else {
+                await removeLazyRouterQueryString(vm);
+            }
+        };
         onMounted(async () => {
-            apiHandler.routerQuerySync(props);
-            console.debug(apiHandler.tableTS.querySearch.tags.value, 'before query');
-            await apiHandler.getData();
+            await routerHandler();
+            watch(() => props, async (aft, bef) => {
+                await routerHandler();
+            });
         });
 
         return {
@@ -547,6 +547,7 @@ export default {
             collectModalState,
             metricAPIHandler,
             mainTableLayout,
+            routerHandler,
         };
     },
 };
