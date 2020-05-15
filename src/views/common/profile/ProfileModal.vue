@@ -150,7 +150,11 @@ export const profileSetup = (props, context) => {
         showPassword: computed(() => state.isDomainOwner || state.isLocalType),
         userState,
         languages: context.root.$i18n.availableLocales.map(lang => (new MenuItem(lang, LANGUAGES[lang]))),
-        timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
+        timezones: [
+            { type: 'item', label: 'UTC', name: 'UTC' },
+            { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
+        ],
+        // timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
         showValidation: false,
         ...formValidation(userState, updateUserValidations),
         isLocalType: computed(() => vm.$ls.domain.state.isLocalType),

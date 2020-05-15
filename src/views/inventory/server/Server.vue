@@ -184,7 +184,6 @@ import {
     DefaultMultiItemTabBarQSPropsName, DefaultSingleItemTabBarQSProps,
     RouterTabBarToolSet,
 } from '@/components/molecules/tabs/tab-bar/toolset';
-import { api } from '@/lib/api/axios';
 
 
 export default {
@@ -334,7 +333,7 @@ export default {
                 tabs: computed(() => makeTrItems([
                     ['detail', 'TAB.DETAILS'],
                     ['tag', 'TAB.TAG'],
-                    ['admin', 'TAB.ADMIN'],
+                    ['admin', 'TAB.MEMBER'],
                     ['history', 'TAB.HISTORY'],
                     ['monitoring', 'TAB.MONITORING'],
                 ],
@@ -349,7 +348,7 @@ export default {
             {
                 tabs: makeTrItems([
                     ['data', 'TAB.DATA'],
-                    ['admin', 'TAB.ADMIN'],
+                    ['admin', 'TAB.MEMBER'],
                     ['monitoring', 'TAB.MONITORING'],
                 ], context.parent),
             });
