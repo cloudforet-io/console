@@ -39,14 +39,14 @@
         </p-horizontal-layout>
 
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne"
-               :tabs="tabState.tabs"
-               :active-tab.sync="tabState.activeTab"
+               :tabs="singleItemTab.state.tabs"
+               :active-tab.sync="singleItemTab.syncState.activeTab"
         >
             <template #detail>
                 <collector-detail :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
             </template>
             <template #tag>
-                <s-tags-panel :is-show="tabState.activeTab==='tag'"
+                <s-tags-panel :is-show="singleItemTab.syncState.activeTab==='tag'"
                               :resource-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
                               tag-page-name="collectorTags"
                 />
@@ -59,7 +59,7 @@
             </template>
         </p-tab>
         <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
-               :tabs="tabState.multiTabs" :active-tab.sync="tabState.multiActiveTab"
+               :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab"
         >
             <template #data>
                 <s-dynamic-layout v-bind="multiDataLayout"
@@ -98,7 +98,7 @@
 /* eslint-disable class-methods-use-this */
 
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
@@ -112,7 +112,7 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
-import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import { DefaultQSTableQSProps, QuerySearchTableFluentAPI, RouteQuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
     getEnumValues, makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
@@ -122,6 +122,13 @@ import { dateTimeViewType } from '@/lib/data-source';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Component } from 'vue/types/umd';
 import { showErrorMessage } from '@/lib/util';
+import {
+    DefaultMultiItemTabBarQSProps,
+    DefaultMultiItemTabBarQSPropsName,
+    DefaultSingleItemTabBarQSProps,
+    RouterTabBarToolSet,
+} from '@/components/molecules/tabs/tab-bar/toolset';
+import { propsCopy } from '@/lib/router-query-string';
 
 const PTab = (): Component => import('@/components/organisms/tabs/tab/Tab.vue') as Component;
 const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/TableCheckModal.vue') as Component;
@@ -151,6 +158,11 @@ export default {
         STagsPanel,
         SDynamicLayout,
     },
+    props: {
+        ...DefaultQSTableQSProps,
+        ...DefaultSingleItemTabBarQSProps,
+        ...DefaultMultiItemTabBarQSProps,
+    },
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -174,7 +186,7 @@ export default {
                 ];
             }
         }
-        const apiHandler = new QuerySearchTableFluentAPI(
+        const apiHandler = new RouteQuerySearchTableFluentAPI(
             collectorApi.list(),
             {
                 selectable: true,
@@ -194,6 +206,7 @@ export default {
                     suggestKeys: ['collector_id', 'name'],
                 },
             },
+            vm,
         );
 
         const checkModalState: UnwrapRef<{
@@ -220,19 +233,31 @@ export default {
             visible: false,
         });
 
-        const tabState = reactive({
-            activeTab: 'detail',
-            tabs: computed(() => makeTrItems([
-                ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-                ['tag', 'TAB.TAG', { keepAlive: true }],
-                ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-                ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
-            ])),
-            multiActiveTab: 'data',
-            multiTabs: computed(() => makeTrItems([
-                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
-            ])),
-        });
+        const singleItemTab = new RouterTabBarToolSet(
+            vm,
+            undefined,
+            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+            {
+                tabs: computed(() => makeTrItems([
+                    ['detail', 'PANEL.DETAILS', { keepAlive: true }],
+                    ['tag', 'TAB.TAG', { keepAlive: true }],
+                    ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+                    ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
+                ],
+                context.parent)),
+            },
+        );
+        singleItemTab.syncState.activeTab = 'detail';
+
+        const multiItemTab = new RouterTabBarToolSet(vm,
+            DefaultMultiItemTabBarQSPropsName,
+            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+            {
+                tabs: makeTrItems([
+                    ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
+                ], context.parent),
+            });
+        multiItemTab.syncState.activeTab = 'data';
 
         const state = reactive({
             dropdown: computed(() => (
@@ -350,11 +375,22 @@ export default {
         const onClickCollectData = (): void => {
             collectDataState.visible = true;
         };
-
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+            apiHandler.applyDisplayRouter(prop);
+            singleItemTab.applyDisplayRouter(prop);
+            multiItemTab.applyDisplayRouter(prop);
+        };
+        onMounted(async () => {
+            await routerHandler();
+        });
 
         return {
             ...toRefs(state),
-            tabState,
+            singleItemTab,
+            multiItemTab,
             updateModalState,
             collectDataState,
             checkModalState,
