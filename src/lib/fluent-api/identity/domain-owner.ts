@@ -17,11 +17,29 @@ interface CreateParameter extends Tags {
     name: string;
 }
 interface UpdateParameter extends Tags, IdParameter {
-    name: string;
+    owner_id: string;
+    password?: string;
+    name?: string;
+    language?: string;
+    timezone?: string;
+    email?: string;
+    mobile?: string;
 }
 
 class Create extends CreateAction<CreateParameter, any> {}
-class Update extends UpdateAction<UpdateParameter, any> {}
+class Update extends UpdateAction<UpdateParameter, any> {
+    setLanguage(lang: string): this {
+        const api = this.clone();
+        api.apiState.parameter.language = lang;
+        return api;
+    }
+
+    setOnwerId(id: string): this {
+        const api = this.clone();
+        api.apiState.parameter.owner_id = id;
+        return api;
+    }
+}
 class Delete extends SingleDeleteAction<IdParameter, any> {
     idField = idField;
 }
@@ -38,5 +56,4 @@ export default class DomainOwner extends Resource implements ResourceActions<'cr
     delete() { return new Delete(this.api, this.baseUrl); }
 
     get() { return new Get(this.api, this.baseUrl); }
-
 }

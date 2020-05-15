@@ -130,7 +130,6 @@ export class QuerySearchGridFluentAPI<
         this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
             if (isShow.value && tags !== preTags) {
-                console.table('this.gridTS.querySearch.tags.value', this.gridTS.querySearch.tags.value);
                 await this.getData();
             }
         });

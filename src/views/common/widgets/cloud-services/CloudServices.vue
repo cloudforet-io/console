@@ -17,7 +17,7 @@
                         </div>
                     </div>
                 </template>
-                <router-link v-else-if="data.length === 0" to="/inventory/cloud-service"
+                <router-link v-else-if="data.length === 0" to="/plugin/collector"
                              class="no-data rounded-sm bg-gray-100 flex items-center justify-center"
                 >
                     <p-i name="ic_plus_square" width="1rem" height="1rem"
@@ -58,28 +58,23 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import _ from 'lodash';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import casual, { arrayOf } from '@/lib/casual';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
-export default defineComponent({
+export default {
     name: 'CloudServices',
     components: {
         PWidgetLayout,
         PSelectableItem,
-        PBadge,
-        PGridLayout,
         PSkeleton,
         PI,
     },
@@ -159,7 +154,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

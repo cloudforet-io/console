@@ -1,14 +1,15 @@
 {
 	"ACTION": {
 		"DICT": {
-			"ADD_TAG_BY": "Add tags associated with {name}.",
+			"ADD_TAG": "Add associated tags.",
 			"CLICK_ADD_BTN_MSG": "Tap the button below to add a tag.",
 			"HELPMSG": "The Key - Value pair is a required entry and the Key can start with a letter and contain only letters, numbers, and underscores.",
 			"INVALID": {
 				"KEY_DUPL": "Keys cannot be duplicated.",
 				"KEY_EMPTY": "Enter the Key.",
 				"VAL_EMPTY": "Enter the Value."
-			}
+			},
+			"NO_TAG": "No associated tags found."
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "Limit {limitCount} {itemName}",
@@ -91,7 +92,7 @@
 		"DEL_MEM": "Delete Member",
 		"DEL_PARAM": "Delete {0}",
 		"DESC": "Description",
-		"DETAILS": "Details",
+		"DETAILS": "Detail",
 		"DEVICE": "Device",
 		"DIRECTION": "Direction",
 		"DISK_SZ": "Disk Size",
@@ -194,7 +195,7 @@
 		"SRC_DEST": "Source / Destination",
 		"STATE": "State",
 		"STATUS": "Status",
-		"SUMMARY": "SUMMARY",
+		"SUMMARY": "Summary",
 		"TAG": "Tags",
 		"TIMEZONE": "Timezone",
 		"TITLE": "{0} {1}",
@@ -209,6 +210,7 @@
 		"UPT_COUNT": "Updated Count",
 		"UPT_PAST": "Updated",
 		"USER": "User",
+		"USER_ID": "User ID",
 		"VERIFIED": "Verified",
 		"VERIFY": "Verify",
 		"VERSION": "Version",
@@ -366,7 +368,7 @@
 		"COMPUTE": "Compute",
 		"CREDENTIAL": "Credentials",
 		"DATA": "Data",
-		"DETAILS": "Details",
+		"DETAILS": "Detail",
 		"FILTER_FORMAT": "Filter Format",
 		"INFO": "Info",
 		"JOBS": "Jobs",
@@ -423,11 +425,13 @@
 		"ADMIN": "Admin",
 		"CREDENTIALS": "Credentials",
 		"DATA": "Data",
-		"DETAILS": "Details",
+		"DETAILS": "Detail",
 		"HISTORY": "History",
+		"MEMBER": "Member",
 		"MONITORING": "Monitoring",
 		"RAW_DATA": "Raw Data",
 		"SECRET": "Secret",
+		"SELECTED_DATA": "Selected Data",
 		"TAG": "Tag"
 	},
 	"TREE_TYPE": {

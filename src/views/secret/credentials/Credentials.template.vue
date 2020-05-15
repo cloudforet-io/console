@@ -183,7 +183,7 @@ export const credentialsSetup = (props, context, eventName) => {
         context.parent),
         activeTab: 'detail',
         multiSelectTabs: makeTrItems([
-            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
         ], context.parent),
         multiSelectActiveTab: 'data',
         credentialsDetail: null, // template refs

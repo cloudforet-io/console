@@ -21,11 +21,29 @@ interface CreateParameter extends Tags {
     name: string;
 }
 interface UpdateParameter extends Tags, IdParameter {
-    name: string;
+    password?: string;
+    name?: string;
+    email?: string;
+    mobile?: string;
+    group?: string;
+    language?: string;
+    timezone?: string;
 }
 
 class Create extends CreateAction<CreateParameter, any> {}
-class Update extends UpdateAction<UpdateParameter, any> {}
+class Update extends UpdateAction<UpdateParameter, any> {
+    setId(id: string): this {
+        const api = this.clone();
+        api.apiState.parameter[idField] = id;
+        return api;
+    }
+
+    setLanguage(lang: string): this {
+        const api = this.clone();
+        api.apiState.parameter.language = lang;
+        return api;
+    }
+}
 class Delete extends SingleDeleteAction<IdParameter, any> {
     idField = idField;
 }

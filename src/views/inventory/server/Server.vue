@@ -57,7 +57,7 @@
             </template>
             <template #admin>
                 <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                 v-bind="defaultAdminLayout"
                 />
             </template>
@@ -92,7 +92,7 @@
             </template>
             <template #admin>
                 <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                 v-bind="defaultAdminLayout"
                 />
             </template>
@@ -579,8 +579,9 @@ export default {
     }
 
     #empty-space {
-        @apply text-primary2;
+        @apply text-primary2 mt-6;
         text-align: center;
         margin-bottom: 0.5rem;
+        font-size: 1.5rem;
     }
 </style>

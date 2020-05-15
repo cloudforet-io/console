@@ -230,7 +230,7 @@ export default {
             ])),
             multiActiveTab: 'data',
             multiTabs: computed(() => makeTrItems([
-                ['data', 'TAB.DATA', { keepAlive: true }],
+                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
             ])),
         });
 
@@ -266,7 +266,7 @@ export default {
                             name: vm.$t('COMMON.RESOURCE'),
                             type: 'list',
                             options: {
-                                item: { type: 'badge' }, delimiter: ', ',
+                                item: { type: 'badge' }, delimiter: ' ',
                             },
                         },
                         { key: 'last_collected_at.seconds', name: vm.$t('COMMON.LAST_COL'), ...dateTimeViewType },
@@ -275,7 +275,7 @@ export default {
                 },
             })),
             multiDataLayout: computed(() => ({
-                name: vm.$t('TAB.DATA'),
+                name: vm.$t('TAB.SELECTED_DATA'),
                 type: 'simple-table',
                 options: {
                     fields: [

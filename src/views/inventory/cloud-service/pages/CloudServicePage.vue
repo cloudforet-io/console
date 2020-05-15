@@ -90,8 +90,12 @@
             <template #data>
                 <s-dynamic-layout
                     type="simple-table"
-                    :data_source="dataSource"
+                    :options="options"
                     :data="apiHandler.tableTS.selectState.selectItems"
+                    :vbind="{
+                        showTitle:false,
+
+                    }"
                 />
             </template>
             <template #member>
@@ -240,7 +244,7 @@ export default {
 
         const multiItemTab = new TabBarState({
             tabs: makeTrItems([
-                ['data', 'TAB.DATA'],
+                ['data', 'TAB.SELECTED_DATA'],
                 ['member', 'TAB.MEMBER'],
                 ['monitoring', 'TAB.MONITORING'],
             ]),

@@ -46,7 +46,7 @@ export default {
             path: 'cloud-service',
             name: 'cloudService',
             redirect: '/inventory/cloud-service',
-            meta: { label: 'Cloud Service', breadcrumb: true, beta: true },
+            meta: { label: 'Cloud Service', breadcrumb: true },
             component: { template: '<router-view />' },
             children: [
                 {

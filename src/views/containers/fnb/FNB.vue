@@ -1,15 +1,16 @@
 <template>
-    <div class="fnb">
-        <div class="fnb-contents">
-            <span class="copyright">Copyright © 2020 Megazone Cloud Inc.</span>
-            <span class="policy" @click="showTemp">Privacy Policy</span>
-            <span class="email">
-                <p-i name="ic_footer_email" width="1rem" height="1rem" />
-                <a href="mailto:support@spaceone.dev">
-                    support@spaceone.dev
-                </a>
-            </span>
-            <transition name="fade"><span v-if="temp" class="footerMsg" transition="expand" @click="showTemp">Will be updated</span></transition>
+    <div class="fnb h-11 sm:h-10 ">
+        <div class="fnb-contents flex flex-col sm:flex-row">
+            <div class="flex-1 sm:flex-auto"><span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2020 Megazone Cloud Inc.</span></div>
+            <div class="sm:flex-col-reverse ">
+                <span class="email">
+                    <p-i name="ic_footer_email" width="1rem" height="1rem" color="gray-200" />
+                    <a href="mailto:support@spaceone.dev">support@spaceone.dev</a>
+                </span>
+                <span class="divider"></span>
+                <span class="policy" @click="showTemp">Privacy Policy</span>
+                <transition name="fade"><span v-if="temp" class="footerMsg" transition="expand" @click="showTemp">Will be updated</span></transition>
+            </div>
         </div>
     </div>
 </template>
@@ -48,19 +49,16 @@ export default {
 
 <style lang="postcss" scoped>
     .fnb {
-        @apply text-gray-200 h-10 text-xs;
+        @apply text-gray-300 text-xs;
         background-color: inherit;
         .fnb-contents {
             @apply border-t border-gray-200 h-full py-2 px-0 my-0 mx-6;
         }
-        .email{
-            @apply mx-2;
-        }
-        .policy{
-            @apply border-l border-gray-200 pl-2;
+        .divider{
+            @apply border-l border-gray-200 mx-2
         }
         .email, .policy{
-            @apply float-right underline cursor-pointer;
+            @apply underline cursor-pointer;
             transition: color 0.3s ease-in-out;
             &:hover {
                 @apply text-gray-500;

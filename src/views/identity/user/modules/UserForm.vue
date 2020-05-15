@@ -2,6 +2,7 @@
     <p-button-modal
         :header-title="headerTitle"
         :centered="true"
+        :scrollable="true"
         size="lg"
         :fade="true"
         :backdrop="true"

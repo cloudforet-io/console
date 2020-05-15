@@ -204,7 +204,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation, ACHandler
         context.parent),
         activeTab: 'detail',
         multiSelectTabs: makeTrItems([
-            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
         ], context.parent),
         multiSelectActiveTab: 'data',
         cdgDetail: null,

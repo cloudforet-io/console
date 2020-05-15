@@ -10,18 +10,18 @@
             <div v-if="!loading && data.length === 0"
                  class="flex flex-col h-full justify-center items-center pt-16 pb-10"
             >
-                <p class="text-2xl font-bold capitalize mb-4 text-primary">
+                <p class="text-2xl font-bold capitalize mb-4 text-primary text-center leading-tight">
                     {{ $t('DASHBOARD.ACTION.CRT_DBD') }}
                 </p>
-                <p class="w-2/5 text-primary1 text-sm capitalize mb-4 text-center leading-normal">
+                <p class="text-primary1 text-sm capitalize mb-4 text-center leading-normal">
                     {{ $t('DASHBOARD.ACTION.CRT_GUIDE') }}
                 </p>
-                <router-link to="/project" tag="div" class="w-1/3">
+                <router-link to="/project" tag="div" class="">
                     <p-icon-text-button name="ic_back" icon-direction="right"
                                         size="lg" dir="down"
                                         style-type="primary" icon-color="transparent inherit"
                                         width="1.5rem" height="1.5rem"
-                                        class="w-full"
+                                        class="getstarted"
                     >
                         {{ $t('DASHBOARD.BTN.GET_START') }}
                     </p-icon-text-button>
@@ -311,5 +311,10 @@ export default {
             width: 9rem;
         }
     }
+}
+.getstarted{
+    padding-left:1.2rem;
+    width: 100%;
+    max-width: 12rem;
 }
 </style>

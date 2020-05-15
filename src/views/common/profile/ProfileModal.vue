@@ -45,7 +45,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="$t('FORM.LABEL.NEW_PWD')"
+                                   :label="$t('FORM.LABEL.PWD')"
                                    :invalid-text="invalidMsg.password"
                                    :invalid="invalidState.password"
                     >

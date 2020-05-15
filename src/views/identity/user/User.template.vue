@@ -159,21 +159,21 @@ const PUserDetail = () => import('@/views/identity/user/modules/UserDetail.vue')
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['user_id', undefined, { label: 'ID' }],
-        ['name', undefined, { label: 'Name' }],
-        ['email', undefined, { label: 'Email' }],
-        ['state', undefined, { label: 'State' }],
-        ['mobile', undefined, { label: 'Mobile', sortable: false }],
-        ['group', undefined, { label: 'Group' }],
-        ['language', undefined, { label: 'Language' }],
-        ['timezone', undefined, { label: 'Timezone' }],
+        ['user_id', 'COMMON.USER_ID'],
+        ['name', 'COMMON.NAME'],
+        ['email', 'COMMON.EMAIL'],
+        ['state', 'COMMON.STATE'],
+        ['mobile', 'COMMON.PHONE', { sortable: false }],
+        ['group', 'COMMON.GROUP'],
+        ['language', 'COMMON.LANGUAGE'],
+        ['timezone', 'COMMON.TIMEZONE'],
     ],
     parent),
     multiSelectFields: makeTrItems([
-        ['user_id', undefined, { label: 'ID' }],
-        ['name', undefined, { label: 'Name' }],
-        ['email', undefined, { label: 'Email' }],
-        ['group', undefined, { label: 'Group' }],
+        ['user_id', 'COMMON.USER_ID'],
+        ['name', 'COMMON.NAME'],
+        ['email', 'COMMON.EMAIL'],
+        ['group', 'COMMON.GROUP'],
     ],
     parent),
     selectIndex: [],
@@ -222,7 +222,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         context.parent),
         activeTab: 'detail',
         multiSelectTabs: makeTrItems([
-            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
         ], context.parent),
         multiSelectActiveTab: 'data',
         userDetail: null, // template refs
@@ -453,9 +453,9 @@ export default {
     }
 
     #empty-space{
-        @apply text-primary2;
+        @apply text-primary2 mt-6;
         text-align: center;
         margin-bottom: 0.5rem;
-        font: 24px/32px Arial;
+        font-size: 1.5rem;
     }
 </style>
