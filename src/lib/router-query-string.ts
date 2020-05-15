@@ -19,7 +19,7 @@ export const cleanQuery = (query: any) => {
     return copy;
 };
 
-const LAZY_ROUTER_PROP_NAME = 'lazyRouter';
+export const LAZY_ROUTER_PROP_NAME = 'lazyRouter';
 
 export const BaseRouterProps = {
     [LAZY_ROUTER_PROP_NAME]: {
@@ -47,7 +47,7 @@ export interface RouterAPIToolsetInterface {
 }
 
 export const pushRouterQuery = async (vm: Vue|ComponentInstance, query: any) => {
-    const route: any = { path: vm.$route.path };
+    const route: any = { };
 
     const q = cleanQuery(query);
     if (!_.isEmpty(q)) {
@@ -56,10 +56,12 @@ export const pushRouterQuery = async (vm: Vue|ComponentInstance, query: any) => 
             [LAZY_ROUTER_PROP_NAME]: true,
         };
     }
+    console.debug(!_.isEqual(vm.$route.query, route.query), JSON.parse(JSON.stringify(vm.$route.query)), JSON.parse(JSON.stringify(route.query)));
+
     if (!_.isEqual(vm.$route.query, route.query)) {
-        console.debug(!_.isEqual(vm.$route.query, route.query), vm.$route.query, route.query);
-        // @ts-ignore
-        await vm.$router.push(route);
+        console.debug('push');
+        // @ts-ignor
+        await vm.$router.replace(route);
     }
 };
 
@@ -78,9 +80,12 @@ export const getArrayQueryString = (data: any[]|string, transform: null| ((any) 
 
 export const removeLazyRouterQueryString = async (vm: Vue|ComponentInstance) => {
     if (!_.isEmpty(vm.$route.query) && vm.$route.query[LAZY_ROUTER_PROP_NAME]) {
-        const query = vm.$route.query;
+        const query = _.clone(vm.$route.query);
+        console.debug('before', query);
         delete query[LAZY_ROUTER_PROP_NAME];
-        await vm.$router.replace({ path: vm.$route.path, query });
+        // eslint-disable-next-line no-empty-function
+        await vm.$router.replace({ query });
+        console.debug('replace');
     }
 };
 export const propsCopy = (props: any) => JSON.parse(JSON.stringify(props));

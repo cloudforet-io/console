@@ -178,7 +178,7 @@ import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynami
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
-    BaseRouterProps, isNotLazy, propsCopy, removeLazyRouterQueryString,
+    BaseRouterProps, isNotLazy, LAZY_ROUTER_PROP_NAME, propsCopy, removeLazyRouterQueryString,
 } from '@/lib/router-query-string';
 
 
@@ -509,8 +509,14 @@ export default {
         };
         onMounted(async () => {
             await routerHandler();
-            watch(() => props, async (aft, bef) => {
-                await routerHandler();
+            const propComp = computed(() => JSON.parse(JSON.stringify(props)));
+            watch(propComp, async (aft, bef) => {
+                console.debug('watch', aft, bef);
+                if (bef && bef[LAZY_ROUTER_PROP_NAME] && !aft[LAZY_ROUTER_PROP_NAME]) {
+                    console.debug('pass');
+                } else {
+                    await routerHandler();
+                }
             });
         });
 
