@@ -17,6 +17,7 @@
 <script lang="ts">
 import { computed, defineComponent, getCurrentInstance } from '@vue/composition-api';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import _ from 'lodash';
 
 export default defineComponent({
     name: 'SDynamicLayoutList',
