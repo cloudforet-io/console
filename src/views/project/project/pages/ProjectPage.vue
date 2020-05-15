@@ -446,7 +446,6 @@ export default {
         };
 
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
-            state.showAllProjects = false;
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
                 apiHandler.action = listAction.setId(after.data.id);
                 apiHandler.resetAll();
