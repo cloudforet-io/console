@@ -79,7 +79,12 @@ export default {
         const getTrend = async (): Promise<void> => {
             try {
                 const res = await props.getTrendAction(trendApi).execute();
-                ts.state.data = _.sortBy(res.data.results, 'date');
+                if (res.data.results.length === 0) {
+                    ts.state.data = [{ count: 0, date: new Date() }, { count: 0, date: new Date() }];
+                } else if (res.data.results.length === 1) {
+                    ts.state.data = res.data.results;
+                    ts.sate.data.push(res.data.results[0]);
+                } else ts.state.data = _.sortBy(res.data.results, 'date');
             } catch (e) {
                 console.error(e);
             }
