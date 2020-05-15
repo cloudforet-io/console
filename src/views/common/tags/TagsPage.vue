@@ -2,12 +2,11 @@
     <general-page-layout>
         <div class="page-nav">
             <div class="left">
-                <p-i name="ic_back" width="2rem" height="2rem"
-                     @click="onSave()"
+                <p-icon-button name="ic_back" width="2rem" height="2rem" class="mr-2"
+                               @click="onSave()"
                 />
-
                 <div class="title">
-                    {{ resource.label || 'Service' }} / {{ resourceId }} / Tags
+                    Tags
                 </div>
             </div>
             <div class="right" />
@@ -62,6 +61,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { DictPanelAPI } from '@/lib/api/dict';
 import {
     DictItem,
@@ -79,6 +79,7 @@ export default {
     components: {
         GeneralPageLayout,
         PI,
+        PIconButton,
         PButton,
         PPaneLayout,
         PDictInputGroup,
