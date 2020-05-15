@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, toRefs, watch,
+    getCurrentInstance, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
@@ -68,7 +68,7 @@ import {
     ServiceAccountsPropsType,
 } from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
 
-export default defineComponent({
+export default {
     name: 'ServiceAccounts',
     components: {
         PWidgetLayout,
@@ -172,7 +172,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

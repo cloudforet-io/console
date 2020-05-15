@@ -47,7 +47,7 @@
 <script lang="ts">
 import {
     computed,
-    defineComponent, getCurrentInstance, Ref, toRefs, watch,
+    getCurrentInstance, Ref, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
@@ -72,7 +72,7 @@ import {
     ResourcesByRegionProps,
 } from '@/views/common/widgets/resources-by-region/ResourcesByRegion.toolset';
 
-export default defineComponent({
+export default {
     name: 'ResourcesByRegion',
     components: {
         PWidgetLayout,
@@ -179,7 +179,7 @@ export default defineComponent({
                 defaultItems,
             };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, toRefs } from '@vue/composition-api';
+import { computed, toRefs } from '@vue/composition-api';
 import numeral from 'numeral';
 import {
     serviceSummaryProps,
@@ -38,7 +38,7 @@ import _ from 'lodash';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import moment from 'moment';
 
-export default defineComponent({
+export default {
     name: 'ServiceSummary',
     components: { PWidgetLayout, PChartLoader, AnimatedNumber },
     props: serviceSummaryProps,
@@ -109,7 +109,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

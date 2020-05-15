@@ -70,7 +70,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, defineComponent, getCurrentInstance, reactive, Ref, toRefs,
+    computed, getCurrentInstance, reactive, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
@@ -85,7 +85,7 @@ import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
-export default defineComponent({
+export default {
     name: 'ServiceAccountsTable',
     components: {
         PWidgetLayout,
@@ -200,7 +200,7 @@ export default defineComponent({
                 ...toRefs(state),
             };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

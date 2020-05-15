@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
