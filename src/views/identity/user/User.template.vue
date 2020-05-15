@@ -159,7 +159,7 @@ const PUserDetail = () => import('@/views/identity/user/modules/UserDetail.vue')
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['user_id', 'COMMON.ID'],
+        ['user_id', 'COMMON.USER_ID'],
         ['name', 'COMMON.NAME'],
         ['email', 'COMMON.EMAIL'],
         ['state', 'COMMON.STATE'],
@@ -170,7 +170,7 @@ export const UserTableReactive = parent => reactive({
     ],
     parent),
     multiSelectFields: makeTrItems([
-        ['user_id', 'COMMON.ID'],
+        ['user_id', 'COMMON.USER_ID'],
         ['name', 'COMMON.NAME'],
         ['email', 'COMMON.EMAIL'],
         ['group', 'COMMON.GROUP'],
@@ -453,9 +453,9 @@ export default {
     }
 
     #empty-space{
-        @apply text-primary2;
+        @apply text-primary2 mt-6;
         text-align: center;
         margin-bottom: 0.5rem;
-        font: 24px/32px Arial;
+        font-size: 1.5rem;
     }
 </style>

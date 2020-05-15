@@ -28,7 +28,7 @@
                     <li>
                         <router-link class="group" to="/dashboard">
                             <span class="icon">
-                                <p-i name="ic_dashboard" width="2rem" height="2rem"
+                                <p-i name="ic_dashboard" 
                                      color="transparent inherit"
                                 />
                             </span>
@@ -98,22 +98,23 @@
                     </li>
 
                     <template v-if="$ls.user.state.isDomainOwner">
-                        <li>
+                        <li class="admin_menu">
                             <router-link class="group" to="/management">
                                 <span class="icon">
                                     <p-i name="ic_admin"
+                                         color="#58309C inherit"
                                     />
                                 </span>
                                 <span class="name">Management</span>
                             </router-link>
                         </li>
 
-                        <li>
+                        <li class="admin_menu">
                             <router-link class="service" to="/management/supervisor/plugins">
-                                Plugins
+                                Plugin
                             </router-link>
                         </li>
-                        <li>
+                        <li class="admin_menu">
                             <router-link class="service" to="/secret/credentials">
                                 Credentials
                             </router-link>
@@ -204,7 +205,7 @@ export default {
             display: flex;
             align-items: center;
             font-size: 1rem;
-            padding: 1rem 1.75rem;
+            padding: 1rem 1.1rem;
             font-weight: normal;
             line-height: 1.5rem;
             .name {
@@ -227,18 +228,22 @@ export default {
             cursor: pointer;
             &:hover {
                 @apply bg-primary3;
-                .icon {
+                /* .icon {
                     @apply text-primary;
-                }
+                } */
             }
             a {
                 display: block;
             }
         }
+ 
+        .admin_menu{
+            @apply text-violet-600 ;
+        }
 
         .group {
             @apply border-t border-gray-200;
-            padding: 1rem 1.75rem;
+            padding: 1rem 1.5rem;
             font-size: 1rem;
             font-weight: bold;
             vertical-align: middle;
@@ -247,7 +252,7 @@ export default {
             }
             .icon {
                 display: inline-block;
-                margin-left: 0.5rem;
+                /* margin-left: 0.5rem; */
                 text-align: center;
                 color: inherit;
                 width: 1.5rem;
@@ -255,9 +260,9 @@ export default {
             }
         }
         .service {
-            padding: 0.5rem  0 0.5rem 4.5rem;
+            padding: 0.5rem  0 0.5rem 3.5rem;
             &.last {
-                margin-bottom: 1rem;
+                margin-bottom: .5rem;
             }
         }
     }

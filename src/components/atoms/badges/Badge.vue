@@ -77,7 +77,7 @@ export default {
     text-align: center;
     font-size: 0.75rem;
     line-height: 0.875rem;
-    letter-spacing: 0;
+    letter-spacing: 0.03rem;
     padding: 0.1875rem 0.5rem 0.1875rem 0.5rem;
     @apply text-white bg-gray;
     &.badge-round{
