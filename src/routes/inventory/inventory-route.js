@@ -30,6 +30,7 @@ export default {
                 {
                     path: '/',
                     name: 'server',
+                    props: route => ({ ...route.query }),
                     component: Server,
                 },
                 {

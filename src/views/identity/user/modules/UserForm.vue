@@ -197,7 +197,9 @@ const setup = (props, context) => {
     });
     const languageSelectItems = [
         { type: 'item', label: 'English', name: 'en' },
-        { type: 'item', label: '한국어', name: 'ko', disabled: true },
+        {
+            type: 'item', label: '한국어', name: 'ko',
+        },
     ];
     const timezoneSelectItems = [
         { type: 'item', label: 'UTC', name: 'UTC' },
