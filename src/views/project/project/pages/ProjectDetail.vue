@@ -239,6 +239,11 @@ export default {
                 })
                 .catch((e) => {
                     showErrorMessage('Delete Project Fail', e, context.root);
+                })
+                .finally(() => {
+                    vm?.$router.push({
+                        name: 'projectMain',
+                    });
                 });
             formState.projectDeleteFormVisible = false;
         };
