@@ -1,17 +1,21 @@
 <template>
     <div v-if="!isLoading">
         <SDynamicLayout v-for="(layout,idx) in options.layouts||[]" :key="idx"
-
                         v-bind="layout"
                         :api="api"
                         :data="data"
                         :is-show="isShow" :is-loading="isLoading"
-        />
+                        v-on="$listeners"
+        >
+            <template v-for="(slot) of slotNames" v-slot:[slot]="scope">
+                <slot :name="`${name}-${slot}`" v-bind="scope" />
+            </template>
+        </SDynamicLayout>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { computed, defineComponent, getCurrentInstance } from '@vue/composition-api';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 
 export default defineComponent({
@@ -42,6 +46,12 @@ export default defineComponent({
             type: Boolean,
             required: true,
         },
+    },
+    setup(props) {
+        const vm = getCurrentInstance();
+        return {
+            slotNames: computed(() => (vm ? _.map(vm.$scopedSlots, (slot: string, name) => _.replace(name, `${props.name}-`, '')) : [])),
+        };
     },
 });
 </script>

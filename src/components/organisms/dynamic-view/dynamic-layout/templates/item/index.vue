@@ -1,9 +1,9 @@
 <template>
     <div v-if="!isLoading">
         <p-panel-top>{{ name }}</p-panel-top>
-        <p-definition-table :items="defs">
+        <p-definition-table :items="defs" v-on="$listeners">
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="scope" />
+                <slot :name="slot" v-bind="{...scope, rootData}" />
             </template>
         </p-definition-table>
     </div>
@@ -132,6 +132,7 @@ export default defineComponent({
         return {
             defs,
             noData,
+            rootData,
         };
     },
 });
