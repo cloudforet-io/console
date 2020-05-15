@@ -72,7 +72,6 @@ export default {
     name: 'ServiceAccounts',
     components: {
         PWidgetLayout,
-        PLazyImg,
         PBadge,
         PGridLayout,
         PSelectableItem,
@@ -145,15 +144,20 @@ export default {
                     count: 0,
                     provider: '',
                 };
-                _.forEach(res.data.results, (d: Value, i) => {
-                    const providers: ProviderInfo = providerStore.state.providers;
-                    if (providers[d.provider]) {
-                        ts.state.data.push({
-                            ...providers[d.provider],
-                            count: d.count,
-                        });
-                    } else others.count += d.count;
-                });
+                const providers: ProviderInfo = providerStore.state.providers;
+
+                if (res.data.results.length > 0) {
+                    _.forEach(res.data.results, (d: Value, i) => {
+                        if (providers[d.provider]) {
+                            ts.state.data.push({
+                                ...providers[d.provider],
+                                count: d.count,
+                            });
+                        } else others.count += d.count;
+                    });
+                } else {
+                    ts.state.data = _.map(providers, p => ({ ...p, count: 0 }));
+                }
                 ts.state.data.push(others);
             } catch (e) {
                 console.error(e);
