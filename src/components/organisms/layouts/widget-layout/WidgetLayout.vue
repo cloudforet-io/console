@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
@@ -39,14 +38,14 @@ import {
     WidgetLayoutPropsType,
 } from '@/components/organisms/layouts/widget-layout/WidgetLayout.toolset';
 
-export default defineComponent({
+export default {
     name: 'PWidgetLayout',
     components: { PPaneLayout, PI, PTooltipButton },
     props: widgetLayoutProps,
     setup(props: WidgetLayoutPropsType) {
         return {};
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

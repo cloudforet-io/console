@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
@@ -102,7 +102,7 @@ interface State {
     widgetRef: any;
 }
 
-export default defineComponent({
+export default {
     name: 'DailyUpdates',
     components: {
         PWidgetLayout,
@@ -213,7 +213,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

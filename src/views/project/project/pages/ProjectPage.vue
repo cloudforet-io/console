@@ -83,7 +83,7 @@
                                 <div v-tooltip.bottom="{content: 'Show All Projects of Sub Project Groups', delay: {show: 500}}"
                                      class="text-base truncate leading-tight"
                                 >
-                                    <PCheckBox v-model="showAllProjects" />  <span class="mx-3 leading-relaxed">Show All Projects</span>
+                                    <PCheckBox v-model="showAllProjects" />  <span class="text-sm ml-2 leading-relaxed ">Show All Projects</span>
                                 </div>
                             </div>
                         </div>
@@ -100,7 +100,7 @@
                     <template #no-data>
                         <div class="empty-project">
                             <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
-                            <p>Looks like you don't have any Project.</p>
+                            <p class="text-primary2" >Looks like you don't have any Project.</p>
                         </div>
                     </template>
                     <template #card="{item}">
@@ -119,14 +119,21 @@
                                     <div v-if="item.force_console_data.providers.length == 0" class="empty-providers"
                                          @click.stop="clickServiceAccount"
                                     >
-                                        <p>
+                                        <!-- <p>
                                             <p-simple-icon-button :normal-icon-name="'btn_circle_plus_blue'"
                                                                   :hovered-icon-name="'btn_circle_plus_blue--hover'"
-                                                                  width="24px" height="24px"
+                                                                  width="1.5rem" height="1.5rem"
                                                                   class="add-service-account-btn"
                                             />
                                             Add Service Account
-                                        </p>
+                                        </p> -->
+                                            <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
+                                                <p-i name="ic_plus_bold" color="inherit"
+                                                    width=".75rem" height=".75rem"
+                                                />
+                                            </div>
+                                            <span class="text-sm ml-2"> Add Service Account</span>
+                                    
                                     </div>
                                     <div v-else-if="item.force_console_data.providers" class="providers">
                                         <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
@@ -690,7 +697,7 @@ export default {
         }
 
         .empty-providers {
-            p {
+            /* p {
                 @apply relative z-10 text-secondary text-sm;
                 max-height: 1.5rem;
                 min-height: 1.5rem;
@@ -700,6 +707,12 @@ export default {
                 &:hover {
                      @apply font-bold;
                  }
+            } */
+            @apply relative text-blue-600 ;
+            div { padding:0.125rem 0.375rem; }
+            &:hover {
+                @apply text-secondary font-bold;
+               div{ @apply bg-blue-300 ; } 
             }
         }
     }

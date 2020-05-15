@@ -10,9 +10,9 @@ import { DataTableFieldType } from '@/components/organisms/tables/data-table/too
 
 
 export interface DynamicFieldType {
+    name: string;
     type: string;
     key: string;
-    name: string;
     options: any;
 }
 
@@ -44,8 +44,10 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     exportFields?: any[];
 }
 interface Field extends DataTableFieldType{
+    name: string;
     label: string;
     sortable: boolean;
+    sortKey?: string;
 }
 
 export const makeFields = (props: DynamicLayoutProps|any) => computed<Field[]>((): Field[] => (props.options.fields ? props.options.fields.map((ds: DynamicFieldType): Field => ({

@@ -80,20 +80,12 @@ export default {
             state.proxySelectedRepoId = val;
         };
 
-        // const onClickResourceText = (val) => {
-        //     if (proxyFilters.value.includes(val)) {
-        //         _.remove(proxyFilters.value, item => item === val);
-        //         proxyFilters.value = [...proxyFilters.value];
-        //     } else proxyFilters.value.push(val);
-        // };
-
         const onClickResourceText = (val) => {
             state.resourceOptions[val] = !state.resourceOptions[val];
             const itemIdx = _.findIndex(props.queryTagTool.tags.value, { value: val });
             if (itemIdx > -1) {
                 props.queryTagTool.deleteTag(itemIdx);
             } else props.queryTagTool.addTag({ key: 'labels', value: val, operator: '=' });
-            console.debug('onClickResourceText', props.queryTagTool.tags.value);
         };
 
 

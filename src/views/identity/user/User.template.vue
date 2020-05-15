@@ -453,9 +453,9 @@ export default {
     }
 
     #empty-space{
-        @apply text-primary2;
+        @apply text-primary2 mt-6;
         text-align: center;
         margin-bottom: 0.5rem;
-        font: 24px/32px Arial;
+        font-size: 1.5rem;
     }
 </style>
