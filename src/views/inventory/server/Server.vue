@@ -450,9 +450,8 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.inventory().server().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const changeAction = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+            const changeAction = fluentApi.inventory().server().changeProject().clone().setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
             if (node) {
                 await changeAction.setId(node.data.id).execute();
