@@ -1,14 +1,13 @@
 <template>
     <general-page-layout>
         <PPageTitle
-
-            class="mb-6 mt-2"
+            class="mb-6"
             title="Add Service Account"
             child
             @goBack="goBack"
         >
             <template #before-title>
-                <div class="inline-block ml-2 mr-4">
+                <div class="inline-block ml-2 mr-2 -mt-1">
                     <img v-if="providerIcon"
                          width="32px" height="32px"
                          :src="providerIcon"

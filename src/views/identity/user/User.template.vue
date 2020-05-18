@@ -222,7 +222,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         context.parent),
         activeTab: 'detail',
         multiSelectTabs: makeTrItems([
-            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
         ], context.parent),
         multiSelectActiveTab: 'data',
         userDetail: null, // template refs

@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="SERVICE ACCOUNT" class="accounts-table">
+    <p-widget-layout title="Service Accounts" class="accounts-table">
         <div class="mt-4 overflow-auto">
             <p-data-table :fields="fields"
                           :sortable="false"
