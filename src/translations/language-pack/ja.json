@@ -2,6 +2,7 @@
 	"ACTION": {
 		"DICT": {
 			"ADD_TAG": "",
+			"ADD_TAG_BY": "",
 			"CLICK_ADD_BTN_MSG": "",
 			"HELPMSG": "",
 			"INVALID": {
@@ -260,6 +261,7 @@
 			"GROUP": "",
 			"LANG": "",
 			"NAME": "",
+			"NEW_PWD": "",
 			"PHONE": "",
 			"PWD": "",
 			"PWD_CHECK": "",
