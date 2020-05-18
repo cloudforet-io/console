@@ -49,7 +49,7 @@
                                   class="right-table"
                     >
                         <template #col-name-format="{value}">
-                            <p-badge outline style-type="gray">
+                            <p-badge v-if="value" outline style-type="gray">
                                 {{ value }}
                             </p-badge>
                         </template>
@@ -65,21 +65,14 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, defineComponent, SetupContext, watch,
+    toRefs, reactive, computed, SetupContext, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
@@ -93,13 +86,6 @@ export default {
     name: 'CollectModal',
     components: {
         PButtonModal,
-        PButton,
-        PFieldGroup,
-        PRow,
-        PCol,
-        PTextInput,
-        PDropdownMenuBtn,
-        PSelectDropdown,
         PDataTable,
         PSelectableList,
         PBadge,
