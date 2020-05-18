@@ -48,3 +48,4 @@ export const getArrayQueryString = (data: any[]|string, transform: null| ((any) 
 };
 
 export const propsCopy = (props: any) => JSON.parse(JSON.stringify(props));
+export const bypassQueryString = route => ({ ...route.query, ...route.params });
