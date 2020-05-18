@@ -39,7 +39,7 @@
 ```sh  
  git clone github.com/spaceone-dev/console
 
- cd spaceone-dev/console
+ cd console
 
  git submodule init && git submodule update 
 
