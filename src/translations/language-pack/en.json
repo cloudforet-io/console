@@ -223,9 +223,14 @@
 	},
 	"DASHBOARD": {
 		"ACTION": {
+			"CLOUD_SERVICES": "Major services under management",
 			"CRT_DBD": "create your dashboard!",
 			"CRT_GUIDE": "Create Project Group first & Register Service Account",
-			"NO_RUN": "No Recent Collecting Run"
+			"DAILY_UPDATES": "Check your resource updates on daily usage.",
+			"HEALTH_DASHBOARD": "You can see the status of AWS services and notifications.",
+			"NO_RUN": "No Recent Collecting Run",
+			"RECENT_COLLECTING": "Check your collecting history with the plugin list.",
+			"TOP_PROJECTS": "Check project ranking with most resources and services."
 		},
 		"BTN": {
 			"GET_START": "Get Started"
