@@ -165,10 +165,10 @@ export default {
         overflow-y: auto;
     }
     .resizer-container {
-        display: flex;
+        display: flex; 
         align-items: flex-start;
         justify-content: center;
-        width: 1rem;
+        width: 0rem;
         &.line {
             @apply border-l border-gray-200;
             background-color: transparent;
@@ -193,7 +193,7 @@ export default {
             z-index: 99;
             cursor: col-resize;
             > span {
-                margin-right: 1.5rem;
+                margin-right: .65rem;
                 cursor: pointer;
             }
         }
