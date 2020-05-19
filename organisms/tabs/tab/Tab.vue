@@ -61,7 +61,7 @@ export default defineComponent({
         }
     }
     .tab-pane {
-        @apply w-full;
+        @apply w-full pb-8;
     }
 
 </style>

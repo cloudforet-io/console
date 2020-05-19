@@ -67,7 +67,7 @@ export default {
         padding-right: 1rem;
         border-radius: 2px;
         font-size: .875rem;
-        line-height: 1.75rem;
+        line-height: 2rem;
         appearance: none;
         &:hover{
             @apply border-secondary;
@@ -80,6 +80,9 @@ export default {
         }
         &.is-invalid {
             @apply border-alert;
+        }
+        &::placeholder{
+            @apply text-gray-300;
         }
     }
 }

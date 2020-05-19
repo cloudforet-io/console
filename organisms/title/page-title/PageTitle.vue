@@ -65,7 +65,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-page-title{
-        @apply mb-4 inline-flex content-start items-center;
+        @apply mb-6 inline-flex content-start items-center;
         .title{
             @apply font-bold;
             font-size: 2rem;
