@@ -1,7 +1,6 @@
 <template>
     <general-page-layout class="collector-page">
         <p-page-title :title="$t('WORD.COLLECTOR')"
-                      class="ml-4"
                       use-total-count
                       :total-count="apiHandler.totalCount.value"
         />

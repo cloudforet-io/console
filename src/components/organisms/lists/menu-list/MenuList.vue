@@ -131,6 +131,7 @@ export default {
         border-radius: 2px;
         border: 0px;
         min-width: 32px;
+        line-height:1; 
         &:hover, &.active {
             @apply bg-primary-dark;
         }
