@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout ref="widgetRef" class="health-dashboard" title="Health Dashboard"
+    <p-widget-layout ref="widgetRef" class="health-dashboard" title="AWS Health Dashboard"
                      help="Get a notice the status of AWS services."
     >
         <template #default>
@@ -162,8 +162,16 @@ export default {
 <style lang="postcss" scoped>
 .health-dashboard {
     background-color: rgba(theme('colors.white'), 0.8);
-    &::v-deep .widget-contents {
-        overflow-y: auto;
+    &::v-deep {
+        .widget-contents {
+            overflow-y: auto;
+        }
+        .title {
+            @apply text-sm leading-normal;
+        }
+        .top {
+             @apply mt-6;
+        }
     }
 }
 .group-name {
@@ -177,8 +185,9 @@ export default {
 }
 
 .no-issue-text {
-    @apply text-center text-gray-300;
+    @apply text-center;
     font-size: 1.5rem;
+    color: #DCDBEA;
 }
 
 .count-info {

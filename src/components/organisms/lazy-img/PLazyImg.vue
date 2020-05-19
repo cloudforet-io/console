@@ -82,7 +82,7 @@ export default {
 
 <style lang="postcss" scoped>
     .img-container {
-      @apply inline-block w-full h-full absolute;
+      @apply inline-block w-full h-full absolute rounded-sm overflow-hidden;
     }
     .fade-in-leave-active, .fade-in-enter-active {
         transition: opacity 0.5s;
