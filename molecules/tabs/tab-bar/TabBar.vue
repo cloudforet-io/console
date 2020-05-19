@@ -45,7 +45,7 @@ export default {
     }
     .p-nav-link {
         @apply flex no-underline text-sm min-h-9;
-        min-width: 5rem;
+        /* min-width: 5rem; */
         text-align: center;
         margin-bottom: -4px;
         .label {
