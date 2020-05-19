@@ -87,7 +87,7 @@ export default {
         border-radius: 2px;
         border: 0;
         min-width: 32px;
-
+        line-height:1; 
         @mixin theme primary-dark, theme('colors.primary-dark');
         @mixin theme transparent, transparent;
     }

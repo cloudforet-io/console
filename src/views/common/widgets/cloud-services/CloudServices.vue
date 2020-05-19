@@ -18,10 +18,11 @@
                     </div>
                 </template>
                 <router-link v-else-if="data.length === 0" to="/plugin/collector"
-                             class="no-data rounded-sm bg-gray-100 flex items-center justify-center"
+                             class="no-data rounded-sm flex items-center justify-center
+                              border border-gray-200 border-solid bg-transparent text-gray-900 hover:border-secondary hover:text-secondary "
                 >
                     <p-i name="ic_plus_square" width="1rem" height="1rem"
-                         class="mr-4"
+                         class="mr-2" color="inherit white"
                     />
                     Create a Collector
                 </router-link>
@@ -169,6 +170,9 @@ export default {
 }
 .more {
     @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
+    &:hover {
+        @apply text-secondary underline;
+    }
 }
 .no-data {
     height: 3.5rem;

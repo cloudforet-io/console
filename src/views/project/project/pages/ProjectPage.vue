@@ -2,10 +2,10 @@
     <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <div class="h-full treeSidebar" :style="{width:width+'px'}">
-                <div class="tree-header">
+                <div class="tree-header flex">
                     PROJECT GROUP
                     <p-i name="ic_plus" color="transparent inherit"
-                         width="1rem" height="1rem" class="cursor-pointer add-btn"
+                         width="1rem" height="1rem" class="ml-2 cursor-pointer add-btn"
                          @click="openProjectGroupForm(true)"
                     />
                 </div>
@@ -68,8 +68,18 @@
                             <div class="flex flex-row flex-wrap w-full tool-left">
                                 <div class="tool-left-btn">
                                     <p-button style-type="primary-dark" @click="openProjectForm">
+                                          <p-i name="ic_plus_bold" color="inherit"
+                                                width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
+                                            />
                                         {{ $t('INVENTORY.CRT_PROJ') }}
                                     </p-button>
+
+                                    <!-- <PIconTextButton style-type="primary-dark"
+                                         name="ic_plus_bold"
+                                         @click="openProjectForm"
+                                    />
+                                    {{ $t('INVENTORY.CRT_PROJ') }}
+                                    </PIconTextButton> -->
                                 </div>
                                 <div class="tool-left-search">
                                     <p-query-search-bar
@@ -118,7 +128,7 @@
                                     <p id="project-name">
                                         {{ item.name }}
                                     </p>
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers"
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
                                          @click.stop="clickServiceAccount"
                                     >
                                         <!-- <p>
@@ -174,14 +184,14 @@
                         accounts with your own project.<br><br>
                     </p>
                     <p class="content-order">
-                        1. Name your project group first. <br>
-                        2. Register your project.
+                        <b>1.</b> Name your project group first. <br>
+                        <b>2.</b> Register your project.
                     </p>
                     <p-button style-type="primary-dark"
                               @click="openProjectGroupForm"
                     >
-                        <p-i name="ic_plus" color="transparent inherit"
-                             width="1rem" height="1rem" class="mt-1 cursor-pointer add-btn"
+                        <p-i name="ic_plus_bold" color="inherit"
+                             width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
                         />
                         Create Project Group
                     </p-button>
@@ -235,6 +245,7 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -288,6 +299,7 @@ export default {
         PButtonModal,
         SProjectCreateFormModal,
         SProjectGroupCreateFormModal,
+        PIconTextButton,
     },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
@@ -715,6 +727,7 @@ export default {
                 @apply text-secondary font-bold;
                div{ @apply bg-blue-300 ; }
             }
+            span {line-height:1.75;}
         }
     }
 
@@ -756,18 +769,15 @@ export default {
     }
 
     .empty-project-grp {
+        line-height:1.5;
         .title {
-            @apply text-primary-dark font-bold text-2xl pt-8 pb-4;
-            line-height: 120%;
+            @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
         }
         .content {
-            @apply text-sm font-hairline pb-4;
-            line-height: 150%;
+            @apply text-gray-600;
         }
         .content-order {
-            @apply text-base pb-10;
-            line-height: 180%;
+            @apply text-base pb-8 text-left m-auto max-w-64;
         }
     }
-
 </style>

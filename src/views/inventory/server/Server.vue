@@ -1,7 +1,6 @@
 <template>
     <general-page-layout>
         <PPageTitle title="Server"
-                    class="ml-4"
                     use-total-count use-selected-count
                     :total-count="apiHandler.totalCount.value"
                     :selected-count="apiHandler.tableTS.selectState.selectItems.length"

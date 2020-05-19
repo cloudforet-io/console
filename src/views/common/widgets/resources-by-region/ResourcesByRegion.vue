@@ -184,6 +184,7 @@ export default {
 
 <style lang="postcss" scoped>
     .resources-by-region {
+        border:none;
     &::v-deep .widget-contents {
          overflow-y: auto;
          margin-bottom: 2rem;
