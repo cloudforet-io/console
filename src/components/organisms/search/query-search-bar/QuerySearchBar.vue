@@ -20,21 +20,19 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
 import {
-    computed, defineComponent, isRef, onMounted, reactive, ref, watch,
+    computed, isRef, onMounted, reactive, Ref, ref, watch,
 } from '@vue/composition-api';
 import { windowEventMount } from '@/lib/compostion-util';
 
 import PSearch from '@/components/molecules/search/Search.vue';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
-import { baseAutocompleteHandler, searchContextType, SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { searchContextType, SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { parseTag } from '@/components/organisms/search/query-search-bar/toolset';
 
 // regx
-const keyRegx = new RegExp('^(?<key>.+?):');
-const operatorRegx = new RegExp('^.+?:(?<operator>[=|<|>|!|$]=?)?');
-// const valueRegx = new RegExp('^.+?:(?:[=|<|>|!]=?)?(?<value>.+)');
 
 export default {
     name: 'PQuerySearchBar',
@@ -55,31 +53,23 @@ export default {
     event: ['newQuery'],
     setup(props, context) {
         // const proxySearchText = makeProxy('searchText', props, context.emit);
-        const proxySearchText = computed({
+        const proxySearchText: Ref<string> = computed({
             get: () => props.searchText,
             set: _.debounce((val) => {
                 context.emit('update:searchText', val);
-            }, 150),
-        });
+            }, 100),
+        }) as unknown as Ref<string>;
 
         const cleanSearchText = () => { proxySearchText.value = ''; };
         const contextState = reactive({
-            hasKey: computed(() => keyRegx.test(proxySearchText.value)),
-            key: computed(() => {
-                const result = keyRegx.exec(proxySearchText.value);
-                return result && !!result.groups.key ? result.groups.key.trim() : '';
+            tag: computed(() => {
+                const text = proxySearchText.value;
+                return parseTag(text);
             }),
-            operator: computed(() => {
-                const result = operatorRegx.exec(proxySearchText.value);
-                return result && !!result.groups.operator ? result.groups.operator.trim() : '';
-            }),
-            value: computed(() => {
-                if (operatorRegx.test(proxySearchText.value)) {
-                    const operatorIndex = operatorRegx.exec(proxySearchText.value)[0].length;
-                    return proxySearchText.value.slice(operatorIndex).trim();
-                }
-                return null;
-            }),
+            hasKey: computed(() => contextState.tag.hasKey),
+            key: computed(() => contextState.tag.key),
+            operator: computed(() => contextState.tag.operator),
+            value: computed(() => contextState.tag.value),
         });
 
 
@@ -111,7 +101,7 @@ export default {
             return false;
         });
         windowEventMount('click', hideAC);
-        const getACData = async (text, forceContextType) => {
+        const getACData = async (text, forceContextType: any = undefined) => {
             const handler = isRef(props.autocompleteHandler) ? props.autocompleteHandler.value : props.autocompleteHandler;
             const result = await handler.getAutoCompleteData(forceContextType || contextType.value, text, contextState);
             acState.items = result;
@@ -130,6 +120,7 @@ export default {
         const focusAC = (event) => {
             if (contextMenuRef.value && acState.items.length >= 1) {
                 acState.isFocusAC = true;
+                // @ts-ignore
                 contextMenuRef.value.focus();
             }
         };

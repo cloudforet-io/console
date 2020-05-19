@@ -1,6 +1,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
+import { getBindClass } from '@/lib/functional';
 
 
 export default {
@@ -17,7 +18,7 @@ export default {
             required: true,
         },
     },
-    render(h, { props }) {
+    render(h, { props, data: compData }) {
         const option = _.get(props.options, ['item'], {});
         let datas: any[] = [];
         const pushData = (data: any): void => {
@@ -58,7 +59,19 @@ export default {
             children = _.flatten(_.zip(children, dim));
         }
 
-        return h('span', children);
+        return h('span', {
+            ...compData,
+            class: {
+                ...getBindClass(compData.class),
+                'dynamic-layout-list': true,
+            },
+        }, children);
     },
 };
 </script>
+
+<style lang="postcss">
+.dynamic-layout-list{
+    line-height: 1.8;
+}
+</style>

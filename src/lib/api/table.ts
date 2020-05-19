@@ -14,7 +14,7 @@ import {
 import {
     BaseApiState, transformHandlerType, getDataAPI, DynamicFluentAPIToolSet,
 } from '@/lib/api/toolset';
-import { cnaRefArgs, forceRefArg, readonlyRefArg } from '@/lib/type';
+import { forceRefArg, readonlyRefArg } from '@/lib/type';
 import {
     baseAutocompleteHandler,
     SearchQueryType,
@@ -24,6 +24,13 @@ import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import {
     GetDataAction, ListType, MemberListAction, QueryAPI,
 } from '@/lib/fluent-api';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import _ from 'lodash';
+import {
+    getArrayQueryString, pushRouterQuery, RouterAPIToolsetInterface,
+} from '@/lib/router-query-string';
+import { makeSearchText, makeSearchQuery } from '@/components/organisms/search/query-search-bar/toolset';
+import { isNotEmpty } from '@/lib/util';
 
 interface DynamicTableOptions{
     options: any;
@@ -57,7 +64,7 @@ export abstract class BaseTableFluentAPI<
 
     getAction = () => this.getDefaultAction()
 
-    getData = async () => {
+    defaultGetData = async () => {
         this.tableTS.syncState.loading = true;
         this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
@@ -74,6 +81,10 @@ export abstract class BaseTableFluentAPI<
             this.tableTS.syncState.loading = false;
         }
     };
+
+    getData = async () => {
+        await this.defaultGetData();
+    }
 
     protected defaultReset = () => {
         this.tableTS.state.allPage = 1;
@@ -362,19 +373,26 @@ export class QuerySearchTableFluentAPI<
     T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>,
     action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
     > extends BaseTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
-    constructor(
-        action: action,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-        acHandlerMeta: ACHandlerMeta = defaultACHandler,
-    ) {
-        super(action);
+    initToolset = (initData, initSyncData, acHandlerMeta) => {
         this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
             if (tags !== preTags && this.action) {
                 await this.getData();
             }
         });
+    }
+
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        acHandlerMeta: ACHandlerMeta = defaultACHandler,
+        initLazy = false,
+    ) {
+        super(action);
+        if (!initLazy) {
+            this.initToolset(initData, initSyncData, acHandlerMeta);
+        }
     }
 
     getAction = () => {
@@ -387,6 +405,128 @@ export class QuerySearchTableFluentAPI<
     resetAll = () => {
         this.defaultReset();
         this.tableTS.querySearch.state.searchText = '';
+    };
+}
+interface QuerySearchQSNameType{
+    selectItems: string;
+    filters: string;
+    sortBy: string;
+    sortDesc: string;
+    thisPage: string;
+    pageSize: string;
+}
+
+export enum DefaultQSTableQSPropsName {
+    selectItems= 'sl',
+    filters= 'f',
+    sortBy='sb',
+    sortDesc= 'sd',
+    thisPage= 'p',
+    pageSize= 'ps',
+}
+export const makeQSTableQSProps = (names: QuerySearchQSNameType) => ({
+    [names.selectItems]: {
+        type: [Array, String, Number],
+        default: null,
+    },
+    [names.filters]: {
+        type: [Array, String],
+        default: null,
+    },
+    [names.sortBy]: {
+        type: String,
+        default: null,
+    },
+    [names.sortDesc]: {
+        type: String,
+        default: null,
+    },
+    [names.thisPage]: {
+        type: [String, Number],
+        default: null,
+    },
+    [names.pageSize]: {
+        type: [String, Number],
+        default: null,
+    },
+});
+
+export const DefaultQSTableQSProps = makeQSTableQSProps(DefaultQSTableQSPropsName);
+export class RouteQuerySearchTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
+    > extends QuerySearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements RouterAPIToolsetInterface {
+    constructor(
+        action: action,
+        initData: initData = undefined as unknown as initData,
+        initSyncData: initSyncData = undefined as unknown as initSyncData,
+        acHandlerMeta: ACHandlerMeta = defaultACHandler,
+        public vm: Vue|ComponentInstance,
+        public qsName: QuerySearchQSNameType = DefaultQSTableQSPropsName,
+        public isReady = false,
+        initLazy = false,
+    ) {
+        super(action, initData, initSyncData, acHandlerMeta, true);
+        if (!initLazy) {
+            this.initToolset(initData, initSyncData, acHandlerMeta);
+        }
+        watch(() => this.tableTS.syncState.selectIndex, async (aft, bef) => {
+            if (!_.isEqual(aft, bef)) {
+                await this.routerPush();
+            }
+        });
+    }
+
+    applyAPIRouter = (props: any) => {
+        if (isNotEmpty(props[this.qsName.pageSize])) {
+            this.tableTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
+        }
+        if (isNotEmpty(props[this.qsName.thisPage])) {
+            this.tableTS.syncState.thisPage = Number(props[this.qsName.thisPage]);
+        }
+        const filters = props[this.qsName.filters];
+        if (isNotEmpty(filters)) {
+            this.tableTS.querySearch.tags.value = getArrayQueryString(filters, makeSearchQuery);
+            console.debug(this.tableTS.querySearch.tags.value);
+        }
+
+        this.isReady = true;
+    };
+
+    applyDisplayRouter =(props: any) => {
+        const selectItems = props[this.qsName.selectItems];
+        console.debug(selectItems);
+        if (isNotEmpty(selectItems)) {
+            this.tableTS.syncState.selectIndex = getArrayQueryString(selectItems, Number);
+            console.debug(this.tableTS.syncState.selectIndex);
+        }
+    }
+
+    routerPush = async () => {
+        const query = {
+            ...this.vm.$route.query,
+            [this.qsName.sortBy]: this.tableTS.syncState.sortBy,
+            [this.qsName.sortDesc]: String(this.tableTS.syncState.sortDesc),
+            [this.qsName.filters]: this.tableTS.querySearch.tags.value?.map(t => makeSearchText(t.key, t.operator, t.value)),
+            [this.qsName.thisPage]: this.tableTS.syncState.thisPage,
+            [this.qsName.pageSize]: this.tableTS.syncState.pageSize,
+            [this.qsName.selectItems]: this.tableTS.syncState.selectIndex,
+        };
+        if (!query[this.qsName.sortBy]) {
+            delete query[this.qsName.sortDesc];
+        }
+        await pushRouterQuery(this.vm, query);
+    }
+
+    getData = async () => {
+        if (this.isReady) {
+            await this.defaultGetData();
+            await this.routerPush();
+        }
     };
 }
 
@@ -510,64 +650,6 @@ interface DataSource {
 }
 
 
-export class TabSearchTableAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
-    protected isShow: forceRefArg<boolean>;
-
-    constructor(
-        url: readonlyRefArg<string>,
-        extraParams: forceRefArg<any>,
-        fixSearchQuery: SearchQueryType[] = [],
-        initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData,
-        public dataSource: DataSource[] = [],
-        isShow: forceRefArg<boolean>,
-    ) {
-        super(
-            url,
-            undefined, // sub api can't support only query
-            extraParams,
-            fixSearchQuery,
-        );
-        this.tableTS = new SearchTableToolSet(initData, initSyncData);
-        this.isShow = isShow;
-        const params = computed(() => this.apiState.extraParams);
-        onMounted(() => {
-            watch([isShow, params], (origine, before) => {
-                let show;
-                let parm;
-                let preShow;
-                let preParm;
-                if (origine) {
-                    show = origine[0];
-                    parm = origine[1];
-                }
-                if (before) {
-                    preShow = before[0];
-                    preParm = before[1];
-                }
-
-                if (show && parm && (show !== preShow || parm !== preParm)) {
-                    this.getData();
-                }
-            });
-        });
-    }
-}
-
-export class AdminTableAPI<initData, initSyncData> extends TabSearchTableAPI<initData, initSyncData> {
-    constructor(
-        url: readonlyRefArg<string>,
-        extraParams: forceRefArg<any>,
-        fixSearchQuery: SearchQueryType[] = [],
-        initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
-        public dataSource: DataSource[] = defaultAdminFields,
-        isShow: forceRefArg<boolean>,
-    ) {
-        super(url, extraParams, fixSearchQuery, initData, initSyncData, dataSource, isShow);
-    }
-}
-
-export const MockAdminTableAPI = () => new AdminTableAPI('', computed(() => ({})), [], undefined, undefined, [], computed(() => false));
-
 export class SubDataAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
     // @ts-ignore
     constructor(
@@ -586,30 +668,11 @@ export class SubDataAPI<initData = any, initSyncData = any> extends SearchTableA
 }
 
 
-export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTableAPI<initData, initSyncData> {
-    // @ts-ignore
-    constructor(
-        url: readonlyRefArg<string>,
-        idKey: string,
-        private id: readonlyRefArg<cnaRefArgs<string>>,
-        initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
-        public dataSource: DataSource[] = defaultHistoryFields,
-        isShow: forceRefArg<boolean>,
-    ) {
-        super(url, computed(() => ({})), undefined, initData, initSyncData, dataSource, isShow);
-        this.apiState.extraParams = computed(() => ({
-            key_path: 'collection_info.update_history',
-            [idKey]: isRef(this.id) ? this.id.value : this.id,
-        }));
-    }
-}
-
-
 export class QuerySearchTableAPI<initData = any, initSyncData = any,
     T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>> extends BaseTableAPI<initData, initSyncData, T> {
     constructor(
         url: string, only?: string[], extraParams?: object, fixSearchQuery: SearchQueryType[] = [],
-        initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
+        initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData,
         acHandlerMeta: ACHandlerMeta = defaultACHandler,
     ) {
         super(url, only, extraParams, fixSearchQuery);

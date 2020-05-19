@@ -40,23 +40,23 @@
                 </SDynamicLayout>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
+        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
             <template #detail>
                 <p-server-detail
                     :select-id="apiHandler.tableTS.selectState.firstSelectItem.server_id"
-                    :is-show="activeTab ==='detail'"
+                    :is-show="singleItemTab.syncState.activeTab ==='detail'"
                 />
             </template>
             <template #tag>
                 <s-tags-panel
-                    :is-show="activeTab==='tag'"
+                    :is-show="singleItemTab.syncState.activeTab==='tag'"
                     :resource-id="apiHandler.tableTS.selectState.firstSelectItem.server_id"
                     tag-page-name="serverTags"
                 />
             </template>
             <template #admin>
                 <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                 v-bind="defaultAdminLayout"
                 />
             </template>
@@ -74,7 +74,7 @@
                 />
             </template>
         </p-tab>
-        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab">
             <template #data>
                 <p-data-table
                     :fields="multiSelectFields"
@@ -91,7 +91,7 @@
             </template>
             <template #admin>
                 <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.ADMIN')"
+                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                 v-bind="defaultAdminLayout"
                 />
             </template>
@@ -133,11 +133,11 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, reactive, ref, toRefs,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import {
-    getValue, platformBadgeFormatter, serverStateFormatter, showErrorMessage, timestampFormatter,
+    platformBadgeFormatter, serverStateFormatter, showErrorMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -148,7 +148,10 @@ import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
-    defaultAdminLayout, defaultHistoryLayout, QuerySearchTableFluentAPI,
+    defaultAdminLayout,
+    defaultHistoryLayout,
+    DefaultQSTableQSProps,
+    RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
@@ -171,12 +174,19 @@ import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/S
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import {
+    propsCopy,
+} from '@/lib/router-query-string';
+import {
+    DefaultMultiItemTabBarQSProps,
+    DefaultMultiItemTabBarQSPropsName, DefaultSingleItemTabBarQSProps,
+    RouterTabBarToolSet,
+} from '@/components/molecules/tabs/tab-bar/toolset';
+
 
 export default {
     name: 'Server',
-    filters: {
-        getValue,
-    },
     components: {
         GeneralPageLayout,
         PStatus,
@@ -194,7 +204,14 @@ export default {
         STagsPanel,
         PPageTitle,
     },
+    props: {
+        ...DefaultQSTableQSProps,
+        ...DefaultSingleItemTabBarQSProps,
+        ...DefaultMultiItemTabBarQSProps,
+        // ...BaseRouterProps,
+    },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentInstance;
         const mainTableLayout = computed<any>(() => ({
             name: 'Server',
             type: baseTable.type as any,
@@ -265,7 +282,7 @@ export default {
 
                 return result;
             });
-        const apiHandler = new QuerySearchTableFluentAPI(
+        const apiHandler = new RouteQuerySearchTableFluentAPI(
             action,
             {
                 selectable: true,
@@ -279,7 +296,9 @@ export default {
             },
             undefined,
             { handlerClass: ACHandler, args },
+            vm,
         );
+
 
         const fields = makeTrItems([
             ['name', 'FIELD.NAME'],
@@ -304,23 +323,35 @@ export default {
         ],
         context.parent);
 
-        const tabData = reactive({
-            tabs: computed(() => makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['tag', 'TAB.TAG'],
-                ['admin', 'TAB.ADMIN'],
-                ['history', 'TAB.HISTORY'],
-                ['monitoring', 'TAB.MONITORING'],
-            ],
-            context.parent)),
-            activeTab: 'detail',
-            multiSelectTabs: makeTrItems([
-                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
-                ['admin', 'TAB.ADMIN'],
-                ['monitoring', 'TAB.MONITORING'],
-            ], context.parent),
-            multiSelectActiveTab: 'data',
-        });
+
+        const singleItemTab = new RouterTabBarToolSet(
+            vm,
+            undefined,
+            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+            {
+                tabs: computed(() => makeTrItems([
+                    ['detail', 'TAB.DETAILS'],
+                    ['tag', 'TAB.TAG'],
+                    ['admin', 'TAB.MEMBER'],
+                    ['history', 'TAB.HISTORY'],
+                    ['monitoring', 'TAB.MONITORING'],
+                ],
+                context.parent)),
+            },
+        );
+        singleItemTab.syncState.activeTab = 'detail';
+
+        const multiItemTab = new RouterTabBarToolSet(vm,
+            DefaultMultiItemTabBarQSPropsName,
+            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+            {
+                tabs: makeTrItems([
+                    ['data', 'TAB.DATA'],
+                    ['admin', 'TAB.MEMBER'],
+                    ['monitoring', 'TAB.MONITORING'],
+                ], context.parent),
+            });
+        multiItemTab.syncState.activeTab = 'data';
 
 
         const checkTableModalState = reactive({
@@ -418,9 +449,8 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.inventory().server().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const changeAction = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+            const changeAction = fluentApi.inventory().server().changeProject().clone().setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
             if (node) {
                 await changeAction.setId(node.data.id).execute();
@@ -437,11 +467,11 @@ export default {
             let result = false;
 
             if (apiHandler.tableTS.selectState.isSelectOne) {
-                result = tabData.activeTab === 'admin';
+                result = singleItemTab.syncState.activeTab === 'admin';
             }
 
             if (apiHandler.tableTS.selectState.isSelectMulti) {
-                result = tabData.multiSelectActiveTab === 'admin';
+                result = multiItemTab.syncState.activeTab === 'admin';
             }
 
             return result;
@@ -468,7 +498,7 @@ export default {
         const historyIsShow = computed(() => {
             let result = false;
 
-            if (apiHandler.tableTS.selectState.isSelectOne && tabData.activeTab === 'history') {
+            if (apiHandler.tableTS.selectState.isSelectOne && singleItemTab.syncState.activeTab === 'history') {
                 result = true;
             }
 
@@ -484,10 +514,21 @@ export default {
             'server_id',
             apiHandler,
         );
-
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+            apiHandler.applyDisplayRouter(prop);
+            singleItemTab.applyDisplayRouter(prop);
+            multiItemTab.applyDisplayRouter(prop);
+        };
+        onMounted(async () => {
+            await routerHandler();
+        });
 
         return {
-            ...toRefs(tabData),
+            singleItemTab,
+            multiItemTab,
             dropdown,
             serverStateFormatter,
             timestampFormatter,
@@ -519,6 +560,7 @@ export default {
             collectModalState,
             metricAPIHandler,
             mainTableLayout,
+            routerHandler,
         };
     },
 };

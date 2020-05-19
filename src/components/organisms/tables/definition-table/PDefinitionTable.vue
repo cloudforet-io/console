@@ -65,6 +65,9 @@ export default defineComponent({
 <style lang="postcss" scoped>
 table {
     @apply w-full;
+    td{
+        line-height: 1.8;
+    }
 }
 .def-row:nth-child(2n+1)::v-deep {
     td {

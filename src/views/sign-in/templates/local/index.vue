@@ -133,6 +133,8 @@ export default defineComponent({
                     domain_id: vm.$ls.domain.state.domainId,
                 }, { skipAuthRefresh: true }).catch(() => {
                     state.loginFail = true;
+                    state.password = '';
+
                 });
                 ['userId', 'password'].forEach((key) => {
                     if (state[key]) {
