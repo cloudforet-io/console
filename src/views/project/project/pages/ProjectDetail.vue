@@ -1,13 +1,13 @@
 <template>
     <general-page-layout>
-        <div class="top">
+        <div class="top flex">
             <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
             />
         </div>
-        <PTab :tabs="tabs" :active-tab.sync="activeTab" :style="{'background':'#f8f8fc', 'border-width':0+'px'}">
+        <PTab :tabs="tabs" :active-tab.sync="activeTab" :style="{'background':'#f8f8fc', 'border-width':0+'px'}" >
             <template #summary>
                 <project-dashboard ref="ProjectDashboard" />
             </template>
@@ -334,8 +334,18 @@ export default {
               @apply text-base text-gray-400 mt-1;
           }
     }
+    .p-tab{
+        &::v-deep {
+            .p-tab-bar{
+                border-color:#f8f8fc;
+            }
+            .tab-pane{
+               @apply pb-0;
+            }
+        }
+    }
 
     .delete-btn {
-        @apply ml-3 -mt-3 cursor-pointer;
+        @apply ml-3 cursor-pointer;
     }
 </style>

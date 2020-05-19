@@ -8,14 +8,14 @@
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
-                                lg:col-start-5 lg:col-end-10"
+                                lg:col-start-5 lg:col-end-9"
                          v-bind="cloudServiceSummary.state"
         />
-        <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
+        <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
                                sm:col-end-13 lg:row-start-2"
                         :get-action="getCloudServiceCount"
         />
-        <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
+        <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
              lg:row-start-3 resources-tab"
         >
             <PTab :tabs="tabs" :active-tab.sync="activeTab">
@@ -32,15 +32,15 @@
             </PTab>
         </div>
         <service-accounts-table
-            class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10 lg:row-start-4"
+            class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9 lg:row-start-4"
         />
-        <daily-updates class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-10 col-end-13
+        <daily-updates class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
                        :get-cloud-service-action="dailyUpdates.cloudService"
                        :get-server-action="dailyUpdates.server"
         />
-        <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-10 col-end-13
+        <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
                               row-start-5 row-end-8 sm:row-start-3 sm:row-end-4 lg:row-start-3
                               health-dashboard"
         />

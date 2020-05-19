@@ -116,7 +116,7 @@
                                     <p id="project-name">
                                         {{ item.name }}
                                     </p>
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers"
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
                                          @click.stop="clickServiceAccount"
                                     >
                                         <!-- <p>
@@ -132,7 +132,7 @@
                                                     width=".75rem" height=".75rem"
                                                 />
                                             </div>
-                                            <span class="text-sm ml-2"> Add Service Account</span>
+                                            <span class="text-sm ml-2" > Add Service Account</span>
                                     
                                     </div>
                                     <div v-else-if="item.force_console_data.providers" class="providers">
@@ -714,6 +714,7 @@ export default {
                 @apply text-secondary font-bold;
                div{ @apply bg-blue-300 ; } 
             }
+            span {line-height:1.75;}
         }
     }
 

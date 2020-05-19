@@ -3,6 +3,7 @@
         <p-icon-button v-if="child" width="2rem" height="2rem"
                        name="ic_back"
                        @click="$emit('goBack',$event)"
+                       class="mr-1"
         />
         <div class="title" :class="{child}">
             <slot name="before-title" />
