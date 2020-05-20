@@ -1,6 +1,6 @@
 <template>
     <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
-                     help="Check your resource updates of daily usage."
+                     :help="$t('DASHBOARD.ACTION.DAILY_UPDATES')"
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
@@ -22,7 +22,7 @@
             >
                 <template #card="{item, index}">
                     <p-selectable-item :icon-url="item.icon" :default-icon="item.defaultIcon" theme="card"
-                                       @click="onItemClick(item, idx)"
+                                       @click="onItemClick(item)"
                     >
                         <template #contents>
                             <div v-tooltip.bottom.start="{content: item.group, delay: {show: 500}}" class="group">
@@ -85,6 +85,7 @@ interface Data {
     type: string;
     count: number;
     icon?: string;
+    provider?: string;
     defaultIcon?: string;
 }
 
@@ -142,7 +143,7 @@ export default {
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
             // .setTopic('daily_server_updates')
-            .setFrom('now/d - 2w')
+            .setFrom('now/d')
             .setDefaultFields('server_type')
             .setDiffFields('server_count');
 
@@ -157,7 +158,7 @@ export default {
 
         const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
             // .setTopic('daily_cloud_service_updates')
-            .setFrom('now/d - 7d')
+            .setFrom('now/d')
             .setDefaultFields('cloud_service_type', 'cloud_service_group', 'provider', 'icon')
             .setDiffFields('cloud_service_count');
 
@@ -187,6 +188,7 @@ export default {
                     group: d.cloud_service_group,
                     type: d.cloud_service_type,
                     count: d.cloud_service_count,
+                    provider: d.provider,
                     icon: d.icon || providerStore.state.providers[d.provider]?.icon,
                 })),
             ];
@@ -198,7 +200,11 @@ export default {
         return {
             ...toRefs(state),
             onItemClick(item) {
-                vm.$router.push('/identity/service-account');
+                console.log(item)
+                vm.$router.push({
+                    path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
+                    // path: '/inventory/cloud-service',
+                });
             },
             getIcon(count: number): string {
                 if (count > 0) return 'ic_list_increase';

@@ -2,18 +2,13 @@
     <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
-                <div class="cloud-service-page-nav">
-                    <div class="left">
-                        <p-i name="ic_back" width="2rem" height="2rem"
-                             @click="$router.push({name:'cloudServiceMain'})"
-                        />
-
-                        <div class="title">
-                            <span class="group">{{ $route.params.group }}/</span><span class="name">{{ $route.params.name }}</span>
-                        </div>
-                    </div>
-                    <div class="right" />
-                </div>
+                <PPageTitle :title="$route.params.name"
+                            child
+                            use-total-count
+                            use-selected-count :total-count="apiHandler.totalCount.value"
+                            :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+                            @goBack="$router.push({name:'cloudServiceMain'})"
+                />
                 <s-dynamic-layout type="query-search-table"
                                   :toolset="apiHandler"
                                   name="cloudService"
@@ -76,11 +71,7 @@
                 />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
-                              :data-tools="metricAPIHandler.ts.state.dataTools"
-                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
-                              :resources="metricAPIHandler.ts.state.resources"
-                />
+                <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
@@ -90,8 +81,12 @@
             <template #data>
                 <s-dynamic-layout
                     type="simple-table"
-                    :data_source="dataSource"
+                    :options="options"
                     :data="apiHandler.tableTS.selectState.selectItems"
+                    :vbind="{
+                        showTitle:false,
+
+                    }"
                 />
             </template>
             <template #member>
@@ -101,14 +96,10 @@
                 />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
-                              :data-tools="metricAPIHandler.ts.state.dataTools"
-                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
-                              :resources="metricAPIHandler.ts.state.resources"
-                />
+                <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </PTab>
-        <p-empty v-else style="height: auto;margin-top:4rem ">
+        <p-empty v-else style="height: auto; margin-top: 4rem;">
             No Selected Item
         </p-empty>
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
@@ -123,7 +114,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed, watch, getCurrentInstance,
+    reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -133,8 +124,8 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
-    defaultAdminLayout, defaultHistoryLayout,
-    QuerySearchTableFluentAPI,
+    defaultAdminLayout, defaultHistoryLayout, DefaultQSTableQSProps,
+    QuerySearchTableFluentAPI, RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
@@ -145,18 +136,24 @@ import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import PI from '@/components/atoms/icons/PI.vue';
+import {
+    DefaultMultiItemTabBarQSProps, DefaultMultiItemTabBarQSPropsName,
+    DefaultSingleItemTabBarQSProps, RouterTabBarToolSet,
+    TabBarState,
+} from '@/components/molecules/tabs/tab-bar/toolset';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
-import { MetricAPI } from '@/lib/api/monitoring';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
 import baseTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import baseInfoSchema from '@/metadata-schema/view/inventory/cloud_service/sub_data/layouts/base_info.json';
 import _ from 'lodash';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { propsCopy } from '@/lib/router-query-string';
+import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -172,7 +169,7 @@ export default {
         GeneralPageLayout,
         PHorizontalLayout,
         SDynamicLayout,
-        PI,
+        PPageTitle,
         PIconTextButton,
         PTab,
         SDynamicSubData,
@@ -197,9 +194,12 @@ export default {
             type: String,
             required: true,
         },
+        ...DefaultQSTableQSProps,
+        ...DefaultSingleItemTabBarQSProps,
+        ...DefaultMultiItemTabBarQSProps,
     },
     setup(props, context) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
 
         const filedMap = {
             project_id: {
@@ -227,26 +227,6 @@ export default {
             // ]),
         });
 
-        const singleItemTab = new TabBarState({
-            tabs: makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['tag', 'TAB.TAG'],
-                ['member', 'TAB.MEMBER'],
-                ['history', 'TAB.HISTORY'],
-                ['monitoring', 'TAB.MONITORING'],
-            ]),
-        });
-        singleItemTab.syncState.activeTab = 'detail';
-
-        const multiItemTab = new TabBarState({
-            tabs: makeTrItems([
-                ['data', 'TAB.DATA'],
-                ['member', 'TAB.MEMBER'],
-                ['monitoring', 'TAB.MONITORING'],
-            ]),
-        });
-        multiItemTab.syncState.activeTab = 'data';
-
         const { project } = useStore();
         project.getProject();
         const csListAction = fluentApi.inventory().cloudService().list()
@@ -264,15 +244,52 @@ export default {
                 { key: 'cloud_service_type', operator: '=', value: props.name },
             );
 
+        const apiHandler = new RouteQuerySearchTableFluentAPI(
+            csListAction,
+            {
+                shadow: true,
+                border: true,
+                padding: true,
+                selectable: true,
+                dragable: true,
+                excelVisible: true,
+            },
+            undefined,
+            undefined,
+            vm,
+        );
 
-        const apiHandler = new QuerySearchTableFluentAPI(csListAction, {
-            shadow: true,
-            border: true,
-            padding: true,
-            selectable: true,
-            dragable: true,
-            excelVisible: true,
-        });
+        const singleItemTab = new RouterTabBarToolSet(
+            vm,
+            undefined,
+            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+            {
+                tabs: makeTrItems([
+                    ['detail', 'TAB.DETAILS'],
+                    ['tag', 'TAB.TAG'],
+                    ['member', 'TAB.MEMBER'],
+                    ['history', 'TAB.HISTORY'],
+                    ['monitoring', 'TAB.MONITORING'],
+                ]),
+            },
+        );
+        singleItemTab.syncState.activeTab = 'detail';
+
+        const multiItemTab = new RouterTabBarToolSet(
+            vm,
+            DefaultMultiItemTabBarQSPropsName,
+            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+            {
+                tabs: makeTrItems([
+                    ['data', 'TAB.SELECTED_DATA'],
+                    ['member', 'TAB.MEMBER'],
+                    ['monitoring', 'TAB.MONITORING'],
+                ]),
+            },
+        );
+        multiItemTab.syncState.activeTab = 'data';
+
+
         const getFields = async (provider, group, name) => {
             const resp = await fluentApi.inventory().cloudServiceType().list().setFilter(
                 { key: 'provider', operator: '=', value: provider },
@@ -335,9 +352,9 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.inventory().cloudService().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id));
+            const action = fluentApi.inventory().cloudService().changeProject().clone()
+                .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id));
             if (node) {
                 await action.setId(node.data.id).execute();
             } else {
@@ -442,11 +459,23 @@ export default {
             }
         });
 
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+            apiHandler.applyDisplayRouter(prop);
+            singleItemTab.applyDisplayRouter(prop);
+            multiItemTab.applyDisplayRouter(prop);
+        };
+        onMounted(async () => {
+            await routerHandler();
+        });
 
-        const metricAPIHandler = new MetricAPI(
-            'inventory.CloudService',
+
+        const monitoringTS = new MonitoringToolSet(
             'cloud_service_id',
-            apiHandler,
+            'inventory.CloudService',
+            computed(() => apiHandler.tableTS.selectState.selectItems),
         );
 
         return {
@@ -463,7 +492,7 @@ export default {
             clickCollectData,
             singleItemTab,
             multiItemTab,
-            metricAPIHandler,
+            monitoringTS,
             defaultAdminLayout,
             defaultHistoryLayout,
             adminApi,

@@ -40,7 +40,6 @@
                     <p-horizontal-layout>
                         <template #container="{ height }">
                             <PPageTitle
-                                class="mb-6 mt-2"
                                 :use-selected-count="true" :use-total-count="true" :title="selectProviderItem.name+' Account'"
                                 :total-count="apiHandler.totalCount.value"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
@@ -284,7 +283,7 @@ export default {
                 const properties = selectProviderItem.value.template.service_account.schema.properties || {};
                 if (selectProviderItem) {
                     return [
-                        { name: 'name', key: 'name' },
+                        { name: 'Name', key: 'name' },
                         ...Object.entries(properties).map(([key, item]) => ({
                             key: `data.${key}`,
                             name: item.title,
@@ -299,7 +298,7 @@ export default {
         const accountFields = computed<any[]>(() => [
             ...originDataSource.value,
             {
-                name: 'project', key: 'console_force_data.project', type: 'text', option: {},
+                name: 'Project', key: 'console_force_data.project', type: 'text', option: {},
             },
             createAtVF,
         ]);
@@ -316,7 +315,7 @@ export default {
 
         const multiItemTab = new TabBarState({
             tabs: makeTrItems([
-                ['data', 'TAB.DATA'],
+                ['data', 'TAB.SELECTED_DATA'],
                 ['member', 'TAB.MEMBER'],
             ]),
         });
@@ -373,9 +372,8 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.identity().serviceAccount().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
+            const action = fluentApi.identity().serviceAccount().changeProject().clone().setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
             if (node) {
                 await action.setId(node.data.id).execute()
@@ -515,7 +513,7 @@ export default {
             { name: 'Name', key: 'name' },
             { name: 'Schema', key: 'schema' },
             {
-                name: 'Created at',
+                name: 'Created',
                 key: 'created_at.seconds',
                 type: 'datetime',
                 options: {
@@ -632,7 +630,7 @@ export default {
         }
     }
     .provider-list{
-        @apply w-full px-4 pt-4;
+        @apply w-full px-4 pt-6;
 
     }
     >>> .provider-card-item{
@@ -653,10 +651,10 @@ export default {
             }
         }
         &.selected{
-            @apply border-blue-600 bg-blue-200 text-blue-600;
+            @apply border-blue-500 bg-blue-200 text-blue-500;
             .left{
                 .title{
-                    @apply text-blue-600;
+                    @apply text-blue-500;
                 }
             }
         }

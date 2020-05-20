@@ -7,6 +7,7 @@ import { ColorBindFactory } from '@/lib/view-helper';
 import { getCurrentInstance } from '@vue/composition-api';
 import { getCurrentVM } from '@vue/composition-api/dist/runtimeContext';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import timezones from 'timezones.json';
 
 // color set
 /**
@@ -72,8 +73,8 @@ export const userStateColor = Object.freeze({
         textColor: styles.alert,
     },
     UNIDENTIFIED: {
-        iconColor: styles.gray,
-        textColor: styles.gray,
+        iconColor: styles.gray[500],
+        textColor: styles.gray[500],
     },
 });
 
@@ -103,7 +104,10 @@ export const platformBadgeColor = Object.freeze({
     LINUX: { backgroundColor: styles.coral.default },
     WINDOWS: { backgroundColor: styles.secondary },
 });
-export const getTimezone = () => localStorage.getItem('timezone') || 'UTC';
+export const getTimezone = () => {
+    const timezone = localStorage.getItem('user/timezone');
+    return timezone ? JSON.parse(timezone).data || 'UTC' : 'UTC';
+};
 export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' for display Timezone
 export const getTimestamp = (momentTime: Moment) => ({
     seconds: `${momentTime.unix()}`,

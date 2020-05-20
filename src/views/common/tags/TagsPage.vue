@@ -2,23 +2,22 @@
     <general-page-layout>
         <div class="page-nav">
             <div class="left">
-                <p-i name="ic_back" width="2rem" height="2rem"
-                     @click="onSave()"
+                <p-icon-button name="ic_back" width="2rem" height="2rem" class="mr-2"
+                               @click="goBack()"
                 />
-
                 <div class="title">
-                    {{ resource.label || 'Service' }} / {{ resourceId }} / Tags
+                    Tags
                 </div>
             </div>
             <div class="right" />
         </div>
         <p-pane-layout class="w-full px-4 py-8">
             <div v-if="items.length == 0" class="comment">
-                <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그가 없습니다.<br>
+                <span class="highlight">{{ $t('ACTION.DICT.NO_TAG') }}</span><br>
                 {{ $t('ACTION.DICT.CLICK_ADD_BTN_MSG') }}
             </div>
             <div v-else class="comment">
-                <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그를 추가합니다.<br>
+                <span class="highlight">{{ $t('ACTION.DICT.ADD_TAG') }}</span><br>
                 {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
 
@@ -62,6 +61,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { DictPanelAPI } from '@/lib/api/dict';
 import {
     DictItem,
@@ -79,6 +79,7 @@ export default {
     components: {
         GeneralPageLayout,
         PI,
+        PIconButton,
         PButton,
         PPaneLayout,
         PDictInputGroup,

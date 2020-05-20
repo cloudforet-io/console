@@ -33,6 +33,7 @@ export default {
                 {
                     path: '/',
                     name: 'collectorMain',
+                    props: route => ({ ...route.query }),
                     component: Collector,
                 },
                 {
