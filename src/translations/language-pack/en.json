@@ -14,7 +14,6 @@
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "{itemName} limit:  {limitCount}",
-		"NONE": "",
 		"PROJECT": {
 			"ITEM_WILL_SELECT_FOR": "The {item} is/ are in {project}.",
 			"NO_PROJECT": "There is no project.",
