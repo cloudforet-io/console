@@ -63,7 +63,7 @@ export default defineComponent({
 }
 .key, .value{
     @apply py-2 px-4 text-sm;
-    line-height: 1.0625rem;
+    line-height:1.45;
     cursor: unset;
 }
 
