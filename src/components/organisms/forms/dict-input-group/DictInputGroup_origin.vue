@@ -28,14 +28,21 @@
                  * {{ $t('ORGANISMS.TAG_EMPTY') }}
             </div>-->
             <!-- <p-dict-input :name.sync="newPair.name" :value.sync="newPair.value" />-->
-            <p-button class="add-btn" style-type="primary-dark"
+            <!-- <p-button class="add-btn" style-type="primary-dark"
                       @click="addPair"
             >
                 <p-i name="ic_plus" color="transparent inherit"
                      width="1rem" height="1rem"
                 />
                 {{ $t('BTN.ADD') }}
-            </p-button>
+            </p-button> -->
+
+            <PIconTextButton style-type="primary-dark"  class="add-btn" 
+            name="ic_plus_bold"
+            @click="addPair"
+            >
+            {{ $t('BTN.ADD') }}
+            </PIconTextButton>
         </div>
     </div>
 </template>
@@ -50,6 +57,7 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 const mergeDict = dict => _.transform(dict, (result, pair) => {
     result[pair.name] = pair.value;
@@ -159,7 +167,7 @@ export const setup = (props, context) => {
 export default {
     name: 'PDictInputGroup',
     components: {
-        PDictInput, PIconButton, PCopyButton, PI, PButton,
+        PDictInput, PIconButton, PCopyButton, PI, PButton, PIconTextButton,
     },
     events: ['update:dict', 'change'],
     props: {

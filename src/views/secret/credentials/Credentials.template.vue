@@ -1,5 +1,10 @@
 <template>
     <general-page-layout>
+         <PPageTitle title="Credentials" />
+                    <!-- use-total-count use-selected-count
+                    :total-count="apiHandler.totalCount.value"
+                    :selected-count="apiHandler.tableTS.selectState.selectItems.length" -->
+       
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -134,6 +139,7 @@ const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-
 const PSearch = () => import('@/components/molecules/search/Search');
 const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+const PPageTitle = () => import('@/components/organisms/title/page-title/PageTitle.vue');
 
 export const getDataInputType = () => {
     const currentURL = window.location.href;
@@ -387,6 +393,7 @@ export default {
         PSearch,
         PBadge,
         PTableCheckModal,
+        PPageTitle,
     },
     setup(props, context) {
         const dataBind = reactive({

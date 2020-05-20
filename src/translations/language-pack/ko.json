@@ -14,7 +14,7 @@
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "{itemName} {limitCount}개 제한",
-		"NONE": "폴더 구조 유지를 위한 임시 번",
+		"NONE": "폴더유지를 위한 임시 번역",
 		"PROJECT": {
 			"ITEM_WILL_SELECT_FOR": "{project}에 {item}이 존재합니다.",
 			"NO_PROJECT": "프로젝트가 없습니다.",
