@@ -17,7 +17,7 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          cd translations
+          cd ./src/translations
           python3 -m pip install --upgrade pip
           pip3 install -r requirements.txt
 
