@@ -1,4 +1,5 @@
 import { fluentApi } from '@/lib/fluent-api';
+import { bypassQueryString } from '@/lib/router-query-string';
 
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 
@@ -30,6 +31,7 @@ export default {
                 {
                     path: '/',
                     name: 'server',
+                    props: bypassQueryString,
                     component: Server,
                 },
                 {
@@ -65,7 +67,7 @@ export default {
                         {
                             path: '/',
                             name: 'cloudServicePage',
-                            props: true,
+                            props: bypassQueryString,
                             component: CloudServicePage,
                         },
                         {

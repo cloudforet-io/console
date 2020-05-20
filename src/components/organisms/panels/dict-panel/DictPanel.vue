@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-panel-top :use-total-count="true" :total-count="Object.keys(dict).length">
-            <template>{{ $t('WORD.TAGS') }}</template>
+            <template>{{ $t('WORD.TAG') }}</template>
             <template #extra>
                 <slot name="extra">
                     <p-button v-if="!editMode" style-type="primary-dark"

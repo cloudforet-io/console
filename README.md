@@ -37,9 +37,9 @@
 ## ⚙️ Install  
   
 ```sh  
- git clone github.com/spaceone-dev/console-client 
+ git clone github.com/spaceone-dev/console
 
- cd spaceone-dev/console-client 
+ cd spaceone-dev/console
 
  git submodule init && git submodule update 
 

@@ -1,6 +1,7 @@
 {
 	"ACTION": {
 		"DICT": {
+			"ADD_TAG": "",
 			"ADD_TAG_BY": "",
 			"CLICK_ADD_BTN_MSG": "",
 			"HELPMSG": "",
@@ -8,7 +9,8 @@
 				"KEY_DUPL": "",
 				"KEY_EMPTY": "",
 				"VAL_EMPTY": ""
-			}
+			},
+			"NO_TAG": ""
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
@@ -259,6 +261,7 @@
 			"GROUP": "",
 			"LANG": "",
 			"NAME": "",
+			"NEW_PWD": "",
 			"PHONE": "",
 			"PWD": "",
 			"PWD_CHECK": "",

@@ -1,13 +1,15 @@
 <template>
     <general-page-layout>
-        <div class="top flex">
+        <div class="top">
             <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
             />
         </div>
-        <PTab :tabs="tabs" :active-tab.sync="activeTab" :style="{'background':'#f8f8fc', 'border-width':0+'px'}" >
+        <PTab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
+              :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
+        >
             <template #summary>
                 <project-dashboard ref="ProjectDashboard" />
             </template>
@@ -43,7 +45,7 @@
             </template>
             <template #tag>
                 <s-tags-panel
-                    :is-show="activeTab==='tag'"
+                    :is-show="singleItemTab.syncState.activeTab==='tag'"
                     :resource-id="projectId"
                     tag-page-name="projectTags"
                 />
@@ -113,6 +115,12 @@ import { TableCheckModalState } from '@/components/organisms/modals/table-modal/
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { showErrorMessage } from '@/lib/util';
+import {
+    DefaultSingleItemTabBarQSProps,
+    RouterTabBarToolSet,
+} from '@/components/molecules/tabs/tab-bar/toolset';
+import { propsCopy } from '@/lib/router-query-string';
+import {ComponentInstance} from "@vue/composition-api/dist/component";
 
 export default {
     name: 'ProjectDetail',
@@ -130,8 +138,11 @@ export default {
         PButton,
         SProjectMemberAddModal,
     },
+    props: {
+        ...DefaultSingleItemTabBarQSProps,
+    },
     setup(props, context) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const item = ref({} as ProjectModel);
         const state = reactive({
@@ -159,15 +170,30 @@ export default {
         });
 
         // Tab
-        const tabData = reactive({
-            tabs: makeTrItems([
-                ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
-                ['member', 'COMMON.MEMBER'],
-                ['tag', 'TAB.TAG'],
-            ],
-            context.parent),
-            activeTab: 'summary',
-        });
+        // const tabData = reactive({
+        //     tabs: makeTrItems([
+        //         ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
+        //         ['member', 'COMMON.MEMBER'],
+        //         ['tag', 'TAB.TAG'],
+        //     ],
+        //     context.parent),
+        //     activeTab: 'summary',
+        // });
+
+        const singleItemTab = new RouterTabBarToolSet(
+            vm,
+            undefined,
+            undefined,
+            {
+                tabs: computed(() => makeTrItems([
+                    ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
+                    ['member', 'COMMON.MEMBER'],
+                    ['tag', 'TAB.TAG'],
+                ],
+                context.parent)),
+            },
+        );
+        singleItemTab.syncState.activeTab = 'summary';
 
         // Auto Complete Handler for query search bar
         const projectKeyAutoCompletes = ['project_id'];
@@ -304,13 +330,24 @@ export default {
             deleteTS.syncState.visible = false;
         };
 
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            // apiHandler.applyAPIRouter(prop);
+            // await apiHandler.getData();
+            // apiHandler.applyDisplayRouter(prop);
+            singleItemTab.applyDisplayRouter(prop);
+        };
+        onMounted(async () => {
+            await routerHandler();
+        });
 
         return {
             ...toRefs(state),
+            singleItemTab,
             apiHandler,
             dataSource,
             item,
-            ...toRefs(tabData),
+            // ...toRefs(singleItemTab),
             tagsApi,
             ...toRefs(formState),
             deleteTS,
@@ -334,18 +371,8 @@ export default {
               @apply text-base text-gray-400 mt-1;
           }
     }
-    .p-tab{
-        &::v-deep {
-            .p-tab-bar{
-                border-color:#f8f8fc;
-            }
-            .tab-pane{
-               @apply pb-0;
-            }
-        }
-    }
 
     .delete-btn {
-        @apply ml-3 cursor-pointer;
+        @apply ml-3 -mt-3 cursor-pointer;
     }
 </style>
