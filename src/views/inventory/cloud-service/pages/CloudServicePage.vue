@@ -161,7 +161,7 @@ import baseInfoSchema from '@/metadata-schema/view/inventory/cloud_service/sub_d
 import _ from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import {propsCopy} from "@/lib/router-query-string";
+import { propsCopy } from '@/lib/router-query-string';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -360,9 +360,9 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.inventory().cloudService().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id));
+            const action = fluentApi.inventory().cloudService().changeProject().clone()
+                .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id));
             if (node) {
                 await action.setId(node.data.id).execute();
             } else {

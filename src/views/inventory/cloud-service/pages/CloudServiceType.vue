@@ -35,11 +35,12 @@
             </p-grid-layout>
         </template>
         <template #default>
-            <div class="text-xs text-gray-500" style="line-height: 120%">
+            <div class="text-xs text-gray-500 mb-1">
                 Cloud Service Provider
             </div>
-            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value" />
-            <div class="pb-8 cloud-services">
+            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value" 
+            class="pagetitle"/>
+            <div class="cloud-services">
                 <PToolboxGridLayout
                     v-bind="apiHandler.gridTS.state"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
@@ -245,7 +246,6 @@ export default {
                 cardClass: () => ['card-item', 'cst-card-item'],
                 cardMinWidth: '23rem',
                 cardHeight: '8rem',
-                columnGap: '0.5rem',
                 excelVisible: false,
             },
             undefined,
@@ -319,7 +319,7 @@ export default {
         }
     }
     .provider-list{
-        @apply w-full px-4 pt-4;
+        @apply w-full px-4 pt-6;
 
     }
     >>> .provider-card-item{
@@ -341,10 +341,10 @@ export default {
             }
         }
         &.selected{
-            @apply border-blue-600 bg-blue-200 text-blue-600;
+            @apply border-secondary bg-blue-200 text-secondary;
             .left{
                 .title{
-                    @apply text-blue-600;
+                    @apply text-secondary;
                 }
             }
         }
@@ -355,6 +355,9 @@ export default {
         @apply p-6 flex flex-row justify-between items-center;
         .left{
             @apply inline-flex items-center;
+            img { 
+                @apply rounded-sm overflow-hidden;
+            }
             .text-content{
                 @apply ml-4;
                 .sub-title{
@@ -387,4 +390,5 @@ export default {
             }
         }
     }
+    .pagetitle{margin-bottom:0;}
 </style>

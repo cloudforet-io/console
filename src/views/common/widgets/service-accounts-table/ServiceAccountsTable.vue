@@ -26,19 +26,17 @@
                     </div>
                 </template>
                 <template #th-secret_count="{field}">
-                    <div class="text-center custom-th"
-                         :style="{color: colors.credentials, 'font-weight': 'bold'}"
-                    >
+                    <div class="text-center custom-th" :style="{color: colors.credentials, 'font-weight': 'bold'}">
                         {{ field.label }}
                     </div>
                 </template>
 
                 <!-- others -->
-                <template #col-provider-format="{value}">
+                <template #col-provider-format="{value, index}">
                     <div class="font-bold"
-                         :style="{'padding-top':'0.5rem', 'padding-left':'1.04rem', 'vertical-align':'middle'}"
+                         :style="{'padding-left': '1.04rem','vertical-align': 'middle'}"
                     >
-                        <span class="color" />
+                        <span class="color" :style="{color: data[index].provider_color}"/>
                         {{ value || 0 }}
                     </div>
                 </template>
@@ -73,51 +71,37 @@ import {
     computed, getCurrentInstance, reactive, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { gray, secondary, secondary1 } from '@/styles/colors';
-import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
+import _ from 'lodash';
 
 export default {
     name: 'ServiceAccountsTable',
     components: {
         PWidgetLayout,
-        PBadge,
         PDataTable,
-        PTr,
         PTd,
-        PI,
-        PChartLoader,
-        PSkeleton,
     },
     setup(props, context) {
         const vm: any = getCurrentInstance();
         const projectId = computed<string>(() => context.root.$route.params.id as string);
+        const {
+            provider,
+        } = useStore();
+        const providerStore: ProviderStoreType = provider;
 
             interface DataType {
                 provider: string;
+                provider_color: string;
                 service_account_name: string;
                 server_count: number;
                 cloud_service_count: number;
                 secret_count: number;
-            }
-
-            interface InitDataType {
-                data: Array<DataType | undefined>;
-                loading: boolean;
-                colors: {
-                    servers: string;
-                    cloud_services: string;
-                    credentials: string;
-                };
-                fields: Ref<Readonly<string[]>>;
             }
 
             const state = reactive({
@@ -172,14 +156,16 @@ export default {
                 .addFormula('resource_count', 'server_count + cloud_service_count')
                 .setSort('resource_count');
 
-
             const getData = async () => {
                 state.loading = true;
                 state.data = [];
+                await providerStore.getProvider();
                 try {
                     const res = await api.execute();
-                    state.data = res.data.results.map((item) => ({
+                    const providers: ProviderInfo = providerStore.state.providers;
+                    state.data = res.data.results.map(item => ({
                         provider: item.provider,
+                        provider_color: providers[item.provider].color,
                         service_account_name: item.service_account_name,
                         cloud_service_count: item?.cloud_service_count || 0,
                         server_count: item?.server_count || 0,
@@ -210,7 +196,7 @@ export default {
         height: 0.75rem;
         margin-right: 0.5rem;
         border-radius: 2px;
-        background-color: currentColor;
+        background: currentColor;
     }
     .custom-th {
         @apply flex items-center justify-center uppercase font-bold px-1;

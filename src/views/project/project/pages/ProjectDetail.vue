@@ -1,6 +1,6 @@
 <template>
     <general-page-layout>
-        <div class="top">
+        <div class="top flex">
             <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
@@ -120,7 +120,7 @@ import {
     RouterTabBarToolSet,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import { propsCopy } from '@/lib/router-query-string';
-import {ComponentInstance} from "@vue/composition-api/dist/component";
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {
     name: 'ProjectDetail',
@@ -168,17 +168,6 @@ export default {
                 getProject(after);
             }
         });
-
-        // Tab
-        // const tabData = reactive({
-        //     tabs: makeTrItems([
-        //         ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
-        //         ['member', 'COMMON.MEMBER'],
-        //         ['tag', 'TAB.TAG'],
-        //     ],
-        //     context.parent),
-        //     activeTab: 'summary',
-        // });
 
         const singleItemTab = new RouterTabBarToolSet(
             vm,
@@ -332,9 +321,6 @@ export default {
 
         const routerHandler = async () => {
             const prop = propsCopy(props);
-            // apiHandler.applyAPIRouter(prop);
-            // await apiHandler.getData();
-            // apiHandler.applyDisplayRouter(prop);
             singleItemTab.applyDisplayRouter(prop);
         };
         onMounted(async () => {
@@ -371,8 +357,18 @@ export default {
               @apply text-base text-gray-400 mt-1;
           }
     }
+    .p-tab{
+        &::v-deep {
+            .p-tab-bar{
+                border-color:#f8f8fc;
+            }
+            .tab-pane{
+               @apply pb-0;
+            }
+        }
+    }
 
     .delete-btn {
-        @apply ml-3 -mt-3 cursor-pointer;
+        @apply ml-3 cursor-pointer;
     }
 </style>

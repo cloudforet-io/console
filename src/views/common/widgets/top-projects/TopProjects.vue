@@ -1,5 +1,7 @@
 <template>
-    <p-widget-layout title="Top 5 Resource Managing Projects" help="Check project ranking with most resources and service." class="top-projects">
+    <p-widget-layout title="Top 5 Resource Managing Projects" :help="$t('DASHBOARD.ACTION.TOP_PROJECTS')"
+                     class="top-projects"
+    >
         <div class="flex flex-col h-full">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>

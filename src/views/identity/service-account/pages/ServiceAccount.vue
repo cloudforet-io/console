@@ -40,7 +40,6 @@
                     <p-horizontal-layout>
                         <template #container="{ height }">
                             <PPageTitle
-                                class="mb-6 mt-2"
                                 :use-selected-count="true" :use-total-count="true" :title="selectProviderItem.name+' Account'"
                                 :total-count="apiHandler.totalCount.value"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
@@ -373,9 +372,8 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.identity().serviceAccount().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
+            const action = fluentApi.identity().serviceAccount().changeProject().clone().setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
             if (node) {
                 await action.setId(node.data.id).execute()
@@ -632,7 +630,7 @@ export default {
         }
     }
     .provider-list{
-        @apply w-full px-4 pt-4;
+        @apply w-full px-4 pt-6;
 
     }
     >>> .provider-card-item{
@@ -653,10 +651,10 @@ export default {
             }
         }
         &.selected{
-            @apply border-blue-600 bg-blue-200 text-blue-600;
+            @apply border-blue-500 bg-blue-200 text-blue-500;
             .left{
                 .title{
-                    @apply text-blue-600;
+                    @apply text-blue-500;
                 }
             }
         }

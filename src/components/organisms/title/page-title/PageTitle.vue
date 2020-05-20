@@ -3,6 +3,7 @@
         <p-icon-button v-if="child" width="2rem" height="2rem"
                        name="ic_back"
                        @click="$emit('goBack',$event)"
+                       class="mr-1"
         />
         <div class="title" :class="{child}">
             <slot name="before-title" />
@@ -65,7 +66,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-page-title{
-        @apply mb-4 inline-flex content-start items-center;
+        @apply mb-6 inline-flex content-start items-center;
         .title{
             @apply font-bold;
             font-size: 2rem;

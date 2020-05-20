@@ -1,7 +1,6 @@
 <template>
     <general-page-layout>
         <PPageTitle title="Server"
-                    class="ml-4"
                     use-total-count use-selected-count
                     :total-count="apiHandler.totalCount.value"
                     :selected-count="apiHandler.tableTS.selectState.selectItems.length"
@@ -14,6 +13,7 @@
                     :vbind="{
                         responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
                         showTitle:false,
+                        exportFields:mergeFields,
                     }"
                 >
                     <template #toolbox-left>
@@ -213,14 +213,23 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
+        const filedMap = {
+            project_id: {
+                key: 'console_force_data.project',
+                type: 'text',
+                name: 'Project',
+            },
+        };
+
         const mainTableLayout = computed<any>(() => ({
             name: 'Server',
             type: baseTable.type as any,
             options: {
-                fields: baseTable.options.fields,
+                fields: baseTable.options.fields.map(field => filedMap[field.key] || field),
             },
 
         }));
+
         class ACHandler extends QuerySearchTableACHandler {
             // eslint-disable-next-line class-methods-use-this
             get valuesFetchUrl() {
@@ -450,9 +459,9 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.inventory().server().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const changeAction = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+            const changeAction = fluentApi.inventory().server().changeProject().clone()
+                .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
             if (node) {
                 await changeAction.setId(node.data.id).execute();
