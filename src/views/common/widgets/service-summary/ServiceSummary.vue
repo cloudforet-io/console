@@ -65,7 +65,7 @@ export default {
 
         const trendApi = fluentApi.statisticsTest().history().stat<Trend>()
             .addGroupKey('created_at', 'date')
-            .setFilter({ key: 'created_at', value: 'now/d-8d', operator: FILTER_OPERATOR.gtTime });
+            .setFilter({ key: 'created_at', value: 'now/d-6d', operator: FILTER_OPERATOR.gtTime });
 
         const getCount = async (): Promise<void> => {
             try {
