@@ -68,9 +68,9 @@
                             <div class="flex flex-row flex-wrap w-full tool-left">
                                 <div class="tool-left-btn">
                                     <p-button style-type="primary-dark" @click="openProjectForm">
-                                          <p-i name="ic_plus_bold" color="inherit"
-                                                width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
-                                            />
+                                        <p-i name="ic_plus_bold" color="inherit"
+                                             width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
+                                        />
                                         {{ $t('INVENTORY.CRT_PROJ') }}
                                     </p-button>
 
@@ -129,7 +129,7 @@
                                         {{ item.name }}
                                     </p>
                                     <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
-                                         @click.stop="clickServiceAccount"
+                                         @click.stop="goToServiceAccount"
                                     >
                                         <!-- <p>
                                             <p-simple-icon-button :normal-icon-name="'btn_circle_plus_blue'"
@@ -504,7 +504,7 @@ export default {
             });
         };
 
-        const clickServiceAccount = () => {
+        const goToServiceAccount = () => {
             vm?.$router.push({
                 name: 'serviceAccount',
             });
@@ -620,7 +620,7 @@ export default {
             selected,
             hovered,
             clickCard,
-            clickServiceAccount,
+            goToServiceAccount,
             cardSummary,
             projectSummary,
             openProjectForm,

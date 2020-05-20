@@ -26,6 +26,7 @@
 	"BTN": {
 		"ACTION": "Action",
 		"ADD": "Add",
+		"ADD_SERVICE_ACCOUNT": "Add Service Account",
 		"ADD_TAG": "Add Tag",
 		"BACK": "Back",
 		"CANCEL": "Cancel",

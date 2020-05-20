@@ -26,6 +26,7 @@
 	"BTN": {
 		"ACTION": "작업",
 		"ADD": "추가",
+		"ADD_SERVICE_ACCOUNT": "서비스 계정 추",
 		"ADD_TAG": "태그 추가",
 		"BACK": "이전으로",
 		"CANCEL": "취소",

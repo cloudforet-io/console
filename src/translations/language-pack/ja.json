@@ -26,6 +26,7 @@
 	"BTN": {
 		"ACTION": "",
 		"ADD": "",
+		"ADD_SERVICE_ACCOUNT": "",
 		"ADD_TAG": "",
 		"BACK": "",
 		"CANCEL": "",
