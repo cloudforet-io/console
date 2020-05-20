@@ -133,7 +133,6 @@ class LanguagePack:
 
 
 language_pack = LanguagePack()
-print(language_pack.packs)
 spread_sheet = get_sheet(SHEET_URL)
 
 

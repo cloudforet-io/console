@@ -1,10 +1,22 @@
 name: FetchTranslation
-#on:
-#  push:
-#    branches:
-#      - master
+on:
+  schedule:
+    - cron:  '0 2 * * *'
+  watch:
+    types: [started]
 jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: octokit/request-action@v2.0.0
+      with:
+        route: GET /repos/:repository/collaborators/${{ github.actor }}
+        repository: ${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
+    needs: [authorize]
     runs-on: ubuntu-latest
     steps:
       - name: git clone
@@ -15,7 +27,7 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          cd translations
+          cd ./src/translations
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Sync data
@@ -29,3 +41,5 @@ jobs:
         run: |
           cd ./src/translations
           python3 fetch_language-pack.py
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v2
