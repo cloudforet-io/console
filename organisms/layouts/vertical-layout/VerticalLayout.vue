@@ -165,10 +165,10 @@ export default {
         overflow-y: auto;
     }
     .resizer-container {
-        display: flex;
+        display: flex; 
         align-items: flex-start;
         justify-content: center;
-        width: 1px;
+        width: 0rem;
         &.line {
             @apply border-l border-gray-200;
             background-color: transparent;
