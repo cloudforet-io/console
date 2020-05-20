@@ -33,6 +33,7 @@ jobs:
       - name: Sync data
         env:
           SHEET_URL: https://docs.google.com/spreadsheets/d/1K81JbXNLtui93caZu_MyQdy8lv5qxyo69AvlKRA98bM
+          CREDENTIAL_BASE64: ${{ secrets.CREDENTIAL_BASE64 }}
           DATA_SHEET_NAME: origin
           SYNC_SHEET_NAME: data
           META_SHEET_NAME: meta
