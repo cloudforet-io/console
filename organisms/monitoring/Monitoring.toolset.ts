@@ -1,10 +1,8 @@
 import { HelperToolSet, initReactive, StateToolSet } from '@/lib/toolset';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { DataSourceResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
 import _ from 'lodash';
-import { watch } from '@vue/composition-api';
-import Metric, { MetricList } from '@/lib/fluent-api/monitoring/metric';
-import { fluentApi } from '@/lib/fluent-api';
+import { computed } from '@vue/composition-api';
 
 export const monitoringProps = {
     resourceType: {
@@ -18,28 +16,10 @@ export const monitoringProps = {
             return resources.every(resource => resource.id);
         },
     },
-    dataTools: { // aws cloud watch, data dog, ....
-        type: Array,
-        default: () => [],
-        validator(dataTools) {
-            return dataTools.every(d => d.id && d.name);
-        },
-    },
-    // statisticsTypes: {
-    //     type: Array,
-    //     default: () => [],
-    // },
     viewType: {
         type: Object,
         default: () => ({}),
     },
-    // apiHandler: {
-    //     type: Object,
-    //     default: () => ({}),
-    //     validator(api: MetricList) {
-    //         return api.getResourceType() && api.getId();
-    //     },
-    // },
 };
 
 export interface MonitoringResourceType {
@@ -57,8 +37,6 @@ export interface MonitoringProps {
     resourceType: string;
     resources: MonitoringResourceType[];
     dataTools: DataToolType[];
-    // statisticsTypes: STATISTICS_TYPE[];
-    // apiHandler: MetricList;
 }
 
 @StateToolSet<MonitoringProps>()
@@ -70,8 +48,6 @@ export class MonitoringState<D, S extends MonitoringProps = MonitoringProps> {
             resourceType: '',
             resources: [],
             dataTools: [],
-            // statisticsTypes: [],
-            // apiHandler: fluentApi.monitoring().metric().list(),
         };
     }
 
@@ -82,15 +58,18 @@ export class MonitoringState<D, S extends MonitoringProps = MonitoringProps> {
 
 
 @HelperToolSet()
-export class MonitoringToolSet<D> extends MonitoringState<D> {
-    idField: string;
-
+export class MonitoringToolSet<D=any> extends MonitoringState<D> {
     // eslint-disable-next-line no-empty-function
-    static initToolSet() {}
+    static initToolSet(_this: MonitoringToolSet, targetResources: Ref<any[]>) {
+        _this.state.resources = computed(() => targetResources.value.map(d => ({
+            id: _.get(d, _this.idField),
+            name: d.name,
+        })));
+    }
 
-    constructor(idField: string, resourceType: string, initData: D = {} as D) {
+    constructor(public idField: string, resourceType: string, target: Ref<any[]>, initData: D = {} as D) {
         super({ resourceType, ...initData });
-        this.idField = idField;
+        MonitoringToolSet.initToolSet(this, target);
     }
 
     setDataTools(data: DataSourceResp[]): void {
@@ -105,18 +84,5 @@ export class MonitoringToolSet<D> extends MonitoringState<D> {
             return undefined;
         }).compact().uniqBy('id')
             .value();
-    }
-
-    // setStatisticsTypes(data: DataSourceResp[]): void {
-    //     this.state.statisticsTypes = _.reduce(data,
-    //         (stats, d) => [...stats, ...(d.plugin_info.options.supported_stat || [])],
-    //         [] as STATISTICS_TYPE[]);
-    // }
-
-    setResources(resourceData: any) {
-        this.state.resources = resourceData.map(d => ({
-            id: _.get(d, this.idField),
-            name: d.name,
-        }));
     }
 }

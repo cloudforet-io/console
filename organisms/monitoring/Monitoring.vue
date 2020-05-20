@@ -100,7 +100,10 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { BtnType } from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.toolset';
-import { MetricListResp, MetricResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
+import {
+    DataSourceResp,
+    MetricListResp, MetricResp, MONITORING_TYPE, STATISTICS_TYPE,
+} from '@/lib/fluent-api/monitoring/type';
 import { GetMetricData, MetricList } from '@/lib/fluent-api/monitoring/metric';
 import moment, { Moment } from 'moment';
 import { getTimestamp } from '@/lib/util';
@@ -134,7 +137,14 @@ export default {
             error?: boolean;
         }
 
+        interface DataToolType {
+            id: string;
+            name: string;
+            statisticsTypes: STATISTICS_TYPE[];
+        }
+
         interface State {
+            dataTools: DataToolType[];
             tools: readonly BtnType[];
             selectedToolId: string;
             selectedTimeRange: string;
@@ -151,16 +161,17 @@ export default {
         }
 
         const state: UnwrapRef<State> = reactive({
-            tools: computed(() => props.dataTools.map(d => ({
+            dataTools: [],
+            selectedToolId: '',
+            tools: computed(() => state.dataTools.map(d => ({
                 name: d.id,
                 label: d.name,
                 vbind: { styleType: 'black', outline: state.selectedToolId !== d.id },
             }))),
-            selectedToolId: props.dataTools[0]?.id,
             selectedTimeRange: '1h',
             statisticsTypes: computed(() => {
                 const tool = _.find(
-                    props.dataTools,
+                    state.dataTools,
                     { id: state.selectedToolId },
                 );
                 return tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
@@ -184,9 +195,33 @@ export default {
                 .setStat(state.selectedStat)),
         });
 
+        const dataSourceApi = fluentApi.monitoring().dataSource().list().setMonitoringType(MONITORING_TYPE.metric);
+
+        const listDataSources = async () => {
+            try {
+                const res = await dataSourceApi.execute();
+                state.dataTools = _.chain(res.data.results)
+                    .map((d) => {
+                        if (d.plugin_info.options.supported_resource_type.some(t => props.resourceType === t)) {
+                            return {
+                                id: d.data_source_id,
+                                name: d.name,
+                                statisticsTypes: d.plugin_info.options.supported_stat || [STATISTICS_TYPE.average],
+                            };
+                        }
+                        return undefined;
+                    }).compact().uniqBy('id')
+                    .value();
+                state.selectedToolId = state.dataTools[0].id;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listMetrics = async (): Promise<MetricListResp> => {
             state.metricsLoading = true;
             try {
+                if (state.dataTools.length === 0) await listDataSources();
                 const res = await state.metricListApi.execute();
                 return res.data;
             } catch (e) {
