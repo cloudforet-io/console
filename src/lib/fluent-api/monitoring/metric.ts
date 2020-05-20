@@ -15,7 +15,6 @@ export abstract class MetricAction<param extends MetricParameter, resp> extends 
     setId(id: string): this {
         const api = this.clone();
         api.apiState.parameter.data_source_id = id;
-        console.debug('id', id);
         return api;
     }
 
