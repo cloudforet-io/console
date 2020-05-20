@@ -103,7 +103,9 @@
                     <template #no-data>
                         <div class="empty-project">
                             <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
-                            <p class="text-primary2" >Looks like you don't have any Project.</p>
+                            <p class="text-primary2">
+                                Looks like you don't have any Project.
+                            </p>
                         </div>
                     </template>
                     <template #card="{item}">
@@ -120,7 +122,7 @@
                                         {{ item.name }}
                                     </p>
                                     <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
-                                         @click.stop="clickServiceAccount"
+                                         @click.stop="goToServiceAccount"
                                     >
                                         <!-- <p>
                                             <p-simple-icon-button :normal-icon-name="'btn_circle_plus_blue'"
@@ -130,13 +132,12 @@
                                             />
                                             Add Service Account
                                         </p> -->
-                                            <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
-                                                <p-i name="ic_plus_bold" color="inherit"
-                                                    width=".75rem" height=".75rem"
-                                                />
-                                            </div>
-                                            <span class="text-sm ml-2" > Add Service Account</span>
-                                    
+                                        <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
+                                            <p-i name="ic_plus_bold" color="inherit"
+                                                 width=".75rem" height=".75rem"
+                                            />
+                                        </div>
+                                        <span class="text-sm ml-2"> Add Service Account</span>
                                     </div>
                                     <div v-else-if="item.force_console_data.providers" class="providers">
                                         <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
@@ -496,7 +497,7 @@ export default {
             });
         };
 
-        const clickServiceAccount = () => {
+        const goToServiceAccount = () => {
             vm?.$router.push({
                 name: 'serviceAccount',
             });
@@ -612,7 +613,7 @@ export default {
             selected,
             hovered,
             clickCard,
-            clickServiceAccount,
+            goToServiceAccount,
             cardSummary,
             projectSummary,
             openProjectForm,
@@ -718,7 +719,7 @@ export default {
             div { padding:0.125rem 0.375rem; }
             &:hover {
                 @apply text-secondary font-bold;
-               div{ @apply bg-blue-300 ; } 
+               div{ @apply bg-blue-300 ; }
             }
             span {line-height:1.75;}
         }

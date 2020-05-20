@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Cloud Services" help="Major services on management">
+    <p-widget-layout title="Cloud Services" :help="$t('DASHBOARD.ACTION.CLOUD_SERVICES')">
         <template #default>
             <div class="grid gap-2
                         grid-cols-1

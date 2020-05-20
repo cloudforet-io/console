@@ -168,6 +168,10 @@ export default {
             const ts = isOption ? optionsFormTS : fixedFormTS;
             const valueKey = isOption ? `plugin_info.options.${key}` : key;
 
+            if (key === 'plugin_info.version') {
+                // eslint-disable-next-line no-param-reassign
+                val = `${parseFloat(val)}`;
+            }
             _.set(props.form, valueKey, val);
             state.proxyForm = { ...state.proxyForm };
             if (props.enableValidation) {
@@ -195,12 +199,13 @@ export default {
             try {
                 const res = await pluginApi.getVersions().setId(props.pluginId).execute();
                 fixedFormTS.formState.objectSchema.properties['plugin_info.version'].enum = res.data.results;
+                res.data.results[0] = `${res.data.results[0]} (latest)`;
                 if (!fixedFormTS.syncState.item['plugin_info.version']) {
                     fixedFormTS.syncState.item = {
                         ...fixedFormTS.syncState.item,
-                        'plugin_info.version': res.data.results[res.data.total_count - 1],
+                        'plugin_info.version': res.data.results[0],
                     };
-                    await updateFormAndValidateField('plugin_info.version', res.data.results[res.data.total_count - 1]);
+                    await updateFormAndValidateField('plugin_info.version', res.data.results[0]);
                 }
             } catch (e) {
                 console.error(e);

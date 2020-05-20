@@ -13,6 +13,7 @@
                     :vbind="{
                         responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
                         showTitle:false,
+                        exportFields:mergeFields,
                     }"
                 >
                     <template #toolbox-left>
@@ -67,11 +68,7 @@
                 />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
-                              :data-tools="metricAPIHandler.ts.state.dataTools"
-                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
-                              :resources="metricAPIHandler.ts.state.resources"
-                />
+                <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </p-tab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab">
@@ -96,11 +93,7 @@
                 />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
-                              :data-tools="metricAPIHandler.ts.state.dataTools"
-                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
-                              :resources="metricAPIHandler.ts.state.resources"
-                />
+                <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </PTab>
 
@@ -168,7 +161,6 @@ import { AxiosResponse } from 'axios';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
-import { MetricAPI } from '@/lib/api/monitoring';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
@@ -183,6 +175,7 @@ import {
     DefaultMultiItemTabBarQSPropsName, DefaultSingleItemTabBarQSProps,
     RouterTabBarToolSet,
 } from '@/components/molecules/tabs/tab-bar/toolset';
+import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
 
 
 export default {
@@ -212,14 +205,23 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
+        const filedMap = {
+            project_id: {
+                key: 'console_force_data.project',
+                type: 'text',
+                name: 'Project',
+            },
+        };
+
         const mainTableLayout = computed<any>(() => ({
             name: 'Server',
             type: baseTable.type as any,
             options: {
-                fields: baseTable.options.fields,
+                fields: baseTable.options.fields.map(field => filedMap[field.key] || field),
             },
 
         }));
+
         class ACHandler extends QuerySearchTableACHandler {
             // eslint-disable-next-line class-methods-use-this
             get valuesFetchUrl() {
@@ -449,9 +451,9 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProjectAction = fluentApi.inventory().server().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const changeAction = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+            const changeAction = fluentApi.inventory().server().changeProject().clone()
+                .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
             if (node) {
                 await changeAction.setId(node.data.id).execute();
@@ -510,10 +512,10 @@ export default {
             visible: false,
         });
 
-        const metricAPIHandler = new MetricAPI(
-            'inventory.Server',
+        const monitoringTS = new MonitoringToolSet(
             'server_id',
-            apiHandler,
+            'inventory.Server',
+            computed(() => apiHandler.tableTS.selectState.selectItems),
         );
         const routerHandler = async () => {
             const prop = propsCopy(props);
@@ -559,7 +561,7 @@ export default {
             historyApi,
             historyIsShow,
             collectModalState,
-            metricAPIHandler,
+            monitoringTS,
             mainTableLayout,
             routerHandler,
         };

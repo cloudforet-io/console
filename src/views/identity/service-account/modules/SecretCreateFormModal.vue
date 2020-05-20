@@ -136,7 +136,9 @@ export default {
                 const item = {
                     name: fixFormTS.syncState.item.name,
                     data: jscTS.syncState.item,
+                    schema: fixFormTS.syncState.item.schemaName,
                     tags: tagsTS.vdState.newDict,
+
                 };
                 context.emit('confirm', item);
             }

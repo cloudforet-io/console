@@ -1,6 +1,6 @@
 <template>
     <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
-                     help="Check your resource updates of daily usage."
+                     :help="$t('DASHBOARD.ACTION.DAILY_UPDATES')"
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
@@ -143,7 +143,7 @@ export default {
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
             // .setTopic('daily_server_updates')
-            .setFrom('now/d - 2w')
+            .setFrom('now/d')
             .setDefaultFields('server_type')
             .setDiffFields('server_count');
 
@@ -158,7 +158,7 @@ export default {
 
         const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
             // .setTopic('daily_cloud_service_updates')
-            .setFrom('now/d - 7d')
+            .setFrom('now/d')
             .setDefaultFields('cloud_service_type', 'cloud_service_group', 'provider', 'icon')
             .setDiffFields('cloud_service_count');
 
