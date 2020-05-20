@@ -88,7 +88,7 @@ export default {
             .addGroupKey('created_at', 'date')
             .addGroupField('success', STAT_OPERATORS.sum, 'values.success_count')
             .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
-            .setFilter({ key: 'created_at', value: 'now/d-8d', operator: FILTER_OPERATOR.gtTime });
+            .setFilter({ key: 'created_at', value: 'now/d-6d', operator: FILTER_OPERATOR.gtTime });
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
