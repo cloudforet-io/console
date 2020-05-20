@@ -67,19 +67,12 @@
                         <div class="flex flex-row xs:flex-col sm:flex-col md:flex-row lg:flex-row xl:flew-row tool">
                             <div class="flex flex-row flex-wrap w-full tool-left">
                                 <div class="tool-left-btn">
-                                    <p-button style-type="primary-dark" @click="openProjectForm">
-                                          <p-i name="ic_plus_bold" color="inherit"
-                                                width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
-                                            />
-                                        {{ $t('INVENTORY.CRT_PROJ') }}
-                                    </p-button>
-
-                                    <!-- <PIconTextButton style-type="primary-dark"
+                                    <PIconTextButton style-type="primary-dark"
                                          name="ic_plus_bold"
                                          @click="openProjectForm"
-                                    />
+                                    >
                                     {{ $t('INVENTORY.CRT_PROJ') }}
-                                    </PIconTextButton> -->
+                                    </PIconTextButton>
                                 </div>
                                 <div class="tool-left-search">
                                     <p-query-search-bar
@@ -673,7 +666,7 @@ export default {
 
     .project-group {
         & p {
-            @apply text-xs pt-2 pb-3;
+            @apply text-xs text-gray;
         }
         & span {
             @apply text-2xl font-bold pb-2;
@@ -721,6 +714,7 @@ export default {
                  }
             } */
             @apply relative text-blue-600 ;
+            width: fit-content;
             div { padding:0.125rem 0.375rem; }
             &:hover {
                 @apply text-secondary font-bold;

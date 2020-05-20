@@ -1,6 +1,6 @@
 <template>
     <general-page-layout>
-        <div class="top">
+        <div class="top flex">
             <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
@@ -19,18 +19,19 @@
                                 :data_source="dataSource"
                                 :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
                                 :data="null"
+                                class="tab-bg"
                 >
                     <template #toolbox-top>
                         <PPageTitle :title="'Member'" use-total-count :total-count="apiHandler.totalCount.value" />
                     </template>
                     <template #toolbox-left>
-                        <div class="pr-4 toolbox-left">
-                            <p-button class="mr-4 add-btn"
-                                      style-type="primary-dark"
-                                      @click="openMemberAddForm()"
+                        <div class="flex pr-4 toolbox-left">
+                            <PIconTextButton style-type="primary-dark" class=" mr-4 add-btn"
+                                             name="ic_plus_bold"
+                                             @click="openMemberAddForm()"
                             >
-                                {{ $t('BTN.ADD') }}
-                            </p-button>
+                            {{ $t('BTN.ADD') }}
+                            </PIconTextButton>
                             <p-button
                                 outline
                                 style-type="alert"
@@ -48,6 +49,7 @@
                     :is-show="singleItemTab.syncState.activeTab==='tag'"
                     :resource-id="projectId"
                     tag-page-name="projectTags"
+                    class="tab-bg"
                 />
             </template>
         </PTab>
@@ -93,6 +95,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
@@ -137,6 +140,7 @@ export default {
         PIconButton,
         PButton,
         SProjectMemberAddModal,
+        PIconTextButton,
     },
     props: {
         ...DefaultSingleItemTabBarQSProps,
@@ -371,8 +375,22 @@ export default {
               @apply text-base text-gray-400 mt-1;
           }
     }
+    .p-tab{
+        &::v-deep {
+            .p-tab-bar{
+                border-color:#f8f8fc;
+            }
+            .tab-pane{
+               @apply pb-0;
+            }
+        }
+    }
 
     .delete-btn {
-        @apply ml-3 -mt-3 cursor-pointer;
+        @apply ml-3 cursor-pointer;
+    }
+
+    .tab-bg{
+        @apply bg-white border border-gray-200 rounded-sm pb-8;
     }
 </style>

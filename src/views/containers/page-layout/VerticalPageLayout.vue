@@ -58,14 +58,9 @@ export default {
             width: 100%;
             flex-grow: 1;
             padding: 1.5rem;
-            padding-bottom:0;
             /* padding: 1.5625rem 2rem 2rem; */
             /* padding-top: 1rem;
             padding-right: 1rem; */
-        }
-
-        .fnb {
-            width: 100%;
         }
 
     }

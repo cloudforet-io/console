@@ -100,7 +100,7 @@ export default {
 
 <style lang="postcss" scoped>
 .plugin-filter-container {
-    padding: 0 1rem;
+    padding: 0.5rem 1rem;
     .rows {
          margin-top: 1.25rem;
      }
@@ -123,6 +123,7 @@ export default {
         line-height: 1.5rem;
         margin-bottom: 0.5rem;
         cursor: pointer;
+        font-size: .875rem;
         &.selected {
             @apply text-secondary;
         }

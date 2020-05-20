@@ -24,9 +24,13 @@
                          @changeSort="listSchedules"
         >
             <template slot="toolbox-left">
-                <p-button style-type="primary-dark" @click="openEditModal(null)">
-                    {{ $t('BTN.ADD') }}
-                </p-button>
+                <PIconTextButton style-type="primary-dark"
+                name="ic_plus_bold"
+                @click="openEditModal(null)"
+                >
+                {{ $t('BTN.ADD') }}
+                </PIconTextButton>
+
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="ml-4"
                                      @click-update="openEditModal(items[selectIndex[0]])"
@@ -81,6 +85,7 @@ import { showErrorMessage, timestampFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
@@ -95,6 +100,7 @@ export default {
         PToolboxTable,
         PButton,
         EditScheduleModal,
+        PIconTextButton,
     },
     props: {
         collectorId: {

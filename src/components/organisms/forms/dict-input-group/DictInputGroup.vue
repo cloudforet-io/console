@@ -1,15 +1,22 @@
 <template>
     <div>
         <slot name="addButton" :disabled="disabled" :addPair="addPair">
-            <p-button class="add-btn" style-type="primary-dark"
+            <!-- <p-button class="add-btn" style-type="primary-dark"
                       :disabled="disabled"
                       @click="addPair"
             >
-                <p-i name="ic_plus" color="transparent inherit"
+                <p-i name="ic_plus_bold" color="inherit"
                      width="1rem" height="1rem"
                 />
                 {{ $t('BTN.ADD') }}
-            </p-button>
+            </p-button> -->
+            <PIconTextButton style-type="primary-dark"
+            class="add-btn" name="ic_plus_bold"
+            @click="addPair"
+            >
+                {{ $t('BTN.ADD') }}
+            </PIconTextButton>
+
         </slot>
         <div v-if="showHeader" class="tag-header">
             <div class="key">
@@ -52,6 +59,7 @@ const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInp
 const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
 const PButton = () => import('@/components/atoms/buttons/Button.vue');
 const PI = () => import('@/components/atoms/icons/PI.vue');
+const PIconTextButton = () => import('@/components/molecules/buttons/IconTextButton.vue');
 
 
 export default defineComponent({
@@ -61,6 +69,7 @@ export default defineComponent({
         PDictInput,
         PButton,
         PI,
+        PIconTextButton,
     },
     props: dictIGProps,
     setup(props: DictIGPropsType): any {
