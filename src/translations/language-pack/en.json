@@ -381,6 +381,7 @@
 		"INFO": "Info",
 		"JOBS": "Job",
 		"LOCAL": "Local",
+		"NONE_TR": "",
 		"RAWDATA": "Raw Data",
 		"SCHEDULE": "Schedules",
 		"TAG": "Tag",
