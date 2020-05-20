@@ -85,8 +85,8 @@ export default {
     }
     .icon-button {
         &:not(:disabled):not(.disabled):hover {
-            @apply bg-white;
             border-color:transparent;
+            @apply bg-transparent;
         }
     }
 

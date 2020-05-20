@@ -1,5 +1,9 @@
 <template>
     <general-page-layout>
+         <PPageTitle title="Plugins"
+                    use-total-count
+                    :total-count="apiHandler.totalCount.value"
+        />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-dynamic-view view_type="query-search-table"
@@ -40,9 +44,9 @@
                 />
             </template>
         </PTab>
-        <p-empty v-else class="header">
+        <!-- <p-empty v-else class="header">
             No Selected Item
-        </p-empty>
+        </p-empty> -->
     </general-page-layout>
 </template>
 
@@ -77,6 +81,7 @@ import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import { showErrorMessage } from '@/lib/util';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 export default {
     name: 'Supervisor',
@@ -90,6 +95,7 @@ export default {
         PEmpty,
         GeneralPageLayout,
         PDictPanel,
+        PPageTitle,
     },
     props: {
         queryString: {
