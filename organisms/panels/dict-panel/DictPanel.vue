@@ -63,7 +63,7 @@ import {
 
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
 
-export default defineComponent({
+export default {
     name: 'PDictPanel',
     components: {
         PPanelTop,
@@ -137,7 +137,7 @@ export default defineComponent({
         };
     },
 
-});
+};
 </script>
 
 <style lang="postcss" scoped>
