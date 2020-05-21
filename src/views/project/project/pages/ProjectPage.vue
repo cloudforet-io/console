@@ -68,10 +68,10 @@
                             <div class="flex flex-row flex-wrap w-full tool-left">
                                 <div class="tool-left-btn">
                                     <PIconTextButton style-type="primary-dark"
-                                         name="ic_plus_bold"
-                                         @click="openProjectForm"
+                                                     name="ic_plus_bold"
+                                                     @click="openProjectForm"
                                     >
-                                    {{ $t('INVENTORY.CRT_PROJ') }}
+                                        {{ $t('INVENTORY.CRT_PROJ') }}
                                     </PIconTextButton>
                                 </div>
                                 <div class="tool-left-search">
@@ -124,14 +124,6 @@
                                     <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
                                          @click.stop="goToServiceAccount"
                                     >
-                                        <!-- <p>
-                                            <p-simple-icon-button :normal-icon-name="'btn_circle_plus_blue'"
-                                                                  :hovered-icon-name="'btn_circle_plus_blue--hover'"
-                                                                  width="1.5rem" height="1.5rem"
-                                                                  class="add-service-account-btn"
-                                            />
-                                            Add Service Account
-                                        </p> -->
                                         <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
                                             <p-i name="ic_plus_bold" color="inherit"
                                                  width=".75rem" height=".75rem"
@@ -282,7 +274,6 @@ export default {
         PButton,
         PI,
         PIconButton,
-        PSimpleIconButton,
         PPageTitle,
         PCheckBox,
         PQuerySearchBar,
@@ -703,17 +694,6 @@ export default {
         }
 
         .empty-providers {
-            /* p {
-                @apply relative z-10 text-secondary text-sm;
-                max-height: 1.5rem;
-                min-height: 1.5rem;
-                .add-service-account-btn {
-                    @apply relative z-10 mr-2;
-                }
-                &:hover {
-                     @apply font-bold;
-                 }
-            } */
             @apply relative text-blue-600 ;
             width: fit-content;
             div { padding:0.125rem 0.375rem; }
