@@ -74,12 +74,12 @@
                                     </p-badge>
                                 </div>
                                 <div class="btns">
-                                    <p-button style-type="primary-dark" @click="onPluginCreate(item)">
-                                        <p-i name="ic_plus" color="transparent inherit"
-                                             width="1rem" height="1rem"
-                                        />
-                                        {{ $t('BTN.CREATE') }}
-                                    </p-button>
+                                    <PIconTextButton style-type="primary-dark"
+                                    name="ic_plus_bold"
+                                    @click="onPluginCreate(item)"
+                                    >
+                                    {{ $t('BTN.CREATE') }}
+                                    </PIconTextButton>
                                 </div>
                             </div>
                         </template>
@@ -112,6 +112,7 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/Sel
 import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 const repoState = reactive({
     repositories: [] as unknown as RepositoryModel[],
@@ -153,10 +154,10 @@ export const setup = (props, { root }) => {
     );
 
     const listPlugins = _.debounce(async () => {
-        console.debug('listPlugins');
         apiHandler.action = apiHandler.action
             .setRepositoryId(repoState.selectedRepoId)
-            .setSortBy(state.sortBy);
+            .setSortBy(state.sortBy)
+            .setSortDesc(state.sortBy !== 'name');
         await apiHandler.getData();
     }, 100);
 
@@ -224,6 +225,7 @@ export default {
         PButton,
         PI,
         PluginFilter,
+        PIconTextButton,
     },
     setup(props, context) {
         return setup(props, context);

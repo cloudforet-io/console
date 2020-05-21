@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set environment virables
+      run: |
+        echo "::set-env name=SERVICE::console"
+        echo "::set-env name=PYPI_USERNAME::${{ secrets.PYPI_USERNAME }}"
+        echo "::set-env name=PYPI_PASSWORD::${{ secrets.PYPI_PASSWORD }}"
+
+        echo "::set-env name=DOCKERHUB_USERNAME::${{ secrets.DOCKERHUB_USERNAME }}"
+        echo "::set-env name=DOCKERHUB_PASSWORD::${{ secrets.DOCKERHUB_PASSWORD }}"
+        echo "::set-env name=IMAGE_PREFIX::spaceone"
+
+        echo "::set-env name=DOCKER_UPLOAD::true"
+        echo "::set-env name=PYPI_UPLOAD::false"
+        echo "::set-env name=LOCATION_DOCKERFILE::."
+        echo "::set-env name=LOCATION_SETUP_PY::src"
+
+        echo "::set-env name=SUDO::false"
+        version=$(cat src/VERSION)${{ github.run_id }}
+        echo "::set-env name=VERSION::$version"
+
+    - name: Configure integration
+
+      run: |
+        echo "Configuring integrations ... None"
+
+#    - name: Build
+#      if: env.PYPI_UPLOAD == 'true'
+#      run: |
+#        echo "Building pypi ..."
+#        cd $LOCATION_SETUP_PY
+#        python3 setup.py bdist_wheel
+
+    - name: Test
+      id: test
+      run: |
+        echo "Running test ... None"
+        # fail test or pass test
+
+    - name: Upload docker
+      id: upload_docker
+      if: ${{ always() && steps.test.conclusion == 'success' && env.DOCKER_UPLOAD == 'true' }}
+      run: |
+        echo "Uploading docker hub ..."
+        cd $LOCATION_DOCKERFILE
+        docker build . -t $IMAGE_PREFIX/$SERVICE:latest
+        docker tag $IMAGE_PREFIX/$SERVICE:latest $IMAGE_PREFIX/$SERVICE:$VERSION
+        docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
+        docker push $IMAGE_PREFIX/$SERVICE:latest
+        docker push $IMAGE_PREFIX/$SERVICE:$VERSION
+
+    - name: Push to a branch
+      if: ${{ always() && steps.test.conclusion == 'success' }}
+      run: |
+        echo "Pusing to a branch ... None"
+#        git checkout -b ${POST_BRANCH_NAME} || git checkout ${POST_BRANCH_NAME}
+#        git merge master
+#        git push origin ${POST_BRANCH_NAME}

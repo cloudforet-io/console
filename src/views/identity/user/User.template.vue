@@ -1,5 +1,9 @@
 <template>
     <general-page-layout>
+         <PPageTitle title="User" />
+                    <!-- use-total-count use-selected-count
+                    :total-count="apiHandler.totalCount.value"
+                    :selected-count="apiHandler.tableTS.selectState.selectItems.length" -->
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -148,6 +152,7 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
@@ -157,6 +162,7 @@ const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-
 const PSearch = () => import('@/components/molecules/search/Search.vue');
 const PUserDetail = () => import('@/views/identity/user/modules/UserDetail.vue');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
+
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([
         ['user_id', 'COMMON.USER_ID'],
@@ -428,6 +434,7 @@ export default {
         PHr,
         PIconButton,
         STagsPanel,
+        PPageTitle,
     },
     setup(props, context) {
         const dataBind = reactive({
