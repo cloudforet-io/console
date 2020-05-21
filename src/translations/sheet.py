@@ -186,17 +186,22 @@ def make_sort_lang(lang_index: dict):
     return [i['lang'] for i in sort_data]
 
 
+def get_id_field_cell(sheet: Worksheet):
+    return sheet.find(ID_FIELD, in_row=1)
+
+
 def remove_keys(sheet: Worksheet, keys: List[str]):
     rows = []
-    remove_keys = []
+    _remove_keys = []
+    col_num = get_id_field_cell(sheet).col
     for k in keys:
         try:
-            cell = sheet.find(k, in_column=1)
+            cell = sheet.find(k, in_column=col_num)
             rows.append(cell.row)
-            remove_keys.append(k)
+            _remove_keys.append(k)
         except Exception as e:
             pass
     if rows:
         sheet.delete_rows(rows)
         print(f'remove {len(rows)} keys')
-        print(remove_keys)
+        print(_remove_keys)
