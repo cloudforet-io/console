@@ -3,6 +3,7 @@ import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { DataSourceResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
 import _ from 'lodash';
 import { computed } from '@vue/composition-api';
+import {forceRefArg} from "@/lib/type";
 
 export const monitoringProps = {
     resourceType: {
@@ -60,14 +61,15 @@ export class MonitoringState<D, S extends MonitoringProps = MonitoringProps> {
 @HelperToolSet()
 export class MonitoringToolSet<D=any> extends MonitoringState<D> {
     // eslint-disable-next-line no-empty-function
-    static initToolSet(_this: MonitoringToolSet, targetResources: Ref<any[]>) {
+    static initToolSet(_this: MonitoringToolSet, targetResources: forceRefArg<any[]>) {
+        // @ts-ignore
         _this.state.resources = computed(() => targetResources.value.map(d => ({
             id: _.get(d, _this.idField),
             name: d.name,
         })));
     }
 
-    constructor(public idField: string, resourceType: string, target: Ref<any[]>, initData: D = {} as D) {
+    constructor(public idField: string, resourceType: string, target: forceRefArg<any[]>, initData: D = {} as D) {
         super({ resourceType, ...initData });
         MonitoringToolSet.initToolSet(this, target);
     }

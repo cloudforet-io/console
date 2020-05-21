@@ -62,7 +62,7 @@ const PI = () => import('@/components/atoms/icons/PI.vue');
 const PIconTextButton = () => import('@/components/molecules/buttons/IconTextButton.vue');
 
 
-export default defineComponent({
+export default {
     name: 'PDictInputGroup',
     components: {
         PIconButton,
@@ -120,7 +120,7 @@ export default defineComponent({
             addPair,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
