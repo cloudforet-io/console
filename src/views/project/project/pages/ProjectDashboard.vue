@@ -191,7 +191,8 @@ export default {
                         key: 'project_id',
                         value: projectId.value,
                         operator: '=',
-                    }]);
+                    }])
+                    .setLimit(12);;
             },
         };
     },

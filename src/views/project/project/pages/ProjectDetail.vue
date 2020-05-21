@@ -123,7 +123,7 @@ import {
     RouterTabBarToolSet,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import { propsCopy } from '@/lib/router-query-string';
-import {ComponentInstance} from "@vue/composition-api/dist/component";
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {
     name: 'ProjectDetail',
@@ -172,17 +172,6 @@ export default {
                 getProject(after);
             }
         });
-
-        // Tab
-        // const tabData = reactive({
-        //     tabs: makeTrItems([
-        //         ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
-        //         ['member', 'COMMON.MEMBER'],
-        //         ['tag', 'TAB.TAG'],
-        //     ],
-        //     context.parent),
-        //     activeTab: 'summary',
-        // });
 
         const singleItemTab = new RouterTabBarToolSet(
             vm,
@@ -336,9 +325,6 @@ export default {
 
         const routerHandler = async () => {
             const prop = propsCopy(props);
-            // apiHandler.applyAPIRouter(prop);
-            // await apiHandler.getData();
-            // apiHandler.applyDisplayRouter(prop);
             singleItemTab.applyDisplayRouter(prop);
         };
         onMounted(async () => {
