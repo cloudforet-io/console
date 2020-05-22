@@ -39,8 +39,6 @@ export const dictIGProps = {
 };
 
 export class DictItem {
-    // private _id: number = 0;
-
     private static count = 0;
 
     key: string | number;
@@ -50,13 +48,8 @@ export class DictItem {
     constructor(key?: string | number, value?: string | number) {
         this.key = key || '';
         this.value = value || '';
-        // this._id = DictItem.count;
         DictItem.count += 1;
     }
-
-    // get id() {
-    //     return this._id;
-    // }
 }
 
 interface InvalidMessage { [idx: number]: { key: string; value: string } }

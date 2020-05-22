@@ -25,12 +25,12 @@
 
 <script lang="ts">
 import {
-    reactive, computed, toRefs, defineComponent,
+    reactive, computed, toRefs,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
-export default defineComponent({
+export default {
     name: 'PIconButton',
     components: { PButton, PI },
     mixins: [PI],
@@ -76,53 +76,54 @@ export default defineComponent({
 
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
-    .icon-button {
-        border-radius: 2px;
-        padding: 0px;
-        display: inline-flex;
-        justify-content: center;
-        align-content: center;
-        min-width: 2rem;
-        max-width: 2rem;
-        min-height: 2rem;
-        max-height: 2rem;
-        @apply text-gray-400;
+.icon-button {
+    border-radius: 2px;
+    padding: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-content: center;
+    min-width: 2rem;
+    max-width: 2rem;
+    min-height: 2rem;
+    max-height: 2rem;
+
+    @apply text-gray-400;
+    &:hover {
+        @apply text-white;
+    }
+    &.disabled {
+        @apply bg-gray-200;
+        cursor: unset;
         &:hover {
-            @apply text-white;
+            color: inherit;
         }
+    }
+    &.white {
+        @apply bg-white border-gray-300;
+        &:hover {
+            @apply text-gray-200;
+        }
+    }
+    &.gray900 {
+        @apply bg-gray-900;
+    }
+    &:not(:disabled):not(.disabled):hover {
+        @apply bg-secondary border-secondary;
+    }
+    &.transparent {
         &.disabled {
-            @apply bg-gray-200;
+            color: theme('colors.gray.200') !important;
+            border-color: transparent !important;
+            background-color: transparent !important;
             cursor: unset;
             &:hover {
-                color: inherit;
-            }
-        }
-        &.white {
-            @apply bg-white border-gray-300;
-            &:hover {
-                @apply text-gray-200;
-            }
-        }
-        &.gray900 {
-            @apply bg-gray-900;
-        }
-        &:not(:disabled):not(.disabled):hover {
-            @apply bg-secondary border-secondary;
-        }
-        &.transparent {
-            &.disabled {
-                color: theme('colors.gray.200') !important;;
-                border-color: transparent !important;
-                background-color: transparent !important;
-                cursor: unset;
-                &:hover {
-                    color: theme('colors.gray.200') !important;;
-                }
+                color: theme('colors.gray.200') !important;
             }
         }
     }
+}
 </style>

@@ -5,18 +5,9 @@ import {
 import {
     computed, ref, Ref, watch,
 } from '@vue/composition-api';
-import { Computed } from '@/lib/type';
-import {
-    DataTableSelectState,
-    DataTableState, initLinkState,
-    initSelectState,
-    LinkState,
-} from '@/components/organisms/tables/data-table/toolset';
-import { getArrayQueryString, pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
-import { makeSearchText } from '@/components/organisms/search/query-search-bar/toolset';
+import { pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Vue } from 'vue/types/vue';
-import { DefaultQSTableQSPropsName, makeQSTableQSProps } from '@/lib/api/table';
 import { isNotEmpty } from '@/lib/util';
 
 export const tabBarProps = {
