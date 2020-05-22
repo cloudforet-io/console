@@ -193,7 +193,6 @@ export default {
                     collector_id: props.collectorId,
                     name: state.name,
                     schedule: {
-                        ...state.schedule?.schedule,
                         hours: state.selectedUTCHoursList,
                     },
                 };

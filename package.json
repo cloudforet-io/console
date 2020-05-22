@@ -93,7 +93,7 @@
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
     "@fortawesome/fontawesome-free": "^5.13.0",
-    "@fullhuman/postcss-purgecss": "^2.1.0",
+    "@fullhuman/postcss-purgecss": "^2.2.0",
     "@storybook/addon-a11y": "^5.3.1",
     "@storybook/addon-actions": "^5.3.1",
     "@storybook/addon-centered": "^5.3.1",
@@ -134,8 +134,6 @@
     "eslint-config-stylelint": "^11.1.0",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-vue": "^5.0.0",
-    "geobuf": "^3.0.1",
-    "growl": "^1.10.5",
     "https-proxy-agent": "^2.2.4",
     "node-sass": "^4.13.1",
     "postcss-conditionals": "^2.1.0",
@@ -150,13 +148,11 @@
     "style-loader": "^1.0.0",
     "stylelint": "^13.2.1",
     "stylelint-config-standard": "^20.0.0",
-    "stylelint-processor-html": "^1.0.0",
     "stylelint-webpack-plugin": "^1.2.3",
     "tailwindcss": "^1.2.0",
     "typescript": "^3.8.3",
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.10",
-    "webfonts-generator": "^0.4.0",
     "webpack": "^4.28.4"
   },
   "browserslist": [

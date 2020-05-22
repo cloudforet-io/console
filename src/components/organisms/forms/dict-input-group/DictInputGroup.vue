@@ -1,22 +1,12 @@
 <template>
     <div>
         <slot name="addButton" :disabled="disabled" :addPair="addPair">
-            <!-- <p-button class="add-btn" style-type="primary-dark"
-                      :disabled="disabled"
-                      @click="addPair"
-            >
-                <p-i name="ic_plus_bold" color="inherit"
-                     width="1rem" height="1rem"
-                />
-                {{ $t('BTN.ADD') }}
-            </p-button> -->
-            <PIconTextButton style-type="primary-dark"
-            class="add-btn" name="ic_plus_bold"
-            @click="addPair"
+            <p-icon-text-button style-type="primary-dark"
+                                class="add-btn" name="ic_plus_bold"
+                                @click="addPair"
             >
                 {{ $t('BTN.ADD') }}
-            </PIconTextButton>
-
+            </p-icon-text-button>
         </slot>
         <div v-if="showHeader" class="tag-header">
             <div class="key">
@@ -45,7 +35,7 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, watch, getCurrentInstance, defineComponent, Ref,
+    toRefs, reactive, getCurrentInstance, Ref,
 } from '@vue/composition-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
@@ -57,8 +47,6 @@ import { makeProxy } from '@/lib/compostion-util';
 
 const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
 const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
-const PButton = () => import('@/components/atoms/buttons/Button.vue');
-const PI = () => import('@/components/atoms/icons/PI.vue');
 const PIconTextButton = () => import('@/components/molecules/buttons/IconTextButton.vue');
 
 
@@ -67,8 +55,6 @@ export default {
     components: {
         PIconButton,
         PDictInput,
-        PButton,
-        PI,
         PIconTextButton,
     },
     props: dictIGProps,
@@ -126,27 +112,27 @@ export default {
 <style lang="postcss" scoped>
     .add-btn {
         @apply text-white;
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
         .p-i-icon {
-            margin-right: .5rem;
+            margin-right: 0.5rem;
         }
     }
-    .tag-header{
+    .tag-header {
         @apply py-4;
-        .key{
+        .key {
             @apply inline-block font-bold;
             width: 15rem;
         }
-        .value{
+        .value {
             @apply inline-block font-bold;
             width: 20rem;
         }
     }
     .dict-group {
         display: flex;
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
         .p-dict-input {
-            margin-right: .5rem;
+            margin-right: 0.5rem;
         }
     }
 </style>

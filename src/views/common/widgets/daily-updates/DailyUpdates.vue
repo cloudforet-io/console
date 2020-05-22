@@ -139,6 +139,8 @@ export default {
 
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
+            // .setTopic('daily_server_updates')
+
             .setFrom('now/d')
             .setDefaultFields('server_type')
             .setDiffFields('server_count');
@@ -196,7 +198,6 @@ export default {
         return {
             ...toRefs(state),
             onItemClick(item) {
-                console.log(item)
                 vm.$router.push({
                     path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
                     // path: '/inventory/cloud-service',

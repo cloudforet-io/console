@@ -6,7 +6,7 @@
                                @click="goBack()"
                 />
                 <div class="title">
-                    Tags
+                    Tag
                 </div>
             </div>
             <div class="right" />

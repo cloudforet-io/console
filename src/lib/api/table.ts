@@ -29,8 +29,8 @@ import _ from 'lodash';
 import {
     getArrayQueryString, pushRouterQuery, RouterAPIToolsetInterface,
 } from '@/lib/router-query-string';
-import { makeSearchText, makeSearchQuery } from '@/components/organisms/search/query-search-bar/toolset';
 import { isNotEmpty } from '@/lib/util';
+import { makeSearchQuery, makeSearchText } from '@/components/organisms/search/query-search-bar/toolset';
 
 interface DynamicTableOptions{
     options: any;

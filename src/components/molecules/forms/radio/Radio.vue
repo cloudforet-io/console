@@ -55,8 +55,9 @@ export default {
             if (isSelected.value) {
                 name += '--checked';
             } else if (props.hovered || mouseover.value) {
-                color = 'transparent inherit';
+                color = 'transparent #666666';
                 fill = false;
+                //name += '--hover';
             }
             return {
                 name,
