@@ -3,7 +3,7 @@ import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { DataSourceResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
 import _ from 'lodash';
 import { computed } from '@vue/composition-api';
-import {forceRefArg} from "@/lib/type";
+import { forceRefArg } from '@/lib/type';
 
 export const monitoringProps = {
     resourceType: {
