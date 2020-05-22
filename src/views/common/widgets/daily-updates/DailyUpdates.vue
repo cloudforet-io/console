@@ -139,6 +139,8 @@ export default {
 
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
+            // .setTopic('daily_server_updates')
+
             .setFrom('now/d')
             .setDefaultFields('server_type')
             .setDiffFields('server_count');

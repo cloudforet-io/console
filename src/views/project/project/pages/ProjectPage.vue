@@ -734,7 +734,7 @@ export default {
             }
         }
         .tool-right-checkbox {
-            @apply whitespace-no-wrap self-end;
+            @apply whitespace-no-wrap self-center;
         }
     }
 
