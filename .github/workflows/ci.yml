@@ -1,7 +1,7 @@
-name: CI
+name: SpaceONE CI
 
 on:
-  push:
+  pull_request:
     branches:
       - master
 jobs:
@@ -11,31 +11,25 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Checkout submodules
-      uses: srt32/git-actions@v0.0.3
-      with:
-        args: git submodule update --init --recursive
     - name: Set environment virables
       run: |
-        echo "::set-env name=SERVICE::console"
-        echo "::set-env name=IMAGE_PREFIX::spaceone"
-
-        echo "::set-env name=DOCKER_UPLOAD::true"
-        echo "::set-env name=PYPI_UPLOAD::false"
-        echo "::set-env name=LOCATION_DOCKERFILE::."
         echo "::set-env name=LOCATION_SETUP_PY::src"
+        echo "::set-env name=LOCATION_DOCKERFILE::."
 
-        echo "::set-env name=SUDO::false"
-        version=$(cat src/VERSION)${{ github.run_id }}
+        version=$(cat src/VERSION)-${{ github.run_id }}
         echo "::set-env name=VERSION::$version"
 
-    - name: Configure integration
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
       run: |
-        echo "Configuring integrations ... None"
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
 
     - name: Build
-      id: build
-      if: env.PYPI_UPLOAD == 'true'
       run: |
         echo "Building pypi ..."
         cd $LOCATION_SETUP_PY
@@ -47,31 +41,21 @@ jobs:
         echo "Running test ... None"
         # fail test or pass test
 
-    - name: Upload pypi
-      id: upload_pypi
-      if: ${{ steps.test.outcome == 'success' && env.PYPI_UPLOAD == 'true' }}
-      run: |
-        echo "Uploading pypi ..."
-        cd $LOCATION_SETUP_PY
-        twine upload dist/*.whl --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }} --verbose
-
-    - name: Upload docker
-      if: ${{ always() && steps.test.conclusion == 'success' && env.DOCKER_UPLOAD == 'true' }}
-      uses: elgohr/Publish-Docker-Github-Action@master
+    - name: Merge branch automatically
+      if: steps.test.outcome == 'success'
+      uses: pascalgn/automerge-action@v0.8.3
+      env:
+        # repository token으로는 새로운 workflow run시킬 수 없음.
+        GITHUB_TOKEN: ${{secrets.REPOSITORY_CONTROL_ACCESS_KEY}}
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+        MERGE_LABELS: ""
+    - name: Notify to slack
+      if: always() # Pick up events even if the job fails or is canceled.
+      uses: 8398a7/action-slack@v3
       with:
-        name: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        workdir: ${{ env.LOCATION_DOCKERFILE }}
-        tags: latest,${{ env.VERSION }}
-
-    - name: Push to a branch
-      if: ${{ always() && steps.test.conclusion == 'success' }}
-      run: |
-        echo "Pusing to a branch ... None"
-
-    - name: Deploy by spinnaker
-      id: deploy_spinnaker
-      if: always() && steps.test.outcome == 'success' && env.DOCKER_UPLOAD
-      run: |
-        echo "Deploy to spinnaker. it will listen DockerHub"
+        status: ${{ job.status }}
+        author_name: "[BOT]"
+        fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
