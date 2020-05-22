@@ -100,10 +100,10 @@
                             >
                                 <template #toolbox-left>
                                     <PIconTextButton style-type="primary-dark"
-                                        name="ic_plus_bold"
-                                        @click="clickSecretAddForm()"
+                                                     name="ic_plus_bold"
+                                                     @click="clickSecretAddForm()"
                                     >
-                                    {{ $t('BTN.ADD') }}
+                                        {{ $t('BTN.ADD') }}
                                     </PIconTextButton>
                                     <p-button
                                         class="left-toolbox-item"
@@ -174,6 +174,7 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
@@ -372,7 +373,8 @@ export default {
             projectModalVisible.value = true;
         };
         const changeProject = async (node?: ProjectNode|null) => {
-            const action = fluentApi.identity().serviceAccount().changeProject().clone().setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
+            const action = fluentApi.identity().serviceAccount().changeProject().clone()
+                .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
             if (node) {
                 await action.setId(node.data.id).execute()
