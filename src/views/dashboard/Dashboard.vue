@@ -1,51 +1,155 @@
-<script>
-import { toRefs } from '@vue/composition-api';
-import DashboardTemplate, { setup } from '@/views/dashboard/Dashboard.template.vue';
-import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
-import { mountBusEvent } from '@/lib/compostion-util';
+<template>
+    <general-page-layout class="dashboard">
+        <service-summary class="col-start-1 col-end-13
+                                sm:col-end-5
+                                lg:col-end-4"
+                         v-bind="projects.state"
+        />
+        <service-summary class="col-start-1 col-end-13
+                                sm:col-start-5 sm:col-end-9
+                                lg:col-start-4 lg:col-end-7"
+                         v-bind="servers.state"
+        />
+        <service-summary class="col-start-1 col-end-13
+                                sm:col-start-9
+                                lg:col-start-7 lg:col-end-10"
+                         v-bind="cloudServices.state"
+        />
+        <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
+                                 row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
+        />
+        <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
+                              row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
+                              daily-updates"
+                       :get-server-action="topics.server"
+                       :get-cloud-service-action="topics.cloudService"
+        />
+        <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
+                             lg:row-start-2"
+        />
+        <s-collection class="col-start-1 col-end-13" />
+        <cloud-services class="col-start-1 col-end-13"
+                        :get-action="cloudServiceWidgetGetAction"/>
+    </general-page-layout>
+</template>
+
+<script lang="ts">
+import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
+import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
+import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
+import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
+import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
+import { blue, secondary, secondary1 } from '@/styles/colors';
+import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import SCollection from '@/views/common/widgets/collection/Collection.vue';
+import {Stat} from "@/lib/fluent-api/statistics/resource";
 
 export default {
     name: 'Dashboard',
-    extends: DashboardTemplate,
-    setup(props, context) {
-        const state = setup(props, context);
-        const api = context.root.$http;
+    components: {
+        GeneralPageLayout,
+        CloudServices,
+        DailyUpdates,
+        ServiceAccounts,
+        ServiceSummary,
+        TopProjects,
+        SCollection,
+    },
+    setup() {
+        const projects = new ServiceSummaryWidgetState({
+            title: 'projects',
+            to: '/project',
+            color: blue[600],
+            getAction: api => api.setResourceType('identity.Project'),
+            getTrendAction: api => api.setTopic('daily_project_count')
+                .addGroupField('count', STAT_OPERATORS.sum, 'values.project_count'),
+        });
 
-        const callApi = (url, target, params) => async () => {
-            const res = await api.post(url, params);
-            state[target] = res.data;
+        const servers = new ServiceSummaryWidgetState({
+            title: 'servers',
+            to: '/inventory/server',
+            color: secondary,
+            getAction: api => api.setResourceType('inventory.Server'),
+            getTrendAction: api => api.setTopic('daily_server_count')
+                .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
+        });
+
+        const cloudServices = new ServiceSummaryWidgetState({
+            title: 'cloud services',
+            to: '/inventory/cloud-service',
+            color: secondary1,
+            getAction: api => api.setResourceType('inventory.CloudService'),
+            getTrendAction: api => api.setTopic('daily_cloud_service_count')
+                .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
+        });
+
+        const topics = ({
+            server: api => api.setTopic('daily_server_updates'),
+            cloudService: api => api.setTopic('daily_cloud_service_updates'),
+        });
+
+        return {
+            projects,
+            servers,
+            cloudServices,
+            topics,
+            cloudServiceWidgetGetAction(apiAction: Stat) {
+                return apiAction
+                    .setLimit(12);
+            },
         };
-
-        const resourcesByRegionCallApi = (url, params) => async () => {
-            state.resourcesByRegionLoading = true;
-            const res = await api.post(url, params);
-            state.resourcesByRegionData = res.data;
-            state.resourcesByRegionLoading = false;
-        };
-
-        // Summary
-        mountBusEvent(DashboardEventBus, 'listSummary', callApi('/statistics/summary', 'summaryData'));
-
-        // Resources By Region
-        mountBusEvent(DashboardEventBus, 'listRegionByServer',
-            resourcesByRegionCallApi('/statistics/datacenter-items', {
-                item_type: 'server',
-            }));
-        mountBusEvent(DashboardEventBus, 'listRegionByCloudService',
-            resourcesByRegionCallApi('/statistics/datacenter-items', {
-                item_type: 'cloud_service',
-            }));
-
-        // Server State
-        mountBusEvent(DashboardEventBus, 'listServerState', callApi('/statistics/server-state', 'serverStateData'));
-
-        // Servers by Type
-        mountBusEvent(DashboardEventBus, 'listServerType', callApi('/statistics/server-type', 'serverTypeData', { item_type: 'server_type' }));
-        mountBusEvent(DashboardEventBus, 'listVmType', callApi('/statistics/server-type', 'vmTypeData', { item_type: 'vm_type' }));
-        mountBusEvent(DashboardEventBus, 'listOsType', callApi('/statistics/server-type', 'osTypeData', { item_type: 'os_type' }));
-        mountBusEvent(DashboardEventBus, 'listHypervisorType', callApi('/statistics/server-type', 'hypervisorTypeData', { item_type: 'hypervisor_type' }));
-
-        return { ...toRefs(state) };
     },
 };
 </script>
+
+<style lang="postcss">
+    /*@media (max-width: 477px) {*/
+    /*    html, body {*/
+    /*        font-size: 12px;*/
+    /*    }*/
+    /*}*/
+
+    /*@media (min-width: 478px) and (max-width: 676px) {*/
+    /*    html, body {*/
+    /*        font-size: 14px;*/
+    /*    }*/
+    /*}*/
+
+    /*@media (min-width: 768px) {*/
+    /*    html, body {*/
+    /*        font-size: 16px;*/
+    /*    }*/
+    /*}*/
+</style>
+
+<style lang="postcss" scoped>
+    .dashboard::v-deep {
+        @apply bg-primary-dark;
+        .page-contents {
+            @apply grid gap-4 grid-flow-row grid-cols-12 p-4;
+        }
+
+        @screen md {
+            .page-contents {
+                @apply p-8;
+            }
+        }
+
+        @screen xl {
+            .page-contents {
+                @apply p-12;
+            }
+        }
+    }
+    .daily-updates {
+        height: 33.75rem;
+    }
+
+    @screen lg {
+        .daily-updates {
+            height: 48rem;
+        }
+    }
+</style>
