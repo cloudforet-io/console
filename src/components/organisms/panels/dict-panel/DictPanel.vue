@@ -44,7 +44,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    reactive, toRefs, getCurrentInstance, defineComponent, computed,
+    reactive, toRefs, getCurrentInstance, computed,
 } from '@vue/composition-api';
 import { DataTableState } from '@/components/organisms/tables/data-table/toolset';
 import { makeTrItems } from '@/lib/view-helper';
@@ -63,7 +63,7 @@ import {
 
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
 
-export default defineComponent({
+export default {
     name: 'PDictPanel',
     components: {
         PPanelTop,
@@ -137,14 +137,14 @@ export default defineComponent({
         };
     },
 
-});
+};
 </script>
 
 <style lang="postcss" scoped>
     .extra-btns {
         float: right;
         .btn {
-            margin-left: .5rem;
+            margin-left: 0.5rem;
         }
     }
 </style>

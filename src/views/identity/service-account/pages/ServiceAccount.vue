@@ -197,7 +197,6 @@ import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import _ from 'lodash';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
@@ -223,7 +222,6 @@ export default {
         PPageTitle,
         STagsPanel,
         SDynamicLayout,
-        PIconTextButton,
     },
     setup(props, context) {
         const { project } = useStore();
