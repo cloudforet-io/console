@@ -1,0 +1,49 @@
+name: SpaceONE Upload
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set environment virables
+      run: |
+        echo "::set-env name=IMAGE_PREFIX::spaceone"
+        echo "::set-env name=SERVICE::console"
+        echo "::set-env name=LOCATION_SETUP_PY::src"
+        echo "::set-env name=LOCATION_DOCKERFILE::."
+
+        version=$(cat src/VERSION)-${{ github.run_id }}
+        echo "::set-env name=VERSION::$version"
+
+
+#    - name: Set up Python
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.8'
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install setuptools wheel twine
+#
+#    - name: Upload pypi
+#      id: upload_pypi
+#      run: |
+#        echo "Uploading pypi ..."
+#        cd $LOCATION_SETUP_PY
+#        python3 setup.py bdist_wheel
+#        twine upload dist/*.whl --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }} --verbose
+
+    - name: Upload docker
+      uses: docker/build-push-action@v1
+      with:
+        repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        workdir: ${{ env.LOCATION_DOCKERFILE }}
+        tags: latest,${{ env.VERSION }}
