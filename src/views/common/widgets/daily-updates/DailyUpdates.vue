@@ -196,7 +196,6 @@ export default {
         return {
             ...toRefs(state),
             onItemClick(item) {
-                console.log(item)
                 vm.$router.push({
                     path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
                     // path: '/inventory/cloud-service',

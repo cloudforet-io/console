@@ -2,7 +2,7 @@ import {
     computed, reactive, ref, Ref,
 } from '@vue/composition-api';
 import { TagToolSet } from '@/components/molecules/tags/toolset';
-import { baseAutocompleteHandler, SearchQuery, SearchQueryType } from './autocompleteHandler';
+import { baseAutocompleteHandler, SearchQueryType } from './autocompleteHandler';
 
 
 interface QuerySearchState {
