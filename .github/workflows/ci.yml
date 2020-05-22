@@ -13,6 +13,8 @@ jobs:
 
     - name: Set environment virables
       run: |
+        echo "::set-env name=IMAGE_PREFIX::spaceone"
+        echo "::set-env name=SERVICE::console"
         echo "::set-env name=LOCATION_SETUP_PY::src"
         echo "::set-env name=LOCATION_DOCKERFILE::."
 
@@ -24,16 +26,16 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install setuptools wheel twine
 
-    - name: Build
-      run: |
-        echo "Building pypi ..."
-        cd $LOCATION_SETUP_PY
-        python3 setup.py bdist_wheel
+#    - name: Build
+#      run: |
+#        echo "Building pypi ..."
+#        cd $LOCATION_SETUP_PY
+#        python3 setup.py bdist_wheel
 
     - name: Test
       id: test
