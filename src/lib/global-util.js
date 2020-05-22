@@ -1,4 +1,3 @@
-import timezone from 'countries-and-timezones';
 import { GlobalEnum } from '@/lib/enum';
 import _ from 'lodash';
 
@@ -165,34 +164,6 @@ export const Util = {
             return NodeArray;
         },
         /** ********************************************************************************
-         * Name       : getDatefromTimeStamp
-         * Input   => (f: flag                         =>  String)
-         * Output  => Node
-         * Description:  return tree array of object which suits for BaseTree
-         ********************************************************************************* */
-        getDatefromTimeStamp(ts, tz, tzr) {
-            const mxTimezones = timezone.getAllTimezones();
-            const options = {
-                timeZone: 'UTC',
-                hour12: false,
-                timeZoneName: 'long',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-            };
-
-            if (!this.isEmpty(mxTimezones[tz])) {
-                options.timeZone = tz;
-            }
-            const timeStamps = new Date(ts * 1000).toLocaleString('en-US', options).split(' ');
-            const DateTime = this.isEmpty(tzr) ? `${this.getTimeStampFormatter(timeStamps[0])} ${timeStamps[1]}` : new Date(ts * 1000).toLocaleString('en-US', options);
-            return DateTime;
-        },
-        /** ********************************************************************************
-         * Name       : getDatefromTimeStamp
          * Input   => (f: flag                         =>  String)
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree

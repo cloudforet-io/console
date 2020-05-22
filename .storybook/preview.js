@@ -9,15 +9,12 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '@/store';
 import directive from '@/directives';
-import VueInputAutowidth from 'vue-input-autowidth';
-import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
 import { Util } from '@/lib/global-util';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
-import Skeleton from 'vue-loading-skeleton';
 import Fragment from "vue-fragment";
 
 import "@/styles/style.scss";
@@ -34,14 +31,11 @@ Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
 Vue.mixin(Util);
-Vue.use(VueAlertify);
-Vue.use(VueInputAutowidth);
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
 })
 Vue.use(LiquorTree);
-Vue.use(Skeleton, {prefix: 'p'});
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
 

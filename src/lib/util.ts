@@ -1,13 +1,9 @@
-import momentTimezone from 'moment-timezone';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
 import { ColorBindFactory } from '@/lib/view-helper';
 import { getCurrentInstance } from '@vue/composition-api';
-import { getCurrentVM } from '@vue/composition-api/dist/runtimeContext';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-import timezones from 'timezones.json';
 
 // color set
 /**

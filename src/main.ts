@@ -1,7 +1,4 @@
 import Vue from 'vue';
-import VueCookies from 'vue-cookies';
-import VueInputAutowidth from 'vue-input-autowidth';
-import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
 import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
@@ -15,7 +12,6 @@ import { Util } from '@/lib/global-util';
 import LocalStorageStore from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
-import Skeleton from 'vue-loading-skeleton';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import App from './App.vue';
@@ -23,10 +19,7 @@ import '@/styles/style.scss';
 
 
 Vue.mixin(Util);
-Vue.use(VueCookies);
 Vue.use(VueCompositionApi);
-Vue.use(VueAlertify);
-Vue.use(VueInputAutowidth);
 Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
@@ -34,7 +27,6 @@ Vue.use(SvgIcon, {
 });
 Vue.use(LiquorTree);
 // @ts-ignore
-Vue.use(Skeleton, { prefix: 'p' });
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 

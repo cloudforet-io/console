@@ -1,4 +1,4 @@
-const Dashboard = () => import('@/views/dashboard/Dashboard.new.vue');
+const Dashboard = () => import('@/views/dashboard/Dashboard.vue');
 
 export default {
     path: 'dashboard',
