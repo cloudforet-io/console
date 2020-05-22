@@ -192,7 +192,7 @@ export default {
                         value: projectId.value,
                         operator: '=',
                     }])
-                    .setLimit(12);;
+                    .setLimit(12);
             },
         };
     },
@@ -205,7 +205,7 @@ export default {
     }
 
     .health-dashboard {
-        height: 34rem;
+        height: 30rem;
     }
 
 </style>
