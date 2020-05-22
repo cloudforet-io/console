@@ -71,11 +71,7 @@
                 />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
-                              :data-tools="metricAPIHandler.ts.state.dataTools"
-                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
-                              :resources="metricAPIHandler.ts.state.resources"
-                />
+                <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
@@ -100,14 +96,10 @@
                 />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
-                              :data-tools="metricAPIHandler.ts.state.dataTools"
-                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
-                              :resources="metricAPIHandler.ts.state.resources"
-                />
+                <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </PTab>
-        <p-empty v-else style="height: auto;margin-top:4rem ">
+        <p-empty v-else style="height: auto; margin-top: 4rem;">
             No Selected Item
         </p-empty>
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
@@ -152,7 +144,6 @@ import {
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
-import { MetricAPI } from '@/lib/api/monitoring';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
 import baseTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
@@ -162,6 +153,7 @@ import _ from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { propsCopy } from '@/lib/router-query-string';
+import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -480,10 +472,10 @@ export default {
         });
 
 
-        const metricAPIHandler = new MetricAPI(
-            'inventory.CloudService',
+        const monitoringTS = new MonitoringToolSet(
             'cloud_service_id',
-            apiHandler,
+            'inventory.CloudService',
+            computed(() => apiHandler.tableTS.selectState.selectItems),
         );
 
         return {
@@ -500,7 +492,7 @@ export default {
             clickCollectData,
             singleItemTab,
             multiItemTab,
-            metricAPIHandler,
+            monitoringTS,
             defaultAdminLayout,
             defaultHistoryLayout,
             adminApi,

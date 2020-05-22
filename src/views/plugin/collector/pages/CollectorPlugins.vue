@@ -154,10 +154,10 @@ export const setup = (props, { root }) => {
     );
 
     const listPlugins = _.debounce(async () => {
-        console.debug('listPlugins');
         apiHandler.action = apiHandler.action
             .setRepositoryId(repoState.selectedRepoId)
-            .setSortBy(state.sortBy);
+            .setSortBy(state.sortBy)
+            .setSortDesc(state.sortBy !== 'name');
         await apiHandler.getData();
     }, 100);
 

@@ -14,6 +14,7 @@
 		},
 		"DICT_FORM_HELPMSG": "",
 		"LIMIT_OF": "",
+		"NONE": "",
 		"PROJECT": {
 			"ITEM_WILL_SELECT_FOR": "",
 			"NO_PROJECT": "",
@@ -26,6 +27,7 @@
 	"BTN": {
 		"ACTION": "",
 		"ADD": "",
+		"ADD_SERVICE_ACCOUNT": "",
 		"ADD_TAG": "",
 		"BACK": "",
 		"CANCEL": "",
@@ -380,6 +382,7 @@
 		"INFO": "",
 		"JOBS": "",
 		"LOCAL": "",
+		"NONE_TR": "",
 		"RAWDATA": "",
 		"SCHEDULE": "",
 		"TAG": "",

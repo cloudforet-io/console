@@ -38,8 +38,9 @@
             <div class="text-xs text-gray-500 mb-1">
                 Cloud Service Provider
             </div>
-            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value" 
-            class="pagetitle"/>
+            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value"
+                        class="pagetitle"
+            />
             <div class="cloud-services">
                 <PToolboxGridLayout
                     v-bind="apiHandler.gridTS.state"
@@ -54,6 +55,20 @@
                     <template slot="toolbox-bottom">
                         <div class="cst-toolbox-bottom">
                             <PSearch :search-text.sync="apiHandler.gridTS.searchText.value" @onSearch="apiHandler.getData()" />
+                        </div>
+                    </template>
+                    <template #no-data>
+                        <div class="text-center empty-project">
+                            <img class="w-48 mx-auto pt-19 mb-8" src="@/assets/images/illust_satellite.svg">
+                            <p class="text-primary2 mb-12">
+                                We need your registration for monitoring cloud resources.
+                            </p>
+                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                                class="mx-auto text-center"
+                                                @click="goToServiceAccount"
+                            >
+                                {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                            </p-icon-text-button>
                         </div>
                     </template>
                     <template #card="{item}">
@@ -126,10 +141,12 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'ServiceAccount',
     components: {
+        PIconTextButton,
         PVerticalPageLayout,
         PSearch,
         PI,
@@ -275,6 +292,13 @@ export default {
             });
             console.debug(item);
         };
+
+        const goToServiceAccount = () => {
+            vm?.$router.push({
+                name: 'serviceAccount',
+            });
+        };
+
         const dataSource = [
             { name: 'provider', key: 'provider' },
             { name: 'group', key: 'group' },
@@ -287,6 +311,7 @@ export default {
             selectProviderName,
             apiHandler,
             clickCard,
+            goToServiceAccount,
             providerStore,
             statData,
             providerListState,
@@ -355,7 +380,7 @@ export default {
         @apply p-6 flex flex-row justify-between items-center;
         .left{
             @apply inline-flex items-center;
-            img { 
+            img {
                 @apply rounded-sm overflow-hidden;
             }
             .text-content{

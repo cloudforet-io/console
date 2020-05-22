@@ -12,7 +12,6 @@
             </div>
             <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
                 <img :src="'./images/illust_no-update.svg'" class="no-data-img">
-                <!--                <img :src="'./images/illust_list.svg'" class="no-data-img hidden lg:block">-->
             </div>
             <p-grid-layout v-else :items="data"
                            row-gap="0.5rem" column-gap="0"
@@ -106,12 +105,10 @@ export default {
     name: 'DailyUpdates',
     components: {
         PWidgetLayout,
-        PSelectableList,
         PI,
         PGridLayout,
         PSelectableItem,
         PSkeleton,
-        PTooltipButton,
     },
     props: {
         getServerAction: {
@@ -143,6 +140,7 @@ export default {
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
             // .setTopic('daily_server_updates')
+
             .setFrom('now/d')
             .setDefaultFields('server_type')
             .setDiffFields('server_count');
