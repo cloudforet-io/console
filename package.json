@@ -16,7 +16,8 @@
     "build:storybook:github": "build-storybook -s ./public -o .out",
     "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console",
     "storybook": "start-storybook -p 6006 -s ./public",
-    "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
+    "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6",
+    "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build"
   },
   "dependencies": {
     "@vue/composition-api": "^0.5.0",
@@ -67,7 +68,6 @@
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
     "@fortawesome/fontawesome-free": "^5.13.0",
-    "@fullhuman/postcss-purgecss": "^2.2.0",
     "@storybook/addon-a11y": "^5.3.1",
     "@storybook/addon-actions": "^5.3.1",
     "@storybook/addon-centered": "^5.3.1",
@@ -104,6 +104,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",
+    "babel-plugin-lodash": "^3.3.4",
     "css-loader": "^3.2.0",
     "eslint": "^5.16.0",
     "eslint-config-stylelint": "^11.1.0",
@@ -133,7 +134,8 @@
     "typescript": "^3.8.3",
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.28.4"
+    "webpack": "^4.28.4",
+    "webpack-bundle-analyzer": "^3.8.0"
   },
   "browserslist": [
     "> 1%",

@@ -121,6 +121,7 @@ export default {
 .service-summary::v-deep {
     .widget-contents {
         padding: 0;
+        height: fit-content;
     }
     .top {
         @apply mt-6 mb-2;

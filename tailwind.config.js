@@ -2,8 +2,9 @@ const _ = require('lodash');
 const plugin = require('tailwindcss/plugin');
 const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('./src/styles/colors');
-
-const rawSize = Array(160).fill('').map((value, idx) => [`${idx}`, `${idx * 0.25}rem`]);
+const rawSize = Array(32)
+    .fill('')
+    .map((value, idx) => [`${idx}`, `${idx * 0.25}rem`]);
 const size = _.fromPairs(rawSize);
 
 const rawPercent = [
@@ -31,6 +32,7 @@ module.exports = {
             px: '1px',
             '2px': '2px',
             '3px': '3px',
+            72: '18rem',
             ...size,
         },
         minWidth: theme => ({
