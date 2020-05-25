@@ -1,17 +1,27 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const StylelintPlugin = require('stylelint-webpack-plugin');
 const postcssConfig = require('./postcss.config');
 
+
 const extraPlugins = [];
-// if (process.env.NODE_ENV === 'development') {
-//     extraPlugins.push(
-//         new StylelintPlugin({
-//             files: ['src/**/*.{vue,scss}'],
-//         }),
-//     );
-// }
+if (process.env.NODE_ENV === 'development') {
+    // const StylelintPlugin = require('stylelint-webpack-plugin');
+
+    // extraPlugins.push(
+    // new StylelintPlugin({
+    //     files: ['src/**/*.{vue,scss}'],
+    // }),
+    // );
+}
+
+if (process.env.VUE_APP_ANALYZE_MOD) {
+    const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+    extraPlugins.push(
+        new BundleAnalyzerPlugin(),
+    );
+}
+
 
 module.exports = {
     lintOnSave: false,
