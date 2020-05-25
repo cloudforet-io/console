@@ -185,6 +185,7 @@ export default {
 <style lang="postcss" scoped>
     .resources-by-region {
         border:none;
+        height: 27.1rem;
     &::v-deep .widget-contents {
          overflow-y: auto;
          margin-bottom: 2rem;
@@ -205,7 +206,6 @@ export default {
     }
     .reverse {
         @apply block mb-0;
-        height: 24rem;
     }
 
     @screen md {
@@ -213,10 +213,10 @@ export default {
             @apply flex flex-row-reverse;
         .chart-container {
             min-width: 40%;
-        .chart {
-            height: 18rem;
+            .chart {
+                height: 13.3rem;
+            }
         }
-    }
-    }
+      }
     }
 </style>
