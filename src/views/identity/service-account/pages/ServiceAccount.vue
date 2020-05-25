@@ -200,7 +200,6 @@ import nunjucks from 'nunjucks';
 import _ from 'lodash';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
