@@ -3,5 +3,6 @@
     "ENDPOINT": "http://console-api.dev.spaceone.dev"
   },
   "GTAG_ID": "DISABLED",
+  "DOMAIN_NAME": "spaceone",
   "NO_SERVER_MODE": false
 }

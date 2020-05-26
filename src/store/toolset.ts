@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { DateTime } from 'luxon';
 import { api } from '@/lib/api/axios';
 import { fluentApi } from '@/lib/fluent-api';
+import config from '@/lib/config';
 
 const bindLocalStorage = (prefix: string, name: string, state: any) => computed({
     get: () => state[name],
@@ -150,9 +151,10 @@ class DomainStore extends Store<DomainState> {
     getDomain= async (vm: any) => {
         const { hostname } = window.location;
         this.state.domainName = hostname.split('.')[0];
-        const resp = await api.newInstance().post('/identity/domain/list', {
-            name: this.state.domainName,
-        });
+        const param = {
+            name: process.env.NODE_ENV === 'development' ? config.get('DOMAIN_NAME') : this.state.domainName,
+        };
+        const resp = await api.newInstance().post('/identity/domain/list', param);
         const domain = _.get(resp, 'data.results.0', null);
         if (domain) {
             this.state.domainId = domain.domain_id;
