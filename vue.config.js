@@ -39,7 +39,6 @@ module.exports = {
             postcss: postcssConfig,
         },
     },
-
     configureWebpack: {
         resolve: {
             alias: {
@@ -76,5 +75,4 @@ module.exports = {
         }
     },
     parallel: false,
-
 };
