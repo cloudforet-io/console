@@ -1,6 +1,6 @@
 {
   "VUE_APP_API": {
-    "ENDPOINT": "http://console-api.dev.spaceone.dev"
+    "ENDPOINT": "http://console-api.dev.pyengine.dev"
   },
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": "spaceone",
