@@ -6,6 +6,10 @@
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
             />
+            <p-icon-button name="ic_edit-text"
+                           width="1.5rem" height="1.5rem" class="delete-btn"
+                           @click="openProjectEditForm"
+            />
         </div>
         <PTab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
               :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
@@ -30,7 +34,7 @@
                                              name="ic_plus_bold"
                                              @click="openMemberAddForm()"
                             >
-                            {{ $t('BTN.ADD') }}
+                                {{ $t('BTN.ADD') }}
                             </PIconTextButton>
                             <p-button
                                 outline
@@ -73,6 +77,10 @@
                 </p>
             </template>
         </p-button-modal>
+        <SProjectCreateFormModal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
+                                 :update-mode="updateMode" :current-project="item.name"
+                                 @confirm="projectEditFormConfirm($event)"
+        />
         <SProjectMemberAddModal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="addMember()" />
         <PTableCheckModal
             v-bind="deleteTS.state"
@@ -111,6 +119,7 @@ import { DictPanelAPI } from '@/lib/api/dict';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/TableCheckModal.vue';
@@ -139,6 +148,7 @@ export default {
         PI,
         PIconButton,
         PButton,
+        SProjectCreateFormModal,
         SProjectMemberAddModal,
         PIconTextButton,
     },
@@ -229,12 +239,45 @@ export default {
         // Member modal
         const formState = reactive({
             projectDeleteFormVisible: false,
+            projectEditFormVisible: false,
+            updateMode: false,
             headerTitle: '',
             themeColor: '',
             modalContent: '',
             memberAddFormVisible: false,
             memberDeleteFormVisible: false,
         });
+
+        const openProjectEditForm = () => {
+            formState.updateMode = true;
+            formState.projectEditFormVisible = true;
+        };
+
+        const projectEditFormConfirm = (params) => {
+            console.log(params, projectId.value);
+            fluentApi.identity().project().update().setParameter({
+                project_id: projectId.value,
+                ...params,
+            })
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Update Project',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .catch((e) => {
+                    showErrorMessage('Fail to Update a Project', e, context.root);
+                })
+                .finally(async () => {
+                    await getProject(projectId.value);
+                });
+            formState.projectEditFormVisible = false;
+        };
 
         const openProjectDeleteForm = () => {
             formState.projectDeleteFormVisible = true;
@@ -343,6 +386,8 @@ export default {
             deleteTS,
             openProjectDeleteForm,
             projectDeleteFormConfirm,
+            openProjectEditForm,
+            projectEditFormConfirm,
             openMemberAddForm,
             addMember,
             memberDeleteClick,

@@ -61,6 +61,10 @@
                                            width="1.5rem" height="1.5rem" class="delete-btn"
                                            @click="openProjectGroupDeleteForm"
                             />
+                            <p-icon-button name="ic_edit-text"
+                                           width="1.5rem" height="1.5rem" class="delete-btn"
+                                           @click="openProjectGroupEditForm"
+                            />
                         </div>
                     </template>
                     <template #toolbox-bottom>
@@ -121,7 +125,7 @@
                                     <p id="project-name">
                                         {{ item.name }}
                                     </p>
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
                                          @click.stop="goToServiceAccount"
                                     >
                                         <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
@@ -183,6 +187,7 @@
                 </div>
             </div>
             <SProjectGroupCreateFormModal v-if="projectGroupFormVisible" :visible.sync="projectGroupFormVisible"
+                                          :update-mode="updateMode" :current-group="currentGroup"
                                           @confirm="projectGroupFormConfirm($event)"
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
@@ -234,7 +239,7 @@ import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { ProjectListResp } from '@/lib/fluent-api/identity/project';
+import project, { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
@@ -297,11 +302,13 @@ export default {
         const projectState = reactive({
             parentGroup: '',
             currentGroup: '',
+            currentGroupId: '',
         });
         const treeState = new TreeState().state;
         const formState = reactive({
             projectGroupFormVisible: false,
             projectFormVisible: false,
+            updateMode: false,
             projectGroupDeleteFormVisible: false,
             isRoot: false,
             headerTitle: '',
@@ -436,6 +443,7 @@ export default {
          * */
         const setProjectState = (item) => {
             projectState.currentGroup = item.data.name;
+            projectState.currentGroupId = item.data.id;
             if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
         };
 
@@ -527,39 +535,72 @@ export default {
         };
 
         const openProjectGroupForm = (isRoot) => {
+            formState.updateMode = false;
             if (isRoot) {
                 formState.isRoot = true;
             }
             formState.projectGroupFormVisible = true;
         };
 
+        const openProjectGroupEditForm = () => {
+            formState.updateMode = true;
+            formState.projectGroupFormVisible = true;
+        };
+
         const projectGroupFormConfirm = (item) => {
-            let projectGroupId;
-            if (formState.isRoot) projectGroupId = null;
-            else projectGroupId = state.hoveredId;
-            fluentApi.identity().projectGroup().create().setParameter({
-                parent_project_group_id: projectGroupId,
-                ...item,
-            })
-                .execute()
-                .then((resp) => {
-                    context.root.$notify({
-                        group: 'noticeBottomRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Create Project Group',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                    item.id = resp.data.project_group_id;
-                    item.item_type = 'PROJECT_GROUP';
-                    const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
-                    if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
-                    if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
+            let projectGroupId;;
+            if (!formState.updateMode) {
+                if (formState.isRoot) projectGroupId = null;
+                else projectGroupId = state.hoveredId;
+                fluentApi.identity().projectGroup().create().setParameter({
+                    parent_project_group_id: projectGroupId,
+                    ...item,
                 })
-                .catch((e) => {
-                    showErrorMessage('Fail to Create Project Group', e, context.root);
-                });
+                    .execute()
+                    .then((resp) => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Success',
+                            text: 'Create Project Group',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                        item.id = resp.data.project_group_id;
+                        item.item_type = 'PROJECT_GROUP';
+                        const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
+                        if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
+                        if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
+                    })
+                    .catch((e) => {
+                        showErrorMessage('Fail to Create Project Group', e, context.root);
+                    });
+            } else {
+                projectGroupId = projectState.currentGroupId;
+                fluentApi.identity().projectGroup().update().setParameter({
+                    project_group_id: projectGroupId,
+                    ...item,
+                })
+                    .execute()
+                    .then(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Success',
+                            text: 'Update Project Group',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                        projectState.currentGroup = item.name;
+                    })
+                    .catch((e) => {
+                        showErrorMessage('Fail to Update Project Group', e, context.root);
+                    })
+                    .finally(() => {
+                        apiHandler.getData();
+                    });
+            }
+
             formState.projectGroupFormVisible = false;
         };
 
@@ -614,6 +655,7 @@ export default {
             projectFormConfirm,
             openProjectGroupForm,
             projectGroupFormConfirm,
+            openProjectGroupEditForm,
         };
     },
 };

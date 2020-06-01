@@ -285,7 +285,8 @@
 		},
 		"CHECK_HASH": "Please, Check Hash Tag format.",
 		"CRT_FAIL_ARG": "Fail to create {0}. Please, check your action.",
-		"CRT_PROJ": "",
+		"CRT_PROJ": "Create Project",
+		"CRT_PROJ_GRP": "Create Project Group",
 		"CRT_SUCC_ARG": "New {0} is successfully created.",
 		"DEL_ARG": "Delete {0}",
 		"DEL_FAIL_ARG": "Delete {0} has failed.\nPlease, check your action.",
@@ -301,6 +302,8 @@
 		"TAB": {
 			"None": ""
 		},
+		"UPDATE_PROJ": "Update Project Group",
+		"UPDATE_PROJ_GRP": "Update Project Group",
 		"UPT_ARG": "Update {0}",
 		"UPT_FAIL_ARG": "Fail to delete {0}. Please, check your action.",
 		"UPT_SUCC_ARG": "{0} has successfully updated."

@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        header-title="Create Project Group"
+        :header-title="updateMode ?$t('IDENTITY.UPDATE_PROJ_GRP') :$t('IDENTITY.CRT_PROJ_GRP')"
         :centered="true"
         :scrollable="false"
         size="lg"
@@ -76,6 +76,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        currentGroup: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, context) {
         const tagsTS = new DictIGToolSet({
@@ -91,9 +95,8 @@ export default {
 
         const checkNameLength = (...args) => {
             const prom = new Promise<boolean>((resolve, reject) => {
-                console.debug(args)
                 const data = args[1] || '';
-                if (data.length <= 20) {
+                if (data.length <= 40) {
                     resolve(true);
                 }
                 resolve(false);
@@ -103,11 +106,15 @@ export default {
 
         const validation: CustomKeywords = {
             uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
-            longName: new CustomValidator(checkNameLength, 'Should not be longer than 20 characters'),
+            longName: new CustomValidator(checkNameLength, 'Should not be longer than 40 characters'),
         };
 
         const sch = new JsonSchemaObjectType(undefined, undefined, true);
-        sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true, longName: true});
+        if (props.updateMode) {
+            sch.addStringProperty('name', 'Name', true, props.currentGroup, { uniqueName: true, longName: true });
+        } else {
+            sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true, longName: true });
+        }
         fixFormTS.setProperty(sch, ['name'], validation);
         const confirm = async () => {
             const fixFormValid = await fixFormTS.formState.validator();
