@@ -51,7 +51,7 @@ jobs:
       uses: pascalgn/automerge-action@v0.8.3
       env:
         # repository token으로는 새로운 workflow run시킬 수 없음.
-        GITHUB_TOKEN: ${{secrets.REPOSITORY_CONTROL_ACCESS_KEY}}
+        GITHUB_TOKEN: ${{secrets.REPOSITORY_ACCESS_KEY}}
 #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
         MERGE_LABELS: ""
     - name: Notify to slack
