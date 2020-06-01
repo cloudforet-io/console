@@ -286,6 +286,7 @@
 		"CHECK_HASH": "해시태그 형식을 확인해주세요.",
 		"CRT_FAIL_ARG": "{0} 생성이 실패했습니다.",
 		"CRT_PROJ": "프로젝트 생성",
+		"CRT_PROJ_GRP": "프로젝트 그룹 생성  ",
 		"CRT_SUCC_ARG": "{0}이/가 생성됐습니다.",
 		"DEL_ARG": "{0} 삭제",
 		"DEL_FAIL_ARG": "{0} 삭제 실패.",
@@ -301,6 +302,8 @@
 		"TAB": {
 			"None": ""
 		},
+		"UPDATE_PROJ": "프로젝트 수정",
+		"UPDATE_PROJ_GRP": "프로젝트 그룹 수정",
 		"UPT_ARG": "{0} 변경",
 		"UPT_FAIL_ARG": "{0} 변경이 실패하였습니다.",
 		"UPT_SUCC_ARG": "{0}가 변경되었습니다."

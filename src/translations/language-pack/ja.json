@@ -286,6 +286,7 @@
 		"CHECK_HASH": "",
 		"CRT_FAIL_ARG": "",
 		"CRT_PROJ": "",
+		"CRT_PROJ_GRP": "",
 		"CRT_SUCC_ARG": "",
 		"DEL_ARG": "",
 		"DEL_FAIL_ARG": "",
@@ -301,6 +302,8 @@
 		"TAB": {
 			"None": ""
 		},
+		"UPDATE_PROJ": "",
+		"UPDATE_PROJ_GRP": "",
 		"UPT_ARG": "",
 		"UPT_FAIL_ARG": "",
 		"UPT_SUCC_ARG": ""
