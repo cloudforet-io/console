@@ -25,7 +25,7 @@ jobs:
           DOCKER_UPLOAD: true
           # LOCATION points the parent directory
           LOCATION_SETUP_PY: . # optional. for pypi upload
-          LOCATION_VERSION: . # the location for VERSION file (ex- . means the location of VERSION is ./VERSION)
+          LOCATION_VERSION: src # the location for VERSION file (ex- . means the location of VERSION is ./VERSION)
           LOCATION_DOCKERFILE: .
           IMAGE_PREFIX: spaceone
           IS_SUDO: false
