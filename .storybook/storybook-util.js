@@ -41,11 +41,10 @@ export const getKnobProps = (props, data = {}, disable = {}, knobs = {}, options
 
         if (!disable[k]) {
             res[k] = {};
-            if (type.name === Function) res[k].default = defaultVal;
-            else res[k].default = getKnobProp(k, getDefaultValue(defaultVal), knob, option);
+            if(knob) res[k].default = getKnobProp(k, getDefaultValue(defaultVal), knob, option);
+            else if (type.name === 'Function') res[k].default = () => defaultVal;
         }
     })
-
     return res;
 }
 
