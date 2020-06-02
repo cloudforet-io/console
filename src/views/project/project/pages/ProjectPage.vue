@@ -61,10 +61,6 @@
                                            width="1.5rem" height="1.5rem" class="delete-btn"
                                            @click="openProjectGroupDeleteForm"
                             />
-                            <p-icon-button name="ic_edit-text"
-                                           width="1.5rem" height="1.5rem" class="delete-btn"
-                                           @click="openProjectGroupEditForm"
-                            />
                         </div>
                     </template>
                     <template #toolbox-bottom>
@@ -125,7 +121,7 @@
                                     <p id="project-name">
                                         {{ item.name }}
                                     </p>
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
                                          @click.stop="goToServiceAccount"
                                     >
                                         <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
@@ -187,7 +183,6 @@
                 </div>
             </div>
             <SProjectGroupCreateFormModal v-if="projectGroupFormVisible" :visible.sync="projectGroupFormVisible"
-                                          :update-mode="updateMode" :current-group="currentGroup"
                                           @confirm="projectGroupFormConfirm($event)"
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
@@ -239,7 +234,7 @@ import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import project, { ProjectListResp } from '@/lib/fluent-api/identity/project';
+import { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
@@ -302,13 +297,11 @@ export default {
         const projectState = reactive({
             parentGroup: '',
             currentGroup: '',
-            currentGroupId: '',
         });
         const treeState = new TreeState().state;
         const formState = reactive({
             projectGroupFormVisible: false,
             projectFormVisible: false,
-            updateMode: false,
             projectGroupDeleteFormVisible: false,
             isRoot: false,
             headerTitle: '',
@@ -322,7 +315,7 @@ export default {
 
         /**
              Tree, Project, Statistics API Handler Declaration
-         */
+             */
         const treeAction = fluentApi.identity().project().tree()
             .setSortBy('item_type')
             .setExcludeProject();
@@ -349,8 +342,8 @@ export default {
             .addJoinGroupField('member_count', STAT_OPERATORS.size, 'project_member.user', 2);
 
         /**
-        * Make Card Data
-        */
+             * Make Card Data
+             */
         const createdData = reactive({});
         const cardSummary = ref(createdData);
         const projectSummary = ref(createdData);
@@ -398,9 +391,9 @@ export default {
         };
 
         /**
-         * QuerySearch Grid Fluent API Declaration
-         * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
-         */
+             * QuerySearch Grid Fluent API Declaration
+             * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
+             */
         const listAction = projectGroupAPI.listProjects().setTransformer(getCard).setIncludeProvider();
 
         const isShow = computed(() => treeApiHandler.ts.metaState.firstSelectedNode);
@@ -424,8 +417,8 @@ export default {
         );
 
         /**
-         * Check Child Project(Group)
-         * */
+             * Check Child Project(Group)
+             * */
         const checkChildProject = (resp) => {
             const projectTotal = resp?.data?.total_count;
             if (projectTotal > 0) state.hasChildProject = true;
@@ -439,17 +432,16 @@ export default {
         };
 
         /**
-         * Set Page Title
-         * */
+             * Set Page Title
+             * */
         const setProjectState = (item) => {
             projectState.currentGroup = item.data.name;
-            projectState.currentGroupId = item.data.id;
             if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
         };
 
         /**
-         * Click or Hover Tree Item
-         */
+             * Click or Hover Tree Item
+             */
         const selected = async (item) => {
             formState.isRoot = false;
             treeApiHandler.ts.getSelectedNode(item);
@@ -482,29 +474,29 @@ export default {
         };
 
         /**
-         * Click Card Item
-         */
+             * Click Card Item
+             */
         const clickCard = (item) => {
-            vm?.$router.push({
-                name: 'projectDetail',
-                params: {
-                    id: item.project_id,
-                    name: item.name,
-                    project_group: item.project_group_info,
-                    tags: item.tags,
-                },
-            });
+                vm?.$router.push({
+                    name: 'projectDetail',
+                    params: {
+                        id: item.project_id,
+                        name: item.name,
+                        project_group: item.project_group_info,
+                        tags: item.tags,
+                    },
+                });
         };
 
         const goToServiceAccount = () => {
-            vm?.$router.push({
-                name: 'serviceAccount',
-            });
+                vm?.$router.push({
+                    name: 'serviceAccount',
+                });
         };
 
         /**
-         * Handling Form
-         */
+             * Handling Form
+             */
         const openProjectGroupDeleteForm = () => {
             formState.projectGroupDeleteFormVisible = true;
             formState.headerTitle = 'Delete Project Group';
@@ -535,72 +527,39 @@ export default {
         };
 
         const openProjectGroupForm = (isRoot) => {
-            formState.updateMode = false;
             if (isRoot) {
                 formState.isRoot = true;
             }
             formState.projectGroupFormVisible = true;
         };
 
-        const openProjectGroupEditForm = () => {
-            formState.updateMode = true;
-            formState.projectGroupFormVisible = true;
-        };
-
         const projectGroupFormConfirm = (item) => {
-            let projectGroupId;;
-            if (!formState.updateMode) {
-                if (formState.isRoot) projectGroupId = null;
-                else projectGroupId = state.hoveredId;
-                fluentApi.identity().projectGroup().create().setParameter({
-                    parent_project_group_id: projectGroupId,
-                    ...item,
-                })
-                    .execute()
-                    .then((resp) => {
-                        context.root.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'success',
-                            title: 'Success',
-                            text: 'Create Project Group',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                        item.id = resp.data.project_group_id;
-                        item.item_type = 'PROJECT_GROUP';
-                        const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
-                        if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
-                        if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
-                    })
-                    .catch((e) => {
-                        showErrorMessage('Fail to Create Project Group', e, context.root);
+            let projectGroupId;
+            if (formState.isRoot) projectGroupId = null;
+            else projectGroupId = state.hoveredId;
+            fluentApi.identity().projectGroup().create().setParameter({
+                parent_project_group_id: projectGroupId,
+                ...item,
+            })
+                .execute()
+                .then((resp) => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Create Project Group',
+                        duration: 2000,
+                        speed: 1000,
                     });
-            } else {
-                projectGroupId = projectState.currentGroupId;
-                fluentApi.identity().projectGroup().update().setParameter({
-                    project_group_id: projectGroupId,
-                    ...item,
+                    item.id = resp.data.project_group_id;
+                    item.item_type = 'PROJECT_GROUP';
+                    const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
+                    if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
+                    if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
                 })
-                    .execute()
-                    .then(() => {
-                        context.root.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'success',
-                            title: 'Success',
-                            text: 'Update Project Group',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                        projectState.currentGroup = item.name;
-                    })
-                    .catch((e) => {
-                        showErrorMessage('Fail to Update Project Group', e, context.root);
-                    })
-                    .finally(() => {
-                        apiHandler.getData();
-                    });
-            }
-
+                .catch((e) => {
+                    showErrorMessage('Fail to Create Project Group', e, context.root);
+                });
             formState.projectGroupFormVisible = false;
         };
 
@@ -655,7 +614,6 @@ export default {
             projectFormConfirm,
             openProjectGroupForm,
             projectGroupFormConfirm,
-            openProjectGroupEditForm,
         };
     },
 };
@@ -680,37 +638,37 @@ export default {
         max-height: 1.5rem;
         min-width: 1.5rem;
         min-height: 1.5rem;
-        &:hover {
-             color: inherit;
-         }
-        &:not(:disabled):not(.disabled):hover {
-            @apply bg-blue-300 border-blue-300;
-         }
+    &:hover {
+         color: inherit;
+     }
+    &:not(:disabled):not(.disabled):hover {
+         @apply bg-blue-300 border-blue-300;
+     }
     }
 
     ::v-deep .card-item {
         @apply bg-white border border-gray-200;
         border-radius: 2px;
         cursor: pointer;
-        &:hover {
-             @apply border-l border-secondary bg-blue-200;
-             cursor: pointer;
-         }
+    &:hover {
+         @apply border-l border-secondary bg-blue-200;
+         cursor: pointer;
+     }
     }
 
     .project-group {
-        & p {
-            @apply text-xs text-gray;
-        }
-        & span {
-            @apply text-2xl font-bold pb-2;
-        }
-        .delete-btn {
-            @apply text-black -mt-2 ml-2 cursor-pointer;
-            &:hover {
-                @apply text-white;
-             }
-        }
+    & p {
+          @apply text-xs text-gray;
+      }
+    & span {
+          @apply text-2xl font-bold pb-2;
+      }
+    .delete-btn {
+        @apply text-black -mt-2 ml-2 cursor-pointer;
+    &:hover {
+         @apply text-white;
+     }
+    }
     }
 
     .empty {
@@ -719,32 +677,32 @@ export default {
 
     .project-description {
         @apply mx-6 mt-6;
-        .project-group-name {
-            @apply text-gray-500 text-xs mb-1;
-        }
-        #project-name {
-            @apply text-lg font-bold truncate pb-5 overflow-hidden;
-        }
-        .provider-icon {
-            @apply mr-2 inline;
-            max-width: 1.5rem;
-            max-height: 1.5rem;
-        }
-        .providers {
-            max-height: 1.5rem;
-            min-height: 1.5rem;
-        }
+    .project-group-name {
+        @apply text-gray-500 text-xs mb-1;
+    }
+    #project-name {
+        @apply text-lg font-bold truncate pb-5 overflow-hidden;
+    }
+    .provider-icon {
+        @apply mr-2 inline;
+        max-width: 1.5rem;
+        max-height: 1.5rem;
+    }
+    .providers {
+        max-height: 1.5rem;
+        min-height: 1.5rem;
+    }
 
-        .empty-providers {
-            @apply relative text-blue-600 ;
-            width: fit-content;
-            div { padding:0.125rem 0.375rem; }
-            &:hover {
-                @apply text-secondary font-bold;
-               div{ @apply bg-blue-300 ; }
-            }
-            span {line-height:1.75;}
-        }
+    .empty-providers {
+        @apply relative text-blue-600 ;
+        width: fit-content;
+    div { padding:0.125rem 0.375rem; }
+    &:hover {
+         @apply text-secondary font-bold;
+    div{ @apply bg-blue-300 ; }
+    }
+    span {line-height:1.75;}
+    }
     }
 
     .solid {
@@ -753,31 +711,31 @@ export default {
 
     .project-summary {
         @apply mt-4 mx-6;
-        .summary-item-text {
-            @apply text-sm text-left mb-4 inline-block;
-        }
+    .summary-item-text {
+        @apply text-sm text-left mb-4 inline-block;
+    }
 
-        .summary-item-num {
-            @apply text-blue-600 text-base font-bold text-right mb-3 inline-block float-right;
-        }
+    .summary-item-num {
+        @apply text-blue-600 text-base font-bold text-right mb-3 inline-block float-right;
+    }
     }
 
     .tool {
         @apply mb-6 justify-between;
-        .tool-left {
-            .tool-left-btn {
-                @apply mr-4;
-            }
-            .tool-left-search {
-                @apply flex-1;
-                @screen lg {
-                    @apply max-w-lg;
-                }
-            }
-        }
-        .tool-right-checkbox {
-            @apply whitespace-no-wrap self-center;
-        }
+    .tool-left {
+    .tool-left-btn {
+        @apply mr-4;
+    }
+    .tool-left-search {
+        @apply flex-1;
+    @screen lg {
+        @apply max-w-lg;
+    }
+    }
+    }
+    .tool-right-checkbox {
+        @apply whitespace-no-wrap self-center;
+    }
     }
 
     .empty-project {
@@ -786,14 +744,14 @@ export default {
 
     .empty-project-grp {
         line-height:1.5;
-        .title {
-            @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
-        }
-        .content {
-            @apply text-gray-600;
-        }
-        .content-order {
-            @apply text-base pb-8 text-left m-auto max-w-64;
-        }
+    .title {
+        @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
+    }
+    .content {
+        @apply text-gray-600;
+    }
+    .content-order {
+        @apply text-base pb-8 text-left m-auto max-w-64;
+    }
     }
 </style>
