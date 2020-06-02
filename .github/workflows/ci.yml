@@ -11,12 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Only console use submodule
-      - name: Checkout submodules
-        uses: srt32/git-actions@v0.0.3
-        with:
-          args: git submodule update --init --recursive
-
       - name: Set environment virables
         env:
           # 이 곳에서 환경변수를 통해 설정 관리
@@ -133,6 +127,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      # Only console use submodule
+      - name: Checkout submodules
+        uses: srt32/git-actions@v0.0.3
+        with:
+          args: git submodule update --init --recursive
+
       - uses: actions/download-artifact@v2
         with:
           name: set_env.sh
