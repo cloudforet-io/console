@@ -4,7 +4,7 @@ import {
 import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
 import { number, select, object } from '@storybook/addon-knobs/vue';
-import TreeItem, { TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
+import TreeItem, { TreeState, TreeToolSet } from '@/components/molecules/tree-origin/ToolSet';
 import PTree from './Tree.vue';
 
 export default {
