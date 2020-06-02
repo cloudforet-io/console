@@ -4,7 +4,7 @@ import { ref } from '@vue/composition-api';
 import { DynamicFluentAPIToolSet, getDataAPI } from '@/lib/api/toolset';
 // @ts-ignore
 import { ClassTypeOf } from '@/lib/type';
-import TreeItem, { TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
+import TreeItem, { TreeToolSet } from '@/components/molecules/tree-origin/ToolSet';
 import { ActionAPI, TreeAction } from '@/lib/fluent-api';
 
 export interface TreeResp<T> {
