@@ -220,7 +220,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
@@ -243,7 +243,7 @@ import project, { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
-import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
+import { DefaultQSGridQSProps, QuerySearchGridFluentAPI, RouteQuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
@@ -252,6 +252,8 @@ import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCrea
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
+import { propsCopy } from '@/lib/router-query-string';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -290,6 +292,9 @@ export default {
         SProjectGroupCreateFormModal,
         PIconTextButton,
     },
+    props: {
+        ...DefaultQSGridQSProps,
+    },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
             items: [],
@@ -318,7 +323,7 @@ export default {
 
         const { provider } = useStore();
         provider.getProvider();
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
 
         /**
              Tree, Project, Statistics API Handler Declaration
@@ -405,7 +410,7 @@ export default {
 
         const isShow = computed(() => treeApiHandler.ts.metaState.firstSelectedNode);
 
-        const apiHandler = new QuerySearchGridFluentAPI(
+        const apiHandler = new RouteQuerySearchGridFluentAPI(
             listAction,
             {
                 cardClass: () => ['card-item', 'project-card-item'],
@@ -421,6 +426,7 @@ export default {
                 },
             },
             isShow,
+            vm,
         );
 
         /**
@@ -548,7 +554,7 @@ export default {
         };
 
         const projectGroupFormConfirm = (item) => {
-            let projectGroupId;;
+            let projectGroupId;
             if (!formState.updateMode) {
                 if (formState.isRoot) projectGroupId = null;
                 else projectGroupId = state.hoveredId;
@@ -633,6 +639,15 @@ export default {
                 });
             formState.projectFormVisible = false;
         };
+
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+        };
+        onMounted(async () => {
+            await routerHandler();
+        });
 
         return {
             treeRef: treeApiHandler.ts.treeRef,
