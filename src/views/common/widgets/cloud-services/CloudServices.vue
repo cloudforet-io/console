@@ -84,6 +84,10 @@ export default {
             type: Function,
             default: api => api,
         },
+        projectFilter: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const vm: any = getCurrentInstance();
@@ -147,11 +151,17 @@ export default {
             ...toRefs(state),
             skeletons: _.range(12),
             iconUrl: (item: Value): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
-            onSelected(item: Value): void {
-                vm.$router.push({
-                    path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
-                    query: { provider: item.provider },
-                });
+            onSelected(item): void {
+                if (props.projectFilter) {
+                    vm.$router.push({
+                        path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}?provider=${item.provider}${props.projectFilter}`,
+                    });
+                } else {
+                    vm.$router.push({
+                        path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
+                        query: { provider: item.provider },
+                    });
+                }
             },
         };
     },

@@ -82,6 +82,7 @@ interface Server {
 interface Data {
     group: string;
     type: string;
+    isServer?: boolean;
     count: number;
     icon?: string;
     provider?: string;
@@ -91,6 +92,7 @@ interface Data {
 interface Props {
     getServerAction: (api: HistoryDiff<Server>) => HistoryDiff<Server>;
     getCloudServiceAction: (api: HistoryDiff<CloudService>) => HistoryDiff<CloudService>;
+    projectFilter: string;
 }
 
 interface State {
@@ -119,6 +121,10 @@ export default {
             type: Function,
             default: api => api,
         },
+        projectFilter: {
+            type: String,
+            default: '',
+        },
     },
     setup(props: Props) {
         const vm: any = getCurrentInstance();
@@ -139,7 +145,7 @@ export default {
 
 
         const serverApi = fluentApi.statisticsTest().history().diff<Server>()
-            // .setTopic('daily_server_updates')
+        // .setTopic('daily_server_updates')
 
             .setFrom('now/d')
             .setDefaultFields('server_type')
@@ -181,6 +187,7 @@ export default {
                     type: d.server_type,
                     count: d.server_count,
                     defaultIcon: 'ic_server',
+                    isServer: true,
                 })),
                 ...state.cloudServiceData.map(d => ({
                     group: d.cloud_service_group,
@@ -198,10 +205,17 @@ export default {
         return {
             ...toRefs(state),
             onItemClick(item) {
-                vm.$router.push({
-                    path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}`,
-                    // path: '/inventory/cloud-service',
-                });
+                console.log('item test', item);
+                const path = item.isServer ? `/inventory/server?&f=server_type%3A${item.type}` : `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}/?`;
+                if (props.projectFilter) {
+                    vm.$router.push({
+                        path: `${path}${props.projectFilter}`,
+                    });
+                } else {
+                    vm.$router.push({
+                        path: `${path}`,
+                    });
+                }
             },
             getIcon(count: number): string {
                 if (count > 0) return 'ic_list_increase';
