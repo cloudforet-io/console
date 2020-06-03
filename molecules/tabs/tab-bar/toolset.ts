@@ -139,7 +139,6 @@ export class RouterTabBarToolSet<initData, initSyncData> extends TabBarState< in
             }
         };
         watch(() => _this.syncState.activeTab, async (aft, bef) => {
-            console.debug(aft);
             if (aft !== bef) {
                 await _this.routerPush();
             }
