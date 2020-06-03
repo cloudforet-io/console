@@ -104,6 +104,7 @@ export class SearchGridFluentAPI<
         this.gridTS.searchText.value = '';
     };
 }
+
 export interface ACHandlerMeta {
     handlerClass: typeof baseAutocompleteHandler;
     args: any;
@@ -154,7 +155,7 @@ export class QuerySearchGridFluentAPI<
     };
 }
 interface QuerySearchQSNameType{
-    selectItems: string;
+    search: string;
     filters: string;
     sortBy: string;
     sortDesc: string;
@@ -162,16 +163,25 @@ interface QuerySearchQSNameType{
     pageSize: string;
 }
 export enum DefaultQSGridQSPropsName {
-    selectItems= 'g_sl',
+    search = 'g_s',
     filters= 'g_f',
     sortBy='g_sb',
     sortDesc= 'g_sd',
     thisPage= 'g_p',
     pageSize= 'g_ps',
 }
+
 export const makeQSGridQSProps = (names: QuerySearchQSNameType) => ({
-    [names.selectItems]: {
-        type: [Array, String, Number],
+    // [names.selectItem]: {
+    //     type: [Array, String],
+    //     default: null,
+    // },
+    // [names.selectItems]: {
+    //     type: [Array, String, Number],
+    //     default: null,
+    // },
+    [names.search]: {
+        type: String,
         default: null,
     },
     [names.filters]: {
@@ -195,6 +205,70 @@ export const makeQSGridQSProps = (names: QuerySearchQSNameType) => ({
         default: null,
     },
 });
+
+export class RouteSearchGridFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchGridLayoutToolSet<initData, initSyncData> = SearchGridLayoutToolSet<initData, initSyncData>,
+    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
+    > extends SearchGridFluentAPI<parameter, resp, initData, initSyncData, T, action> implements RouterAPIToolsetInterface {
+
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        isShow: any = ref(true),
+        public vm: Vue|ComponentInstance,
+        public qsName: QuerySearchQSNameType = DefaultQSGridQSPropsName,
+        public isReady = false,
+        initLazy = false,
+    ) {
+        super(action, initData, initSyncData);
+
+        watch(() => this.gridTS.syncState.thisPage, async (aft, bef) => {
+            if (!_.isEqual(aft, bef)) {
+                await this.routerPush();
+            }
+        });
+    }
+
+    applyAPIRouter = (props: any) => {
+        if (isNotEmpty(props[this.qsName.pageSize])) {
+            this.gridTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
+        }
+        if (isNotEmpty(props[this.qsName.thisPage])) {
+            this.gridTS.syncState.thisPage = Number(props[this.qsName.thisPage]);
+        }
+        const search = props[this.qsName.search];
+        if (isNotEmpty(search)) {
+            this.gridTS.searchText.value = this.qsName.search;
+        }
+        this.isReady = true;
+    };
+
+    routerPush = async () => {
+        const query = {
+            ...this.vm.$route.query,
+            [this.qsName.search]: this.gridTS.searchText.value,
+            [this.qsName.thisPage]: this.gridTS.syncState.thisPage,
+            [this.qsName.pageSize]: this.gridTS.syncState.pageSize,
+        };
+        if (!query[this.qsName.sortBy]) {
+            delete query[this.qsName.sortDesc];
+        }
+        await pushRouterQuery(this.vm, query);
+    }
+
+    getData = async () => {
+        if (this.isReady) {
+            await this.defaultGetData();
+            await this.routerPush();
+        }
+    };
+}
+
 export const DefaultQSGridQSProps = makeQSGridQSProps(DefaultQSGridQSPropsName);
 export class RouteQuerySearchGridFluentAPI<
     parameter = any,
@@ -261,3 +335,4 @@ export class RouteQuerySearchGridFluentAPI<
         }
     };
 }
+
