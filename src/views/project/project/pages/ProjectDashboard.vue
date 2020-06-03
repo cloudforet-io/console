@@ -12,7 +12,7 @@
                          v-bind="cloudServiceSummary.state"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
-                               sm:col-end-13 lg:row-start-2"
+                               sm:col-end-13 lg:row-start-2 cloud-service"
                         :get-action="getCloudServiceCount"
                         :project-filter="projectFilter"
         />
@@ -197,8 +197,7 @@ export default {
                         key: 'project_id',
                         value: projectId.value,
                         operator: '=',
-                    }])
-                    .setLimit(12);
+                    }]);
             },
         };
     },
@@ -206,8 +205,16 @@ export default {
 </script>
 
 <style scoped>
+    .cloud-service {
+        height: 26rem;
+    &::v-deep .widget-contents {
+         overflow-y: auto;
+         margin-bottom: 1rem;
+     }
+    }
+
     .daily-updates {
-        height: 38rem;
+        height: 39.2rem;
     }
 
     .health-dashboard {
