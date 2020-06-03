@@ -47,12 +47,14 @@
             </div>
         </template>
         <template #extra>
-            <router-link to="/inventory/cloud-service" class="more">
-                MORE
-                <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                     color="transparent currentColor" class="ml-1"
-                />
-            </router-link>
+            <div v-if="moreInfo">
+                <router-link to="/inventory/cloud-service" class="more">
+                    MORE
+                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                         color="transparent currentColor" class="ml-1"
+                    />
+                </router-link>
+            </div>
         </template>
     </p-widget-layout>
 </template>
@@ -87,6 +89,10 @@ export default {
         projectFilter: {
             type: String,
             default: '',
+        },
+        moreInfo: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {
