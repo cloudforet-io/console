@@ -23,6 +23,7 @@
                     <template #card="{item, index}">
                         <p-selectable-item :icon-url="item.icon" theme="card"
                                            default-icon="ic_provider_other"
+                                           @click="onSelected(item, index)"
                         >
                             <template #contents>
                                 <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
@@ -177,6 +178,17 @@ export default {
                 ...toRefs(ts.state),
                 skeletons: _.range(4),
                 defaultItems,
+                onSelected(item) {
+                    if (props.projectFilter) {
+                        vm.$router.push({
+                            path: `/inventory/server?&f=data.compute.region_name%3A${item.name}${props.projectFilter}`,
+                        });
+                    } else {
+                        vm.$router.push({
+                            path: '/inventory/cloud-service',
+                        });
+                    }
+                },
             };
     },
 };
