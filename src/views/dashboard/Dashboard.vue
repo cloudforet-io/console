@@ -99,6 +99,7 @@ export default {
             topics,
             cloudServiceWidgetGetAction(apiAction: Stat) {
                 return apiAction
+                    .setFilter({ key: 'tags.spaceone:is_major', value: 'true', operator: '=' })
                     .setLimit(12);
             },
         };
