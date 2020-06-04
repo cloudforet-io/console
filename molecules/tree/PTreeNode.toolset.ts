@@ -5,7 +5,11 @@ export const treeNodeProps = {
     },
     classNames: {
         type: Array,
-        default: undefined,
+        default: () => ['basic'],
+    },
+    disableToggle: {
+        type: Boolean,
+        default: false,
     },
     disabled: {
         type: Boolean,
@@ -31,15 +35,21 @@ export const treeNodeProps = {
         type: Array,
         default: undefined,
     },
+    matched: {
+        type: Array,
+        default: undefined,
+    },
 };
 
 export interface TreeNodeProps {
     level: number;
     data: any;
     padSize?: string;
-    classNames?: string[];
+    classNames: string[];
+    disableToggle?: boolean;
     disabled?: boolean;
     selected?: boolean;
     expanded?: boolean;
     children?: TreeNodeProps[];
+    matched?: TreeNodeProps[];
 }
