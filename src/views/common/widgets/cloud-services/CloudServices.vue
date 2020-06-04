@@ -124,7 +124,6 @@ export default {
 
         const api = fluentApi.statisticsTest().resource().stat<Value>()
             .setResourceType('inventory.CloudServiceType')
-            .setFilter({ key: 'tags.spaceone:is_major', value: 'true', operator: '=' })
             .addGroupKey('name', 'name')
             .addGroupKey('group', 'group')
             .addGroupKey('provider', 'provider')
