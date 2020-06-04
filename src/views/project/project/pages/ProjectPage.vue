@@ -186,6 +186,7 @@
                                           @confirm="projectGroupFormConfirm($event)"
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
+                                     :current-project="treeApiHandler.ts.metaState.firstSelectedNode.data.id"
                                      @confirm="projectFormConfirm($event)"
             />
             <p-button-modal

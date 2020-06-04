@@ -128,20 +128,37 @@ import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
-import { SearchGridFluentAPI } from '@/lib/api/grid';
+import {
+    DefaultQSGridQSProps,
+    RouteQuerySearchGridFluentAPI,
+    RouteSearchGridFluentAPI,
+    SearchGridFluentAPI
+} from '@/lib/api/grid';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import { AxiosResponse } from 'axios';
 import { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
-import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import {
+    propsCopy,
+} from '@/lib/router-query-string';
+import {
+    GridLayoutState,
+    SelectGridLayoutToolSet,
+    DefaultSingleItemSelectGridQSProps,
+    DefaultMultiItemSelectGridQSProps,
+} from '@/components/molecules/layouts/grid-layout/toolset';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import router from '@/routes';
+import { select } from '@storybook/addon-knobs';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 
 export default {
     name: 'ServiceAccount',
@@ -154,6 +171,11 @@ export default {
         PGridLayout,
         PSkeleton,
         PPageTitle,
+    },
+    props: {
+        ...DefaultQSGridQSProps,
+        ...DefaultMultiItemSelectGridQSProps,
+        ...DefaultSingleItemSelectGridQSProps,
     },
     setup(props, context) {
         const {
@@ -184,31 +206,35 @@ export default {
             data.all = total;
             providerTotalCount.value = data;
         });
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
         const selectProvider = ref('all');
-        const providerListState = new GridLayoutState({
-            items: computed(() => {
-                const result = [{
-                    provider: 'all', icon: '', color: '', name: 'All',
-                }];
-                if (providerStore.state.providers) {
-                    result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
-                }
-                return result;
-            }),
-            cardClass: (item) => {
-                const _class = ['provider-card-item', 'card-item'];
-                if (item.provider === selectProvider.value) {
-                    _class.push('selected');
-                }
-                return _class;
-            },
-            cardMinWidth: '14.125rem',
-            cardHeight: '3.5rem',
-            columnGap: '0.5rem',
-            rowGap: '0.5rem',
-            fixColumn: 1,
-        });
+        const providerListState = new SelectGridLayoutToolSet(vm,
+            undefined,
+            undefined,
+            selectProvider,
+            {
+                items: computed(() => {
+                    const result = [{
+                        provider: 'all', icon: '', color: '', name: 'All',
+                    }];
+                    if (providerStore.state.providers) {
+                        result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
+                    }
+                    return result;
+                }),
+                cardClass: (item) => {
+                    const _class = ['provider-card-item', 'card-item'];
+                    if (item.provider === selectProvider.value) {
+                        _class.push('selected');
+                    }
+                    return _class;
+                },
+                cardMinWidth: '14.125rem',
+                cardHeight: '3.5rem',
+                columnGap: '0.5rem',
+                rowGap: '0.5rem',
+                fixColumn: 1,
+            });
         const selectProviderName = computed(() => _.find(providerListState.state.items, { provider: selectProvider.value }).name);
         const totalResourceCountName = 'cloud_service_count';
 
@@ -257,7 +283,7 @@ export default {
             .setOnly('provider', 'group', 'name', 'tags.spaceone:icon', 'cloud_service_type_id')
             .setTransformer(getMetric);
 
-        const apiHandler = new SearchGridFluentAPI(
+        const apiHandler = new RouteSearchGridFluentAPI(
             listAction,
             {
                 cardClass: () => ['card-item', 'cst-card-item'],
@@ -266,6 +292,8 @@ export default {
                 excelVisible: false,
             },
             undefined,
+            undefined,
+            vm,
         );
         const getData = _.debounce(() => apiHandler.getData(), 50);
         watch(selectProvider, (after, before) => {
@@ -306,6 +334,17 @@ export default {
         ];
         const exportAction = fluentApi.addons().excel().export().setDataSource(dataSource);
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
+
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+            providerListState.applyDisplayRouter(prop);
+        };
+        onMounted(async () => {
+            await routerHandler();
+        });
+
         return {
             selectProvider,
             selectProviderName,
@@ -319,6 +358,7 @@ export default {
             exportToolSet,
             newResourceCountName,
             totalResourceCountName,
+            routerHandler,
         };
     },
 
