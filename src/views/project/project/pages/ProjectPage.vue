@@ -216,7 +216,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
@@ -239,7 +239,7 @@ import { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
-import { DefaultQSGridQSProps, QuerySearchGridFluentAPI, RouteQuerySearchGridFluentAPI } from '@/lib/api/grid';
+import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
@@ -248,8 +248,6 @@ import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCrea
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
-import { propsCopy } from '@/lib/router-query-string';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -288,9 +286,6 @@ export default {
         SProjectGroupCreateFormModal,
         PIconTextButton,
     },
-    props: {
-        ...DefaultQSGridQSProps,
-    },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
             items: [],
@@ -317,7 +312,7 @@ export default {
 
         const { provider } = useStore();
         provider.getProvider();
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance();
 
         /**
              Tree, Project, Statistics API Handler Declaration
@@ -404,7 +399,7 @@ export default {
 
         const isShow = computed(() => treeApiHandler.ts.metaState.firstSelectedNode);
 
-        const apiHandler = new RouteQuerySearchGridFluentAPI(
+        const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
                 cardClass: () => ['card-item', 'project-card-item'],
@@ -420,7 +415,6 @@ export default {
                 },
             },
             isShow,
-            vm,
         );
 
         /**
@@ -542,31 +536,21 @@ export default {
 
         const projectGroupFormConfirm = (item) => {
             let projectGroupId;
-            if (!formState.updateMode) {
-                if (formState.isRoot) projectGroupId = null;
-                else projectGroupId = state.hoveredId;
-                fluentApi.identity().projectGroup().create().setParameter({
-                    parent_project_group_id: projectGroupId,
-                    ...item,
-                })
-                    .execute()
-                    .then((resp) => {
-                        context.root.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'success',
-                            title: 'Success',
-                            text: 'Create Project Group',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                        item.id = resp.data.project_group_id;
-                        item.item_type = 'PROJECT_GROUP';
-                        const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
-                        if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
-                        if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
-                    })
-                    .catch((e) => {
-                        showErrorMessage('Fail to Create Project Group', e, context.root);
+            if (formState.isRoot) projectGroupId = null;
+            else projectGroupId = state.hoveredId;
+            fluentApi.identity().projectGroup().create().setParameter({
+                parent_project_group_id: projectGroupId,
+                ...item,
+            })
+                .execute()
+                .then((resp) => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Create Project Group',
+                        duration: 2000,
+                        speed: 1000,
                     });
                     item.id = resp.data.project_group_id;
                     item.item_type = 'PROJECT_GROUP';
@@ -609,15 +593,6 @@ export default {
                 });
             formState.projectFormVisible = false;
         };
-
-        const routerHandler = async () => {
-            const prop = propsCopy(props);
-            apiHandler.applyAPIRouter(prop);
-            await apiHandler.getData();
-        };
-        onMounted(async () => {
-            await routerHandler();
-        });
 
         return {
             treeRef: treeApiHandler.ts.treeRef,

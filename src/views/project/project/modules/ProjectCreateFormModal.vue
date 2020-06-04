@@ -82,7 +82,7 @@ export default {
         currentProject: {
             type: String,
             default: '',
-        }
+        },
     },
     setup(props, context) {
         const tagsTS = new DictIGToolSet({
@@ -95,8 +95,7 @@ export default {
             .setFilter({ key: 'name', operator: '=', value: args[1] })
             .setCountOnly()
             .execute()
-            // .then(resp => resp.data.total_count === 0);
-            .then(rp => rp.data.total_count === 0)
+            .then(rp => rp.data.total_count === 0);
 
         const checkNameLength = (...args) => {
             const prom = new Promise<boolean>((resolve, reject) => {
