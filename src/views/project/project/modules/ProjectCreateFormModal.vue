@@ -90,11 +90,13 @@ export default {
         });
         const fixFormTS = new JsonSchemaFormToolSet();
 
-        const checkNameUnique = (...args: any[]) => fluentApi.identity().project().list()
+        const checkNameUnique = (...args: any[]) => fluentApi.identity().projectGroup().listProjects()
+            .setProjectGroupId(props.currentProject)
             .setFilter({ key: 'name', operator: '=', value: args[1] })
             .setCountOnly()
             .execute()
-            .then(resp => resp.data.total_count === 0);
+            // .then(resp => resp.data.total_count === 0);
+            .then(rp => rp.data.total_count === 0)
 
         const checkNameLength = (...args) => {
             const prom = new Promise<boolean>((resolve, reject) => {
