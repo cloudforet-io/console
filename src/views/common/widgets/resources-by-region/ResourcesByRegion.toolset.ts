@@ -6,10 +6,15 @@ export const resourceByRegionProps = {
         type: Function,
         default: (action: Stat<any>) => action.setResourceType('identity.ServiceAccount'),
     },
+    projectFilter: {
+        type: String,
+        default: '',
+    },
 };
 
 export interface ResourcesByRegionProps {
     getAction(api: Stat<any>): Stat<any>;
+    projectFilter: string;
 }
 
 @StateToolSet<ResourcesByRegionProps>()
@@ -19,6 +24,7 @@ export class ServiceAccountsWidgetState {
     static initState(): ResourcesByRegionProps {
         return {
             getAction: action => action.setResourceType('identity.ServiceAccount'),
+            projectFilter: '',
         };
     }
 

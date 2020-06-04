@@ -499,7 +499,6 @@ export class RouteQuerySearchTableFluentAPI<
 
     applyDisplayRouter =(props: any) => {
         const selectItems = props[this.qsName.selectItems];
-        console.debug(selectItems);
         if (isNotEmpty(selectItems)) {
             this.tableTS.syncState.selectIndex = getArrayQueryString(selectItems, Number);
             console.debug(this.tableTS.syncState.selectIndex);

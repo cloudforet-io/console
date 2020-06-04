@@ -12,8 +12,9 @@
                          v-bind="cloudServiceSummary.state"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
-                               sm:col-end-13 lg:row-start-2"
+                               sm:col-end-13 lg:row-start-2 cloud-service"
                         :get-action="getCloudServiceCount"
+                        :project-filter="projectFilter"
         />
         <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
              lg:row-start-3 resources-tab"
@@ -22,6 +23,7 @@
                 <template #server>
                     <resources-by-region
                         :get-action="resources.server"
+                        :project-filter="projectFilter"
                     />
                 </template>
                 <template #cloud_service>
@@ -39,6 +41,7 @@
                               daily-updates"
                        :get-cloud-service-action="dailyUpdates.cloudService"
                        :get-server-action="dailyUpdates.server"
+                       :project-filter="projectFilter"
         />
         <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
                               row-start-5 row-end-8 sm:row-start-3 sm:row-end-4 lg:row-start-3
@@ -91,6 +94,8 @@ export default {
         });
         const vm = getCurrentInstance();
         const projectId = computed<string>(() => context.root.$route.params.id as string);
+        const projectFilter = `&f=project_id%3A%3D${projectId.value}`;
+        // const regionFilter =
 
         const tabData = reactive({
             tabs: makeTrItems([
@@ -103,7 +108,7 @@ export default {
 
         const serverSummary = new ServiceSummaryWidgetState({
             title: 'servers',
-            to: '/inventory/server',
+            to: `/inventory/server?p=1&ps=15&f=project_id%3A%3D${projectId.value}`,
             color: secondary,
             getAction: api => api.setResourceType('identity.Project')
                 .setFilter({
@@ -180,6 +185,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(tabData),
+            projectFilter,
             serverSummary,
             cloudServiceSummary,
             dailyUpdates,
@@ -191,8 +197,7 @@ export default {
                         key: 'project_id',
                         value: projectId.value,
                         operator: '=',
-                    }])
-                    .setLimit(12);
+                    }]);
             },
         };
     },
@@ -200,8 +205,16 @@ export default {
 </script>
 
 <style scoped>
+    .cloud-service {
+        height: 26rem;
+    &::v-deep .widget-contents {
+         overflow-y: auto;
+         margin-bottom: 1rem;
+     }
+    }
+
     .daily-updates {
-        height: 38rem;
+        height: 39.2rem;
     }
 
     .health-dashboard {
