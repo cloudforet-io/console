@@ -5,7 +5,7 @@ import {
 } from '@vue/composition-api';
 import {
     TreeMetaState, TreePropsInterface, TreeState, TreeToolSet,
-} from '@/components/molecules/tree-new/ToolSet';
+} from '@/components/molecules/tree-origin/ToolSet';
 import {
     HelperToolSet, initReactive, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';

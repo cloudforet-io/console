@@ -44,8 +44,8 @@ import { setup as contentModalSetup } from '@/components/organisms/modals/conten
 import {
     makeByPass, makeProxy,
 } from '@/lib/compostion-util';
-import PTree from '@/components/molecules/tree-new/Tree.vue';
-import { treeProps } from '@/components/molecules/tree-new/ToolSet';
+import PTree from '@/components/molecules/tree-origin/Tree.vue';
+import { treeProps } from '@/components/molecules/tree-origin/ToolSet';
 import { modalSizeValidator } from '@/components/molecules/modals/toolset';
 
 const setup = (props, context) => {
