@@ -27,6 +27,10 @@ export const treeNodeProps = {
         type: String,
         default: '1rem',
     },
+    toggleSize: {
+        type: String,
+        default: '1rem',
+    },
     data: {
         type: [Array, Object, Boolean, String, Number],
         default: '',
@@ -45,6 +49,7 @@ export interface TreeNodeProps {
     level: number;
     data: any;
     padSize?: string;
+    toggleSize?: string;
     classNames: string[];
     disableToggle?: boolean;
     disabled?: boolean;

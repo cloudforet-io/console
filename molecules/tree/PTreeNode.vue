@@ -1,36 +1,45 @@
 <template>
     <div class="p-tree-node" :class="classNames">
-        <div class="node" :class="nodeClasses" v-on="getListeners(false)">
+        <div class="row" :class="nodeClasses"
+             :style="{paddingLeft: depth}"
+             v-on="getListeners('row')"
+        >
             <slot :name="`row-${level}`" v-bind="slotBind">
                 <slot name="row" v-bind="slotBind">
-                    <span :style="{paddingLeft: depth}" class="bg-primary" />
-                    <slot :name="`node-level-${level}`" v-bind="slotBind">
-                        <slot name="node" v-bind="slotBind">
-                            <span>
+                    <div class="node" v-on="getListeners('node')">
+                        <slot :name="`node-level-${level}`" v-bind="slotBind">
+                            <slot name="node" v-bind="slotBind">
                                 <slot :name="`left-extra-level-${level}`" v-bind="slotBind">
-                                    <slot name="left-extra" v-bind="slotBind">
-                                        @
+                                    <slot name="left-extra" v-bind="slotBind" />
+                                </slot>
+                                <span v-if="!disableToggle" class="toggle"
+                                      :style="{height: toggleSize, width: toggleSize}"
+                                      v-on="getListeners('toggle')"
+                                >
+                                    <slot v-if="children" :name="`toggle-${level}`" v-bind="slotBind">
+                                        <slot name="toggle" v-bind="slotBind">
+                                            <p-i :name="expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
+                                                 :width="toggleSize" :height="toggleSize"
+                                            />
+                                        </slot>
                                     </slot>
+                                </span>
+                                <slot :name="`icon-level-${level}`" v-bind="slotBind">
+                                    <slot name="icon" v-bind="slotBind" />
                                 </slot>
-                                <slot v-if="!disableToggle && children" :name="`toggle-${level}`" v-bind="slotBind">
-                                    <slot name="toggle" v-bind="slotBind">
-                                        <p-i :name="expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
-                                             width="1rem" height="1rem"
-                                             class="toggle"
-                                        />
+                                <span class="data" v-on="getListeners('data')">
+                                    <slot :name="`data-${level}`" v-bind="slotBind">
+                                        <slot name="data" v-bind="slotBind">
+                                            {{ data }}
+                                        </slot>
                                     </slot>
+                                </span>
+                                <slot :name="`right-extra-${level}-${$vnode.key || 0}`" v-bind="slotBind">
+                                    <slot name="right-extra" v-bind="slotBind" />
                                 </slot>
-                            </span>
-                            <slot :name="`data-${level}`" v-bind="slotBind">
-                                <slot name="data" v-bind="slotBind">
-                                    {{ data }}
-                                </slot>
-                            </slot>
-                            <slot :name="`right-extra-${level}-${$vnode.key || 0}`" v-bind="slotBind">
-                                <slot name="right-extra" v-bind="slotBind" />
                             </slot>
                         </slot>
-                    </slot>
+                    </div>
                 </slot>
             </slot>
         </div>
@@ -40,7 +49,7 @@
                          :children.sync="child.children"
                          :matched="getMatched(child, idx)"
                          :level="level + 1"
-                         v-on="getListeners(true)"
+                         v-on="$listeners"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                     <slot :name="slot" v-bind="scope" />
@@ -95,17 +104,15 @@ export default {
                 });
                 return res;
             },
-            getListeners(isChild: boolean) {
-                let res = {};
-                if (isChild) {
-                    res = { ...vm.$listeners };
-                } else {
-                    forEach(vm.$listeners, (l, event) => {
-                        if (event !== 'update:children') {
-                            res[`${event.substring(5)}`] = () => { emit(event, props); };
-                        }
-                    });
-                }
+            getListeners(type: string) {
+                const res = {};
+                forEach(vm.$listeners, (l, event: string) => {
+                    if (event.startsWith(type)) {
+                        res[`${event.substring(type.length + 1)}`] = (e: MouseEvent) => {
+                            emit(event, e, props);
+                        };
+                    }
+                });
                 delete res['update:children'];
                 return res;
             },
@@ -116,9 +123,14 @@ export default {
 
 <style lang="postcss" scoped>
 .basic {
-    @apply rounded-sm text-sm leading-normal;
+    .row {
+        @apply h-8 rounded-sm text-sm leading-normal;
+    }
     .node {
-        @apply h-8;
+        @apply h-full w-full inline-flex items-center;
+    }
+    .toggle {
+        @apply cursor-pointer;
     }
     .selected {
         @apply bg-blue-200 border border-secondary;
