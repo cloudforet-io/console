@@ -29,10 +29,13 @@ export const defaultCase = () => ({
         data: 'root',
     }, { children: true }, { data: text }),
     template: `
-    <div style="width: 80vw;">
+    <div class="bg-coral-100" style="width: 80vw;">
         <PTreeNode v-bind="$props" :children.sync="children"
-                   @node:click="onClick"
-                   @node:mouseenter="onMouseenter"
+                   @row:click="rowClick"
+                   @node:click="nodeClick"
+                   @toggle:click.stop="toggleClick"
+                   @data:click.stop="dataClick"
+                   @node:mouseenter="nodeMouseenter"
         >
         </PTreeNode>
     </div>`,
@@ -72,8 +75,11 @@ export const defaultCase = () => ({
 
         return {
             ...toRefs(state),
-            onClick: action('click'),
-            onMouseenter: action('mouseenter'),
+            rowClick: action('row:click'),
+            nodeClick: action('node:click'),
+            toggleClick: action('toggle:click'),
+            dataClick: action('data:click'),
+            nodeMouseenter: action('node:mouseenter'),
         };
     },
 });
@@ -86,7 +92,6 @@ export const slotCase = () => ({
     template: `
     <div style="width: 80vw;">
         <PTreeNode v-bind="$props" :children.sync="children"
-                   @node:click="onClick"
         >
             <template #toggle>CUSTOM TOGGLE</template>
         </PTreeNode>
@@ -127,7 +132,6 @@ export const slotCase = () => ({
 
         return {
             ...toRefs(state),
-            onClick: action('click'),
         };
     },
 });
@@ -140,7 +144,6 @@ export const particularNodeSlotCase = () => ({
     template: `
     <div style="width: 80vw;">
         <PTreeNode v-bind="$props" :children.sync="children"
-                   @node:click="onClick"
         >
             <template #node-level-2>CUSTOM NODE</template>
         </PTreeNode>
@@ -181,7 +184,6 @@ export const particularNodeSlotCase = () => ({
 
         return {
             ...toRefs(state),
-            onClick: action('click'),
         };
     },
 });
