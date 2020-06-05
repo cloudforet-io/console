@@ -79,7 +79,7 @@ import {
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import PTree from '@/components/molecules/tree-new/Tree.vue';
+import PTree from '@/components/molecules/tree-origin/Tree.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProjectNode, ProjectTreeFluentAPI } from '@/lib/api/tree';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';

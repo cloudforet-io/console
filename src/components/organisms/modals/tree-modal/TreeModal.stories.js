@@ -3,7 +3,7 @@ import { ref } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTreeModal from './TreeModal.vue';
 import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/toolset';
-import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
+import TreeItem, { TreeState } from '@/components/molecules/tree-origin/ToolSet';
 
 export default {
     title: 'organisms/modals/tree_origin-modal',
