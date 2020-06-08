@@ -50,6 +50,10 @@
         <div v-if="children && expanded" class="children">
             <p-tree-node v-for="(child, idx) in children" :key="idx"
                          v-bind="child"
+                         :data.sync="child.data"
+                         :expanded.sync="child.expanded"
+                         :selected.sync="child.selected"
+                         :disabled.sync="child.disabled"
                          :children.sync="child.children"
                          :level="level + 1"
                          v-on="getChildListeners(idx)"
@@ -99,23 +103,30 @@ export default {
                 forEach(vm.$listeners, (l, eventName: string) => {
                     if (eventName.startsWith(type)) {
                         res[`${eventName.substring(type.length + 1)}`] = (e: MouseEvent) => {
-                            emit(eventName, props, [{ node: { ...props }, key: vm.$vnode.key || 0 }], e);
+                            emit(eventName, reactive({
+                                data: makeProxy('data', props, emit),
+                                expanded: makeProxy('expanded', props, emit),
+                                selected: makeProxy('selected', props, emit),
+                                disabled: makeProxy('disabled', props, emit),
+                                children: proxyChildren,
+                            }), [{
+                                node: props,
+                                key: vm.$vnode.key || 0,
+                            }], e);
                         };
                     }
                 });
-                delete res['update:children'];
                 return res;
             },
             getChildListeners(idx) {
                 const res = {};
                 forEach(vm.$listeners, (l, eventName: string) => {
-                    if (eventName !== 'update:children') {
+                    if (!eventName.startsWith('update')) {
                         res[eventName] = (child, matched, e) => {
-                            emit(eventName, child, [{ node: { ...props }, key: vm.$vnode.key || 0 }, ...matched], e);
+                            emit(eventName, child, [{ node: props, key: vm.$vnode.key || 0 }, ...matched], e);
                         };
                     }
                 });
-                delete res['update:children'];
                 return res;
             },
 
