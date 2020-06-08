@@ -13,7 +13,7 @@
                                     <slot name="left-extra" v-bind="slotBind" />
                                 </slot>
                                 <span v-if="!disableToggle" class="toggle"
-                                      :style="{height: toggleSize, width: toggleSize}"
+                                      :style="{width: toggleSize}"
                                       v-on="getListeners('toggle')"
                                 >
                                     <slot v-if="children" :name="`toggle-${level}`" v-bind="slotBind">
@@ -34,22 +34,25 @@
                                         </slot>
                                     </slot>
                                 </span>
-                                <slot :name="`right-extra-${level}-${$vnode.key || 0}`" v-bind="slotBind">
-                                    <slot name="right-extra" v-bind="slotBind" />
-                                </slot>
+                                <span v-if="$scopedSlots[`right-extra-${level}`] || $scopedSlots[`right-extra`]"
+                                      class="right-extra"
+                                >
+                                    <slot :name="`right-extra-${level}`" v-bind="slotBind">
+                                        <slot name="right-extra" v-bind="slotBind" />
+                                    </slot>
+                                </span>
                             </slot>
                         </slot>
                     </div>
                 </slot>
             </slot>
         </div>
-        <div v-if="children" class="children">
+        <div v-if="children && expanded" class="children">
             <p-tree-node v-for="(child, idx) in children" :key="idx"
                          v-bind="child"
                          :children.sync="child.children"
-                         :matched="getMatched(child, idx)"
                          :level="level + 1"
-                         v-on="$listeners"
+                         v-on="getChildListeners(idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                     <slot :name="slot" v-bind="scope" />
@@ -91,31 +94,31 @@ export default {
                 disabled: props.disabled,
                 selected: props.selected,
             })),
-
-            getMatched(item, idx) {
-                const res = props.matched ? [...props.matched] : [{
-                    ...props,
-                    key: 0,
-                }];
-                res.push({
-                    ...props,
-                    level: props.level + 1,
-                    key: idx,
-                });
-                return res;
-            },
             getListeners(type: string) {
                 const res = {};
-                forEach(vm.$listeners, (l, event: string) => {
-                    if (event.startsWith(type)) {
-                        res[`${event.substring(type.length + 1)}`] = (e: MouseEvent) => {
-                            emit(event, e, props);
+                forEach(vm.$listeners, (l, eventName: string) => {
+                    if (eventName.startsWith(type)) {
+                        res[`${eventName.substring(type.length + 1)}`] = (e: MouseEvent) => {
+                            emit(eventName, props, [{ node: { ...props }, key: vm.$vnode.key || 0 }], e);
                         };
                     }
                 });
                 delete res['update:children'];
                 return res;
             },
+            getChildListeners(idx) {
+                const res = {};
+                forEach(vm.$listeners, (l, eventName: string) => {
+                    if (eventName !== 'update:children') {
+                        res[eventName] = (child, matched, e) => {
+                            emit(eventName, child, [{ node: { ...props }, key: vm.$vnode.key || 0 }, ...matched], e);
+                        };
+                    }
+                });
+                delete res['update:children'];
+                return res;
+            },
+
         };
     },
 };
@@ -124,13 +127,19 @@ export default {
 <style lang="postcss" scoped>
 .basic {
     .row {
-        @apply h-8 rounded-sm text-sm leading-normal;
+        @apply h-8 rounded-sm text-sm;
     }
     .node {
         @apply h-full w-full inline-flex items-center;
     }
     .toggle {
         @apply cursor-pointer;
+    }
+    .data {
+        @apply truncate;
+    }
+    .right-extra {
+        @apply flex-grow;
     }
     .selected {
         @apply bg-blue-200 border border-secondary;

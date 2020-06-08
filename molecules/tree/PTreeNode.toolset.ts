@@ -11,6 +11,10 @@ export const treeNodeProps = {
         type: Boolean,
         default: false,
     },
+    toggleSize: {
+        type: String,
+        default: '1rem',
+    },
     disabled: {
         type: Boolean,
         default: false,
@@ -27,19 +31,11 @@ export const treeNodeProps = {
         type: String,
         default: '1rem',
     },
-    toggleSize: {
-        type: String,
-        default: '1rem',
-    },
     data: {
         type: [Array, Object, Boolean, String, Number],
         default: '',
     },
     children: {
-        type: Array,
-        default: undefined,
-    },
-    matched: {
         type: Array,
         default: undefined,
     },
@@ -56,5 +52,4 @@ export interface TreeNodeProps {
     selected?: boolean;
     expanded?: boolean;
     children?: TreeNodeProps[];
-    matched?: TreeNodeProps[];
 }
