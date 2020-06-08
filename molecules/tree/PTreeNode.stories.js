@@ -142,6 +142,14 @@ export const defaultCase = () => ({
             },
             toggleClick(item, matched, e) {
                 e.stopPropagation();
+                if (!item.expanded) {
+                    item.children = [];
+                    setTimeout(() => {
+                        item.children = [
+                            { data: `This is [${item.data}]'s child`, children: [] },
+                        ];
+                    }, 2000);
+                }
                 item.expanded = !item.expanded;
                 // let current;
                 // matched.forEach((d, i) => {
