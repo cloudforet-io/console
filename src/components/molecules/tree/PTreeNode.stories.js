@@ -176,29 +176,71 @@ export const slotCase = () => ({
     components: { PTreeNode, PI },
     props: getKnobProps(treeNodeProps, {
         data: 'root',
-    }, { children: true }, { data: text }),
+    }, {
+        children: true,
+        data: true,
+        expanded: true,
+        selected: true,
+        disabled: true,
+    }, { data: text }),
     template: `
-        <div class="bg-coral-100" style="width: 80vw;">
-            <PTreeNode v-bind="$props" :children.sync="children"
-            >
-                <template #toggle>
-                    <p-i name="btn_ic_tree_hidden—folded"
-                         :width="toggleSize" :height="toggleSize"
-                    />
-                </template>
-                <template #right-extra>
-                    <div class="text-right"><p-i name="common-gear"></p-i></div>
-                </template>
-            </PTreeNode>
+        <div style="display: flex; width: 80vw; padding: 4rem 0;">
+            <div class="bg-coral-100 w-1/2">
+                <PTreeNode v-bind="$props"
+                           :data.sync="state.data"
+                           :expanded.sync="state.expanded"
+                           :selected.sync="state.selected"
+                           :disabled.sync="state.disabled"
+                           :children.sync="state.children"
+                           @toggle:click="toggleClick"
+                >
+                    <template #toggle>
+                        <p-i name="btn_ic_tree_hidden—folded"
+                             :width="toggleSize" :height="toggleSize"
+                        />
+                    </template>
+                    <template #right-extra>
+                        <div class="text-right"><p-i name="common-gear"></p-i></div>
+                    </template>
+                    <template #icon="{children, expanded}">
+                        <p-i :name="children ? 
+                                    (expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
+                                    : 'ic_tree_project'"
+                             width="1rem" height="1rem"
+                             class="mx-2"
+                        ></p-i>
+                    </template>
+                </PTreeNode>
+            </div>
+            <div class="bg-yellow-200 p-4 w-1/2">
+                <pre class="whitespace-pre-wrap">{{state}}</pre>
+            </div>
         </div>
         `,
     setup(props, context) {
         const state = reactive({
+            data: 'root',
+            expanded: true,
+            selected: false,
+            disabled: false,
             children: childrenData,
         });
 
         return {
-            ...toRefs(state),
+            state,
+            toggleClick(item, matched, e) {
+                e.stopPropagation();
+                if (!item.expanded) {
+                    item.children = [];
+                    setTimeout(() => {
+                        item.children = [
+                            { data: `This is [${item.data}]'s child`, children: [] },
+                        ];
+                    }, 2000);
+                }
+                item.expanded = !item.expanded;
+                action('toggle:click')(item, matched, e);
+            },
         };
     },
 });
@@ -207,21 +249,42 @@ export const levelSlotCase = () => ({
     components: { PTreeNode },
     props: getKnobProps(treeNodeProps, {
         data: 'root',
-    }, { children: true }, { data: text }),
+    }, {
+        children: true,
+        data: true,
+        expanded: true,
+        selected: true,
+        disabled: true,
+    }, { data: text }),
     template: `
-    <div class="bg-coral-100" style="width: 80vw;">
-        <PTreeNode v-bind="$props" :children.sync="children"
-        >
-            <template #node-level-2>CUSTOM NODE</template>
-        </PTreeNode>
-    </div>`,
+    <div style="display: flex; width: 80vw; padding: 4rem 0;">
+        <div class="bg-coral-100 w-1/2">
+            <PTreeNode v-bind="$props"
+                       :data.sync="state.data"
+                       :expanded.sync="state.expanded"
+                       :selected.sync="state.selected"
+                       :disabled.sync="state.disabled"
+                       :children.sync="state.children"
+            >
+                <template #node-level-2>CUSTOM NODE</template>
+            </PTreeNode>
+        </div>
+        <div class="bg-yellow-200 p-4 w-1/2">
+            <pre class="whitespace-pre-wrap">{{state}}</pre>
+        </div>
+    </div>
+    `,
     setup(props, context) {
         const state = reactive({
+            data: 'root',
+            expanded: true,
+            selected: false,
+            disabled: false,
             children: childrenData,
         });
 
         return {
-            ...toRefs(state),
+            state,
         };
     },
 });
