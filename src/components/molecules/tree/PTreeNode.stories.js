@@ -85,10 +85,10 @@ export const defaultCase = () => ({
         <div style="display: flex; width: 80vw; padding: 4rem 0;">
             <div class="bg-coral-100 w-1/2">
                 <PTreeNode v-bind="$props"
-                           :data="state.data"
-                           :expanded="state.expanded"
-                           :selected="state.selected"
-                           :disabled="state.disabled"
+                           :data.sync="state.data"
+                           :expanded.sync="state.expanded"
+                           :selected.sync="state.selected"
+                           :disabled.sync="state.disabled"
                            :children.sync="state.children"
                            @row:click="rowClick"
                            @node:click="nodeClick"
@@ -118,41 +118,44 @@ export const defaultCase = () => ({
             rowClick: action('row:click'),
             nodeClick(item, matched, e) {
                 e.stopPropagation();
-
-                if (selectedItem) {
-                    selectedItem.selected = false;
-                }
-                let current;
-                matched.forEach((d, i) => {
-                    if (i === 0) {
-                        current = state;
-                    } else {
-                        current = current.children[d.key];
-                    }
-
-                    if (i === matched.length - 1) {
-                        current.selected = !item.selected;
-                        selectedItem = current;
-                    }
-                });
-                state.children = [...state.children];
+                if (selectedItem) selectedItem.selected = false;
+                item.selected = !item.selected;
+                selectedItem = item;
+                // if (selectedItem) {
+                //     selectedItem.selected = false;
+                // }
+                // let current;
+                // matched.forEach((d, i) => {
+                //     if (i === 0) {
+                //         current = state;
+                //     } else {
+                //         current = current.children[d.key];
+                //     }
+                //
+                //     if (i === matched.length - 1) {
+                //         current.selected = !item.selected;
+                //         selectedItem = current;
+                //     }
+                // });
+                // state.children = [...state.children];
                 action('node:click')(item, matched, e);
             },
             toggleClick(item, matched, e) {
                 e.stopPropagation();
-                let current;
-                matched.forEach((d, i) => {
-                    if (i === 0) {
-                        current = state;
-                    } else {
-                        current = current.children[d.key];
-                    }
-
-                    if (i === matched.length - 1) {
-                        current.expanded = !item.expanded;
-                    }
-                });
-                state.children = [...state.children];
+                item.expanded = !item.expanded;
+                // let current;
+                // matched.forEach((d, i) => {
+                //     if (i === 0) {
+                //         current = state;
+                //     } else {
+                //         current = current.children[d.key];
+                //     }
+                //
+                //     if (i === matched.length - 1) {
+                //         current.expanded = !item.expanded;
+                //     }
+                // });
+                // state.children = [...state.children];
                 action('toggle:click')(item, matched, e);
             },
             dataClick: action('data:click'),
