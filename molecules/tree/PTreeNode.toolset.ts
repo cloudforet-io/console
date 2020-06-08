@@ -36,7 +36,7 @@ export const treeNodeProps = {
         default: '',
     },
     children: {
-        type: Array,
+        type: [Array, Boolean],
         default: undefined,
     },
 };
@@ -51,5 +51,5 @@ export interface TreeNodeProps {
     disabled?: boolean;
     selected?: boolean;
     expanded?: boolean;
-    children?: TreeNodeProps[];
+    children?: TreeNodeProps[] | boolean;
 }

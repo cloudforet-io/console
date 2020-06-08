@@ -20,13 +20,18 @@
                                         <slot name="toggle" v-bind="slotBind">
                                             <p-i :name="expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
                                                  :width="toggleSize" :height="toggleSize"
+                                                 color="inherit transparent"
                                             />
                                         </slot>
                                     </slot>
                                 </span>
-                                <slot :name="`icon-level-${level}`" v-bind="slotBind">
-                                    <slot name="icon" v-bind="slotBind" />
-                                </slot>
+                                <span v-if="$scopedSlots[`icon-${level}`] || $scopedSlots[`icon`]"
+                                      class="icon"
+                                >
+                                    <slot :name="`icon-level-${level}`" v-bind="slotBind">
+                                        <slot name="icon" v-bind="slotBind" />
+                                    </slot>
+                                </span>
                                 <span class="data" v-on="getListeners('data')">
                                     <slot :name="`data-${level}`" v-bind="slotBind">
                                         <slot name="data" v-bind="slotBind">
@@ -138,16 +143,23 @@ export default {
 <style lang="postcss" scoped>
 .basic {
     .row {
-        @apply h-8 rounded-sm text-sm;
+        @apply h-10 rounded-sm text-sm;
     }
     .node {
-        @apply h-full w-full inline-flex items-center;
+        @apply h-full w-full inline-flex items-center text-black;
+        &:hover {
+            @apply text-secondary bg-secondary2 font-bold;
+        }
     }
     .toggle {
         @apply cursor-pointer;
+        color: inherit;
+    }
+    .icon {
+        @apply flex-shrink-0 flex-grow-0;
     }
     .data {
-        @apply truncate;
+        @apply leading-normal truncate;
     }
     .right-extra {
         @apply flex-grow;
