@@ -119,7 +119,7 @@ export class DataTableState<
     > extends TableState< initData, initState> {
     syncState: UnwrapRef<optionalType<initSync, initSyncData>>;
 
-    static initState() {
+    static initState(): any {
         return {
             ...TableState.initState(),
             fields: [],
@@ -162,9 +162,9 @@ export interface DataTableSelectState {
 
 
 export const initSelectState = (state: DataTablePropsType, syncState: DataTableSyncType): DataTableSelectState => {
-    const isNotSelected: Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 0 : true));
-    const isSelectOne: Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 1 : false));
-    const isSelectMulti: Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length > 1 : false));
+    const isNotSelected: Ref<boolean> = computed<boolean>(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 0 : true));
+    const isSelectOne: Ref<boolean> = computed<boolean>(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 1 : false));
+    const isSelectMulti: Ref<boolean> = computed<boolean>(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length > 1 : false));
     const selectItems: Ref<readonly any[]> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
     const firstSelectItem: Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(syncState.selectIndex as number[])[0]] : {}));
     return reactive({
@@ -182,7 +182,7 @@ export interface LinkState {
 }
 
 export const initLinkState = (selectState: DataTableSelectState): LinkState => {
-    const link: Ref<string|undefined> = computed((): string|undefined => {
+    const link: Ref<Readonly<string|undefined>> = computed((): string|undefined => {
         if (selectState.isSelectOne) {
             return _.get(selectState.firstSelectItem, 'data.reference.link')
                 || _.get(selectState.firstSelectItem, 'reference.external_link');
@@ -191,7 +191,7 @@ export const initLinkState = (selectState: DataTableSelectState): LinkState => {
     });
     const openLink = () => {
         if (link.value) {
-            window.open(link.value);
+            window.open(link.value as string);
         }
     };
     return reactive({
