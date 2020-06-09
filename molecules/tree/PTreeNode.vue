@@ -1,5 +1,5 @@
 <template>
-    <div class="p-tree-node" :class="classNames">
+    <div class="p-tree-node basic" :class="[...classNames(), `level-${level}`]">
         <div class="row" :class="nodeClasses"
              :style="{paddingLeft: depth}"
              v-on="getListeners('row')"
@@ -93,36 +93,37 @@ export default {
             if (!props.padSize) return `${props.level}rem`;
             const size = props.padSize.match(/\d+/g);
             const unit = props.padSize.match(/[a-zA-Z]+/g);
-            return `${props.level * (size ? Number(size[0]) : 1)}${unit ? unit[0] : 'rem'}`;
+            return `${props.level || 0 * (size ? Number(size[0]) : 1)}${unit ? unit[0] : 'rem'}`;
         });
+        const getListeners = (type: string) => {
+            const res = {};
+            forEach(vm.$listeners, (l, eventName: string) => {
+                if (eventName.startsWith(type)) {
+                    res[`${eventName.substring(type.length + 1)}`] = (e: MouseEvent) => {
+                        emit(eventName, reactive({
+                            data: makeProxy('data', props, emit),
+                            expanded: makeProxy('expanded', props, emit),
+                            selected: makeProxy('selected', props, emit),
+                            disabled: makeProxy('disabled', props, emit),
+                            children: proxyChildren,
+                        }), [{
+                            node: props,
+                            key: vm.$vnode.key || 0,
+                        }], e);
+                    };
+                }
+            });
+            return res;
+        };
         return {
             proxyChildren,
             depth,
-            slotBind: computed(() => ({ ...props, depth: depth.value })),
+            slotBind: computed(() => ({ ...props, depth: depth.value, getListeners })),
             nodeClasses: computed(() => ({
                 disabled: props.disabled,
                 selected: props.selected,
             })),
-            getListeners(type: string) {
-                const res = {};
-                forEach(vm.$listeners, (l, eventName: string) => {
-                    if (eventName.startsWith(type)) {
-                        res[`${eventName.substring(type.length + 1)}`] = (e: MouseEvent) => {
-                            emit(eventName, reactive({
-                                data: makeProxy('data', props, emit),
-                                expanded: makeProxy('expanded', props, emit),
-                                selected: makeProxy('selected', props, emit),
-                                disabled: makeProxy('disabled', props, emit),
-                                children: proxyChildren,
-                            }), [{
-                                node: props,
-                                key: vm.$vnode.key || 0,
-                            }], e);
-                        };
-                    }
-                });
-                return res;
-            },
+            getListeners,
             getChildListeners(idx) {
                 const res = {};
                 forEach(vm.$listeners, (l, eventName: string) => {
@@ -143,13 +144,13 @@ export default {
 <style lang="postcss" scoped>
 .basic {
     .row {
-        @apply h-10 rounded-sm text-sm;
+        @apply h-10 rounded-sm text-sm text-black cursor-pointer;
+        &:hover {
+            @apply text-secondary bg-secondary2;
+        }
     }
     .node {
-        @apply h-full w-full inline-flex items-center text-black;
-        &:hover {
-            @apply text-secondary bg-secondary2 font-bold;
-        }
+        @apply h-full w-full inline-flex items-center;
     }
     .toggle {
         @apply cursor-pointer;
