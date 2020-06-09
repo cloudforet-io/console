@@ -42,9 +42,13 @@
                                  v-bind.sync="node"
                                  disable-toggle
                                  @row:click="onTreeRowClick"
-                                 @row:mouseenter="onTreeRowMouseenter(node, true)"
-                                 @row:mouseleave="onTreeRowMouseenter(node, false)"
+                                 @row:mouseenter="onTreeRowMouseenter(...arguments, true)"
+                                 @row:mouseleave="onTreeRowMouseenter(...arguments,false)"
+                                 @node:click="test"
                     >
+                        <template #data-0="{data}">
+                            <span class="font-bold">{{ data.name }}</span>
+                        </template>
                         <template #data="{data}">
                             {{ data.name }}
                         </template>
@@ -57,10 +61,10 @@
                         </template>
                         <template #right-extra="{data}">
                             <div v-if="treeNodeState.hoveredId === data.id" class="text-right">
-                                <p-i name="ic_setting"
-                                     color="transparent inherit"
-                                     width="2rem" height="2rem"
-                                     class="mr-3"
+                                <p-icon-button name="ic_setting"
+                                               color="transparent inherit"
+                                               width="2rem" height="2rem"
+                                               class="tree-setting"
                                 />
                             </div>
                         </template>
@@ -444,7 +448,8 @@ export default {
             }
         };
 
-        const onTreeRowMouseenter = (node, entered: boolean) => {
+        const onTreeRowMouseenter = (node, matched, e: MouseEvent, entered: boolean) => {
+            e.stopPropagation();
             if (entered) treeNodeState.hoveredId = node.data.id;
             else treeNodeState.hoveredId = null;
         };
@@ -557,7 +562,7 @@ export default {
          */
         const selected = async (item) => {
             formState.isRoot = false;
-            treeApiHandler.ts.getSelectedNode(item);
+            // treeApiHandler.ts.getSelectedNode(item);
             setProjectState(item);
             await checkChildProjectGroup();
         };
@@ -770,6 +775,9 @@ export default {
             openProjectGroupForm,
             projectGroupFormConfirm,
             openProjectGroupEditForm,
+            test() {
+                console.log('test');
+            },
         };
     },
 };
@@ -909,5 +917,9 @@ export default {
         .content-order {
             @apply text-base pb-8 text-left m-auto max-w-64;
         }
+    }
+
+    .tree-setting {
+        @apply cursor-pointer mr-3 text-secondary;
     }
 </style>
