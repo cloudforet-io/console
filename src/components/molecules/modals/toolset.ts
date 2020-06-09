@@ -1,7 +1,7 @@
 import {
     onMounted, reactive, ref, Ref, watch,
 } from '@vue/composition-api';
-import { TreePropsInterface, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
+import { TreePropsInterface, TreeToolSet } from '@/components/molecules/tree-origin/ToolSet';
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,

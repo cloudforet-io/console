@@ -219,9 +219,9 @@ import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import PTree from '@/components/molecules/tree-new/Tree.vue';
+import PTree from '@/components/molecules/tree-origin/Tree.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree';
-import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
+import TreeItem, { TreeState } from '@/components/molecules/tree-origin/ToolSet';
 import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
