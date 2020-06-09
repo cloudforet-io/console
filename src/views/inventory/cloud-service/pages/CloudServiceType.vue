@@ -132,7 +132,7 @@ import {
     DefaultQSGridQSProps,
     RouteQuerySearchGridFluentAPI,
     RouteSearchGridFluentAPI,
-    SearchGridFluentAPI
+    SearchGridFluentAPI,
 } from '@/lib/api/grid';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import { AxiosResponse } from 'axios';
@@ -194,18 +194,6 @@ export default {
             .setJoinResourceType('inventory.CloudServiceType', 0)
             .addJoinGroupKey('provider', 'provider', 0)
             .addJoinGroupField(cstCountName, STAT_OPERATORS.count, undefined, 0);
-        onMounted(async () => {
-            const resp = await cstCountApi.execute();
-            let total = 0;
-            const data: any = { };
-            resp.data.results.forEach((item) => {
-                const count = item[cstCountName];
-                total += count;
-                data[item.provider] = count;
-            });
-            data.all = total;
-            providerTotalCount.value = data;
-        });
         const vm = getCurrentInstance() as ComponentInstance;
         const selectProvider = ref('all');
         const providerListState = new SelectGridLayoutToolSet(vm,
@@ -335,13 +323,24 @@ export default {
         const exportAction = fluentApi.addons().excel().export().setDataSource(dataSource);
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
+
         const routerHandler = async () => {
             const prop = propsCopy(props);
+            providerListState.applyDisplayRouter(prop);
             apiHandler.applyAPIRouter(prop);
             await apiHandler.getData();
-            providerListState.applyDisplayRouter(prop);
         };
         onMounted(async () => {
+            const resp = await cstCountApi.execute();
+            let total = 0;
+            const data: any = { };
+            resp.data.results.forEach((item) => {
+                const count = item[cstCountName];
+                total += count;
+                data[item.provider] = count;
+            });
+            data.all = total;
+            providerTotalCount.value = data;
             await routerHandler();
         });
 
