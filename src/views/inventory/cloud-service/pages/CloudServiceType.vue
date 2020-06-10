@@ -54,7 +54,7 @@
                 >
                     <template slot="toolbox-bottom">
                         <div class="cst-toolbox-bottom">
-                            <PSearch :search-text.sync="apiHandler.gridTS.searchText.value" @onSearch="apiHandler.getData()" />
+                            <PSearch :search-text.sync="apiHandler.gridTS.searchText.value" @onSearch="apiHandler.getData(true)" />
                         </div>
                     </template>
                     <template #no-data>
@@ -132,7 +132,7 @@ import {
     DefaultQSGridQSProps,
     RouteQuerySearchGridFluentAPI,
     RouteSearchGridFluentAPI,
-    SearchGridFluentAPI
+    SearchGridFluentAPI,
 } from '@/lib/api/grid';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import { AxiosResponse } from 'axios';
@@ -194,24 +194,13 @@ export default {
             .setJoinResourceType('inventory.CloudServiceType', 0)
             .addJoinGroupKey('provider', 'provider', 0)
             .addJoinGroupField(cstCountName, STAT_OPERATORS.count, undefined, 0);
-        onMounted(async () => {
-            const resp = await cstCountApi.execute();
-            let total = 0;
-            const data: any = { };
-            resp.data.results.forEach((item) => {
-                const count = item[cstCountName];
-                total += count;
-                data[item.provider] = count;
-            });
-            data.all = total;
-            providerTotalCount.value = data;
-        });
         const vm = getCurrentInstance() as ComponentInstance;
         const selectProvider = ref('all');
         const providerListState = new SelectGridLayoutToolSet(vm,
             undefined,
             undefined,
             selectProvider,
+            undefined,
             {
                 items: computed(() => {
                     const result = [{
@@ -295,20 +284,7 @@ export default {
             undefined,
             vm,
         );
-        const getData = _.debounce(() => apiHandler.getData(), 50);
-        watch(selectProvider, (after, before) => {
-            if (after && after !== before) {
-                if (after === 'all') {
-                    apiHandler.action = listAction.setFixFilter();
-                } else {
-                    apiHandler.action = listAction.setFixFilter(
-                        { key: 'provider', operator: '=', value: after },
-                    );
-                }
-                apiHandler.resetAll();
-                getData();
-            }
-        });
+
         const clickCard = (item) => {
             vm?.$router.push({
                 name: 'cloudServicePage',
@@ -335,20 +311,58 @@ export default {
         const exportAction = fluentApi.addons().excel().export().setDataSource(dataSource);
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
+
+        const requestProvider = async () => {
+            const resp = await cstCountApi.execute();
+            let total = 0;
+            const data: any = { };
+            resp.data.results.forEach((item) => {
+                const count = item[cstCountName];
+                total += count;
+                data[item.provider] = count;
+            });
+            data.all = total;
+            providerTotalCount.value = data;
+        };
         const routerHandler = async () => {
             const prop = propsCopy(props);
+            await requestProvider();
+            providerListState.applyDisplayRouter(prop);
             apiHandler.applyAPIRouter(prop);
             await apiHandler.getData();
-            providerListState.applyDisplayRouter(prop);
         };
+
+        const testGetData = async (resetPage: boolean) => {
+            if (resetPage) {
+                apiHandler.gridTS.syncState.thisPage = 1;
+                await apiHandler.getData();
+            }
+        };
+
         onMounted(async () => {
             await routerHandler();
+            const getData = _.debounce(() => apiHandler.getData(), 50);
+            let ready = false;
+            watch(selectProvider, (after, before) => {
+                if (ready && after && after !== before) {
+                    if (after === 'all') {
+                        apiHandler.action = listAction.setFixFilter();
+                    } else {
+                        apiHandler.action = listAction.setFixFilter(
+                            { key: 'provider', operator: '=', value: after },
+                        );
+                    }
+                    apiHandler.resetAll();
+                    getData();
+                }
+            });
+            ready = true;
         });
-
         return {
             selectProvider,
             selectProviderName,
             apiHandler,
+            testGetData,
             clickCard,
             goToServiceAccount,
             providerStore,
