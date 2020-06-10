@@ -226,6 +226,7 @@ import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
 import PSimpleIconButton from '@/components/molecules/buttons/SimpleIconButton.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
@@ -274,6 +275,7 @@ export default {
         PTree,
         PButton,
         PI,
+        PHr,
         PIconButton,
         PPageTitle,
         PCheckBox,
