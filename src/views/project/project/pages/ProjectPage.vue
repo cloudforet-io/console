@@ -46,9 +46,9 @@
                     card-height="16rem"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                    @changePageNumber="apiHandler.defaultGetData"
-                    @changePageSize="apiHandler.defaultGetData"
-                    @clickRefresh="apiHandler.defaultGetData"
+                    @changePageNumber="apiHandler.defaultGetData(false)"
+                    @changePageSize="apiHandler.defaultGetData(false)"
+                    @clickRefresh="apiHandler.defaultGetData(false)"
                     @card:click.self="clickCard"
                 >
                     <template #toolbox-top>
@@ -454,7 +454,7 @@ export default {
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
                 apiHandler.action = listAction.setId(after.data.id);
                 apiHandler.resetAll();
-                const resp = await apiHandler.defaultGetData();
+                const resp = await apiHandler.defaultGetData(false);
                 checkChildProject(resp);
             }
         });
@@ -463,7 +463,7 @@ export default {
             if (isShow.value && after !== before) {
                 apiHandler.action = apiHandler.action.setRecursive(after);
                 apiHandler.resetAll();
-                const resp = await apiHandler.defaultGetData();
+                const resp = await apiHandler.defaultGetData(false);
                 checkChildProject(resp);
             }
         });
@@ -589,7 +589,7 @@ export default {
                 })
                 .finally(() => {
                     state.hasChildProject = true;
-                    apiHandler.defaultGetData();
+                    apiHandler.defaultGetData(false);
                 });
             formState.projectFormVisible = false;
         };
