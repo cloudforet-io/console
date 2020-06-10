@@ -11,13 +11,16 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { clone } from 'lodash';
 import PTreeNode from './PTreeNode.vue';
 import { treeNodeProps } from './PTreeNode.toolset';
+import md from './PTreeNode.md';
+import style from './PTreeNodes.stories.scss';
 
 export default {
     title: 'molecules/tree/TreeNode',
     component: PTreeNode,
     parameters: {
+        notes: md,
         info: {
-            summary: '',
+            summary: md,
             components: { PTreeNode },
         },
         knobs: { escapeHTML: false },
@@ -121,23 +124,6 @@ export const defaultCase = () => ({
                 if (selectedItem) selectedItem.selected = false;
                 item.selected = !item.selected;
                 selectedItem = item;
-                // if (selectedItem) {
-                //     selectedItem.selected = false;
-                // }
-                // let current;
-                // matched.forEach((d, i) => {
-                //     if (i === 0) {
-                //         current = state;
-                //     } else {
-                //         current = current.children[d.key];
-                //     }
-                //
-                //     if (i === matched.length - 1) {
-                //         current.selected = !item.selected;
-                //         selectedItem = current;
-                //     }
-                // });
-                // state.children = [...state.children];
                 action('node:click')(item, matched, e);
             },
             toggleClick(item, matched, e) {
@@ -151,19 +137,6 @@ export const defaultCase = () => ({
                     }, 2000);
                 }
                 item.expanded = !item.expanded;
-                // let current;
-                // matched.forEach((d, i) => {
-                //     if (i === 0) {
-                //         current = state;
-                //     } else {
-                //         current = current.children[d.key];
-                //     }
-                //
-                //     if (i === matched.length - 1) {
-                //         current.expanded = !item.expanded;
-                //     }
-                // });
-                // state.children = [...state.children];
                 action('toggle:click')(item, matched, e);
             },
             dataClick: action('data:click'),
@@ -184,37 +157,58 @@ export const slotCase = () => ({
         disabled: true,
     }, { data: text }),
     template: `
-        <div style="display: flex; width: 80vw; padding: 4rem 0;">
-            <div class="bg-coral-100 w-1/2">
-                <PTreeNode v-bind="$props"
-                           :data.sync="state.data"
-                           :expanded.sync="state.expanded"
-                           :selected.sync="state.selected"
-                           :disabled.sync="state.disabled"
-                           :children.sync="state.children"
-                           @toggle:click="toggleClick"
+        <div style="width: 80vw; padding: 4rem 0;">
+            <div>
+                <ul class="mb-4">
+                    <li>row: <span class="color row"></span></li>
+                    <li>node: <span class="color node"></span></li>
+                    <li>left-extra: <span class="color left-extra"></span></li>
+                    <li>toggle: <span class="color toggle"></span></li>
+                    <li>icon: <span class="color icon"></span></li>
+                    <li>data: <span class="color data"></span></li>
+                    <li>right-extra: <span class="color right-extra"></span></li>
+                </ul>
+                <PTreeNode data="data"
+                           :classNames="() => ['basic', 'slot-case']"
+                           :children="[]"
                 >
-                    <template #toggle>
-                        <p-i name="btn_ic_tree_hidden—folded"
-                             :width="toggleSize" :height="toggleSize"
-                        />
-                    </template>
-                    <template #right-extra>
-                        <div class="text-right"><p-i name="common-gear"></p-i></div>
-                    </template>
-                    <template #icon="{children, expanded}">
-                        <p-i :name="children ? 
-                                    (expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
-                                    : 'ic_tree_project'"
-                             width="1rem" height="1rem"
-                             class="mx-2"
-                        ></p-i>
-                    </template>
+                    <template #left-extra><span>left</span></template>
+                    <template #icon><span>icon</span></template>
+                    <template #right-extra><span class="text-right">right</span></template>
                 </PTreeNode>
             </div>
-            <div class="bg-yellow-200 p-4 w-1/2">
-                <pre class="whitespace-pre-wrap">{{state}}</pre>
-            </div>
+            <div style="display: flex; margin-top: 2rem;">
+                <div class="bg-coral-100 w-1/2">
+                    <PTreeNode v-bind="$props"
+                               :data.sync="state.data"
+                               :expanded.sync="state.expanded"
+                               :selected.sync="state.selected"
+                               :disabled.sync="state.disabled"
+                               :children.sync="state.children"
+                               @toggle:click="toggleClick"
+                    >
+                        <template #toggle>
+                            <p-i name="btn_ic_tree_hidden—folded"
+                                 :width="toggleSize" :height="toggleSize"
+                            />
+                        </template>
+                        <template #right-extra>
+                            <div class="text-right"><p-i name="common-gear"></p-i></div>
+                        </template>
+                        <template #icon="{props}">
+                            <p-i :name="props.children ? 
+                                        (props.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
+                                        : 'ic_tree_project'"
+                                 width="1rem" height="1rem"
+                                 class="mx-2"
+                            ></p-i>
+                        </template>
+                    </PTreeNode>
+                </div>
+                <div class="bg-yellow-200 p-4 w-1/2">
+                    <pre class="whitespace-pre-wrap">{{state}}</pre>
+                </div>
+                </div>
         </div>
         `,
     setup(props, context) {
@@ -285,6 +279,56 @@ export const levelSlotCase = () => ({
 
         return {
             state,
+        };
+    },
+});
+
+export const customEventListener = () => ({
+    components: { PTreeNode },
+    props: getKnobProps(treeNodeProps, {
+        data: 'root',
+    }, {
+        children: true,
+        data: true,
+        expanded: true,
+        selected: true,
+        disabled: true,
+    }, { data: text }),
+    template: `
+    <div style="display: flex; width: 80vw; padding: 4rem 0;">
+        <div class="bg-coral-100 w-1/2">
+            <PTreeNode v-bind="$props"
+                       :data.sync="state.data"
+                       :expanded.sync="state.expanded"
+                       :selected.sync="state.selected"
+                       :disabled.sync="state.disabled"
+                       :children.sync="state.children"
+                       @hello:click="onHelloClick"
+            >
+                <template #node-level-2="{getListeners}">
+                    <span class="text-primary font-bold cursor-pointer"
+                          v-on="getListeners('hello')"
+                    >CLICK ME~!</span>
+                </template>
+            </PTreeNode>
+        </div>
+        <div class="bg-yellow-200 p-4 w-1/2">
+            <pre class="whitespace-pre-wrap">{{state}}</pre>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const state = reactive({
+            data: 'root',
+            expanded: true,
+            selected: false,
+            disabled: false,
+            children: childrenData,
+        });
+
+        return {
+            state,
+            onHelloClick: action('hello:click'),
         };
     },
 });
