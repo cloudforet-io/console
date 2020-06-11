@@ -35,12 +35,12 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
+                <p-search :search-text.sync="proxySearchText" @onSearch="searchGetData" />
             </div>
         </template>
         <template #toolbox-bottom>
             <div class="flex-1 2xs:block lg:hidden mt-4" :class="{'mb-4':$scopedSlots['toolbox-bottom']}">
-                <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
+                <p-search :search-text.sync="proxySearchText" @onSearch="searchGetData" />
             </div>
             <slot name="toolbox-bottom" />
         </template>
@@ -146,8 +146,11 @@ export default {
                 debounceGetData();
             }
         };
-
-
+        const searchGetData = async () => {
+            if (apiHandler.action && checkCanGetData(props)) {
+                await apiHandler.getData(true);
+            }
+        };
         let apiWatchStop: any = null;
         let optionsWatchStop: any = null;
 
@@ -224,6 +227,7 @@ export default {
             fields,
             slots,
             getData,
+            searchGetData,
             proxySearchText,
             apiHandler,
             exportExcel,

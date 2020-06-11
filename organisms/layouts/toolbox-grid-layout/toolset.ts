@@ -78,7 +78,7 @@ export class ToolboxGridLayoutToolSet<initData=any, initSyncData=any> extends To
     static initToolSet(_this: any, ...args: any[]) {
         _this.setAllPage = (totalCount: number) => {
             _this.state.allPage = getAllPage(totalCount, (_this.syncState.pageSize));
-        };
+        }
     }
 
     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
