@@ -93,7 +93,7 @@ export default {
         // eslint-disable-next-line
         data_source: {
             type: Array,
-            defaults: () => [],
+            default: () => [],
         },
         data: {
             type: [Array, Object],

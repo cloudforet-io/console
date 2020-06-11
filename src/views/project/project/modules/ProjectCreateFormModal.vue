@@ -29,21 +29,18 @@
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import {
-    makeProxy, requiredValidation,
+    makeProxy,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 import {
     CustomKeywords,
     JsonSchemaFormToolSet,
-    makeCustomError,
     CustomValidator,
 } from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
-import { watch } from '@vue/composition-api';
-import { AxiosResponse } from 'axios';
 
 export default {
     name: 'ProjectCreateFormModal',

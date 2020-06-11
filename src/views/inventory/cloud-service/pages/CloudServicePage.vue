@@ -125,7 +125,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
     defaultAdminLayout, defaultHistoryLayout, DefaultQSTableQSProps,
-    QuerySearchTableFluentAPI, RouteQuerySearchTableFluentAPI,
+    RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
@@ -139,7 +139,6 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import {
     DefaultMultiItemTabBarQSProps, DefaultMultiItemTabBarQSPropsName,
     DefaultSingleItemTabBarQSProps, RouterTabBarToolSet,
-    TabBarState,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';

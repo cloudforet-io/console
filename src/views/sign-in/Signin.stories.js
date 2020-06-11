@@ -1,5 +1,4 @@
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
-import { action } from '@storybook/addon-actions';
+import { withKnobs } from '@storybook/addon-knobs/vue';
 import PSignIn from '@/views/sign-in/Signin.vue';
 
 export default {

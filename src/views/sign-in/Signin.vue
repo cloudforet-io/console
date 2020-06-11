@@ -16,9 +16,8 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, ref, computed, defineComponent, onMounted, Ref, getCurrentInstance, onBeforeMount, watch,
+    toRefs, reactive, computed, defineComponent, getCurrentInstance,
 } from '@vue/composition-api';
-import { Route } from 'vue-router';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';

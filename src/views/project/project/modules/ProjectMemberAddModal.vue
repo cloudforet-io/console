@@ -32,7 +32,7 @@
 <script lang="ts">
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import {
-    makeProxy, requiredValidation,
+    makeProxy,
 } from '@/lib/compostion-util';
 import PTag from '@/components/molecules/tags/Tag.vue';
 import { tagList } from '@/components/molecules/tags/toolset';
@@ -40,8 +40,7 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import { computed, reactive, toRefs } from '@vue/composition-api';
-import { api } from '@/lib/api/axios';
+import { reactive, toRefs } from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import { showErrorMessage } from '@/lib/util';
 

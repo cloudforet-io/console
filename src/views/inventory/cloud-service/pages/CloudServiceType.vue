@@ -126,15 +126,10 @@ import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayo
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import {
     DefaultQSGridQSProps,
-    RouteQuerySearchGridFluentAPI,
     RouteSearchGridFluentAPI,
-    SearchGridFluentAPI,
 } from '@/lib/api/grid';
-import PHr from '@/components/atoms/hr/Hr.vue';
 import { AxiosResponse } from 'axios';
 import { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
 import _ from 'lodash';
@@ -144,7 +139,6 @@ import {
     propsCopy,
 } from '@/lib/router-query-string';
 import {
-    GridLayoutState,
     SelectGridLayoutToolSet,
     DefaultSingleItemSelectGridQSProps,
     DefaultMultiItemSelectGridQSProps,
@@ -156,9 +150,6 @@ import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import router from '@/routes';
-import { select } from '@storybook/addon-knobs';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 
 export default {
     name: 'ServiceAccount',

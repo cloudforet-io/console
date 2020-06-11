@@ -138,8 +138,6 @@ import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/Sel
 import PLabel from '@/components/atoms/labels/Label.vue';
 import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import _ from 'lodash';
-import { fluentApi } from '@/lib/fluent-api';
-import schema from '@/lib/fluent-api/repository/schema';
 
 
 export const getDataInputType = () => {
@@ -169,8 +167,6 @@ const components = {
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
 
-    const schemaAPI = fluentApi.repository().schema().list();
-    const secretAPI = fluentApi.secret().secret();
     const dynamicFormState = reactive({
         // schemaList: [],
         // selectedSchema: null,
@@ -188,16 +184,6 @@ const setup = (props, context) => {
         }),
         selectedInputType: 'Json',
     });
-    // const listSchema = async () => {
-    //     const res = await schemaAPI.execute();
-    //     dynamicFormState.schemaList = res.data.results;
-    //     if (props.selectedSchemaId) {
-    //         dynamicFormState.selectedSchema = _.find(dynamicFormState.schemaList, { schema_id: props.selectedSchemaId });
-    //         console.log('selected Schema', dynamicFormState.selectedSchema);
-    //         dynamicFormState.dynamicForm = dynamicFormState.selectedSchema.fields || [];
-    //     } else dynamicFormState.selectedSchema = null;
-    // };
-    // listSchema();
 
     state.selected = reactive({ selected: _.isEmpty(getDataInputType()) ? 'json' : 'form' });
 

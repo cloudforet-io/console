@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, watch, Ref, defineComponent,
+    reactive, toRefs, computed, watch, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';

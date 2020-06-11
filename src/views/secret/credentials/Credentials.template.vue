@@ -145,7 +145,6 @@ export const getDataInputType = () => {
     const currentURL = window.location.href;
     const url = new URL(currentURL);
     const plugin_id = url.searchParams.get('plugin_id');
-    const repository_id = url.searchParams.get('repository_id');
     return plugin_id;
 };
 
@@ -216,7 +215,6 @@ export const credentialsSetup = (props, context, eventName) => {
         return idxs;
     });
 
-    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
     const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
 
     const getSelectedCredentialsItems = computed(() => {
