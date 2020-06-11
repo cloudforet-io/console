@@ -10,7 +10,7 @@ import casual from '@/lib/casual';
 import PI from '@/components/atoms/icons/PI.vue';
 import { clone } from 'lodash';
 import PTreeNode from './PTreeNode.vue';
-import { treeNodeProps } from './PTreeNode.toolset';
+import { treeNodeProps, TreeNodeToolSet } from './PTreeNode.toolset';
 import md from './PTreeNode.md';
 import style from './PTreeNodes.stories.scss';
 
@@ -201,7 +201,6 @@ export const apiCase = () => ({
 export const slotCase = () => ({
     components: { PTreeNode, PI },
     props: getKnobProps(treeNodeProps, {
-        data: 'root',
     }, {
         children: true,
         data: true,
@@ -281,7 +280,6 @@ export const slotCase = () => ({
 export const levelSlotCase = () => ({
     components: { PTreeNode },
     props: getKnobProps(treeNodeProps, {
-
     }, {
         children: true,
         data: true,
@@ -319,7 +317,6 @@ export const levelSlotCase = () => ({
 export const customEventListener = () => ({
     components: { PTreeNode },
     props: getKnobProps(treeNodeProps, {
-        data: 'root',
     }, {
         children: true,
         data: true,
@@ -356,6 +353,42 @@ export const customEventListener = () => ({
         return {
             state,
             onHelloClick: action('hello:click'),
+        };
+    },
+});
+
+
+export const HelperToolSetUsage = () => ({
+    components: { PTreeNode },
+    template: `
+        <div style="width: 80vw; padding: 4rem 0;">
+            <div class="flex">
+                <div class="bg-coral-100 w-1/2">
+                    <PTreeNode v-bind="ts.state"
+                               :data.sync="ts.syncState.data"
+                               :children.sync="ts.syncState.children"
+                               :state.sync="ts.syncState.state"
+                               @toggle:click="toggleClick"
+                    >
+                    </PTreeNode>
+                </div>
+                <div class="bg-yellow-200 p-4 w-1/2">
+                    <pre class="whitespace-pre-wrap">{{ts.syncState}}</pre>
+                </div>
+            </div>
+        </div>`,
+    setup(props, context) {
+        const ts = new TreeNodeToolSet(undefined, {
+            data: 'using state helper',
+            children: childrenData,
+        });
+        return {
+            ts,
+            toggleClick(node, matched, e) {
+                e.stopPropagation();
+                node.sync.state.expanded = !node.sync.state.expanded;
+                action('toggle:click')(node, matched, e);
+            },
         };
     },
 });
