@@ -69,7 +69,7 @@ export class TreeNodeState<
             level: 0,
             padSize: '1rem',
             toggleSize: '1rem',
-            disableToggle: true,
+            disableToggle: false,
             classNames: (node: TreeNode) => ({
                 basic: true,
                 [`level-${node.level}`]: true,
@@ -99,6 +99,13 @@ export interface TreeNodeMetaState<T=any, S extends BaseNodeStateType = BaseNode
     firstSelectedNode: TreeNode<T, S>;
 }
 
+export type TreeNodeEventListener<T=any, S extends BaseNodeStateType = BaseNodeStateType>
+    = (node: TreeNode<T, S>, matched: TreeNode<T, S>[], e: MouseEvent) => void;
+
+export interface TreeNodeEventListeners<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
+    [eventName: string]: TreeNodeEventListener<T, S>;
+}
+
 
 @HelperToolSet()
 export class TreeNodeToolSet<
@@ -125,9 +132,10 @@ export class TreeNodeToolSet<
             }
 
             if (_this.isMultiSelect) {
-                const idx = findIndex(_this.metaState.selectedNodes, (d: TreeNode) => d.key === node.key && d.level === node.level);
-                if (idx === -1) _this.metaState.selectedNodes.push(node);
-                else _this.metaState.selectedNodes.splice(idx, 1);
+                // TODO: multi select case
+                // const idx = findIndex(_this.metaState.selectedNodes, (d: TreeNode) => d.key === node.key && d.level === node.level);
+                // if (idx === -1) _this.metaState.selectedNodes.push(node);
+                // else _this.metaState.selectedNodes.splice(idx, 1);
             } else {
                 _this.metaState.selectedNodes = [node];
             }
