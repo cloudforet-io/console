@@ -99,7 +99,7 @@ export default {
             if (!props.padSize) return `${props.level}rem`;
             const size = props.padSize.match(/\d+/g);
             const unit = props.padSize.match(/[a-zA-Z]+/g);
-            return `${props.level * (size ? Number(size[0]) : 1)}${unit ? unit[0] : 'rem'}`;
+            return `${(props.level || 0) * (size ? Number(size[0]) : 1)}${unit ? unit[0] : 'rem'}`;
         });
 
         const node: any = computed(() => ({
@@ -108,21 +108,22 @@ export default {
             sync: reactive({
                 data: makeProxy('data', props, emit),
                 children: makeProxy('children', props, emit),
-                state: computed({
-                    set(val) { emit('update:state', val); },
-                    get() {
-                        const res = {};
-                        forEach(props.state, (v, k) => {
-                            res[k] = computed({
-                                set(val) {
-                                    emit('update:state', { ...props.state, [k]: val });
-                                },
-                                get() { return props.state[k]; },
-                            });
-                        });
-                        return reactive(res);
-                    },
-                }),
+                // state: computed({
+                //     set(val) { emit('update:state', val); },
+                //     get() {
+                //         const res = {};
+                //         forEach(props.state, (v, k) => {
+                //             res[k] = computed({
+                //                 set(val) {
+                //                     emit('update:state', { ...props.state, [k]: val });
+                //                 },
+                //                 get() { return props.state[k]; },
+                //             });
+                //         });
+                //         return reactive(res);
+                //     },
+                // }),
+                state: makeProxy('state', props, emit),
             }),
         }));
 
@@ -166,7 +167,7 @@ export default {
         return {
             depth,
             slotBind: computed(() => ({
-                depth: depth.value, getListeners, node,
+                depth: depth.value, getListeners, ...props,
             })),
             node,
             // childrenHaveState,
