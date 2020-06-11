@@ -28,6 +28,7 @@ interface UpdateParameter extends Tags, IdParameter {
 interface ExtraParameter {
     include_provider: boolean;
     recursive: boolean;
+    project_group_id: string;
 }
 
 class Create extends CreateAction<CreateParameter, any> {}
@@ -52,6 +53,11 @@ class ListProjects extends SingleItemQueryAction<ExtraParameter, any> {
 
     setRecursive(val) {
         this.apiState.extraParameter.recursive = val;
+        return this.clone();
+    }
+
+    setProjectGroupId(val) {
+        this.apiState.extraParameter.project_group_id = val;
         return this.clone();
     }
 }

@@ -53,6 +53,7 @@ export default {
                 {
                     path: '/',
                     name: 'cloudServiceMain',
+                    props: bypassQueryString,
                     component: CloudService,
                 },
                 {

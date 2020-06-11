@@ -47,12 +47,14 @@
             </div>
         </template>
         <template #extra>
-            <router-link to="/inventory/cloud-service" class="more">
-                MORE
-                <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                     color="transparent currentColor" class="ml-1"
-                />
-            </router-link>
+            <div v-if="moreInfo">
+                <router-link to="/inventory/cloud-service" class="more">
+                    MORE
+                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                         color="transparent currentColor" class="ml-1"
+                    />
+                </router-link>
+            </div>
         </template>
     </p-widget-layout>
 </template>
@@ -84,6 +86,14 @@ export default {
             type: Function,
             default: api => api,
         },
+        projectFilter: {
+            type: String,
+            default: '',
+        },
+        moreInfo: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const vm: any = getCurrentInstance();
@@ -114,7 +124,6 @@ export default {
 
         const api = fluentApi.statisticsTest().resource().stat<Value>()
             .setResourceType('inventory.CloudServiceType')
-            .setFilter({ key: 'tags.spaceone:is_major', value: 'true', operator: '=' })
             .addGroupKey('name', 'name')
             .addGroupKey('group', 'group')
             .addGroupKey('provider', 'provider')
@@ -147,11 +156,17 @@ export default {
             ...toRefs(state),
             skeletons: _.range(12),
             iconUrl: (item: Value): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
-            onSelected(item: Value): void {
-                vm.$router.push({
-                    path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
-                    query: { provider: item.provider },
-                });
+            onSelected(item): void {
+                if (props.projectFilter) {
+                    vm.$router.push({
+                        path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}?provider=${item.provider}${props.projectFilter}`,
+                    });
+                } else {
+                    vm.$router.push({
+                        path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
+                        query: { provider: item.provider },
+                    });
+                }
             },
         };
     },

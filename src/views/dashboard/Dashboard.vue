@@ -29,7 +29,9 @@
         />
         <s-collection class="col-start-1 col-end-13" />
         <cloud-services class="col-start-1 col-end-13"
-                        :get-action="cloudServiceWidgetGetAction"/>
+                        :more-info="true"
+                        :get-action="cloudServiceWidgetGetAction"
+        />
     </general-page-layout>
 </template>
 
@@ -44,7 +46,7 @@ import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summar
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import SCollection from '@/views/common/widgets/collection/Collection.vue';
-import {Stat} from "@/lib/fluent-api/statistics/resource";
+import { Stat } from '@/lib/fluent-api/statistics/resource';
 
 export default {
     name: 'Dashboard',
@@ -97,6 +99,7 @@ export default {
             topics,
             cloudServiceWidgetGetAction(apiAction: Stat) {
                 return apiAction
+                    .setFilter({ key: 'tags.spaceone:is_major', value: 'true', operator: '=' })
                     .setLimit(12);
             },
         };
