@@ -31,15 +31,18 @@ export interface TreeNodeSyncStateType<T=any, S extends BaseNodeStateType = Base
     state: S;
 }
 
-export interface InitTreeNodeProps<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeSyncStateType<T, S> {
+export const getBaseNodeState = (): BaseNodeStateType => ({ expanded: false });
+
+export interface InitTreeNodeProps<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
     level?: number;
     padSize?: string;
     toggleSize?: string;
     disableToggle?: boolean;
     classNames?: ClassNamesType<T, S>;
+    data?: T;
+    children?: InitTreeNodeProps<T, S>[] | boolean;
+    state?: S;
 }
-
-export const getBaseNodeState = (): BaseNodeStateType => ({ expanded: false });
 
 export const getDefaultNode = <T=any, S extends BaseNodeStateType = BaseNodeStateType>(data: T, init?: InitTreeNodeProps<T, S>): InitTreeNodeProps<T, S> => ({
     data,
@@ -50,7 +53,7 @@ export const getDefaultNode = <T=any, S extends BaseNodeStateType = BaseNodeStat
 
 export interface TreeNode<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeProps {
     key: number;
-    sync: UnwrapRef<TreeNodeSyncStateType<T, UnwrapRef<S>>>;
+    sync: TreeNodeSyncStateType<T, S>;
 }
 
 @StateToolSet<TreeNodeStateType>()
@@ -94,7 +97,7 @@ export class TreeNodeState<
 
 
 export interface TreeNodeMetaState<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
-    nodes: InitTreeNodeProps<T, S>[];
+    nodes: TreeNodeProps<T, S>[];
     selectedNodes: TreeNode<T, S>[];
     firstSelectedNode: TreeNode<T, S>;
 }
@@ -112,7 +115,7 @@ export class TreeNodeToolSet<
     data=any, state extends BaseNodeStateType = BaseNodeStateType,
     initData=any, initSyncData=any
     > extends TreeNodeState<data, state, initData, TreeNodeStateType<data, state>, initSyncData, TreeNodeSyncStateType<data, state>> {
-    metaState: UnwrapRef<TreeNodeMetaState<data, state>> = null as unknown as UnwrapRef<TreeNodeMetaState<data, state>>;
+    metaState: TreeNodeMetaState<data, state> = null as unknown as TreeNodeMetaState<data, state>;
 
     isMultiSelect = false;
 

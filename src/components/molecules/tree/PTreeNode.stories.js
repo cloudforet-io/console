@@ -122,7 +122,12 @@ export const defaultCase = () => ({
             rowClick: action('row:click'),
             nodeClick(node, matched, e) {
                 e.stopPropagation();
-                if (selectedItem) selectedItem.sync.state.selected = false;
+                if (selectedItem) {
+                    selectedItem.sync.state = {
+                        ...selectedItem.sync.state,
+                        selected: false,
+                    };
+                }
                 node.sync.state = {
                     ...node.sync.state,
                     selected: true,
@@ -132,7 +137,10 @@ export const defaultCase = () => ({
             },
             toggleClick(node, matched, e) {
                 e.stopPropagation();
-                node.sync.state.expanded = !node.sync.state.expanded;
+                node.sync.state = {
+                    ...node.sync.state,
+                    expanded: !node.sync.state.expanded,
+                };
                 action('toggle:click')(node, matched, e);
             },
             dataClick(node, matched, e) {
@@ -183,7 +191,7 @@ export const apiCase = () => ({
             state,
             toggleClick(node, matched, e) {
                 e.stopPropagation();
-                if (!node.state.sync.expanded) {
+                if (!node.sync.state.expanded) {
                     node.children = [];
                     setTimeout(() => {
                         node.children = [
@@ -191,7 +199,10 @@ export const apiCase = () => ({
                         ];
                     }, 1000);
                 }
-                node.state.sync.expanded = !node.state.sync.expanded;
+                node.sync.state = {
+                    ...node.sync.state,
+                    expanded: !node.sync.state.expanded,
+                };
                 action('toggle:click')(node, matched, e);
             },
         };
@@ -243,9 +254,9 @@ export const slotCase = () => ({
                         <template #right-extra>
                             <div class="text-right"><p-i name="common-gear"></p-i></div>
                         </template>
-                        <template #icon="{node}">
-                            <p-i :name="node.sync.children ? 
-                                        (node.sync.state.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
+                        <template #icon="{children, state}">
+                            <p-i :name="children ? 
+                                        (state.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
                                         : 'ic_tree_project'"
                                  width="1rem" height="1rem"
                                  class="mx-2"
@@ -270,7 +281,10 @@ export const slotCase = () => ({
             state,
             toggleClick(node, matched, e) {
                 e.stopPropagation();
-                node.sync.state.expanded = !node.sync.state.expanded;
+                node.sync.state = {
+                    ...node.sync.state,
+                    expanded: !node.sync.state.expanded,
+                };
                 action('toggle:click')(node, matched, e);
             },
         };
@@ -386,7 +400,10 @@ export const HelperToolSetUsage = () => ({
             ts,
             toggleClick(node, matched, e) {
                 e.stopPropagation();
-                node.sync.state.expanded = !node.sync.state.expanded;
+                node.sync.state = {
+                    ...node.sync.state,
+                    expanded: !node.sync.state.expanded,
+                };
                 action('toggle:click')(node, matched, e);
             },
         };

@@ -37,24 +37,12 @@
                 <!--                        </span>-->
                 <!--                    </template>-->
                 <!--                </p-tree>-->
-                <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
-                             v-bind="node"
-                             :data.sync="node.data"
-                             :children.sync="node.children"
-                             :state.sync="node.state"
-                             @toggle:click="treeApiHandler.getData"
-                >
-                    <template #data-0="{data, state}">
+                <p-tree-node>
+                    <template #data-0="{data}">
                         <span class="font-bold">{{ data.name }}</span>
-                        {{ state.loading }}
                     </template>
                     <template #data="{data}">
                         {{ data.name }}
-                    </template>
-                    <template #toggle="{state, toggleSize}">
-                        <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
-                             :height="toggleSize"
-                        />
                     </template>
                 </p-tree-node>
             </div>
@@ -141,7 +129,7 @@
                                     <p id="project-name">
                                         {{ item.name }}
                                     </p>
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex "
                                          @click.stop="goToServiceAccount"
                                     >
                                         <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
@@ -155,11 +143,6 @@
                                         <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
                                              class="provider-icon"
                                         >
-                                        <span class="w-6 h-6 bg-blue-100 rounded-full inline-block" @click.stop="goToServiceAccount">
-                                            <p-i name="ic_plus_bold" color="inherit"
-                                                 width=".75rem" height=".75rem"
-                                            />
-                                        </span>
                                         <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
                                     </div>
                                 </div>
@@ -348,12 +331,10 @@ export default {
              Tree, Project, Statistics API Handler Declaration
              */
         const treeAction = fluentApi.identity().project().tree()
-            .setSortBy('name')
-            .setSortDesc(false)
+            .setSortBy('item_type')
             .setExcludeProject();
         const treeApiHandlerOrigin = new ProjectTreeFluentAPIOrigin(treeAction);
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
-        treeApiHandler.getData();
         const projectAPI = fluentApi.identity().project();
         const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statisticsTest().resource().stat()
@@ -630,7 +611,6 @@ export default {
         return {
             treeRef: treeApiHandlerOrigin.ts.treeRef,
             treeApiHandlerOrigin,
-            treeApiHandler,
             treeState,
             ...toRefs(state),
             ...toRefs(projectState),
@@ -719,37 +699,25 @@ export default {
         @apply text-lg font-bold truncate pb-5 overflow-hidden;
     }
     .provider-icon {
-        @apply mr-4 inline;
+        @apply mr-2 inline;
         max-width: 1.5rem;
         max-height: 1.5rem;
-        min-height: 1.5rem;
     }
     .providers {
-        @apply relative text-blue-600 whitespace-no-wrap;
         max-height: 1.5rem;
         min-height: 1.5rem;
-        width: fit-content;
-        span { padding:0.125rem 0.375rem; }
-        &:hover {
-             @apply text-secondary font-bold;
-            span {
-                @apply bg-blue-300 ;
-            }
-        }
     }
 
     .empty-providers {
-        @apply relative text-blue-600;
+        @apply relative text-blue-600 ;
         width: fit-content;
-            div { padding:0.125rem 0.375rem; }
-            &:hover {
-                 @apply text-secondary font-bold;
-                     div{
-                         @apply bg-blue-300 ;
-                     }
-            }
-            span { line-height:1.75; }
-        }
+    div { padding:0.125rem 0.375rem; }
+    &:hover {
+         @apply text-secondary font-bold;
+    div{ @apply bg-blue-300 ; }
+    }
+    span {line-height:1.75;}
+    }
     }
 
     .solid {

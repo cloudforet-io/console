@@ -6,20 +6,21 @@ import { TreeAction } from '@/lib/fluent-api';
 import {
     TreeNodeToolSet,
     getDefaultNode,
-    BaseNodeStateType, InitTreeNodeProps,
+    BaseNodeStateType, TreeNodeProps, TreeNode,
 } from '@/components/molecules/tree/PTreeNode.toolset';
+import { reactive, UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export interface TreeResp<T> {
     items: T[];
 }
 
 export abstract class BaseTreeFluentAPI<
-    data=any, state extends BaseNodeStateType = BaseNodeStateType,
+    state extends BaseNodeStateType = BaseNodeStateType,
     initData = any, initSyncData = any,
     parameter = any,
     resp = any,
     action extends TreeAction<any, any> = TreeAction<parameter, resp>,
-    T extends TreeNodeToolSet<data, state, initData, initSyncData> = TreeNodeToolSet<data, state, initData, initSyncData>
+    T extends TreeNodeToolSet<resp, state, initData, initSyncData> = TreeNodeToolSet<resp, state, initData, initSyncData>
     > extends DynamicFluentAPIToolSet<parameter, resp, action> {
     ts: T;
 
@@ -28,22 +29,24 @@ export abstract class BaseTreeFluentAPI<
         this.ts = new TreeNodeToolSet(initData, initSyncData, isMultiSelect) as T;
     }
 
-    abstract getAction: (node: InitTreeNodeProps<data, state>) => action
+    abstract getAction: (node?: TreeNode<resp, state>) => action
 
-    protected abstract toNode: (data: AxiosResponse) => InitTreeNodeProps<data, state>[];
+    protected abstract toNode: (data: AxiosResponse<TreeResp<resp>>, parentNode?: TreeNode<resp, state>) => TreeNodeProps<resp, state>[]|boolean;
 
-    getData = async (node?: any): Promise<InitTreeNodeProps<data, state>[]> => {
-        // this.ts.state.loading = true;
-        let result: InitTreeNodeProps<data, state>[] = [];
+    protected requestData = async (node?: TreeNode<resp, state>): Promise<void> => {
         try {
-            const resp = await this.getAction(node).execute();
-            result = this.toNode(resp);
+            const res: AxiosResponse<TreeResp<resp>> = await this.getAction(node).execute();
+            if (node) {
+                node.sync.children = this.toNode(res, node) as TreeNodeProps<resp, state>[];
+            } else {
+                this.ts.metaState.nodes = this.toNode(res) as TreeNodeProps<resp, state>[];
+            }
         } catch (e) {
             console.error(e);
         }
-        // this.ts.state.loading = false;
-        return result;
     };
+
+    abstract getData: (node?: TreeNode<resp, state>) => Promise<void>;
 }
 
 export interface ProjectItemResp {
@@ -53,23 +56,63 @@ export interface ProjectItemResp {
     item_type: 'PROJECT_GROUP'|'PROJECT';
 }
 
-export type ProjectNode<S extends BaseNodeStateType = BaseNodeStateType> = InitTreeNodeProps<ProjectItemResp, S>
+export interface ProjectNodeState extends BaseNodeStateType {
+    loading: boolean;
+}
+
+export type ProjectNode<S extends BaseNodeStateType = BaseNodeStateType> = TreeNodeProps<ProjectItemResp, S>
 
 export class ProjectTreeFluentAPI<
-    state extends BaseNodeStateType = BaseNodeStateType,
+    state extends ProjectNodeState = ProjectNodeState,
     initData = any,
     initSyncData = any,
     parameter = any,
-    resp = any,
-    action extends TreeAction<any, any> = TreeAction<parameter, resp>,
-    T extends TreeNodeToolSet<any, state> = TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData>
-    > extends BaseTreeFluentAPI<ProjectItemResp, state, initData, initSyncData, parameter, resp, action, T> {
-    getAction = (node: ProjectNode<state>): action => {
-        if (node.data.id !== 'root') {
+    action extends TreeAction<any, any> = TreeAction<parameter, ProjectItemResp>,
+    T extends TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData> = TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData>
+    > extends BaseTreeFluentAPI<state, initData, initSyncData, parameter, ProjectItemResp, action, T> {
+    getAction = (node?: TreeNode<ProjectItemResp, state>): action => {
+        if (node) {
             return this.action.setItemId(node.data.id).setItemType(node.data.item_type);
         }
         return this.action.setRoot();
     };
 
-    protected toNode = (resp: AxiosResponse<TreeResp<ProjectItemResp>>): ProjectNode<state>[] => resp.data.items.map(item => getDefaultNode<ProjectItemResp, state>(item))
+    protected toNode = (resp: AxiosResponse<TreeResp<ProjectItemResp>>, parentNode?: TreeNode<ProjectItemResp, state>): TreeNodeProps<ProjectItemResp, state>[]|boolean => {
+        if (resp.data.items.length === 0) {
+            return false;
+        }
+        return resp.data.items.map(
+            item => getDefaultNode<ProjectItemResp, state>(item, {
+                children: item.has_child,
+                state: {
+                    expanded: false,
+                    loading: false,
+                } as state,
+            }) as TreeNodeProps<ProjectItemResp, state>,
+        );
+    }
+
+    // @ts-ignore
+    getData = async (node?: TreeNode<ProjectItemResp, state>, matched?: TreeNode<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+        if (node) {
+            if (node.sync.state.expanded) {
+                node.sync.state = {
+                    ...node.sync.state,
+                    expanded: true,
+                };
+                return;
+            }
+            node.sync.state = {
+                expanded: true,
+                loading: true,
+            } as state;
+        }
+        await this.requestData(node);
+        if (node) {
+            node.sync.state = {
+                ...node.sync.state,
+                loading: false,
+            };
+        }
+    }
 }
