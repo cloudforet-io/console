@@ -80,24 +80,91 @@ export const defaultCase = () => ({
     }, {
         children: true,
         data: true,
-        expanded: true,
-        selected: true,
-        disabled: true,
+        state: true,
+    }),
+    template: `
+        <div style="width: 80vw; padding: 4rem 0;">
+            <div>
+                <p>Node Click: selection</p>
+                <p>Toggle Click: expand</p>
+                <p>Data Click: deletion</p>
+            </div>
+            <div class="flex">
+                <div class="bg-coral-100 w-1/2">
+                    <PTreeNode v-bind="$props"
+                               :data.sync="state.data"
+                               :children.sync="state.children"
+                               :state.sync="state.state"
+                               @row:click="rowClick"
+                               @node:click="nodeClick"
+                               @toggle:click="toggleClick"
+                               @data:click="dataClick"
+                               @node:mouseenter="nodeMouseenter"
+                    >
+                    </PTreeNode>
+                </div>
+                <div class="bg-yellow-200 p-4 w-1/2">
+                    <pre class="whitespace-pre-wrap">{{state}}</pre>
+                </div>
+            </div>
+        </div>`,
+    setup(props, context) {
+        const state = reactive({
+            data: 'root',
+            children: childrenData,
+            state: { expanded: true },
+        });
+
+        let selectedItem = null;
+
+        return {
+            state,
+            rowClick: action('row:click'),
+            nodeClick(node, matched, e) {
+                e.stopPropagation();
+                if (selectedItem) selectedItem.sync.state.selected = false;
+                node.sync.state = {
+                    ...node.sync.state,
+                    selected: true,
+                };
+                selectedItem = node;
+                action('node:click')(node, matched, e);
+            },
+            toggleClick(node, matched, e) {
+                e.stopPropagation();
+                node.sync.state.expanded = !node.sync.state.expanded;
+                action('toggle:click')(node, matched, e);
+            },
+            dataClick(node, matched, e) {
+                e.stopPropagation();
+                const parent = matched[matched.length - 2];
+                if (Array.isArray(parent.sync.children)) {
+                    parent.sync.children.splice(node.key, 1);
+                }
+                action('data:click')(node, matched, e);
+            },
+            nodeMouseenter: action('node:mouseenter'),
+        };
+    },
+});
+
+
+export const apiCase = () => ({
+    components: { PTreeNode },
+    props: getKnobProps(treeNodeProps, {
+    }, {
+        children: true,
+        data: true,
+        state: true,
     }),
     template: `
         <div style="display: flex; width: 80vw; padding: 4rem 0;">
             <div class="bg-coral-100 w-1/2">
                 <PTreeNode v-bind="$props"
                            :data.sync="state.data"
-                           :expanded.sync="state.expanded"
-                           :selected.sync="state.selected"
-                           :disabled.sync="state.disabled"
                            :children.sync="state.children"
-                           @row:click="rowClick"
-                           @node:click="nodeClick"
+                           :state.sync="state.state"
                            @toggle:click="toggleClick"
-                           @data:click="dataClick"
-                           @node:mouseenter="nodeMouseenter"
                 >
                 </PTreeNode>
             </div>
@@ -108,39 +175,25 @@ export const defaultCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: 'root',
-            expanded: true,
-            selected: false,
-            disabled: false,
             children: childrenData,
+            state: { expanded: true },
         });
-
-        let selectedItem = null;
 
         return {
             state,
-            rowClick: action('row:click'),
-            nodeClick(item, matched, e) {
+            toggleClick(node, matched, e) {
                 e.stopPropagation();
-                if (selectedItem) selectedItem.selected = false;
-                item.selected = !item.selected;
-                selectedItem = item;
-                action('node:click')(item, matched, e);
-            },
-            toggleClick(item, matched, e) {
-                e.stopPropagation();
-                if (!item.expanded) {
-                    item.children = [];
+                if (!node.state.sync.expanded) {
+                    node.children = [];
                     setTimeout(() => {
-                        item.children = [
-                            { data: `This is [${item.data}]'s child`, children: [] },
+                        node.children = [
+                            { data: `This is [${node.data}]'s child`, children: [] },
                         ];
-                    }, 2000);
+                    }, 1000);
                 }
-                item.expanded = !item.expanded;
-                action('toggle:click')(item, matched, e);
+                node.state.sync.expanded = !node.state.sync.expanded;
+                action('toggle:click')(node, matched, e);
             },
-            dataClick: action('data:click'),
-            nodeMouseenter: action('node:mouseenter'),
         };
     },
 });
@@ -152,9 +205,7 @@ export const slotCase = () => ({
     }, {
         children: true,
         data: true,
-        expanded: true,
-        selected: true,
-        disabled: true,
+        state: true,
     }, { data: text }),
     template: `
         <div style="width: 80vw; padding: 4rem 0;">
@@ -181,10 +232,8 @@ export const slotCase = () => ({
                 <div class="bg-coral-100 w-1/2">
                     <PTreeNode v-bind="$props"
                                :data.sync="state.data"
-                               :expanded.sync="state.expanded"
-                               :selected.sync="state.selected"
-                               :disabled.sync="state.disabled"
                                :children.sync="state.children"
+                               :state.sync="state.state"
                                @toggle:click="toggleClick"
                     >
                         <template #toggle>
@@ -195,9 +244,9 @@ export const slotCase = () => ({
                         <template #right-extra>
                             <div class="text-right"><p-i name="common-gear"></p-i></div>
                         </template>
-                        <template #icon="{props}">
-                            <p-i :name="props.children ? 
-                                        (props.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
+                        <template #icon="{node}">
+                            <p-i :name="node.sync.children ? 
+                                        (node.sync.state.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
                                         : 'ic_tree_project'"
                                  width="1rem" height="1rem"
                                  class="mx-2"
@@ -214,26 +263,16 @@ export const slotCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: 'root',
-            expanded: true,
-            selected: false,
-            disabled: false,
             children: childrenData,
+            state: {},
         });
 
         return {
             state,
-            toggleClick(item, matched, e) {
+            toggleClick(node, matched, e) {
                 e.stopPropagation();
-                if (!item.expanded) {
-                    item.children = [];
-                    setTimeout(() => {
-                        item.children = [
-                            { data: `This is [${item.data}]'s child`, children: [] },
-                        ];
-                    }, 2000);
-                }
-                item.expanded = !item.expanded;
-                action('toggle:click')(item, matched, e);
+                node.sync.state.expanded = !node.sync.state.expanded;
+                action('toggle:click')(node, matched, e);
             },
         };
     },
@@ -242,23 +281,19 @@ export const slotCase = () => ({
 export const levelSlotCase = () => ({
     components: { PTreeNode },
     props: getKnobProps(treeNodeProps, {
-        data: 'root',
+
     }, {
         children: true,
         data: true,
-        expanded: true,
-        selected: true,
-        disabled: true,
+        state: true,
     }, { data: text }),
     template: `
     <div style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
             <PTreeNode v-bind="$props"
                        :data.sync="state.data"
-                       :expanded.sync="state.expanded"
-                       :selected.sync="state.selected"
-                       :disabled.sync="state.disabled"
                        :children.sync="state.children"
+                       :state.sync="state.state"
             >
                 <template #node-level-2>CUSTOM NODE</template>
             </PTreeNode>
@@ -271,10 +306,8 @@ export const levelSlotCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: 'root',
-            expanded: true,
-            selected: false,
-            disabled: false,
             children: childrenData,
+            state: {},
         });
 
         return {
@@ -290,19 +323,15 @@ export const customEventListener = () => ({
     }, {
         children: true,
         data: true,
-        expanded: true,
-        selected: true,
-        disabled: true,
+        state: true,
     }, { data: text }),
     template: `
     <div style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
             <PTreeNode v-bind="$props"
                        :data.sync="state.data"
-                       :expanded.sync="state.expanded"
-                       :selected.sync="state.selected"
-                       :disabled.sync="state.disabled"
                        :children.sync="state.children"
+                       :state.sync="state.state"
                        @hello:click="onHelloClick"
             >
                 <template #node-level-2="{getListeners}">
@@ -320,10 +349,8 @@ export const customEventListener = () => ({
     setup(props, context) {
         const state = reactive({
             data: 'root',
-            expanded: true,
-            selected: false,
-            disabled: false,
             children: childrenData,
+            state: {},
         });
 
         return {
