@@ -1,100 +1,64 @@
+/* eslint-disable @typescript-eslint/no-explicit-any,no-empty-function */
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { TreeMetaState } from '@/components/molecules/tree-origin/ToolSet';
 import {
-    computed, reactive, ref, Ref,
+    computed, reactive,
 } from '@vue/composition-api';
-import _ from 'lodash';
+import { findIndex } from 'lodash';
 
-export const treeNodeProps = {
-    level: {
-        type: Number,
-        default: 0,
-    },
-    classNames: {
-        type: Function,
-        default: () => ['basic'],
-    },
-    disableToggle: {
-        type: Boolean,
-        default: false,
-    },
-    toggleSize: {
-        type: String,
-        default: '1rem',
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    selected: {
-        type: Boolean,
-        default: false,
-    },
-    expanded: {
-        type: Boolean,
-        default: false,
-    },
-    padSize: {
-        type: String,
-        default: '1rem',
-    },
-    data: {
-        type: [Array, Object, Boolean, String, Number],
-        default: '',
-    },
-    children: {
-        type: [Array, Boolean],
-        default: false,
-    },
-};
-
-export interface TreeNodeStateType {
-    level?: number; // generate
-    padSize?: string; // bypass
-    toggleSize?: string; // bypass
-    disableToggle?: boolean; // bypass
-    classNames?: (...args) => string[]; // bypass
+export interface TreeNodeStateType<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
+    level: number;
+    padSize: string;
+    toggleSize: string;
+    disableToggle: boolean;
+    classNames: ClassNamesType<T, S>;
 }
 
-export interface TreeNodeSyncStateType<T=any> {
-    data: T;
-    disabled: boolean;
-    selected: boolean;
+export interface BaseNodeStateType {
     expanded: boolean;
-    children: TreeNode[] | boolean;
 }
 
-export interface TreeNode extends TreeNodeStateType, TreeNodeSyncStateType {
+type ClassNamesType<T=any, S extends BaseNodeStateType = BaseNodeStateType> = (node: TreeNode<T, S>) => {[name: string]: boolean};
+
+export interface TreeNodeProps<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeStateType, TreeNodeSyncStateType<T, S> {}
+
+export interface TreeNodeSyncStateType<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
+    data: T;
+    children: TreeNodeProps<T, S>[] | boolean;
+    state: S;
 }
 
-export type TreeNodeProps = TreeNode;
-
-export interface DefaultNodeType extends TreeNodeStateType {
-    disabled?: boolean;
-    selected?: boolean;
-    expanded?: boolean;
-    children?: TreeNode[] | boolean;
+export interface InitTreeNodeProps<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeSyncStateType<T, S> {
+    level?: number;
+    padSize?: string;
+    toggleSize?: string;
+    disableToggle?: boolean;
+    classNames?: ClassNamesType<T, S>;
 }
 
-export const getDefaultNode = <T=any>(data: T, init?: DefaultNodeType): TreeNodeSyncStateType => ({
+export const getBaseNodeState = (): BaseNodeStateType => ({ expanded: false });
+
+export const getDefaultNode = <T=any, S extends BaseNodeStateType = BaseNodeStateType>(data: T, init?: InitTreeNodeProps<T, S>): InitTreeNodeProps<T, S> => ({
     data,
-    disabled: false,
-    selected: false,
-    expanded: false,
     children: false,
+    state: getBaseNodeState() as S,
     ...init,
 });
 
+export interface TreeNode<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeProps {
+    key: number;
+    sync: UnwrapRef<TreeNodeSyncStateType<T, UnwrapRef<S>>>;
+}
 
 @StateToolSet<TreeNodeStateType>()
 @SyncStateToolSet<TreeNodeSyncStateType>()
 export class TreeNodeState<
-    initData=any, initState extends TreeNodeStateType = TreeNodeStateType,
-    initSyncData=any, initSyncState extends TreeNodeSyncStateType = TreeNodeSyncStateType,
+    data=any, state extends BaseNodeStateType = BaseNodeStateType,
+    initData=any, initState extends TreeNodeStateType<data, state> = TreeNodeStateType<data, state>,
+    initSyncData=any, initSyncState extends TreeNodeSyncStateType<data, state> = TreeNodeSyncStateType<data, state>,
     > {
     state: UnwrapRef<optionalType<initState, initData>>
 
@@ -103,20 +67,22 @@ export class TreeNodeState<
     static initState(): TreeNodeStateType {
         return {
             level: 0,
-            classNames: () => ['basic'],
             padSize: '1rem',
             toggleSize: '1rem',
             disableToggle: true,
+            classNames: (node: TreeNode) => ({
+                basic: true,
+                [`level-${node.level}`]: true,
+                ...node.state,
+            }),
         };
     }
 
     static initSyncState(): TreeNodeSyncStateType {
         return {
             data: '',
-            disabled: false,
-            selected: false,
-            expanded: false,
             children: false,
+            state: getBaseNodeState(),
         };
     }
 
@@ -126,37 +92,105 @@ export class TreeNodeState<
     }
 }
 
-export interface TreeNodeMetaState {
-    nodes: TreeNode[];
-    selectedNodes: TreeNode[];
-    firstSelectedNode: TreeNode;
-    loading: boolean;
+
+export interface TreeNodeMetaState<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
+    nodes: InitTreeNodeProps<T, S>[];
+    selectedNodes: TreeNode<T, S>[];
+    firstSelectedNode: TreeNode<T, S>;
 }
 
 
 @HelperToolSet()
-export class TreeNodeToolSet<initData, initSyncData> extends TreeNodeState<
-    initData, TreeNodeStateType, initSyncData> {
-    metaState: UnwrapRef<TreeNodeMetaState> = null as unknown as TreeNodeMetaState;
+export class TreeNodeToolSet<
+    data=any, state extends BaseNodeStateType = BaseNodeStateType,
+    initData=any, initSyncData=any
+    > extends TreeNodeState<data, state, initData, TreeNodeStateType<data, state>, initSyncData, TreeNodeSyncStateType<data, state>> {
+    metaState: UnwrapRef<TreeNodeMetaState<data, state>> = null as unknown as UnwrapRef<TreeNodeMetaState<data, state>>;
 
-    // eslint-disable-next-line no-empty-function
-    getSelectedNode: (event?: any) => void = () => {};
+    isMultiSelect = false;
 
-    static initToolSet(_this: TreeNodeToolSet<any, any>) {
+    setSelectedNodes: (node?: TreeNode<data, state>) => void = () => {};
+
+    static initToolSet(_this: TreeNodeToolSet<any, any>, isMultiSelect: boolean): void {
+        _this.isMultiSelect = isMultiSelect;
         _this.metaState = reactive({
             nodes: [],
             selectedNodes: [],
             firstSelectedNode: computed(() => _this.metaState.selectedNodes[0]),
-            loading: false,
         });
-        _this.getSelectedNode = (event?: any) => {
-            // console.debug('getSelectedNode', event, _this.tree.value.selected());
-            _this.metaState.selectedNodes = event ? [event] : [];
+        _this.setSelectedNodes = (node?: TreeNode): void => {
+            if (!node) {
+                _this.metaState.selectedNodes = [];
+                return;
+            }
+
+            if (_this.isMultiSelect) {
+                const idx = findIndex(_this.metaState.selectedNodes, (d: TreeNode) => d.key === node.key && d.level === node.level);
+                if (idx === -1) _this.metaState.selectedNodes.push(node);
+                else _this.metaState.selectedNodes.splice(idx, 1);
+            } else {
+                _this.metaState.selectedNodes = [node];
+            }
         };
     }
 
-    constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData) {
+    constructor(initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        isMultiSelect = false) {
         super(initData, initSyncData);
-        TreeNodeToolSet.initToolSet(this);
+        TreeNodeToolSet.initToolSet(this, isMultiSelect);
     }
 }
+
+
+export const treeNodeProps = {
+    level: {
+        type: Number,
+        default: 0,
+    },
+    padSize: {
+        type: String,
+        default: '1rem',
+    },
+    toggleSize: {
+        type: String,
+        default: '1rem',
+    },
+    disableToggle: {
+        type: Boolean,
+        default: false,
+    },
+    classNames: {
+        type: Function,
+        default: (node: TreeNode): ReturnType<ClassNamesType> => ({
+            basic: true,
+            [`level-${node.level}`]: true,
+            ...node.state,
+        }),
+    },
+    /**
+     * sync
+     */
+    data: {
+        type: [Array, Object, String, Number, Boolean],
+        default: '',
+        required: true,
+    },
+    /**
+     * sync
+     */
+    children: {
+        type: [Array, Boolean],
+        default: false,
+    },
+    /**
+     * sync
+     */
+    state: {
+        type: Object,
+        default: (): BaseNodeStateType => ({ expanded: false }),
+        validator(state): boolean {
+            return state instanceof Object && state.expanded !== undefined;
+        },
+    },
+};
