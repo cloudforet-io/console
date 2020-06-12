@@ -9,45 +9,14 @@
                          @click="openProjectGroupForm(true)"
                     />
                 </div>
-                <!--                <p-tree-->
-                <!--                    ref="treeRef"-->
-                <!--                    v-bind="treeApiHandlerOrigin.ts.state"-->
-                <!--                    :select-mode="true"-->
-                <!--                    :style="{width:width+'px'}"-->
-                <!--                    @node:selected="selected"-->
-                <!--                >-->
-                <!--                    <template #icon="{node,isExpanded}">-->
-                <!--                        <p-i :name="'ic_tree_folder'"-->
-                <!--                             color="transparent inherit"-->
-                <!--                             width="1rem" height="1rem"-->
-                <!--                        />-->
-                <!--                    </template>-->
-                <!--                    <template #extra="{node, hoveredNode}">-->
-                <!--                        <span v-if="node===hoveredNode"-->
-                <!--                              @mouseenter.stop="hovered(node)"-->
-                <!--                              @click.stop="openProjectGroupForm(false)"-->
-                <!--                        >-->
-                <!--                            <div v-tooltip.bottom="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"-->
-                <!--                                 class="text-base truncate leading-tight"-->
-                <!--                            >-->
-                <!--                                <p-icon-button :name="'ic_plus'" class="group-add-btn"-->
-                <!--                                               width="1rem" height="1rem"-->
-                <!--                                />-->
-                <!--                            </div>-->
-                <!--                        </span>-->
-                <!--                    </template>-->
-                <!--                </p-tree>-->
                 <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
                              v-bind="node"
                              :data.sync="node.data"
                              :children.sync="node.children"
                              :state.sync="node.state"
                              @toggle:click="treeApiHandler.getData"
+                             @node:click="treeApiHandler.ts.setSelectedNodes"
                 >
-                    <template #data-0="{data, state}">
-                        <span class="font-bold">{{ data.name }}</span>
-                        {{ state.loading }}
-                    </template>
                     <template #data="{data}">
                         {{ data.name }}
                     </template>
@@ -60,7 +29,7 @@
             </div>
         </template>
         <template #default>
-            <div v-if="treeApiHandlerOrigin.ts.metaState.firstSelectedNode" class="pb-8 grid-layout">
+            <div v-if="treeApiHandler.ts.metaState.firstSelectedNode" class="pb-8 grid-layout">
                 <p-toolbox-grid-layout
                     v-bind="apiHandler.gridTS.state"
                     card-height="16rem"
@@ -129,7 +98,7 @@
                         </div>
                     </template>
                     <template #card="{item}">
-                        <div v-if="treeApiHandlerOrigin.ts.metaState.firstSelectedNode && item">
+                        <div v-if="treeApiHandler.ts.metaState.firstSelectedNode && item">
                             <div class="project-description">
                                 <div class="project">
                                     <div v-if="parentGroup" class="project-group-name">
@@ -211,7 +180,7 @@
                                           @confirm="projectGroupFormConfirm($event)"
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
-                                     :current-project="treeApiHandlerOrigin.ts.metaState.firstSelectedNode.data.id"
+                                     :current-project="treeApiHandler.ts.metaState.firstSelectedNode.data.id"
                                      @confirm="projectFormConfirm($event)"
             />
             <p-button-modal
@@ -276,6 +245,7 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
 import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
+import { getBaseNodeState, getDefaultNode, TreeNode } from '@/components/molecules/tree/PTreeNode.toolset';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -289,7 +259,7 @@ import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
     interface State {
         items: ProjectCardData[];
         hoveredId: string;
-        hoveredNode: any;
+        hoveredNode: TreeNode|null;
         hasChildProject: boolean;
         hasChildProjectGroup: boolean;
         showAllProjects: boolean;
@@ -320,7 +290,7 @@ export default {
         const state: UnwrapRef<State> = reactive({
             items: [],
             hoveredId: '',
-            hoveredNode: {},
+            hoveredNode: null,
             hasChildProject: true,
             hasChildProjectGroup: true,
             showAllProjects: ref(false),
@@ -351,9 +321,8 @@ export default {
             .setSortBy('name')
             .setSortDesc(false)
             .setExcludeProject();
-        const treeApiHandlerOrigin = new ProjectTreeFluentAPIOrigin(treeAction);
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
-        treeApiHandler.getData();
+        treeApiHandler.getRootData();
         const projectAPI = fluentApi.identity().project();
         const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statisticsTest().resource().stat()
@@ -430,7 +399,7 @@ export default {
              */
         const listAction = projectGroupAPI.listProjects().setTransformer(getCard).setIncludeProvider();
 
-        const isShow = computed(() => treeApiHandlerOrigin.ts.metaState.firstSelectedNode);
+        const isShow = computed(() => treeApiHandler.ts.metaState.firstSelectedNode);
 
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
@@ -460,7 +429,7 @@ export default {
         };
 
         const checkChildProjectGroup = async () => {
-            const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandlerOrigin.ts.metaState.firstSelectedNode.data.id }).execute();
+            const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
             if (resp.data.total_count > 0) state.hasChildProjectGroup = true;
             else state.hasChildProjectGroup = false;
         };
@@ -473,22 +442,17 @@ export default {
             if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
         };
 
-        /**
-             * Click or Hover Tree Item
-             */
-        const selected = async (item) => {
-            formState.isRoot = false;
-            treeApiHandlerOrigin.ts.getSelectedNode(item);
-            setProjectState(item);
-            await checkChildProjectGroup();
-        };
 
-        watch(() => treeApiHandlerOrigin.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
+        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
+                formState.isRoot = false;
+                setProjectState(after);
+                await checkChildProjectGroup();
                 apiHandler.action = listAction.setId(after.data.id);
                 apiHandler.resetAll();
                 const resp = await apiHandler.defaultGetData(false);
                 checkChildProject(resp);
+                setProjectState(after);
             }
         });
 
@@ -501,7 +465,7 @@ export default {
             }
         });
 
-        const hovered = async (item) => {
+        const hovered = async (item: TreeNode) => {
             formState.isRoot = false;
             state.hoveredId = item.data.id;
             state.hoveredNode = item;
@@ -540,7 +504,7 @@ export default {
 
         const projectGroupDeleteFormConfirm = () => {
             // @ts-ignore
-            fluentApi.identity().projectGroup().delete().setId(treeApiHandlerOrigin.ts.metaState.firstSelectedNode.data.id)
+            fluentApi.identity().projectGroup().delete().setId(treeApiHandler.ts.metaState.firstSelectedNode.data.id)
                 .execute()
                 .then(() => {
                     context.root.$notify({
@@ -551,8 +515,8 @@ export default {
                         duration: 2000,
                         speed: 1000,
                     });
-                    treeApiHandlerOrigin.ts.treeRef.value.deleteNode(treeApiHandlerOrigin.ts.metaState.firstSelectedNode);
-                    treeApiHandlerOrigin.ts.metaState.selectedNode = null;
+                    treeApiHandler.ts.deleteNode(treeApiHandler.ts.metaState.firstSelectedNode);
+                    treeApiHandler.ts.metaState.selectedNodes = [];
                 })
                 .catch((e) => {
                     showErrorMessage('Fail to Delete Project Group', e, context.root);
@@ -587,9 +551,15 @@ export default {
                     });
                     item.id = resp.data.project_group_id;
                     item.item_type = 'PROJECT_GROUP';
-                    const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
-                    if (formState.isRoot) treeApiHandlerOrigin.ts.treeRef.value.addNode(undefined, newNode);
-                    if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandlerOrigin.ts.treeRef.value.addNode(state.hoveredNode, newNode);
+                    const newNode = getDefaultNode(item, {
+                        children: item.has_child,
+                        state: {
+                            ...getBaseNodeState(),
+                            loading: false,
+                        },
+                    });
+                    if (formState.isRoot) treeApiHandler.ts.addNode(newNode);
+                    if (!formState.isRoot && !state.hoveredNode) treeApiHandler.ts.addNode(newNode, state.hoveredNode);
                 })
                 .catch((e) => {
                     showErrorMessage('Fail to Create Project Group', e, context.root);
@@ -603,7 +573,7 @@ export default {
         const projectFormConfirm = (item) => {
             fluentApi.identity().project().create().setParameter({
                 // @ts-ignore
-                project_group_id: treeApiHandlerOrigin.ts.metaState.firstSelectedNode.data.id,
+                project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.data.id,
                 ...item,
             })
                 .execute()
@@ -628,15 +598,12 @@ export default {
         };
 
         return {
-            treeRef: treeApiHandlerOrigin.ts.treeRef,
-            treeApiHandlerOrigin,
             treeApiHandler,
             treeState,
             ...toRefs(state),
             ...toRefs(projectState),
             ...toRefs(formState),
             skeletons: _.range(3),
-            selected,
             hovered,
             clickCard,
             goToServiceAccount,
@@ -791,14 +758,20 @@ export default {
 
     .empty-project-grp {
         line-height:1.5;
-    .title {
-        @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
+        .title {
+            @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
+        }
+        .content {
+            @apply text-gray-600;
+        }
+        .content-order {
+            @apply text-base pb-8 text-left m-auto max-w-64;
+        }
     }
-    .content {
-        @apply text-gray-600;
-    }
-    .content-order {
-        @apply text-base pb-8 text-left m-auto max-w-64;
-    }
+
+    .p-tree-node::v-deep {
+        .level-0 {
+            @apply font-bold;
+        }
     }
 </style>

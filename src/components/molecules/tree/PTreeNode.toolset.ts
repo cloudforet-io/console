@@ -19,6 +19,7 @@ export interface TreeNodeStateType<T=any, S extends BaseNodeStateType = BaseNode
 
 export interface BaseNodeStateType {
     expanded: boolean;
+    selected: boolean;
 }
 
 type ClassNamesType<T=any, S extends BaseNodeStateType = BaseNodeStateType> = (node: TreeNode<T, S>) => {[name: string]: boolean};
@@ -31,14 +32,14 @@ export interface TreeNodeSyncStateType<T=any, S extends BaseNodeStateType = Base
     state: S;
 }
 
-export const getBaseNodeState = (): BaseNodeStateType => ({ expanded: false });
+export const getBaseNodeState = (): BaseNodeStateType => ({ expanded: false, selected: false });
 
-export interface InitTreeNodeProps<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
+export interface InitTreeNodeProps<T, S extends BaseNodeStateType = BaseNodeStateType> {
     level?: number;
     padSize?: string;
     toggleSize?: string;
     disableToggle?: boolean;
-    classNames?: ClassNamesType<T, S>;
+    classNames?: ClassNamesType<T>;
     data?: T;
     children?: InitTreeNodeProps<T, S>[] | boolean;
     state?: S;
@@ -53,6 +54,7 @@ export const getDefaultNode = <T=any, S extends BaseNodeStateType = BaseNodeStat
 
 export interface TreeNode<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeProps {
     key: number;
+    parent: TreeNode<T, S>|null;
     sync: TreeNodeSyncStateType<T, S>;
 }
 
@@ -75,7 +77,6 @@ export class TreeNodeState<
             disableToggle: false,
             classNames: (node: TreeNode) => ({
                 basic: true,
-                [`level-${node.level}`]: true,
                 ...node.state,
             }),
         };
@@ -97,7 +98,7 @@ export class TreeNodeState<
 
 
 export interface TreeNodeMetaState<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
-    nodes: TreeNodeProps<T, S>[];
+    nodes: InitTreeNodeProps<T, S>[];
     selectedNodes: TreeNode<T, S>[];
     firstSelectedNode: TreeNode<T, S>;
 }
@@ -119,7 +120,33 @@ export class TreeNodeToolSet<
 
     isMultiSelect = false;
 
-    setSelectedNodes: (node?: TreeNode<data, state>) => void = () => {};
+    setSelectedNodes: (node: TreeNode<data, state>) => void = () => {};
+
+    setNodeState: (node: TreeNode<data, state>, state: {[name: string]: boolean}) => void
+        = (node: TreeNode<data, state>, state: {[name: string]: boolean}) => {
+            node.sync.state = {
+                ...node.sync.state,
+                ...state,
+            } as state;
+        };
+
+    deleteNode: (node: TreeNode<data, state>) => void
+        = (node: TreeNode<data, state>) => {
+            if (node.parent && Array.isArray(node.parent.sync.children)) {
+                node.parent.sync.children.splice(node.key, 1);
+            } else {
+                this.metaState.nodes.splice(node.key, 1);
+            }
+        };
+
+    addNode: (node: InitTreeNodeProps<data, state>, target?: TreeNode<data, state>) => void
+        = (node: InitTreeNodeProps<data, state>, target?: TreeNode<data, state>) => {
+            if (target && Array.isArray(target.sync.children)) {
+                target.sync.children = [...target.sync.children, node] as TreeNodeProps<data, state>[];
+            } else {
+                this.metaState.nodes.push(node);
+            }
+        };
 
     static initToolSet(_this: TreeNodeToolSet<any, any>, isMultiSelect: boolean): void {
         _this.isMultiSelect = isMultiSelect;
@@ -128,20 +155,23 @@ export class TreeNodeToolSet<
             selectedNodes: [],
             firstSelectedNode: computed(() => _this.metaState.selectedNodes[0]),
         });
-        _this.setSelectedNodes = (node?: TreeNode): void => {
-            if (!node) {
-                _this.metaState.selectedNodes = [];
-                return;
-            }
+        _this.setSelectedNodes = (node: TreeNode): void => {
+            // TODO: multi select case
+            // if (_this.isMultiSelect) {
+            // const idx = findIndex(_this.metaState.selectedNodes, (d: TreeNode) => d.key === node.key && d.level === node.level);
+            // if (idx === -1) _this.metaState.selectedNodes.push(node);
+            // else _this.metaState.selectedNodes.splice(idx, 1);
+            // }
 
-            if (_this.isMultiSelect) {
-                // TODO: multi select case
-                // const idx = findIndex(_this.metaState.selectedNodes, (d: TreeNode) => d.key === node.key && d.level === node.level);
-                // if (idx === -1) _this.metaState.selectedNodes.push(node);
-                // else _this.metaState.selectedNodes.splice(idx, 1);
-            } else {
-                _this.metaState.selectedNodes = [node];
+            if (_this.metaState.firstSelectedNode) {
+                _this.setNodeState(_this.metaState.firstSelectedNode, { selected: false });
+                if (_this.metaState.firstSelectedNode.key === node.key && _this.metaState.firstSelectedNode.level === node.level) {
+                    _this.metaState.selectedNodes = [];
+                    return;
+                }
             }
+            _this.setNodeState(node, { selected: true });
+            _this.metaState.selectedNodes = [node];
         };
     }
 
@@ -175,7 +205,6 @@ export const treeNodeProps = {
         type: Function,
         default: (node: TreeNode): ReturnType<ClassNamesType> => ({
             basic: true,
-            [`level-${node.level}`]: true,
             ...node.state,
         }),
     },
@@ -199,7 +228,7 @@ export const treeNodeProps = {
      */
     state: {
         type: Object,
-        default: (): BaseNodeStateType => ({ expanded: false }),
+        default: (): BaseNodeStateType => ({ expanded: false, selected: false }),
         validator(state): boolean {
             return state instanceof Object && state.expanded !== undefined;
         },

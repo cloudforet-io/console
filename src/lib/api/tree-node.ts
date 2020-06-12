@@ -46,7 +46,11 @@ export abstract class BaseTreeFluentAPI<
         }
     };
 
-    abstract getData: (node?: TreeNode<resp, state>) => Promise<void>;
+    abstract getData: (node: TreeNode<resp, state>, matched: TreeNode<resp, state>[], e: MouseEvent) => Promise<void>;
+
+    getRootData = async (): Promise<void> => {
+        await this.requestData();
+    }
 }
 
 export interface ProjectItemResp {
@@ -85,6 +89,7 @@ export class ProjectTreeFluentAPI<
             item => getDefaultNode<ProjectItemResp, state>(item, {
                 children: item.has_child,
                 state: {
+                    selected: false,
                     expanded: false,
                     loading: false,
                 } as state,
@@ -92,27 +97,14 @@ export class ProjectTreeFluentAPI<
         );
     }
 
-    // @ts-ignore
-    getData = async (node?: TreeNode<ProjectItemResp, state>, matched?: TreeNode<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
-        if (node) {
-            if (node.sync.state.expanded) {
-                node.sync.state = {
-                    ...node.sync.state,
-                    expanded: true,
-                };
-                return;
-            }
-            node.sync.state = {
-                expanded: true,
-                loading: true,
-            } as state;
+    getData = async (node: TreeNode<ProjectItemResp, state>, matched: TreeNode<ProjectItemResp, state>[], e: MouseEvent): Promise<void> => {
+        e.stopPropagation();
+        if (node.state.expanded) {
+            this.ts.setNodeState(node, { expanded: false });
+        } else {
+            this.ts.setNodeState(node, { expanded: true, loading: true });
         }
         await this.requestData(node);
-        if (node) {
-            node.sync.state = {
-                ...node.sync.state,
-                loading: false,
-            };
-        }
+        this.ts.setNodeState(node, { loading: false });
     }
 }

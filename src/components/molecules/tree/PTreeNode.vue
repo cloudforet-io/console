@@ -1,6 +1,6 @@
 <template>
     <div class="p-tree-node">
-        <div :class="classNames(node)" :style="{paddingLeft: depth}"
+        <div :class="{...classNames(node), [`level-${node.level}`]: true}" :style="{paddingLeft: depth}"
              v-on="getListeners('row')"
         >
             <slot :name="`row-${level}`" v-bind="slotBind">
@@ -105,6 +105,7 @@ export default {
         const node: any = computed(() => ({
             key: vm.$vnode.key || 0,
             ...props,
+            parent: null,
             sync: reactive({
                 data: makeProxy('data', props, emit),
                 children: makeProxy('children', props, emit),
@@ -177,6 +178,7 @@ export default {
                 forEach(vm.$listeners, (l, eventName: string) => {
                     if (!eventName.startsWith('update')) {
                         res[eventName] = (_node, matched, e) => {
+                            _node.parent = node.value;
                             emit(eventName, _node, [node.value, ...matched], e);
                         };
                     }
