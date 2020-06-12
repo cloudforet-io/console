@@ -139,8 +139,8 @@ export class TreeNodeToolSet<
             }
         };
 
-    addNode: (node: InitTreeNodeProps<data, state>, target?: TreeNode<data, state>) => void
-        = (node: InitTreeNodeProps<data, state>, target?: TreeNode<data, state>) => {
+    addNode: (node: InitTreeNodeProps<data, state>, target?: TreeNode<data, state>|null) => void
+        = (node: InitTreeNodeProps<data, state>, target?: TreeNode<data, state>|null) => {
             if (target && Array.isArray(target.sync.children)) {
                 target.sync.children = [...target.sync.children, node] as TreeNodeProps<data, state>[];
             } else {

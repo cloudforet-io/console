@@ -1,36 +1,35 @@
 <template>
-    <p-tree-modal ref="treeRef"
-                  :scrollable="false"
-                  :visible.sync="treeAPITS.ts.syncState.visible"
-                  :header-title="headerTitle"
-                  theme-color="primary"
-                  v-bind="treeAPITS.ts.state"
-                  @cancel="close"
-                  @close="close"
-                  @confirm="confirm"
-                  @node:selected="update"
-                  @node:unselected="update"
+    <p-button-modal :header-title="headerTitle"
+                    :scrollable="false"
+                    size="sm"
+                    centered
+                    fade
+                    backdrop
+                    :visible.sync="proxyVisible"
+                    @cancel="close"
+                    @close="close"
+                    @confirm="confirm"
     >
-        <template #default>
-            <div class="mt-2">
-                <span @click.stop.capture="release= !release"><p-check-box v-model="release" /> release project</span>
-            </div>
-            <div v-show="error" class="alert">
-                <span class="alert-msg">
-                    <p-i name="ic_alert" width="1rem" height="1rem" />
-                </span>
-                <span>Please select a project or release the project</span>
-            </div>
+        <template #body>
+            <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
+                         v-bind="node"
+                         :data.sync="node.data"
+                         :children.sync="node.children"
+                         :state.sync="node.state"
+                         @toggle:click="treeApiHandler.getData"
+                         @node:click="treeApiHandler.ts.setSelectedNodes"
+            >
+                <template #data="{data}">
+                    {{ data.name }}
+                </template>
+                <template #toggle="{state, toggleSize}">
+                    <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
+                         :height="toggleSize"
+                    />
+                </template>
+            </p-tree-node>
         </template>
-        <template #icon="{node,isExpanded}">
-            <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' :
-                     isExpanded ? 'ic_tree_folder--opened' : 'ic_tree_folder'"
-                 color="transparent inherit"
-                 width="1rem" height="1rem"
-            />
-        </template>
-        <template #footer-extra />
-    </p-tree-modal>
+    </p-button-modal>
 </template>
 
 <script lang="ts">
@@ -44,10 +43,20 @@ import { makeProxy } from '@/lib/compostion-util';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { Computed } from '@/lib/type';
 import PI from '@/components/atoms/icons/PI.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
+import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
+import { fluentApi } from '@/lib/fluent-api';
 
-export default defineComponent({
+export default {
     name: 'SProjectTreeModal',
-    components: { PTreeModal, PCheckBox, PI },
+    components: {
+        PTreeNode,
+        PTreeModal,
+        PCheckBox,
+        PI,
+        PButtonModal,
+    },
     props: {
         visible: { // sync
             type: Boolean,
@@ -57,52 +66,52 @@ export default defineComponent({
             type: String,
             default: 'Change Project',
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }) {
-        const visible = makeProxy<boolean>('visible');
-        const treeRef = ref(null);
-        const treeAPITS = new ProjectTreeAPI<any, any, ProjectNode, any, TreeModalToolSet>(
-            TreeModalToolSet, undefined, { visible }, treeRef,
-        );
+        const projectApi = fluentApi.identity().project();
+        const treeAction = projectApi.tree()
+            .setSortBy('name')
+            .setSortDesc(false);
+
+        const treeApiHandler = new ProjectTreeFluentAPI({
+            treeAction, treeSearchAction: projectApi.treeSearch(),
+        });
+
         const state = reactive({
             release: ref(false),
             error: ref(false),
         });
-        const selectNode: Computed<null|ProjectNode> = computed(() => (treeAPITS.ts.metaState.firstSelectedNode as unknown as null|ProjectNode));
-        watch(visible, (show, preShow) => {
-            if (!show && show !== preShow) {
-                state.error = false;
-                state.release = false;
+
+        watch(() => props.visible, async (after, before) => {
+            if (after === before) return;
+            if (after) {
+                if (props.projectId) await treeApiHandler.getSearchData(props.projectId);
+                else await treeApiHandler.getData();
+            } else {
+                treeApiHandler.ts.metaState.nodes = [];
             }
         });
 
         return {
-            treeAPITS,
-            treeRef: treeAPITS.ts.treeRef,
+            proxyVisible: makeProxy('visible'),
+            treeApiHandler,
             ...toRefs(state),
             update: (event) => {
-                console.log(event);
-                treeAPITS.ts.getSelectedNode(event);
             },
             click() {
-                treeAPITS.ts.open();
             },
             close() {
-                treeAPITS.ts.close();
             },
             confirm() {
                 state.error = false;
-                if (state.release) {
-                    emit('confirm');
-                } else if (selectNode.value && selectNode.value.data.item_type === 'PROJECT') {
-                    treeAPITS.ts.confirm();
-                } else {
-                    state.error = true;
-                }
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
