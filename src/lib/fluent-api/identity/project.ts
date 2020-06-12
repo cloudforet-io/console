@@ -10,7 +10,7 @@ import {
     SingleItemMemberListAction,
     SubMultiItemAction,
     SubMultiItemAddAction,
-    TreeAction,
+    TreeAction, TreeSearchAction,
     UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
@@ -73,7 +73,13 @@ class Tree extends TreeAction<ProjectTreeParameter, any> {
     setExcludeProject(val = true) {
         return val ? this.setExcludeType('PROJECT') : this.setExcludeType('');
     }
+}
 
+export interface TreeSearchResp {
+    open_path: string[];
+}
+
+class TreeSearch extends TreeSearchAction<ProjectTreeParameter, TreeSearchResp> {
 }
 
 abstract class MemberAction extends SubMultiItemAction<any, any> {
@@ -90,7 +96,7 @@ class RemoveMember extends MemberAction {
     path = 'member/remove'
 }
 
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'memberList'|'tree'|'addMember'|'removeMember'> {
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'|'treeSearch'|'memberList'|'addMember'|'removeMember'> {
     protected name = 'project';
 
     create() { return new Create(this.api, this.baseUrl); }
@@ -106,6 +112,8 @@ export default class Project extends Resource implements ResourceActions<'create
     memberList() { return new MemberList(this.api, this.baseUrl); }
 
     tree() { return new Tree(this.api, this.baseUrl); }
+
+    treeSearch() { return new TreeSearch(this.api, this.baseUrl); }
 
     addMember() { return new AddMember(this.api, this.baseUrl); }
 

@@ -317,13 +317,17 @@ export default {
         /**
              Tree, Project, Statistics API Handler Declaration
              */
-        const treeAction = fluentApi.identity().project().tree()
+        const projectAPI = fluentApi.identity().project();
+        const treeAction = projectAPI.tree()
             .setSortBy('name')
             .setSortDesc(false)
             .setExcludeProject();
-        const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
-        treeApiHandler.getRootData();
-        const projectAPI = fluentApi.identity().project();
+        const treeSearchAction = projectAPI.treeSearch();
+        const treeApiHandler = new ProjectTreeFluentAPI({
+            treeAction, treeSearchAction,
+        });
+        treeApiHandler.getData();
+
         const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statisticsTest().resource().stat()
             .setResourceType('identity.Project')
