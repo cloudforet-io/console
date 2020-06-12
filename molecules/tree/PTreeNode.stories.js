@@ -183,8 +183,8 @@ export const apiCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: 'root',
-            children: childrenData,
-            state: { expanded: true },
+            children: true,
+            state: { expanded: false },
         });
 
         return {
@@ -192,9 +192,9 @@ export const apiCase = () => ({
             toggleClick(node, matched, e) {
                 e.stopPropagation();
                 if (!node.sync.state.expanded) {
-                    node.children = [];
+                    node.sync.children = [];
                     setTimeout(() => {
-                        node.children = [
+                        node.sync.children = [
                             { data: `This is [${node.data}]'s child`, children: [] },
                         ];
                     }, 1000);
@@ -274,7 +274,7 @@ export const slotCase = () => ({
         const state = reactive({
             data: 'root',
             children: childrenData,
-            state: {},
+            state: { expanded: true },
         });
 
         return {
@@ -319,7 +319,7 @@ export const levelSlotCase = () => ({
         const state = reactive({
             data: 'root',
             children: childrenData,
-            state: {},
+            state: { expanded: true },
         });
 
         return {
@@ -361,7 +361,7 @@ export const customEventListener = () => ({
         const state = reactive({
             data: 'root',
             children: childrenData,
-            state: {},
+            state: { expanded: true },
         });
 
         return {
@@ -400,10 +400,7 @@ export const HelperToolSetUsage = () => ({
             ts,
             toggleClick(node, matched, e) {
                 e.stopPropagation();
-                node.sync.state = {
-                    ...node.sync.state,
-                    expanded: !node.sync.state.expanded,
-                };
+                ts.setNodeState(node, { expanded: !node.sync.state.expanded });
                 action('toggle:click')(node, matched, e);
             },
         };

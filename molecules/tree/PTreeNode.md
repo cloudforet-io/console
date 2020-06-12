@@ -10,23 +10,38 @@
 typescript: 
 
 ```typescript
-interface TreeNodeStateType {
+
+interface TreeNodeStateType<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
     level: number;
     padSize: string;
     toggleSize: string;
     disableToggle: boolean;
-    classNames: (...args) => string[];
+    classNames: ClassNamesType<T, S>;
 }
 
-interface TreeNodeSyncStateType<T=any> {
-    data: T;
-    disabled: boolean;
-    selected: boolean;
+interface BaseNodeStateType {
     expanded: boolean;
-    children: TreeNodeProps[] | boolean;
+    selected: boolean;
 }
 
-interface TreeNodeProps extends TreeNodeStateType, TreeNodeSyncStateType {}
+type ClassNamesType<T=any, S extends BaseNodeStateType = BaseNodeStateType> = (node: TreeNode<T, S>) => {[name: string]: boolean};
+
+interface TreeNodeProps<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeStateType, TreeNodeSyncStateType<T, S> {}
+
+interface TreeNodeSyncStateType<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
+    data: T;
+    children: TreeNodeProps<T, S>[] | boolean;
+    state: S;
+}
+
+interface TreeNode<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeProps {
+    key: number;
+    parent: TreeNode<T, S>|null;
+    sync: TreeNodeSyncStateType<T, S>;
+}
+
+type TreeNodeEventListener<T=any, S extends BaseNodeStateType = BaseNodeStateType>
+    = (node: TreeNode<T, S>, matched: TreeNode<T, S>[], e: MouseEvent) => void;
 
 ```
 
@@ -39,15 +54,12 @@ list:
 | toggleSize | ``` String ``` | 1rem | The size for toggle. <br> If no value is given to the child node, the value is inherited. |
 | disableToggle | ``` Boolean ``` | false | Whether to disable the toggle. <br> If no value is given to the child node, the value is inherited. |
 | classNames | ``` Function ``` | ``` () => ['basic'] ``` | Class names given to each node. <br> If no value is given to the child node, the value is inherited. |
-| disabled | ``` Boolean ``` | ``` false ``` | Whether the state is disabled. <br> If no value is given to the child node, it is automatically generated with default value. |
-| selected | ``` Boolean ``` | ``` false ``` | Whether the state is selected. <br> If no value is given to the child node, it is automatically generated with default value. |
-| expanded | ``` Boolean ``` | ``` false ``` | Whether the state is expanded. <br> If no value is given to the child node, it is automatically generated with default value. |
-| data | ``` Array, Object, String, Number, Boolean ``` | ``` '' ``` | Data to display on each node. <br> If no value is given to the child node, it is automatically generated with default value. |
-| children | ``` Array, Boolean ``` | ``` false ``` | Children data. <br> If no value is given to the child node, it is automatically generated with default value. |
+| data | ``` Array, Object, String, Number, Boolean ``` | ``` '' ``` | Data to display on each node. sync.|
+| children | ``` Array, Boolean ``` | ``` false ``` | Children data. sync.|
+| state | ``` Boolean ``` | ``` false ``` | Indicates state of the node. sync.|
 
 
 ## Slots
-
 
 - row
 - row-{level}
@@ -69,10 +81,16 @@ list:
 
 | Name | Contents | Type(typescript) |
 | ---- | :------- | ---- |
-| node | It has all props of the node. |```Readonly<TreeNode>``` |
-| depth | Depth of the node. |```string``` |
-| getListeners | Function that returns listeners. See _customEventListener_ case. |```(type: string)=>any``` |
-| syncNode | The sync state of the node. <br> Mutation works only with the node that props were given from the parent and bound with  ```sync```. | ```UnwrapRef<TreeNodeSyncStateType<T>> ``` |
+| depth | Depth of the node. |``` string ``` |
+| getListeners | Function that returns listeners. See _customEventListener_ case. |``` (type: string)=>any ``` |
+| level | The depth of the node. <br/> If no value is given, it is automatically generated. It starts at 0 and goes down and increases by 1. | ``` number ```|
+| padSize | The size for expressing 1 depth(level). <br> If no value is given to the child node, the value is inherited. | ``` string ``` |
+| toggleSize | The size for toggle. <br> If no value is given to the child node, the value is inherited. | ``` string ``` |
+| disableToggle | Whether to disable the toggle. <br> If no value is given to the child node, the value is inherited. | ``` boolean ```|
+| classNames | Class names given to each node. <br> If no value is given to the child node, the value is inherited. | ``` ClassNamesType<dataType, stateType> ``` |
+| data | Data to display on each node. sync. | ``` any ``` |
+| children | Children data. sync.| ``` TreeNodeProps<T, S>[] | boolean ``` |
+| state  | Indicates state of the node. sync.| ``` {[name: string]: boolean} ``` |
 
 
 ## Events
@@ -89,9 +107,22 @@ list:
 
 | Order | Name | Contents | Type(typescript) |
 | ----- | ---- | :------- | ---- |
-| 1 | syncNode | The sync state of the node. <br> Mutation works only with the node that props were given from the parent and bound with  ```sync```. | ```UnwrapRef<TreeNodeSyncStateType<T>> ``` |
-| 2 | node | It has all READONLY props of the node. |```Readonly<TreeNode>``` |
-| 2 | matched | Array of the matched nodes ordered by ```level``` and starts from the root. <br> ```key``` indicates ```$vnode.key``` which is generated by children array index. | ```Array<{ key: number, node: Readonly<TreeNodeProps> }>``` |
+| 1 | node | It has all READONLY props of the node. |``` TreeNode<dataType, stateType> ``` |
+| 2 | matched | Array of the matched nodes ordered by ```level``` and starts from the root. <br> ```key``` indicates ```$vnode.key``` which is generated by children array index. | ```TreeNode<dataType, stateType>[] ``` |
 | 3 | MouseEvent | MouseEvent |```MouseEvent``` |
+
+```typescript
+import {BaseNodeStateType,TreeNodeProps,TreeNodeSyncStateType} from "./PTreeNode.toolset";
+ 
+interface TreeNode<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeProps {
+    key: number;
+    parent: TreeNode<T, S>|null;
+    sync: TreeNodeSyncStateType<T, S>;
+}
+
+type TreeNodeEventListener<T=any, S extends BaseNodeStateType = BaseNodeStateType>
+    = (node: TreeNode<T, S>, matched: TreeNode<T, S>[], e: MouseEvent) => void;
+```
+
 <br>
 <br>
