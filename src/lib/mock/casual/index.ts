@@ -8,15 +8,15 @@ import pluginModels, { PluginCasual } from '@/lib/mock/casual/plugin';
 import serviceAccountModels, { ServiceAccountCasual } from '@/lib/mock/casual/serviceAccount';
 import cloudServiceTypeModels, { CloudServiceTypeCasual } from '@/lib/mock/casual/cloudServiceType';
 import statisticsModels, { StatisticsCasual } from '@/lib/mock/casual/statistics';
+import projectModels, { ProjectCasual } from '@/lib/mock/casual/project';
 import { ModelType } from '@/lib/mock/casual/type';
-import moment from 'moment';
 
 export type MockCasualType = CustomCasual &
     CollectorCasual & ServerCasual &
     MemberCasual & CredentialsCasual &
     RepositoryCasual & PluginCasual &
     ServiceAccountCasual & CloudServiceTypeCasual
-& StatisticsCasual
+& StatisticsCasual & ProjectCasual
 
 
 /* DO NOT CHANGE the order of models */
@@ -30,6 +30,7 @@ const models: ModelType[][] = [
     serviceAccountModels,
     cloudServiceTypeModels,
     statisticsModels,
+    projectModels,
 ];
 
 const getModels = (origin: CustomCasual): MockCasualType => {
