@@ -54,7 +54,7 @@
                 >
                     <template slot="toolbox-bottom">
                         <div class="cst-toolbox-bottom">
-                            <PSearch :search-text.sync="apiHandler.gridTS.searchText.value" @onSearch="apiHandler.getData()" />
+                            <PSearch :search-text.sync="apiHandler.gridTS.searchText.value" @onSearch="apiHandler.getData(true)" />
                         </div>
                     </template>
                     <template #no-data>
@@ -191,6 +191,7 @@ export default {
             undefined,
             undefined,
             selectProvider,
+            undefined,
             {
                 items: computed(() => {
                     const result = [{
@@ -274,20 +275,7 @@ export default {
             undefined,
             vm,
         );
-        const getData = _.debounce(() => apiHandler.getData(), 50);
-        watch(selectProvider, (after, before) => {
-            if (after && after !== before) {
-                if (after === 'all') {
-                    apiHandler.action = listAction.setFixFilter();
-                } else {
-                    apiHandler.action = listAction.setFixFilter(
-                        { key: 'provider', operator: '=', value: after },
-                    );
-                }
-                apiHandler.resetAll();
-                getData();
-            }
-        });
+
         const clickCard = (item) => {
             vm?.$router.push({
                 name: 'cloudServicePage',
@@ -315,13 +303,7 @@ export default {
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
 
-        const routerHandler = async () => {
-            const prop = propsCopy(props);
-            providerListState.applyDisplayRouter(prop);
-            apiHandler.applyAPIRouter(prop);
-            await apiHandler.getData();
-        };
-        onMounted(async () => {
+        const requestProvider = async () => {
             const resp = await cstCountApi.execute();
             let total = 0;
             const data: any = { };
@@ -332,13 +314,46 @@ export default {
             });
             data.all = total;
             providerTotalCount.value = data;
-            await routerHandler();
-        });
+        };
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            await requestProvider();
+            providerListState.applyDisplayRouter(prop);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+        };
 
+        const testGetData = async (resetPage: boolean) => {
+            if (resetPage) {
+                apiHandler.gridTS.syncState.thisPage = 1;
+                await apiHandler.getData();
+            }
+        };
+
+        onMounted(async () => {
+            await routerHandler();
+            const getData = _.debounce(() => apiHandler.getData(), 50);
+            let ready = false;
+            watch(selectProvider, (after, before) => {
+                if (ready && after && after !== before) {
+                    if (after === 'all') {
+                        apiHandler.action = listAction.setFixFilter();
+                    } else {
+                        apiHandler.action = listAction.setFixFilter(
+                            { key: 'provider', operator: '=', value: after },
+                        );
+                    }
+                    apiHandler.resetAll();
+                    getData();
+                }
+            });
+            ready = true;
+        });
         return {
             selectProvider,
             selectProviderName,
             apiHandler,
+            testGetData,
             clickCard,
             goToServiceAccount,
             providerStore,

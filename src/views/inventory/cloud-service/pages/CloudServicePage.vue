@@ -7,7 +7,7 @@
                             use-total-count
                             use-selected-count :total-count="apiHandler.totalCount.value"
                             :selected-count="apiHandler.tableTS.selectState.selectItems.length"
-                            @goBack="$router.push({name:'cloudServiceMain'})"
+                            @goBack="$router.go(-1)"
                 />
                 <s-dynamic-layout type="query-search-table"
                                   :toolset="apiHandler"

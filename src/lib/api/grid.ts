@@ -44,12 +44,15 @@ export abstract class BaseGridFluentAPI<
 
     getAction = () => this.getDefaultAction()
 
-    defaultGetData = async () => {
+    defaultGetData = async (resetThisPage) => {
+        if (resetThisPage) {
+            this.gridTS.syncState.thisPage = 1;
+        }
         this.gridTS.syncState.loading = true;
         this.gridTS.state.items = [];
-        let res: PromiseLike<AxiosResponse<any>>|any = null;
+        // let res: PromiseLike<AxiosResponse<any>>|any = null;
         try {
-            res = await this.getAction().execute();
+            const res = await this.getAction().execute();
             this.gridTS.state.items = res.data.results;
             this.totalCount.value = res.data.total_count;
             this.gridTS.setAllPage(res.data.total_count);
@@ -58,11 +61,11 @@ export abstract class BaseGridFluentAPI<
             this.gridTS.state.allPage = 1;
         }
         this.gridTS.syncState.loading = false;
-        return res;
+        // return res;
     };
 
-    getData = async () => {
-        await this.defaultGetData();
+    getData = async (resetThisPage = false) => {
+        await this.defaultGetData(resetThisPage);
     };
 
     protected defaultReset = () => {
@@ -128,7 +131,7 @@ export class QuerySearchGridFluentAPI<
         this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
             if (isShow.value && tags !== preTags) {
-                await this.getData();
+                await this.getData(true);
             }
         });
     }
@@ -214,7 +217,6 @@ export class RouteSearchGridFluentAPI<
     T extends SearchGridLayoutToolSet<initData, initSyncData> = SearchGridLayoutToolSet<initData, initSyncData>,
     action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
     > extends SearchGridFluentAPI<parameter, resp, initData, initSyncData, T, action> implements RouterAPIToolsetInterface {
-
     constructor(
         action: action,
         initData: initData = {} as initData,
@@ -235,6 +237,7 @@ export class RouteSearchGridFluentAPI<
     }
 
     applyAPIRouter = (props: any) => {
+        console.log('props test', props);
         if (isNotEmpty(props[this.qsName.pageSize])) {
             this.gridTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
         }
@@ -243,7 +246,7 @@ export class RouteSearchGridFluentAPI<
         }
         const search = props[this.qsName.search];
         if (isNotEmpty(search)) {
-            this.gridTS.searchText.value = this.qsName.search;
+            this.gridTS.searchText.value = search;
         }
         this.isReady = true;
     };
@@ -261,9 +264,12 @@ export class RouteSearchGridFluentAPI<
         await pushRouterQuery(this.vm, query);
     }
 
-    getData = async () => {
+    getData = async (resetThisPage = false) => {
         if (this.isReady) {
-            await this.defaultGetData();
+            // if (resetThisPage) {
+            //     this.gridTS.syncState.thisPage = 1;
+            // }
+            await this.defaultGetData(resetThisPage);
             await this.routerPush();
         }
     };
@@ -328,11 +334,10 @@ export class RouteQuerySearchGridFluentAPI<
         await pushRouterQuery(this.vm, query);
     }
 
-    getData = async () => {
+    getData = async (resetThisPage = false) => {
         if (this.isReady) {
-            await this.defaultGetData();
+            await this.defaultGetData(resetThisPage);
             await this.routerPush();
         }
     };
 }
-

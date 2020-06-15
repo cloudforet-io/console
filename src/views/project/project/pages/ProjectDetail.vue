@@ -7,6 +7,7 @@
                            @click="openProjectDeleteForm"
             />
         </div>
+        <p class="float-right text-gray-500 -my-6"><b>Project ID:</b> {{projectId}}</p>
         <PTab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
               :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
         >

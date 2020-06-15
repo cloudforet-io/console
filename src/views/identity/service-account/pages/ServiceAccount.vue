@@ -283,6 +283,7 @@ export default {
                 const properties = selectProviderItem.value.template.service_account.schema.properties || {};
                 if (selectProviderItem) {
                     return [
+                        { name: 'ID', key: 'service_account_id' },
                         { name: 'Name', key: 'name' },
                         ...Object.entries(properties).map(([key, item]) => ({
                             key: `data.${key}`,

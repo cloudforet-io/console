@@ -64,7 +64,10 @@ export abstract class BaseTableFluentAPI<
 
     getAction = () => this.getDefaultAction()
 
-    defaultGetData = async () => {
+    defaultGetData = async (resetThisPage) => {
+        if (resetThisPage) {
+            this.tableTS.syncState.thisPage = 1;
+        }
         this.tableTS.syncState.loading = true;
         this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
@@ -82,8 +85,8 @@ export abstract class BaseTableFluentAPI<
         }
     };
 
-    getData = async () => {
-        await this.defaultGetData();
+    getData = async (resetThisPage = false) => {
+        await this.defaultGetData(resetThisPage);
     }
 
     protected defaultReset = () => {
@@ -377,7 +380,7 @@ export class QuerySearchTableFluentAPI<
         this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
             if (tags !== preTags && this.action) {
-                await this.getData();
+                await this.getData(true);
             }
         });
     }
@@ -521,9 +524,9 @@ export class RouteQuerySearchTableFluentAPI<
         await pushRouterQuery(this.vm, query);
     }
 
-    getData = async () => {
+    getData = async (resetThisPage = false) => {
         if (this.isReady) {
-            await this.defaultGetData();
+            await this.defaultGetData(resetThisPage);
             await this.routerPush();
         }
     };
@@ -585,7 +588,10 @@ export abstract class BaseTableAPI<
     };
 
 
-    getData = async () => {
+    getData = async (resetThisPage = false) => {
+        if (resetThisPage) {
+            this.tableTS.syncState.thisPage = 1;
+        }
         this.tableTS.syncState.loading = true;
         this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
@@ -678,7 +684,7 @@ export class QuerySearchTableAPI<initData = any, initSyncData = any,
         this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, (tags, preTags) => {
             if (tags !== preTags) {
-                this.getData();
+                this.getData(false);
             }
         });
     }
