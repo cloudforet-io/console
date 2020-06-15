@@ -44,7 +44,7 @@ export class TreeModalState<
         super(initData, initSyncData, true);
         this.state = initReactive(lazy, TreeModalState.initState(), initData);
         this.syncState = initReactive(lazy, TreeModalState.initSyncState(), initSyncData);
-        console.debug(initData, this.state.selectMode);
+        // console.debug(initData, this.state.selectMode);
     }
 }
 

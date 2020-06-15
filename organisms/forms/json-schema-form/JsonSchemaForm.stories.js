@@ -132,7 +132,7 @@ export const customValidatorForm = () => ({
         const checkEmail = (...args) => {
             const prom = new Promise((resolve, reject) => {
                 const data = args[1] || '';
-                console.debug(data.indexOf('@'));
+                // console.debug(data.indexOf('@'));
                 if (data.indexOf('@') !== -1) {
                     resolve(true);
                 }
