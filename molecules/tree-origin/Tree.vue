@@ -190,7 +190,7 @@ export default defineComponent({
     }
 
     .p-tree-container .tree-root {
-        padding: 1.5rem .5rem;
+        /*padding: 1.5rem .5rem;*/
         .tree-content {
             padding: .5rem 0;
             height: 2rem;

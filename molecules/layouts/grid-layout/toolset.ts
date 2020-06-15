@@ -12,6 +12,7 @@ import { isNotEmpty } from '@/lib/util';
 import {
     ACHandlerMeta, defaultACHandler, DefaultQSGridQSPropsName, QuerySearchGridFluentAPI,
 } from '@/lib/api/grid';
+import router from "@/routes";
 
 export const gridLayoutProps = {
     cardMinWidth: {
@@ -142,6 +143,7 @@ export const DefaultSingleItemSelectGridQSProps = makeSelectGridQSProps(DefaultS
 export const DefaultMultiItemSelectGridQSProps = makeSelectGridQSProps(DefaultMultiItemSelectGridQSPropsName);
 
 @HelperToolSet()
+// @ts-ignore
 export class SelectGridLayoutToolSet<initData, initSyncData>
     extends GridLayoutState<initData, initSyncData>
     implements RouterAPIToolsetInterface {
@@ -167,11 +169,15 @@ export class SelectGridLayoutToolSet<initData, initSyncData>
             if (isNotEmpty(selectItems)) {
                 _this.select.value = selectItems;
             }
+            _this.isReady.value = true;
+
         };
         watch( _this.select, async (aft, bef) => {
             // console.debug(aft);
             if (aft !== bef) {
-                await _this.routerPush();
+                if (_this.isReady?.value) {
+                    await _this.routerPush();
+                }
             }
         });
         watch(_this.isShow, async (aft, bef) => {
@@ -187,6 +193,7 @@ export class SelectGridLayoutToolSet<initData, initSyncData>
         public qsName: SelectGridQSNameType = DefaultSingleItemSelectGridQSPropsName,
         public isShow: Ref<boolean> = ref(true),
         public select: Ref<string> = ref(''),
+        public isReady: Ref<boolean> = ref(false),
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
     ) {
