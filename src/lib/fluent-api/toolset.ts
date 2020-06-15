@@ -1,5 +1,5 @@
 /* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
-import {AxiosInstance, AxiosResponse} from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import {
     ApiMethods,
@@ -10,9 +10,9 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface,
+    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface, TreeParameter,
 } from '@/lib/fluent-api/type';
-import {isNotEmpty} from '@/lib/util';
+import { isNotEmpty } from '@/lib/util';
 
 
 export abstract class ActionAPI<parameter = any, resp = any> implements ActionAPIInterface<parameter, resp> {
@@ -137,7 +137,7 @@ export const filterItemToQuery = (filters: FilterItem[] = [], fixedFilters: Filt
         if (MERGE_OPERATOR_SET.has(op)) {
             mergeOpQuery = mergeQuery(mergeOpQuery, q, op);
         } else {
-            newFilters.push({k: q.key, v: q.value, o: op});
+            newFilters.push({ k: q.key, v: q.value, o: op });
         }
     });
 
@@ -324,14 +324,14 @@ interface SingleItemActionInterface {
 }
 
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    getParameter = (): parameter => ({...this.apiState.parameter});
+    getParameter = (): parameter => ({ ...this.apiState.parameter });
 
     protected apiState: RawParameterActionState<parameter>;
 
     constructor(
         api: ApiType,
         baseUrl: string,
-        initState: RawParameterActionState<parameter> = {parameter: {} as parameter},
+        initState: RawParameterActionState<parameter> = { parameter: {} as parameter },
         transformer: ((any) => any | Promise<any>) | null = null,
     ) {
         super(api, baseUrl, initState, transformer);
@@ -383,7 +383,6 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
         return api;
     }
 }
-
 
 
 interface TreeActionState<parameter = any> {
@@ -453,7 +452,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
     }
 
     getParameter = (): parameter & any => {
-        const params: any = {};
+        const params: TreeParameter = {};
 
         if (this.apiState.item_type) {
             params.item_type = this.apiState.item_type;
@@ -504,7 +503,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
     }
 
     getParameter = (): { only?: string[] } & parameter => {
-        const parms: any = {...this.apiState.parameter};
+        const parms: any = { ...this.apiState.parameter };
         if (this.apiState.only.length || this.apiState.fixOnly.length) {
             parms.only = [...this.apiState.fixOnly, ...this.apiState.only];
         }

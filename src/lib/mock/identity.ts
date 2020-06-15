@@ -1,8 +1,10 @@
 /* eslint-disable camelcase */
-import { makeArrayResults, MockData } from '@/lib/mock/toolset';
+import { makeArrayResults, makeTreeResults, MockData } from '@/lib/mock/toolset';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/lib/mock/casual';
 import _ from 'lodash';
+import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import { TreeParameter } from '@/lib/fluent-api/type';
 
 export const DOMAIN_INFO = {
     domain_id: 'domain_test_id',
@@ -151,6 +153,25 @@ const providerList = [
         },
     },
 ];
+let parentId;
+let callCount = 0;
+const getTreeItems = (id?: string) => {
+    if (!id) {
+        callCount += 1;
+        if (callCount > 5) {
+            // eslint-disable-next-line no-param-reassign
+            id = `project-${casual.uuid}`;
+        }
+    }
+    parentId = id;
+
+    return makeTreeResults([
+        casual._projectTreeItem(),
+        casual._projectTreeItem(parentId),
+        casual._projectTreeItem(),
+        casual._projectTreeItem(),
+    ]);
+};
 
 export default [
     new MockData('/identity/domain/list', () => (makeArrayResults([DOMAIN_INFO]))),
@@ -168,4 +189,12 @@ export default [
         access_token: 'asdf.asdf.asdf',
         refresh_token: 'asdf.asdf.asdf',
     })),
+    new MockData('/identity/project/tree', () => getTreeItems()),
+    new MockData('/identity/project/tree/search', () => [
+        `pg-${casual.uuid}`,
+        `pg-${casual.uuid}`,
+        `pg-${casual.uuid}`,
+        `pg-${casual.uuid}`,
+        `project-${casual.uuid}`,
+    ]),
 ];

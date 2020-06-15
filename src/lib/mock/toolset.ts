@@ -43,3 +43,8 @@ export const makeArrayResults = (results: any[] = [], totalCount: null|number = 
     // eslint-disable-next-line camelcase
     total_count: totalCount !== null ? totalCount : results.length,
 });
+
+
+export const makeTreeResults = (items: any[]) => ({
+    items,
+});
