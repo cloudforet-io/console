@@ -190,3 +190,10 @@ export interface ActionAPIInterface<parameter=any, resp=any> {
 export interface TreeResp<T> {
     items: T[];
 }
+
+export interface TreeParameter {
+    item_type?: string;
+    item_id?: string;
+    sort?: {key: string; desc: boolean};
+    exclude_type?: string;
+}
