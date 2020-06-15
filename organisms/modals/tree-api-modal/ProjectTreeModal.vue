@@ -37,11 +37,8 @@ import {
     computed, defineComponent, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PTreeModal from '@/components/organisms/modals/tree-modal/TreeModal.vue';
-import { ProjectNode, ProjectTreeAPI } from '@/lib/api/tree';
-import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/toolset';
 import { makeProxy } from '@/lib/compostion-util';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
-import { Computed } from '@/lib/type';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
