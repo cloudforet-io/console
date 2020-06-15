@@ -40,23 +40,18 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
-import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
 import _ from 'lodash';
-import PI from '@/components/atoms/icons/PI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/ProgressWizard.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { JsonSchemaObjectType } from '@/lib/type';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import { showErrorMessage } from '@/lib/util';
 
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue');
 const ConfigureCollector = () => import('@/views/plugin/collector/modules/ConfigureCollector.vue');
-const ChooseCredentials = () => import('@/views/plugin/collector/modules/ChooseCredentials.vue');
 const ConfirmCredentials = () => import('@/views/plugin/collector/modules/ConfirmCredentials.vue');
 
 export default {

@@ -16,9 +16,8 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, ref, computed, defineComponent, onMounted, Ref, getCurrentInstance, onBeforeMount, watch,
+    toRefs, reactive, computed, defineComponent, getCurrentInstance,
 } from '@vue/composition-api';
-import { Route } from 'vue-router';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
@@ -52,7 +51,7 @@ export default defineComponent({
         },
     },
     setup(props: any, context: any) {
-        console.debug('login!!');
+        // console.debug('login!!');
         const vm = (getCurrentInstance() as any);
         vm.$ls.domain.getDomain(vm);
 

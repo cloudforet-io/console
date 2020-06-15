@@ -73,6 +73,7 @@ class Tree extends TreeAction<ProjectTreeParameter, any> {
     setExcludeProject(val = true) {
         return val ? this.setExcludeType('PROJECT') : this.setExcludeType('');
     }
+
 }
 
 abstract class MemberAction extends SubMultiItemAction<any, any> {

@@ -1,19 +1,5 @@
 <template>
     <div>
-        <!--        <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">-->
-        <!--            <template #def-created_at-format="data">-->
-        <!--                {{ timestampFormatter(data.value) }}-->
-        <!--            </template>-->
-        <!--            <template #def-credential_group_id-format="{item}">-->
-        <!--                <div>-->
-        <!--                    <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"-->
-        <!--                            style-type="gray200"-->
-        <!--                    >-->
-        <!--                        {{ getEmptyString(label.name) }}-->
-        <!--                    </PBadge>-->
-        <!--                </div>-->
-        <!--            </template>-->
-        <!--        </p-info-panel>-->
         <p-panel-top>Base Information</p-panel-top>
         <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
                         :data_source="baseDataSource"
@@ -28,14 +14,12 @@
 <script>
 /* eslint-disable camelcase */
 
-import { ref, watch } from '@vue/composition-api';
+import { watch } from '@vue/composition-api';
 import { DictPanelAPI } from '@/lib/api/dict';
 import { fluentApi } from '@/lib/fluent-api';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 
 export default {
     name: 'PCredentialsDetail',

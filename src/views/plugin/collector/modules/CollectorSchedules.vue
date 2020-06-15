@@ -25,10 +25,10 @@
         >
             <template slot="toolbox-left">
                 <PIconTextButton style-type="primary-dark"
-                name="ic_plus_bold"
-                @click="openEditModal(null)"
+                                 name="ic_plus_bold"
+                                 @click="openEditModal(null)"
                 >
-                {{ $t('BTN.ADD') }}
+                    {{ $t('BTN.ADD') }}
                 </PIconTextButton>
 
                 <p-dropdown-menu-btn :menu="dropdown"
@@ -84,7 +84,6 @@ import moment from 'moment';
 import { showErrorMessage, timestampFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
@@ -98,7 +97,6 @@ export default {
         PTableCheckModal,
         PDropdownMenuBtn,
         PToolboxTable,
-        PButton,
         EditScheduleModal,
         PIconTextButton,
     },

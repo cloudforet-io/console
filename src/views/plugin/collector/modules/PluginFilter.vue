@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import { toRefs, reactive, computed } from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 
 import PSearch from '@/components/molecules/search/Search.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';

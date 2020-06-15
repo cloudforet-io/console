@@ -40,7 +40,7 @@ export default defineComponent({
     setup(props, context) {
         const vm = getCurrentInstance()as CombinedVueInstance<any, any, any, any, any>;
         const login = async (userId, param) => {
-            console.debug('start oauth login');
+            // console.debug('start oauth login');
             const response = await vm.$http.post('/identity/token/issue', {
                 credentials: param,
                 domain_id: vm.$ls.domain.state.domainId,

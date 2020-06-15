@@ -29,7 +29,7 @@ export const getKnobProps = (props, data = {}, disable = {}, knobs = {}, options
 
     if(props instanceof Array) {
         throw new Error('prop MUST be an object.');
-        return res;
+        // return res;
     };
 
     _.forEach(props, (v, k) => {

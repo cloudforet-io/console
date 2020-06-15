@@ -81,7 +81,7 @@ export default defineComponent({
             treeRef: treeAPITS.ts.treeRef,
             ...toRefs(state),
             update: (event) => {
-                console.log(event);
+                // console.log(event);
                 treeAPITS.ts.getSelectedNode(event);
             },
             click() {

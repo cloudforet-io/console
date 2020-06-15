@@ -125,7 +125,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
     defaultAdminLayout, defaultHistoryLayout, DefaultQSTableQSProps,
-    QuerySearchTableFluentAPI, RouteQuerySearchTableFluentAPI,
+    RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
@@ -139,7 +139,6 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import {
     DefaultMultiItemTabBarQSProps, DefaultMultiItemTabBarQSPropsName,
     DefaultSingleItemTabBarQSProps, RouterTabBarToolSet,
-    TabBarState,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
@@ -323,7 +322,7 @@ export default {
                     { key: 'cloud_service_type', operator: '=', value: after[2] },
                 );
                 await apiHandler.getData();
-                console.debug(state.exportDataSource);
+                // console.debug(state.exportDataSource);
                 await getFields(after[0], after[1], after[2]);
                 // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
@@ -427,7 +426,7 @@ export default {
             const selectId = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
             let layouts;
             if (cache[selectId]) {
-                console.debug(selectId, ' hit cache layout');
+                // console.debug(selectId, ' hit cache layout');
                 layouts = cache[selectId];
             } else {
                 const resp = await fluentApi.inventory().cloudService().get().setId(selectId)

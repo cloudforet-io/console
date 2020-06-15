@@ -66,41 +66,23 @@ import {
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-// import {
-//     DiffQueryAPI, DiffResponse, HistoryResponse, OPERATORS,
-// } from '@/lib/fluent-api/statistics/toolset_origin';
-import moment from 'moment';
-import { getTimestamp } from '@/lib/util';
-import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
-import { number } from '@storybook/addon-knobs';
-import casual, { arrayOf } from '@/lib/casual';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import _ from 'lodash';
-import { VTooltip } from 'v-tooltip';
-import router from '@/routes';
 
 export default {
     name: 'HealthDashboard',
     components: {
         PWidgetLayout,
-        PSelectableList,
         PI,
         PGridLayout,
         PSelectableItem,
         PSkeleton,
-        PTooltipButton,
-        PLazyImg,
     },
     setup(props, context) {
-        const vm: any = getCurrentInstance();
         const projectId = computed<string>(() => context.root.$route.params.id as string);
 
         interface Data {

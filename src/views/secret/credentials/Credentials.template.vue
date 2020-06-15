@@ -145,7 +145,6 @@ export const getDataInputType = () => {
     const currentURL = window.location.href;
     const url = new URL(currentURL);
     const plugin_id = url.searchParams.get('plugin_id');
-    const repository_id = url.searchParams.get('repository_id');
     return plugin_id;
 };
 
@@ -209,14 +208,13 @@ export const credentialsSetup = (props, context, eventName) => {
     });
 
     const sortSelectIndex = computed(() => {
-        console.debug('temp sortable', tableState.selectIndex);
+        // console.debug('temp sortable', tableState.selectIndex);
         const idxs = [...tableState.selectIndex];
         idxs.sort((a, b) => a - b);
-        console.debug('idxs', idxs);
+        // console.debug('idxs', idxs);
         return idxs;
     });
 
-    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
     const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
 
     const getSelectedCredentialsItems = computed(() => {
@@ -309,12 +307,12 @@ export const credentialsSetup = (props, context, eventName) => {
     const getEmptyString = object => (_.isEmpty(object) ? '' : object);
 
     const checkModalConfirm = (event) => {
-        console.debug(checkTableModalState.confirmEventName, event);
+        // console.debug(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
-        console.debug('tableState.selectIndex', tableState.selectIndex);
+        // console.debug('tableState.selectIndex', tableState.selectIndex);
         tableState.selectIndex = [];
-        console.debug('tableState.selectIndex', tableState.selectIndex);
+        // console.debug('tableState.selectIndex', tableState.selectIndex);
     };
 
     const dropdownMenu = reactive({
@@ -354,7 +352,7 @@ export const credentialsSetup = (props, context, eventName) => {
         dropdown: dropdownMenu,
         timestampFormatter,
         clickCollectData() {
-            console.debug('add');
+            // console.debug('add');
         },
         getCredentials,
         ...eventNames,

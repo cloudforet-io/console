@@ -569,7 +569,7 @@ export default {
         const clickLink = () => {
             const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
             const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
-            console.debug(linkTemplate, link);
+            // console.debug(linkTemplate, link);
             window.open(link);
         };
 

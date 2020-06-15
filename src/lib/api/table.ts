@@ -494,7 +494,7 @@ export class RouteQuerySearchTableFluentAPI<
         const filters = props[this.qsName.filters];
         if (isNotEmpty(filters)) {
             this.tableTS.querySearch.tags.value = getArrayQueryString(filters, makeSearchQuery);
-            console.debug(this.tableTS.querySearch.tags.value);
+            // console.debug(this.tableTS.querySearch.tags.value);
         }
 
         this.isReady = true;
@@ -504,7 +504,7 @@ export class RouteQuerySearchTableFluentAPI<
         const selectItems = props[this.qsName.selectItems];
         if (isNotEmpty(selectItems)) {
             this.tableTS.syncState.selectIndex = getArrayQueryString(selectItems, Number);
-            console.debug(this.tableTS.syncState.selectIndex);
+            // console.debug(this.tableTS.syncState.selectIndex);
         }
     }
 
@@ -579,7 +579,7 @@ export abstract class BaseTableAPI<
                 try {
                     result = this.apiState.transformHandler(response);
                 } catch (e) {
-                    console.debug(e);
+                    console.error(e);
                 }
             }
             return result;

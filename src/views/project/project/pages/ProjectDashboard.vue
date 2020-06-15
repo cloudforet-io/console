@@ -92,10 +92,8 @@ export default {
                 color: secondary1,
             },
         });
-        const vm = getCurrentInstance();
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const projectFilter = `&f=project_id%3A%3D${projectId.value}`;
-        // const regionFilter =
 
         const tabData = reactive({
             tabs: makeTrItems([

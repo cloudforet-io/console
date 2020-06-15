@@ -89,7 +89,6 @@ import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 // @ts-ignore
 import { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
@@ -132,7 +131,6 @@ export default {
     name: 'CollectDataModal',
     components: {
         PButtonModal,
-        PButton,
         PFieldGroup,
         PTextInput,
         PSelectDropdown,

@@ -24,7 +24,7 @@ export abstract class ChangeAPI<
     }
 
     protected hasError : (e:AxiosError)=> Promise<any> =(e) => {
-        console.debug(this.apiState.url, e);
+        console.error(this.apiState.url, e);
         return Promise.reject(e);
     };
 

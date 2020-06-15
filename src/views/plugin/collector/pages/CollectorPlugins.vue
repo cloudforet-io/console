@@ -75,10 +75,10 @@
                                 </div>
                                 <div class="btns">
                                     <PIconTextButton style-type="primary-dark"
-                                    name="ic_plus_bold"
-                                    @click="onPluginCreate(item)"
+                                                     name="ic_plus_bold"
+                                                     @click="onPluginCreate(item)"
                                     >
-                                    {{ $t('BTN.CREATE') }}
+                                        {{ $t('BTN.CREATE') }}
                                     </PIconTextButton>
                                 </div>
                             </div>
@@ -222,7 +222,6 @@ export default {
         PPageTitle,
         PToolboxGridLayout,
         PBadge,
-        PButton,
         PI,
         PluginFilter,
         PIconTextButton,

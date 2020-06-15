@@ -13,7 +13,7 @@ import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata
 import { fluentApi } from '@/lib/fluent-api';
 import {
     computed,
-    defineComponent, onMounted, reactive, toRefs, watch,
+    defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import baseInfoSchema from '@/metadata-schema/view/inventory/server/sub_data/layouts/base_info.json';
@@ -218,7 +218,7 @@ export default defineComponent({
             state.layouts = null;
             let layouts;
             if (cache[props.selectId]) {
-                console.debug(props.selectId, ' hit cache layout');
+                // console.debug(props.selectId, ' hit cache layout');
                 layouts = cache[props.selectId];
             } else {
                 const resp = await fluentApi.inventory().server().get().setId(props.selectId)

@@ -1,10 +1,6 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import PCloudServices from './CloudServices.vue';
 
 export default {
@@ -26,7 +22,7 @@ export default {
  */
 const getProps = () => ({});
 
-const getState = (props, context) => {
+const getState = () => {
     const state = reactive({});
 
     return state;

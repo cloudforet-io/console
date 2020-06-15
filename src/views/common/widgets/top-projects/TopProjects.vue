@@ -131,7 +131,7 @@
 /* eslint-disable camelcase */
 import _ from 'lodash';
 import {
-    computed, defineComponent, getCurrentInstance, Ref, toRefs,
+    computed, getCurrentInstance, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
