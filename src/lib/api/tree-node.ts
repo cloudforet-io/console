@@ -2,47 +2,46 @@
 import { AxiosResponse } from 'axios';
 import { DynamicAPI } from '@/lib/api/toolset';
 // @ts-ignore
-import { ResourceActions, TreeAction } from '@/lib/fluent-api/type';
+import { ResourceActions, TreeAction } from '@/lib/fluent-api/toolset';
 import {
     TreeNodeToolSet,
     getDefaultNode,
     BaseNodeStateType, TreeNodeProps, TreeNode,
 } from '@/components/molecules/tree/PTreeNode.toolset';
-import { TreeSearchAction } from '@/lib/fluent-api';
-import { TreeSearchResp } from '@/lib/fluent-api/identity/project';
+import { TreeResp, TreeSearchAction } from '@/lib/fluent-api';
+import {
+    ProjectItemResp, ProjectTree, ProjectTreeParameter, TreeSearchResp,
+} from '@/lib/fluent-api/identity/project';
 import { findIndex } from 'lodash';
 
-export interface TreeResp<T> {
-    items: T[];
-}
 
-export interface TreeApiActions<parameter, resp> {
-    treeAction: TreeAction<parameter, resp>;
-    treeSearchAction: TreeSearchAction<parameter, TreeSearchResp>;
+export interface TreeApiActions<treeAction, searchAction> {
+    treeAction: treeAction;
+    treeSearchAction: searchAction;
 }
 
 export abstract class BaseTreeFluentAPI<
     state extends BaseNodeStateType = BaseNodeStateType,
     initData = any, initSyncData = any,
-    parameter = any,
-    resp = any,
-    actions extends TreeApiActions<parameter, resp> = TreeApiActions<parameter, resp>,
+    parameter = any, resp = any,
+    treeAction extends TreeAction<parameter, TreeResp<resp>> = TreeAction<parameter, TreeResp<resp>>,
+    treeSearch extends TreeSearchAction<parameter, TreeSearchResp> = TreeSearchAction<parameter, TreeSearchResp>,
     T extends TreeNodeToolSet<resp, state, initData, initSyncData> = TreeNodeToolSet<resp, state, initData, initSyncData>
     > extends DynamicAPI {
     ts: T;
 
-    treeAction: TreeAction<parameter, resp>;
+    treeAction: treeAction;
 
-    treeSearchAction: TreeSearchAction<parameter, TreeSearchResp>;
+    treeSearchAction: treeSearch;
 
-    constructor(actions: actions, initData?: initData, initSyncData?: initSyncData, isMultiSelect = false) {
+    constructor(actions: TreeApiActions<treeAction, treeSearch>, initData?: initData, initSyncData?: initSyncData, isMultiSelect = false) {
         super();
         this.treeAction = actions.treeAction;
         this.treeSearchAction = actions.treeSearchAction;
         this.ts = new TreeNodeToolSet(initData, initSyncData, isMultiSelect) as T;
     }
 
-    abstract getTreeAction: (node?: TreeNode<resp, state>) => TreeAction<parameter, TreeResp<resp>>
+    abstract getTreeAction: (node?: TreeNode<resp, state>) => treeAction
 
     protected abstract toNodes: (data: AxiosResponse<TreeResp<resp>>, parentNode?: TreeNode<resp, state>) => TreeNodeProps<resp, state>[]|boolean;
 
@@ -59,9 +58,11 @@ export abstract class BaseTreeFluentAPI<
         }
     };
 
-    protected requestTreeSearchData = async (id: string, type: string): Promise<TreeNodeProps<resp, state>[]> => {
+    protected requestTreeSearchData = async (id?: string, type?: string): Promise<TreeNodeProps<resp, state>[]> => {
         try {
-            const res = await this.treeAction.setItemId(id).setItemType(type).execute();
+            let res;
+            if (id && type) res = await this.treeAction.setItemId(id).setItemType(type).execute();
+            else res = await this.treeAction.setRoot().execute();
             const children = this.toNodes(res);
             return typeof children === 'boolean' ? [] : children;
         } catch (e) {
@@ -75,12 +76,6 @@ export abstract class BaseTreeFluentAPI<
     abstract getSearchData: (...args) => Promise<any>;
 }
 
-export interface ProjectItemResp {
-    id: string;
-    name: string;
-    has_child: boolean;
-    item_type: 'PROJECT_GROUP'|'PROJECT';
-}
 
 export interface ProjectNodeState extends BaseNodeStateType {
     loading: boolean;
@@ -90,12 +85,11 @@ export type ProjectNode<S extends BaseNodeStateType = BaseNodeStateType> = TreeN
 
 export class ProjectTreeFluentAPI<
     state extends ProjectNodeState = ProjectNodeState,
-    initData = any,
-    initSyncData = any,
-    parameter = any,
+    initData = any, initSyncData = any,
+    treeAction extends ProjectTree = ProjectTree,
     T extends TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData> = TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData>
-    > extends BaseTreeFluentAPI<state, initData, initSyncData, parameter, ProjectItemResp, TreeApiActions<parameter, ProjectItemResp>, T> {
-    getTreeAction = (node?: TreeNode<ProjectItemResp, state>): TreeAction<parameter, TreeResp<ProjectItemResp>> => {
+    > extends BaseTreeFluentAPI<state, initData, initSyncData, ProjectTreeParameter, ProjectItemResp, treeAction, TreeSearchAction<ProjectTreeParameter, TreeSearchResp>, T> {
+    getTreeAction = (node?: TreeNode<ProjectItemResp, state>): treeAction => {
         if (node) {
             return this.treeAction.setItemId(node.data.id).setItemType(node.data.item_type);
         }
@@ -136,16 +130,18 @@ export class ProjectTreeFluentAPI<
         return res.data;
     }
 
-    getRecursiveData = async (ids: string[], idx: number, children?: TreeNodeProps<ProjectItemResp, state>[]) => {
-        if (idx < 0) {
+    getRecursiveData = async (ids: string[], idx: number, children?: TreeNodeProps<ProjectItemResp, state>[], selected?: string) => {
+        if (idx < -1) {
             this.ts.metaState.nodes = children || [];
             return;
         }
 
         const id = ids[idx];
         let itemType;
-        if (id.startsWith('pg')) itemType = 'PROJECT_GROUP';
-        else itemType = 'PROJECT';
+        if (id) {
+            if (id.startsWith('pg')) itemType = 'PROJECT_GROUP';
+            else itemType = 'PROJECT';
+        }
 
         const parents = await this.requestTreeSearchData(id, itemType);
         if (children) {
@@ -153,7 +149,7 @@ export class ProjectTreeFluentAPI<
             if (attachIdx !== -1) parents[attachIdx].children = children;
         }
 
-        await this.getRecursiveData(ids, idx - 1, parents);
+        await this.getRecursiveData(ids, idx - 1, parents, selected || id);
     }
 
     getSearchData = async (id: string, type: 'PROJECT_GROUP'|'PROJECT' = 'PROJECT'): Promise<void> => {

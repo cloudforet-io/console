@@ -14,7 +14,7 @@ import {
     UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType, ProjectGroupInfo, Tags, TimeStamp,
+    ListType, ProjectGroupInfo, Tags, TimeStamp, TreeResp,
 } from '@/lib/fluent-api/type';
 
 const idField = 'project_id';
@@ -65,11 +65,18 @@ class MemberList extends SingleItemMemberListAction<any, any> {
     idField = idField;
 }
 
-interface ProjectTreeParameter {
+export interface ProjectTreeParameter {
     include_project: boolean;
 }
 
-class Tree extends TreeAction<ProjectTreeParameter, any> {
+export interface ProjectItemResp {
+    id: string;
+    name: string;
+    has_child: boolean;
+    item_type: 'PROJECT_GROUP'|'PROJECT';
+}
+
+export class ProjectTree extends TreeAction<ProjectTreeParameter, TreeResp<ProjectItemResp>> {
     setExcludeProject(val = true) {
         return val ? this.setExcludeType('PROJECT') : this.setExcludeType('');
     }
@@ -111,7 +118,7 @@ export default class Project extends Resource implements ResourceActions<'create
 
     memberList() { return new MemberList(this.api, this.baseUrl); }
 
-    tree() { return new Tree(this.api, this.baseUrl); }
+    tree() { return new ProjectTree(this.api, this.baseUrl); }
 
     treeSearch() { return new TreeSearch(this.api, this.baseUrl); }
 

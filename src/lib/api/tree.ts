@@ -70,7 +70,7 @@ export class ProjectTreeFluentAPI <
     resp = any,
     action extends TreeAction<any, any> = TreeAction<parameter, resp>,
     T extends TreeToolSet<any> = TreeToolSet<initData >
-    > extends BaseTreeFluentAPI<initData, node, resp, T> {
+    > extends BaseTreeFluentAPI<initData, node, parameter, resp, action, T> {
     getAction = (node: node) => {
         if (node.id !== 'root') {
             return this.action.setItemId(node.data.id).setItemType(node.data.item_type);
@@ -170,9 +170,9 @@ export class ProjectTreeAPI<
             return resp;
         };
 
-        protected toNode = (data: ProjectItemResp[]|ProjectGroupItem[]) => {
+        protected toNode = (data: ProjectItemResp[]|ProjectGroupItem[]) =>
             // @ts-ignore
-            return data.map((item) => {
+            data.map((item) => {
                 if (item.item_type) {
                     return new TreeItem(item.name, item, undefined, undefined, undefined, item.item_type === 'PROJECT_GROUP');
                 }
@@ -183,6 +183,6 @@ export class ProjectTreeAPI<
                     item_type: 'PROJECT_GROUP',
 
                 }, undefined, undefined, undefined, true);
-            });
-        };
+            })
+        ;
 }
