@@ -51,7 +51,7 @@ export default defineComponent({
         },
     },
     setup(props: any, context: any) {
-        console.debug('login!!');
+        // console.debug('login!!');
         const vm = (getCurrentInstance() as any);
         vm.$ls.domain.getDomain(vm);
 

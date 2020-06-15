@@ -68,7 +68,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, reactive, Ref, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
@@ -78,7 +78,6 @@ import PTd from '@/components/atoms/table/Td.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
-import _ from 'lodash';
 
 export default {
     name: 'ServiceAccountsTable',
@@ -88,7 +87,6 @@ export default {
         PTd,
     },
     setup(props, context) {
-        const vm: any = getCurrentInstance();
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const {
             provider,

@@ -109,7 +109,7 @@ export default {
         },
     },
     setup(props: Props) {
-        console.debug(props.apiHandler);
+        // console.debug(props.apiHandler);
         const fields: Ref<Readonly<Field[]>> = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
             name: ds.key,
             label: ds.name,

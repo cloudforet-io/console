@@ -284,7 +284,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         userFormState.updateMode = true;
         userFormState.headerTitle = 'Update User';
         const item = getSelectedUserItems.value[0];
-        console.debug(item);
+        // console.debug(item);
         userFormState.item = {
             // eslint-disable-next-line camelcase
             user_id: item.user_id,
@@ -354,7 +354,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
 
 
     const checkModalConfirm = (event) => {
-        console.debug(checkTableModalState.confirmEventName, event);
+        // console.debug(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };

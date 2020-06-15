@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent, watch,
+    reactive, toRefs, computed, getCurrentInstance, defineComponent,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';

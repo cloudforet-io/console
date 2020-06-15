@@ -218,7 +218,7 @@ export default defineComponent({
             state.layouts = null;
             let layouts;
             if (cache[props.selectId]) {
-                console.debug(props.selectId, ' hit cache layout');
+                // console.debug(props.selectId, ' hit cache layout');
                 layouts = cache[props.selectId];
             } else {
                 const resp = await fluentApi.inventory().server().get().setId(props.selectId)

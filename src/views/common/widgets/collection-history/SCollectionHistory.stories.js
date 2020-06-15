@@ -1,10 +1,6 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
 
 export default {

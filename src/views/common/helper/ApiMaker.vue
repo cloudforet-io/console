@@ -220,10 +220,10 @@ export default {
                     // eslint-disable-next-line no-restricted-syntax
                     for (const res of resources) {
                         const checkResource = fluentApi[state.selectService]()[res]();
-                        console.debug(checkResource, 'resource');
+                        // console.debug(checkResource, 'resource');
                         // eslint-disable-next-line no-proto
                         const actionNames = Object.getOwnPropertyNames(checkResource.__proto__);
-                        console.debug('action names', actionNames);
+                        // console.debug('action names', actionNames);
                         actionNames.forEach((name: string) => {
                             // eslint-disable-next-line no-restricted-syntax
                             for (const action of SUPPORT_ACTIONS) {
@@ -281,7 +281,7 @@ export default {
                     const order: string[] = [];
                     const hasMethod = (name: string): boolean => {
                         try {
-                            console.debug(state.resourceApi[name]);
+                            // console.debug(state.resourceApi[name]);
                             if (name !== 'constructor' && state.resourceApi[name]) {
                                 return true;
                             }

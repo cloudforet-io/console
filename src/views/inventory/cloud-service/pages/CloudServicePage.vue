@@ -322,7 +322,7 @@ export default {
                     { key: 'cloud_service_type', operator: '=', value: after[2] },
                 );
                 await apiHandler.getData();
-                console.debug(state.exportDataSource);
+                // console.debug(state.exportDataSource);
                 await getFields(after[0], after[1], after[2]);
                 // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
@@ -426,7 +426,7 @@ export default {
             const selectId = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
             let layouts;
             if (cache[selectId]) {
-                console.debug(selectId, ' hit cache layout');
+                // console.debug(selectId, ' hit cache layout');
                 layouts = cache[selectId];
             } else {
                 const resp = await fluentApi.inventory().cloudService().get().setId(selectId)

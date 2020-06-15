@@ -1,9 +1,8 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import {
-    text, number, select, object, boolean, color,
+    color,
 } from '@storybook/addon-knobs/vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import { getKnobProps } from '@sb/storybook-util';

@@ -205,7 +205,7 @@ export default {
         return {
             ...toRefs(state),
             onItemClick(item) {
-                console.log('item test', item);
+                // console.log('item test', item);
                 const path = item.isServer ? `/inventory/server?&f=server_type%3A${item.type}` : `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}/?`;
                 if (props.projectFilter) {
                     vm.$router.push({

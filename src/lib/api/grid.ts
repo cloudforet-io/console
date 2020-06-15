@@ -310,7 +310,7 @@ export class RouteQuerySearchGridFluentAPI<
         const filters = props[this.qsName.filters];
         if (isNotEmpty(filters)) {
             this.gridTS.querySearch.tags.value = getArrayQueryString(filters, makeSearchQuery);
-            console.debug(this.gridTS.querySearch.tags.value);
+            // console.debug(this.gridTS.querySearch.tags.value);
         }
         this.isReady = true;
     };

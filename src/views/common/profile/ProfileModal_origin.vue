@@ -1,8 +1,7 @@
 <script>
-import _ from 'lodash';
 import { reactive, toRefs, getCurrentInstance } from '@vue/composition-api';
-import { makeProxy, mountBusEvent } from '@/lib/compostion-util';
-import ProfileModalTemplate, { profileSetup } from '@/views/common/profile/ProfileModal_origin.template.vue';
+import { mountBusEvent } from '@/lib/compostion-util';
+import { profileSetup } from '@/views/common/profile/ProfileModal_origin.template.vue';
 import GNBEventBus from '@/views/containers/gnb/GNBEventBus';
 
 export default {
@@ -51,7 +50,7 @@ export default {
         const updateUser = async (params) => {
             state.loading = true;
             try {
-                const res = await context.root.$http.post('identity/user/update', params);
+                // const res = await context.root.$http.post('identity/user/update', params);
 
                 if (params.timezone) {
                     vm.$ls.user.state.timezone = params.timezone;

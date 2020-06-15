@@ -35,7 +35,6 @@ import { SChartToolSet } from '@/lib/chart/toolset';
 import { gray } from '@/styles/colors';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import _ from 'lodash';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import moment from 'moment';
 
 export default {

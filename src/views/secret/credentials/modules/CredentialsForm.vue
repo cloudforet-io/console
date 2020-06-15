@@ -240,14 +240,14 @@ const setup = (props, context) => {
         const leftHalfResult = await validateLeftHalfAPI.allValidation();
 
         if (leftHalfResult) {
-            console.log(formState, formState.data);
+            // console.log(formState, formState.data);
             const params = {
                 name: formState.name,
                 secret_type: formState.secret_type,
                 data: JSON.parse(formState.data),
                 tags: formState.tags,
             };
-            console.log('params', params);
+            // console.log('params', params);
             context.emit('confirm', params);
         }
     };

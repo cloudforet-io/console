@@ -106,7 +106,7 @@ export default {
         };
 
         const validation: CustomKeywords = {
-            uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
+            uniqueName: new CustomValidator(checkNameUnique, 'The name already exists.'),
             longName: new CustomValidator(checkNameLength, 'Should not be longer than 40 characters'),
         };
 

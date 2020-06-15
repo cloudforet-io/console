@@ -362,7 +362,7 @@ export default {
         });
         const forceRefresh = () => {
             state.refresh = false;
-            console.debug('foreRefresh');
+            // console.debug('foreRefresh');
             setTimeout(() => { state.refresh = true; }, 300);
         };
         const subDataState = reactive({
@@ -372,7 +372,7 @@ export default {
             subDataDefaultSchema: computed(() => {
                 if (state.selectService && state.selectResource) {
                     try {
-                        console.debug(state.selectService, state.selectResource);
+                        // console.debug(state.selectService, state.selectResource);
                         const schemas = [defaultSchema[state.selectService][state.selectResource].subData, { type: 'raw', name: 'raw' }];
                         return schemas;
                     } catch (e) {
