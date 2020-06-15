@@ -186,3 +186,7 @@ export interface ActionAPIInterface<parameter=any, resp=any> {
     debug(...args: string[]): void;
     clone(): this;
 }
+
+export interface TreeResp<T> {
+    items: T[];
+}

@@ -155,7 +155,10 @@
                 :visible.sync="deleteTS.syncState.visible"
                 @confirm="deleteConfirm"
             />
-            <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+            <s-project-tree-modal :visible.sync="projectModalVisible"
+                                  :project-id="selectedProjectId"
+                                  @confirm="changeProject"
+            />
 
             <SSecretCreateFormModal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
                                     @confirm="secretFormConfirm($event)"
@@ -589,8 +592,11 @@ export default {
         //         resource: fluentApi.identity().serviceAccount().get().setId(id),
         //     };
         // });
+
+        const selectedProjectId = computed(() => _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', ''));
         return {
             apiHandler,
+            selectedProjectId,
             accountFields,
             singleItemTab,
             multiItemTab,
