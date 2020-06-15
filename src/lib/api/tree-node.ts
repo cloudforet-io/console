@@ -104,8 +104,8 @@ export class ProjectTreeFluentAPI<
             item => getDefaultNode<ProjectItemResp, state>(item, {
                 children: item.has_child,
                 state: {
-                    selected: false,
                     expanded: false,
+                    selected: false,
                     loading: false,
                 } as state,
             }) as TreeNodeProps<ProjectItemResp, state>,
@@ -130,7 +130,8 @@ export class ProjectTreeFluentAPI<
         return res.data;
     }
 
-    getRecursiveData = async (ids: string[], idx: number, children?: TreeNodeProps<ProjectItemResp, state>[], selected?: string) => {
+    getRecursiveData = async (ids: string[], idx: number, children?: TreeNodeProps<ProjectItemResp, state>[], isFirst = true) => {
+        console.debug('recursive data', ids[idx], children, isFirst);
         if (idx < -1) {
             this.ts.metaState.nodes = children || [];
             return;
@@ -146,10 +147,14 @@ export class ProjectTreeFluentAPI<
         const parents = await this.requestTreeSearchData(id, itemType);
         if (children) {
             const attachIdx = findIndex(parents, d => d.data.id === id);
-            if (attachIdx !== -1) parents[attachIdx].children = children;
+            if (attachIdx !== -1) {
+                parents[attachIdx].children = children;
+                parents[attachIdx].state = { ...parents[attachIdx].state, expanded: !isFirst, selected: isFirst };
+                console.debug('parents[attachIdx]', parents[attachIdx]);
+            }
         }
 
-        await this.getRecursiveData(ids, idx - 1, parents, selected || id);
+        await this.getRecursiveData(ids, idx - 1, parents, false);
     }
 
     getSearchData = async (id: string, type: 'PROJECT_GROUP'|'PROJECT' = 'PROJECT'): Promise<void> => {
