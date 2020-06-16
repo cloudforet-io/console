@@ -318,6 +318,14 @@ export default {
              Tree, Project, Statistics API Handler Declaration
              */
         const projectAPI = fluentApi.identity().project();
+
+        // projectAPI.favorite().create().setParameter({ projectId: ['test'] }).execute()
+        //     .then(res => console.debug('favorite create', res));
+        // projectAPI.favorite().get().execute().then(res => console.debug('favorite', res));
+        // projectAPI.favorite().delete().execute().then(res => console.debug('favorite', res));
+        // projectAPI.favorite().update().setParameter({ projectGroupId: ['hahaha'] }).execute()
+        //     .then(res => console.debug('favorite', res));
+
         const treeAction = projectAPI.tree()
             .setSortBy('name')
             .setSortDesc(false)
