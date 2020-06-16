@@ -9,7 +9,7 @@
                 </template>
                 <canvas ref="chartRef" />
             </p-chart-loader>
-            <div v-if="!loading && data.length > 0"
+            <div v-if="!loading && data.length === 0"
                  class="flex flex-col h-full justify-center items-center pt-16 pb-10"
             >
                 <p class="text-2xl font-bold capitalize mb-4 text-primary text-center leading-tight">
