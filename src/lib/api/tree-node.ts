@@ -110,29 +110,39 @@ export class ProjectTreeFluentAPI<
         });
     }
 
-    protected resetSelectedNode = (node: TreeItem<ProjectItemResp, state>, compare?: TreeItem<ProjectItemResp, state>) => {
+    protected resetSelectedNode = (item: TreeItem<ProjectItemResp, state>, compare?: TreeItem<ProjectItemResp, state>) => {
         if (compare) {
-            if (compare.node.data.id === node.node.data.id) this.ts.metaState.selectedNodes = [];
-            else if (compare.parent) this.resetSelectedNode(node, compare.parent);
+            if (compare.node.data.id === item.node.data.id) {
+                this.ts.metaState.selectedNodes = [item];
+                item.node.state.selected = true;
+            } else if (compare.parent) this.resetSelectedNode(item, compare.parent);
         } else {
             if (!this.ts.metaState.firstSelectedNode) return;
             if (!this.ts.metaState.firstSelectedNode.parent) return;
-            if (this.ts.metaState.firstSelectedNode.level <= node.level) return;
-            this.resetSelectedNode(node, this.ts.metaState.firstSelectedNode.parent);
+            if (this.ts.metaState.firstSelectedNode.level <= item.level) return;
+            this.resetSelectedNode(item, this.ts.metaState.firstSelectedNode.parent);
         }
     }
 
-    getData = async (node?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
-        if (node && matched && e) {
-            e.stopPropagation();
-            if (node.node.state.expanded) {
-                this.ts.setNodeState(node, { expanded: false });
-                this.resetSelectedNode(node);
-            } else {
-                this.ts.setNodeState(node, { expanded: true, loading: true });
+    getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+        if (item) {
+            if (e) e.stopPropagation();
+            if (item.node.state.expanded) {
+                this.resetSelectedNode(item);
+                item.node.state.expanded = false;
+                this.ts.applyState(item);
+                item.node.children = !!item.node.children;
+                return;
             }
-            node.node.children = await this.requestTreeData(node.node);
-            this.ts.setNodeState(node, { loading: false });
+
+            item.node.state.expanded = true;
+            item.node.state.loading = true;
+            this.ts.applyState(item);
+
+            item.node.children = await this.requestTreeData(item.node);
+
+            item.node.state.loading = false;
+            this.ts.applyState(item);
         } else {
             const res = await this.requestTreeData();
             this.ts.metaState.nodes = Array.isArray(res) ? res : [];

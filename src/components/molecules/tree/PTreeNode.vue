@@ -137,7 +137,7 @@ export default {
                 forEach(vm.$listeners, (l, eventName: string) => {
                     if (!eventName.startsWith('update')) {
                         res[eventName] = (_node, matched, e) => {
-                            _node.parent = node.value;
+                            if (!_node.parent) _node.parent = node.value;
                             emit(eventName, _node, [node.value, ...matched], e);
                         };
                     }

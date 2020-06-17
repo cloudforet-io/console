@@ -114,7 +114,9 @@
 
             @confirm="checkModalConfirm"
         />
-        <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+        <s-project-tree-modal :visible.sync="projectModalVisible"
+                              :project-id="selectedProjectId"
+                              @confirm="changeProject" />
         <s-collect-modal :visible.sync="collectModalState.visible"
                          :resources="apiHandler.tableTS.selectState.selectItems"
                          id-key="server_id"
@@ -176,6 +178,8 @@ import {
     RouterTabBarToolSet,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
+import _ from "lodash";
+import {ProjectItemResp} from "@/lib/fluent-api/identity/project";
 
 
 export default {
@@ -451,12 +455,16 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProject = async (node?: ProjectNode|null) => {
+        const selectedProjectId = computed(() => {
+            if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
+            return _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', '');
+        });
+        const changeProject = async (data?: ProjectItemResp|null) => {
             const changeAction = fluentApi.inventory().server().changeProject().clone()
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
-            if (node) {
-                await changeAction.setId(node.data.id).execute();
+            if (data) {
+                await changeAction.setId(data.id).execute();
             } else {
                 await changeAction.setReleaseProject().execute();
             }
@@ -550,6 +558,7 @@ export default {
             checkModalConfirm,
             projectModalVisible,
             clickProject,
+            selectedProjectId,
             changeProject,
             apiHandler,
             fields,
