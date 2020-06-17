@@ -2,7 +2,7 @@ import { fluentApi } from '@/lib/fluent-api';
 import { bypassQueryString } from '@/lib/router-query-string';
 
 const ProjectNavBar = () => import('@/views/project/ProjectNavBar');
-const Project = () => import('@//views/project/project/pages/ProjectPage');
+const Project = () => import('@/views/project/project/pages/ProjectPage');
 const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 

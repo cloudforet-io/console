@@ -2,7 +2,7 @@
     <p-button-modal
         :header-title="updateMode ?$t('IDENTITY.UPDATE_PROJ') :$t('IDENTITY.CRT_PROJ')"
         :centered="true"
-        size="lg"
+        size="md"
         :fade="true"
         :scrollable="false"
         :backdrop="true"
@@ -11,16 +11,16 @@
     >
         <template #body>
             <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
-            <PFieldGroup
-                label="Tags"
-            >
-                <p-dict-input-group
-                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"
-                    v-bind="tagsTS.state"
-                    :items.sync="tagsTS.syncState.items"
-                    v-on="tagsTS.events"
-                />
-            </PFieldGroup>
+<!--            <PFieldGroup-->
+<!--                label="Tags"-->
+<!--            >-->
+<!--                <p-dict-input-group-->
+<!--                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"-->
+<!--                    v-bind="tagsTS.state"-->
+<!--                    :items.sync="tagsTS.syncState.items"-->
+<!--                    v-on="tagsTS.events"-->
+<!--                />-->
+<!--            </PFieldGroup>-->
         </template>
     </p-button-modal>
 </template>
@@ -76,10 +76,14 @@ export default {
             type: Boolean,
             default: false,
         },
-        currentProject: {
+        projectGroupId: {
             type: String,
             default: '',
         },
+        currentProject: {
+            type: String,
+            default: '',
+        }
     },
     setup(props, context) {
         const tagsTS = new DictIGToolSet({
@@ -88,7 +92,7 @@ export default {
         const fixFormTS = new JsonSchemaFormToolSet();
 
         const checkNameUnique = (...args: any[]) => fluentApi.identity().projectGroup().listProjects()
-            .setProjectGroupId(props.currentProject)
+            .setProjectGroupId(props.projectGroupId)
             .setFilter({ key: 'name', operator: '=', value: args[1] })
             .setCountOnly()
             .execute()

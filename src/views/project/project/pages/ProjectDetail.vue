@@ -6,8 +6,14 @@
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
             />
+            <p-icon-button name="ic_edit-text"
+                           width="1.5rem" height="1.5rem" class="edit-btn"
+                           @click="openProjectEditForm"
+            />
         </div>
-        <p class="float-right text-gray-500 -my-6"><b>Project ID:</b> {{projectId}}</p>
+        <p class="float-right text-gray-500 -my-6">
+            <b>Project ID:</b> {{ projectId }}
+        </p>
         <PTab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
               :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
         >
@@ -74,6 +80,11 @@
                 </p>
             </template>
         </p-button-modal>
+        <SProjectCreateFormModal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
+                                 :update-mode="updateMode" :project-group-id="projectGroupId"
+                                 :current-project="projectName"
+                                 @confirm="projectEditFormConfirm($event)"
+        />
         <SProjectMemberAddModal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="addMember()" />
         <PTableCheckModal
             v-bind="deleteTS.state"
@@ -106,6 +117,7 @@ import {
 import { DictPanelAPI } from '@/lib/api/dict';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/TableCheckModal.vue';
@@ -133,6 +145,7 @@ export default {
         PTab,
         PIconButton,
         PButton,
+        SProjectCreateFormModal,
         SProjectMemberAddModal,
         PIconTextButton,
     },
@@ -145,6 +158,7 @@ export default {
         const item = ref({} as ProjectModel);
         const state = reactive({
             projectName: '',
+            projectGroupId: '',
             projectId,
         });
 
@@ -154,6 +168,8 @@ export default {
                 .execute();
             if (resp) {
                 item.value = resp.data;
+                state.projectGroupId = item.value.project_group_info.project_group_id;
+                state.projectName = item.value.name;
             }
         };
 
@@ -223,6 +239,8 @@ export default {
         // Member modal
         const formState = reactive({
             projectDeleteFormVisible: false,
+            projectEditFormVisible: false,
+            updateMode: false,
             headerTitle: '',
             themeColor: '',
             modalContent: '',
@@ -260,6 +278,36 @@ export default {
                 });
             formState.projectDeleteFormVisible = false;
         };
+
+        const openProjectEditForm = () => {
+            formState.projectEditFormVisible = true;
+            formState.updateMode = true;
+        };
+
+        const projectEditFormConfirm = (input) => {
+            fluentApi.identity().project().update().setParameter({
+                project_id: projectId.value,
+                ...input,
+            })
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Update Project',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                    item.value.name = input.name;
+                })
+                .catch((e) => {
+                    showErrorMessage('Update Project Fail', e, context.root);
+                });
+            formState.projectEditFormVisible = false;
+        };
+
+
         const openMemberAddForm = () => {
             formState.memberAddFormVisible = true;
         };
@@ -323,6 +371,11 @@ export default {
         };
         onMounted(async () => {
             await routerHandler();
+            // fluentApi.identity().project().get().setId(projectId.value)
+            //     .execute()
+            //     .then((resp) => {
+            //         state.projectGroupId = resp.data.project_group_info.project_group_id;
+            //     });
         });
 
         return {
@@ -337,6 +390,8 @@ export default {
             deleteTS,
             openProjectDeleteForm,
             projectDeleteFormConfirm,
+            openProjectEditForm,
+            projectEditFormConfirm,
             openMemberAddForm,
             addMember,
             memberDeleteClick,
