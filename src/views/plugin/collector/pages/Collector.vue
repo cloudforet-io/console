@@ -111,7 +111,7 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
-import { DefaultQSTableQSProps, QuerySearchTableFluentAPI, RouteQuerySearchTableFluentAPI } from '@/lib/api/table';
+import { DefaultQSTableQSProps, RouteQuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
     getEnumValues, makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';

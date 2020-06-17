@@ -1,5 +1,5 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
 import PHealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 
@@ -17,7 +17,7 @@ export default {
 
 const getProps = () => ({});
 
-const getState = (props, context) => {
+const getState = () => {
     const state = reactive({});
 
     return state;

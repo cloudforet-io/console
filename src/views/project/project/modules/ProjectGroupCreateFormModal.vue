@@ -29,7 +29,7 @@
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import {
-    makeProxy, requiredValidation,
+    makeProxy,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
@@ -105,7 +105,7 @@ export default {
         };
 
         const validation: CustomKeywords = {
-            uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
+            uniqueName: new CustomValidator(checkNameUnique, 'The name already exists.'),
             longName: new CustomValidator(checkNameLength, 'Should not be longer than 40 characters'),
         };
 

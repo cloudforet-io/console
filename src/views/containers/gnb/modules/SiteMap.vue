@@ -28,7 +28,7 @@
                     <li>
                         <router-link class="group" to="/dashboard">
                             <span class="icon">
-                                <p-i name="ic_dashboard" 
+                                <p-i name="ic_dashboard"
                                      color="transparent inherit"
                                 />
                             </span>
@@ -39,8 +39,7 @@
                     <li>
                         <router-link class="group" to="/project">
                             <span class="icon">
-                                <p-i name="ic_project"
-                                />
+                                <p-i name="ic_project" />
                             </span>
                             <span class="name">Project</span>
                         </router-link>
@@ -48,8 +47,7 @@
                     <li>
                         <router-link class="group" to="/inventory">
                             <span class="icon">
-                                <p-i name="ic_inventory"
-                                />
+                                <p-i name="ic_inventory" />
                             </span>
                             <span class="name">Inventory</span>
                         </router-link>
@@ -67,8 +65,7 @@
                     <li>
                         <router-link class="group" to="/identity">
                             <span class="icon">
-                                <p-i name="ic_identity"
-                                />
+                                <p-i name="ic_identity" />
                             </span>
                             <span class="name">Identity</span>
                         </router-link>
@@ -86,7 +83,7 @@
                     <li>
                         <router-link class="group" to="/plugin">
                             <span class="icon">
-                                <p-i name="ic_plugin"/>
+                                <p-i name="ic_plugin" />
                             </span>
                             <span class="name">Plugin</span>
                         </router-link>
@@ -132,7 +129,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, defineComponent } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -236,7 +233,7 @@ export default {
                 display: block;
             }
         }
- 
+
         .admin_menu{
             @apply text-violet-600 ;
         }

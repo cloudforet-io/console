@@ -193,7 +193,7 @@ export default [
     new MockData('/inventory/server/list', () => makeArrayResults(arrayOf(15, casual._server), 80)),
     new MockData('/inventory/server/get', () => dynamicLayoutData),
     new MockData('/inventory/server/get-data', (req) => {
-        console.log(req);
+        // console.log(req);
         const data = JSON.parse(req.data);
         return makeArrayResults(_.get(dynamicLayoutData, data.key_path), 20);
     }),

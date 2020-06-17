@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
 import FNB from '@/views/containers/fnb/FNB.vue';
 
 export default {

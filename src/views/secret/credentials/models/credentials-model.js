@@ -1,4 +1,4 @@
-import casual, { arrayOf } from '@/lib/casual';
+import casual from '@/lib/casual';
 
 casual.define('credentials', () => ({
     credentials_id: casual.word,

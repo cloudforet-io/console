@@ -51,16 +51,14 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, ref, watch,
+    reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
-import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 

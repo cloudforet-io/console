@@ -54,7 +54,7 @@
 /* eslint-disable camelcase */
 
 
-import { computed, defineComponent } from '@vue/composition-api';
+import { computed } from '@vue/composition-api';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
@@ -62,21 +62,11 @@ import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details
 
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
-import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
-import { QuerySearchTableToolSet } from '@/components/organisms/tables/toolbox-table/toolset';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { DataSourceItem, fluentApi, Tags } from '@/lib/fluent-api';
+import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import { AxiosResponse } from 'axios';
-import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
@@ -92,7 +82,6 @@ export default {
         PButton,
         PRawData,
         PDynamicDetails,
-        PEmpty,
         GeneralPageLayout,
         PDictPanel,
         PPageTitle,

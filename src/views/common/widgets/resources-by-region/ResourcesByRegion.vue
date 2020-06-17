@@ -51,7 +51,6 @@ import {
     getCurrentInstance, Ref, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
@@ -67,7 +66,6 @@ import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import { Stat } from '@/lib/fluent-api/statistics/resource';
 import {
     resourceByRegionProps,
     ResourcesByRegionProps,
@@ -77,7 +75,6 @@ export default {
     name: 'ResourcesByRegion',
     components: {
         PWidgetLayout,
-        PLazyImg,
         PBadge,
         PGridLayout,
         PSelectableItem,

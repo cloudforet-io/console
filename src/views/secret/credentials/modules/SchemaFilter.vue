@@ -16,8 +16,6 @@
 <script>
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import PI from '@/components/atoms/icons/PI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
@@ -26,8 +24,6 @@ export default {
     name: 'SchemaFilter',
     events: ['schemaChange'],
     components: {
-        PI,
-        PButton,
         PRadio,
     },
     props: {

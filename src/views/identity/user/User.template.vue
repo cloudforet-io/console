@@ -135,7 +135,6 @@ import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -149,7 +148,6 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
@@ -159,7 +157,6 @@ const PDataTable = () => import('@/components/organisms/tables/data-table/DataTa
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
 const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
-const PSearch = () => import('@/components/molecules/search/Search.vue');
 const PUserDetail = () => import('@/views/identity/user/modules/UserDetail.vue');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 
@@ -287,7 +284,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         userFormState.updateMode = true;
         userFormState.headerTitle = 'Update User';
         const item = getSelectedUserItems.value[0];
-        console.debug(item);
+        // console.debug(item);
         userFormState.item = {
             // eslint-disable-next-line camelcase
             user_id: item.user_id,
@@ -357,7 +354,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
 
 
     const checkModalConfirm = (event) => {
-        console.debug(checkTableModalState.confirmEventName, event);
+        // console.debug(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };

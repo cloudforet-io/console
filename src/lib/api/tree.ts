@@ -143,7 +143,7 @@ export class ProjectTreeAPI<
             let url = '';
             let data: any = {};
             let cb: (resp: AxiosResponse<any>) => Promise<any[]> = null as unknown as (resp: AxiosResponse<any>) => Promise<any[]>;
-            console.debug('request node', node);
+            // console.debug('request node', node);
             if (node.id !== 'root') {
                 url = '/identity/project/tree';
                 data = {
@@ -166,7 +166,7 @@ export class ProjectTreeAPI<
                 cb = resp => Promise.resolve(resp.data.results);
             }
             const resp = await this.$http.post(url, data).then(cb);
-            console.debug('tree result', resp);
+            // console.debug('tree result', resp);
             return resp;
         };
 

@@ -134,7 +134,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import CardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PLabel from '@/components/atoms/labels/Label.vue';
-import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import _ from 'lodash';
 
 
@@ -142,7 +142,6 @@ export const getDataInputType = () => {
     const currentURL = window.location.href;
     const url = new URL(currentURL);
     const plugin_id = url.searchParams.get('plugin_id');
-    const repository_id = url.searchParams.get('repository_id');
     return plugin_id;
 };
 
