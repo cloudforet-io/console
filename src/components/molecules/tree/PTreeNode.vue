@@ -1,6 +1,6 @@
 <template>
     <div class="p-tree-node">
-        <div :class="{...classNames(node), [`level-${node.level}`]: true}" :style="{paddingLeft: depth}"
+        <div :class="{...classNames(node), [`level-${level}`]: true}" :style="{paddingLeft: depth}"
              v-on="getListeners('row')"
         >
             <slot :name="`row-${level}`" v-bind="slotBind">
@@ -59,10 +59,10 @@
             <p-tree-node v-for="(child, idx) in children"
                          :key="idx"
                          :level="level + 1"
-                         :pad-size="child.padSize || padSize"
-                         :toggle-size="child.toggleSize || toggleSize"
-                         :disable-toggle="child.disableToggle || disableToggle"
-                         :class-names="child.classNames || classNames"
+                         :pad-size="padSize"
+                         :toggle-size="toggleSize"
+                         :disable-toggle="disableToggle"
+                         :class-names="classNames"
                          :data.sync="child.data"
                          :children.sync="child.children"
                          :state.sync="child.state"
@@ -104,54 +104,14 @@ export default {
 
         const node: any = computed(() => ({
             key: vm.$vnode.key || 0,
-            ...props,
+            level: props.level,
             parent: null,
-            sync: reactive({
+            node: reactive({
                 data: makeProxy('data', props, emit),
                 children: makeProxy('children', props, emit),
-                // state: computed({
-                //     set(val) { emit('update:state', val); },
-                //     get() {
-                //         const res = {};
-                //         forEach(props.state, (v, k) => {
-                //             res[k] = computed({
-                //                 set(val) {
-                //                     emit('update:state', { ...props.state, [k]: val });
-                //                 },
-                //                 get() { return props.state[k]; },
-                //             });
-                //         });
-                //         return reactive(res);
-                //     },
-                // }),
                 state: makeProxy('state', props, emit),
             }),
         }));
-
-        // const childrenHaveState = computed(() => {
-        //     if (Array.isArray(props.children)) {
-        //         return props.children.every(child => child.state);
-        //     }
-        //     return false;
-        // });
-
-        // const setChildrenState = () => {
-        //     if (!childrenHaveState.value && Array.isArray(props.children)) {
-        //         node.value.sync.children = props.children.map(child => ({
-        //             ...child,
-        //             state: child.state
-        //                 ? { ...props.defaultState, ...child.state }
-        //                 : { ...props.state, ...props.defaultState },
-        //         }));
-        //     }
-        // };
-        //
-        // setChildrenState();
-        //
-        // watch(() => props.children, (before, after) => {
-        //     if (before !== after) setChildrenState();
-        // });
-
 
         const getListeners = (type: string) => {
             const res = {};
@@ -171,21 +131,19 @@ export default {
                 depth: depth.value, getListeners, ...props,
             })),
             node,
-            // childrenHaveState,
             getListeners,
             getChildListeners(idx) {
                 const res = {};
                 forEach(vm.$listeners, (l, eventName: string) => {
                     if (!eventName.startsWith('update')) {
                         res[eventName] = (_node, matched, e) => {
-                            _node.parent = node.value;
+                            if (!_node.parent) _node.parent = node.value;
                             emit(eventName, _node, [node.value, ...matched], e);
                         };
                     }
                 });
                 return res;
             },
-
         };
     },
 };

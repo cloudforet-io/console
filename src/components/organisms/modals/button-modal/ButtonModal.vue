@@ -17,7 +17,7 @@
     >
         <template #header>
             <div class="header">
-                <slot name="header">
+                <slot name="header" :slot-scope="$props">
                     {{ headerTitle }}
                 </slot>
                 <p-i v-if="headerCloseButtonVisible"
@@ -29,12 +29,12 @@
             </div>
         </template>
         <template #body>
-            <slot name="body" />
+            <slot name="body" :slot-scope="$props" />
         </template>
         <template #footer>
-            <slot name="footer">
+            <slot name="footer" :slot-scope="$props">
                 <div class="footer">
-                    <slot name="footer-extra" />
+                    <slot name="footer-extra" :slot-scope="$props" />
                     <p-button
                         v-if="footerCancelButtonVisible"
                         class="modal-btn cancel-btn"
@@ -42,7 +42,7 @@
                         :disabled="loading"
                         @click="onCancelClick"
                     >
-                        <slot name="close-button">
+                        <slot name="close-button" :slot-scope="$props">
                             {{ $t('BTN.CANCEL') }}
                         </slot>
                     </p-button>
@@ -50,9 +50,10 @@
                                       class="modal-btn"
                                       :button-bind="footerConfirmButtonBind"
                                       :loading="loading"
+                                      :disabled="disabled"
                                       @click="onConfirmClick"
                     >
-                        <slot name="confirm-button">
+                        <slot name="confirm-button" :slot-scope="$props">
                             {{ $t('BTN.CONFIRM') }}
                         </slot>
                     </p-loading-button>
@@ -140,6 +141,10 @@ export default defineComponent({
             default: true,
         },
         loading: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
             type: Boolean,
             default: false,
         },

@@ -500,6 +500,10 @@ export class RouteQuerySearchTableFluentAPI<
             this.tableTS.syncState.sortBy = props[this.qsName.sortBy];
             this.tableTS.syncState.sortDesc = Boolean(props[this.qsName.sortDesc]);
         }
+        if (isNotEmpty(props[this.qsName.sortBy])) {
+            this.tableTS.syncState.sortBy = props[this.qsName.sortBy];
+            this.tableTS.syncState.sortDesc = Boolean(props[this.qsName.sortDesc]);
+        }
 
         this.isReady = true;
     };

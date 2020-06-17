@@ -30,42 +30,56 @@ export default {
 const childrenData = [
     {
         data: 'a long text long text long text long text long text long text long text longlonglonglonglonglong longlonglonglonglonglonglong',
+        state: { expanded: true },
     },
     {
         data: 'b',
-        expanded: true,
+        state: { expanded: true },
         children: [
             {
                 data: 'hello',
                 children: [
-                    { data: 'world' },
+                    {
+                        data: 'world',
+                        state: { expanded: false },
+                    },
                 ],
             },
             {
                 data: 'hi',
+                state: { expanded: false },
                 children: [
-                    { data: 'mart' },
+                    {
+                        data: 'mart',
+                        state: { expanded: false },
+                    },
                 ],
             },
         ],
     },
     {
         data: 'c',
+        state: { expanded: true },
         children: [
             {
                 data: 'd',
+                state: { expanded: true },
             },
             {
                 data: 'e',
+                state: { expanded: false },
                 children: [
                     {
                         data: 'f',
+                        state: { expanded: false },
                     },
                     {
                         data: 'g',
+                        state: { expanded: false },
                     },
                     {
                         data: 'h',
+                        state: { expanded: false },
                     },
                 ],
             },
@@ -120,34 +134,33 @@ export const defaultCase = () => ({
         return {
             state,
             rowClick: action('row:click'),
-            nodeClick(node, matched, e) {
+            nodeClick({ node }, matched, e) {
                 e.stopPropagation();
                 if (selectedItem) {
-                    selectedItem.sync.state = {
-                        ...selectedItem.sync.state,
+                    selectedItem.state = {
+                        ...selectedItem.state,
                         selected: false,
                     };
                 }
-                node.sync.state = {
-                    ...node.sync.state,
+                node.state = {
+                    ...node.state,
                     selected: true,
                 };
                 selectedItem = node;
                 action('node:click')(node, matched, e);
             },
-            toggleClick(node, matched, e) {
+            toggleClick({ node }, matched, e) {
                 e.stopPropagation();
-                node.sync.state = {
-                    ...node.sync.state,
-                    expanded: !node.sync.state.expanded,
+                node.state = {
+                    ...node.state,
+                    expanded: !node.state.expanded,
                 };
                 action('toggle:click')(node, matched, e);
             },
-            dataClick(node, matched, e) {
+            dataClick({ node, parent }, matched, e) {
                 e.stopPropagation();
-                const parent = matched[matched.length - 2];
-                if (Array.isArray(parent.sync.children)) {
-                    parent.sync.children.splice(node.key, 1);
+                if (Array.isArray(parent.children)) {
+                    parent.children.splice(node.key, 1);
                 }
                 action('data:click')(node, matched, e);
             },
