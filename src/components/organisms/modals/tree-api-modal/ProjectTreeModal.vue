@@ -29,8 +29,8 @@
                     </template>
                     <template #left-extra="{state, getListeners, data}">
                         <span>
-                            <p-check-box v-if="data.item_type === 'PROJECT'"
-                                         :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
+                            <p-radio v-if="data.item_type === 'PROJECT'"
+                                     :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
                             />
                         </span>
                     </template>
@@ -48,7 +48,6 @@
 <script lang="ts">
 import { watch } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { ProjectNodeState, ProjectTreeFluentAPI } from '@/lib/api/tree-node';
@@ -56,12 +55,13 @@ import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 
 export default {
     name: 'SProjectTreeModal',
     components: {
+        PRadio,
         PTreeNode,
-        PCheckBox,
         PI,
         PButtonModal,
     },
