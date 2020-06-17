@@ -93,7 +93,7 @@ export default {
         // eslint-disable-next-line
         data_source: {
             type: Array,
-            defaults: () => [],
+            default: () => [],
         },
         data: {
             type: [Array, Object],
@@ -109,7 +109,7 @@ export default {
         },
     },
     setup(props: Props) {
-        console.debug(props.apiHandler);
+        // console.debug(props.apiHandler);
         const fields: Ref<Readonly<Field[]>> = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
             name: ds.key,
             label: ds.name,

@@ -79,7 +79,7 @@ export default {
                     action = action.setOnly(props.options.root_path);
                 }
                 const resp = await action.execute();
-                console.debug('resp', resp);
+                // console.debug('resp', resp);
                 state.data = resp.data || {};
             }
         };
