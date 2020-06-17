@@ -257,7 +257,8 @@ export const tabIsShow = (handler: BaseTableAPI<any, any>, state: TabState, tabN
     let result = false;
     if (handler.tableTS.selectState.isSelectOne) {
         result = state.activeTab.value === tabName;
-    } if (handler.tableTS.selectState.isSelectMulti) {
+    }
+    if (handler.tableTS.selectState.isSelectMulti) {
         result = state.activeMultiTab.value === tabName;
     }
     return result;

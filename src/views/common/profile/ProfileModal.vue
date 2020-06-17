@@ -104,7 +104,6 @@
 import {
     reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
-import moment from 'moment-timezone';
 import {
     makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
 } from '@/lib/compostion-util';
@@ -117,7 +116,6 @@ import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import { update } from 'vue-i18n/src/directive';
 import { fluentApi } from '@/lib/fluent-api';
 
 

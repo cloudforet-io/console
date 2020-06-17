@@ -232,7 +232,7 @@ const setup = (props, context) => {
                     if (!formState.group) { formState.group = data.group; }
                 }
             }
-        }).catch((error) => { console.debug(error); });
+        }).catch((error) => { console.error(error); });
         return result;
     }, "ID doesn't exists!");
 

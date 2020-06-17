@@ -8,7 +8,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
 import SCollectingRuns from '@/views/common/widgets/collecting-runs/SCollectingRuns.vue';

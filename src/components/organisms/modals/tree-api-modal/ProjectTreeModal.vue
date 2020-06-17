@@ -6,7 +6,6 @@
                     fade
                     backdrop
                     :visible.sync="proxyVisible"
-                    :disabled="treeApiHandler.ts.metaState.firstSelectedNode && treeApiHandler.ts.metaState.firstSelectedNode.node.data.item_type === 'PROJECT_GROUP'"
                     @confirm="confirm"
     >
         <template #body>
@@ -92,6 +91,7 @@ export default {
                 else await treeApiHandler.getData();
             } else {
                 treeApiHandler.ts.metaState.nodes = [];
+                treeApiHandler.ts.metaState.selectedNodes = [];
             }
         });
 

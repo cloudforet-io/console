@@ -172,7 +172,8 @@ export class SelectGridLayoutToolSet<initData, initSyncData>
             _this.isReady.value = true;
 
         };
-        watch(_this.select, async (aft, bef) => {
+        watch( _this.select, async (aft, bef) => {
+            // console.debug(aft);
             if (aft !== bef) {
                 if (_this.isReady?.value) {
                     await _this.routerPush();

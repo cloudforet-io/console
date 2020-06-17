@@ -60,7 +60,6 @@ import {
 import PButton from '@/components/atoms/buttons/Button.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
-import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { DictPanelAPI } from '@/lib/api/dict';
 import {
@@ -78,7 +77,6 @@ export default {
     name: 'CloudServicePage',
     components: {
         GeneralPageLayout,
-        PI,
         PIconButton,
         PButton,
         PPaneLayout,
@@ -122,7 +120,7 @@ export default {
 
 
         const { invalidMessages, allValidation, itemValidation } = dictValidation(computed(() => state.items as unknown as DictItem[]));
-        const isAllValid = computed(() => _.every(invalidMessages.value, (item: any) => !item.key && !item.value));
+        // const isAllValid = computed(() => _.every(invalidMessages.value, (item: any) => !item.key && !item.value));
         const newDict = computed(() => getNewDict(state.items as unknown as DictItem[], invalidMessages.value));
 
         const dictIGListeners = {

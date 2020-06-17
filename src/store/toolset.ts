@@ -165,7 +165,7 @@ class DomainStore extends Store<DomainState> {
                 this.state.authType = 'local';
             }
         } else {
-            console.debug('no domain');
+            // console.debug('no domain');
             vm.$router.push({ name: 'error' });
         }
     }
@@ -201,14 +201,14 @@ class ProjectStore extends Store<ProjectState> {
         if (this.isExpiration() || force) {
             const result = {};
             try {
-                console.debug('request project names');
+                // console.debug('request project names');
                 const res = await projectAPI.list().setOnly('project_id', 'name', 'project_group').execute();
                 res.data.results.forEach((project) => {
                     result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
                 });
                 this.state.ttl = DateTime.local().plus({ hours: 1 });
             } catch (e) {
-                console.debug(e);
+                console.error(e);
             }
             this.state.projects = result;
         }
@@ -252,7 +252,7 @@ class ProviderStore extends Store<ProviderState> {
         if (this.isExpiration()) {
             const result = {};
             try {
-                console.debug('request provider');
+                // console.debug('request provider');
                 const res = await providerAPI.list().execute();
 
                 res.data.results.forEach((provider) => {
@@ -298,7 +298,7 @@ export default {
                 state.project.reset();
                 state.provider.reset();
                 if (vm) {
-                    console.debug(routerMeta);
+                    // console.debug(routerMeta);
                     vm.$router.push(routerMeta);
                 }
             },

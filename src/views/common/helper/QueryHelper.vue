@@ -26,7 +26,7 @@
 </template>
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';

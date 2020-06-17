@@ -90,7 +90,6 @@ import {
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
@@ -98,19 +97,14 @@ import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import {
-    AdminFluentAPI,
     QuerySearchTableFluentAPI,
-    SearchTableFluentAPI,
-    TabSearchTableFluentAPI,
 } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
@@ -137,7 +131,6 @@ export default {
         STagsPanel,
         PPageTitle,
         PTab,
-        PI,
         PIconButton,
         PButton,
         SProjectMemberAddModal,

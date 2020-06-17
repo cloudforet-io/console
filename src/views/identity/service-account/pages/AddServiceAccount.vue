@@ -342,7 +342,7 @@ export default {
                                 goBack();
                             })
                             .catch(async (errorResp) => {
-                                console.debug(errorResp);
+                                console.error(errorResp);
                                 await deleteAccount(resp.data.service_account_id);
                                 // vm?.$notify({
                                 //     group: 'noticeBottomRight',

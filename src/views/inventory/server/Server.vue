@@ -126,7 +126,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import {

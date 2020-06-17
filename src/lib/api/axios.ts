@@ -100,7 +100,7 @@ export class API {
                             data.domain_id = this.vm.$ls.domain.state.domainId;
                             request.data = JSON.stringify(data);
                         } catch (e) {
-                            console.debug(e);
+                            console.error(e);
                         }
                     } else {
                         request.data.domain_id = this.vm.$ls.domain.state.domainId;
@@ -110,7 +110,7 @@ export class API {
             return request;
         });
         const refreshAuthLogic = failedRequest => this.refreshInstance.post(refreshUrl).then((resp) => {
-            console.debug('request refresh token');
+            // console.debug('request refresh token');
             this.vm.$ls.user.setToken(resp.data.refresh_token, resp.data.access_token);
             failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
             return Promise.resolve();

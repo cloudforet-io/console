@@ -377,6 +377,10 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
+        const selectedProjectId = computed(() => {
+            if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
+            return _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', '');
+        });
         const changeProject = async (data?: ProjectItemResp|null) => {
             const action = fluentApi.identity().serviceAccount().changeProject().clone()
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
@@ -573,7 +577,7 @@ export default {
         const clickLink = () => {
             const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
             const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
-            console.debug(linkTemplate, link);
+            // console.debug(linkTemplate, link);
             window.open(link);
         };
 
@@ -594,13 +598,9 @@ export default {
         //     };
         // });
 
-        const selectedProjectId = computed(() => {
-            if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
-            return _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', '');
-        });
+
         return {
             apiHandler,
-            selectedProjectId,
             accountFields,
             singleItemTab,
             multiItemTab,
@@ -615,6 +615,7 @@ export default {
             clickProject,
             changeProject,
             projectModalVisible,
+            selectedProjectId,
             adminApi,
             clickSecretAddForm,
             ...toRefs(secretFormState),
