@@ -6,13 +6,14 @@ import { ResourceActions, TreeAction } from '@/lib/fluent-api/toolset';
 import {
     TreeNodeToolSet,
     getDefaultNode,
-    BaseNodeStateType, TreeNodeProps, TreeNode, InitTreeNodeProps,
+    BaseNodeStateType, TreeNodeProps, TreeItem, InitTreeNode, TreeNode, getTreeItem,
 } from '@/components/molecules/tree/PTreeNode.toolset';
 import { TreeResp, TreeSearchAction } from '@/lib/fluent-api';
 import {
     ProjectItemResp, ProjectTree, ProjectTreeParameter, TreeSearchResp,
 } from '@/lib/fluent-api/identity/project';
-import { find } from 'lodash';
+import { find, findIndex } from 'lodash';
+import { computed, reactive } from '@vue/composition-api';
 
 
 export interface TreeApiActions<treeAction, searchAction> {
@@ -43,22 +44,19 @@ export abstract class BaseTreeFluentAPI<
 
     abstract getTreeAction: (node?: TreeNode<resp, state>) => treeAction
 
-    protected abstract toNodes: (data: AxiosResponse<TreeResp<resp>>, parentNode?: TreeNode<resp, state>) => TreeNodeProps<resp, state>[]|boolean;
+    protected abstract toNodes: (data: AxiosResponse<TreeResp<resp>>) => TreeNode<resp, state>[]|boolean;
 
-    protected requestTreeData = async (node?: TreeNode<resp, state>): Promise<void> => {
+    protected requestTreeData = async (node?: TreeNode<resp, state>): Promise<TreeNode<resp, state>[]|boolean> => {
         try {
             const res: AxiosResponse<TreeResp<resp>> = await this.getTreeAction(node).execute();
-            if (node) {
-                node.sync.children = this.toNodes(res, node) as TreeNodeProps<resp, state>[];
-            } else {
-                this.ts.metaState.nodes = this.toNodes(res) as TreeNodeProps<resp, state>[];
-            }
+            return this.toNodes(res);
         } catch (e) {
             console.error(e);
+            return false;
         }
     };
 
-    protected requestTreeSearchData = async (id?: string, type?: string): Promise<TreeNodeProps<resp, state>[]|boolean> => {
+    protected requestTreeSearchData = async (id?: string, type?: string): Promise<TreeNode<resp, state>[]|boolean> => {
         try {
             let res;
             if (id && type) res = await this.treeAction.setItemId(id).setItemType(type).execute();
@@ -70,7 +68,7 @@ export abstract class BaseTreeFluentAPI<
         }
     };
 
-    abstract getData: (node: TreeNode<resp, state>, matched: TreeNode<resp, state>[], e: MouseEvent) => Promise<void>;
+    abstract getData: (node: TreeItem<resp, state>, matched: TreeItem<resp, state>[], e: MouseEvent) => Promise<void>;
 
     abstract getSearchData: (...args) => Promise<any>;
 }
@@ -95,33 +93,50 @@ export class ProjectTreeFluentAPI<
         return this.treeAction.setRoot();
     };
 
-    protected toNodes = (resp: AxiosResponse<TreeResp<ProjectItemResp>>, parentNode?: TreeNode<ProjectItemResp, state>): TreeNodeProps<ProjectItemResp, state>[]|boolean => {
+    protected toNodes = (resp: AxiosResponse<TreeResp<ProjectItemResp>>): TreeNode<ProjectItemResp, state>[]|boolean => {
         if (resp.data.items.length === 0) {
             return false;
         }
-        return resp.data.items.map(
-            item => getDefaultNode<ProjectItemResp, state>(item, {
+        return resp.data.items.map((item) => {
+            const res = getDefaultNode<ProjectItemResp, state>(item, {
                 children: item.has_child,
                 state: {
                     expanded: false,
                     selected: false,
                     loading: false,
                 } as state,
-            }) as TreeNodeProps<ProjectItemResp, state>,
-        );
+            });
+            return res;
+        });
     }
 
-    getData = async (node?: TreeNode<ProjectItemResp, state>, matched?: TreeNode<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
-        if (node && e) {
+    protected resetSelectedNode = (node: TreeItem<ProjectItemResp, state>, compare?: TreeItem<ProjectItemResp, state>) => {
+        if (compare) {
+            if (compare.node.data.id === node.node.data.id) this.ts.metaState.selectedNodes = [];
+            else if (compare.parent) this.resetSelectedNode(node, compare.parent);
+        } else {
+            if (!this.ts.metaState.firstSelectedNode) return;
+            if (!this.ts.metaState.firstSelectedNode.parent) return;
+            if (this.ts.metaState.firstSelectedNode.level <= node.level) return;
+            this.resetSelectedNode(node, this.ts.metaState.firstSelectedNode.parent);
+        }
+    }
+
+    getData = async (node?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+        if (node && matched && e) {
             e.stopPropagation();
-            if (node.state.expanded) {
+            if (node.node.state.expanded) {
                 this.ts.setNodeState(node, { expanded: false });
+                this.resetSelectedNode(node);
             } else {
                 this.ts.setNodeState(node, { expanded: true, loading: true });
             }
-            await this.requestTreeData(node);
+            node.node.children = await this.requestTreeData(node.node);
             this.ts.setNodeState(node, { loading: false });
-        } else await this.requestTreeData();
+        } else {
+            const res = await this.requestTreeData();
+            this.ts.metaState.nodes = Array.isArray(res) ? res : [];
+        }
     }
 
     getSearchPath = async (id: string, type: string): Promise<TreeSearchResp> => {
@@ -129,53 +144,36 @@ export class ProjectTreeFluentAPI<
         return res.data;
     }
 
-    getRecursiveData = async (ids: string[], idx = ids.length - 1, parent?: TreeNodeProps<ProjectItemResp, state>): Promise<TreeNodeProps<ProjectItemResp, state>[]|boolean> => {
-        // if (ids.length === idx) {
-        //     this.ts.metaState.nodes = parents || [];
-        //     return;
-        // }
-
-        // const isLeaf = idx === ids.length - 1;
-        // const id = ids[idx];
-        //
-        // if (parents) {
-        //     const children = isLeaf ? false
-        //         : await this.requestTreeSearchData(id, id.startsWith('pg') ? 'PROJECT_GROUP' : 'PROJECT');
-        //
-        //     const itemIdx = findIndex(parents, d => d.data.id === id);
-        //     if (itemIdx !== -1) {
-        //         parents[itemIdx].children = children;
-        //         parents[itemIdx].state = { ...parents[itemIdx].state, expanded: !isLeaf, selected: isLeaf };
-        //     }
-        //     await this.getRecursiveData(ids, idx + 1, Array.isArray(children) ? children : []);
-        // } else { // Root case
-        //     const children = await this.requestTreeSearchData(undefined, 'ROOT');
-        //     await this.getRecursiveData(ids, idx + 1, Array.isArray(children) ? children : []);
-        // }
-
-
+    getRecursiveData = async (ids: string[], idx = 0, parent?: TreeItem<ProjectItemResp, state>): Promise<TreeNode<ProjectItemResp, state>[]|boolean> => {
         if (parent) {
             // Leaf case - end
             if (idx === ids.length - 1) {
-                parent.state.selected = true;
-                return parent.children;
+                parent.node.state.selected = true;
+                this.ts.metaState.selectedNodes = [parent];
+                return parent.node.children;
             }
-            const items = await this.requestTreeSearchData(ids[idx], 'PROJECT_GROUP');
-            parent.state.expanded = !!items;
-            if (Array.isArray(items)) {
-                const item = find(items, d => d.data.id === ids[idx]);
-                parent.children = await this.getRecursiveData(ids, idx + 1, item);
+
+            const children = await this.requestTreeSearchData(ids[idx], parent.node.data.item_type);
+            if (Array.isArray(children)) {
+                const key = findIndex(children, d => d.data.id === ids[idx + 1]);
+                if (key !== -1) {
+                    const nextParent = getTreeItem(key, idx + 1, children[key]);
+                    nextParent.node.children = await this.getRecursiveData(ids, idx + 1, nextParent);
+                    nextParent.node.state.expanded = !!nextParent.node.children;
+                }
             }
-            return items;
+            return children;
         }
 
         // Root case - start
-        const items = await this.requestTreeSearchData(undefined, 'ROOT') as TreeNodeProps<ProjectItemResp, state>[];
-        const item = find(items, d => d.data.id === ids[idx]);
-        if (item) {
-            item.children = await this.getRecursiveData(ids, idx + 1, item);
+        const rootItems = await this.requestTreeSearchData(undefined, 'ROOT') as TreeNodeProps<ProjectItemResp, state>[];
+        const itemIdx = findIndex(rootItems, d => d.data.id === ids[idx]);
+        if (itemIdx !== -1) {
+            const item = getTreeItem(itemIdx, 0, rootItems[itemIdx]);
+            item.node.children = await this.getRecursiveData(ids, idx, item);
+            item.node.state.expanded = !!item.node.children;
         }
-        return items;
+        return rootItems;
     }
 
     getSearchData = async (id: string, type: 'PROJECT_GROUP'|'PROJECT' = 'PROJECT'): Promise<void> => {

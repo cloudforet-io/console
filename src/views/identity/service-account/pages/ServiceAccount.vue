@@ -193,6 +193,7 @@ import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
+import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
 import { useStore } from '@/store/toolset';
@@ -376,12 +377,12 @@ export default {
         const clickProject = () => {
             projectModalVisible.value = true;
         };
-        const changeProject = async (node?: ProjectNode|null) => {
+        const changeProject = async (data?: ProjectItemResp|null) => {
             const action = fluentApi.identity().serviceAccount().changeProject().clone()
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
-            if (node) {
-                await action.setId(node.data.id).execute()
+            if (data) {
+                await action.setId(data.id).execute()
                     .then(() => {
                         context.root.$notify({
                             group: 'noticeBottomRight',
@@ -593,7 +594,10 @@ export default {
         //     };
         // });
 
-        const selectedProjectId = computed(() => _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', ''));
+        const selectedProjectId = computed(() => {
+            if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
+            return _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', '');
+        });
         return {
             apiHandler,
             selectedProjectId,
