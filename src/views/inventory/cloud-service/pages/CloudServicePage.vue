@@ -102,7 +102,11 @@
         <p-empty v-else style="height: auto; margin-top: 4rem;">
             No Selected Item
         </p-empty>
-        <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+        <s-project-tree-modal :visible.sync="changeProjectState.visible"
+                              :project-id="changeProjectState.projectId"
+                              :loading="changeProjectState.loading"
+                              @confirm="changeProject"
+        />
         <s-collect-modal :visible.sync="collectModalVisible"
                          :resources="apiHandler.tableTS.selectState.selectItems"
                          id-key="cloud_service_id"
@@ -129,7 +133,6 @@ import {
 } from '@/lib/api/table';
 
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
-import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi } from '@/lib/fluent-api';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
@@ -148,11 +151,12 @@ import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata
 import baseTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import baseInfoSchema from '@/metadata-schema/view/inventory/cloud_service/sub_data/layouts/base_info.json';
-import _ from 'lodash';
+import { get, debounce } from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { propsCopy } from '@/lib/router-query-string';
 import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
+import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -347,21 +351,28 @@ export default {
         });
 
 
-        const projectModalVisible = ref(false);
-        const clickProject = () => {
-            projectModalVisible.value = true;
-        };
-        const changeProject = async (node?: ProjectNode|null) => {
+        const changeProjectState = reactive({
+            visible: false,
+            loading: false,
+            projectId: computed(() => {
+                if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
+                return get(apiHandler, 'tableTS.selectState.firstSelectItem.project_id', '');
+            }),
+        });
+        const clickProject = () => { changeProjectState.visible = true; };
+        const changeProject = async (data?: ProjectItemResp|null) => {
+            changeProjectState.loading = true;
             const action = fluentApi.inventory().cloudService().changeProject().clone()
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id));
-            if (node) {
-                await action.setId(node.data.id).execute();
+            if (data) {
+                await action.setId(data.id).execute();
             } else {
                 await action.setReleaseProject().execute();
             }
 
+            changeProjectState.loading = false;
+            changeProjectState.visible = false;
             await apiHandler.getData();
-            projectModalVisible.value = false;
         };
 
         const csGetDataAction = fluentApi.inventory().cloudService().getData();
@@ -432,12 +443,12 @@ export default {
                 const resp = await fluentApi.inventory().cloudService().get().setId(selectId)
                     .setOnly('metadata.view.sub_data.layouts')
                     .execute();
-                layouts = _.get(resp.data, 'metadata.view.sub_data.layouts', []);
+                layouts = get(resp.data, 'metadata.view.sub_data.layouts', []);
                 cache[selectId] = layouts;
             }
             dynamicLayoutState.layouts = layouts;
         };
-        const getLayouts = _.debounce(getLayoutsFunc, 50);
+        const getLayouts = debounce(getLayoutsFunc, 50);
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem?.cloud_service_id);
         const subDataIsShow = computed(() => singleItemTab.syncState.activeTab === 'detail');
         let watchStop = null as unknown as any;
@@ -483,8 +494,8 @@ export default {
             subDataIsShow,
             apiHandler,
             csDropdownMenu,
-            projectModalVisible,
             clickProject,
+            changeProjectState,
             changeProject,
             csGetDataAction,
             ...toRefs(collectModalState),

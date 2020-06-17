@@ -142,7 +142,7 @@
                             />
                         </template>
                     </PTab>
-                    <p-empty v-else style="height: auto;margin-top:4rem ">
+                    <p-empty v-else style="height: auto; margin-top: 4rem;">
                         No Selected Item
                     </p-empty>
                 </div>
@@ -155,11 +155,11 @@
                 :visible.sync="deleteTS.syncState.visible"
                 @confirm="deleteConfirm"
             />
-            <s-project-tree-modal :visible.sync="projectModalVisible"
-                                  :project-id="selectedProjectId"
+            <s-project-tree-modal :visible.sync="changeProjectState.visible"
+                                  :project-id="changeProjectState.projectId"
+                                  :loading="changeProjectState.loading"
                                   @confirm="changeProject"
             />
-
             <SSecretCreateFormModal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
                                     @confirm="secretFormConfirm($event)"
             />
@@ -201,7 +201,7 @@ import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
-import _ from 'lodash';
+import { get, zipObject } from 'lodash';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
@@ -267,8 +267,8 @@ export default {
         onMounted(async () => {
             const resp = await providerListAPI.execute();
             const prs = resp.data.results.map(item => item.provider);
-            providers.value = _.zipObject(prs, resp.data.results);
-            providerTotalCount.value = reactive<any>(_.zipObject(
+            providers.value = zipObject(prs, resp.data.results);
+            providerTotalCount.value = reactive<any>(zipObject(
                 prs,
                 Array(prs.length),
             ));
@@ -373,15 +373,17 @@ export default {
             { type: 'item', disabled: isNotSelected }),
         });
 
-        const projectModalVisible = ref(false);
-        const clickProject = () => {
-            projectModalVisible.value = true;
-        };
-        const selectedProjectId = computed(() => {
-            if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
-            return _.get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', '');
+        const changeProjectState = reactive({
+            visible: false,
+            loading: false,
+            projectId: computed(() => {
+                if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
+                return get(apiHandler, 'tableTS.selectState.firstSelectItem.project_info.project_id', '');
+            }),
         });
+        const clickProject = () => { changeProjectState.visible = true; };
         const changeProject = async (data?: ProjectItemResp|null) => {
+            changeProjectState.loading = true;
             const action = fluentApi.identity().serviceAccount().changeProject().clone()
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
@@ -415,8 +417,9 @@ export default {
                     });
             }
 
+            changeProjectState.loading = false;
+            changeProjectState.visible = false;
             await apiHandler.getData();
-            projectModalVisible.value = false;
         };
 
 
@@ -612,10 +615,9 @@ export default {
             deleteConfirm,
             secretDeleteClick,
             dropdown,
+            changeProjectState,
             clickProject,
             changeProject,
-            projectModalVisible,
-            selectedProjectId,
             adminApi,
             clickSecretAddForm,
             ...toRefs(secretFormState),
