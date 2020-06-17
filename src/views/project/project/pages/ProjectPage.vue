@@ -332,7 +332,7 @@ export default {
 
         const { provider } = useStore();
         provider.getProvider();
-        const vm = getCurrentInstance();
+        const vm: any = getCurrentInstance();
 
         /**
              Tree, Project, Statistics API Handler Declaration
@@ -497,7 +497,7 @@ export default {
             }
         });
 
-        const hovered = async (item: TreeItem) => {
+        const hovered = async (item: TreeItem, isHovered: boolean) => {
             formState.isRoot = false;
             state.isHover = true;
             state.hoveredId = item.node.data.id;
@@ -509,21 +509,21 @@ export default {
              * Click Card Item
              */
         const clickCard = (item) => {
-                vm?.$router.push({
-                    name: 'projectDetail',
-                    params: {
-                        id: item.project_id,
-                        name: item.name,
-                        project_group: item.project_group_info,
-                        tags: item.tags,
-                    },
-                });
+            vm.$router.push({
+                name: 'projectDetail',
+                params: {
+                    id: item.project_id,
+                    name: item.name,
+                    project_group: item.project_group_info,
+                    tags: item.tags,
+                },
+            });
         };
 
         const goToServiceAccount = () => {
-                vm?.$router.push({
-                    name: 'serviceAccount',
-                });
+            vm.$router.push({
+                name: 'serviceAccount',
+            });
         };
 
         /**
@@ -600,7 +600,7 @@ export default {
                             },
                         });
                         if (formState.isRoot) treeApiHandler.ts.addNode(newNode);
-                        if (!formState.isRoot && !state.hoveredNode) treeApiHandler.ts.addNode(newNode, state.hoveredNode);
+                        if (!formState.isRoot && state.hoveredNode) treeApiHandler.ts.addNode(newNode, state.hoveredNode);
                     })
                     .catch((e) => {
                         showErrorMessage('Fail to Create Project Group', e, context.root);
@@ -608,7 +608,7 @@ export default {
             } else {
                 // @ts-ignore
                 fluentApi.identity().projectGroup().update().setParameter({
-                    project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.data.id,
+                    project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.node.data.id,
                     ...item,
                 })
                     .execute()
@@ -622,8 +622,8 @@ export default {
                             speed: 1000,
                         });
                         projectState.currentGroup = item.name;
-                        treeApiHandler.ts.metaState.firstSelectedNode.sync.data = {
-                            ...treeApiHandler.ts.metaState.firstSelectedNode.data,
+                        treeApiHandler.ts.metaState.firstSelectedNode.node.data = {
+                            ...treeApiHandler.ts.metaState.firstSelectedNode.node.data,
                             name: item.name,
                         };
                     })
