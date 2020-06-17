@@ -354,12 +354,15 @@ export default {
             treeAction, treeSearchAction,
         });
 
-        const listProjectGroup = async () => {
-            await treeApiHandler.getData();
-            if (treeApiHandler.ts.metaState.nodes[0]) {
-                const item = getTreeItem(0, 0, treeApiHandler.ts.metaState.nodes[0]);
-                treeApiHandler.ts.metaState.selectedNodes = [item];
-                treeApiHandler.ts.setNodeState(item, { selected: true });
+        const listProjectGroup = async (pgId?: string) => {
+            if (pgId) await treeApiHandler.getSearchData(pgId, 'PROJECT_GROUP');
+            else {
+                await treeApiHandler.getData();
+                if (treeApiHandler.ts.metaState.nodes[0]) {
+                    const item = getTreeItem(0, 0, treeApiHandler.ts.metaState.nodes[0]);
+                    treeApiHandler.ts.metaState.selectedNodes = [item];
+                    treeApiHandler.ts.setNodeState(item, { selected: true });
+                }
             }
         };
 
