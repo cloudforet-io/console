@@ -124,9 +124,14 @@ export class TreeNodeToolSet<
 
     isMultiSelect = false;
 
-    setSelectedNodes: (node: TreeItem<data, state>) => void = () => {};
+    setSelectedNodes: (item: TreeItem<data, state>) => void = () => {};
 
-    setNodeState: (...args) => void
+    /**
+     * @param node
+     * @param state
+     * @description Since it is changed by an event-driven method, there may be side effects when used continuously.
+     */
+    setNodeState: (item: TreeItem<data, state>, state: {[name: string]: boolean}) => void
         = ({ node }: TreeItem<data, state>, state: {[name: string]: boolean}) => {
             node.state = {
                 ...node.state,
@@ -134,21 +139,24 @@ export class TreeNodeToolSet<
             } as state;
         };
 
-    deleteNode: (...args) => void
+    /**
+     * @param node
+     * @description Use this method at the end after changing the property value of node state
+     */
+    applyState: (item: TreeItem<data, state>) => void
+        = ({ node }: TreeItem<data, state>) => {
+            node.state = {
+                ...node.state,
+            } as state;
+        };
+
+    deleteNode: (item: TreeItem<data, state>) => void
         = ({ parent, node, key }: TreeItem<data, state>) => {
             if (parent && Array.isArray(parent.node.children)) {
                 parent.node.children.splice(key, 1);
+                if (parent.node.children.length === 0) parent.node.children = false;
             } else {
                 this.metaState.nodes.splice(key, 1);
-            }
-        };
-
-    addNode: (...args) => void
-        = (node: TreeNode<data, state>, target?: TreeItem<data, state>|null) => {
-            if (target && Array.isArray(target.node.children)) {
-                target.node.children = [...target.node.children, node];
-            } else {
-                this.metaState.nodes.push(node);
             }
         };
 
@@ -159,7 +167,7 @@ export class TreeNodeToolSet<
             selectedNodes: [],
             firstSelectedNode: computed(() => _this.metaState.selectedNodes[0]),
         });
-        _this.setSelectedNodes = (node: TreeItem): void => {
+        _this.setSelectedNodes = (item: TreeItem): void => {
             // TODO: multi select case
             // if (_this.isMultiSelect) {
             // const idx = findIndex(_this.metaState.selectedNodes, (d: TreeItem) => d.key === node.key && d.level === node.level);
@@ -169,13 +177,13 @@ export class TreeNodeToolSet<
 
             if (_this.metaState.firstSelectedNode) {
                 _this.setNodeState(_this.metaState.firstSelectedNode, { selected: false });
-                if (_this.metaState.firstSelectedNode.key === node.key && _this.metaState.firstSelectedNode.level === node.level) {
+                if (_this.metaState.firstSelectedNode.key === item.key && _this.metaState.firstSelectedNode.level === item.level) {
                     _this.metaState.selectedNodes = [];
                     return;
                 }
             }
-            _this.setNodeState(node, { selected: true });
-            _this.metaState.selectedNodes = [node];
+            _this.setNodeState(item, { selected: true });
+            _this.metaState.selectedNodes = [item];
         };
     }
 
