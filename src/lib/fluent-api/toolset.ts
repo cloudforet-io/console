@@ -83,6 +83,54 @@ export abstract class ActionAPI<parameter = any, resp = any> implements ActionAP
     }
 }
 
+export interface ConfigActionState<T=any> {
+    name: string;
+    parameter: T;
+}
+
+export abstract class BaseConfigActionAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+    getParameter = (): any => ({ name: this.name, data: { ...this.apiState.parameter } });
+
+    protected apiState: ConfigActionState<parameter>;
+
+    protected _userId = '';
+
+
+    constructor(
+        api: ApiType,
+        baseUrl: string,
+        initState: ConfigActionState<parameter> = { name: '', parameter: {} as parameter },
+        transformer: ((any) => any | Promise<any>) | null = null,
+    ) {
+        super(api, baseUrl, initState, transformer);
+        this.apiState = {
+            ...initState,
+        };
+    }
+
+    set userId(id: string) {
+        this._userId = id;
+    }
+
+    get userId() {
+        return this._userId || JSON.parse(localStorage.getItem('user/userId') as string).data;
+    }
+
+    get name() {
+        return `console/${this.userId}${this.baseUrl}`;
+    }
+
+    get url() {
+        return `config/config-map/${this.path}`;
+    }
+}
+
+
+export class GetConfigAction<parameter, resp> extends BaseConfigActionAPI<parameter, resp> {
+    protected path = 'get';
+}
+
+
 export const OPERATOR_MAP = Object.freeze({
     '': 'contain_in', // merge operator
     '!': 'not_contain', // merge operator
@@ -275,8 +323,9 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     };
 
     setOnly(...args: string[]): this {
-        this.apiState.only = args;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.only = args;
+        return api;
     }
 
     setFixOnly(...args: string[]): this {
@@ -286,18 +335,21 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     }
 
     setCountOnly(value = true): this {
-        this.apiState.count_only = value;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.count_only = value;
+        return api;
     }
 
     setThisPage(thisPage: number): this {
-        this.apiState.thisPage = thisPage;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.thisPage = thisPage;
+        return api;
     }
 
     setPageSize(pageSize: number): this {
-        this.apiState.pageSize = pageSize;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.pageSize = pageSize;
+        return api;
     }
 
     setSortBy(sortBy: string): this {

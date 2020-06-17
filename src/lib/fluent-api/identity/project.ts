@@ -1,11 +1,12 @@
 /* eslint-disable camelcase */
 import {
+    BaseConfigActionAPI,
     CreateAction,
     GetAction,
     ListAction,
     MemberListAction,
     Resource,
-    ResourceActions,
+    ResourceActions, ServiceResources,
     SingleDeleteAction,
     SingleItemMemberListAction,
     SubMultiItemAction,
@@ -16,6 +17,7 @@ import {
 import {
     ListType, ProjectGroupInfo, Tags, TimeStamp, TreeResp,
 } from '@/lib/fluent-api/type';
+import Config from '@/lib/fluent-api/config';
 
 const idField = 'project_id';
 
@@ -103,7 +105,17 @@ class RemoveMember extends MemberAction {
     path = 'member/remove'
 }
 
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'|'treeSearch'|'memberList'|'addMember'|'removeMember'> {
+export interface ProjectFavoriteParameter {
+    projectId?: string[];
+    projectGroupId?: string[];
+}
+
+class Favorite extends Config<ProjectFavoriteParameter, ProjectFavoriteParameter> {
+    name = 'favorite'
+}
+
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'|'treeSearch'|'memberList'|'addMember'|'removeMember'>,
+    ServiceResources<'favorite'> {
     protected name = 'project';
 
     create() { return new Create(this.api, this.baseUrl); }
@@ -125,4 +137,6 @@ export default class Project extends Resource implements ResourceActions<'create
     addMember() { return new AddMember(this.api, this.baseUrl); }
 
     removeMember() { return new RemoveMember(this.api, this.baseUrl); }
+
+    favorite() { return new Favorite(this.api, this.baseUrl.substring(0, this.baseUrl.length - 1)); }
 }
