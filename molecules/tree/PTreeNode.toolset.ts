@@ -8,6 +8,7 @@ import {
     computed, reactive,
 } from '@vue/composition-api';
 import { findIndex } from 'lodash';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export interface TreeNodeStateType<T=any, S extends BaseNodeStateType = BaseNodeStateType> {
     level: number;
@@ -60,6 +61,7 @@ export interface TreeItem<T=any, S extends BaseNodeStateType = BaseNodeStateType
     level: number;
     parent: TreeItem<T, S>|null;
     node: TreeNode<T, S>;
+    el?: HTMLElement;
 }
 
 @StateToolSet<TreeNodeStateType>()

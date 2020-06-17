@@ -1,52 +1,61 @@
 <template>
     <p-button-modal header-title="Change Project"
-                    scrollable
                     size="md"
+                    :scrollable="false"
                     centered
                     fade
                     backdrop
                     :visible.sync="proxyVisible"
+                    :loading="loading"
                     @confirm="confirm"
     >
         <template #body>
-            <div class="mb-8">
-                Selected Project: {{ treeApiHandler.ts.metaState.firstSelectedNode ?
-                    treeApiHandler.ts.metaState.firstSelectedNode.node.data.name
-                    : 'No Project is selected' }}
+            <div class="title">
+                Select a Project
             </div>
-            <div>
-                <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
-                             v-bind="treeApiHandler.ts.state"
-                             :data.sync="node.data"
-                             :children.sync="node.children"
-                             :state.sync="node.state"
-                             @toggle:click="treeApiHandler.getData"
-                             @node:click="selectItem"
-                             @checkbox:click="selectItem"
-                >
-                    <template #data="{data}">
-                        {{ data.name }}
-                    </template>
-                    <template #left-extra="{state, getListeners, data}">
-                        <span>
-                            <p-radio v-if="data.item_type === 'PROJECT'"
+            <div class="body-container">
+                <div ref="treeContainer" class="tree-container">
+                    <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
+                                 v-bind="treeApiHandler.ts.state"
+                                 :data.sync="node.data"
+                                 :children.sync="node.children"
+                                 :state.sync="node.state"
+                                 @toggle:click="treeApiHandler.getData"
+                                 @node:click="selectItem"
+                                 @checkbox:click="selectItem"
+                                 @mounted="onNodeMounted"
+                    >
+                        <template #data="{data}">
+                            <span :class="{
+                                'ml-2': data.item_type === 'PROJECT'
+                            }"
+                            >{{ data.name }}</span>
+                        </template>
+                        <template #toggle="{state, toggleSize, data, getListeners}">
+                            <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
+                                 :height="toggleSize"
+                            />
+                            <p-radio v-else-if="data.item_type === 'PROJECT'"
                                      :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
                             />
-                        </span>
-                    </template>
-                    <template #toggle="{state, toggleSize}">
-                        <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
-                             :height="toggleSize"
-                        />
-                    </template>
-                </p-tree-node>
+                        </template>
+                    </p-tree-node>
+                </div>
+                <div class="no-select">
+                    <p-radio class="mr-2"
+                             :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
+                             :value="true" @click="releaseProject"
+                    /> No Select Project
+                </div>
             </div>
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
-import { watch } from '@vue/composition-api';
+import {
+    computed, onMounted, Ref, ref, watch,
+} from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
@@ -74,6 +83,10 @@ export default {
             type: String,
             default: '',
         },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
     },
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, { emit }) {
@@ -83,6 +96,9 @@ export default {
             treeAction: projectApi.tree().setSortBy('name').setSortDesc(false),
             treeSearchAction: projectApi.treeSearch(),
         });
+
+        const treeContainer: Ref<HTMLElement|null> = ref(null);
+
 
         watch(() => props.visible, async (after, before) => {
             if (after === before) return;
@@ -95,7 +111,19 @@ export default {
             }
         });
 
+        const autoScroll = (el: HTMLElement) => {
+            if (treeContainer.value) {
+                const offsetBottom = el.offsetTop + el.offsetHeight;
+                const scrollBottom = treeContainer.value.scrollTop + treeContainer.value.offsetHeight;
+                if (offsetBottom > scrollBottom) {
+                    treeContainer.value.scrollTop = offsetBottom - treeContainer.value.offsetHeight;
+                }
+            }
+        };
+
+
         return {
+            treeContainer,
             proxyVisible: makeProxy('visible'),
             treeApiHandler,
             selectItem(item: TreeItem<ProjectItemResp, ProjectNodeState>): void {
@@ -108,19 +136,38 @@ export default {
                     emit('confirm', null);
                 }
             },
+            releaseProject() {
+                if (treeApiHandler.ts.metaState.firstSelectedNode) {
+                    treeApiHandler.ts.setNodeState(treeApiHandler.ts.metaState.firstSelectedNode, { selected: false });
+                    treeApiHandler.ts.metaState.selectedNodes = [];
+                }
+            },
+            onNodeMounted(item: TreeItem) {
+                if (treeApiHandler.ts.metaState.firstSelectedNode
+                    && treeApiHandler.ts.metaState.firstSelectedNode.node.data.id === item.node.data.id
+                    && item.el) {
+                    autoScroll(item.el);
+                }
+            },
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.p-tree-node::v-deep {
-    .basic {
-        .left-extra {
-            display: inline-block;
-            width: 1rem;
-            margin-left: 0.5rem;
-        }
-    }
+.title {
+    font-size: 1.375rem;
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+}
+.body-container {
+    @apply bg-primary4 border border-gray-200 rounded-sm flex flex-col;
+}
+.tree-container {
+    @apply overflow-auto flex-grow px-2 py-4;
+    height: 21.5rem;
+}
+.no-select {
+    @apply border-t border-gray-200 p-4 flex items-center;
 }
 </style>

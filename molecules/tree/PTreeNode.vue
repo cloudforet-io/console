@@ -1,5 +1,5 @@
 <template>
-    <div class="p-tree-node">
+    <div ref="nodeRef" class="p-tree-node">
         <div :class="{...classNames(node), [`level-${level}`]: true}" :style="{paddingLeft: depth}"
              v-on="getListeners('row')"
         >
@@ -19,7 +19,9 @@
                                       :style="{width: toggleSize}"
                                       v-on="getListeners('toggle')"
                                 >
-                                    <slot v-if="children" :name="`toggle-${level}`" v-bind="slotBind">
+                                    <slot v-if="children || $scopedSlots[`toggle-${level}`] || $scopedSlots[`toggle`]"
+                                          :name="`toggle-${level}`" v-bind="slotBind"
+                                    >
                                         <slot name="toggle" v-bind="slotBind">
                                             <p-i :name="state.expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
                                                  :width="toggleSize" :height="toggleSize"
@@ -79,12 +81,12 @@
 <script lang="ts">
 import { TreeNodeProps, treeNodeProps } from '@/components/molecules/tree/PTreeNode.toolset';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import {
-    findIndex, clone, forEach, map, isEmpty,
+    forEach,
 } from 'lodash';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 
@@ -102,6 +104,8 @@ export default {
             return `${(props.level || 0) * (size ? Number(size[0]) : 1)}${unit ? unit[0] : 'rem'}`;
         });
 
+        const nodeRef = ref(undefined);
+
         const node: any = computed(() => ({
             key: vm.$vnode.key || 0,
             level: props.level,
@@ -111,6 +115,7 @@ export default {
                 children: makeProxy('children', props, emit),
                 state: makeProxy('state', props, emit),
             }),
+            el: nodeRef.value,
         }));
 
         const getListeners = (type: string) => {
@@ -125,7 +130,12 @@ export default {
             return res;
         };
 
+        onMounted(() => {
+            emit('mounted', node.value, [node.value]);
+        });
+
         return {
+            nodeRef,
             depth,
             slotBind: computed(() => ({
                 depth: depth.value, getListeners, ...props,
