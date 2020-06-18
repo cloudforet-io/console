@@ -1,7 +1,7 @@
 <template>
     <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <div class="h-full treeSidebar" :style="{width:width+'px'}">
+            <div class="h-full treeSidebar">
                 <div class="tree-header flex">
                     PROJECT GROUP
                     <p-i name="ic_plus" color="transparent inherit"
@@ -9,6 +9,7 @@
                          @click="openProjectGroupForm(true)"
                     />
                 </div>
+                <p-hr style="width:100%;"></p-hr>
                 <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
                              v-bind="treeApiHandler.ts.state"
                              :data.sync="node.data"
@@ -200,6 +201,7 @@
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
                                      :current-project="treeApiHandler.ts.metaState.firstSelectedNode.node.data.id"
+                                     :project-group-id="currentGroupId"
                                      @confirm="projectFormConfirm($event)"
             />
             <p-button-modal
@@ -359,23 +361,6 @@ export default {
 
         }, vm, undefined, undefined);
 
-        // const listProjectGroup = async (pgId?: string) => {
-        //     if (pgId) {
-        //         await treeApiHandler.getSearchData(pgId, 'PROJECT_GROUP');
-        //         projectState.currentGroupId = pgId as string;
-        //         if (treeApiHandler.ts.metaState.firstSelectedNode) treeApiHandler.ts.setNodeState(treeApiHandler.ts.metaState.firstSelectedNode, { expanded: false });
-        //     } else {
-        //         await treeApiHandler.defaultGetData();
-        //         if (treeApiHandler.ts.metaState.nodes[0]) {
-        //             const item = getTreeItem(0, 0, treeApiHandler.ts.metaState.nodes[0]);
-        //             treeApiHandler.ts.metaState.selectedNodes = [item];
-        //             treeApiHandler.ts.setNodeState(item, { selected: true });
-        //         }
-        //     }
-        // };
-        // const id = context.root.$route.query.t_se;
-        // listProjectGroup(id);
-
         const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statisticsTest().resource().stat()
             .setResourceType('identity.Project')
@@ -477,6 +462,7 @@ export default {
              * */
         const setProjectState = ({ node, parent }: TreeItem<ProjectItemResp, ProjectNodeState>) => {
             projectState.currentGroup = node.data.name;
+            projectState.currentGroupId = node.data.id;
             if (parent) { projectState.parentGroup = parent.node.data.name; } else { projectState.parentGroup = ''; }
         };
 
@@ -671,10 +657,8 @@ export default {
         };
 
         const routerHandler = async () => {
-            console.log('prop first', props);
             const prop = propsCopy(props);
             treeApiHandler.applyAPIRouter(prop);
-            // await treeApiHandler.defaultGetData();
             await treeApiHandler.applyDisplayRouter(prop);
             apiHandler.applyAPIRouter(prop);
             await apiHandler.getData();
@@ -711,11 +695,11 @@ export default {
 
 <style lang="postcss" scoped>
     .tree-header {
-        @apply text-sm font-semibold text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
+        @apply text-base font-semibold text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
     }
 
     ::v-deep .basic {
-       @apply mx-3;
+       @apply mx-3 mt-1 text-base;
     }
 
     ::v-deep .group-add-btn {
