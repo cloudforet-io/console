@@ -247,7 +247,7 @@ class ProviderStore extends Store<ProviderState> {
     }
 
     getProvider = async () => {
-        console.debug('isEXP?', this.isExpiration());
+        // console.debug('isEXP?', this.isExpiration());
         const providerAPI = fluentApi.identity().provider();
         if (this.isExpiration()) {
             const result = {};

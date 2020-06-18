@@ -249,7 +249,7 @@ export default {
             metricAPI.setFilter(
                 { key: 'cloud_service_type_id', operator: '=', value: ids },
             ).execute().then((rp) => {
-                // console.debug(rp);
+                console.debug(rp);
                 const data = {};
                 rp.data.results.forEach((item) => {
                     data[item.cloud_service_type_id] = item;

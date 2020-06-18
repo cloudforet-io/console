@@ -1,21 +1,23 @@
 /* eslint-disable camelcase */
 import {
+    BaseConfigActionAPI,
     CreateAction,
     GetAction,
     ListAction,
     MemberListAction,
     Resource,
-    ResourceActions,
+    ResourceActions, ServiceResources,
     SingleDeleteAction,
     SingleItemMemberListAction,
     SubMultiItemAction,
     SubMultiItemAddAction,
-    TreeAction,
+    TreeAction, TreeSearchAction,
     UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType, ProjectGroupInfo, Tags, TimeStamp,
+    ListType, ProjectGroupInfo, Tags, TimeStamp, TreeResp,
 } from '@/lib/fluent-api/type';
+import Config from '@/lib/fluent-api/config';
 
 const idField = 'project_id';
 
@@ -65,15 +67,28 @@ class MemberList extends SingleItemMemberListAction<any, any> {
     idField = idField;
 }
 
-interface ProjectTreeParameter {
+export interface ProjectTreeParameter {
     include_project: boolean;
 }
 
-class Tree extends TreeAction<ProjectTreeParameter, any> {
+export interface ProjectItemResp {
+    id: string;
+    name: string;
+    has_child: boolean;
+    item_type: 'PROJECT_GROUP'|'PROJECT';
+}
+
+export class ProjectTree extends TreeAction<ProjectTreeParameter, TreeResp<ProjectItemResp>> {
     setExcludeProject(val = true) {
         return val ? this.setExcludeType('PROJECT') : this.setExcludeType('');
     }
+}
 
+export interface TreeSearchResp {
+    open_path: string[];
+}
+
+class TreeSearch extends TreeSearchAction<ProjectTreeParameter, TreeSearchResp> {
 }
 
 abstract class MemberAction extends SubMultiItemAction<any, any> {
@@ -90,7 +105,17 @@ class RemoveMember extends MemberAction {
     path = 'member/remove'
 }
 
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'memberList'|'tree'|'addMember'|'removeMember'> {
+export interface ProjectFavoriteParameter {
+    projectId?: string[];
+    projectGroupId?: string[];
+}
+
+class Favorite extends Config<ProjectFavoriteParameter, ProjectFavoriteParameter> {
+    name = 'favorite'
+}
+
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'|'treeSearch'|'memberList'|'addMember'|'removeMember'>,
+    ServiceResources<'favorite'> {
     protected name = 'project';
 
     create() { return new Create(this.api, this.baseUrl); }
@@ -105,9 +130,13 @@ export default class Project extends Resource implements ResourceActions<'create
 
     memberList() { return new MemberList(this.api, this.baseUrl); }
 
-    tree() { return new Tree(this.api, this.baseUrl); }
+    tree() { return new ProjectTree(this.api, this.baseUrl); }
+
+    treeSearch() { return new TreeSearch(this.api, this.baseUrl); }
 
     addMember() { return new AddMember(this.api, this.baseUrl); }
 
     removeMember() { return new RemoveMember(this.api, this.baseUrl); }
+
+    favorite() { return new Favorite(this.api, this.baseUrl.substring(0, this.baseUrl.length - 1)); }
 }

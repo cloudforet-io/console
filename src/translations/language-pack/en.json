@@ -302,7 +302,7 @@
 		"TAB": {
 			"None": ""
 		},
-		"UPDATE_PROJ": "Update Project Group",
+		"UPDATE_PROJ": "Update Project",
 		"UPDATE_PROJ_GRP": "Update Project Group",
 		"UPT_ARG": "Update {0}",
 		"UPT_FAIL_ARG": "Fail to delete {0}. Please, check your action.",

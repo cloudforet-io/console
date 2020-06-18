@@ -9,37 +9,34 @@
                          @click="openProjectGroupForm(true)"
                     />
                 </div>
-                <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
-                             v-bind="treeApiHandler.ts.state"
-                             :data.sync="node.data"
-                             :children.sync="node.children"
-                             :state.sync="node.state"
-                             @toggle:click="treeApiHandler.getData"
-                             @node:click="treeApiHandler.ts.setSelectedNodes"
-                             @row:mouseenter="hovered(...arguments, true)"
-                             @row:mouseleave="hovered(...arguments, false)"
+                <p-tree
+                    ref="treeRef"
+                    v-bind="treeApiHandler.ts.state"
+                    :select-mode="true"
+                    :style="{width:width+'px'}"
+                    @node:selected="selected"
                 >
-                    <template #data="{data}">
-                        {{ data.name }}
-                    </template>
-                    <template #toggle="{state, toggleSize}">
-                        <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
-                             :height="toggleSize"
+                    <template #icon="{node,isExpanded}">
+                        <p-i :name="'ic_tree_folder'"
+                             color="transparent inherit"
+                             width="1rem" height="1rem"
                         />
                     </template>
-                    <template #right-extra="{data}">
-                        <div v-if="data.id === hoveredId && isHover">
-                            <div v-tooltip.top="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"
-                                 class="float-right text-base truncate leading-tight"
+                    <template #extra="{node, hoveredNode}">
+                        <span v-if="node===hoveredNode"
+                              @mouseenter.stop="hovered(node)"
+                              @click.stop="openProjectGroupForm(false)"
+                        >
+                            <div v-tooltip.bottom="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"
+                                 class="text-base truncate leading-tight"
                             >
                                 <p-icon-button :name="'ic_plus'" class="group-add-btn"
                                                width="1rem" height="1rem"
-                                               @click.stop="openProjectGroupForm(false)"
                                 />
                             </div>
-                        </div>
+                        </span>
                     </template>
-                </p-tree-node>
+                </p-tree>
             </div>
         </template>
         <template #default>
@@ -49,9 +46,9 @@
                     card-height="16rem"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                    @changePageNumber="apiHandler.getData()"
-                    @changePageSize="apiHandler.getData()"
-                    @clickRefresh="apiHandler.getData()"
+                    @changePageNumber="apiHandler.defaultGetData(false)"
+                    @changePageSize="apiHandler.defaultGetData(false)"
+                    @clickRefresh="apiHandler.defaultGetData(false)"
                     @card:click.self="clickCard"
                 >
                     <template #toolbox-top>
@@ -60,13 +57,9 @@
                                 {{ parentGroup }}
                             </p>
                             <PPageTitle :title="currentGroup" use-total-count :total-count="apiHandler.totalCount.value" />
-                            <p-icon-button name="ic_transhcan"
+                            <p-icon-button v-if="!hasChildProject && !hasChildProjectGroup" name="ic_transhcan"
                                            width="1.5rem" height="1.5rem" class="delete-btn"
                                            @click="openProjectGroupDeleteForm"
-                            />
-                            <p-icon-button name="ic_edit-text"
-                                           width="1.5rem" height="1.5rem" class="edit-btn"
-                                           @click="openProjectGroupEditForm"
                             />
                         </div>
                     </template>
@@ -195,11 +188,10 @@
                 </div>
             </div>
             <SProjectGroupCreateFormModal v-if="projectGroupFormVisible" :visible.sync="projectGroupFormVisible"
-                                          :update-mode="updateMode" :current-group="currentGroup"
                                           @confirm="projectGroupFormConfirm($event)"
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
-                                     :current-project="treeApiHandler.ts.metaState.firstSelectedNode.node.data.id"
+                                     :current-project="treeApiHandler.ts.metaState.firstSelectedNode.data.id"
                                      @confirm="projectFormConfirm($event)"
             />
             <p-button-modal
@@ -229,15 +221,18 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-
+import PTree from '@/components/molecules/tree-origin/Tree.vue';
+import { ProjectTreeFluentAPI } from '@/lib/api/tree';
+import TreeItem, { TreeState } from '@/components/molecules/tree-origin/ToolSet';
 import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
+import PSimpleIconButton from '@/components/molecules/buttons/SimpleIconButton.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
@@ -246,11 +241,11 @@ import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { ProjectItemResp, ProjectListResp } from '@/lib/fluent-api/identity/project';
+import { ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
-import { QuerySearchGridFluentAPI, RouteQuerySearchGridFluentAPI, DefaultQSGridQSProps } from '@/lib/api/grid';
+import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
@@ -259,15 +254,6 @@ import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCrea
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
-import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
-import {
-    ProjectNodeState, DefaultQSTreeProps, RouteProjectTreeFluentAPI,
-} from '@/lib/api/tree-node';
-import {
-    getBaseNodeState, getDefaultNode, getTreeItem, TreeItem,
-} from '@/components/molecules/tree/PTreeNode.toolset';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { propsCopy } from '@/lib/router-query-string';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -280,17 +266,18 @@ import { propsCopy } from '@/lib/router-query-string';
 
     interface State {
         items: ProjectCardData[];
-        isHover: boolean;
         hoveredId: string;
-        hoveredNode: TreeItem<ProjectItemResp, ProjectNodeState>|null;
+        hoveredNode: any;
+        hasChildProject: boolean;
+        hasChildProjectGroup: boolean;
         showAllProjects: boolean;
     }
 
 export default {
     name: 'ProjectPage',
     components: {
-        PTreeNode,
         PVerticalPageLayout,
+        PTree,
         PButton,
         PI,
         PHr,
@@ -306,23 +293,20 @@ export default {
         SProjectGroupCreateFormModal,
         PIconTextButton,
     },
-    props: {
-        ...DefaultQSTreeProps,
-        ...DefaultQSGridQSProps,
-    },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
             items: [],
-            isHover: false,
             hoveredId: '',
-            hoveredNode: null,
+            hoveredNode: {},
+            hasChildProject: true,
+            hasChildProjectGroup: true,
             showAllProjects: ref(false),
         });
         const projectState = reactive({
             parentGroup: '',
             currentGroup: '',
-            currentGroupId: '',
         });
+        const treeState = new TreeState().state;
         const formState = reactive({
             projectGroupFormVisible: false,
             projectFormVisible: false,
@@ -331,51 +315,21 @@ export default {
             headerTitle: '',
             themeColor: '',
             modalContent: '',
-            updateMode: false,
         });
 
         const { provider } = useStore();
         provider.getProvider();
-        const vm: any = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance();
 
         /**
              Tree, Project, Statistics API Handler Declaration
              */
-        const projectAPI = fluentApi.identity().project();
-        // projectAPI.favorite().create().setParameter({ projectId: ['test'] }).execute()
-        //     .then(res => console.debug('favorite create', res));
-        // projectAPI.favorite().get().execute().then(res => console.debug('favorite', res));
-        // projectAPI.favorite().delete().execute().then(res => console.debug('favorite', res));
-        // projectAPI.favorite().update().setParameter({ projectGroupId: ['hahaha'] }).execute()
-        //     .then(res => console.debug('favorite', res));
-        const treeAction = projectAPI.tree()
+        const treeAction = fluentApi.identity().project().tree()
             .setSortBy('name')
             .setSortDesc(false)
             .setExcludeProject();
-        const treeSearchAction = projectAPI.treeSearch();
-        const treeApiHandler = new RouteProjectTreeFluentAPI({
-            treeAction, treeSearchAction,
-        }, {
-
-        }, vm, undefined, undefined);
-
-        // const listProjectGroup = async (pgId?: string) => {
-        //     if (pgId) {
-        //         await treeApiHandler.getSearchData(pgId, 'PROJECT_GROUP');
-        //         projectState.currentGroupId = pgId as string;
-        //         if (treeApiHandler.ts.metaState.firstSelectedNode) treeApiHandler.ts.setNodeState(treeApiHandler.ts.metaState.firstSelectedNode, { expanded: false });
-        //     } else {
-        //         await treeApiHandler.defaultGetData();
-        //         if (treeApiHandler.ts.metaState.nodes[0]) {
-        //             const item = getTreeItem(0, 0, treeApiHandler.ts.metaState.nodes[0]);
-        //             treeApiHandler.ts.metaState.selectedNodes = [item];
-        //             treeApiHandler.ts.setNodeState(item, { selected: true });
-        //         }
-        //     }
-        // };
-        // const id = context.root.$route.query.t_se;
-        // listProjectGroup(id);
-
+        const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
+        const projectAPI = fluentApi.identity().project();
         const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statisticsTest().resource().stat()
             .setResourceType('identity.Project')
@@ -453,7 +407,7 @@ export default {
 
         const isShow = computed(() => treeApiHandler.ts.metaState.firstSelectedNode);
 
-        const apiHandler = new RouteQuerySearchGridFluentAPI(
+        const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
                 cardClass: () => ['card-item', 'project-card-item'],
@@ -469,26 +423,47 @@ export default {
                 },
             },
             isShow,
-            vm,
         );
+
+        /**
+             * Check Child Project(Group)
+             * */
+        const checkChildProject = (resp) => {
+            const projectTotal = resp?.data?.total_count;
+            if (projectTotal > 0) state.hasChildProject = true;
+            else state.hasChildProject = false;
+        };
+
+        const checkChildProjectGroup = async () => {
+            const resp = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: treeApiHandler.ts.metaState.firstSelectedNode.data.id }).execute();
+            if (resp.data.total_count > 0) state.hasChildProjectGroup = true;
+            else state.hasChildProjectGroup = false;
+        };
 
         /**
              * Set Page Title
              * */
-        const setProjectState = ({ node, parent }: TreeItem<ProjectItemResp, ProjectNodeState>) => {
-            projectState.currentGroup = node.data.name;
-            if (parent) { projectState.parentGroup = parent.node.data.name; } else { projectState.parentGroup = ''; }
+        const setProjectState = (item) => {
+            projectState.currentGroup = item.data.name;
+            if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
         };
 
+        /**
+             * Click or Hover Tree Item
+             */
+        const selected = async (item) => {
+            formState.isRoot = false;
+            treeApiHandler.ts.getSelectedNode(item);
+            setProjectState(item);
+            await checkChildProjectGroup();
+        };
 
-        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after, before) => {
-            if ((after && !before) || (after && after.node.data.id !== before.node.data.id)) {
-                formState.isRoot = false;
-                setProjectState(after);
-                apiHandler.action = listAction.setId(after.node.data.id);
+        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
+            if ((after && !before) || (after && after.data.id !== before.data.id)) {
+                apiHandler.action = listAction.setId(after.data.id);
                 apiHandler.resetAll();
-                await apiHandler.getData();
-                setProjectState(after);
+                const resp = await apiHandler.defaultGetData(false);
+                checkChildProject(resp);
             }
         });
 
@@ -496,14 +471,14 @@ export default {
             if (isShow.value && after !== before) {
                 apiHandler.action = apiHandler.action.setRecursive(after);
                 apiHandler.resetAll();
-                await apiHandler.getData();
+                const resp = await apiHandler.defaultGetData(false);
+                checkChildProject(resp);
             }
         });
 
-        const hovered = (item: TreeItem<ProjectItemResp, ProjectNodeState>, matched, e, isHovered: boolean) => {
+        const hovered = async (item) => {
             formState.isRoot = false;
-            state.isHover = isHovered;
-            state.hoveredId = item.node.data.id;
+            state.hoveredId = item.data.id;
             state.hoveredNode = item;
         };
 
@@ -511,21 +486,21 @@ export default {
              * Click Card Item
              */
         const clickCard = (item) => {
-            vm.$router.push({
-                name: 'projectDetail',
-                params: {
-                    id: item.project_id,
-                    name: item.name,
-                    project_group: item.project_group_info,
-                    tags: item.tags,
-                },
-            });
+                vm?.$router.push({
+                    name: 'projectDetail',
+                    params: {
+                        id: item.project_id,
+                        name: item.name,
+                        project_group: item.project_group_info,
+                        tags: item.tags,
+                    },
+                });
         };
 
         const goToServiceAccount = () => {
-            vm.$router.push({
-                name: 'serviceAccount',
-            });
+                vm?.$router.push({
+                    name: 'serviceAccount',
+                });
         };
 
         /**
@@ -540,7 +515,7 @@ export default {
 
         const projectGroupDeleteFormConfirm = () => {
             // @ts-ignore
-            fluentApi.identity().projectGroup().delete().setId(treeApiHandler.ts.metaState.firstSelectedNode.node.data.id)
+            fluentApi.identity().projectGroup().delete().setId(treeApiHandler.ts.metaState.firstSelectedNode.data.id)
                 .execute()
                 .then(() => {
                     context.root.$notify({
@@ -551,8 +526,8 @@ export default {
                         duration: 2000,
                         speed: 1000,
                     });
-                    treeApiHandler.ts.deleteNode(treeApiHandler.ts.metaState.firstSelectedNode);
-                    treeApiHandler.ts.metaState.selectedNodes = [];
+                    treeApiHandler.ts.treeRef.value.deleteNode(treeApiHandler.ts.metaState.firstSelectedNode);
+                    treeApiHandler.ts.metaState.selectedNode = null;
                 })
                 .catch((e) => {
                     showErrorMessage('Fail to Delete Project Group', e, context.root);
@@ -560,31 +535,23 @@ export default {
             formState.projectGroupDeleteFormVisible = false;
         };
 
-        const openProjectGroupEditForm = () => {
-            formState.updateMode = true;
-            formState.projectGroupFormVisible = true;
-        };
-
         const openProjectGroupForm = (isRoot) => {
-            formState.updateMode = false;
             if (isRoot) {
                 formState.isRoot = true;
             }
             formState.projectGroupFormVisible = true;
         };
 
-        const projectGroupFormConfirm = async (item) => {
-            if (!formState.updateMode) {
-                let projectGroupId;
-                if (formState.isRoot) projectGroupId = null;
-                else projectGroupId = state.hoveredId;
-
-                try {
-                    const resp = await fluentApi.identity().projectGroup().create().setParameter({
-                        parent_project_group_id: projectGroupId,
-                        ...item,
-                    })
-                        .execute();
+        const projectGroupFormConfirm = (item) => {
+            let projectGroupId;
+            if (formState.isRoot) projectGroupId = null;
+            else projectGroupId = state.hoveredId;
+            fluentApi.identity().projectGroup().create().setParameter({
+                parent_project_group_id: projectGroupId,
+                ...item,
+            })
+                .execute()
+                .then((resp) => {
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'success',
@@ -595,49 +562,13 @@ export default {
                     });
                     item.id = resp.data.project_group_id;
                     item.item_type = 'PROJECT_GROUP';
-                    const newNode = getDefaultNode(item, {
-                        children: item.has_child,
-                        state: {
-                            ...getBaseNodeState(),
-                            loading: false,
-                        },
-                    });
-                    if (formState.isRoot) treeApiHandler.ts.metaState.nodes.push(newNode);
-                    else if (state.hoveredNode) {
-                        if (Array.isArray(state.hoveredNode.node.children)) {
-                            state.hoveredNode.node.children.push(newNode);
-                            treeApiHandler.ts.setNodeState(state.hoveredNode, { expanded: true });
-                        } else await treeApiHandler.getData(state.hoveredNode);
-                    }
-                } catch (e) {
-                    showErrorMessage('Fail to Create Project Group', e, context.root);
-                }
-            } else {
-                // @ts-ignore
-                fluentApi.identity().projectGroup().update().setParameter({
-                    project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.node.data.id,
-                    ...item,
+                    const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
+                    if (formState.isRoot) treeApiHandler.ts.treeRef.value.addNode(undefined, newNode);
+                    if (!formState.isRoot && !state.hoveredNode.isBatch) treeApiHandler.ts.treeRef.value.addNode(state.hoveredNode, newNode);
                 })
-                    .execute()
-                    .then((resp) => {
-                        context.root.$notify({
-                            group: 'noticeBottomRight',
-                            type: 'success',
-                            title: 'Success',
-                            text: 'Update Project Group',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                        projectState.currentGroup = item.name;
-                        treeApiHandler.ts.metaState.firstSelectedNode.node.data = {
-                            ...treeApiHandler.ts.metaState.firstSelectedNode.node.data,
-                            name: item.name,
-                        };
-                    })
-                    .catch((e) => {
-                        showErrorMessage('Fail to Update Project Group', e, context.root);
-                    });
-            }
+                .catch((e) => {
+                    showErrorMessage('Fail to Create Project Group', e, context.root);
+                });
             formState.projectGroupFormVisible = false;
         };
 
@@ -647,7 +578,7 @@ export default {
         const projectFormConfirm = (item) => {
             fluentApi.identity().project().create().setParameter({
                 // @ts-ignore
-                project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.node.data.id,
+                project_group_id: treeApiHandler.ts.metaState.firstSelectedNode.data.id,
                 ...item,
             })
                 .execute()
@@ -665,31 +596,21 @@ export default {
                     showErrorMessage('Fail to Create a Project', e, context.root);
                 })
                 .finally(() => {
-                    apiHandler.getData();
+                    state.hasChildProject = true;
+                    apiHandler.defaultGetData(false);
                 });
             formState.projectFormVisible = false;
         };
 
-        const routerHandler = async () => {
-            console.log('prop first', props);
-            const prop = propsCopy(props);
-            treeApiHandler.applyAPIRouter(prop);
-            // await treeApiHandler.defaultGetData();
-            await treeApiHandler.applyDisplayRouter(prop);
-            apiHandler.applyAPIRouter(prop);
-            await apiHandler.getData();
-        };
-
-        onMounted(async () => {
-            await routerHandler();
-        });
-
         return {
+            treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
+            treeState,
             ...toRefs(state),
             ...toRefs(projectState),
             ...toRefs(formState),
             skeletons: _.range(3),
+            selected,
             hovered,
             clickCard,
             goToServiceAccount,
@@ -699,11 +620,9 @@ export default {
             apiHandler,
             openProjectGroupDeleteForm,
             projectGroupDeleteFormConfirm,
-            openProjectGroupEditForm,
             projectFormConfirm,
             openProjectGroupForm,
             projectGroupFormConfirm,
-            routerHandler,
         };
     },
 };
@@ -714,12 +633,16 @@ export default {
         @apply text-sm font-semibold text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
     }
 
-    ::v-deep .basic {
-       @apply mx-3;
+    ::v-deep .tree > .tree-root {
+        @apply overflow-x-hidden;
+    }
+
+    ::v-deep .scope-content {
+        @apply truncate;
+        max-width: 13rem;
     }
 
     ::v-deep .group-add-btn {
-        @apply float-right mr-1;
         max-width: 1.5rem;
         max-height: 1.5rem;
         min-width: 1.5rem;
@@ -842,20 +765,14 @@ export default {
 
     .empty-project-grp {
         line-height:1.5;
-        .title {
-            @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
-        }
-        .content {
-            @apply text-gray-600;
-        }
-        .content-order {
-            @apply text-base pb-8 text-left m-auto max-w-64;
-        }
+    .title {
+        @apply text-primary-dark font-bold text-2xl pt-8 pb-4 leading-tight;
     }
-
-    .p-tree-node::v-deep {
-        .level-0 {
-            @apply font-bold;
-        }
+    .content {
+        @apply text-gray-600;
+    }
+    .content-order {
+        @apply text-base pb-8 text-left m-auto max-w-64;
+    }
     }
 </style>

@@ -1,13 +1,21 @@
 <template>
     <span class="p-radio"
+          :class="{
+              selected: isSelected,
+              hovered: hovered || mouseover,
+              disabled, errored
+          }"
           @mouseenter="mouseover = true"
           @mouseleave="mouseover = false"
           @click.stop.prevent="onClick"
+          v-on="$listeners"
     >
         <input type="radio">
-        <p-i class="radio-icon" width="1.25rem" height="1.25rem"
-             v-bind="radioBind"
-        />
+        <slot :slot-scope="$props">
+            <p-i class="radio-icon" width="1.25rem" height="1.25rem"
+                 :name="iconName"
+            />
+        </slot>
     </span>
 </template>
 
@@ -34,6 +42,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        errored: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const isSelected = computed(() => props.selected === props.value);
@@ -48,25 +64,15 @@ export default {
         };
 
         const mouseover = ref(false);
-        const radioBind = computed(() => {
-            let name = 'ic_radio';
-            let color;
-            let fill;
-            if (isSelected.value) {
-                name += '--checked';
-            } else if (props.hovered || mouseover.value) {
-                color = 'transparent #666666';
-                fill = false;
-                //name += '--hover';
-            }
-            return {
-                name,
-                color,
-                fill,
-            };
+
+        const iconName = computed(() => {
+            if (props.disabled) return 'ic_radio--disabled';
+            if (isSelected.value) return 'ic_radio--checked';
+            return 'ic_radio';
         });
         return {
-            radioBind,
+            isSelected,
+            iconName,
             onClick,
             mouseover,
         };

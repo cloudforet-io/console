@@ -10,12 +10,12 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface,
+    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface, TreeParameter,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
 
-export abstract class ActionAPI<parameter=any, resp=any> implements ActionAPIInterface<parameter, resp> {
+export abstract class ActionAPI<parameter = any, resp = any> implements ActionAPIInterface<parameter, resp> {
     protected abstract path: string;
 
     protected method: ApiMethods = 'post';
@@ -24,7 +24,7 @@ export abstract class ActionAPI<parameter=any, resp=any> implements ActionAPIInt
 
     protected apiState: any;
 
-    protected transformer: ((resp) => any|Promise<any>)|null;
+    protected transformer: ((resp) => any | Promise<any>) | null;
 
     public abstract getParameter: () => parameter
 
@@ -47,14 +47,14 @@ export abstract class ActionAPI<parameter=any, resp=any> implements ActionAPIInt
         public api: ApiType,
         baseUrl: string,
         apiState?: any,
-        transformer: ((any) => any|Promise<any>)|null = null,
+        transformer: ((any) => any | Promise<any>) | null = null,
     ) {
         this.baseUrl = baseUrl;
         this.apiState = apiState || {} as any;
         this.transformer = transformer;
     }
 
-    setTransformer<returnType = any>(func: (resp: AxiosResponse<resp>) => returnType|Promise<returnType>): this {
+    setTransformer<returnType = any>(func: (resp: AxiosResponse<resp>) => returnType | Promise<returnType>): this {
         this.transformer = func;
         return this.clone();
     }
@@ -82,6 +82,55 @@ export abstract class ActionAPI<parameter=any, resp=any> implements ActionAPIInt
         return new this.constructor(this.api, this.baseUrl, this.apiState, this.transformer);
     }
 }
+
+export interface ConfigActionState<T=any> {
+    name: string;
+    parameter: T;
+}
+
+export abstract class BaseConfigActionAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+    getParameter = (): any => ({ name: this.name, data: { ...this.apiState.parameter } });
+
+    protected apiState: ConfigActionState<parameter>;
+
+    protected _userId = '';
+
+
+    constructor(
+        api: ApiType,
+        baseUrl: string,
+        initState: ConfigActionState<parameter> = { name: '', parameter: {} as parameter },
+        transformer: ((any) => any | Promise<any>) | null = null,
+    ) {
+        super(api, baseUrl, initState, transformer);
+        this.apiState = {
+            ...initState,
+        };
+    }
+
+    set userId(id: string) {
+        this._userId = id;
+    }
+
+    get userId() {
+        return this._userId || JSON.parse(localStorage.getItem('user/userId') as string).data;
+    }
+
+    get name() {
+        return `console/${this.userId}${this.baseUrl}`;
+    }
+
+    get url() {
+        return `config/config-map/${this.path}`;
+    }
+}
+
+
+export class GetConfigAction<parameter, resp> extends BaseConfigActionAPI<parameter, resp> {
+    protected path = 'get';
+}
+
+
 export const OPERATOR_MAP = Object.freeze({
     '': 'contain_in', // merge operator
     '!': 'not_contain', // merge operator
@@ -106,7 +155,7 @@ export const OPERATOR_MAP = Object.freeze({
 });
 const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
-type MergeQueryType = {[k: string]: ShortFilterType};
+type MergeQueryType = { [k: string]: ShortFilterType };
 
 const mergeQuery = (targetQuery: MergeQueryType, q: FilterItem, op: string): MergeQueryType => {
     const prefix = `${q.key}:${op}`;
@@ -164,13 +213,13 @@ export const getBaseQueryApiState = <parameter>(): BaseQueryState<parameter> => 
 
 
 export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected apiState: BaseQueryState<parameter> ;
+    protected apiState: BaseQueryState<parameter>;
 
     constructor(
         api: ApiType,
         baseUrl: string,
         initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
-        transformer: null|((any) => any) = null,
+        transformer: null | ((any) => any) = null,
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
@@ -224,13 +273,13 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
 
 
 export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
-    protected apiState: QueryApiState<parameter> ;
+    protected apiState: QueryApiState<parameter>;
 
     constructor(
         api: ApiType,
         baseUrl: string,
         initState: QueryApiState<parameter> = {} as unknown as QueryApiState<parameter>,
-        transformer: null|((any) => any) = null,
+        transformer: null | ((any) => any) = null,
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
@@ -274,8 +323,9 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     };
 
     setOnly(...args: string[]): this {
-        this.apiState.only = args;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.only = args;
+        return api;
     }
 
     setFixOnly(...args: string[]): this {
@@ -285,18 +335,21 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     }
 
     setCountOnly(value = true): this {
-        this.apiState.count_only = value;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.count_only = value;
+        return api;
     }
 
     setThisPage(thisPage: number): this {
-        this.apiState.thisPage = thisPage;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.thisPage = thisPage;
+        return api;
     }
 
     setPageSize(pageSize: number): this {
-        this.apiState.pageSize = pageSize;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.pageSize = pageSize;
+        return api;
     }
 
     setSortBy(sortBy: string): this {
@@ -318,9 +371,10 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     }
 }
 
-interface SingleItemActionInterface{
+interface SingleItemActionInterface {
     setId: (id: string) => any;
 }
+
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
     getParameter = (): parameter => ({ ...this.apiState.parameter });
 
@@ -330,7 +384,7 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
         api: ApiType,
         baseUrl: string,
         initState: RawParameterActionState<parameter> = { parameter: {} as parameter },
-        transformer: ((any) => any|Promise<any>)|null = null,
+        transformer: ((any) => any | Promise<any>) | null = null,
     ) {
         super(api, baseUrl, initState, transformer);
         this.apiState = {
@@ -382,6 +436,7 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
     }
 }
 
+
 interface TreeActionState<parameter = any> {
     rootItemType: string;
     item_id: string;
@@ -397,7 +452,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
 
     protected apiState: TreeActionState<parameter>;
 
-    constructor(api: ApiType, baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null|((any) => any) = null) {
+    constructor(api: ApiType, baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null | ((any) => any) = null) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
             rootItemType: 'ROOT',
@@ -449,7 +504,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
     }
 
     getParameter = (): parameter & any => {
-        const params: any = {};
+        const params: TreeParameter = {};
 
         if (this.apiState.item_type) {
             params.item_type = this.apiState.item_type;
@@ -474,6 +529,10 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
             ...this.apiState.extraParameter,
         };
     };
+}
+
+export abstract class TreeSearchAction<parameter, resp> extends TreeAction<parameter, resp> {
+    protected path = 'tree/search';
 }
 
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
@@ -575,6 +634,7 @@ export abstract class MultiItemAction<parameter, resp> extends RawParameterActio
         return this.clone();
     }
 }
+
 export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<parameter, resp> {
     protected abstract idsField: string;
 
@@ -606,6 +666,7 @@ export abstract class MultiEnableAction<parameter, resp> extends MultiItemAction
 
     protected path = 'enable';
 }
+
 export abstract class MultiDisableAction<parameter, resp> extends MultiItemAction<parameter, resp> {
     isMutationApi = true;
 
@@ -644,8 +705,8 @@ export abstract class CollectAction<parameter, resp> extends RawParameterAction<
     protected path = 'collect';
 }
 
-export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI};
-export type OptionalResourceActions<actions extends string> = { [key in actions]?: (...args: any[]) => ActionAPI};
+export type ResourceActions<actions extends string, parameter=any, resp=any> = { [key in actions]: (...args: any[]) => ActionAPI<parameter, resp> };
+export type OptionalResourceActions<actions extends string, parameter=any, resp=any> = { [key in actions]?: (...args: any[]) => ActionAPI<parameter, resp> };
 
 export abstract class Resource {
     protected abstract name: string;
@@ -658,17 +719,19 @@ export abstract class Resource {
     }
 }
 
-export type ServiceResources<resources extends string> = { [key in resources]?: (api: ApiType, service: string) => Resource};
+export type ServiceResources<resources extends string> = { [key in resources]?: (api: ApiType, service: string) => Resource };
 
 export abstract class Service {
     protected abstract name: string;
 
-    constructor(public api: ApiType) { }
+    constructor(public api: ApiType) {
+    }
 }
 
-export interface BaseResources<parameter, resp > extends Resource, ResourceActions<'update'|'get'>{}
+export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update' | 'get'> {
+}
 
-export interface DictResource<parameter, resp> extends Resource, ResourceActions<'update'|'get'> {
+export interface DictResource<parameter, resp> extends Resource, ResourceActions<'update' | 'get'> {
     update: () => UpdateAction<parameter, resp>;
     get: () => GetAction<parameter, resp>;
 }

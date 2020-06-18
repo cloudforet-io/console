@@ -3,6 +3,7 @@
           @mouseenter="mouseover=true"
           @mouseleave="mouseover=false"
           @click.stop.prevent="onClick"
+          v-on="$listeners"
     >
         <input type="checkbox">
         <p-i class="check-icon" width="1.25rem" height="1.25rem"

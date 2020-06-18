@@ -1,115 +1,173 @@
 <template>
-    <p-tree-modal ref="treeRef"
-                  :scrollable="false"
-                  :visible.sync="treeAPITS.ts.syncState.visible"
-                  :header-title="headerTitle"
-                  theme-color="primary"
-                  v-bind="treeAPITS.ts.state"
-                  @cancel="close"
-                  @close="close"
-                  @confirm="confirm"
-                  @node:selected="update"
-                  @node:unselected="update"
+    <p-button-modal header-title="Change Project"
+                    size="md"
+                    :scrollable="false"
+                    centered
+                    fade
+                    backdrop
+                    :visible.sync="proxyVisible"
+                    :loading="loading"
+                    @confirm="confirm"
     >
-        <template #default>
-            <div class="mt-2">
-                <span @click.stop.capture="release= !release"><p-check-box v-model="release" /> release project</span>
+        <template #body>
+            <div class="title">
+                Select a Project
             </div>
-            <div v-show="error" class="alert">
-                <span class="alert-msg">
-                    <p-i name="ic_alert" width="1rem" height="1rem" />
-                </span>
-                <span>Please select a project or release the project</span>
+            <div class="body-container">
+                <div ref="treeContainer" class="tree-container">
+                    <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
+                                 v-bind="treeApiHandler.ts.state"
+                                 :data.sync="node.data"
+                                 :children.sync="node.children"
+                                 :state.sync="node.state"
+                                 @toggle:click="treeApiHandler.getData"
+                                 @node:click="selectItem"
+                                 @checkbox:click="selectItem"
+                                 @mounted="onNodeMounted"
+                    >
+                        <template #data="{data}">
+                            <span :class="{
+                                'ml-2': data.item_type === 'PROJECT'
+                            }"
+                            >{{ data.name }}</span>
+                        </template>
+                        <template #toggle="{state, toggleSize, data, getListeners}">
+                            <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
+                                 :height="toggleSize"
+                            />
+                            <p-radio v-else-if="data.item_type === 'PROJECT'"
+                                     :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
+                            />
+                        </template>
+                    </p-tree-node>
+                </div>
+                <div class="no-select">
+                    <p-radio class="mr-2"
+                             :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
+                             :value="true" @click="releaseProject"
+                    /> No Select Project
+                </div>
             </div>
         </template>
-        <template #icon="{node,isExpanded}">
-            <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' :
-                     isExpanded ? 'ic_tree_folder--opened' : 'ic_tree_folder'"
-                 color="transparent inherit"
-                 width="1rem" height="1rem"
-            />
-        </template>
-        <template #footer-extra />
-    </p-tree-modal>
+    </p-button-modal>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, ref, toRefs, watch,
+    computed, onMounted, Ref, ref, watch,
 } from '@vue/composition-api';
-import PTreeModal from '@/components/organisms/modals/tree-modal/TreeModal.vue';
-import { ProjectNode, ProjectTreeAPI } from '@/lib/api/tree';
-import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/toolset';
 import { makeProxy } from '@/lib/compostion-util';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
-import { Computed } from '@/lib/type';
 import PI from '@/components/atoms/icons/PI.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import { ProjectNodeState, ProjectTreeFluentAPI } from '@/lib/api/tree-node';
+import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
+import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 
-export default defineComponent({
+export default {
     name: 'SProjectTreeModal',
-    components: { PTreeModal, PCheckBox, PI },
+    components: {
+        PRadio,
+        PTreeNode,
+        PI,
+        PButtonModal,
+    },
     props: {
         visible: { // sync
             type: Boolean,
             default: false,
         },
-        headerTitle: {
+        projectId: {
             type: String,
-            default: 'Change Project',
+            default: '',
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, { emit }) {
-        const visible = makeProxy<boolean>('visible');
-        const treeRef = ref(null);
-        const treeAPITS = new ProjectTreeAPI<any, any, ProjectNode, any, TreeModalToolSet>(
-            TreeModalToolSet, undefined, { visible }, treeRef,
-        );
-        const state = reactive({
-            release: ref(false),
-            error: ref(false),
+        const projectApi = fluentApi.identity().project();
+
+        const treeApiHandler = new ProjectTreeFluentAPI({
+            treeAction: projectApi.tree().setSortBy('name').setSortDesc(false),
+            treeSearchAction: projectApi.treeSearch(),
         });
-        const selectNode: Computed<null|ProjectNode> = computed(() => (treeAPITS.ts.metaState.firstSelectedNode as unknown as null|ProjectNode));
-        watch(visible, (show, preShow) => {
-            if (!show && show !== preShow) {
-                state.error = false;
-                state.release = false;
+
+        const treeContainer: Ref<HTMLElement|null> = ref(null);
+
+
+        watch(() => props.visible, async (after, before) => {
+            if (after === before) return;
+            if (after) {
+                if (props.projectId) await treeApiHandler.getSearchData(props.projectId);
+                else await treeApiHandler.getData();
+            } else {
+                treeApiHandler.ts.metaState.nodes = [];
+                treeApiHandler.ts.metaState.selectedNodes = [];
             }
         });
 
+        const autoScroll = (el: HTMLElement) => {
+            if (treeContainer.value) {
+                const offsetBottom = el.offsetTop + el.offsetHeight;
+                const scrollBottom = treeContainer.value.scrollTop + treeContainer.value.offsetHeight;
+                if (offsetBottom > scrollBottom) {
+                    treeContainer.value.scrollTop = offsetBottom - treeContainer.value.offsetHeight;
+                }
+            }
+        };
+
+
         return {
-            treeAPITS,
-            treeRef: treeAPITS.ts.treeRef,
-            ...toRefs(state),
-            update: (event) => {
-                // console.log(event);
-                treeAPITS.ts.getSelectedNode(event);
+            treeContainer,
+            proxyVisible: makeProxy('visible'),
+            treeApiHandler,
+            selectItem(item: TreeItem<ProjectItemResp, ProjectNodeState>): void {
+                if (item.node.data.item_type === 'PROJECT') treeApiHandler.ts.setSelectedNodes(item);
             },
-            click() {
-                treeAPITS.ts.open();
-            },
-            close() {
-                treeAPITS.ts.close();
-            },
-            confirm() {
-                state.error = false;
-                if (state.release) {
-                    emit('confirm');
-                } else if (selectNode.value && selectNode.value.data.item_type === 'PROJECT') {
-                    treeAPITS.ts.confirm();
+            confirm(): void {
+                if (treeApiHandler.ts.metaState.firstSelectedNode) {
+                    emit('confirm', treeApiHandler.ts.metaState.firstSelectedNode.node.data);
                 } else {
-                    state.error = true;
+                    emit('confirm', null);
+                }
+            },
+            releaseProject() {
+                if (treeApiHandler.ts.metaState.firstSelectedNode) {
+                    treeApiHandler.ts.setNodeState(treeApiHandler.ts.metaState.firstSelectedNode, { selected: false });
+                    treeApiHandler.ts.metaState.selectedNodes = [];
+                }
+            },
+            onNodeMounted(item: TreeItem) {
+                if (treeApiHandler.ts.metaState.firstSelectedNode
+                    && treeApiHandler.ts.metaState.firstSelectedNode.node.data.id === item.node.data.id
+                    && item.el) {
+                    autoScroll(item.el);
                 }
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
-.alert{
-    @apply text-alert mt-4 align-middle;
-    .alert-msg{
-        @apply align-middle;
-    }
+.title {
+    font-size: 1.375rem;
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+}
+.body-container {
+    @apply bg-primary4 border border-gray-200 rounded-sm flex flex-col;
+}
+.tree-container {
+    @apply overflow-auto flex-grow px-2 py-4;
+    height: 21.5rem;
+}
+.no-select {
+    @apply border-t border-gray-200 p-4 flex items-center;
 }
 </style>

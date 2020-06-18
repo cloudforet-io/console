@@ -3,7 +3,7 @@
         :header-title="updateMode ?$t('IDENTITY.UPDATE_PROJ_GRP') :$t('IDENTITY.CRT_PROJ_GRP')"
         :centered="true"
         :scrollable="false"
-        size="lg"
+        size="md"
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
@@ -11,16 +11,16 @@
     >
         <template #body>
             <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
-            <PFieldGroup
-                label="Tags"
-            >
-                <p-dict-input-group
-                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"
-                    v-bind="tagsTS.state"
-                    :items.sync="tagsTS.syncState.items"
-                    v-on="tagsTS.events"
-                />
-            </PFieldGroup>
+<!--            <PFieldGroup-->
+<!--                label="Tags"-->
+<!--            >-->
+<!--                <p-dict-input-group-->
+<!--                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"-->
+<!--                    v-bind="tagsTS.state"-->
+<!--                    :items.sync="tagsTS.syncState.items"-->
+<!--                    v-on="tagsTS.events"-->
+<!--                />-->
+<!--            </PFieldGroup>-->
         </template>
     </p-button-modal>
 </template>

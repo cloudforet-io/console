@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueGtag from 'vue-gtag';
 import Hashids from 'hashids';
+import config from '@/lib/config';
 
 export const setGtagUserID = (vm: any) => {
     if (vm.$ls && vm.$gtag) {
@@ -18,7 +19,7 @@ export const setGtagUserID = (vm: any) => {
         } catch (e) {
             console.error('init gtag userid fail', e);
         }
-    } else {
+    } else if (config.get('GTAG_ID') !== 'DISABLED') {
         console.error('not set $ls or $gtag');
     }
 };

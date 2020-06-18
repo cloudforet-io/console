@@ -13,7 +13,7 @@
                     :vbind="{
                         responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
                         showTitle:false,
-                        exportFields:mergeFields,
+                        // exportFields:mergeFields,
                     }"
                 >
                     <template #toolbox-left>
@@ -114,7 +114,11 @@
 
             @confirm="checkModalConfirm"
         />
-        <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+        <s-project-tree-modal :visible.sync="changeProjectState.visible"
+                              :project-id="changeProjectState.projectId"
+                              :loading="changeProjectState.loading"
+                              @confirm="changeProject"
+        />
         <s-collect-modal :visible.sync="collectModalState.visible"
                          :resources="apiHandler.tableTS.selectState.selectItems"
                          id-key="server_id"
@@ -147,7 +151,6 @@ import {
     RouteQuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
-import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi, MultiItemAction } from '@/lib/fluent-api';
 import {
     getEnumValues,
@@ -176,6 +179,8 @@ import {
     RouterTabBarToolSet,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
+import { get } from 'lodash';
+import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 
 
 export default {
@@ -447,22 +452,29 @@ export default {
             { type: 'item', disabled: isNotSelected }),
         });
 
-        const projectModalVisible = ref(false);
-        const clickProject = () => {
-            projectModalVisible.value = true;
-        };
-        const changeProject = async (node?: ProjectNode|null) => {
+        const changeProjectState = reactive({
+            visible: false,
+            loading: false,
+            projectId: computed(() => {
+                if (apiHandler.tableTS.selectState.selectItems.length > 1) return '';
+                return get(apiHandler, 'tableTS.selectState.firstSelectItem.project_id', '');
+            }),
+        });
+        const clickProject = () => { changeProjectState.visible = true; };
+        const changeProject = async (data?: ProjectItemResp|null) => {
+            changeProjectState.loading = true;
             const changeAction = fluentApi.inventory().server().changeProject().clone()
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
-            if (node) {
-                await changeAction.setId(node.data.id).execute();
+            if (data) {
+                await changeAction.setId(data.id).execute();
             } else {
                 await changeAction.setReleaseProject().execute();
             }
 
+            changeProjectState.loading = false;
+            changeProjectState.visible = false;
             await apiHandler.getData();
-            projectModalVisible.value = false;
         };
 
 
@@ -548,7 +560,7 @@ export default {
             clickInService,
             clickMaintenance,
             checkModalConfirm,
-            projectModalVisible,
+            changeProjectState,
             clickProject,
             changeProject,
             apiHandler,
