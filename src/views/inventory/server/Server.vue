@@ -13,7 +13,7 @@
                     :vbind="{
                         responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
                         showTitle:false,
-                        exportFields:mergeFields,
+                        // exportFields:mergeFields,
                     }"
                 >
                     <template #toolbox-left>

@@ -437,7 +437,6 @@ export default {
             const selectId = apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id;
             let layouts;
             if (cache[selectId]) {
-                // console.debug(selectId, ' hit cache layout');
                 layouts = cache[selectId];
             } else {
                 const resp = await fluentApi.inventory().cloudService().get().setId(selectId)
@@ -455,7 +454,6 @@ export default {
         watch(subDataIsShow, (aft, bef) => {
             if (aft !== bef) {
                 if (aft) {
-                    getLayouts();
                     watchStop = watch(selectId, (af, be) => {
                         if (af && af !== be) {
                             getLayouts();
