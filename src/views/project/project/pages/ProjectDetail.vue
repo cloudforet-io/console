@@ -13,6 +13,9 @@
         </div>
         <p class="float-right text-gray-500 -my-6">
             <b>Project ID:</b> {{ projectId }}
+            <p-copy-button class="ml-2"
+                           :value="projectId"
+            />
         </p>
         <PTab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
               :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
@@ -104,6 +107,7 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
@@ -144,6 +148,7 @@ export default {
         PPageTitle,
         PTab,
         PIconButton,
+        PCopyButton,
         PButton,
         SProjectCreateFormModal,
         SProjectMemberAddModal,
