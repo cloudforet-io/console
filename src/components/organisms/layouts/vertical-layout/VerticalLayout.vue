@@ -4,7 +4,7 @@
              :class="{transition:transition}"
         >
             <div :style="sbStyle">
-                <slot name="sidebar" :width="width" />
+                <slot name="sidebar" v-bind="{width, hide, transition, height}"/>
             </div>
         </div>
         <div class="resizer-container line"
