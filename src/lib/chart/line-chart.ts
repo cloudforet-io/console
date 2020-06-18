@@ -52,7 +52,7 @@ export const lineChartSettings: SettingsInterface = {
                     display: false,
                 },
                 ticks: {
-                    display: false,
+                    display: true,
                 },
             }],
         },
@@ -156,9 +156,11 @@ export class SLineChart extends SChart implements SLineChartInterface {
          const color = this.colors[datasetIndex || 0];
          if (!this.gradientHeight) return color;
          const gradient = this.ctx?.createLinearGradient(0, 0, 0, this.gradientHeight);
-         gradient?.addColorStop(0, Color(color).alpha(0.25).toString());
-         gradient?.addColorStop(0.5, Color(color).alpha(0.125).toString());
-         gradient?.addColorStop(1, Color(color).alpha(0).toString());
+         if (gradient) {
+             gradient.addColorStop(0, Color(color).alpha(0.25).toString());
+             gradient.addColorStop(0.5, Color(color).alpha(0.125).toString());
+             gradient.addColorStop(1, Color(color).alpha(0).toString());
+         }
          return gradient || color;
      }
 

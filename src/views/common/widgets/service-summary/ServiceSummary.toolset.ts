@@ -34,8 +34,8 @@ export interface Value {
 }
 
 export interface Trend {
-    count: string;
-    date: number;
+    count: number;
+    date: string;
 }
 
 export interface ServiceSummaryPropsType {
