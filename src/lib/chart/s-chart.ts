@@ -246,7 +246,6 @@ export class NSChart extends Chart {
         return this;
     }
 
-
     apply(): this {
         this.data.datasets = this.data.datasets?.map((ds, i) => ({ ...ds, ...this.globalDatasets }));
         this.update();
