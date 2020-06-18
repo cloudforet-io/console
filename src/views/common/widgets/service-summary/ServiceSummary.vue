@@ -76,9 +76,8 @@ export default {
             const minItem = _.minBy(state.data, 'count');
             const max = maxItem ? maxItem.count : 80;
             const min = minItem ? minItem.count : 0;
-            const stepSize = Math.abs(max - min);
-
-            console.debug('max', max, 'min', min, 'stepSize', stepSize);
+            const diff = Math.abs(max - min);
+            const stepSize = diff / ticksCount;
 
             state.chart = new NSChart(canvas,
                 {
@@ -113,16 +112,13 @@ export default {
                                     zeroLineBorderDash: [2, 2],
                                     offsetGridLines: false,
                                     tickMarkLength: 0,
-                                    // min: -20,
-                                    // max: maxItem? maxItem.count : 0,
-                                    // min: minItem? minItem.count : 0,
                                 },
                                 ticks: {
                                     display: false,
-                                    stepSize: stepSize / ticksCount,
+                                    stepSize,
                                     beginAtZero: false,
-                                    suggestedMax: max,
-                                    suggestedMin: min,
+                                    max: max + (stepSize / 30),
+                                    min,
                                 },
                             }],
                             xAxes: [{

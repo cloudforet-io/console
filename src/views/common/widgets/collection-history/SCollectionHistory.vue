@@ -17,12 +17,13 @@
 
 <script lang="ts">
 import {
-    computed, Ref, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import { coral, gray, primary } from '@/styles/colors';
+import {
+    coral, gray, primary, black,
+} from '@/styles/colors';
 import _ from 'lodash';
-import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
@@ -30,6 +31,10 @@ import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import moment from 'moment';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { HistoryStat } from '@/lib/fluent-api/statistics/history';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import Chart from 'chart.js';
+import numeral from 'numeral';
 
 interface Data {
     date: string;
@@ -61,26 +66,142 @@ export default {
             failure: number;
         }
         interface InitDataType {
-            data: Array<DataType | undefined>;
+            chartRef: HTMLCanvasElement|null;
+            chart: Chart|null;
+            data: DataType[];
             loading: boolean;
-            colors: Ref<Readonly<string[]>>;
         }
         const LEGEND_COLORS: {[k: string]: string} = {
             success: primary,
             failure: coral.default,
         };
 
-        const ts = new SChartToolSet<SBarChart, InitDataType>(SBarChart,
-            (chart: SBarChart) => (chart.addData(ts.state.data.map(d => d.success), 'Success')
-                .addData(ts.state.data.map(d => d.failure), 'Failure')
-                .setLabels(ts.state.data.map(d => moment(d.date).format('MM/DD')))
-                .setColors(ts.state.colors)
-                .setTicksCount(5)
-                .apply()), {
-                data: [],
-                loading: true,
-                colors: computed(() => _.map(LEGEND_COLORS, v => (ts.state.loading ? gray[500] : v))),
+        const state: UnwrapRef<InitDataType> = reactive({
+            chartRef: null,
+            chart: null,
+            data: [],
+            loading: true,
+        });
+
+        const ticksCount = 5;
+
+        const drawChart = (canvas) => {
+            const datasets = [{
+                label: 'Success',
+                data: state.data.map(d => d.success) as number[],
+                backgroundColor: LEGEND_COLORS.success,
+                borderColor: LEGEND_COLORS.success,
+            }, {
+                label: 'Failure',
+                data: state.data.map(d => d.failure) as number[],
+                backgroundColor: LEGEND_COLORS.failure,
+                borderColor: LEGEND_COLORS.failure,
+            }];
+
+            const max: number = _.max(datasets.map(ds => _.max(ds.data as number[]))) as number;
+            const stepSize = max / (ticksCount || 1);
+
+
+            state.chart = new NSChart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: state.data.map(d => moment(d.date).format('MM/DD')),
+                    datasets,
+                },
+                options: {
+                    layout: {
+                        padding: {
+                            top: 30,
+                        },
+                    },
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false,
+                    },
+                    responsive: true,
+                    tooltips,
+                    scales: {
+                        yAxes: [{
+                            gridLines: {
+                                drawTicks: false,
+                                drawBorder: false,
+                                color: gray[200],
+                                zeroLineColor: gray[200],
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize,
+                                max,
+                                padding: 10,
+                                fontColor: black,
+                                callback(value) {
+                                    if (typeof value === 'number') {
+                                        return value < 10000 ? numeral(value).format('0,0') : numeral(value).format('0.0a');
+                                    }
+                                    return value;
+                                },
+                            },
+                            afterTickToLabelConversion(scaleInstance): void {
+                                scaleInstance.ticks[0] = null;
+                                scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
+                            },
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                drawTicks: false,
+                                drawBorder: false,
+                                color: gray[200],
+                                zeroLineColor: gray[200],
+                            },
+                            ticks: {
+                                padding: 10,
+                                fontColor: black,
+                            },
+                        }],
+                    },
+                },
+                plugins: [{
+                    beforeDraw(chart: SBarChart): void {
+                        const ctx: CanvasRenderingContext2D | null = chart.ctx;
+                        if (!ctx) return;
+
+                        ctx.save();
+
+                        ctx.strokeStyle = gray[200];
+                        ctx.lineWidth = 1;
+
+                        ctx.beginPath();
+                        ctx.moveTo(chart.chartArea.left, chart.chartArea.bottom);
+                        ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
+                        ctx.moveTo(chart.chartArea.right, chart.chartArea.top);
+                        ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
+                        ctx.moveTo(chart.chartArea.right, chart.chartArea.top);
+                        ctx.lineTo(chart.chartArea.left, chart.chartArea.top);
+                        ctx.stroke();
+
+                        ctx.font = '12 Noto Sans';
+                        ctx.fillStyle = gray.default;
+                        ctx.textAlign = 'right';
+                        ctx.textBaseline = 'hanging';
+                        ctx.fillText('Job Count', chart.chartArea.left + 10, chart.chartArea.top - 30);
+
+                        ctx.restore();
+                    },
+                }],
+            }, {
+                borderWidth: 0,
+                categoryPercentage: 0.5,
+                barPercentage: 0.8,
             });
+        };
+
+        watch([() => state.chartRef, () => state.loading], ([ctx, loading]) => {
+            if (ctx && !loading) {
+                drawChart(ctx);
+            }
+        }, {
+            lazy: true,
+        });
 
 
         const api = fluentApi.statisticsTest().history().stat<Data>()
@@ -91,22 +212,22 @@ export default {
             .setFilter({ key: 'created_at', value: 'now/d-6d', operator: FILTER_OPERATOR.gtTime });
 
         const getData = async (): Promise<void> => {
-            ts.state.loading = true;
-            ts.state.data = [];
+            state.loading = true;
+            state.data = [];
             try {
                 const res = await props.getAction(api).execute();
-                ts.state.data = _.sortBy(res.data.results, 'date');
+                state.data = _.sortBy(res.data.results, 'date');
             } catch (e) {
                 console.error(e);
             } finally {
-                ts.state.loading = false;
+                state.loading = false;
             }
         };
 
         getData();
 
         return {
-            ...toRefs(ts.state),
+            ...toRefs(state),
             legends: computed(() => _.chain(LEGEND_COLORS)
                 .map((v, k) => ({ name: k, color: v }))
                 .reverse()
