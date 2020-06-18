@@ -156,8 +156,8 @@ export class ProjectTreeFluentAPI<
         }
     }
 
-    getData = async () => {
-        await this.defaultGetData();
+    getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+        await this.defaultGetData(item, matched, e);
     }
 
     getSearchPath = async (id: string, type: string): Promise<TreeSearchResp> => {
@@ -242,7 +242,6 @@ export class RouteProjectTreeFluentAPI<
     ) {
         super(treeActions, initData);
         watch(() => this.ts.metaState.firstSelectedNode, async (aft, bef) => {
-            console.debug('aft', aft, 'bef', bef);
             if (aft && !isEqual(aft.node.data.id, bef?.node.data.id)) {
                 await this.routerPush();
             }
@@ -262,7 +261,6 @@ export class RouteProjectTreeFluentAPI<
         const pgId = props[this.qsName.select];
         if (pgId) {
             await this.getSearchData(pgId, 'PROJECT_GROUP');
-            // projectState.currentGroupId = pgId as string;
             if (this.ts.metaState.firstSelectedNode) this.ts.setNodeState(this.ts.metaState.firstSelectedNode, { expanded: false });
         } else {
             await this.defaultGetData();
@@ -284,7 +282,7 @@ export class RouteProjectTreeFluentAPI<
 
     getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
         if (this.isReady) {
-            await this.defaultGetData(item);
+            await this.defaultGetData(item, matched, e);
             await this.routerPush();
         }
     }
