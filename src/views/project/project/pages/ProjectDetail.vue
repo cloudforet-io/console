@@ -1,7 +1,7 @@
 <template>
     <general-page-layout>
         <div class="top flex">
-            <PPageTitle :title="item.name" child @goBack="$router.push({name:'projectMain'})" />
+            <PPageTitle :title="item.name" child @goBack="$router.go(-1)" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
@@ -272,9 +272,7 @@ export default {
                     showErrorMessage('Delete Project Fail', e, context.root);
                 })
                 .finally(() => {
-                        vm?.$router.push({
-                            name: 'projectMain',
-                        });
+                        vm?.$router.go(-1);
                 });
             formState.projectDeleteFormVisible = false;
         };

@@ -12,8 +12,15 @@ import { TreeResp, TreeSearchAction } from '@/lib/fluent-api';
 import {
     ProjectItemResp, ProjectTree, ProjectTreeParameter, TreeSearchResp,
 } from '@/lib/fluent-api/identity/project';
-import { find, findIndex } from 'lodash';
-import { computed, reactive } from '@vue/composition-api';
+import { find, findIndex, isEqual } from 'lodash';
+import { computed, reactive, watch } from '@vue/composition-api';
+import Vue from 'vue';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { tree } from '@/lib/api/index';
+import { isNotEmpty } from '@/lib/util';
+import { pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
+import { DefaultQSGridQSPropsName, makeQSGridQSProps } from '@/lib/api/grid';
+import Tree from '@/components/molecules/tree-origin/Tree.vue';
 
 
 export interface TreeApiActions<treeAction, searchAction> {
@@ -68,7 +75,7 @@ export abstract class BaseTreeFluentAPI<
         }
     };
 
-    abstract getData: (node: TreeItem<resp, state>, matched: TreeItem<resp, state>[], e: MouseEvent) => Promise<void>;
+    abstract defaultGetData: (node: TreeItem<resp, state>, matched: TreeItem<resp, state>[], e: MouseEvent) => Promise<void>;
 
     abstract getSearchData: (...args) => Promise<any>;
 }
@@ -124,7 +131,7 @@ export class ProjectTreeFluentAPI<
         }
     }
 
-    getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+    defaultGetData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
         if (item) {
             if (e) e.stopPropagation();
             if (item.node.state.expanded) {
@@ -149,6 +156,10 @@ export class ProjectTreeFluentAPI<
         }
     }
 
+    getData = async () => {
+        await this.defaultGetData();
+    }
+
     getSearchPath = async (id: string, type: string): Promise<TreeSearchResp> => {
         const res = await this.treeSearchAction.setItemId(id).setItemType(type).execute();
         return res.data;
@@ -159,6 +170,7 @@ export class ProjectTreeFluentAPI<
             // Leaf case - end
             if (idx === ids.length - 1) {
                 parent.node.state.selected = true;
+                // this.ts.metaState.firstSelectedNode.node.data.id
                 this.ts.metaState.selectedNodes = [parent];
                 return parent.node.children;
             }
@@ -189,5 +201,91 @@ export class ProjectTreeFluentAPI<
     getSearchData = async (id: string, type: 'PROJECT_GROUP'|'PROJECT' = 'PROJECT'): Promise<void> => {
         const res = await this.getSearchPath(id, type);
         this.ts.metaState.nodes = await this.getRecursiveData(res.open_path) as TreeNodeProps<ProjectItemResp, state>[];
+    }
+}
+
+interface TreeQSNameType {
+    select: string;
+    search: string;
+}
+
+export enum DefaultTreeQSPropsName {
+    select = 't_se',
+    search = 't_sc',
+}
+
+export const makeTreeQSProps = (names: TreeQSNameType) => ({
+    [names.select]: {
+        type: String,
+        default: null,
+    },
+    [names.search]: {
+        type: String,
+        default: null,
+    },
+});
+
+export const DefaultQSTreeProps = makeTreeQSProps(DefaultTreeQSPropsName);
+
+export class RouteProjectTreeFluentAPI<
+    state extends ProjectNodeState = ProjectNodeState,
+    initData = any, initSyncData = any,
+    treeAction extends ProjectTree = ProjectTree,
+    T extends TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData> = TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData>
+    > extends ProjectTreeFluentAPI<state, initData, initSyncData, treeAction, T> implements RouterAPIToolsetInterface {
+    constructor(
+        treeActions: TreeApiActions<treeAction, TreeSearchAction<ProjectTreeParameter, TreeSearchResp>>,
+        initData: initData = {} as initData,
+        public vm: Vue|ComponentInstance,
+        public qsName: TreeQSNameType = DefaultTreeQSPropsName,
+        public isReady = false,
+    ) {
+        super(treeActions, initData);
+        watch(() => this.ts.metaState.firstSelectedNode, async (aft, bef) => {
+            console.debug('aft', aft, 'bef', bef);
+            if (aft && !isEqual(aft.node.data.id, bef?.node.data.id)) {
+                await this.routerPush();
+            }
+        });
+    }
+
+    applyAPIRouter = (props: TreeQSNameType) => {
+        const select = props[this.qsName.select];
+        const search = props[this.qsName.search];
+        // if (isNotEmpty(select)) {
+        //     this.ts.metaState.selectedNodes = select;
+        // }
+        this.isReady = true;
+    };
+
+    applyDisplayRouter = async (props: TreeQSNameType) => {
+        const pgId = props[this.qsName.select];
+        if (pgId) {
+            await this.getSearchData(pgId, 'PROJECT_GROUP');
+            // projectState.currentGroupId = pgId as string;
+            if (this.ts.metaState.firstSelectedNode) this.ts.setNodeState(this.ts.metaState.firstSelectedNode, { expanded: false });
+        } else {
+            await this.defaultGetData();
+            if (this.ts.metaState.nodes[0]) {
+                const item = getTreeItem(0, 0, this.ts.metaState.nodes[0]);
+                this.ts.metaState.selectedNodes = [item];
+                this.ts.setNodeState(item, { selected: true });
+            }
+        }
+    }
+
+    routerPush = async () => {
+        const query = {
+            ...this.vm.$route.query,
+            [this.qsName.select]: this.ts.metaState.firstSelectedNode?.node.data.id,
+        };
+        await pushRouterQuery(this.vm, query);
+    }
+
+    getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+        if (this.isReady) {
+            await this.defaultGetData(item);
+            await this.routerPush();
+        }
     }
 }

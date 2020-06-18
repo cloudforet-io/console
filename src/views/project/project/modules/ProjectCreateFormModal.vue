@@ -92,7 +92,7 @@ export default {
         const fixFormTS = new JsonSchemaFormToolSet();
 
         const checkNameUnique = (...args: any[]) => fluentApi.identity().projectGroup().listProjects()
-            .setProjectGroupId(props.projectGroupId)
+            .setProjectGroupId(props.currentProject)
             .setFilter({ key: 'name', operator: '=', value: args[1] })
             .setCountOnly()
             .execute()

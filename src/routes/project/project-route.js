@@ -20,6 +20,7 @@ export default {
         {
             path: '/',
             name: PROJECT_MAIN_PAGE_NAME,
+            props: bypassQueryString,
             component: Project,
         },
         {

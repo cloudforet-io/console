@@ -175,14 +175,6 @@ export enum DefaultQSGridQSPropsName {
 }
 
 export const makeQSGridQSProps = (names: QuerySearchQSNameType) => ({
-    // [names.selectItem]: {
-    //     type: [Array, String],
-    //     default: null,
-    // },
-    // [names.selectItems]: {
-    //     type: [Array, String, Number],
-    //     default: null,
-    // },
     [names.search]: {
         type: String,
         default: null,
@@ -237,7 +229,6 @@ export class RouteSearchGridFluentAPI<
     }
 
     applyAPIRouter = (props: any) => {
-        console.log('props test', props);
         if (isNotEmpty(props[this.qsName.pageSize])) {
             this.gridTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
         }
@@ -316,7 +307,6 @@ export class RouteQuerySearchGridFluentAPI<
         const filters = props[this.qsName.filters];
         if (isNotEmpty(filters)) {
             this.gridTS.querySearch.tags.value = getArrayQueryString(filters, makeSearchQuery);
-            // console.debug(this.gridTS.querySearch.tags.value);
         }
         this.isReady = true;
     };
