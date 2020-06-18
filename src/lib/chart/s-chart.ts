@@ -210,7 +210,7 @@ export class NSChart extends Chart {
     // @ts-ignore
     constructor(canvas: HTMLCanvasElement, config: ChartConfiguration, globalDatasets: ChartDataSets = {}) {
         if (config.data?.datasets) {
-            config.data.datasets = config.data?.datasets?.map((ds, i) => ({ ...ds, ...globalDatasets }));
+            config.data.datasets = config.data.datasets.map((ds, i) => ({ ...globalDatasets, ...ds }));
         }
 
         super(canvas, config);
@@ -245,6 +245,7 @@ export class NSChart extends Chart {
         if (render) this.update();
         return this;
     }
+
 
     apply(): this {
         this.data.datasets = this.data.datasets?.map((ds, i) => ({ ...ds, ...this.globalDatasets }));

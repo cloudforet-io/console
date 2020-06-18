@@ -131,23 +131,26 @@
 /* eslint-disable camelcase */
 import _ from 'lodash';
 import {
-    computed, getCurrentInstance, Ref, toRefs,
+    computed, getCurrentInstance, reactive, Ref, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import { secondary, secondary1 } from '@/styles/colors';
+import {
+    black, gray, secondary, secondary1,
+} from '@/styles/colors';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
-import { SChartToolSet } from '@/lib/chart/toolset';
-import { SBarChart } from '@/lib/chart/bar-chart';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import Chart, { ChartDataSets } from 'chart.js';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export default {
     name: 'TopProjects',
@@ -175,6 +178,8 @@ export default {
         }
 
         interface InitDataType {
+            chartRef: HTMLCanvasElement|null;
+            chart: Chart|null;
             data: Value[];
             loading: boolean;
             colors: {
@@ -184,29 +189,137 @@ export default {
             fields: Ref<Readonly<string[]>>;
         }
 
-        const ts = new SChartToolSet<SBarChart, InitDataType>(SBarChart,
-            (chart: SBarChart) => (chart.addData(ts.state.data.map(d => d.servers), 'Server')
-                .addData(ts.state.data.map(d => d.cloud_services), 'Cloud Service')
-                .setLabels(ts.state.data.map((d, i) => `Top ${i + 1}`))
-                .setColors(_.values(ts.state.colors))
-                .setTicksCount(7)
-                .setCategoryPercentage(0.75)
-                .setBarPercentage(0.5)
-                .setStacked(true)
-                .apply()), {
-                data: [],
-                loading: true,
-                colors: {
-                    servers: secondary,
-                    cloud_services: secondary1,
-                },
-                fields: computed(() => makeTrItems([['rank', 'FIELD.RANK'],
-                    ['project_group', 'FIELD.PROJECT_GRP'],
-                    ['project', 'FIELD.PROJECT'],
-                    ['servers', 'FIELD.SERVER'],
-                    ['cloud_services', 'FIELD.CLOUD_SERVICE'],
-                ])),
-            }, { type: 'horizontalBar' });
+        const state: UnwrapRef<InitDataType> = reactive({
+            chartRef: null,
+            chart: null,
+            data: [],
+            loading: true,
+            colors: {
+                servers: secondary,
+                cloud_services: secondary1,
+            },
+            fields: computed(() => makeTrItems([['rank', 'FIELD.RANK'],
+                ['project_group', 'FIELD.PROJECT_GRP'],
+                ['project', 'FIELD.PROJECT'],
+                ['servers', 'FIELD.SERVER'],
+                ['cloud_services', 'FIELD.CLOUD_SERVICE'],
+            ])),
+        });
+
+        const drawChart = (canvas) => {
+            const datasets: ChartDataSets[] = [{
+                label: 'Server',
+                data: state.data.map(d => d.servers) as number[],
+                backgroundColor: state.colors.servers,
+                borderColor: state.colors.servers,
+            }, {
+                label: 'Cloud Service',
+                data: state.data.map(d => d.cloud_services) as number[],
+                backgroundColor: state.colors.cloud_services,
+                borderColor: state.colors.cloud_services,
+            }];
+
+            // const max: number = _.max(_.reduceRight(datasets, (res: number[], ds) => {
+            //     ds.data.forEach((d, i) => {
+            //         res[i] = res[i] + d || d;
+            //     });
+            //     return res;
+            // }, [])) as number;
+            // const stepSize = max / (ticksCount || 1);
+
+            state.chart = new NSChart(canvas,
+                {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: state.data.map((d, i) => `Top ${i + 1}`),
+                        datasets,
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false,
+                        },
+                        responsive: true,
+                        tooltips,
+                        scales: {
+                            yAxes: [{
+                                stacked: true,
+                                gridLines: {
+                                    drawTicks: false,
+                                    drawBorder: false,
+                                    color: gray[200],
+                                    zeroLineColor: gray[200],
+                                },
+                                ticks: {
+                                    display: true,
+                                    beginAtZero: true,
+                                    padding: 10,
+                                },
+                            }],
+                            xAxes: [{
+                                stacked: true,
+                                gridLines: {
+                                    drawTicks: false,
+                                    drawBorder: false,
+                                    color: gray[200],
+                                    zeroLineColor: gray[200],
+                                },
+                                ticks: {
+                                    padding: 10,
+                                    fontColor: black,
+                                },
+                                afterTickToLabelConversion(scaleInstance): void {
+                                    scaleInstance.ticks[0] = null;
+                                    scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
+                                },
+                            }],
+                        },
+                    },
+                    plugins: [{
+                        beforeDraw(chart: NSChart): void {
+                            const ctx: CanvasRenderingContext2D | null = chart.ctx;
+                            if (!ctx) return;
+
+                            ctx.save();
+
+                            ctx.strokeStyle = gray[200];
+                            ctx.lineWidth = 1;
+
+                            ctx.beginPath();
+                            ctx.moveTo(chart.chartArea.left, chart.chartArea.bottom);
+                            ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
+                            ctx.moveTo(chart.chartArea.right, chart.chartArea.top);
+                            ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
+                            ctx.moveTo(chart.chartArea.left, chart.chartArea.top);
+                            ctx.lineTo(chart.chartArea.left, chart.chartArea.bottom);
+                            ctx.stroke();
+
+
+                            ctx.font = '12 Noto Sans';
+                            ctx.fillStyle = gray.default;
+                            ctx.textAlign = 'right';
+                            ctx.textBaseline = 'hanging';
+                            ctx.fillText('Resource', chart.chartArea.left + 7, chart.chartArea.bottom + 10);
+
+
+                            ctx.restore();
+                        },
+                    }],
+                }, {
+                    borderWidth: 0,
+                    categoryPercentage: 0.75,
+                    barPercentage: 0.5,
+                });
+        };
+
+        watch([() => state.chartRef, () => state.loading], ([ctx, loading]) => {
+            if (ctx && !loading) {
+                drawChart(ctx);
+            }
+        }, {
+            lazy: true,
+        });
+
 
         const api = fluentApi.statisticsTest().resource().stat<Value>()
             .setResourceType('identity.Project')
@@ -227,21 +340,21 @@ export default {
 
 
         const getData = async (): Promise<void> => {
-            ts.state.loading = true;
+            state.loading = true;
             try {
                 const res = await api.execute();
-                ts.state.data = res.data.results;
+                state.data = res.data.results;
             } catch (e) {
                 console.error(e);
             } finally {
-                ts.state.loading = false;
+                state.loading = false;
             }
         };
 
         getData();
 
         return {
-            ...toRefs(ts.state),
+            ...toRefs(state),
             onRowClick(item) {
                 vm.$router.push(`/project/${item.project_id}`);
             },
