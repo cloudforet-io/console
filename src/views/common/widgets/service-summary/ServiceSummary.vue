@@ -140,37 +140,17 @@ export default {
                                     fontSize: 10,
                                     fontFamily: 'Noto Sans',
                                     padding: 4,
+                                    autoSkip: true,
+                                    autoSkipPadding: 10,
+                                    maxRotation: 0,
+                                },
+                                beforeCalculateTickRotation(scaleInstance: any): void {
+                                    scaleInstance.ticks[0] = null;
+                                    scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
                                 },
                             }],
                         },
-                        tooltips: {
-                            enabled: false,
-                        },
-                        animation: {
-                            onComplete() {
-                                if (state.noChange) return;
-                                // @ts-ignore
-                                const ctx = this.chart.ctx;
-                                ctx.font = '10px Noto Sans';
-                                ctx.fillStyle = props.color;
-                                ctx.textAlign = 'center';
-                                ctx.textBaseline = 'bottom';
-
-                                // @ts-ignore
-                                this.data.datasets.forEach((dataset) => {
-                                    for (let i = 0; i < dataset.data.length; i++) {
-                                        if (i === 1 || i === state.data.length - 2) {
-                                            // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                                            for (const key in dataset._meta) {
-                                                const model = dataset._meta[key].data[i]._model;
-                                                const text = countFormatter(dataset.data[i]);
-                                                ctx.fillText(text, model.x, model.y - 2);
-                                            }
-                                        }
-                                    }
-                                });
-                            },
-                        },
+                        tooltips,
                     },
                     plugins: [{
                         beforeDraw(chart: NSChart): void {
@@ -188,6 +168,31 @@ export default {
                             ctx.stroke();
 
                             ctx.restore();
+                        },
+                        afterDraw(chart: Chart): void {
+                            if (state.noChange) return;
+                            const ctx = chart.ctx;
+                            if (!ctx) return;
+                            ctx.font = '10px Noto Sans';
+                            ctx.fillStyle = props.color;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+
+                            if (chart.data?.datasets) {
+                                chart.data.datasets.forEach((dataset) => {
+                                    for (let i = 0; i < dataset.data.length; i++) {
+                                        if (i === 1 || i === state.data.length - 2) {
+                                            // eslint-disable-next-line guard-for-in,no-restricted-syntax
+                                            for (const key in dataset._meta) {
+                                                const model = dataset._meta[key].data[i]._model;
+                                                // @ts-ignore
+                                                const text = countFormatter(dataset.data[i]);
+                                                ctx.fillText(text, model.x, model.y - 2);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
                         },
                     }],
                 }, {
@@ -227,7 +232,9 @@ export default {
 
         const trendApi = fluentApi.statisticsTest().history().stat<Trend>()
             .addGroupKey('created_at', 'date')
-            .setFilter({ key: 'created_at', value: 'now/d-6d', operator: FILTER_OPERATOR.gtTime });
+            .setFilter(
+                { key: 'created_at', value: 'now/d-30d', operator: FILTER_OPERATOR.gtTime },
+            );
 
         const getCount = async (): Promise<void> => {
             try {
@@ -239,15 +246,19 @@ export default {
         };
 
         const getTrend = async (): Promise<void> => {
+            const padItem = { count: 0, date: '' };
             try {
                 const res = await props.getTrendAction(trendApi).execute();
-                const padItem = { count: 0, date: '' };
+                // no data case
                 if (res.data.results.length === 0) {
                     state.data = [padItem, padItem];
+                    // one data case
                 } else if (res.data.results.length === 1) {
                     const item = res.data.results[0];
+                    item.count = state.count;
                     item.date = moment(item.date).format('M/D');
                     state.data = [padItem, item, { ...padItem, count: item.count }];
+                    // more than one data case
                 } else {
                     state.data = _.chain(res.data.results)
                         .sortBy('date')
@@ -255,13 +266,14 @@ export default {
                             d.date = moment(d.date).format('M/D');
                         })
                         .value();
+                    state.data[state.data.length - 1].count = state.count;
                     state.data.splice(0, 0, { ...padItem, count: state.data[0].count });
                     state.data.push({ ...padItem, count: state.data[state.data.length - 1].count });
                 }
             } catch (e) {
                 console.error(e);
                 state.errored = true;
-                state.data = [{ count: 0, date: '' }, { count: 0, date: '' }];
+                state.data = [padItem, padItem];
             } finally {
                 state.isDataReady = true;
             }
@@ -273,7 +285,8 @@ export default {
             state.data = [];
             state.count = 0;
             try {
-                await Promise.all([getTrend(), getCount()]);
+                await getCount();
+                await getTrend();
             } catch (e) {
                 console.error(e);
             } finally {
