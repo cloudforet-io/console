@@ -313,5 +313,6 @@ export default {
 }
 .line-chart {
     height: 7.3rem;
+    width: 100%;
 }
 </style>
