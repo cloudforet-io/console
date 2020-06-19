@@ -19,11 +19,12 @@
                                       :style="{width: toggleSize}"
                                       v-on="getListeners('toggle')"
                                 >
-                                    <slot v-if="children || $scopedSlots[`toggle-${level}`] || $scopedSlots[`toggle`]"
+                                    <slot v-if="$scopedSlots[`toggle-${level}`] || $scopedSlots[`toggle`]"
                                           :name="`toggle-${level}`" v-bind="slotBind"
                                     >
                                         <slot name="toggle" v-bind="slotBind">
-                                            <p-i :name="state.expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
+                                            <p-i v-if="children"
+                                                 :name="state.expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
                                                  :width="toggleSize" :height="toggleSize"
                                                  color="inherit transparent"
                                             />
