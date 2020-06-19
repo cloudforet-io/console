@@ -20,7 +20,7 @@
                                  :data.sync="node.data"
                                  :children.sync="node.children"
                                  :state.sync="node.state"
-                                 @toggle:click="treeApiHandler.getData"
+                                 @toggle:click="treeApiHandler.toggle"
                                  @node:click="selectItem"
                                  @checkbox:click="selectItem"
                                  @mounted="onNodeMounted"
