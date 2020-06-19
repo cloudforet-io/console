@@ -120,7 +120,7 @@ export default {
                                 ticks: {
                                     display: false,
                                     beginAtZero: false,
-                                    max: max + (diff / 30),
+                                    max: state.noChange ? undefined : max + (diff / 30),
                                 },
                             }],
                             xAxes: [{
@@ -241,11 +241,13 @@ export default {
         const getTrend = async (): Promise<void> => {
             try {
                 const res = await props.getTrendAction(trendApi).execute();
+                const padItem = { count: 0, date: '' };
                 if (res.data.results.length === 0) {
-                    state.data = [{ count: 0, date: '' }, { count: 0, date: '' }];
+                    state.data = [padItem, padItem];
                 } else if (res.data.results.length === 1) {
                     const item = res.data.results[0];
-                    state.data = [{ count: 0, date: '' }, item, { count: item.count, date: '' }];
+                    item.date = moment(item.date).format('M/D');
+                    state.data = [padItem, item, { ...padItem, count: item.count }];
                 } else {
                     state.data = _.chain(res.data.results)
                         .sortBy('date')
@@ -253,8 +255,8 @@ export default {
                             d.date = moment(d.date).format('M/D');
                         })
                         .value();
-                    state.data.splice(0, 0, { count: state.data[0].count, date: '' });
-                    state.data.push({ count: state.data[state.data.length - 1].count, date: '' });
+                    state.data.splice(0, 0, { ...padItem, count: state.data[0].count });
+                    state.data.push({ ...padItem, count: state.data[state.data.length - 1].count });
                 }
             } catch (e) {
                 console.error(e);
