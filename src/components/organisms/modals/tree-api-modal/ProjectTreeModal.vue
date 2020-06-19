@@ -20,7 +20,7 @@
                                  :data.sync="node.data"
                                  :children.sync="node.children"
                                  :state.sync="node.state"
-                                 @toggle:click="treeApiHandler.toggle"
+                                 @toggle:click="toggle"
                                  @node:click="selectItem"
                                  @checkbox:click="selectItem"
                                  @mounted="onNodeMounted"
@@ -130,11 +130,36 @@ export default {
             }
         };
 
+        const resetSelectedNode = (item: TreeItem<ProjectItemResp, ProjectNodeState>, compare?: TreeItem<ProjectItemResp, ProjectNodeState>) => {
+            if (compare) {
+                if (compare.node.data.id === item.node.data.id) {
+                    treeApiHandler.ts.metaState.selectedNodes = [];
+                } else if (compare.parent) resetSelectedNode(item, compare.parent);
+            } else {
+                if (!treeApiHandler.ts.metaState.firstSelectedNode) return;
+                if (!treeApiHandler.ts.metaState.firstSelectedNode.parent) return;
+                if (treeApiHandler.ts.metaState.firstSelectedNode.level <= item.level) return;
+                resetSelectedNode(item, treeApiHandler.ts.metaState.firstSelectedNode.parent);
+            }
+        };
+
 
         return {
             treeContainer,
             proxyVisible: makeProxy('visible'),
             treeApiHandler,
+            async toggle(item: TreeItem<ProjectItemResp, ProjectNodeState>, matched: TreeItem<ProjectItemResp, ProjectNodeState>[], e: MouseEvent): Promise<void> {
+                e.stopPropagation();
+                if (item.node.state.expanded) {
+                    resetSelectedNode(item);
+                    item.node.state.expanded = false;
+                    treeApiHandler.ts.applyState(item);
+                    item.node.children = !!item.node.children;
+                    return;
+                }
+
+                await treeApiHandler.getData(item);
+            },
             selectItem(item: TreeItem<ProjectItemResp, ProjectNodeState>): void {
                 if (item.node.data.item_type === 'PROJECT') {
                     if (!item.node.state.selected) treeApiHandler.ts.setSelectedNodes(item);

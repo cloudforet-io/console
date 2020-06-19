@@ -178,11 +178,12 @@ export class ProjectTreeFluentAPI<
                 return parent.node.children;
             }
 
-            const children = await this.requestTreeSearchData(ids[idx], parent.node.data.item_type);
+            let children = await this.requestTreeSearchData(ids[idx], parent.node.data.item_type);
             if (Array.isArray(children)) {
+                children = children.map(d => reactive(d)) as TreeNode<ProjectItemResp, state>[];
                 const key = findIndex(children, d => d.data.id === ids[idx + 1]);
                 if (key !== -1) {
-                    const nextParent = getTreeItem(key, idx + 1, children[key]);
+                    const nextParent = getTreeItem(key, idx + 1, children[key], parent);
                     nextParent.node.children = await this.getRecursiveData(ids, idx + 1, nextParent);
                     nextParent.node.state.expanded = !!nextParent.node.children;
                 }
@@ -191,7 +192,8 @@ export class ProjectTreeFluentAPI<
         }
 
         // Root case - start
-        const rootItems = await this.requestTreeSearchData(undefined, 'ROOT') as TreeNodeProps<ProjectItemResp, state>[];
+        let rootItems = await this.requestTreeSearchData(undefined, 'ROOT') as TreeNode<ProjectItemResp, state>[];
+        rootItems = rootItems.map(d => reactive(d)) as TreeNode<ProjectItemResp, state>[];
         const itemIdx = findIndex(rootItems, d => d.data.id === ids[idx]);
         if (itemIdx !== -1) {
             const item = getTreeItem(itemIdx, 0, rootItems[itemIdx]);
