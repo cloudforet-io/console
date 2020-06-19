@@ -22,17 +22,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs, watch } from '@vue/composition-api';
+import {
+    defineComponent, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { MetricChartProps, metricChartProps } from '@/components/organisms/charts/metric-chart/MetricChart.toolset';
-import { SChartToolSet } from '@/lib/chart/toolset';
 import { SLineChart } from '@/lib/chart/line-chart';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import _ from 'lodash';
 import { gray } from '@/styles/colors';
-import { tooltips } from '@/lib/chart/s-chart';
+import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import { chartTimestampFormatter } from '@/lib/util';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { ChartColor, ChartDataSets } from 'chart.js';
 
 export default defineComponent({
     name: 'PMetricChart',
@@ -57,17 +60,19 @@ export default defineComponent({
             return props.labels;
         };
 
-        const ts = new SChartToolSet<SLineChart, object>(SLineChart,
-            (chart) => {
-                _.forEach(props.dataset, (d, k) => chart.addData(d, k));
+        const state: UnwrapRef<any> = reactive({
+            chartRef: null,
+            chart: null,
+        });
+        const drawChart = (canvas) => {
+            const datasets: ChartDataSets[] = _.map(props.dataset, (d, k) => ({ data: d, label: k }));
 
-                return chart.setLabels(getLabels())
-                    .setColors(props.colors)
-                    .setLineTension(0)
-                    // .setGradientHeight(150)
-                    .setFill(false)
-                    .apply();
-            }, undefined, {
+            state.chart = new NSChart(canvas, {
+                type: 'line',
+                data: {
+                    labels: getLabels(),
+                    datasets,
+                },
                 options: {
                     maintainAspectRatio: false,
                     legend: {
@@ -138,19 +143,36 @@ export default defineComponent({
                         ctx.restore();
                     },
                 }],
+            }, {
+                borderWidth: 1,
+                fill: false,
+                pointRadius: 0,
+                pointBorderWidth: 0,
+                lineTension: 0,
+                borderColor: ({ datasetIndex }): ChartColor => props.colors[datasetIndex || 0],
             });
+        };
+
+
+        watch([() => state.chartRef, () => props.loading], ([ctx, loading]) => {
+            if (ctx && !loading) {
+                drawChart(ctx);
+            }
+        }, {
+            lazy: true,
+        });
 
         watch(() => props.dataset, () => {
-            if (ts.state.chart) {
+            if (state.chart) {
                 _.forEach(props.dataset, (ds, label) => {
-                    ts.state.chart?.upsertData(ds, label);
-                    ts.state.chart?.setLabels(getLabels());
+                    state.chart.upsertData(ds, label);
+                    state.chart.setLabels(getLabels());
                 });
-                ts.state.chart.update();
+                state.chart.update();
             }
         });
         return {
-            ...toRefs(ts.state),
+            ...toRefs(state),
         };
     },
 });
