@@ -1,5 +1,6 @@
 <template>
     <p-widget-layout title="History">
+        <div class="text-gray text-xs mb-2">Job Count</div>
         <p-chart-loader :loading="loading" class="chart">
             <template #loader>
                 <p-skeleton width="100%" height="100%" />
@@ -111,7 +112,6 @@ export default {
                 options: {
                     layout: {
                         padding: {
-                            top: 30,
                         },
                     },
                     maintainAspectRatio: false,
@@ -178,12 +178,6 @@ export default {
                         ctx.moveTo(chart.chartArea.right, chart.chartArea.top);
                         ctx.lineTo(chart.chartArea.left, chart.chartArea.top);
                         ctx.stroke();
-
-                        ctx.font = '12 Noto Sans';
-                        ctx.fillStyle = gray.default;
-                        ctx.textAlign = 'right';
-                        ctx.textBaseline = 'hanging';
-                        ctx.fillText('Job Count', chart.chartArea.left + 10, chart.chartArea.top - 30);
 
                         ctx.restore();
                     },

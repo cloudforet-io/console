@@ -294,14 +294,6 @@ export default {
                             ctx.lineTo(chart.chartArea.left, chart.chartArea.bottom);
                             ctx.stroke();
 
-
-                            ctx.font = '12 Noto Sans';
-                            ctx.fillStyle = gray.default;
-                            ctx.textAlign = 'right';
-                            ctx.textBaseline = 'hanging';
-                            ctx.fillText('Resource', chart.chartArea.left + 7, chart.chartArea.bottom + 10);
-
-
                             ctx.restore();
                         },
                     }],

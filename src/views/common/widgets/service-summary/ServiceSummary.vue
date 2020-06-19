@@ -1,16 +1,21 @@
 <template>
-    <p-widget-layout :title="title" class="service-summary">
-        <router-link class="count" :to="to" :style="{
-            color: countColor,
-        }"
-        >
-            <animated-number :value="count"
-                             :format-value="countFormatter"
-                             :duration="1500"
-                             :round="1"
-                             easing="easeInOutSine"
-            />
-        </router-link>
+    <p-widget-layout class="service-summary">
+        <template #top>
+            <div class="top">
+                <span class="title">{{ title }}</span>
+                <router-link class="count" :to="to" :style="{
+                    color: countColor,
+                }"
+                >
+                    <animated-number :value="count"
+                                     :format-value="countFormatter"
+                                     :duration="1500"
+                                     :round="1"
+                                     easing="easeInOutSine"
+                    />
+                </router-link>
+            </div>
+        </template>
         <p-chart-loader :loading="loading" class="line-chart">
             <canvas ref="chartRef" />
         </p-chart-loader>
@@ -77,7 +82,6 @@ export default {
             const max = maxItem ? maxItem.count : 80;
             const min = minItem ? minItem.count : 0;
             const diff = Math.abs(max - min);
-            const stepSize = diff / ticksCount;
 
             state.chart = new NSChart(canvas,
                 {
@@ -96,7 +100,7 @@ export default {
                         },
                         layout: {
                             padding: {
-                                top: 5,
+                                top: 10,
                                 left: -5,
                                 bottom: 0,
                             },
@@ -115,10 +119,8 @@ export default {
                                 },
                                 ticks: {
                                     display: false,
-                                    stepSize,
                                     beginAtZero: false,
-                                    max: max + (stepSize / 30),
-                                    min,
+                                    max: max + (diff / 30),
                                 },
                             }],
                             xAxes: [{
@@ -137,7 +139,7 @@ export default {
                                     fontColor: gray[400],
                                     fontSize: 10,
                                     fontFamily: 'Noto Sans',
-                                    padding: 15,
+                                    padding: 4,
                                 },
                             }],
                         },
@@ -149,10 +151,10 @@ export default {
                                 if (state.noChange) return;
                                 // @ts-ignore
                                 const ctx = this.chart.ctx;
-                                ctx.font = '12px Noto Sans';
+                                ctx.font = '10px Noto Sans';
                                 ctx.fillStyle = props.color;
                                 ctx.textAlign = 'center';
-                                ctx.textBaseline = 'hanging';
+                                ctx.textBaseline = 'bottom';
 
                                 // @ts-ignore
                                 this.data.datasets.forEach((dataset) => {
@@ -162,7 +164,7 @@ export default {
                                             for (const key in dataset._meta) {
                                                 const model = dataset._meta[key].data[i]._model;
                                                 const text = countFormatter(dataset.data[i]);
-                                                ctx.fillText(text, model.x, model.y + 2);
+                                                ctx.fillText(text, model.x, model.y - 2);
                                             }
                                         }
                                     }
@@ -192,8 +194,8 @@ export default {
                     borderWidth: 1,
                     fill: 'start',
                     pointRadius: state.noChange ? 0 : state.data.map((d, i) => {
-                        if (i === 1 || i === state.data.length - 2) return 2;
-                        return 0;
+                        if (i === 0 || i === state.data.length - 1) return 0;
+                        return 1;
                     }),
                     pointBackgroundColor: props.color,
                     pointBorderWidth: 0,
@@ -292,28 +294,24 @@ export default {
 .service-summary::v-deep {
     .widget-contents {
         padding: 0;
-        height: fit-content;
-    }
-    .top {
-        @apply mt-6 mb-2;
-    }
-    .title {
-        @apply text-sm leading-normal;
+        display: flex;
+        align-items: flex-end;
     }
 }
+.top {
+    @apply mb-2 mx-6 flex justify-between items-baseline;
+}
+.title {
+    @apply mt-6 text-sm leading-normal capitalize font-bold mr-2;
+    line-height: 1.5;
+}
 .count {
-    display: inline-block;
-    line-height: 120%;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-left: 1.5rem;
-    border-bottom-width: 1px;
-    border-color: transparent;
+    @apply inline-block leading-none text-2xl font-bold ml-6 border-b border-transparent;
     &:hover {
         border-color: currentColor;
     }
 }
 .line-chart {
-    height: 6.25rem;
+    height: 7.3rem;
 }
 </style>
