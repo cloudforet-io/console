@@ -179,7 +179,7 @@ export default {
                             ctx.textBaseline = 'bottom';
 
                             if (chart.data?.datasets) {
-                                chart.data.datasets.forEach((dataset) => {
+                                chart.data.datasets.forEach((dataset: any) => {
                                     for (let i = 0; i < dataset.data.length; i++) {
                                         if (i === 1 || i === state.data.length - 2) {
                                             // eslint-disable-next-line guard-for-in,no-restricted-syntax

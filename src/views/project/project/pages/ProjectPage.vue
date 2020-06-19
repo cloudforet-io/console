@@ -9,13 +9,13 @@
                          @click="openProjectGroupForm(true)"
                     />
                 </div>
-                <p-hr style="width:100%;"></p-hr>
+                <p-hr style="width:100%;" />
                 <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
                              v-bind="treeApiHandler.ts.state"
                              :data.sync="node.data"
                              :children.sync="node.children"
                              :state.sync="node.state"
-                             @toggle:click="treeApiHandler.getData"
+                             @toggle:click="treeApiHandler.toggle"
                              @node:click="treeApiHandler.ts.setSelectedNodes"
                              @row:mouseenter="hovered(...arguments, true)"
                              @row:mouseleave="hovered(...arguments, false)"
@@ -588,12 +588,16 @@ export default {
                             loading: false,
                         },
                     });
+                    // add new node to current tree nodes
                     if (formState.isRoot) treeApiHandler.ts.metaState.nodes.push(newNode);
                     else if (state.hoveredNode) {
                         if (Array.isArray(state.hoveredNode.node.children)) {
                             state.hoveredNode.node.children.push(newNode);
                             treeApiHandler.ts.setNodeState(state.hoveredNode, { expanded: true });
-                        } else await treeApiHandler.getData(state.hoveredNode);
+                        } else {
+                            const res = await treeApiHandler.getData(state.hoveredNode);
+                            treeApiHandler.ts.setNodeState(state.hoveredNode, { expanded: true });
+                        }
                     }
                 } catch (e) {
                     showErrorMessage('Fail to Create Project Group', e, context.root);

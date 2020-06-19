@@ -168,7 +168,7 @@ export class TreeNodeToolSet<
             nodes: [],
             selectedNodes: [],
             firstSelectedNode: computed(() => _this.metaState.selectedNodes[0]),
-        });
+        }) as TreeNodeMetaState;
         _this.setSelectedNodes = (item: TreeItem): void => {
             // TODO: multi select case
             // if (_this.isMultiSelect) {
