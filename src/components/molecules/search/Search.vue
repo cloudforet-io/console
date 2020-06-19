@@ -21,10 +21,10 @@
             <p-button class="search-btn"
                       @click="onSearch"
             >
-                <p-i color="transparent inherit"
-                     width="1.5rem"
-                     height="1.5rem"
-                     name="ic_search"
+                <p-i
+                    width="1.5rem"
+                    height="1.5rem"
+                    name="ic_search"
                 />
             </p-button>
         </div>
@@ -97,7 +97,7 @@ export default {
                 }
             }
         }
-        
+
         &.hovered {
             @apply border-secondary text-secondary;
         }
@@ -107,7 +107,7 @@ export default {
                 @apply text-secondary;
             }
         }
-        
+
     }
 
 
