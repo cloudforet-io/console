@@ -131,17 +131,21 @@ export class ProjectTreeFluentAPI<
         }
     }
 
-    defaultGetData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
-        if (item) {
-            if (e) e.stopPropagation();
-            if (item.node.state.expanded) {
-                this.resetSelectedNode(item);
-                item.node.state.expanded = false;
-                this.ts.applyState(item);
-                item.node.children = !!item.node.children;
-                return;
-            }
+    toggle = async (item: TreeItem<ProjectItemResp, state>, matched: TreeItem<ProjectItemResp, state>[], e: MouseEvent): Promise<void> => {
+        e.stopPropagation();
+        if (item.node.state.expanded) {
+            this.resetSelectedNode(item);
+            item.node.state.expanded = false;
+            this.ts.applyState(item);
+            item.node.children = !!item.node.children;
+            return;
+        }
 
+        await this.getData(item);
+    }
+
+    defaultGetData = async (item?: TreeItem<ProjectItemResp, state>): Promise<void> => {
+        if (item) {
             item.node.state.expanded = true;
             item.node.state.loading = true;
             this.ts.applyState(item);
@@ -156,8 +160,8 @@ export class ProjectTreeFluentAPI<
         }
     }
 
-    getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
-        await this.defaultGetData(item, matched, e);
+    getData = async (item?: TreeItem<ProjectItemResp, state>): Promise<void> => {
+        await this.defaultGetData(item);
     }
 
     getSearchPath = async (id: string, type: string): Promise<TreeSearchResp> => {
@@ -279,9 +283,9 @@ export class RouteProjectTreeFluentAPI<
         await pushRouterQuery(this.vm, query);
     }
 
-    getData = async (item?: TreeItem<ProjectItemResp, state>, matched?: TreeItem<ProjectItemResp, state>[], e?: MouseEvent): Promise<void> => {
+    getData = async (item?: TreeItem<ProjectItemResp, state>): Promise<void> => {
         if (this.isReady) {
-            await this.defaultGetData(item, matched, e);
+            await this.defaultGetData(item);
             await this.routerPush();
         }
     }

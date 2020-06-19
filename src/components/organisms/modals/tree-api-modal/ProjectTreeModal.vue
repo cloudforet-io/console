@@ -45,7 +45,7 @@
                     <p-radio class="mr-2"
                              :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
                              :value="true" @click="releaseProject"
-                    /> No Select Project
+                    /><span class="cursor-pointer" @click="releaseProject">No Select Project</span>
                 </div>
             </div>
         </template>
@@ -99,17 +99,26 @@ export default {
 
         const treeContainer: Ref<HTMLElement|null> = ref(null);
 
+        // const isRelease = ref(true);
+
 
         watch(() => props.visible, async (after, before) => {
             if (after === before) return;
             if (after) {
-                if (props.projectId) await treeApiHandler.getSearchData(props.projectId);
-                else await treeApiHandler.getData();
+                if (props.projectId) {
+                    await treeApiHandler.getSearchData(props.projectId);
+                } else {
+                    await treeApiHandler.getData();
+                }
             } else {
                 treeApiHandler.ts.metaState.nodes = [];
                 treeApiHandler.ts.metaState.selectedNodes = [];
             }
         });
+
+        // watch(() => treeApiHandler.ts.metaState.firstSelectedNode, (item) => {
+        //     isRelease.value = !!item;
+        // });
 
         const autoScroll = (el: HTMLElement) => {
             if (treeContainer.value) {
@@ -127,7 +136,9 @@ export default {
             proxyVisible: makeProxy('visible'),
             treeApiHandler,
             selectItem(item: TreeItem<ProjectItemResp, ProjectNodeState>): void {
-                if (item.node.data.item_type === 'PROJECT') treeApiHandler.ts.setSelectedNodes(item);
+                if (item.node.data.item_type === 'PROJECT') {
+                    if (!item.node.state.selected) treeApiHandler.ts.setSelectedNodes(item);
+                }
             },
             confirm(): void {
                 if (treeApiHandler.ts.metaState.firstSelectedNode) {
