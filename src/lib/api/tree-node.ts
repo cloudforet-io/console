@@ -170,7 +170,6 @@ export class ProjectTreeFluentAPI<
             // Leaf case - end
             if (idx === ids.length - 1) {
                 parent.node.state.selected = true;
-                // this.ts.metaState.firstSelectedNode.node.data.id
                 this.ts.metaState.selectedNodes = [parent];
                 return parent.node.children;
             }
