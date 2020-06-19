@@ -695,7 +695,7 @@ export default {
 
 <style lang="postcss" scoped>
     .tree-header {
-        @apply font-semibold text-sm text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
+        @apply font-semibold text-sm text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden overflow-y-hidden;
     }
 
     ::v-deep .basic {
