@@ -695,11 +695,11 @@ export default {
 
 <style lang="postcss" scoped>
     .tree-header {
-        @apply text-base font-semibold text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
+        @apply font-semibold text-sm text-gray-500 ml-5 mt-6 mb-4 overflow-x-hidden;
     }
 
     ::v-deep .basic {
-       @apply mx-3 mt-1 text-base;
+       @apply mx-3 mt-1 ;
     }
 
     ::v-deep .group-add-btn {
@@ -837,9 +837,4 @@ export default {
         }
     }
 
-    .p-tree-node::v-deep {
-        .level-0 {
-            @apply font-bold;
-        }
-    }
 </style>
