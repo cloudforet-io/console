@@ -4,8 +4,10 @@ on:
     - cron:  '0 17 * * *'
   watch:
     types: [started]
+
 jobs:
   authorize:
+    if: github.repository_owner == 'spaceone-dev'
     runs-on: ubuntu-latest
     steps:
     - uses: octokit/request-action@v2.0.0
@@ -14,7 +16,6 @@ jobs:
         repository: ${{ github.repository }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
   build:
     needs: [authorize]
