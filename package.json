@@ -30,7 +30,7 @@
     "casual-browserify": "^1.5.19-2",
     "chart.js": "^2.9.3",
     "color": "^3.1.2",
-    "core-js": "^3.4.4",
+    "core-js": "^3.6.5",
     "dompurify": "^2.0.11",
     "dragselect": "^1.13.1",
     "faker": "^4.1.0",
@@ -67,7 +67,8 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@babel/runtime-corejs2": "^7.6.0",
+    "@babel/compat-data": "^7.10.3",
+    "@babel/runtime-corejs2": "^7.10.3",
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@storybook/addon-a11y": "^5.3.1",
     "@storybook/addon-actions": "^5.3.1",
