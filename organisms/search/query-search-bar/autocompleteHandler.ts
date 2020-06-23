@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js';
 import _ from 'lodash';
 import { autoCompleteQuery } from '@/lib/api/query';
+import { FilterItem } from '@/lib/fluent-api';
 
 export interface SearchQueryType {
     key: string;
@@ -11,6 +12,14 @@ export interface SearchQueryType {
 export class SearchQuery implements SearchQueryType {
     constructor(public key, public operator, public value) { }
 }
+
+export const SEARCH_PREFIX = 'Search';
+
+export const setFilterOrWithSuggestKeys = (query: FilterItem, suggestKeys: string[], filterOr: FilterItem[]): void => {
+    suggestKeys.forEach((key) => {
+        filterOr.push({ ...query, key });
+    });
+};
 
 export const searchContextType = Object.freeze({
     Key: Symbol('Key'),
