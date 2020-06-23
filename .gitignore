@@ -1,0 +1,25 @@
+# Config
+public/config/production.json
+public/config/development.json
+
+# Logs
+npm-debug.log*
+
+# NPM
+node_modules/
+
+# Transpiled code
+dist
+.out
+
+# Dev tools
+.DS_Store
+.vscode
+.idea
+*.swp
+*.bak
+
+src/assets
+
+node_modules.nosync/
+src/translations/__pycache__/
