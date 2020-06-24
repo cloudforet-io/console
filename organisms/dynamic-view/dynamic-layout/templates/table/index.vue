@@ -121,6 +121,10 @@ export default {
             type: Array,
             default: null,
         },
+        isShowGetData: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props: DynamicLayoutProps) {
         const defaultInitData = {
@@ -140,10 +144,9 @@ export default {
             exportToolSet.action = exportAction.setDataSource(props.exportFields || props.options.fields || []);
             exportToolSet.getData();
         };
-        const debounceGetData = _.debounce(apiHandler.getData, 200);
         const getData = () => {
             if (apiHandler.action && checkCanGetData(props)) {
-                debounceGetData();
+                apiHandler.getData();
             }
         };
         const searchGetData = async () => {
@@ -204,7 +207,7 @@ export default {
             }
         });
         watch(() => props.isShow, async (aft, bef) => {
-            if (aft && aft !== bef) {
+            if (aft && aft !== bef && props.isShowGetData) {
                 await getData();
             }
         });

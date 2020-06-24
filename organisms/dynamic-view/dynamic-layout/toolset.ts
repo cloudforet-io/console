@@ -47,6 +47,7 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     isLoading: boolean;
     responsiveStyle?: any;
     exportFields?: any[];
+    isShowGetData?: boolean;
 }
 interface Field extends DataTableFieldType{
     name: string;

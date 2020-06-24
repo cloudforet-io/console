@@ -143,6 +143,10 @@ export default {
             type: Array,
             default: null,
         },
+        isShowGetData: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props: DynamicLayoutProps) {
         const defaultInitData = {
@@ -238,7 +242,7 @@ export default {
                 }
             });
             watch(() => props.isShow, async (aft, bef) => {
-                if (aft && aft !== bef) {
+                if (aft && aft !== bef && props.isShowGetData) {
                     await getData();
                 }
             });
