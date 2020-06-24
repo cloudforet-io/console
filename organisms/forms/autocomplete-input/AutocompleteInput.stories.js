@@ -3,8 +3,8 @@ import {
 } from '@vue/composition-api';
 import PAutocompleteInput from './AutocompleteInput.vue';
 import {
-    baseAutocompleteHandler,
-    defaultAutocompleteHandler, getKeys, getSuggest,
+    BaseAutocompleteHandler,
+    DefaultAutocompleteHandler, getKeys, getSuggest,
     searchContextType,
     SearchQuery,
     makeValuesFetchHandler,
@@ -22,7 +22,7 @@ export default {
 };
 
 const getState = () => {
-    class ACHandler extends baseAutocompleteHandler {
+    class ACHandler extends BaseAutocompleteHandler {
         // eslint-disable-next-line class-methods-use-this
         // get keys() {
         //     return ['credential_id'];
@@ -35,7 +35,7 @@ const getState = () => {
 
         constructor() {
             super();
-            this.handlerMap = {
+            this.HandlerMap = {
                 key: [getSuggest(this.suggestKeys)],
                 value: [...makeValuesFetchHandler(this.parent, this.valuesFetchUrl, this.valuesFetchKeys)],
             };

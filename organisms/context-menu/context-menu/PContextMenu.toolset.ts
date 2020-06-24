@@ -1,7 +1,13 @@
+export enum CONTEXT_MENU_TYPE {
+    divider = 'divider',
+    header = 'header',
+    item = 'item'
+}
+
 export interface MenuItem {
-    name: string;
-    label: string;
-    type: 'divider'|'header'|'item';
+    name?: string;
+    label?: string;
+    type: CONTEXT_MENU_TYPE;
     disabled?: boolean;
 }
 

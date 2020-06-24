@@ -35,7 +35,6 @@ import {
     SearchQuery,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { parseTag } from '@/components/organisms/search/query-search-bar/toolset';
-import { OPERATOR_MAP } from '@/lib/fluent-api';
 
 // regx
 
