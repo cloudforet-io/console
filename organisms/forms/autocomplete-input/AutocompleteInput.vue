@@ -23,7 +23,7 @@ import { windowEventMount, makeProxy } from '@/lib/compostion-util';
 
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
-import { baseAutocompleteHandler, searchContextType, SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { BaseAutocompleteHandler, searchContextType, SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 
 export default defineComponent({
@@ -38,7 +38,7 @@ export default defineComponent({
     },
     props: {
         value: String,
-        autocompleteHandler: baseAutocompleteHandler,
+        autocompleteHandler: BaseAutocompleteHandler,
     },
     setup(props, { emit }) {
         const state = reactive({
