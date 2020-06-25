@@ -18,15 +18,17 @@
              @mouseover="onMouseOver"
              @mouseout="onMouseOut"
         >
-            <p-button class="search-btn"
-                      @click="onSearch"
-            >
-                <p-i
-                    width="1.5rem"
-                    height="1.5rem"
-                    name="ic_search"
-                />
-            </p-button>
+            <slot name="search" v-bind="{...$props, focused: proxyFocused, hovered: isMouseOver }">
+                <p-button class="search-btn"
+                          @click="onSearch"
+                >
+                    <p-i
+                        width="1.5rem"
+                        height="1.5rem"
+                        name="ic_search"
+                    />
+                </p-button>
+            </slot>
         </div>
     </div>
 </template>
@@ -76,6 +78,7 @@ export default {
             onMouseOver,
             onMouseOut,
             bindClass,
+            isMouseOver,
         };
     },
 };
