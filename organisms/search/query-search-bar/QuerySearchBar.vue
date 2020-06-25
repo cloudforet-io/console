@@ -29,7 +29,11 @@ import { windowEventMount } from '@/lib/compostion-util';
 
 import PSearch from '@/components/molecules/search/Search.vue';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
-import { searchContextType, SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import {
+    SEARCH_PREFIX,
+    searchContextType,
+    SearchQuery,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { parseTag } from '@/components/organisms/search/query-search-bar/toolset';
 
 // regx
@@ -129,10 +133,14 @@ export default {
             searchFocused.value = false;
         };
 
-        const newQuery = () => {
+        const newQuery = (val?: string) => {
             if (!!contextState.key && !!contextState.value) {
                 const query = new SearchQuery(contextState.key, contextState.operator, contextState.value);
                 context.emit('newQuery', query);
+                cleanSearchText();
+            } else if (val) {
+                const trimmed = val.trim();
+                if (trimmed) context.emit('newQuery', new SearchQuery(SEARCH_PREFIX, '', trimmed));
                 cleanSearchText();
             }
         };

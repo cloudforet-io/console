@@ -2,7 +2,8 @@ import {
     computed, reactive, ref, Ref,
 } from '@vue/composition-api';
 import { TagToolSet } from '@/components/molecules/tags/toolset';
-import { baseAutocompleteHandler, SearchQueryType } from './autocompleteHandler';
+import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
+import { BaseAutocompleteHandler } from './autocompleteHandler';
 
 
 interface QuerySearchState {
@@ -12,12 +13,12 @@ interface QuerySearchState {
 export class QuerySearchToolSet extends TagToolSet {
     state: QuerySearchState = reactive({ searchText: '' });
 
-    acHandler: Ref<baseAutocompleteHandler>;
+    acHandler: Ref<BaseAutocompleteHandler>;
 
     acHandlerArgs: any;
 
     constructor(
-        public ACHandlerClass: typeof baseAutocompleteHandler,
+        public ACHandlerClass: typeof BaseAutocompleteHandler,
         acHandlerArgs: object = {},
         tags: Ref<any[]> = ref([]),
         checkDuplicate = true,

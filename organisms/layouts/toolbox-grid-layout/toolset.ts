@@ -3,7 +3,7 @@ import { reactive, Ref, ref } from '@vue/composition-api';
 // eslint-disable-next-line import/no-cycle
 import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
 // eslint-disable-next-line import/no-cycle
-import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
@@ -111,13 +111,13 @@ export class SearchGridLayoutToolSet<initData=any, initSyncData=any> extends Too
 export class QuerySearchGridLayoutToolSet<initData, initSyncData> extends ToolboxGridLayoutToolSet<initData, initSyncData> {
     querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
 
-    static initToolSet(_this: any, ACHandlerClass: typeof baseAutocompleteHandler, acHandlerArgs: any, changeTagCallBack?: any) {
+    static initToolSet(_this: any, ACHandlerClass: typeof BaseAutocompleteHandler, acHandlerArgs: any, changeTagCallBack?: any) {
         ToolboxGridLayoutToolSet.initToolSet(_this);
         _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs, undefined, undefined, undefined, undefined, changeTagCallBack);
     }
 
     constructor(
-        ACHandlerClass: typeof baseAutocompleteHandler = baseAutocompleteHandler,
+        ACHandlerClass: typeof BaseAutocompleteHandler = BaseAutocompleteHandler,
         acHandlerArgs: any = {},
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,

@@ -258,8 +258,8 @@ export default {
             },
         });
 
-        const newQuery = (event) => {
-            apiHandler.tableTS.querySearch.addTag(event);
+        const newQuery = (query) => {
+            apiHandler.tableTS.querySearch.addTag(query);
         };
         const acHandler = computed(() => apiHandler.tableTS.querySearch.acHandler.value);
         const tags = computed(() => apiHandler.tableTS.querySearch.tags.value || []);

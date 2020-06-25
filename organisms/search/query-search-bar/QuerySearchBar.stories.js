@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 import moment from 'moment-timezone';
 import PQuerySearchBar from './QuerySearchBar.vue';
 import {
-    defaultAutocompleteHandler,
+    DefaultAutocompleteHandler,
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
@@ -18,7 +18,7 @@ export default {
     },
 };
 
-class ACHandler extends defaultAutocompleteHandler {
+class ACHandler extends DefaultAutocompleteHandler {
     // eslint-disable-next-line class-methods-use-this
     get keys() {
         return ['domain_id', 'private_ip', 'public_ip', 'id', 'suggestKey', 'server_id', '자동완성', '펭수'];
@@ -44,7 +44,7 @@ export const defaultCase = () => ({
     },
 });
 
-class CustomEnumValueHandler extends defaultAutocompleteHandler {
+class CustomEnumValueHandler extends DefaultAutocompleteHandler {
     // eslint-disable-next-line class-methods-use-this
     get keys() {
         return ['state', 'timezone'];
@@ -52,7 +52,7 @@ class CustomEnumValueHandler extends defaultAutocompleteHandler {
 
     constructor() {
         super();
-        this.handlerMap.value.push(...[
+        this.HandlerMap.value.push(...[
             getEnumValues('state', ['ENABLED', 'DISABLED']),
             getSearchEnumValues('timezone', moment.tz.names(), [
                 'UTC', 'Asia/Seoul',
