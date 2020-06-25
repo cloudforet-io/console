@@ -1,14 +1,11 @@
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import PAutocompleteInput from './AutocompleteInput.vue';
 import {
-    BaseAutocompleteHandler,
-    DefaultAutocompleteHandler, getKeys, getSuggest,
-    searchContextType,
-    SearchQuery,
+    BaseAutocompleteHandler, getSuggest,
     makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import PAutocompleteInput from './AutocompleteInput.vue';
 
 export default {
     title: 'organisms/forms/AutocompleteInput',
