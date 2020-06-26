@@ -8,13 +8,22 @@
             <div class="p-notice-alert" :class="item.type"
                  @click="close"
             >
-                <a class="title">{{ item.title }}</a>
-
-                <p-i v-if="item.type === 'alert'" name="ic_alert"
-                     class="alert-icon"
+                <p-i v-if="item.type === 'success'" name="ic_state_active"
+                     class="item-type-icon"
                      width="1.5rem"
                      height="1.5rem"
                 />
+                <p-i v-if="item.type === 'warning'" name="ic_list_duplication"
+                     class="item-type-icon"
+                     width="1.5rem"
+                     height="1.5rem"
+                />
+                <p-i v-if="item.type === 'alert'" name="ic_alert"
+                     class="item-type-icon"
+                     width="1.5rem"
+                     height="1.5rem"
+                />
+                <a class="title">{{ item.title }}</a>
                 <div class="contents">
                     {{ item.text }}
                 </div>
@@ -60,7 +69,8 @@ export default {
         margin: 0 2rem;
     }
     .vue-notification-wrapper {
-        margin: 2rem 0;
+        margin: 1rem 0rem;
+        overflow: visible;
     }
 </style>
 
@@ -75,15 +85,15 @@ export default {
     }
 
     .p-notice-alert {
-        @apply bg-white shadow-2xl;
+        @apply bg-white shadow-2xl rounded-sm box-border p-6 border border-gray-200;
         min-height:160px;
-        padding: 1.5rem;
+        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.08);
         .title {
+            @apply text-gray-900;
             font-size: 1.125rem;
             line-height: 1.375;
             font-weight: bold;
             text-transform: capitalize;
-            text-decoration: underline;
         }
         .contents {
             margin-top: 1rem;
@@ -99,7 +109,8 @@ export default {
         @mixin notice-color warning, theme('colors.coral.default');
         @mixin notice-color success, theme('colors.safe');
     }
-    .alert-icon {
-        float: right;
+    .item-type-icon {
+        float: left;
+        padding-right: 0.5rem;
     }
 </style>
