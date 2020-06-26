@@ -5,7 +5,14 @@
                       :value="searchText"
                       :disabled="disabled"
                       :placeholder="searchPlaceholder"
-                      v-on="inputListeners"
+                      @input="$emit('update:searchText',$event)"
+                      @keyup.enter="onSearch"
+                      @keyup.down="$emit('onDownKey',$event)"
+                      @keyup.esc="$emit('onEscKey',$event)"
+                      @focus="proxyFocused = true"
+                      @blur="proxyFocused = false"
+                      @mouseover="onMouseOver"
+                      @mouseout="onMouseOut"
         />
         <div class="p-search-btn"
              @mouseover="onMouseOver"
@@ -73,42 +80,6 @@ export default {
             onMouseOut,
             bindClass,
             isMouseOver,
-            inputListeners: computed(() => ({
-                ...vm.$listeners,
-                input(e) {
-                    emit('update:searchText', e);
-                    if (vm.$listeners.input) vm.$listeners.input(e);
-                },
-                'keyup.enter': (e) => {
-                    onSearch();
-                    if (vm.$listeners['keyup.enter']) vm.$listeners['keyup.enter'](e);
-                },
-                'keyup.down': (e) => {
-                    emit('onDownKey', e);
-                    if (vm.$listeners['keyup.down']) vm.$listeners['keyup.down'](e);
-                },
-                'keyup.esc': (e) => {
-                    emit('onEscKey', e);
-                    if (vm.$listeners['keyup.esc']) vm.$listeners['keyup.esc'](e);
-                },
-                focus(e) {
-                    proxyFocused.value = true;
-                    if (vm.$listeners.focus) vm.$listeners.focus(e);
-                },
-                blur(e) {
-                    proxyFocused.value = false;
-                    if (vm.$listeners.blur) vm.$listeners.blur(e);
-                },
-                mouseover(e) {
-                    if (vm.$listeners.mouseover) vm.$listeners.mouseover(e);
-                    else onMouseOver();
-                },
-                mouseout(e) {
-                    if (vm.$listeners.mouseout) vm.$listeners.mouseout(e);
-                    else onMouseOut();
-                },
-
-            })),
         };
     },
 };
