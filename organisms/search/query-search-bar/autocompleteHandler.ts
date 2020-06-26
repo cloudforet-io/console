@@ -10,6 +10,7 @@ import {
 } from '@/components/organisms/search/query-search-bar/type';
 import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
 import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
+import {ListAction, QueryAPI} from "@/lib/fluent-api";
 
 export class SearchQuery implements SearchQueryType {
     constructor(public key, public operator, public value) { }
@@ -168,7 +169,7 @@ export const getFetchValues = function (key: string, urlPath: string, parent: an
  *
  * @description Get Auto Complete Handler for values
  */
-export function getValueHandler<api extends StatQueryAPI<any, any> = StatQueryAPI<any, any>>(key: string, action: api, limit = 10, matchKey?: string): ACFunction {
+export function getValueHandler<api extends StatQueryAPI<any, any>|QueryAPI<any, any> = StatQueryAPI<any, any>>(key: string, action: api, limit = 10, matchKey?: string): ACFunction {
     return async (contextType: CONTEXT_MENU_TYPE, inputText: string, searchQuery: FilterItem): Promise<AutoCompleteData> => {
         if (searchQuery.key === key) {
             const realKey = matchKey || searchQuery.key;
@@ -194,7 +195,7 @@ export function getValueHandler<api extends StatQueryAPI<any, any> = StatQueryAP
  * * @description Get Auto Complete Handler List for values
  */
 
-export function makeValueHandlers<api extends StatQueryAPI<any, any> = StatQueryAPI<any, any>>(valuesFetchKeys: string[], action: api): ACFunction[] {
+export function makeValueHandlers<api extends StatQueryAPI<any, any>|QueryAPI<any, any> = StatQueryAPI<any, any>>(valuesFetchKeys: string[], action: api): ACFunction[] {
     if (valuesFetchKeys.length > 0) {
         return _.flatMap(valuesFetchKeys, key => getValueHandler(key, action));
     }
