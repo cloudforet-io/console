@@ -28,12 +28,11 @@ export const defaultCase = () => ({
     props: getKnobProps(autocompleteSearchProps, {
     }, {
         menu: true,
-        searchFocused: true,
-        searchText: true,
+        value: true,
     }),
     template: `
     <div style="width: 80vw;">
-        <PAutocompleteSearch v-model="searchText" 
+        <PAutocompleteSearch v-model="value" 
                              v-bind="$props"
                              :menu="menu"
                              @search="search"
@@ -55,7 +54,7 @@ export const defaultCase = () => ({
     </div>`,
     setup(props, context) {
         const state = reactive({
-            searchText: 'test',
+            value: '',
             menu: [],
         });
 
@@ -79,17 +78,14 @@ export const controlVisibleMenu = () => ({
     props: getKnobProps(autocompleteSearchProps, {
     }, {
         menu: true,
-        searchFocused: true,
-        visibleMenu: true,
-        searchText: true,
+        value: true,
     }),
     template: `
     <div style="width: 80vw;">
-        <PAutocompleteSearch v-model="searchText" 
+        <PAutocompleteSearch ref="searchRef"
+                             v-model="value" 
                              v-bind="$props"
                              :menu="menu"
-                             :visibleMenu.sync="visibleMenu"
-                             :searchFocused.sync="searchFocused"
                              @search="search"
                              @input="input"
                              class="mt-10"
@@ -109,10 +105,9 @@ export const controlVisibleMenu = () => ({
     </div>`,
     setup(props, context) {
         const state = reactive({
-            searchText: 'test',
+            value: 'test',
             menu: [],
-            visibleMenu: false,
-            searchFocused: true,
+            searchRef: null,
         });
 
         const data = arrayOf(10, () => ({ name: casual.name, phone: casual.phone }));
@@ -120,11 +115,19 @@ export const controlVisibleMenu = () => ({
         return {
             ...toRefs(state),
             data,
-            search: action('search'),
+            search: (val) => {
+                if (state.searchRef && state.searchRef.visibleMenu) {
+                    const isExist = state.menu.some(d => d.type === 'item' && d.label === val);
+                    if (isExist) {
+                        state.searchRef.hideMenu();
+                        state.searchRef.blurSearch();
+                    }
+                }
+                action('search')(val);
+            },
             input(val) {
                 action('input')(val);
-                if (val && state.menu.length > 0) state.visibleMenu = true;
-                else state.visibleMenu = false;
+                if (state.searchRef && !state.searchRef.visibleMenu) state.searchRef.showMenu();
                 state.menu = plainAutocompleteHandler(val, data, 'name');
             },
         };

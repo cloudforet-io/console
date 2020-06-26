@@ -4,18 +4,18 @@ import { get } from 'lodash';
 import Fuse, { FuseOptions, FuseResultWithScore } from 'fuse.js';
 
 export const autocompleteSearchProps = {
-    searchText: {
+    value: {
         type: String,
         default: '',
         required: true,
     },
-    searchPlaceholder: {
+    placeholder: {
         type: String,
-        default: '',
+        default: 'Search',
     },
-    searchFocused: {
+    focused: {
         type: Boolean,
-        default: undefined,
+        default: true,
     },
     menu: {
         type: Array,
@@ -25,21 +25,16 @@ export const autocompleteSearchProps = {
         type: Boolean,
         default: false,
     },
-    visibleMenu: {
-        type: Boolean,
-        default: undefined,
-    },
 };
 export interface AutocompleteSearchState {
-    searchPlaceholder: string;
+    placeholder: string;
     menu: MenuItem[];
     loading: boolean;
+    focused: boolean;
 }
 
 export interface AutocompleteSearchSyncState {
-    searchText: string;
-    searchFocused?: boolean;
-    visibleMenu?: boolean;
+    value: string;
 }
 export interface AutocompleteSearchProps extends AutocompleteSearchState, AutocompleteSearchSyncState {
 }

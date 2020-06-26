@@ -1,25 +1,28 @@
 <template>
     <div class="p-autocomplete-search">
-        <p-search :search-text.sync="proxySearchText"
-                  :search-placeholder="searchPlaceholder"
-                  :focused.sync="proxySearchFocused"
-                  @onSearch="onSearch(searchText)"
-                  @onDownKey="focusMenu"
-                  @onEscKey="allFocusOut"
+        <p-search ref="searchRef" v-model="proxyValue"
+                  :placeholder="placeholder"
+                  :focused="focused"
+                  @keyup.down="focusMenu"
+                  @keyup.esc="allFocusOut"
+                  @focus="onSearchFocus"
                   v-on="$listeners"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="{...scope, rootData}" />
+                <slot :name="slot" v-bind="{...scope}" />
             </template>
         </p-search>
-        <p-context-menu v-if="proxyVisibleMenu" ref="menuRef"
-                        theme="secondary"
-                        :menu="menu"
-                        :loading="loading"
-                        @clickMenuEvent="onClickMenuItem"
-                        @onEndOfUpKey="proxySearchFocused=true"
-                        @onEscKey="proxySearchFocused=true"
-        />
+        <template v-if="visibleMenu">
+            <p-context-menu v-if="menu.length > 0" ref="menuRef"
+                            theme="secondary"
+                            :menu="menu"
+                            :loading="loading"
+                            @clickMenuEvent="onClickMenuItem"
+                            @onEndOfUpKey="focusSearch"
+                            @onEscKey="focusSearch"
+            />
+            <slot v-else name="no-data" />
+        </template>
     </div>
 </template>
 
@@ -31,80 +34,69 @@ import {
 } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
-import PSearch from '@/components/molecules/search/Search.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
     name: 'PAutocompleteSearch',
     components: { PSearch, PContextMenu },
     model: {
-        prop: 'searchText',
-        event: 'update:searchText',
+        prop: 'value',
+        event: 'update:value',
     },
     props: autocompleteSearchProps,
     setup(props: AutocompleteSearchProps, { emit }) {
-        const state = reactive({
+        const state: any = reactive({
+            searchRef: null,
             menuRef: null,
-            proxySearchText: computed({
-                set: (val: string) => {
-                    emit('update:searchText', val);
-                    state.forceHideMenu = false;
-                },
-                get() { return props.searchText; },
-            }),
-            menuFocused: false,
-            proxySearchFocused: props.searchFocused === undefined
-                ? true
-                : makeProxy('searchFocused', props, emit),
-            proxyVisibleMenu: props.visibleMenu === undefined
-                ? computed({
-                    set(val) { state.menuFocused = val; },
-                    get() {
-                        if (state.forceHideMenu) return false;
-                        if (state.menuFocused) return true;
-                        return state.proxySearchFocused && props.menu.length !== 0;
-                    },
-                })
-                : makeProxy('visibleMenu', props, emit),
-            forceHideMenu: true,
+            proxyValue: makeProxy('value', props, emit),
+            visibleMenu: false,
         });
 
-
-        const allFocusOut = () => {
-            state.menuFocused = false;
-            state.proxySearchFocused = false;
+        const focusSearch = () => {
+            if (state.searchRef) state.searchRef.focus();
         };
+
+        const blurSearch = () => {
+            if (state.searchRef) state.searchRef.blur();
+        };
+
+        const onSearchFocus = () => {
+            state.visibleMenu = true;
+        };
+
 
         const focusMenu = () => {
             if (props.menu.length === 0) return;
+            state.visibleMenu = true;
             if (state.menuRef) {
-                state.menuFocused = true;
                 state.menuRef.focus();
-            } else {
-                state.forceHideMenu = false;
-                state.menuFocused = true;
             }
         };
 
-        const onSearch = (val: string) => {
-            emit('search', val);
+        const hideMenu = () => {
+            state.visibleMenu = false;
         };
 
-        const hideMenu = () => {
-            if (props.visibleMenu === undefined) state.proxyVisibleMenu = false;
+        const showMenu = () => {
+            state.visibleMenu = true;
+        };
+
+        const allFocusOut = () => {
+            blurSearch();
+            hideMenu();
         };
 
         const onClickMenuItem = (name, idx) => {
-            state.proxySearchText = props.menu[idx].label;
-            state.proxySearchFocused = true;
+            state.proxyValue = props.menu[idx].label;
             hideMenu();
             emit('search', props.menu[idx].label);
-            state.forceHideMenu = true;
         };
 
-        windowEventMount('click', hideMenu);
+        onMounted(() => window.addEventListener('mousedown', hideMenu));
+        onUnmounted(() => window.removeEventListener('mousedown', hideMenu));
 
         const vm: any = getCurrentInstance();
 
@@ -113,8 +105,12 @@ export default {
             ...toRefs(state),
             allFocusOut,
             focusMenu,
-            onSearch,
             onClickMenuItem,
+            onSearchFocus,
+            focusSearch,
+            blurSearch,
+            showMenu,
+            hideMenu,
         };
     },
 };

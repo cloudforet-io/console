@@ -1,15 +1,15 @@
 <template>
     <div class="p-search" :class="{
-        disabled, focused: focus
+        disabled, focused: isFocused
     }"
     >
         <slot name="left">
-            <p-i v-if="!focus && !value" class="left-icon" name="ic_search"
+            <p-i v-if="!isFocused && !value" class="left-icon" name="ic_search"
                  color="inherit"
             />
         </slot>
         <slot name="default">
-            <input v-focus.lazy="focus"
+            <input v-focus.lazy="isFocused"
                    :value="value"
                    :placeholder="placeholder"
                    :disabled="disabled"
@@ -50,8 +50,8 @@ export default {
     props: searchProps,
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentInstance;
-        const state = reactive({
-            focus: props.focused,
+        const state: any = reactive({
+            isFocused: props.focused,
         });
         return {
             ...toRefs(state),
@@ -62,11 +62,11 @@ export default {
                     makeByPassListeners(vm.$listeners, 'input', e.target.value, e);
                 },
                 blur(e) {
-                    state.focus = false;
+                    state.isFocused = false;
                     makeByPassListeners(vm.$listeners, 'blur', e);
                 },
                 focus(e) {
-                    state.focus = true;
+                    state.isFocused = true;
                     makeByPassListeners(vm.$listeners, 'focus', e);
                 },
                 keyup: (e) => {
@@ -77,6 +77,12 @@ export default {
             onDelete() {
                 emit('delete', props.value);
                 emit('update:value', '');
+            },
+            focus() {
+                state.isFocused = true;
+            },
+            blur() {
+                state.isFocused = false;
             },
         };
     },
