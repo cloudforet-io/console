@@ -8,13 +8,13 @@
 import _ from 'lodash';
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/compostion-util';
-import { querySearchProps } from '@/components/organisms/search/query-search-bar-new/QuerySearchBar.toolset';
+import { makeProxy } from '@/components/utils/composition';
+import { querySearchProps } from '@/components/organisms/search/query-search-bar-new/PQuerySearch.toolset';
 
 // regx
 
 export default {
-    name: 'PQuerySearchBar',
+    name: 'PQuerySearch',
     components: { PAutocompleteSearch },
     model: {
         prop: 'searchText',
