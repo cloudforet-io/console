@@ -1,0 +1,130 @@
+<template>
+    <div class="p-search" :class="{
+        disabled, focused: focus
+    }"
+    >
+        <slot name="left">
+            <p-i v-if="!focus && !value" class="left-icon" name="ic_search"
+                 color="inherit"
+            />
+        </slot>
+        <slot name="default">
+            <input v-focus.lazy="focus"
+                   :value="value"
+                   :placeholder="placeholder"
+                   :disabled="disabled"
+                   v-on="inputListeners"
+            >
+        </slot>
+        <slot name="right">
+            <div class="right">
+                <span v-if="value" class="delete-btn" @click="onDelete">
+                    <p-i class="icon" name="ic_delete" height="1rem"
+                         width="1rem"
+                    />
+                </span>
+                <slot name="right-extra" />
+            </div>
+        </slot>
+    </div>
+</template>
+
+<script lang="ts">
+import { focus } from 'vue-focus';
+import { searchProps } from '@/components/molecules/search/PSearch.toolset';
+import {
+    getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import PI from '@/components/atoms/icons/PI.vue';
+import { makeByPassListeners } from '@/components/utils/composition';
+
+export default {
+    name: 'PSearch',
+    components: { PI },
+    directives: { focus },
+    model: {
+        prop: 'value',
+        event: 'update:value',
+    },
+    props: searchProps,
+    setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentInstance;
+        const state = reactive({
+            focus: props.focused,
+        });
+        return {
+            ...toRefs(state),
+            inputListeners: {
+                ...vm.$listeners,
+                input(e) {
+                    emit('update:value', e.target.value);
+                    makeByPassListeners(vm.$listeners, 'input', e.target.value, e);
+                },
+                blur(e) {
+                    state.focus = false;
+                    makeByPassListeners(vm.$listeners, 'blur', e);
+                },
+                focus(e) {
+                    state.focus = true;
+                    makeByPassListeners(vm.$listeners, 'focus', e);
+                },
+                keyup: (e) => {
+                    if (e.code === 'Enter') emit('search', e.target.value);
+                    makeByPassListeners(vm.$listeners, 'keyup', e);
+                },
+            },
+            onDelete() {
+                emit('delete', props.value);
+                emit('update:value', '');
+            },
+        };
+    },
+};
+</script>
+
+<style lang="postcss" scoped>
+    .p-search {
+        @apply flex items-center border border-gray-300 bg-white text-gray-900 px-3;
+        border-radius: 2px;
+        line-height: 2rem;
+        &.disabled {
+            @apply border-gray-200 bg-gray-100;
+        }
+        &.focused {
+            @apply border-secondary bg-blue-100;
+        }
+        &:hover {
+            @apply border-secondary;
+        }
+        input {
+            @apply border-0 bg-transparent flex-grow;
+            color: inherit;
+            font-size: 0.875rem;
+            appearance: none;
+            &::placeholder {
+                @apply text-gray-300;
+            }
+        }
+    }
+    .right {
+        @apply inline-flex;
+    }
+    .delete-btn {
+        @apply cursor-pointer inline-block;
+        position: relative;
+        border-radius: 100px;
+        height: 1rem;
+        width: 1rem;
+        &:hover {
+            @apply bg-gray-200;
+        }
+        .icon {
+            position: absolute;
+        }
+    }
+    .left-icon {
+        @apply text-gray-300 mr-1;
+    }
+
+</style>
