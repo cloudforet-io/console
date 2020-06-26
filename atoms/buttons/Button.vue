@@ -1,6 +1,6 @@
 <script>
 import ButtonMixin from '@/components/atoms/buttons/ButtonMixin';
-import { getBindClass } from '@/lib/functional';
+import { getBindClass } from '@/components/utils/functional';
 
 export default {
     name: 'PButton',

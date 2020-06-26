@@ -1,6 +1,6 @@
 <script>
 import PBadge from '@/components/atoms/badges/Badge';
-import { getBindClass } from '@/lib/functional';
+import { getBindClass } from '@/components/utils/functional';
 
 export default {
     name: 'PNumberBadge',

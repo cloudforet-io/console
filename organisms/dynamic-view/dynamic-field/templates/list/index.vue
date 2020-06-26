@@ -1,7 +1,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import { getBindClass } from '@/lib/functional';
+import { getBindClass } from '@/components/utils/functional';
 
 
 export default {

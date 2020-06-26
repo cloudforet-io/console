@@ -1,5 +1,5 @@
 <script>
-import { getBindClass, mergeBind } from '@/lib/functional';
+import { getBindClass, mergeBind } from '@/components/utils/functional';
 
 export default {
     name: 'PCol',

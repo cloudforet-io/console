@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getBindClass } from '@/lib/functional';
+import { getBindClass } from '@/components/utils/functional';
 import { BadgeShape } from '@/components/atoms/badges/toolset';
 
 export default {
