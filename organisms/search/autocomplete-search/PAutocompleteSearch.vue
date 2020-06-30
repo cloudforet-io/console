@@ -3,16 +3,19 @@
         <p-search ref="searchRef" v-model="proxyValue"
                   :placeholder="placeholder"
                   :focused="focused"
+                  :disable-icon="disableIcon"
+                  :is-focused.sync="proxyIsFocused"
                   @keyup.down="focusMenu"
                   @keyup.esc="allFocusOut"
                   @focus="onSearchFocus"
+                  @click.stop="showMenu"
                   v-on="$listeners"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="{...scope}" />
             </template>
         </p-search>
-        <template v-if="visibleMenu">
+        <template v-if="proxyVisibleMenu">
             <p-context-menu v-if="menu.length > 0" ref="menuRef"
                             theme="secondary"
                             :menu="menu"
@@ -20,6 +23,7 @@
                             @clickMenuEvent="onClickMenuItem"
                             @onEndOfUpKey="focusSearch"
                             @onEscKey="focusSearch"
+                            @focus="onFocusMenuItem"
             />
             <slot v-else name="no-data" />
         </template>
@@ -52,7 +56,11 @@ export default {
             searchRef: null,
             menuRef: null,
             proxyValue: makeProxy('value', props, emit),
-            visibleMenu: false,
+            isAutoMode: computed(() => props.visibleMenu === undefined),
+            proxyVisibleMenu: props.visibleMenu === undefined
+                ? false
+                : makeProxy('visibleMenu', props, emit),
+            proxyIsFocused: makeProxy('isFocused', props, emit),
         });
 
         const focusSearch = () => {
@@ -63,25 +71,18 @@ export default {
             if (state.searchRef) state.searchRef.blur();
         };
 
-        const onSearchFocus = () => {
-            state.visibleMenu = true;
-        };
-
-
-        const focusMenu = () => {
-            if (props.menu.length === 0) return;
-            state.visibleMenu = true;
-            if (state.menuRef) {
-                state.menuRef.focus();
-            }
-        };
-
         const hideMenu = () => {
-            state.visibleMenu = false;
+            if (state.isAutoMode) state.proxyVisibleMenu = false;
         };
 
         const showMenu = () => {
-            state.visibleMenu = true;
+            if (state.isAutoMode) state.proxyVisibleMenu = true;
+        };
+
+        const focusMenu = () => {
+            if (props.menu.length === 0) return;
+            showMenu();
+            if (state.menuRef) state.menuRef.focus();
         };
 
         const allFocusOut = () => {
@@ -92,25 +93,37 @@ export default {
         const onClickMenuItem = (name, idx) => {
             state.proxyValue = props.menu[idx].label;
             hideMenu();
-            emit('search', props.menu[idx].label);
+            emit('menu:select', props.menu[idx].label, idx);
         };
 
-        onMounted(() => window.addEventListener('mousedown', hideMenu));
-        onUnmounted(() => window.removeEventListener('mousedown', hideMenu));
+        const windowMousedown = (e: MouseEvent) => {
+            hideMenu();
+            emit('window:click', e);
+        };
+        onMounted(() => window.addEventListener('click', windowMousedown));
+        onUnmounted(() => window.removeEventListener('click', windowMousedown));
 
         const vm: any = getCurrentInstance();
 
+        const onFocusMenuItem = (idx: string) => {
+            emit('menu:focus', idx);
+        };
+
+        const onSearchFocus = () => {
+            showMenu();
+        };
 
         return {
             ...toRefs(state),
             allFocusOut,
             focusMenu,
             onClickMenuItem,
-            onSearchFocus,
             focusSearch,
             blurSearch,
             showMenu,
             hideMenu,
+            onFocusMenuItem,
+            onSearchFocus,
         };
     },
 };

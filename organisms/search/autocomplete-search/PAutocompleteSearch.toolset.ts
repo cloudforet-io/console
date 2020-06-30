@@ -17,6 +17,10 @@ export const autocompleteSearchProps = {
         type: Boolean,
         default: true,
     },
+    disableIcon: {
+        type: Boolean,
+        default: false,
+    },
     menu: {
         type: Array,
         default: () => [],
@@ -24,6 +28,14 @@ export const autocompleteSearchProps = {
     loading: {
         type: Boolean,
         default: false,
+    },
+    visibleMenu: {
+        type: Boolean,
+        default: undefined,
+    },
+    isFocused: {
+        type: Boolean,
+        default: undefined,
     },
 };
 export interface AutocompleteSearchState {
@@ -35,6 +47,8 @@ export interface AutocompleteSearchState {
 
 export interface AutocompleteSearchSyncState {
     value: string;
+    visibleMenu?: boolean;
+    isFocused?: boolean;
 }
 export interface AutocompleteSearchProps extends AutocompleteSearchState, AutocompleteSearchSyncState {
 }

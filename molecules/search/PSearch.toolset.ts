@@ -16,4 +16,13 @@ export const searchProps = {
         type: Boolean,
         default: false,
     },
+    disableIcon: {
+        type: Boolean,
+        default: false,
+    },
+    /** sync */
+    isFocused: {
+        type: Boolean,
+        default: undefined,
+    },
 };

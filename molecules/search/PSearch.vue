@@ -1,29 +1,30 @@
 <template>
     <div class="p-search" :class="{
-        disabled, focused: isFocused
+        disabled, focused: proxyIsFocused
     }"
     >
-        <slot name="left">
-            <p-i v-if="!isFocused && !value" class="left-icon" name="ic_search"
+        <slot name="icon" v-bind="slotBind">
+            <p-i v-if="!disableIcon && !proxyIsFocused && !value" class="left-icon" name="ic_search"
                  color="inherit"
             />
         </slot>
-        <slot name="default">
-            <input v-focus.lazy="isFocused"
+        <slot name="left" v-bind="slotBind" />
+        <slot name="default" v-bind="slotBind">
+            <input v-focus.lazy="proxyIsFocused"
                    :value="value"
                    :placeholder="placeholder"
                    :disabled="disabled"
                    v-on="inputListeners"
             >
         </slot>
-        <slot name="right">
+        <slot name="right" v-bind="slotBind">
             <div class="right">
                 <span v-if="value" class="delete-btn" @click="onDelete">
                     <p-i class="icon" name="ic_delete" height="1rem"
                          width="1rem"
                     />
                 </span>
-                <slot name="right-extra" />
+                <slot name="right-extra" v-bind="slotBind" />
             </div>
         </slot>
     </div>
@@ -33,11 +34,12 @@
 import { focus } from 'vue-focus';
 import { searchProps } from '@/components/molecules/search/PSearch.toolset';
 import {
+    computed,
     getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PI from '@/components/atoms/icons/PI.vue';
-import { makeByPassListeners } from '@/components/utils/composition';
+import { makeByPassListeners, makeProxy } from '@/components/utils/composition';
 
 export default {
     name: 'PSearch',
@@ -51,10 +53,13 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentInstance;
         const state: any = reactive({
-            isFocused: props.focused,
+            proxyIsFocused: props.isFocused === undefined
+                ? props.focused
+                : makeProxy('isFocused', props, emit),
         });
         return {
             ...toRefs(state),
+            slotBind: computed(() => ({ ...props, isFocused: state.proxyIsFocused })),
             inputListeners: {
                 ...vm.$listeners,
                 input(e) {
@@ -62,11 +67,11 @@ export default {
                     makeByPassListeners(vm.$listeners, 'input', e.target.value, e);
                 },
                 blur(e) {
-                    state.isFocused = false;
+                    state.proxyIsFocused = false;
                     makeByPassListeners(vm.$listeners, 'blur', e);
                 },
                 focus(e) {
-                    state.isFocused = true;
+                    state.proxyIsFocused = true;
                     makeByPassListeners(vm.$listeners, 'focus', e);
                 },
                 keyup: (e) => {
@@ -79,10 +84,10 @@ export default {
                 emit('update:value', '');
             },
             focus() {
-                state.isFocused = true;
+                state.proxyIsFocused = true;
             },
             blur() {
-                state.isFocused = false;
+                state.proxyIsFocused = false;
             },
         };
     },

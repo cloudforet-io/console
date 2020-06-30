@@ -92,14 +92,23 @@ export default {
             const idx = itemsIndex.value[pos];
             // eslint-disable-next-line no-unused-expressions
             document.getElementById(`context-item-${idx}-${uuid}`)?.focus();
+            context.emit('focus', idx);
         };
         const onUpKey = (idx: number) => {
             const pos = itemsIndex.value.indexOf(idx);
-            if (pos !== 0) { focus(pos - 1); } else { context.emit('onEndOfUpKey'); }
+            if (pos !== 0) {
+                focus(pos - 1);
+            } else {
+                context.emit('onEndOfUpKey');
+            }
         };
         const onDownKey = (idx) => {
             const pos = itemsIndex.value.indexOf(idx) + 1;
-            if (pos !== itemsIndex.value.length) { focus(pos); } else { context.emit('onEndOfDownKey'); }
+            if (pos !== itemsIndex.value.length) {
+                focus(pos);
+            } else {
+                context.emit('onEndOfDownKey');
+            }
         };
 
 
