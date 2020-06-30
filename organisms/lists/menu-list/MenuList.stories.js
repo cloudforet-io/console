@@ -1,6 +1,6 @@
 import { object, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PMenuList from './MenuList';
+import PMenuList from './MenuList_new.vue';
 
 export default {
     title: 'Organisms/menu-list',
