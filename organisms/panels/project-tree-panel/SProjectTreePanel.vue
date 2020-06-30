@@ -46,7 +46,6 @@
             <div v-if="hasProject">
                 <p-tree ref="treeRef"
                         class="tree tree-box"
-
                         v-bind="treeAPITS.ts.state"
                         @node:selected="update"
                         @node:unselected="update"
@@ -174,15 +173,15 @@ export default {
 <style lang="postcss" scoped>
     .tree-box{
         @apply w-full min-h-56 max-h-56 rounded-b-sm;
-        @screen lg{
-            @apply w-1/2;
-        }
+    @screen lg{
+        @apply w-1/2;
+    }
     }
     .toolbox{
         @apply flex justify-between mb-2 mt-5 align-middle items-center;
-        .msg{
-            @apply align-middle font-bold;
-        }
+    .msg{
+        @apply align-middle font-bold;
+    }
     }
     .tree{
         @apply  overflow-auto border-gray-200  border;
@@ -194,9 +193,9 @@ export default {
     }
     .alert{
         @apply text-alert align-middle;
-        .alert-msg{
-            @apply align-middle;
-        }
+    .alert-msg{
+        @apply align-middle;
+    }
     }
     .fade-in-enter-active {
         transition: opacity 0.5s, visibility 0.5s;
@@ -205,11 +204,11 @@ export default {
         transition: opacity 0.5s, visibility 0.5s;
     }
     .fade-in-enter, &.fade-in-leave-to {
-        visibility: hidden;
-        opacity: 0;
-    }
+                         visibility: hidden;
+                         opacity: 0;
+                     }
     .fade-in-leave, &.fade-in-enter-to {
-        visibility: visible;
-        opacity: 1;
-    }
+                         visibility: visible;
+                         opacity: 1;
+                     }
 </style>
