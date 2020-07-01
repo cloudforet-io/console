@@ -42,6 +42,7 @@ import {
 } from '@vue/composition-api';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 import PSearch from '@/components/molecules/search/PSearch.vue';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {
     name: 'PAutocompleteSearch',
@@ -62,6 +63,8 @@ export default {
                 : makeProxy('visibleMenu', props, emit),
             proxyIsFocused: makeProxy('isFocused', props, emit),
         });
+
+        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
 
         const focusSearch = () => {
             if (state.searchRef) state.searchRef.focus();
@@ -91,9 +94,11 @@ export default {
         };
 
         const onClickMenuItem = (name, idx) => {
-            state.proxyValue = props.menu[idx].label;
-            hideMenu();
-            emit('menu:select', props.menu[idx].label, idx);
+            if (vm.$listeners['menu:select']) emit('menu:select', props.menu[idx].label, idx);
+            else {
+                state.proxyValue = props.menu[idx].label;
+                hideMenu();
+            }
         };
 
         const windowMousedown = (e: MouseEvent) => {
@@ -102,8 +107,6 @@ export default {
         };
         onMounted(() => window.addEventListener('click', windowMousedown));
         onUnmounted(() => window.removeEventListener('click', windowMousedown));
-
-        const vm: any = getCurrentInstance();
 
         const onFocusMenuItem = (idx: string) => {
             emit('menu:focus', idx);

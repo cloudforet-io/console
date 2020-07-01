@@ -4,55 +4,54 @@
             <p-icon-button name="ic_delete" @click="emitDeleteAllTags" />
         </div>
         <div class="tags">
-            <p-tag v-for="(tag, idx) in tags" :key="idx + tag.key" class="tag"
+            <p-tag v-for="(tag, idx) in tags" :key="`${idx}-${tag.key ? tag.key.name: tag.value}`" class="tag"
                    @delete="emitDeleteTag(idx)"
             >
-                {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                <template v-if="tag.key">
+                    {{ tag.key.label }}:{{ tag.operator }} {{ tag.value }}
+                </template>
+                <template v-else>
+                    {{ tag.value }}
+                </template>
             </p-tag>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { makeByPass } from '@/lib/compostion-util';
-import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import PTag from '@/components/molecules/tags/Tag.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import {
+    QuerySearchTagsProps,
+    querySearchTagsProps,
+} from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
-interface Props {
-    tags: SearchQuery[];
-}
 
 export default {
     name: 'QuerySearchTags',
     components: { PTag, PIconButton },
-    props: {
-        tags: {
-            type: Array,
-            required: true,
-        },
-    },
-    setup(props: Props, { emit }) {
+    props: querySearchTagsProps,
+    setup(props: QuerySearchTagsProps, { emit }) {
         return {
-            emitDeleteTag: makeByPass(emit, 'deleteTag'),
-            emitDeleteAllTags: makeByPass(emit, 'deleteAllTags'),
+            emitDeleteTag(...args) { emit('delete:tag', ...args); },
+            emitDeleteAllTags(...args) { emit('delete:all', ...args); },
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.p-query-search-tags{
+.p-query-search-tags {
     display: flex;
     flex-direction: row;
     width: 100%;
-    .delete-btn{
+    .delete-btn {
         flex-grow: 0;
     }
-    .tags{
+    .tags {
         flex-grow: 1;
         margin-left: 1rem;
-        .tag{
+        .tag {
             margin-top: 0.375rem;
             margin-bottom: 0.37rem;
         }

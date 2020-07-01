@@ -33,18 +33,26 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item">
-                <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"
-                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
+                <!--                <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"-->
+                <!--                                    @newQuery="apiHandler.tableTS.querySearch.addTag"-->
+                <!--                />-->
+                <p-query-search v-model="apiHandler.tableTS.querySearch.state.searchText"
+                                v-bind="apiHandler.tableTS.querySearch.state"
+                                @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
+                                @key:input="apiHandler.tableTS.querySearch.onKeyInput"
+                                @value:input="apiHandler.tableTS.querySearch.onValueInput"
+                                @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                @search="apiHandler.tableTS.querySearch.onSearch"
                 />
             </div>
         </template>
         <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" #toolbox-bottom>
             <p-col :col="12">
                 <p-hr style="width: 100%;" />
-                <p-query-search-tags style="margin-top: .5rem;"
+                <p-query-search-tags style="margin-top: 0.5rem;"
                                      :tags="apiHandler.tableTS.querySearch.tags.value"
-                                     @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
-                                     @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
+                                     @delete:tag="apiHandler.tableTS.querySearch.deleteTag"
+                                     @delete:all="apiHandler.tableTS.querySearch.deleteAllTags"
                 />
             </p-col>
         </template>
@@ -67,11 +75,12 @@ import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import { QuerySearchTableAPI } from '@/lib/api/table';
+import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 
 interface DataSourceType {
     name: string;
@@ -84,7 +93,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode: boolean;
-    apiHandler: QuerySearchTableAPI;
+    apiHandler: QuerySearchTableFluentAPI;
 }
 
 interface SlotBind {
@@ -103,6 +112,7 @@ interface Field {
 export default {
     name: 'PDynamicViewQuerySearchTable',
     components: {
+        PQuerySearch,
         PDynamicField,
         PToolboxTable,
         PQuerySearchBar,
@@ -149,7 +159,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         &:last-child {
             flex-grow: 1;
         }

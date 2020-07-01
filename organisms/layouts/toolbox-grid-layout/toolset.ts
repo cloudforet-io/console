@@ -113,7 +113,7 @@ export class QuerySearchGridLayoutToolSet<initData, initSyncData> extends Toolbo
 
     static initToolSet(_this: any, ACHandlerClass: typeof BaseAutocompleteHandler, acHandlerArgs: any, changeTagCallBack?: any) {
         ToolboxGridLayoutToolSet.initToolSet(_this);
-        _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs, undefined, undefined, undefined, undefined, changeTagCallBack);
+        _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs, undefined, undefined, changeTagCallBack);
     }
 
     constructor(

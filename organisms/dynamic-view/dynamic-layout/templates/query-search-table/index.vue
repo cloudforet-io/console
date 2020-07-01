@@ -26,7 +26,7 @@
         <template #toolbox-top>
             <slot v-if="showTitle||$scopedSlots['toolbox-top']" name="toolbox-top">
                 <PPanelTop v-if="showTitle"
-                           style="margin: 0px; margin-top: 0.5rem"
+                           style="margin: 0; margin-top: 0.5rem;"
                            :use-total-count="true"
                            :total-count="apiHandler.totalCount.value"
                 >
@@ -37,26 +37,44 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item hidden lg:block">
-                <p-query-search-bar
-                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
-                    @newQuery="newQuery"
+                <!--                <p-query-search-bar-->
+                <!--                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"-->
+                <!--                    @newQuery="newQuery"-->
+                <!--                />-->
+                <p-query-search v-model="proxySearchText"
+                                v-bind="apiHandler.tableTS.querySearch.state"
+                                @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
+                                @key:input="apiHandler.tableTS.querySearch.onKeyInput"
+                                @value:input="apiHandler.tableTS.querySearch.onValueInput"
+                                @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                @search="apiHandler.tableTS.querySearch.onSearch"
                 />
             </div>
         </template>
         <template #toolbox-bottom>
             <div class="flex flex-col flex-1">
-                <p-query-search-bar
-                    class="block lg:hidden mt-4 "
-                    :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
-                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"
-                    @newQuery="newQuery"
+                <!--                <p-query-search-bar-->
+                <!--                    class="block lg:hidden mt-4 "-->
+                <!--                    :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"-->
+                <!--                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"-->
+                <!--                    @newQuery="newQuery"-->
+                <!--                />-->
+                <p-query-search v-model="proxySearchText"
+                                class="block lg:hidden mt-4"
+                                :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
+                                v-bind="apiHandler.tableTS.querySearch.state"
+                                @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
+                                @key:input="apiHandler.tableTS.querySearch.onKeyInput"
+                                @value:input="apiHandler.tableTS.querySearch.onValueInput"
+                                @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                @search="apiHandler.tableTS.querySearch.onSearch"
                 />
                 <div v-if="tags.length !==0" class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
                     <p-hr style="width: 100%;" />
-                    <p-query-search-tags style="margin-top: .5rem;"
+                    <p-query-search-tags style="margin-top: 0.5rem;"
                                          :tags="tags"
-                                         @deleteTag="deleteTag"
-                                         @deleteAllTags="deleteAllTags"
+                                         @delete:tag="deleteTag"
+                                         @delete:all="deleteAllTags"
                     />
                 </div>
                 <slot name="toolbox-bottom" />
@@ -76,14 +94,12 @@ import {
 } from '@vue/composition-api';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import { ACHandlerMeta, QuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
-    ActionAPI, BaseResources, fluentApi, GetDataAction, QueryAPI, ResourceActions,
+    ActionAPI, fluentApi, QueryAPI, ResourceActions,
 } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
@@ -93,15 +109,17 @@ import {
     makeTableSlots,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
+import { getKeyHandler, KeyItem } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 
 
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
     components: {
+        PQuerySearch,
         PDynamicField,
         PToolboxTable,
-        PQuerySearchBar,
         PHr,
         PQuerySearchTags,
         PPanelTop,
@@ -147,6 +165,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        resourceType: {
+            type: String,
+            required: true,
+        },
     },
     setup(props: DynamicLayoutProps) {
         const defaultInitData = {
@@ -171,17 +193,31 @@ export default {
         const getKeys = () => fields.value.map(field => field.name);
         const makeApiToolset = () => {
             const keys = getKeys();
-            const acMeta = {
-                handlerClass: QuerySearchTableACHandler,
-                args: {
-                    keys,
-                    suggestKeys: keys,
+            const keyItems: KeyItem[] = fields.value.map(field => ({ label: field.label || field.name, name: field.name }));
+            const acMeta: ACHandlerMeta = {
+                keyHandler: async (val: string) => {
+                    let res = keyItems;
+                    if (val) {
+                        res = keyItems.reduce((result, item) => {
+                            if (item.label.includes(val) || item.name.includes(val)) result.push(item);
+                            return result;
+                        }, [] as KeyItem[]);
+                    }
+
+                    return res;
                 },
+                valueHandlerMap: getStatApiValueHandlerMap(
+                    keys,
+                    props.resourceType as string,
+                ),
+                suggestKeys: keys,
+
             };
             return new QuerySearchTableFluentAPI(
                 getAction(),
                 defaultInitData,
-                undefined, acMeta,
+                undefined,
+                acMeta,
             );
         };
         let apiHandler = props.toolset as QuerySearchTableFluentAPI || makeApiToolset();
@@ -223,8 +259,9 @@ export default {
                         optionsWatchStop = watch(() => props.options, async (aft, bef) => {
                             if (aft && aft !== bef) {
                                 const keys = getKeys();
-                                apiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
-                                apiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
+                                apiHandler.tableTS.querySearch.keyHandler = getKeyHandler(keys);
+                                apiHandler.tableTS.querySearch.valueHandlerMap = getStatApiValueHandlerMap(keys, props.resourceType as string);
+                                apiHandler.tableTS.querySearch.suggestKeys = keys;
                                 exportToolSet.action = exportAction.setDataSource(aft.fields || []);
                                 await resetAction();
                             }
@@ -250,18 +287,14 @@ export default {
 
 
         const proxySearchText = computed({
-            get: () => apiHandler.tableTS.querySearch.state.searchText,
+            get: () => apiHandler.tableTS.querySearch.syncState.value,
             set: (value) => {
-                if (value !== apiHandler.tableTS.querySearch.state.searchText) {
-                    apiHandler.tableTS.querySearch.state.searchText = value;
+                if (value !== apiHandler.tableTS.querySearch.syncState.value) {
+                    apiHandler.tableTS.querySearch.syncState.value = value;
                 }
             },
         });
 
-        const newQuery = (query) => {
-            apiHandler.tableTS.querySearch.addTag(query);
-        };
-        const acHandler = computed(() => apiHandler.tableTS.querySearch.acHandler.value);
         const tags = computed(() => apiHandler.tableTS.querySearch.tags.value || []);
         const deleteTag = (event) => {
             apiHandler.tableTS.querySearch.deleteTag(event);
@@ -276,10 +309,7 @@ export default {
             getData,
             apiHandler,
             exportExcel,
-
             proxySearchText,
-            newQuery,
-            acHandler,
             tags,
             deleteTag,
             deleteAllTags,
@@ -288,14 +318,14 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         &:last-child {
             flex-grow: 1;
         }
     }
-    .s-dynamic-layout-query-search-table{
-        >>> .toolbox{
-            .toolbox-bottom{
+    .s-dynamic-layout-query-search-table {
+        >>> .toolbox {
+            .toolbox-bottom {
                 @apply mt-0;
             }
         }

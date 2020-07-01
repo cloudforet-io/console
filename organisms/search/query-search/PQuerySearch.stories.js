@@ -8,8 +8,7 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import PQuerySearch from './PQuerySearch.vue';
-import { querySearchProps, keyHandler, plainStringHandler } from './PQuerySearch.toolset';
-import { OPERATOR_MAP } from '../../../../lib/api/query';
+import { querySearchProps } from './PQuerySearch.toolset';
 import casual, { arrayOf } from '../../../../lib/casual';
 
 export default {
@@ -30,15 +29,15 @@ export const defaultCase = () => ({
     props: getKnobProps(querySearchProps, {
     }, {
         value: true,
-        contextItems: true,
-        items: true,
+        keyItems: true,
+        valueItems: true,
     }),
     template: `
     <div style="width: 80vw;">
         <PQuerySearch v-bind="$props"
                       v-model="value"
-                      :contextItems="contextItems"
-                      :items="items"
+                      :keyItems="keyItems"
+                      :valueItems="valueItems"
                       @key:select="onKeySelect"
                       @search="onSearch"
                       @key:input="onKeyInput"
@@ -57,8 +56,8 @@ export const defaultCase = () => ({
 
         const state = reactive({
             value: '',
-            contextItems: keyItems,
-            items: [],
+            keyItems,
+            valueItems: [],
             queries: [],
         });
 
@@ -69,10 +68,36 @@ export const defaultCase = () => ({
             project_group_id: arrayOf(10, () => casual.make_id('pg')),
         };
 
+
+        const keyHandler = (inputText) => {
+            let res = keyItems;
+            if (inputText) {
+                res = keyItems.reduce((result, item) => {
+                    if (item.label.includes(inputText) || item.name.includes(inputText)) result.push(item);
+                    return result;
+                }, []);
+            }
+
+            return res;
+        };
+
+        const valueHandler = (inputText, keyItem) => {
+            const items = valueItems[keyItem.name];
+            let res = items;
+            if (inputText) {
+                res = items.reduce((result, d) => {
+                    if (d.includes(inputText)) result.push(d);
+                    return result;
+                }, []);
+            }
+
+            return res;
+        };
+
         return {
             ...toRefs(state),
             onKeySelect(keyItem) {
-                state.items = valueItems[keyItem.name];
+                state.valueItems = valueHandler('', keyItem);
                 action('key:select')(keyItem);
             },
             onSearch(query) {
@@ -80,11 +105,11 @@ export const defaultCase = () => ({
                 action('search')(query);
             },
             onKeyInput(val) {
-                state.contextItems = keyHandler(val, keyItems);
+                state.keyItems = keyHandler(val);
                 action('key:input')(val);
             },
             onValueInput(val, keyItem) {
-                state.items = plainStringHandler(val, valueItems[keyItem.name]);
+                state.valueItems = valueHandler(val, keyItem);
                 action('value:input')(val, keyItem);
             },
         };

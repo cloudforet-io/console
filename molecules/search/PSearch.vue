@@ -75,7 +75,7 @@ export default {
                     makeByPassListeners(vm.$listeners, 'focus', e);
                 },
                 keyup: (e) => {
-                    if (e.code === 'Enter') emit('search', e.target.value);
+                    if (e.code === 'Enter') emit('search', props.value, e);
                     makeByPassListeners(vm.$listeners, 'keyup', e);
                 },
             },
