@@ -38,13 +38,12 @@
                 {{ $t('ACTION.PROJECT.SELECT_PROJECT_FOR',{resource:resourceName}) }}
             </span>
             <p-icon-button
-                    name="ic_refresh"
-                    @click="refreshProject"
+                name="ic_refresh"
+                @click="refreshProject"
             />
         </div>
 
         <div class="body-container">
-
             <div ref="treeContainer" class="tree-container">
                 <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
                              v-bind="treeApiHandler.ts.state"
@@ -67,6 +66,11 @@
                         />
                         <p-radio v-else-if="data.item_type === 'PROJECT'"
                                  :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
+                        />
+                    </template>
+                    <template #toggle-right="{data}">
+                        <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                             width="0.9rem"
                         />
                     </template>
                 </p-tree-node>
@@ -240,6 +244,11 @@ export default {
     .tree{
         @apply  overflow-auto border-gray-200  border;
 
+    }
+    .project-group-icon {
+        @apply ml-2;
+        padding-top: 3px;
+        margin-right: 5px;
     }
     .title{
         @apply text-2xl mb-8;

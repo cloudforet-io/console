@@ -39,6 +39,11 @@
                                      :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
                             />
                         </template>
+                        <template #toggle-right="{data}">
+                            <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                                 width="0.9rem"
+                            />
+                        </template>
                     </p-tree-node>
                 </div>
                 <div class="no-select">
@@ -202,7 +207,13 @@ export default {
 .tree-container {
     @apply overflow-auto flex-grow px-2 py-4;
     height: 21.5rem;
+    .project-group-icon {
+        @apply ml-2;
+        padding-top: 3px;
+        margin-right: 5px;
+    }
 }
+
 .no-select {
     @apply border-t border-gray-200 p-4 flex items-center;
 }

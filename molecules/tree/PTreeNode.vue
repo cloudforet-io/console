@@ -31,6 +31,13 @@
                                         </slot>
                                     </slot>
                                 </span>
+                                <span v-if="$scopedSlots[`toggle-right-${level}`] || $scopedSlots[`toggle-right`]"
+                                      class="toggle-right" v-on="getListeners('toggle-right')"
+                                >
+                                    <slot :name="`toggle-right-level-${level}`" v-bind="slotBind">
+                                        <slot name="toggle-right" v-bind="slotBind" />
+                                    </slot>
+                                </span>
                                 <span v-if="$scopedSlots[`icon-${level}`] || $scopedSlots[`icon`]"
                                       class="icon" v-on="getListeners('icon')"
                                 >
