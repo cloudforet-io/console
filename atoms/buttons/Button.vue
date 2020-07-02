@@ -41,7 +41,10 @@ export default {
                         if (props.href != null && props.href.trim()) {
                             window.open(props.href);
                         }
-                        if (listeners.click) listeners.click(event);
+                        if (listeners.click) {
+                            if (typeof listeners.click === 'function') listeners.click(event);
+                            else listeners.click.forEach(func => func(event));
+                        }
                     }
                 },
             },

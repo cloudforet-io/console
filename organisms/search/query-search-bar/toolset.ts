@@ -42,6 +42,7 @@ export interface TagInfo {
  value: any;
 
 }
+
 export const parseTag = (text: string): TagInfo => {
     const keyParser = keyRegx.exec(text);
     const operatorParser = operatorRegx.exec(text);

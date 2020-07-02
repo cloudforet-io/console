@@ -162,11 +162,22 @@ export interface DataTableSelectState {
 
 
 export const initSelectState = (state: DataTablePropsType, syncState: DataTableSyncType): DataTableSelectState => {
-    const isNotSelected: Ref<boolean> = computed<boolean>(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 0 : true));
-    const isSelectOne: Ref<boolean> = computed<boolean>(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 1 : false));
-    const isSelectMulti: Ref<boolean> = computed<boolean>(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length > 1 : false));
-    const selectItems: Ref<readonly any[]> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
-    const firstSelectItem: Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(syncState.selectIndex as number[])[0]] : {}));
+    const selectItems: Ref<readonly any[]> = computed<any[]>(() => {
+        if (Array.isArray(syncState.selectIndex)) {
+            return syncState.selectIndex.reduce((res, idx) => {
+                if (state.items && state.items[idx] !== undefined && state.items[idx] !== null) res.push(state.items[idx]);
+                return res;
+            }, []);
+        } return [];
+    });
+    const isSelectOne: Ref<boolean> = computed<boolean>(() => selectItems.value.length === 1);
+    const isNotSelected: Ref<boolean> = computed<boolean>(() => selectItems.value.length === 0);
+    const isSelectMulti: Ref<boolean> = computed<boolean>(() => selectItems.value.length > 1);
+    const firstSelectItem: Ref<any> = computed(() => {
+        const item = selectItems.value[0];
+        if (item !== null && item !== undefined) return item;
+        return {};
+    });
     return reactive({
         isNotSelected,
         isSelectOne,

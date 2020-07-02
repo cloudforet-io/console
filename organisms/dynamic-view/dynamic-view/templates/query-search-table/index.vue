@@ -33,9 +33,6 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item">
-                <!--                <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"-->
-                <!--                                    @newQuery="apiHandler.tableTS.querySearch.addTag"-->
-                <!--                />-->
                 <p-query-search v-model="apiHandler.tableTS.querySearch.state.searchText"
                                 v-bind="apiHandler.tableTS.querySearch.state"
                                 @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
@@ -74,7 +71,6 @@ import {
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -115,7 +111,6 @@ export default {
         PQuerySearch,
         PDynamicField,
         PToolboxTable,
-        PQuerySearchBar,
         PCol,
         PHr,
         PQuerySearchTags,

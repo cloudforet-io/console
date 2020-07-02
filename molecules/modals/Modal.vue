@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { computed } from '@vue/composition-api';
 import { modalSizeValidator } from './toolset';
 
 
@@ -66,14 +66,14 @@ export const propsMixin = {
 };
 
 
-export default defineComponent({
+export default {
     name: 'PModal',
     // events: ['hidden', 'shown'],
     mixins: [propsMixin],
     setup(props, context) {
         return setup(props, context);
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

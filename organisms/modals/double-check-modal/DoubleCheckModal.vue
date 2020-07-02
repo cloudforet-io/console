@@ -55,7 +55,7 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const footerCancelButtonBind = reactive({
-        styleType: 'dark',
+        styleType: 'black',
         outline: true,
     });
     const footerConfirmButtonBind = computed(() => ({

@@ -130,7 +130,7 @@ export class RouterTabBarToolSet<initData, initSyncData> extends TabBarState< in
             if (!_this.isShow.value) {
                 delete query[_this.qsName.select];
             }
-            await pushRouterQuery(_this.vm, query);
+            await pushRouterQuery(query);
         };
         _this.applyDisplayRouter = (props: any) => {
             const selectItems = props[_this.qsName.select];
@@ -147,7 +147,7 @@ export class RouterTabBarToolSet<initData, initSyncData> extends TabBarState< in
             if (aft !== bef) {
                 await _this.routerPush();
             }
-        });
+        }, { lazy: true });
     }
 
 

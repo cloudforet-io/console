@@ -2,17 +2,12 @@ import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
-import { ListType, QueryAPI } from '@/lib/fluent-api';
-import { getArrayQueryString, pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
+import { pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
 import { Ref, ref, watch } from '@vue/composition-api';
 import Vue from 'vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import _ from 'lodash';
 import { isNotEmpty } from '@/lib/util';
-import {
-    ACHandlerMeta, defaultACHandler, DefaultQSGridQSPropsName, QuerySearchGridFluentAPI,
-} from '@/lib/api/grid';
-import router from "@/routes";
+import router from '@/routes';
 
 export const gridLayoutProps = {
     cardMinWidth: {
@@ -150,19 +145,20 @@ export class SelectGridLayoutToolSet<initData, initSyncData>
     // eslint-disable-next-line no-empty-function
     routerPush = async () => {}
 
+    // eslint-disable-next-line no-empty-function
     applyDisplayRouter =(...args: any[]) => {};
 
 
     static initToolSet(_this: SelectGridLayoutToolSet<any, any>) {
         _this.routerPush = async () => {
             const query = {
-                ..._this.vm.$route.query,
+                ...router.currentRoute.query,
                 [_this.qsName.select]: _this.select.value,
             };
             if (!_this.isShow.value) {
                 delete query[_this.qsName.select];
             }
-            await pushRouterQuery(_this.vm, query);
+            await pushRouterQuery(query);
         };
         _this.applyDisplayRouter = (props: any) => {
             const selectItems = props[_this.qsName.select];
@@ -170,10 +166,8 @@ export class SelectGridLayoutToolSet<initData, initSyncData>
                 _this.select.value = selectItems;
             }
             _this.isReady.value = true;
-
         };
-        watch( _this.select, async (aft, bef) => {
-            // console.debug(aft);
+        watch(_this.select, async (aft, bef) => {
             if (aft !== bef) {
                 if (_this.isReady?.value) {
                     await _this.routerPush();
@@ -184,12 +178,11 @@ export class SelectGridLayoutToolSet<initData, initSyncData>
             if (aft !== bef) {
                 await _this.routerPush();
             }
-        });
+        }, { lazy: true });
     }
 
 
     constructor(
-        public vm: Vue|ComponentInstance,
         public qsName: SelectGridQSNameType = DefaultSingleItemSelectGridQSPropsName,
         public isShow: Ref<boolean> = ref(true),
         public select: Ref<string> = ref(''),

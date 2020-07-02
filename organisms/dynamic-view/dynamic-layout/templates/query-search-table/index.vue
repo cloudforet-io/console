@@ -37,10 +37,6 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item hidden lg:block">
-                <!--                <p-query-search-bar-->
-                <!--                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"-->
-                <!--                    @newQuery="newQuery"-->
-                <!--                />-->
                 <p-query-search v-model="proxySearchText"
                                 v-bind="apiHandler.tableTS.querySearch.state"
                                 @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
@@ -53,12 +49,6 @@
         </template>
         <template #toolbox-bottom>
             <div class="flex flex-col flex-1">
-                <!--                <p-query-search-bar-->
-                <!--                    class="block lg:hidden mt-4 "-->
-                <!--                    :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"-->
-                <!--                    :search-text.sync="proxySearchText" :autocomplete-handler="acHandler"-->
-                <!--                    @newQuery="newQuery"-->
-                <!--                />-->
                 <p-query-search v-model="proxySearchText"
                                 class="block lg:hidden mt-4"
                                 :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
@@ -97,7 +87,7 @@ import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/Dyn
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 
 import PHr from '@/components/atoms/hr/Hr.vue';
-import { ACHandlerMeta, QuerySearchTableFluentAPI } from '@/lib/api/table';
+import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
     ActionAPI, fluentApi, QueryAPI, ResourceActions,
 } from '@/lib/fluent-api';
@@ -111,7 +101,7 @@ import {
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import { getKeyHandler, KeyItem } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
-import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import { ACHandlerMeta, getStatApiValueHandlerMap } from '@/lib/api/query-search';
 
 
 export default {

@@ -28,7 +28,7 @@ import {
 
 
 export default {
-    name: 'QuerySearchTags',
+    name: 'PQuerySearchTags',
     components: { PTag, PIconButton },
     props: querySearchTagsProps,
     setup(props: QuerySearchTagsProps, { emit }) {

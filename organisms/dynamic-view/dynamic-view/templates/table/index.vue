@@ -33,7 +33,7 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2">
-                <p-search :search-text.sync="apiHandler.tableTS.searchText.value" @onSearch="apiHandler.getData" />
+                <p-search v-model="apiHandler.tableTS.searchText.value" @search="apiHandler.getData" />
             </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
@@ -52,7 +52,7 @@ import { computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import PSearch from '@/components/molecules/search/Search.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 import { SearchTableAPI } from '@/lib/api/table';
 
 interface DataSourceType {
