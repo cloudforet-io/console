@@ -30,7 +30,7 @@
                     </template>
                     <template #toggle-right>
                         <p-i name="ic_tree_project-group" class="project-group-icon"
-                             width="0.9rem"
+                             width="1rem" height="1rem"
                         />
                     </template>
                     <template #right-extra="{data}">
@@ -776,7 +776,6 @@ export default {
 
     .project-group-icon {
         @apply ml-2;
-        padding-top: 3px;
         margin-right: 5px;
     }
 

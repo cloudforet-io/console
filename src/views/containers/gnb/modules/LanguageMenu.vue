@@ -1,8 +1,6 @@
 <template>
     <div>
         <p-menu-list :list-items="languages"
-                     :tooltip="tooltip"
-                     :tooltip-options="{offset: '20px'}"
                      @select="changeLanguage"
         >
             <template #contents>
@@ -16,7 +14,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+    reactive, toRefs, computed, getCurrentInstance, defineComponent, watch,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
@@ -36,7 +34,7 @@ export default defineComponent({
                 contents: LANGUAGES[lang],
                 selected: vm.$ls.user.state.language === lang,
             }))),
-            tooltip: computed(() => `Language: ${LANGUAGES[vm.$ls.user.state.language]}`),
+            // tooltip: computed(() => `Language: ${LANGUAGES[vm.$ls.user.state.language]}`),
         });
 
         const changeLanguage = async (item?: any) => {
@@ -47,7 +45,6 @@ export default defineComponent({
             }
             // document.getElementsByTagName('HTML')[0].setAttribute('lang', state.language);
         };
-
 
         changeLanguage();
 

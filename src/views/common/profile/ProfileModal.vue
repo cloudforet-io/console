@@ -186,7 +186,6 @@ export const profileSetup = (props, context) => {
     const getOwner = async (id) => {
         const res = await fluentApi.identity().domainOwner().get().setId(id)
             .execute();
-        console.log('res test', res);
         try {
             state.userState.name = res.data.name;
             state.userState.email = res.data.email;

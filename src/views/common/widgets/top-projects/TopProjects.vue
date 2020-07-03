@@ -386,8 +386,8 @@ export default {
     background-color: currentColor;
 }
 .custom-th {
-    @apply flex items-center justify-center uppercase font-bold px-1;
-    font-size: 0.75rem;
+    @apply flex items-center justify-center font-bold px-1;
+    font-size: 0.875rem;
 }
 .project-field {
     @apply truncate font-bold;

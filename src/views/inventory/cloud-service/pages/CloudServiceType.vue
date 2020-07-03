@@ -436,7 +436,7 @@ export default {
                 @apply ml-4;
                 .title{
                     padding-bottom: .3rem;
-                    font-size: 1.125rem;
+                    font-size: 1rem;
                     line-height: 120%;
                 }
                 .sub-title{
