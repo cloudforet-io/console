@@ -117,7 +117,7 @@ export default {
                         .execute();
 
                     root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'success',
                         text: 'Update Collector',

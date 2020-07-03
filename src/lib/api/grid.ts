@@ -1,6 +1,6 @@
 import { Ref, ref, watch } from '@vue/composition-api';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
-import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { ListType, QueryAPI } from '@/lib/fluent-api';
 import {
@@ -109,7 +109,7 @@ export class SearchGridFluentAPI<
 }
 
 export interface ACHandlerMeta {
-    handlerClass: typeof baseAutocompleteHandler;
+    handlerClass: typeof BaseAutocompleteHandler;
     args: any;
 }
 export const defaultACHandler: ACHandlerMeta = {

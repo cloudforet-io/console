@@ -117,7 +117,7 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
-import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
 
@@ -319,7 +319,7 @@ export default {
             }),
             result: {},
         });
-        const querySearch = new QuerySearchToolSet(baseAutocompleteHandler);
+        const querySearch = new QuerySearchToolSet(BaseAutocompleteHandler);
 
         const methodForm = new JsonSchemaFormToolSet();
         watch(() => state.schema, (aft, bef) => {

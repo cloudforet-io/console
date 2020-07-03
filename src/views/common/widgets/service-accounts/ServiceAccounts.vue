@@ -20,23 +20,24 @@
                            card-height="auto" :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item :icon-url="item.icon" theme="card"
-                                       default-icon="ic_provider_other"
-                                       @click="onSelected(item)"
-                    >
-                        <template #contents>
-                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
-                                 class="mx-2 text-base truncate leading-tight"
-                            >
-                                {{ item.name }}
-                            </div>
-                        </template>
-                        <template #extra>
-                            <p-badge :background-color="item.color" class="count">
-                                {{ item.count }}
-                            </p-badge>
-                        </template>
-                    </p-selectable-item>
+                    <router-link :to="item.href">
+                        <p-selectable-item :icon-url="item.icon" theme="card"
+                                           default-icon="ic_provider_other"
+                        >
+                            <template #contents>
+                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
+                                     class="mx-2 text-base truncate leading-tight"
+                                >
+                                    {{ item.name }}
+                                </div>
+                            </template>
+                            <template #extra>
+                                <p-badge :background-color="item.color" class="count">
+                                    {{ item.count }}
+                                </p-badge>
+                            </template>
+                        </p-selectable-item>
+                    </router-link>
                 </template>
             </p-grid-layout>
         </div>
@@ -92,7 +93,8 @@ export default {
 
         const api = fluentApi.statisticsTest().resource().stat<Value>()
             .addGroupKey('provider', 'provider')
-            .addGroupField('count', STAT_OPERATORS.count);
+            .addGroupField('count', STAT_OPERATORS.count)
+            .setSort('count');
 
         interface Item {
             provider: string;
@@ -100,6 +102,7 @@ export default {
             icon: string;
             color: string;
             count: number;
+            href: string;
         }
         interface StateInterface {
             loaderRef: HTMLCanvasElement | null;
@@ -141,6 +144,7 @@ export default {
                     color: yellow[500],
                     count: 0,
                     provider: '',
+                    href: '/identity/service-account',
                 };
                 const providers: ProviderInfo = providerStore.state.providers;
 
@@ -149,6 +153,7 @@ export default {
                         if (providers[d.provider]) {
                             ts.state.data.push({
                                 ...providers[d.provider],
+                                href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
                                 count: d.count,
                             });
                         } else others.count += d.count;

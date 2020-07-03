@@ -1,4 +1,5 @@
 import { fluentApi } from '@/lib/fluent-api';
+import { bypassQueryString } from '@/lib/router-query-string';
 
 const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount.vue');
 
@@ -31,6 +32,7 @@ export default {
                 {
                     path: '/',
                     name: 'serviceAccount',
+                    props: bypassQueryString,
                     component: ServiceAccount,
                 },
                 {

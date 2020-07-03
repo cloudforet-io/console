@@ -1,1 +1,0 @@
-Can NOT be tested on storybook due to Vue Router.

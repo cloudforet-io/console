@@ -86,7 +86,7 @@ export default {
             await context.parent.$http.post('/secret/secret/delete', { secret_id: items[0].secret_id }).then(async (_) => {
                 await requestCredentialsList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Selected secrets is successfully deleted.',
@@ -103,7 +103,7 @@ export default {
             await context.parent.$http.post('/secret/secret/create', item).then(async (_) => {
                 await requestCredentialsList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'New secrets has been successfully created.',

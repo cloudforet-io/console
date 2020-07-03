@@ -39,21 +39,33 @@ export interface Aggregate {
     count?: {name: string};
 }
 
+export interface AggregateState {
+    group: Group;
+    unwind: UnwindItem[];
+    count: {name: string};
+}
+
 export interface StatSort {
     name: string;
     desc: boolean;
 }
 
 export interface StatQueryState<param> extends BaseQueryState<param> {
-    aggregate: Aggregate;
-    sort?: StatSort;
+    aggregate: AggregateState;
+    distinct: string|undefined;
+    sort: StatSort|undefined;
+    limit: number|undefined;
+}
+
+export interface StatPage {
     limit?: number;
 }
 
 export interface StatQuery extends BaseQuery {
-    aggregate: Aggregate;
+    aggregate?: Aggregate;
+    distinct?: string;
     sort?: StatSort;
-    limit?: number;
+    page?: StatPage;
 }
 
 /* Resource */

@@ -37,12 +37,13 @@ import {
 import PTag from '@/components/molecules/tags/Tag.vue';
 import { tagList } from '@/components/molecules/tags/toolset';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { DataSourceItem, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import { reactive, toRefs } from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import { showErrorMessage } from '@/lib/util';
+import { makeValueHandlers } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     name: 'ProjectMemberAddModal',
@@ -80,18 +81,42 @@ export default {
             tagTools: tagList(null),
         });
         const proxyVisible = makeProxy('visible', props, context.emit);
-        const memberKeyAutoCompletes = ['user_id', 'name', 'email'];
+        // const memberKeyAutoCompletes = ['user_id', 'name', 'email'];
         const project_id = context.root.$route.params.id;
 
-        const memberACHandlerMeta = {
-            handlerClass: QuerySearchTableACHandler,
-            args: {
-                keys: memberKeyAutoCompletes,
-                suggestKeys: memberKeyAutoCompletes,
-            },
-        };
+        // const memberACHandlerMeta = {
+        //     handlerClass: QuerySearchTableACHandler,
+        //     args: {
+        //         keys: memberKeyAutoCompletes,
+        //         suggestKeys: memberKeyAutoCompletes,
+        //     },
+        // };
 
         // List api Handler for query search table
+
+        class ACHandler extends QuerySearchTableACHandler {
+            constructor(args: QSTableACHandlerArgs) {
+                super(args);
+                this.HandlerMap.value = [
+                    // ...makeValueHandlers<QueryAPI<any,any>>([
+                    //     'name',
+                    // ], projectGroupAPI.listProjects().setRecursive(true)),
+                    ...makeValueHandlers(['user_id', 'name', 'email'],
+                        fluentApi
+                            .statisticsTest()
+                            .resource()
+                            .stat()
+                            .setResourceType('identity.User')),
+                ];
+            }
+        }
+        const args = {
+            keys: [
+                'user_id', 'name', 'email',
+            ],
+            suggestKeys: ['user_id', 'name', 'email'],
+        };
+
         const MemberListAction = fluentApi.identity().user().list();
         const apiHandler = new QuerySearchTableFluentAPI(MemberListAction, {
             shadow: false,
@@ -99,7 +124,7 @@ export default {
             padding: true,
             selectable: false,
             dragable: false,
-        }, undefined, memberACHandlerMeta);
+        }, undefined, { handlerClass: ACHandler, args });
 
         const dataSource: DataSourceItem[] = [
             { name: 'ID', key: 'user_id' },
@@ -118,7 +143,7 @@ export default {
                 .execute()
                 .then(() => {
                     context.root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'Success',
                         text: 'Add Member',

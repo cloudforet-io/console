@@ -50,6 +50,7 @@
                                               :vbind="{
                                                   responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
                                                   showTitle:false,
+                                                  isShowGetData:false,
                                               }"
                             >
                                 <template #toolbox-left>
@@ -185,10 +186,27 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import {
     SearchTableFluentAPI, TabSearchTableFluentAPI,
-    defaultAdminLayout,
-
+    defaultAdminLayout, DefaultQSTableQSProps,
+    RouteSearchTableFluentAPI,
 } from '@/lib/api/table';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
+import {
+    DefaultQSGridQSProps,
+    RouteSearchGridFluentAPI,
+} from '@/lib/api/grid';
+import {
+    propsCopy,
+} from '@/lib/router-query-string';
+import {
+    SelectGridLayoutToolSet,
+    DefaultSingleItemSelectGridQSProps,
+    DefaultMultiItemSelectGridQSProps,
+    GridLayoutState, makeSelectGridQSProps, DefaultSingleItemSelectGridQSPropsName,
+} from '@/components/molecules/layouts/grid-layout/toolset';
+import {
+    DefaultMultiItemTabBarQSProps, DefaultMultiItemTabBarQSPropsName,
+    DefaultSingleItemTabBarQSProps, RouterTabBarToolSet,
+    TabBarState,
+} from '@/components/molecules/tabs/tab-bar/toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
@@ -201,13 +219,21 @@ import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
-import { get, zipObject } from 'lodash';
-import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import _, { get, zipObject } from 'lodash';
+
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+
+enum providerQsName{
+    select = 'provider'
+}
+
+const providerQsNameProps = makeSelectGridQSProps(providerQsName);
 
 export default {
     name: 'ServiceAccount',
@@ -227,6 +253,12 @@ export default {
         STagsPanel,
         SDynamicLayout,
     },
+    props: {
+        ...providerQsNameProps,
+        ...DefaultQSTableQSProps,
+        ...DefaultSingleItemTabBarQSProps,
+        ...DefaultMultiItemTabBarQSProps,
+    },
     setup(props, context) {
         const { project } = useStore();
         project.getProject();
@@ -240,7 +272,7 @@ export default {
             'template.service_account.schema',
             'capability.supported_schema',
         );
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
 
 
         const selectProvider = ref<string>('');
@@ -248,38 +280,43 @@ export default {
         const selectProviderItem = computed<ProviderModel>(() => providers.value[selectProvider.value]);
         const providerTotalCount = ref({});
 
-        const providerListState = new GridLayoutState({
-            items: computed(() => Object.values(providers.value)),
-            cardClass: (item) => {
-                const _class = ['provider-card-item', 'card-item'];
-                if (item.provider === selectProvider.value) {
-                    _class.push('selected');
-                }
-                return _class;
-            },
-            cardMinWidth: '14.125rem',
-            cardHeight: '3.5rem',
-            columnGap: '0.5rem',
-            rowGap: '0.5rem',
-            fixColumn: 1,
-        });
-
-        onMounted(async () => {
-            const resp = await providerListAPI.execute();
-            const prs = resp.data.results.map(item => item.provider);
-            providers.value = zipObject(prs, resp.data.results);
-            providerTotalCount.value = reactive<any>(zipObject(
-                prs,
-                Array(prs.length),
-            ));
-            selectProvider.value = prs[0];
-
-            prs.forEach((key) => {
-                resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).execute().then((res) => {
-                    providerTotalCount.value[key] = res.data.total_count;
-                });
+        const providerListState = new SelectGridLayoutToolSet(vm,
+            providerQsName,
+            undefined,
+            selectProvider,
+            undefined,
+            {
+                items: computed(() => Object.values(providers.value)),
+                cardClass: (item) => {
+                    const _class = ['provider-card-item', 'card-item'];
+                    if (item.provider === selectProvider.value) {
+                        _class.push('selected');
+                    }
+                    return _class;
+                },
+                cardMinWidth: '14.125rem',
+                cardHeight: '3.5rem',
+                columnGap: '0.5rem',
+                rowGap: '0.5rem',
+                fixColumn: 1,
             });
-        });
+
+        // onMounted(async () => {
+        //     const resp = await providerListAPI.execute();
+        //     const prs = resp.data.results.map(item => item.provider);
+        //     providers.value = zipObject(prs, resp.data.results);
+        //     providerTotalCount.value = reactive<any>(zipObject(
+        //         prs,
+        //         Array(prs.length),
+        //     ));
+        //     selectProvider.value = prs[0];
+        //
+        //     prs.forEach((key) => {
+        //         resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).execute().then((res) => {
+        //             providerTotalCount.value[key] = res.data.total_count;
+        //         });
+        //     });
+        // });
 
 
         const originDataSource = computed<any[]>(() => {
@@ -308,25 +345,6 @@ export default {
             createAtVF,
         ]);
 
-        const singleItemTab = new TabBarState({
-            tabs: makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['tag', 'TAB.TAG'],
-                ['credentials', 'TAB.CREDENTIALS'],
-                ['member', 'TAB.MEMBER'],
-            ]),
-        });
-        singleItemTab.syncState.activeTab = 'detail';
-
-        const multiItemTab = new TabBarState({
-            tabs: makeTrItems([
-                ['data', 'TAB.SELECTED_DATA'],
-                ['member', 'TAB.MEMBER'],
-            ]),
-        });
-        multiItemTab.syncState.activeTab = 'data';
-
-
         const ListAction = fluentApi.identity().serviceAccount().list()
             .setTransformer((resp: AxiosResponse<ServiceAccountListResp>) => {
                 const result = resp;
@@ -337,26 +355,64 @@ export default {
                 return result;
             });
 
-        const apiHandler = new SearchTableFluentAPI(ListAction, {
+        const ACHandlerMeta = {
+            handlerClass: QuerySearchTableACHandler,
+            args: {
+                keys: ['name'],
+                suggestKeys: ['name'],
+            },
+        };
+
+        const apiHandler = new RouteSearchTableFluentAPI(ListAction, {
             shadow: true,
             border: true,
             padding: true,
             selectable: true,
             excelVisible: true,
-        });
+        },
+        undefined,
+        vm, undefined, undefined);
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
-        watch(selectProvider, (after, before) => {
-            if (after && after !== before) {
-                apiHandler.resetAll();
-                apiHandler.action = ListAction.setFixFilter(
-                    { key: 'provider', operator: '=', value: after },
-                );
-                apiHandler.getData();
-                exportToolSet.action = exportAction.setDataSource(originDataSource.value);
-            }
-        });
+        // watch(selectProvider, (after, before) => {
+        //     if (after && after !== before) {
+        //         apiHandler.resetAll();
+        //         apiHandler.action = ListAction.setFixFilter(
+        //             { key: 'provider', operator: '=', value: after },
+        //         );
+        //         apiHandler.getData();
+        //         exportToolSet.action = exportAction.setDataSource(originDataSource.value);
+        //     }
+        // });
+
+        const singleItemTab = new RouterTabBarToolSet(
+            vm,
+            undefined,
+            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+            {
+                tabs: makeTrItems([
+                    ['detail', 'TAB.DETAILS'],
+                    ['tag', 'TAB.TAG'],
+                    ['credentials', 'TAB.CREDENTIALS'],
+                    ['member', 'TAB.MEMBER'],
+                ]),
+            },
+        );
+        singleItemTab.syncState.activeTab = 'detail';
+
+        const multiItemTab = new RouterTabBarToolSet(
+            vm,
+            DefaultMultiItemTabBarQSPropsName,
+            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+            {
+                tabs: makeTrItems([
+                    ['data', 'TAB.SELECTED_DATA'],
+                    ['member', 'TAB.MEMBER'],
+                ]),
+            },
+        );
+        multiItemTab.syncState.activeTab = 'data';
 
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
@@ -391,10 +447,10 @@ export default {
                 await action.setId(data.id).execute()
                     .then(() => {
                         context.root.$notify({
-                            group: 'noticeBottomRight',
+                            group: 'noticeTopRight',
                             type: 'success',
                             title: 'Success',
-                            text: 'Change Project Success',
+                            text: 'Project has been successfully changed.',
                             duration: 2000,
                             speed: 1000,
                         });
@@ -405,7 +461,7 @@ export default {
                 await action.setReleaseProject().execute()
                     .then(() => {
                         context.root.$notify({
-                            group: 'noticeBottomRight',
+                            group: 'noticeTopRight',
                             type: 'success',
                             title: 'Success',
                             text: 'Release Project Success',
@@ -505,7 +561,7 @@ export default {
             deleteAction.value.execute()
                 .then(() => {
                     context.root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'Deleted Success',
                         text: 'Delete Secret Success',
@@ -552,7 +608,7 @@ export default {
                 .execute()
                 .then(() => {
                     context.root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'Add Success',
                         text: 'Add Secret Success',
@@ -580,7 +636,6 @@ export default {
         const clickLink = () => {
             const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
             const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
-            // console.debug(linkTemplate, link);
             window.open(link);
         };
 
@@ -600,6 +655,60 @@ export default {
         //         resource: fluentApi.identity().serviceAccount().get().setId(id),
         //     };
         // });
+        const requestProvider = async () => {
+            const resp = await providerListAPI.execute();
+            const prs = resp.data.results.map(item => item.provider);
+            providers.value = zipObject(prs, resp.data.results);
+            providerTotalCount.value = reactive<any>(zipObject(
+                prs,
+                Array(prs.length),
+            ));
+            prs.forEach((key) => {
+                resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).setCountOnly().execute().then((res) => {
+                    providerTotalCount.value[key] = res.data.total_count;
+                });
+            });
+        };
+
+        const setFixFilter = (provider: string, handler: RouteSearchTableFluentAPI<any, any>, reset = true) => {
+            handler.action = ListAction.setFixFilter(
+                { key: 'provider', operator: '=', value: provider },
+            );
+            exportToolSet.action = exportAction.setDataSource(originDataSource.value);
+            if (reset) {
+                handler.resetAll();
+            }
+        };
+
+        const routerHandler = async () => {
+            const prop = propsCopy(props);
+            await requestProvider();
+            if (prop[providerQsName.select]) {
+                providerListState.applyDisplayRouter(prop);
+            } else {
+                providerListState.select.value = providerListState.state.items[0]?.provider;
+                providerListState.isReady.value = true;
+            }
+            setFixFilter(providerListState.select.value, apiHandler, false);
+            apiHandler.applyAPIRouter(prop);
+            await apiHandler.getData();
+            apiHandler.applyDisplayRouter(prop);
+            singleItemTab.applyDisplayRouter(prop);
+            multiItemTab.applyDisplayRouter(prop);
+        };
+
+        onMounted(async () => {
+            await routerHandler();
+            // const getData = _.debounce(() => apiHandler.getData(), 50);
+            let ready = false;
+            watch(selectProvider, async (after, before) => {
+                if (ready && after && after !== before) {
+                    setFixFilter(after, apiHandler);
+                    await apiHandler.getData();
+                }
+            });
+            ready = true;
+        });
 
 
         return {
@@ -631,6 +740,7 @@ export default {
             defaultAdminLayout,
             // saApi,
             saLayout,
+            routerHandler,
         };
     },
 };

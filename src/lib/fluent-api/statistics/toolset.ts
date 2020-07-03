@@ -2,10 +2,43 @@
 import { BaseQueryAPI, getBaseQueryApiState } from '@/lib/fluent-api/toolset';
 import { isNotEmpty } from '@/lib/util';
 import {
-    Aggregate, Group, GroupFieldsItem, GroupKeyItem, JoinStateItem, STAT_OPERATORS, StatQuery, StatQueryState, UnwindItem,
+    Aggregate,
+    AggregateState,
+    Group,
+    GroupFieldsItem,
+    GroupKeyItem,
+    JoinStateItem,
+    STAT_OPERATORS,
+    StatQuery,
+    StatQueryState,
+    UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
 import { ApiType } from '@/lib/fluent-api/type';
 import _ from 'lodash';
+
+
+export const getInitStatQueryState = <parameter=undefined>(): StatQueryState<parameter> => ({
+    aggregate: {
+        unwind: [],
+        group: {
+            keys: [],
+            fields: [],
+        },
+        count: undefined,
+    },
+    distinct: undefined,
+    sort: undefined,
+    limit: undefined,
+    ...getBaseQueryApiState<parameter>(),
+} as unknown as StatQueryState<parameter>);
+
+export const getInitJoinState = (): JoinStateItem => ({
+    keys: [],
+    type: '',
+    resource_type: '',
+    query: getInitStatQueryState(),
+});
+
 
 export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
     protected apiState: StatQueryState<parameter> ;
@@ -18,15 +51,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
     ) {
         super(api, baseUrl, undefined, transformer);
         this.apiState = {
-            aggregate: {
-                unwind: [],
-                group: {
-                    keys: [],
-                    fields: [],
-                },
-                count: undefined,
-            },
-            ...getBaseQueryApiState<parameter>(),
+            ...getInitStatQueryState<parameter>(),
             ...initState,
         };
     }
@@ -45,9 +70,10 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
     protected getStatisticsQuery<Q extends StatQuery>(query: Q, state?: StatQueryState<any>): Q {
         const apiState = state || this.apiState;
-        query.aggregate = this.getAggregate(apiState);
         if (isNotEmpty(apiState.sort)) query.sort = apiState.sort;
-        if (isNotEmpty(apiState.limit)) query.limit = apiState.limit;
+        if (apiState.limit !== undefined) query.page = { limit: apiState.limit };
+        if (apiState.distinct === undefined) query.aggregate = this.getAggregate(apiState);
+        else query.distinct = apiState.distinct;
         return this.getBaseQuery<Q>(query, state) as Q;
     }
 
@@ -56,7 +82,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         ...this.apiState.extraParameter,
     });
 
-    setAggregate(aggregate: Aggregate): this {
+    setAggregate(aggregate: AggregateState): this {
         const api = this.clone();
         api.apiState.aggregate = aggregate;
         return api;
@@ -102,7 +128,7 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
     addUnwind(unwind: UnwindItem): this {
         const api = this.clone();
-        api.apiState.aggregate.unwind?.push(unwind);
+        if (api.apiState.aggregate.unwind) api.apiState.aggregate.unwind.push(unwind);
         return api;
     }
 
@@ -123,26 +149,13 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
         api.apiState.limit = limit;
         return api;
     }
+
+    setDistinct(distinct: string): this {
+        const api = this.clone();
+        api.apiState.distinct = distinct;
+        return api;
+    }
 }
-
-export const getInitStatQueryState = (): StatQueryState<undefined> => ({
-    aggregate: {
-        unwind: [],
-        group: {
-            keys: [],
-            fields: [],
-        },
-        count: undefined,
-    },
-    ...getBaseQueryApiState<undefined>(),
-} as unknown as StatQueryState<undefined>);
-
-export const getInitJoinState = (): JoinStateItem => ({
-    keys: [],
-    type: '',
-    resource_type: '',
-    query: getInitStatQueryState(),
-});
 
 export abstract class StatAction<parameter, resp> extends StatQueryAPI<parameter, resp> {
     protected path = 'stat';

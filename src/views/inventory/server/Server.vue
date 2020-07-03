@@ -154,7 +154,7 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { fluentApi, MultiItemAction } from '@/lib/fluent-api';
 import {
     getEnumValues,
-    getFetchValues,
+    getFetchValues, getValueHandler, makeValueHandlers,
     makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -228,37 +228,27 @@ export default {
         }));
 
         class ACHandler extends QuerySearchTableACHandler {
-            // eslint-disable-next-line class-methods-use-this
-            get valuesFetchUrl() {
-                return '/inventory/server/list';
-            }
-
-            // eslint-disable-next-line class-methods-use-this
-            get valuesFetchKeys() {
-                return [
-                    'server_id', 'name', 'primary_ip_address',
-                    'data.compute.instance_name', 'data.compute.instance_id',
-                    'data.vm.vm_name', 'data.vm.vm_id',
-                ];
-            }
-
             constructor(args: QSTableACHandlerArgs) {
                 super(args);
-                this.handlerMap.value = [
-                    ...makeValuesFetchHandler(
-                        context.parent,
-                        '/inventory/server/list',
-                        [
-                            'server_id', 'name', 'primary_ip_address',
-                            'data.compute.instance_name', 'data.compute.instance_id',
-                            'data.vm.vm_name', 'data.vm.vm_id',
-                        ],
-                    ),
+                this.HandlerMap.value = [
+                    ...makeValueHandlers([
+                        'server_id', 'name', 'primary_ip_address',
+                        'data.compute.instance_name', 'data.compute.instance_id',
+                        'data.vm.vm_name', 'data.vm.vm_id',
+                    ], fluentApi
+                        .statisticsTest()
+                        .resource()
+                        .stat()
+                        .setResourceType('inventory.Server')),
                     getEnumValues('state', ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
                     getEnumValues('os_type', ['LINUX', 'WINDOWS']),
                     getEnumValues('collection_info.state', ['MANUAL', 'ACTIVE', 'DISCONNECTED']),
                     getEnumValues('server_type', ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
-                    getFetchValues('project_id', '/identity/project/list', context.parent),
+                    getValueHandler('project_id', fluentApi
+                        .statisticsTest()
+                        .resource()
+                        .stat()
+                        .setResourceType('identity.Project')),
                 ];
             }
         }
@@ -420,7 +410,7 @@ export default {
         const checkModalConfirm = (items: ServerModel[]) => {
             checkTableModalState.action.setIds(items.map(item => item.server_id)).execute().then(() => {
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     duration: 2000,

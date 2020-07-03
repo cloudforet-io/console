@@ -209,7 +209,7 @@ export const showErrorMessage = (errorTitle, error, root) => {
     const errorMsg = error.response.data.error.message;
     if (vmRoot) {
         vmRoot.$notify({
-            group: 'noticeBottomRight',
+            group: 'noticeTopRight',
             type: 'alert',
             title: errorTitle,
             text: errorMsg,

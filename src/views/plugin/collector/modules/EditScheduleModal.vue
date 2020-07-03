@@ -171,7 +171,7 @@ export default {
 
                 emit('success');
                 root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Add Schedule',
@@ -203,7 +203,7 @@ export default {
 
                 emit('success');
                 root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Update Schedule',

@@ -89,26 +89,33 @@
                                 />
                             </div>
                             <div class="text-content">
-                                <div class="sub-title">
-                                    {{ item.provider }} / {{ item.group }}
-                                </div>
                                 <div class="title">
-                                    {{ item.name }}
+                                    {{ item.group }}
+                                </div>
+                                <div class="sub-title">
+                                    <span class="sub-title-provider"> {{ item.provider }} </span>
+                                    <span class="sub-title-divider">
+                                        |
+                                    </span>
+                                    <span class="sub-title-name">{{ item.name }}</span>
+                                    <span v-if="statData" class="sub-title-count">
+                                        {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="statData" class="right">
-                            <div v-if="statData[item.cloud_service_type_id][newResourceCountName]" class="today-created">
-                                <p-i name="ic_list_increase" width="12px" height="12px" />
-                                <div class="number">
-                                    {{ statData[item.cloud_service_type_id][newResourceCountName] }}
-                                </div>
-                            </div>
-                            <div class="total-count">
-                                {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
-                            </div>
-                        </div>
-                        <PSkeleton v-else width="5rem" height="1.875rem" />
+                        <!--                        <div v-if="statData" class="right">-->
+                        <!--                            <div v-if="statData[item.cloud_service_type_id][newResourceCountName]" class="today-created">-->
+                        <!--                                <p-i name="ic_list_increase" width="12px" height="12px" />-->
+                        <!--                                <div class="number">-->
+                        <!--                                    {{ statData[item.cloud_service_type_id][newResourceCountName] }}-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                            <div class="total-count">-->
+                        <!--                                {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <!--                        <PSkeleton v-else width="5rem" height="1.875rem" />-->
                     </template>
                 </PToolboxGridLayout>
             </div>
@@ -249,7 +256,6 @@ export default {
             metricAPI.setFilter(
                 { key: 'cloud_service_type_id', operator: '=', value: ids },
             ).execute().then((rp) => {
-                console.debug(rp);
                 const data = {};
                 rp.data.results.forEach((item) => {
                     data[item.cloud_service_type_id] = item;
@@ -267,8 +273,8 @@ export default {
             listAction,
             {
                 cardClass: () => ['card-item', 'cst-card-item'],
-                cardMinWidth: '23rem',
-                cardHeight: '8rem',
+                cardMinWidth: '28rem',
+                cardHeight: '6rem',
                 excelVisible: false,
             },
             undefined,
@@ -285,7 +291,6 @@ export default {
                     name: item.name,
                 },
             });
-            // console.debug(item);
         };
 
         const goToServiceAccount = () => {
@@ -315,19 +320,26 @@ export default {
             data.all = total;
             providerTotalCount.value = data;
         };
+
+        const setFixFilter = (pro: string, handler: RouteSearchGridFluentAPI<any, any>, reset = true) => {
+            if (pro === 'all') {
+                handler.action = listAction.setFixFilter();
+            } else {
+                handler.action = listAction.setFixFilter(
+                    { key: 'provider', operator: '=', value: pro },
+                );
+            }
+            if (reset) {
+                handler.resetAll();
+            }
+        };
         const routerHandler = async () => {
             const prop = propsCopy(props);
             await requestProvider();
             providerListState.applyDisplayRouter(prop);
+            setFixFilter(prop.st || 'all', apiHandler, false);
             apiHandler.applyAPIRouter(prop);
             await apiHandler.getData();
-        };
-
-        const testGetData = async (resetPage: boolean) => {
-            if (resetPage) {
-                apiHandler.gridTS.syncState.thisPage = 1;
-                await apiHandler.getData();
-            }
         };
 
         onMounted(async () => {
@@ -336,14 +348,7 @@ export default {
             let ready = false;
             watch(selectProvider, (after, before) => {
                 if (ready && after && after !== before) {
-                    if (after === 'all') {
-                        apiHandler.action = listAction.setFixFilter();
-                    } else {
-                        apiHandler.action = listAction.setFixFilter(
-                            { key: 'provider', operator: '=', value: after },
-                        );
-                    }
-                    apiHandler.resetAll();
+                    setFixFilter(after, apiHandler);
                     getData();
                 }
             });
@@ -353,7 +358,6 @@ export default {
             selectProvider,
             selectProviderName,
             apiHandler,
-            testGetData,
             clickCard,
             goToServiceAccount,
             providerStore,
@@ -373,7 +377,7 @@ export default {
 
 <style lang="postcss" scoped>
     .cst-toolbox-bottom{
-        @apply flex flex-col-reverse items-start justify-between  w-full mb-4;
+        @apply flex flex-col-reverse items-start justify-between w-full mb-4;
         @screen lg {
             @apply flex-row items-center;
         }
@@ -398,7 +402,7 @@ export default {
         .left{
             @apply flex items-center;
             .title {
-                @apply ml-4 text-base;
+                @apply ml-4;
 
             }
         }
@@ -430,16 +434,28 @@ export default {
             }
             .text-content{
                 @apply ml-4;
+                .title{
+                    padding-bottom: .3rem;
+                    font-size: 1.125rem;
+                    line-height: 120%;
+                }
                 .sub-title{
                     @apply text-gray-500;
                     font-size: 0.875rem;
-                    line-height: 1.0625rem;
-                }
-                .title{
-                    @apply font-bold;
-                    font-size: 1.125rem;
-                    line-height: 1.375rem;
-
+                    line-height: 150%;
+                    .sub-title-provider {
+                        @apply text-gray-300;
+                    }
+                    .sub-title-divider {
+                        @apply px-2 text-gray-200;
+                    }
+                    .sub-title-name {
+                        @apply text-gray-500;
+                    }
+                    .sub-title-count {
+                        @apply ml-2 font-bold text-base;
+                        line-height: 150%;
+                    }
                 }
             }
         }
@@ -459,6 +475,12 @@ export default {
                 }
             }
         }
+        &:hover {
+             @apply border-gray-200 bg-blue-100;
+             cursor: pointer;
+         }
     }
-    .pagetitle{margin-bottom:0;}
+    .pagetitle{
+        margin-bottom:0;
+    }
 </style>

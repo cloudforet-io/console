@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import { readonlyArgs } from '@/lib/type';
-import { SearchQueryType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
+import { FilterItem, ListAction, QueryAPI } from '@/lib/fluent-api';
+import { StatAction, StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 
 export const OPERATOR_MAP = Object.freeze({
     '': 'contain_in', // merge operator
@@ -43,7 +45,7 @@ export interface ApiQuery {
 }
 
 export interface APIParameter{
-    query?:ApiQuery
+    query?: ApiQuery;
 }
 type ValueFormatter = (string, any) => string | number | Array<string | number>;
 /**
@@ -86,7 +88,7 @@ export const defaultQuery = (
         const filter: Filter[] = [];
 
         // eslint-disable-next-line camelcase
-        const mergeOpQuery: { [propName: string]: Filter; } = {};
+        const mergeOpQuery: { [propName: string]: Filter } = {};
         searchQueries.forEach((q) => {
             const op = OPERATOR_MAP[q.operator];
             const value = valueFormatter ? valueFormatter(q.key, q.value) : q.value;
@@ -125,7 +127,7 @@ export const defaultQuery = (
  * @param sortDesc
  * @return {{page: {start: number, limit: *}}}
  */
-export const autoCompleteQuery = (searchQuery, itemLimit?: number, sortBy?: string, sortDesc?: boolean) => {
+export const autoCompleteQuery = (searchQuery, itemLimit?: number, sortBy?: string, sortDesc?: boolean, distinct?: boolean) => {
     const query: ApiQuery = {
         page: { start: 1, limit: itemLimit },
         only: [searchQuery.key],
@@ -143,3 +145,34 @@ export const autoCompleteQuery = (searchQuery, itemLimit?: number, sortBy?: stri
     }
     return query;
 };
+
+/**
+ * set autocomplete query to given action
+ */
+export function setActionByQuery
+<api extends StatQueryAPI<any, any>|QueryAPI<any, any> = StatQueryAPI<any, any>>(
+    action: api,
+    searchQuery: FilterItem,
+    itemLimit?: number,
+    sortBy?: string,
+    sortDesc?: boolean,
+): api {
+    let api;
+    if (action instanceof StatQueryAPI) {
+        api = action.setDistinct(searchQuery.key);
+        api = api.setSort(sortBy || searchQuery.key, sortDesc === undefined ? false : sortDesc);
+        if (itemLimit) api = api.setLimit(itemLimit);
+    } else if (action instanceof QueryAPI) {
+        api = action;
+        if (sortBy) {
+            api.setSortBy(sortBy);
+            if (sortDesc !== undefined) api.setSortDesc(sortDesc);
+        }
+        if (itemLimit) api = api.setPageSize(itemLimit);
+    }
+
+
+
+    if (searchQuery.value) api = api.setFilter(searchQuery);
+    return api;
+}

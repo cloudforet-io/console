@@ -60,7 +60,7 @@ export default {
                 }
 
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Update Profile',
@@ -71,7 +71,7 @@ export default {
             } catch (e) {
                 console.error(e);
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'Request Fail',
@@ -90,7 +90,7 @@ export default {
             try {
                 const res = await context.root.$http.post('identity/domain-owner/update', params);
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Update Profile',
@@ -101,7 +101,7 @@ export default {
             } catch (e) {
                 console.error(e);
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'Request Fail',

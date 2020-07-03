@@ -113,7 +113,7 @@ import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 import { DefaultQSTableQSProps, RouteQuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
-    getEnumValues, makeValuesFetchHandler,
+    getEnumValues, getValueHandler, makeValueHandlers, makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -167,24 +167,46 @@ export default {
         const vm = getCurrentInstance() as ComponentInstance;
         const collectorApi = fluentApi.inventory().collector();
 
+        // class ACHandler extends QuerySearchTableACHandler {
+        //     get valuesFetchUrl(): string { return '/inventory/collector/list'; }
+        //
+        //     get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
+        //
+        //     constructor(args: QSTableACHandlerArgs) {
+        //         super(args);
+        //         this.HandlerMap.value = [
+        //             ...makeValuesFetchHandler(
+        //                 context.parent,
+        //                 '/inventory/collector/list',
+        //                 ['collector_id', 'name'],
+        //             ),
+        //             getEnumValues('state', ['ENABLED', 'DISABLED']),
+        //             getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+        //         ];
+        //     }
+        // }
+
+        // TODO: Apply revision of backend
         class ACHandler extends QuerySearchTableACHandler {
-            get valuesFetchUrl(): string { return '/inventory/collector/list'; }
-
-            get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
-
             constructor(args: QSTableACHandlerArgs) {
                 super(args);
-                this.handlerMap.value = [
-                    ...makeValuesFetchHandler(
-                        context.parent,
-                        '/inventory/collector/list',
-                        ['collector_id', 'name'],
-                    ),
+                this.HandlerMap.value = [
+                    ...makeValueHandlers(['collector_id', 'name', 'priority'],
+                        fluentApi
+                            .statisticsTest()
+                            .resource()
+                            .stat()
+                            .setResourceType('inventory.Collector')),
                     getEnumValues('state', ['ENABLED', 'DISABLED']),
                     getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
                 ];
             }
         }
+
+        const args = {
+            keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
+            suggestKeys: ['collector_id', 'name'],
+        };
         const apiHandler = new RouteQuerySearchTableFluentAPI(
             collectorApi.list(),
             {
@@ -198,13 +220,7 @@ export default {
                 excelVisible: true,
             },
             undefined,
-            {
-                handlerClass: ACHandler,
-                args: {
-                    keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
-                    suggestKeys: ['collector_id', 'name'],
-                },
-            },
+            { handlerClass: ACHandler, args },
             vm,
         );
 
@@ -327,7 +343,7 @@ export default {
             try {
                 await checkModalState.api.execute();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: checkModalState.title,

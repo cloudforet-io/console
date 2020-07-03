@@ -32,32 +32,38 @@
                 </template>
 
                 <!-- others -->
-                <template #col-provider-format="{value, index}">
+                <template #col-provider-format="{index, field, item}">
                     <div class="font-bold"
                          :style="{'padding-left': '1.04rem','vertical-align': 'middle'}"
                     >
-                        <span class="color" :style="{color: data[index].provider_color}"/>
-                        {{ value || 0 }}
+                        <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}`">
+                            <span class="color" :style="{color: data[index].provider_color}" />
+                            {{ item.provider || 0 }}
+                        </router-link>
                     </div>
                 </template>
-                <template #col-account_name="{value}">
-                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ value || 0 }}
+                <template #col-service_account_name="{index, field, item}">
+                    <p-td v-tooltip.bottom="{content: item.service_account_name, delay: {show: 500}}">
+                        <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}&t_se=${item.service_account_name}`">
+                            {{ item.service_account_name || 0 }}
+                        </router-link>
                     </p-td>
                 </template>
-                <template #col-server_count-format="{value}">
+                <template #col-server_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        {{ value || 0 }}
+                        <router-link :to="`/inventory/server?p=1&ps=15&f=collection_info.service_accounts%3A${item.service_account_id}&f=project_id%3A%3D${item.project_id}`">
+                            {{ item.server_count || 0 }}
+                        </router-link>
                     </div>
                 </template>
-                <template #col-cloud_service_count-format="{value}">
+                <template #col-cloud_service_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        {{ value || 0 }}
+                        {{ item.cloud_service_count || 0 }}
                     </div>
                 </template>
-                <template #col-secret_count-format="{value}">
+                <template #col-secret_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.credentials}">
-                        {{ value || 0 }}
+                        {{ item.secret_count || 0 }}
                     </div>
                 </template>
             </p-data-table>
@@ -96,10 +102,12 @@ export default {
             interface DataType {
                 provider: string;
                 provider_color: string;
+                service_account_id: string;
                 service_account_name: string;
                 server_count: number;
                 cloud_service_count: number;
                 secret_count: number;
+                project_id: string;
             }
 
             const state = reactive({
@@ -165,9 +173,11 @@ export default {
                         provider: item.provider,
                         provider_color: providers[item.provider].color,
                         service_account_name: item.service_account_name,
+                        service_account_id: item.service_account_id,
                         cloud_service_count: item?.cloud_service_count || 0,
                         server_count: item?.server_count || 0,
                         secret_count: item?.secret_count || 0,
+                        project_id: projectId.value,
                     }));
                 } catch (e) {
                     console.error(e);

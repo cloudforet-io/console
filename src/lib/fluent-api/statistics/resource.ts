@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
-import {getBaseQueryApiState, Resource, ResourceActions} from '@/lib/fluent-api/toolset';
-import {StatAction, getInitJoinState, getInitStatQueryState} from '@/lib/fluent-api/statistics/toolset';
+import { Resource, ResourceActions } from '@/lib/fluent-api/toolset';
+import { StatAction, getInitJoinState, getInitStatQueryState } from '@/lib/fluent-api/statistics/toolset';
 import {
-    Aggregate,
+    Aggregate, AggregateState,
     FormulaItem,
     Group, GroupFieldsItem, GroupKeyItem,
     JoinItem,
@@ -121,7 +121,7 @@ export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<
         return api;
     }
 
-    setJoinAggregate(aggregate: Aggregate, joinIndex = 0): this {
+    setJoinAggregate(aggregate: AggregateState, joinIndex = 0): this {
         const api = this.clone();
         this.initJoinState(api, joinIndex);
         api.apiState.extraParameter.joinState[joinIndex].query.aggregate = aggregate;
@@ -189,7 +189,7 @@ export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<
     addJoinUnwind(unwind: UnwindItem, joinIndex = 0): this {
         const api = this.clone();
         this.initJoinState(api, joinIndex);
-        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.unwind?.push(unwind);
+        api.apiState.extraParameter.joinState[joinIndex].query.aggregate.unwind.push(unwind);
         return api;
     }
 

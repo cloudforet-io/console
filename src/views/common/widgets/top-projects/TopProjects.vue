@@ -42,7 +42,6 @@
                               marginTop: '1rem'
                           }"
                           class="data-table"
-                          @rowLeftClick="onRowClick"
             >
                 <template #skeleton-rank>
                     <p-skeleton width="1.5rem" height="1.5rem" />
@@ -73,19 +72,26 @@
 
                 <!-- top 1 row -->
                 <template #row-0="{index, fields, item}">
-                    <p-tr @click="onRowClick(item)">
+                    <p-tr>
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
                         </p-td>
+
                         <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
-                            {{ item.project_group }}
+                            <router-link :to="`/project?g_p=1&g_ps=24&t_se=${item.project_group_id}`">
+                                {{ item.project_group }}
+                            </router-link>
                         </p-td>
                         <p-td v-tooltip.bottom="{content: item.project, delay: {show: 500}}" class="project-field">
-                            {{ item.project }}
+                            <router-link :to="`/project/${item.project_id}?st=summary`">
+                                {{ item.project }}
+                            </router-link>
                         </p-td>
                         <p-td class="text-center">
                             <p-badge :background-color="colors.servers">
-                                {{ item.servers || 0 }}
+                                <router-link :to="`/inventory/server?p=1&ps=15&f=project_id%3A%3D${item.project_id}`">
+                                    {{ item.servers || 0 }}
+                                </router-link>
                             </p-badge>
                         </p-td>
                         <p-td class="text-center">
@@ -97,14 +103,18 @@
                 </template>
 
                 <!-- others -->
-                <template #col-project_group="{value}">
-                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ value || 0 }}
+                <template #col-project_group="{index, field, item}">
+                    <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}">
+                        <router-link :to="`/project?g_p=1&g_ps=24&t_se=${item.project_group_id}`">
+                            {{ item.project_group }}
+                        </router-link>
                     </p-td>
                 </template>
-                <template #col-project="{value}">
-                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
-                        {{ value || 0 }}
+                <template #col-project="{index, field, item}">
+                    <p-td v-tooltip.bottom="{content: item.project, delay: {show: 500}}">
+                        <router-link :to="`/project/${item.project_id}?st=summary`">
+                            {{ item.project }}
+                        </router-link>
                     </p-td>
                 </template>
                 <template #col-rank-format="{index}">
@@ -112,9 +122,11 @@
                         {{ index + 1 }}
                     </div>
                 </template>
-                <template #col-servers-format="{value}">
+                <template #col-servers-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        {{ value || 0 }}
+                        <router-link :to="`/inventory/server?p=1&ps=15&f=project_id%3A%3D${item.project_id}`">
+                            {{ item.servers || 0 }}
+                        </router-link>
                     </div>
                 </template>
                 <template #col-cloud_services-format="{value}">
@@ -167,11 +179,11 @@ export default {
     },
     setup() {
         const vm: any = getCurrentInstance();
-
         interface Value {
             project_id: string;
             project: string;
             project_group: string;
+            project_group_id: string;
             servers?: number;
             cloud_services?: number;
             total?: number;
@@ -317,6 +329,7 @@ export default {
             .setResourceType('identity.Project')
             .addGroupKey('project_id', 'project_id')
             .addGroupKey('name', 'project')
+            .addGroupKey('project_group.project_group_id', 'project_group_id')
             .addGroupKey('project_group.name', 'project_group')
             .setJoinResourceType('inventory.Server')
             .addJoinKey('project_id')

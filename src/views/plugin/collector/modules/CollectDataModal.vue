@@ -206,7 +206,7 @@ export default {
             try {
                 await collectApi.value.execute();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Collect Data',

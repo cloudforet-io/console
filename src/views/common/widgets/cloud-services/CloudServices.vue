@@ -27,22 +27,23 @@
                     Create a Collector
                 </router-link>
                 <template v-else>
-                    <p-selectable-item v-for="(item, index) in data" :key="index"
-                                       :icon-url="iconUrl(item)" theme="card"
-                                       @click="onSelected(item, index)"
-                    >
-                        <template #contents>
-                            <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
-                                {{ item.group }}
-                            </div>
-                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
-                                {{ item.name }}
-                            </div>
-                        </template>
-                        <template #extra>
-                            <span class="count">{{ item.count || 0 }}</span>
-                        </template>
-                    </p-selectable-item>
+                    <router-link v-for="(item, index) in data" :key="index" :to="item.href">
+                        <p-selectable-item
+                                :icon-url="iconUrl(item)" theme="card"
+                        >
+                            <template #contents>
+                                <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
+                                    {{ item.group }}
+                                </div>
+                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
+                                    {{ item.name }}
+                                </div>
+                            </template>
+                            <template #extra>
+                                <span class="count">{{ item.count || 0 }}</span>
+                            </template>
+                        </p-selectable-item>
+                    </router-link>
                 </template>
             </div>
         </template>
@@ -109,6 +110,7 @@ export default {
             icon: string;
             name: string;
             count: number;
+            href: [string, object];
         }
 
         interface StateInterface {
@@ -142,7 +144,32 @@ export default {
             await providerStore.getProvider();
             try {
                 const res = await props.getAction(api).execute();
-                state.data = res.data.results;
+                if (props.projectFilter) {
+                    state.data = [
+                        ...res.data.results.map(d => ({
+                            count: d.count,
+                            group: d.group,
+                            icon: d.icon,
+                            name: d.name,
+                            provider: d.provider,
+                            href: `/inventory/cloud-service/${d.provider}/${d.group}/${d.name}?provider=${d.provider}${props.projectFilter}`,
+                        })),
+                    ];
+                } else {
+                    state.data = [
+                        ...res.data.results.map(d => ({
+                            count: d.count,
+                            group: d.group,
+                            icon: d.icon,
+                            name: d.name,
+                            provider: d.provider,
+                            href: {
+                                path: `/inventory/cloud-service/${d.provider}/${d.group}/${d.name}`,
+                                query: { provider: d.provider },
+                            },
+                        })),
+                    ];
+                }
             } catch (e) {
                 console.error(e);
             } finally {
@@ -156,18 +183,18 @@ export default {
             ...toRefs(state),
             skeletons: _.range(12),
             iconUrl: (item: Value): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
-            onSelected(item): void {
-                if (props.projectFilter) {
-                    vm.$router.push({
-                        path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}?provider=${item.provider}${props.projectFilter}`,
-                    });
-                } else {
-                    vm.$router.push({
-                        path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
-                        query: { provider: item.provider },
-                    });
-                }
-            },
+            // onSelected(item): void {
+            //     if (props.projectFilter) {
+            //         vm.$router.push({
+            //             path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}?provider=${item.provider}${props.projectFilter}`,
+            //         });
+            //     } else {
+            //         vm.$router.push({
+            //             path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
+            //             query: { provider: item.provider },
+            //         });
+            //     }
+            // },
         };
     },
 };

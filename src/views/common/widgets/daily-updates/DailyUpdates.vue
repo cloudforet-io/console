@@ -20,24 +20,24 @@
                            :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item :icon-url="item.icon" :default-icon="item.defaultIcon" theme="card"
-                                       @click="onItemClick(item)"
-                    >
-                        <template #contents>
-                            <div v-tooltip.bottom.start="{content: item.group, delay: {show: 500}}" class="group">
-                                {{ item.group }}
-                            </div>
-                            <div v-tooltip.bottom.start="{content: item.type, delay: {show: 500}}" class="type">
-                                {{ item.type }}
-                            </div>
-                        </template>
-                        <template #extra>
-                            <div class="inline-flex items-center">
-                                <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
-                                <span class="count">{{ Math.abs(item.count) }}</span>
-                            </div>
-                        </template>
-                    </p-selectable-item>
+                    <router-link :to="item.href">
+                        <p-selectable-item :icon-url="item.icon" :default-icon="item.defaultIcon" theme="card">
+                            <template #contents>
+                                <div v-tooltip.bottom.start="{content: item.group, delay: {show: 500}}" class="group">
+                                    {{ item.group }}
+                                </div>
+                                <div v-tooltip.bottom.start="{content: item.type, delay: {show: 500}}" class="type">
+                                    {{ item.type }}
+                                </div>
+                            </template>
+                            <template #extra>
+                                <div class="inline-flex items-center">
+                                    <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
+                                    <span class="count">{{ Math.abs(item.count) }}</span>
+                                </div>
+                            </template>
+                        </p-selectable-item>
+                    </router-link>
                 </template>
             </p-grid-layout>
         </template>
@@ -181,22 +181,45 @@ export default {
             state.data = [];
             await providerStore.getProvider();
             await Promise.all([getServerData(), getCloudServiceData()]);
-            state.data = [
-                ...state.serverData.map(d => ({
-                    group: 'Server',
-                    type: d.server_type,
-                    count: d.server_count,
-                    defaultIcon: 'ic_server',
-                    isServer: true,
-                })),
-                ...state.cloudServiceData.map(d => ({
-                    group: d.cloud_service_group,
-                    type: d.cloud_service_type,
-                    count: d.cloud_service_count,
-                    provider: d.provider,
-                    icon: d.icon || providerStore.state.providers[d.provider]?.icon,
-                })),
-            ];
+            if (props.projectFilter) {
+                state.data = [
+                    ...state.serverData.map(d => ({
+                        group: 'Server',
+                        type: d.server_type,
+                        count: d.server_count,
+                        defaultIcon: 'ic_server',
+                        isServer: true,
+                        href: `/inventory/server?&f=server_type%3A${d.server_type}${props.projectFilter}`,
+                    })),
+                    ...state.cloudServiceData.map(d => ({
+                        group: d.cloud_service_group,
+                        type: d.cloud_service_type,
+                        count: d.cloud_service_count,
+                        provider: d.provider,
+                        icon: d.icon || providerStore.state.providers[d.provider]?.icon,
+                        href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
+                    })),
+                ];
+            } else {
+                state.data = [
+                    ...state.serverData.map(d => ({
+                        group: 'Server',
+                        type: d.server_type,
+                        count: d.server_count,
+                        defaultIcon: 'ic_server',
+                        isServer: true,
+                        href: `/inventory/server?&f=server_type%3A${d.server_type}`,
+                    })),
+                    ...state.cloudServiceData.map(d => ({
+                        group: d.cloud_service_group,
+                        type: d.cloud_service_type,
+                        count: d.cloud_service_count,
+                        provider: d.provider,
+                        icon: d.icon || providerStore.state.providers[d.provider]?.icon,
+                        href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
+                    })),
+                ];
+            }
             state.loading = false;
         };
 
@@ -204,19 +227,19 @@ export default {
 
         return {
             ...toRefs(state),
-            onItemClick(item) {
-                // console.log('item test', item);
-                const path = item.isServer ? `/inventory/server?&f=server_type%3A${item.type}` : `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}/?`;
-                if (props.projectFilter) {
-                    vm.$router.push({
-                        path: `${path}${props.projectFilter}`,
-                    });
-                } else {
-                    vm.$router.push({
-                        path: `${path}`,
-                    });
-                }
-            },
+            // onItemClick(item) {
+            //     // console.log('item test', item);
+            //     const path = item.isServer ? `/inventory/server?&f=server_type%3A${item.type}` : `/inventory/cloud-service/${item.provider}/${item.group}/${item.type}/?`;
+            //     if (props.projectFilter) {
+            //         vm.$router.push({
+            //             path: `${path}${props.projectFilter}`,
+            //         });
+            //     } else {
+            //         vm.$router.push({
+            //             path: `${path}`,
+            //         });
+            //     }
+            // },
             getIcon(count: number): string {
                 if (count > 0) return 'ic_list_increase';
                 if (count < 0) return 'ic_list_decrease';

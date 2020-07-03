@@ -44,33 +44,36 @@
                             />
                         </template>
                     </p-field-group>
-                    <p-field-group v-if="showPassword"
-                                   :label="$t('FORM.LABEL.PWD')"
-                                   :invalid-text="invalidMsg.password"
-                                   :invalid="invalidState.password"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="userState.password" block type="password"
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                          :class="{'is-invalid': invalid}"
-                            />
-                        </template>
-                    </p-field-group>
-                    <p-field-group v-if="showPassword"
-                                   :label="$t('FORM.LABEL.PWD_CHECK')"
-                                   :invalid-text="invalidMsg.passwordCheck"
-                                   :invalid="invalidState.passwordCheck"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="userState.passwordCheck" block type="password"
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                          :class="{'is-invalid': invalid}"
-                            />
-                        </template>
-                    </p-field-group>
+                    <form class="form">
+                        <p-field-group v-if="showPassword"
+                                       :label="$t('FORM.LABEL.PWD')"
+                                       :invalid-text="invalidMsg.password"
+                                       :invalid="invalidState.password"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="userState.password" block type="password"
+                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
+
+                                              :class="{'is-invalid': invalid}"
+                                />
+                            </template>
+                        </p-field-group>
+                        <p-field-group v-if="showPassword"
+                                       :label="$t('FORM.LABEL.PWD_CHECK')"
+                                       :invalid-text="invalidMsg.passwordCheck"
+                                       :invalid="invalidState.passwordCheck"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="userState.passwordCheck" block type="password"
+                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
+                                              :class="{'is-invalid': invalid}"
+                                />
+                            </template>
+                        </p-field-group>
+                    </form>
                 </p-col>
                 <p-col class="form-div" :col="6">
-                    <p-field-group :label="$t('COMMON.PHONE')">
+                    <p-field-group :label="$t('COMMON.MOBILE')">
                         <br>
                         <p-text-input v-model="userState.mobile"
                                       block
@@ -147,9 +150,13 @@ export const profileSetup = (props, context) => {
         loading: false,
         showPassword: computed(() => state.isDomainOwner || state.isLocalType),
         userState,
-        languages: context.root.$i18n.availableLocales.map(lang => (new MenuItem(lang, LANGUAGES[lang]))),
+        // languages: context.root.$i18n.availableLocales.map(lang => (new MenuItem(lang, LANGUAGES[lang]))),
+        languages: [
+            { type: 'item', label: 'English (default)', name: 'en' },
+            { type: 'item', label: '한국어', name: 'ko' },
+        ],
         timezones: [
-            { type: 'item', label: 'UTC', name: 'UTC' },
+            { type: 'item', label: 'UTC (default)', name: 'UTC' },
             { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
         ],
         // timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
@@ -179,6 +186,7 @@ export const profileSetup = (props, context) => {
     const getOwner = async (id) => {
         const res = await fluentApi.identity().domainOwner().get().setId(id)
             .execute();
+        console.log('res test', res);
         try {
             state.userState.name = res.data.name;
             state.userState.email = res.data.email;
@@ -196,7 +204,7 @@ export const profileSetup = (props, context) => {
             .execute()
             .then(() => {
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Update Profile',
@@ -215,7 +223,7 @@ export const profileSetup = (props, context) => {
             .execute()
             .then(() => {
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'Update Profile',

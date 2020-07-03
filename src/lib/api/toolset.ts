@@ -1,10 +1,10 @@
 import { AxiosResponse } from 'axios';
 import { getCurrentInstance } from '@vue/composition-api';
 import { readonlyArgs } from '@/lib/type';
-import { SearchQueryType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import {
     ActionAPI, BaseResources,
 } from '@/lib/fluent-api';
+import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
 import { api } from './axios';
 
 export abstract class DynamicAPI {}

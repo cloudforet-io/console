@@ -114,13 +114,13 @@ import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 
-import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
+import { DataSourceItem, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import {
     QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
@@ -135,6 +135,7 @@ import {
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import { propsCopy } from '@/lib/router-query-string';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { makeValueHandlers } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     name: 'ProjectDetail',
@@ -204,7 +205,7 @@ export default {
         singleItemTab.syncState.activeTab = 'summary';
 
         // Auto Complete Handler for query search bar
-        const projectKeyAutoCompletes = ['project_id'];
+        const projectKeyAutoCompletes = ['name'];
         const projectACHandlerMeta = {
             handlerClass: QuerySearchTableACHandler,
             args: {
@@ -215,13 +216,41 @@ export default {
 
         // List api Handler for query search table
         const MemberListAction = fluentApi.identity().project().memberList().setId(projectId.value);
+
+        class ACHandler extends QuerySearchTableACHandler {
+            constructor(args: QSTableACHandlerArgs) {
+                super(args);
+                this.HandlerMap.value = [
+                    ...makeValueHandlers(['user_id'],
+                        // fluentApi
+                        //     .statisticsTest()
+                        //     .resource()
+                        //     .stat()
+                        //     .setResourceType('identity.Project')
+                        //     .setFixFilter({
+                        //         key: 'project_id',
+                        //         value: projectId.value,
+                        //         operator: FILTER_OPERATOR.in,
+                        //     })),
+                        MemberListAction),
+                ];
+            }
+        }
+        const args = {
+            keys: [
+                'user_id',
+            ],
+            suggestKeys: ['user_id'],
+        };
+
         const apiHandler = new QuerySearchTableFluentAPI(MemberListAction, {
             shadow: false,
             border: false,
             padding: true,
             selectable: true,
             dragable: true,
-        }, undefined, projectACHandlerMeta);
+        }, undefined, { handlerClass: ACHandler, args });
+
         const dataSource: DataSourceItem[] = [
             { name: 'ID', key: 'user_info.user_id' },
             { name: 'Name', key: 'user_info.name' },
@@ -265,7 +294,7 @@ export default {
                 .execute()
                 .then(() => {
                     context.root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'Success',
                         text: 'Delete Project',
@@ -295,7 +324,7 @@ export default {
                 .execute()
                 .then(() => {
                     context.root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'Success',
                         text: 'Update Project',
@@ -352,7 +381,7 @@ export default {
             await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute()
                 .then(() => {
                     context.root.$notify({
-                        group: 'noticeBottomRight',
+                        group: 'noticeTopRight',
                         type: 'success',
                         title: 'Success',
                         text: 'Sucessfully Deleted',

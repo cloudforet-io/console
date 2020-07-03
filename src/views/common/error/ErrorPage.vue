@@ -1,14 +1,17 @@
 <template>
-    <div id="oops">
-        <div id="error-text">
-            <span>404</span>
-            <p id="error-message">
-                PAGE NOT FOUND
-            </p>
-            <p id="sub-message">
-                The page you are looking for could not be found.
-            </p>
+    <div class="wrap">
+        <div class="error">
+            <div class="error-contents">
+                <img src="@/assets/images/illust_whoops.png" class="w-40 sm:w-40 md:w-40 lg:w-64 xl:w-64 error-img">
+                <p class="error-code">
+                    404
+                </p>
+                <p class="error-message">
+                    Whoops! Nothing here. <br> Try going <a href="javascript:history.go(-1)">back.</a>
+                </p>
+            </div>
         </div>
+        <footer><img src="@/assets/images/SpaceONE_logo_bottom.png" class="footer-img"></footer>
     </div>
 </template>
 
@@ -32,58 +35,33 @@ export default {
 
 
 <style lang="css" scoped>
-    * {
-        padding: 0;
-        margin: 0;
+    .wrap {
+        @apply flex min-h-screen flex-col;
     }
-    #oops  {
-        background: #ffffff;
-        text-align: center;
-        margin-bottom: 50px;
-        font-weight: 800;
-        font-size: 40px;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        line-height: 1.5em;
-        z-index: 9999;
-        left: 0px;
-    }
-    #error-text  {
-        top: 40%;
-        position: relative;
-    }
-    #error-text #error-message {
-        margin: 60px 0 0 0;
-        font-weight: 600;
-        font-size: 2rem;
-    }
-    #error-text #sub-message  {
-        color: #444444;
-        margin: -20px 0 0 0;
-        font-weight: 500;
-        font-size: 1.3rem;
-    }
-    #error-text span  {
-        position: relative;
-        background: #4568DC linear-gradient(315deg, #9921e8 0%, #5f72be 74%);
-        color: #fff;
-        font-size: 450%;
-        padding: 0 20px;
-        border-radius: 5px;
-        font-weight: 600;
-        transition: all .5s;
-        box-shadow: 5px 5px 5px 0px rgba(50, 50, 50, 0.4);
-    }
-    /* CSS Error Page Responsive */
-    @media only screen and (max-width:640px) {
 
-        #error-text span  {
-            font-size: 200%;
+    .error{
+        @apply m-auto flex-1 text-center;
+        .error-contents {
+            padding-top: calc(70% - 2.5rem);
+            .error-img {
+                @apply mx-auto align-middle;
+            }
+            .error-code {
+                @apply font-bold text-6xl text-primary pb-4;
+                line-height: 120%;
+            }
+            .error-message {
+                @apply text-lg;
+                line-height: 150%;
+                a {
+                    @apply text-blue-700;
+                }
+            }
         }
+    }
 
-        #error-text a:hover  {
-            color: #fff;
-        }
+
+    .footer-img {
+        @apply mx-auto w-24 align-middle pb-8;
     }
 </style>

@@ -8,7 +8,7 @@ import UserTemplate, { userSetup, eventNames } from '@/views/identity/user/User.
 import userEventBus from '@/views/identity/user/UserEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import {
-    defaultAutocompleteHandler,
+    DefaultAutocompleteHandler,
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { defaultQuery } from '@/lib/api/query';
@@ -18,7 +18,7 @@ export default {
     name: 'User',
     extends: UserTemplate,
     setup(props, context) {
-        class ACHandler extends defaultAutocompleteHandler {
+        class ACHandler extends DefaultAutocompleteHandler {
         // eslint-disable-next-line class-methods-use-this
             get keys() {
                 return [
@@ -52,7 +52,7 @@ export default {
             // eslint-disable-next-line no-shadow
             constructor() {
                 super();
-                this.handlerMap.value.push(...[
+                this.HandlerMap.value.push(...[
                     getEnumValues('state', ['ENABLED', 'DISABLED']),
                     getSearchEnumValues('timezone', moment.tz.names(), [
                         'UTC', 'Asia/Seoul',
@@ -125,7 +125,7 @@ export default {
             await context.parent.$http.post('/identity/user/enable', getUsersParam(items)).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'enable users',
@@ -141,7 +141,7 @@ export default {
             await context.parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'disable users',
@@ -158,7 +158,7 @@ export default {
             await context.parent.$http.post('/identity/user/delete', getUsersParam(items)).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'delete users',
@@ -175,7 +175,7 @@ export default {
             await context.parent.$http.post('/identity/user/create', item).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'add users',
@@ -192,7 +192,7 @@ export default {
             await context.parent.$http.post('/identity/user/update', item).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
-                    group: 'noticeBottomRight',
+                    group: 'noticeTopRight',
                     type: 'success',
                     title: 'success',
                     text: 'update users',
