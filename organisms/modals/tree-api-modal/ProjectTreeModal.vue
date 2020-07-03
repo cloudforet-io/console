@@ -41,7 +41,7 @@
                         </template>
                         <template #toggle-right="{data}">
                             <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
-                                 width="0.9rem"
+                                 width="1rem" height="1rem" color="inherit transparent"
                             />
                         </template>
                     </p-tree-node>
@@ -208,9 +208,7 @@ export default {
     @apply overflow-auto flex-grow px-2 py-4;
     height: 21.5rem;
     .project-group-icon {
-        @apply ml-2;
-        padding-top: 3px;
-        margin-right: 5px;
+        @apply mx-1;
     }
 }
 

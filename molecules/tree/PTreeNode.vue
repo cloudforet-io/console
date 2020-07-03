@@ -169,7 +169,7 @@ export default {
 
 <style lang="postcss" scoped>
 .basic {
-    @apply h-10 rounded-sm text-sm text-black cursor-pointer;
+    @apply h-8 rounded-sm text-sm text-black cursor-pointer;
     .node {
         @apply h-full w-full inline-flex items-center;
     }
