@@ -151,8 +151,9 @@ export default {
 
         const onMenuSelect = (value: string, idx: number) => {
             if (state.selectedKey) {
-                const val = state.valueMenu[idx].name || '';
-                emitSearch(val);
+                const val = state.valueMenu[idx].name as any;
+                if (val === undefined || val === null) emitSearch('');
+                else emitSearch(val);
             } else {
                 state.selectedKey = state.keyMenu[idx] as KeyItem;
                 emitKeySelect();
@@ -160,9 +161,9 @@ export default {
             }
         };
 
-        const onSearch = (val?: string) => {
-            console.debug('on search', val);
-            emitSearch(val ? val.trim() : '');
+        const onSearch = (val?: any) => {
+            if (val === undefined || val === null) emitSearch('');
+            else emitSearch(typeof val === 'string' ? val.trim() : val);
         };
 
         const onDelete = (e) => {
