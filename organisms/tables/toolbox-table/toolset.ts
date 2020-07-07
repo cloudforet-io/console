@@ -7,7 +7,6 @@ import {
     DataTableToolSet, LinkState,
 } from '@/components/organisms/tables/data-table/toolset';
 // eslint-disable-next-line import/no-cycle
-import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
 // eslint-disable-next-line import/no-cycle
 import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import {
@@ -15,6 +14,12 @@ import {
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
 import { Computed } from '@/lib/type';
+import {
+    KeyHandler,
+    QuerySearchToolSet,
+    ValueHandlerMap,
+} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { ChangeTagCallBack } from '@/components/molecules/tags/toolset';
 import { getAllPage } from '../../pagenations/toolset';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{
@@ -110,7 +115,7 @@ export class ToolboxTableToolSet<initData=any, initSyncData=any> extends Toolbox
          };
      }
 
-     constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
+     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
          super(initData, initSyncData);
          if (!lazy) {
              ToolboxTableToolSet.initToolSet(this);
@@ -128,7 +133,7 @@ export class SearchTableToolSet<initData=any, initSyncData=any> extends ToolboxT
         _this.searchText = ref('');
     }
 
-    constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
+    constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
         super(initData, initSyncData, true);
         if (!lazy) {
             SearchTableToolSet.initToolSet(this);
@@ -140,22 +145,27 @@ export class SearchTableToolSet<initData=any, initSyncData=any> extends ToolboxT
 export class QuerySearchTableToolSet<initData, initSyncData> extends ToolboxTableToolSet<initData, initSyncData> {
     querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
 
-    static initToolSet(_this: any, ACHandlerClass: typeof BaseAutocompleteHandler, acHandlerArgs: any, changeTagCallBack?: any) {
+    static initToolSet(_this: any,
+        keyHandler: KeyHandler,
+        valueHandlerMap: ValueHandlerMap,
+        suggestKeys: string[],
+        changeTagCallBack?: ChangeTagCallBack) {
         ToolboxTableToolSet.initToolSet(_this);
-        _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs, undefined, undefined, undefined, undefined, changeTagCallBack);
+        _this.querySearch = new QuerySearchToolSet(keyHandler, valueHandlerMap, suggestKeys, undefined, undefined, changeTagCallBack);
     }
 
     constructor(
-        ACHandlerClass: typeof BaseAutocompleteHandler = BaseAutocompleteHandler,
-        acHandlerArgs: any = {},
+        keyHandler: KeyHandler,
+        valueHandlerMap: ValueHandlerMap,
+        suggestKeys: string[],
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         lazy = false,
-        changeTagCallBack?: any,
+        changeTagCallBack?: ChangeTagCallBack,
     ) {
         super(initData, initSyncData, true);
         if (!lazy) {
-            QuerySearchTableToolSet.initToolSet(this, ACHandlerClass, acHandlerArgs, changeTagCallBack);
+            QuerySearchTableToolSet.initToolSet(this, keyHandler, valueHandlerMap, suggestKeys, changeTagCallBack);
         }
     }
 }

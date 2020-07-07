@@ -1,12 +1,8 @@
 import { reactive, Ref, ref } from '@vue/composition-api';
 
-// eslint-disable-next-line import/no-cycle
-import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
-// eslint-disable-next-line import/no-cycle
-import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import {
     HelperToolSet,
-    initReactive, optionalType, StateToolSet, SyncStateToolSet,
+    initReactive, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
 import {
     GridLayoutPropsType,
@@ -14,15 +10,12 @@ import {
     GridLayoutStateType, GridLayoutSyncStateType,
 } from '@/components/molecules/layouts/grid-layout/toolset';
 import { getAllPage } from '@/components/organisms/pagenations/toolset';
-
-export interface ToolBoxGridLayoutPropsType extends GridLayoutPropsType{
-    pagenationVisible?: boolean;
-    pageSizeVisible?: boolean;
-    refreshVisible?: boolean;
-    allPage?: number;
-    pageNationValues?: number[];
-}
-
+import {
+    KeyHandler,
+    QuerySearchToolSet,
+    ValueHandlerMap,
+} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { ChangeTagCallBack } from '@/components/molecules/tags/toolset';
 
 export interface ToolBoxGridLayoutStateType extends GridLayoutStateType{
     pagenationVisible: boolean;
@@ -78,7 +71,7 @@ export class ToolboxGridLayoutToolSet<initData=any, initSyncData=any> extends To
     static initToolSet(_this: any, ...args: any[]) {
         _this.setAllPage = (totalCount: number) => {
             _this.state.allPage = getAllPage(totalCount, (_this.syncState.pageSize));
-        }
+        };
     }
 
     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
@@ -111,21 +104,27 @@ export class SearchGridLayoutToolSet<initData=any, initSyncData=any> extends Too
 export class QuerySearchGridLayoutToolSet<initData, initSyncData> extends ToolboxGridLayoutToolSet<initData, initSyncData> {
     querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
 
-    static initToolSet(_this: any, ACHandlerClass: typeof BaseAutocompleteHandler, acHandlerArgs: any, changeTagCallBack?: any) {
+    static initToolSet(_this: any,
+        keyHandler: KeyHandler,
+        valueHandlerMap: ValueHandlerMap,
+        suggestKeys: string[],
+        changeTagCallBack?: ChangeTagCallBack) {
         ToolboxGridLayoutToolSet.initToolSet(_this);
-        _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs, undefined, undefined, undefined, undefined, changeTagCallBack);
+        _this.querySearch = new QuerySearchToolSet(keyHandler, valueHandlerMap, suggestKeys, undefined, undefined, changeTagCallBack);
     }
 
     constructor(
-        ACHandlerClass: typeof BaseAutocompleteHandler = BaseAutocompleteHandler,
-        acHandlerArgs: any = {},
+        keyHandler: KeyHandler,
+        valueHandlerMap: ValueHandlerMap,
+        suggestKeys: string[],
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         lazy = false,
+        changeTagCallBack?: ChangeTagCallBack,
     ) {
         super(initData, initSyncData, true);
         if (!lazy) {
-            QuerySearchGridLayoutToolSet.initToolSet(this, ACHandlerClass, acHandlerArgs);
+            QuerySearchGridLayoutToolSet.initToolSet(this, keyHandler, valueHandlerMap, suggestKeys, changeTagCallBack);
         }
     }
 }

@@ -4,18 +4,16 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 
-export class TagToolSet {
+export type ChangeTagCallBack<T=any> = (tags: T[]) => void;
+export class TagToolSet<T=any> {
     constructor(
-        public tags: Ref<any[]> = ref([]),
+        public tags: Ref<T[]> = ref([]),
         public checkDuplicate: boolean = true,
-        public eventBus?: any,
-        public eventName?: string,
-        public changeTagCallBack?: any,
+        public changeTagCallBack?: ChangeTagCallBack<T>,
     ) { }
 
-    setTags = (tags: any[]): void => {
+    setTags = (tags: T[]): void => {
         this.tags.value = tags;
-        if (this.eventBus && this.eventName) { this.eventBus.$emit(this.eventName, this.tags.value); }
         if (this.changeTagCallBack) { this.changeTagCallBack(this.tags.value); }
     };
 
@@ -29,11 +27,12 @@ export class TagToolSet {
         this.setTags([]);
     };
 
-    validation = value => this.tags.value.every(tag => !_.isEqual(tag, value));
+    validation = (value: T): boolean => this.tags.value.every(tag => !_.isEqual(tag, value));
 
-     addTag = (value) => {
-         const val = (typeof value === 'string') ? value.trim() : value;
-         if (!val || val === '') return;
+     addTag = (value: T) => {
+         let val: T = value;
+         if (typeof value === 'string') val = value.trim() as unknown as T;
+         if (!val) return;
          if (this.checkDuplicate && !this.validation(val)) return;
          this.setTags([...this.tags.value, val]);
      };

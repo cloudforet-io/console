@@ -1,6 +1,6 @@
 <template>
     <p-autocomplete-search ref="searchRef"
-                           v-model.trim="proxyValue"
+                           v-model="proxyValue"
                            :placeholder="placeholder"
                            :loading="loading"
                            :disable-icon="!!selectedKey"
@@ -26,7 +26,8 @@
 <script lang="ts">
 
 import {
-    ContextItem, QueryItem,
+    KeyItem,
+    QueryItem,
     QuerySearchProps,
     querySearchProps,
 } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
@@ -38,21 +39,19 @@ import {
 } from 'lodash';
 import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { OperatorType } from '@/lib/fluent-api';
 
-interface ContextMenuItem extends MenuItem {
-    data: ContextItem|null;
-}
 
 interface State {
     searchRef: any;
     visibleMenu: boolean;
     isFocused: boolean;
     proxyValue: string;
-    selectedKey: ContextItem|null;
-    operator: string;
-    keyMenu: Readonly<ContextMenuItem[]>;
+    selectedKey: KeyItem|null;
+    operator: OperatorType;
+    keyMenu: Readonly<MenuItem[]>;
     valueMenu: Readonly<MenuItem[]>;
-    menu: Readonly<MenuItem[]|ContextMenuItem[]>;
+    menu: Readonly<MenuItem[]>;
 }
 
 export default {
@@ -70,31 +69,28 @@ export default {
             isFocused: props.focused,
             proxyValue: makeProxy('value', props, emit),
             selectedKey: null,
-            operator: ':',
+            operator: '',
             keyMenu: computed(() => [
                 {
-                    label: `Key (${props.contextItems.length})`,
+                    label: `Key (${props.keyItems.length})`,
                     type: CONTEXT_MENU_TYPE.header,
-                    data: null,
                 },
-                ...props.contextItems.map(d => ({
+                ...props.keyItems.map(d => ({
                     label: d.label,
                     name: d.name,
                     type: CONTEXT_MENU_TYPE.item,
-                    data: d,
                 })),
             ]),
             valueMenu: computed(() => {
                 if (state.selectedKey === null) return [];
                 return [
                     {
-                        label: `${state.selectedKey.label} (${props.items.length})`,
+                        label: `${state.selectedKey.label} (${props.valueItems.length})`,
                         type: CONTEXT_MENU_TYPE.header,
-                        data: null,
                     },
-                    ...props.items.map(val => ({
-                        label: `${state.selectedKey?.label}${state.operator} ${val}`,
-                        name: val,
+                    ...props.valueItems.map(d => ({
+                        label: `${state.selectedKey?.label}:${state.operator} ${d}`,
+                        name: d,
                         type: CONTEXT_MENU_TYPE.item,
                     })),
                 ];
@@ -105,13 +101,16 @@ export default {
             }),
         });
 
-        const findKey = (val: string): null|ContextItem => {
-            const res = find(state.keyMenu as ContextMenuItem[],
-                (item: ContextMenuItem) => (item.label === val || item.name === val));
-            return res ? res.data : null;
+        const findKey = (val: string): null|KeyItem => {
+            const res = find(state.keyMenu as unknown as KeyItem[],
+                (item: KeyItem) => (item.label === val || item.name === val));
+            return res || null;
         };
 
-        const showMenu = () => { state.visibleMenu = true; };
+        const showMenu = () => {
+            emit('menu:show', state.proxyValue, state.selectedKey);
+            state.visibleMenu = true;
+        };
         const hideMenu = () => { state.visibleMenu = false; };
         const focus = () => { state.isFocused = true; };
 
@@ -127,10 +126,10 @@ export default {
             emit('key:select', state.selectedKey);
         };
 
-        const emitSearch = () => {
+        const emitSearch = (val: string) => {
             emit('search', {
                 key: state.selectedKey,
-                value: state.proxyValue,
+                value: val,
                 operator: state.operator,
             } as QueryItem);
             clearText();
@@ -152,17 +151,19 @@ export default {
 
         const onMenuSelect = (value: string, idx: number) => {
             if (state.selectedKey) {
-                state.proxyValue = state.valueMenu[idx].name || '';
-                emitSearch();
+                const val = state.valueMenu[idx].name as any;
+                if (val === undefined || val === null) emitSearch('');
+                else emitSearch(val);
             } else {
-                state.selectedKey = state.keyMenu[idx].data;
+                state.selectedKey = state.keyMenu[idx] as KeyItem;
                 emitKeySelect();
                 showMenu();
             }
         };
 
-        const onSearch = () => {
-            emitSearch();
+        const onSearch = (val?: any) => {
+            if (val === undefined || val === null) emitSearch('');
+            else emitSearch(typeof val === 'string' ? val.trim() : val);
         };
 
         const onDelete = (e) => {

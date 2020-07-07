@@ -63,7 +63,7 @@ export const setup = (props, context) => {
     };
 };
 
-export default defineComponent({
+export default {
     name: 'PContentModal',
     components: { PModal },
     mixins: [propsMixin],
@@ -105,7 +105,7 @@ export default defineComponent({
         },
     },
 
-});
+};
 </script>
 
 <style lang="postcss" scoped>

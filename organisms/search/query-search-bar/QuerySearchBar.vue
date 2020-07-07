@@ -3,10 +3,10 @@
         <p-search
             ref="searchBarRef"
             class="p-search"
-            :search-placeholder="searchPlaceholder"
-            :search-text.sync="proxySearchText"
-            :focused.sync="searchFocused"
-            @onSearch="newQuery"
+            :placeholder="searchPlaceholder"
+            v-model="proxySearchText"
+            :focused="searchFocused"
+            @search="newQuery"
             @onDownKey="focusAC"
             @onEscKey="focusOut"
         />
@@ -27,7 +27,7 @@ import {
 } from '@vue/composition-api';
 import { windowEventMount } from '@/lib/compostion-util';
 
-import PSearch from '@/components/molecules/search/Search.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
 import {
     SEARCH_PREFIX,

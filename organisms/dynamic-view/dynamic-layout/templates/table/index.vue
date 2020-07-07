@@ -24,7 +24,7 @@
         <template #toolbox-top>
             <slot v-if="showTitle||$scopedSlots['toolbox-top']" name="toolbox-top">
                 <PPanelTop v-if="showTitle"
-                           style="margin: 0px; margin-top: 0.5rem"
+                           style="margin: 0; margin-top: 0.5rem;"
                            :use-total-count="true"
                            :total-count="apiHandler.totalCount.value"
                 >
@@ -35,12 +35,12 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                <p-search :search-text.sync="proxySearchText" @onSearch="searchGetData" />
+                <p-search v-model="apiHandler.tableTS.searchText.value" @search="searchGetData(false)" @delete="searchGetData(true)" />
             </div>
         </template>
         <template #toolbox-bottom>
             <div class="flex-1 2xs:block lg:hidden mt-4" :class="{'mb-4':$scopedSlots['toolbox-bottom']}">
-                <p-search :search-text.sync="proxySearchText" @onSearch="searchGetData" />
+                <p-search v-model="apiHandler.tableTS.searchText.value" @search="searchGetData(false)" @delete="searchGetData(true)" />
             </div>
             <slot name="toolbox-bottom" />
         </template>
@@ -57,7 +57,7 @@ import {
 } from '@vue/composition-api';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import PSearch from '@/components/molecules/search/Search.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 import { SearchTableFluentAPI } from '@/lib/api/table';
 import {
     DynamicLayoutProps,
@@ -126,7 +126,7 @@ export default {
             default: true,
         },
     },
-    setup(props: DynamicLayoutProps) {
+    setup(props: DynamicLayoutProps, { emit }) {
         const defaultInitData = {
             selectable: false,
             excelVisible: true,
@@ -149,9 +149,12 @@ export default {
                 apiHandler.getData();
             }
         };
-        const searchGetData = async () => {
+
+        const searchGetData = async (isDelete?: boolean) => {
             if (apiHandler.action && checkCanGetData(props)) {
+                if (isDelete) apiHandler.tableTS.searchText.value = '';
                 await apiHandler.getData(true);
+                emit('search', apiHandler.tableTS.searchText.value);
             }
         };
         let apiWatchStop: any = null;
@@ -216,14 +219,6 @@ export default {
         const fields = makeFields(props);
         const slots = makeTableSlots(props);
 
-        const proxySearchText = computed({
-            get: () => apiHandler.tableTS.searchText.value,
-            set: (value) => {
-                if (value !== apiHandler.tableTS.searchText.value) {
-                    apiHandler.tableTS.searchText.value = value;
-                }
-            },
-        });
 
         return {
             ...toRefs(state),
@@ -231,7 +226,6 @@ export default {
             slots,
             getData,
             searchGetData,
-            proxySearchText,
             apiHandler,
             exportExcel,
         };

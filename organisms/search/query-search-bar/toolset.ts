@@ -3,6 +3,8 @@ import {
 } from '@vue/composition-api';
 import { TagToolSet } from '@/components/molecules/tags/toolset';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
+import { QueryItem } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { OperatorType } from '@/lib/fluent-api';
 import { BaseAutocompleteHandler } from './autocompleteHandler';
 
 
@@ -22,11 +24,9 @@ export class QuerySearchToolSet extends TagToolSet {
         acHandlerArgs: object = {},
         tags: Ref<any[]> = ref([]),
         checkDuplicate = true,
-        eventBus?: any,
-        eventName?: string,
         changeTagCallBack?: any,
     ) {
-        super(tags, checkDuplicate, eventBus, eventName, changeTagCallBack);
+        super(tags, checkDuplicate, changeTagCallBack);
         this.acHandlerArgs = reactive({ ...acHandlerArgs });
         // @ts-ignore
         this.acHandler = computed(() => new this.ACHandlerClass(this.acHandlerArgs));
@@ -42,6 +42,7 @@ export interface TagInfo {
  value: any;
 
 }
+
 export const parseTag = (text: string): TagInfo => {
     const keyParser = keyRegx.exec(text);
     const operatorParser = operatorRegx.exec(text);
@@ -61,8 +62,8 @@ export const parseTag = (text: string): TagInfo => {
         value,
     };
 };
-export const makeSearchQuery = (text: string) => {
+export const makeSearchQuery = (text: string): QueryItem => {
     const data = parseTag(text);
-    return { key: data.key, operator: data.operator, value: data.value }as SearchQueryType;
+    return { key: { label: data.key, name: data.key }, operator: data.operator as OperatorType, value: data.value };
 };
 export const makeSearchText = (key: string, operator = '', value: any) => `${key}:${operator}${value}`;
