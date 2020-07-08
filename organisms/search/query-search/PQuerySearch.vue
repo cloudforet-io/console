@@ -149,21 +149,26 @@ export default {
             } else emitKeyInput(val);
         };
 
+        const onSearch = (val?: any) => {
+            if (val !== undefined && val !== null) {
+                if (typeof val === 'string') {
+                    const str = val.trim();
+                    if (str) emitSearch(str);
+                } else {
+                    emitSearch(val);
+                }
+            }
+        };
+
         const onMenuSelect = (value: string, idx: number) => {
             if (state.selectedKey) {
                 const val = state.valueMenu[idx].name as any;
-                if (val === undefined || val === null) emitSearch('');
-                else emitSearch(val);
+                onSearch(val);
             } else {
                 state.selectedKey = state.keyMenu[idx] as KeyItem;
                 emitKeySelect();
                 showMenu();
             }
-        };
-
-        const onSearch = (val?: any) => {
-            if (val === undefined || val === null) emitSearch('');
-            else emitSearch(typeof val === 'string' ? val.trim() : val);
         };
 
         const onDelete = (e) => {
