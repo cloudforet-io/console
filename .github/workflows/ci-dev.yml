@@ -1,4 +1,4 @@
-name: SpaceONE CI
+name: SpaceONE CI dev
 
 on:
   push:

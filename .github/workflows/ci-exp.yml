@@ -1,0 +1,93 @@
+name: SpaceONE CI exp
+
+on:
+  push:
+    branches:
+      - release
+jobs:
+  initialize:
+    if: github.repository_owner == 'spaceone-dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set environment virables
+        env:
+          # 이 곳에서 환경변수를 통해 설정 관리
+          IMAGE_PREFIX: spaceone
+          DOCKER_UPLOAD: true
+          # LOCATION points the parent directory
+          LOCATION_VERSION: src # the location for VERSION file (ex- . means the location of VERSION is ./VERSION)
+          LOCATION_DOCKERFILE: .
+
+        run: |
+          cat <<EOF>set_env.sh
+
+          echo "::set-env name=SERVICE::$(cut -d'/' -f2 <<<${{github.repository}})"
+          echo "::set-env name=IMAGE_PREFIX::$IMAGE_PREFIX"
+
+          echo "::set-env name=DOCKER_UPLOAD::$DOCKER_UPLOAD"
+          echo "::set-env name=LOCATION_VERSION::$LOCATION_VERSION"
+          echo "::set-env name=LOCATION_DOCKERFILE::$LOCATION_DOCKERFILE"
+
+          echo "::set-env name=VERSION::$(cat $LOCATION_VERSION/VERSION).${{ github.run_id }}"
+          echo "$(cat $LOCATION_VERSION/VERSION).${{ github.run_id }}">$LOCATION_VERSION/VERSION
+          EOF
+
+          bash set_env.sh
+
+      - name: save envs
+        uses: actions/upload-artifact@v2
+        with:
+          name: set_env.sh
+          path: set_env.sh
+      - run: |
+          cat set_env.sh
+
+      - name: Clone master branch
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: master_branch
+
+      - name: Compare version
+        run: |
+          echo "MASTER BRANCH VERSION"
+          cat master_branch/$LOCATION_VERSION/VERSION
+          echo -e "\n\n"
+
+          echo "PR VERSION"
+          cat $LOCATION_VERSION/VERSION
+          echo -e "\n\n"
+
+          echo "::set-env name=IS_NEW_VERSION::false"
+          cmp --silent master_branch/$LOCATION_VERSION/VERSION $LOCATION_VERSION/VERSION || \
+          echo "::set-env name=IS_NEW_VERSION::true"
+
+  docker:
+    needs: initialize
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Only console use submodule
+      - name: Checkout submodules
+        uses: srt32/git-actions@v0.0.3
+        with:
+          args: git submodule update --init --recursive
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: set_env.sh
+
+      - name: Set environment variables
+        run: |
+          bash set_env.sh
+
+      - name: Upload docker
+        if: env.DOCKER_UPLOAD == 'true'
+        uses: docker/build-push-action@v1
+        with:
+          repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}-exp
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          workdir: ${{ env.LOCATION_DOCKERFILE }}
+          tags: latest,${{ env.VERSION }}
