@@ -4,7 +4,7 @@
              :class="{transition:transition}"
         >
             <div :style="sbStyle">
-                <slot name="sidebar" v-bind="{width, hide, transition, height}"/>
+                <slot name="sidebar" v-bind="{width, hide, transition, height}" />
             </div>
         </div>
         <div class="resizer-container line"
@@ -83,6 +83,7 @@ export default {
                 opacity: state.hide && !state.transition ? 0 : 1,
                 overflowY: 'auto',
                 overflowX: 'hidden',
+                height: '100%',
             })),
             mainStyle: computed(() => ({
                 width: `calc( 100% - ${state.width}px )`,
