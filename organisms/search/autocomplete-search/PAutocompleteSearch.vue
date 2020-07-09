@@ -1,6 +1,7 @@
 <template>
     <div class="p-autocomplete-search">
-        <p-search ref="searchRef" v-model="proxyValue"
+        <p-search ref="searchRef"
+                  v-model="proxyValue"
                   :placeholder="placeholder"
                   :focused="focused"
                   :disable-icon="disableIcon"
@@ -15,7 +16,7 @@
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <template v-if="proxyVisibleMenu">
+        <div v-if="proxyVisibleMenu" class="menu-container">
             <p-context-menu v-if="menu.length > 0" ref="menuRef"
                             theme="secondary"
                             :menu="menu"
@@ -29,7 +30,7 @@
                     <slot :name="`menu-${slot}`" v-bind="scope" />
                 </template>
             </p-context-menu>
-        </template>
+        </div>
     </div>
 </template>
 
@@ -153,7 +154,15 @@ export default {
 
 <style lang="postcss" scoped>
     .p-autocomplete-search {
-        width: 100%;
-        position: relative;
+        @apply w-full relative;
+        .p-search {
+            @apply text-sm font-normal;
+        }
+        .menu-container {
+            @apply w-full relative;
+        }
+        .p-context-menu {
+            @apply w-full font-normal;
+        }
     }
 </style>
