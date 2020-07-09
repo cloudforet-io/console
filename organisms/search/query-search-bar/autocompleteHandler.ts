@@ -10,7 +10,7 @@ import {
 } from '@/components/organisms/search/query-search-bar/type';
 import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
 import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
-import { ListAction, QueryAPI } from '@/lib/fluent-api';
+import { ListAction, QueryAPI } from '@/lib/fluent-api/toolset';
 
 export class SearchQuery implements SearchQueryType {
     constructor(public key, public operator, public value) { }
@@ -68,7 +68,7 @@ export class BaseAutocompleteHandler {
     }
 
     makeContextMenu(data: AutoCompleteData): MenuItem[] {
-        let result = [{ type: CONTEXT_MENU_TYPE.divider }];
+        let result = [{ type: CONTEXT_MENU_TYPE.divider }] as MenuItem[];
         const title = data[0] ? [{ type: CONTEXT_MENU_TYPE.header, label: data[0] }] : [];
         result = result.concat(title);
         const menus = data[1];

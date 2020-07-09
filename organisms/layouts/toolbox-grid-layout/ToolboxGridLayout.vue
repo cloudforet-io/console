@@ -25,7 +25,7 @@
                             <PDropdownMenuBtn
                                 class="page-size-dropdown"
                                 :menu="pageSizeOptions"
-                                @clickMenuEvent="changePageSize"
+                                @select="changePageSize"
                             >
                                 {{ proxyPageSize }}
                             </PDropdownMenuBtn>
@@ -110,7 +110,7 @@ export default {
         PIconButton,
         PDropdownMenuBtn,
     },
-    events: ['pageChange', 'clickMenuEvent', 'clickRefresh'],
+    events: ['pageChange', 'select', 'clickRefresh'],
     props: {
         ...gridLayoutProps,
         pagenationVisible: {

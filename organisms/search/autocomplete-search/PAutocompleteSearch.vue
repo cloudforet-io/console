@@ -11,8 +11,8 @@
                   @click.stop="showMenu"
                   v-on="$listeners"
         >
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="{...scope}" />
+            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+                <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
         <template v-if="proxyVisibleMenu">
@@ -20,12 +20,15 @@
                             theme="secondary"
                             :menu="menu"
                             :loading="loading"
-                            @clickMenuEvent="onClickMenuItem"
-                            @onEndOfUpKey="focusSearch"
-                            @onEscKey="focusSearch"
+                            @select="onClickMenuItem"
+                            @keyup:up:end="focusSearch"
+                            @keyup:esc="focusSearch"
                             @focus="onFocusMenuItem"
-            />
-            <slot v-else name="no-data" />
+            >
+                <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                    <slot :name="`menu-${slot}`" v-bind="scope" />
+                </template>
+            </p-context-menu>
         </template>
     </div>
 </template>
@@ -43,6 +46,7 @@ import {
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { reduce } from 'lodash';
 
 export default {
     name: 'PAutocompleteSearch',
@@ -52,7 +56,7 @@ export default {
         event: 'update:value',
     },
     props: autocompleteSearchProps,
-    setup(props: AutocompleteSearchProps, { emit }) {
+    setup(props: AutocompleteSearchProps, { emit, slots }) {
         const state: any = reactive({
             searchRef: null,
             menuRef: null,
@@ -116,6 +120,16 @@ export default {
             showMenu();
         };
 
+        const menuSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
+            return res;
+        }, {}));
+
+        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+            return res;
+        }, {}));
+
         return {
             ...toRefs(state),
             allFocusOut,
@@ -127,6 +141,8 @@ export default {
             hideMenu,
             onFocusMenuItem,
             onSearchFocus,
+            menuSlots,
+            searchSlots,
         };
     },
 };

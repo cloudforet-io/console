@@ -15,7 +15,7 @@
                         :menu="menu"
                         :loading="loading"
                         :auto-height="autoHeight"
-                        @clickMenuEvent="clickMenuEvent"
+                        @select="clickMenuEvent"
         />
     </div>
 </template>
@@ -38,7 +38,7 @@ export default {
         const popup = ref(false);
         const outsideClick = (): void => { popup.value = false; };
         const clickMenuEvent = (eventName: string, idx: number) => {
-            emit('clickMenuEvent', eventName, idx);
+            emit('select', eventName, idx);
             emit(`click-${eventName}`, idx);
             popup.value = false;
         };

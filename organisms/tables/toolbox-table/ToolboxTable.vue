@@ -24,7 +24,7 @@
                         <PDropdownMenuBtn
                             class="page-size-dropdown"
                             :menu="pageSizeOptions"
-                            @clickMenuEvent="changePageSize"
+                            @select="changePageSize"
                         >
                             {{ proxyPageSize }}
                         </PDropdownMenuBtn>

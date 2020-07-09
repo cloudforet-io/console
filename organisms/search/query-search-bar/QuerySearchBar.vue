@@ -8,14 +8,14 @@
             :focused="searchFocused"
             @search="newQuery"
             @onDownKey="focusAC"
-            @onEscKey="focusOut"
+            @keyup:esc="focusOut"
         />
         <p-context-menu v-if="showAC" ref="contextMenuRef"
                         theme="secondary"
                         :menu="acState.items"
-                        @clickMenuEvent="clickMenuEvent"
-                        @onEndOfUpKey="searchFocused=true"
-                        @onEscKey="searchFocused=true"
+                        @select="clickMenuEvent"
+                        @keyup:up:end="searchFocused=true"
+                        @keyup:esc="searchFocused=true"
         />
     </div>
 </template>

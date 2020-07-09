@@ -7,8 +7,14 @@ export enum CONTEXT_MENU_TYPE {
 export interface MenuItem {
     name?: string;
     label?: string;
-    type: CONTEXT_MENU_TYPE;
+    type: keyof typeof CONTEXT_MENU_TYPE;
     disabled?: boolean;
+    href?: string;
+}
+
+export enum CONTEXT_MENU_THEME {
+    secondary = 'secondary',
+    gray900 = 'gray900',
 }
 
 export const contextMenuProps = {
@@ -20,7 +26,7 @@ export const contextMenuProps = {
         type: String,
         default: 'secondary',
         validator(theme) {
-            return ['secondary', 'gray900'].includes(theme);
+            return Object.keys(CONTEXT_MENU_THEME).includes(theme);
         },
     },
     loading: {
@@ -33,11 +39,10 @@ export const contextMenuProps = {
     },
 };
 
-export type ContextMenuTheme = 'secondary'|'gray900'
 
 export interface ContextMenuProps {
     menu: MenuItem[];
-    theme: ContextMenuTheme;
+    theme: keyof typeof CONTEXT_MENU_THEME;
     loading: boolean;
     autoHeight: boolean;
 }

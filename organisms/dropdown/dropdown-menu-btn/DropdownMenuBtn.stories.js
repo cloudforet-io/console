@@ -19,7 +19,7 @@ const actions = {
     clickUpdate: action('clickUpdate'),
     clickCollect: action('clickCollect'),
     clickRemove: action('clickRemove'),
-    clickMenuEvent: action('clickMenuEvent'),
+    menuSelect: action('select'),
 };
 const data = {};
 
@@ -28,7 +28,7 @@ export const dropdownMenuBtn = () => ({
     template: `
 <PDropdownMenuBtn
     :menu="menu"
-    @clickMenuEvent="clickMenuEvent"
+    @select="menuSelect"
     @click-add="clickAdd"
     @click-hello='clickHello'
     @click-delete='clickDelete'

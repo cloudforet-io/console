@@ -1,36 +1,68 @@
 <template>
     <div ref="contextMenu" class="p-context-menu" :class="theme"
          :style="autoHeightStyle"
-         @keyup.esc="$emit('onEscKey',$event)"
+         @keyup.esc="$emit('keyup:esc',$event)"
     >
-        <div v-if="loading" class="context-content context-item no-drag">
-            <p-lottie name="spinner" auto :size="1" />
-        </div>
-        <div v-else-if="menu.length < 0" class="context-content context-item no-drag empty" :class="theme">
-            {{ $t('COMMON.NO_ITEM') }}
-        </div>
-        <template v-for="(item, index) in menu" v-else>
-            <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="`${item.name}-${index}`"
-               :tabindex="index"
-               class="context-content context-item no-drag"
-               :class="[{disabled:item.disabled},theme]"
-               @click.stop="menuClick(item.name, index, $event)"
-               @keyup.up="onUpKey(index)"
-               @keyup.down="onDownKey(index)"
-               @keyup.enter="menuClick(item.name, index, $event)"
-            >
-                {{ item.label }}
-            </a>
-            <div v-else-if="item.type==='divider'" :key="index" class="context-divider"
-                 @click.stop
-            />
-            <div v-else-if="item.type==='header'" :key="index" class="context-content context-header no-drag"
-                 :class="theme"
-                 @click.stop
-            >
-                {{ item.label }}
+        <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
+            <div class="context-content context-item no-drag">
+                <slot name="loading-format" v-bind="{...$props, uuid}">
+                    <p-lottie name="spinner" auto :size="1" />
+                </slot>
             </div>
-        </template>
+        </slot>
+        <slot v-else-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
+            <div class="context-content context-item no-drag empty" :class="theme">
+                <slot name="no-data-format" v-bind="{...$props, uuid}">
+                    {{ $t('COMMON.NO_ITEM') }}
+                </slot>
+            </div>
+        </slot>
+        <slot v-else name="menu" v-bind="{...$props, uuid}">
+            <template v-for="(item, index) in menu">
+                <slot v-if="item.type==='item'" name="item" v-bind="{...$props, uuid, item, index}">
+                    <slot :name="`item-${item.name}`" v-bind="{...$props, uuid, item, index}">
+                        <a :id="`context-item-${index}-${uuid}`"
+                           :key="`${item.name}-${index}`"
+                           :tabindex="index"
+                           class="context-content context-item no-drag"
+                           :class="{ disabled: item.disabled, [theme]: true }"
+                           :href="item.href"
+                           @click.stop="menuClick(item.name, index, $event)"
+                           @keyup.up="onUpKey(index)"
+                           @keyup.down="onDownKey(index)"
+                           @keyup.enter="menuClick(item.name, index, $event)"
+                        >
+                            <slot name="item--format" v-bind="{...$props, uuid, item, index}">
+                                <slot :name="`item-${item.name}-format`" v-bind="{...$props, uuid, item, index}">
+                                    {{ item.label }}
+                                </slot>
+                            </slot>
+                        </a>
+                    </slot>
+                </slot>
+                <slot v-else-if="item.type==='divider'" name="divider" v-bind="{...$props, uuid, item, index}">
+                    <slot :name="`divider-${item.name}`" v-bind="{...$props, uuid, item, index}">
+                        <div :key="index" class="context-divider"
+                             @click.stop
+                        />
+                    </slot>
+                </slot>
+                <slot v-else-if="item.type==='header'" name="header" v-bind="{...$props, uuid, item, index}">
+                    <slot :name="`header-${item.name}`" v-bind="{...$props, uuid, item, key: index}">
+                        <div :key="index" class="context-content context-header no-drag"
+                             :class="theme"
+                             @click.stop
+                        >
+                            <slot name="header--format" v-bind="{...$props, uuid, item, index}">
+                                <slot :name="`header-${item.name}-format`" v-bind="{...$props, uuid, item, index}">
+                                    {{ item.label }}
+                                </slot>
+                            </slot>
+                        </div>
+                    </slot>
+                </slot>
+            </template>
+        </slot>
     </div>
 </template>
 
@@ -69,29 +101,28 @@ const setAutoHeight = (props) => {
 
 export default {
     name: 'PContextMenu',
-    events: ['clickMenuEvent', 'onEndOfUpKey', 'onEndOfDownKey', 'onEscKey'],
+    events: ['select', 'keyup:up:end', 'keyup:down:end', 'keyup:esc'],
     components: { PLottie },
     props: contextMenuProps,
     setup(props: ContextMenuProps, context) {
         const uuid = `${Math.random()}`.slice(2);
-        const menuClick = (eventName, index, event) => {
+        const menuClick = (itemName, index, event) => {
             if (!props.menu[index].disabled) {
-                context.emit(`click-${eventName}`, index, event);
-                context.emit('clickMenuEvent', eventName, index);
+                context.emit(`${itemName}:select`, index, event);
+                context.emit('select', itemName, index);
             }
         };
         const itemsIndex = computed<number[]>(() => {
             const idxs: number[] = [];
             for (let i = 0; i < Object.keys(props.menu).length; i++) {
-                if (props.menu[i].type === 'item') idxs.push(i);
+                if (props.menu[i].type === 'item' && !props.menu[i].disabled) idxs.push(i);
             }
             return idxs;
         });
         const focus = (position) => {
-            const pos = position || 0;
-            const idx = itemsIndex.value[pos];
-            // eslint-disable-next-line no-unused-expressions
-            document.getElementById(`context-item-${idx}-${uuid}`)?.focus();
+            const idx = itemsIndex.value[position || 0];
+            const el = document.getElementById(`context-item-${idx}-${uuid}`);
+            if (el) el.focus();
             context.emit('focus', idx);
         };
         const onUpKey = (idx: number) => {
@@ -99,7 +130,7 @@ export default {
             if (pos !== 0) {
                 focus(pos - 1);
             } else {
-                context.emit('onEndOfUpKey');
+                context.emit('keyup:up:end');
             }
         };
         const onDownKey = (idx) => {
@@ -107,10 +138,9 @@ export default {
             if (pos !== itemsIndex.value.length) {
                 focus(pos);
             } else {
-                context.emit('onEndOfDownKey');
+                context.emit('keyup:down:end');
             }
         };
-
 
         return {
             menuClick,

@@ -9,13 +9,15 @@ import {
 import PAutocompleteSearch from './PAutocompleteSearch.vue';
 import { autocompleteSearchProps, plainAutocompleteHandler } from './PAutocompleteSearch.toolset';
 import casual, { arrayOf } from '../../../../lib/casual';
+import md from './PAutocompleteSearch.md';
 
 export default {
     title: 'organisms/search/AutocompleteSearch',
     component: PAutocompleteSearch,
     parameters: {
+        notes: md,
         info: {
-            summary: '',
+            summary: md,
             components: { PAutocompleteSearch },
         },
         knobs: { escapeHTML: false },
