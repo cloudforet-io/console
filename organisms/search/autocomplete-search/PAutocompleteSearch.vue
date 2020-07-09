@@ -80,6 +80,7 @@ export default {
 
         const hideMenu = () => {
             if (state.isAutoMode) state.proxyVisibleMenu = false;
+            emit('menu:hide');
         };
 
         const showMenu = () => {
@@ -105,12 +106,14 @@ export default {
             }
         };
 
-        const windowMousedown = (e: MouseEvent) => {
-            hideMenu();
-            emit('window:click', e);
-        };
-        onMounted(() => window.addEventListener('click', windowMousedown));
-        onUnmounted(() => window.removeEventListener('click', windowMousedown));
+        onMounted(() => {
+            window.addEventListener('click', hideMenu);
+            window.addEventListener('blur', hideMenu);
+        });
+        onUnmounted(() => {
+            window.removeEventListener('click', hideMenu);
+            window.removeEventListener('blur', hideMenu);
+        });
 
         const onFocusMenuItem = (idx: string) => {
             emit('menu:focus', idx);

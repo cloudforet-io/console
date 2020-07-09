@@ -13,7 +13,7 @@
                            @keyup.esc="hideMenu"
                            @keydown.delete="onDelete"
                            @mousedown.stop="showMenu"
-                           @window:click="hideMenu"
+                           @menu:hide="hideMenu"
     >
         <template #left>
             <span v-if="selectedKey" class="key-tag"

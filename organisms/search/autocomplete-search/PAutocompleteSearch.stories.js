@@ -100,7 +100,7 @@ export const controlCase = () => ({
                              @menu:select="search"
                              @input="input"
                              @mousedown.stop="mousedown"
-                             @window:click="windowClick"
+                             @menu:hide="onMenuHide"
                              class="mt-10"
         >
             
@@ -148,8 +148,8 @@ export const controlCase = () => ({
                 action('mousedown')(e);
                 state.visibleMenu = true;
             },
-            windowClick(e) {
-                action('window:click')(e);
+            onMenuHide(e) {
+                action('menu:hide')(e);
                 state.visibleMenu = false;
             },
         };
