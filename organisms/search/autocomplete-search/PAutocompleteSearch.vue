@@ -133,5 +133,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
+    .p-autocomplete-search {
+        width: 100%;
+        position: relative;
+    }
 </style>

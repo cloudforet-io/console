@@ -162,6 +162,7 @@ export default defineComponent({
             th {
                 border-top: 1px solid black;
                 border-bottom: 1px solid black;
+                position: relative;
             }
         }
         &.table-bordered {

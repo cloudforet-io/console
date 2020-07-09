@@ -1,14 +1,20 @@
 <template>
     <div class="p-query-search-tags">
+        <span class="filter">Filter: </span>
         <div class="delete-btn">
-            <p-icon-button name="ic_delete" @click="emitDeleteAllTags" />
+            <p-badge class="tag" outline style-type="gray900"
+                     @click="emitDeleteAllTags"
+            >
+                Clear all
+            </p-badge>
         </div>
+        <div class="divider" />
         <div class="tags">
             <p-tag v-for="(tag, idx) in tags" :key="`${idx}-${tag.key ? tag.key.name: tag.value}`" class="tag"
                    @delete="emitDeleteTag(idx)"
             >
                 <template v-if="tag.key">
-                    {{ tag.key.label }}:{{ tag.operator }} {{ tag.value }}
+                    <b>{{ tag.key.label }}</b>:{{ tag.operator }} {{ tag.value }}
                 </template>
                 <template v-else>
                     {{ tag.value }}
@@ -20,7 +26,7 @@
 
 <script lang="ts">
 import PTag from '@/components/molecules/tags/Tag.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
     QuerySearchTagsProps,
     querySearchTagsProps,
@@ -29,7 +35,7 @@ import {
 
 export default {
     name: 'PQuerySearchTags',
-    components: { PTag, PIconButton },
+    components: { PTag, PBadge },
     props: querySearchTagsProps,
     setup(props: QuerySearchTagsProps, { emit }) {
         return {
@@ -42,20 +48,26 @@ export default {
 
 <style lang="postcss" scoped>
 .p-query-search-tags {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
+    @apply flex flex-row w-full;
+    margin-bottom: 0.37rem;
+    .filter {
+        @apply mr-4 rounded-sm;
+    }
+    .divider {
+        @apply inline-block my-0 mx-4;
+        height: 1.375rem;
+        border-left-width: 1px;
+    }
     .delete-btn {
-        flex-grow: 0;
+        .tag {
+            @apply cursor-pointer rounded-sm flex-grow-0;
+        }
     }
     .tags {
         flex-grow: 1;
-        margin-left: 1rem;
         .tag {
-            margin-top: 0.375rem;
-            margin-bottom: 0.37rem;
+            @apply rounded-sm mr-3 mb-3;
         }
     }
-
 }
 </style>
