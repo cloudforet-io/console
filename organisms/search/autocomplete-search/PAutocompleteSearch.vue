@@ -17,7 +17,7 @@
             </template>
         </p-search>
         <div v-if="proxyVisibleMenu" class="menu-container">
-            <p-context-menu v-if="menu.length > 0" ref="menuRef"
+            <p-context-menu ref="menuRef"
                             theme="secondary"
                             :menu="menu"
                             :loading="loading"
@@ -161,8 +161,27 @@ export default {
         .menu-container {
             @apply w-full relative;
         }
-        .p-context-menu {
+        .p-context-menu::v-deep {
             @apply w-full font-normal;
+            .secondary {
+                &.context-header {
+                    @apply text-secondary;
+                }
+                &.context-item {
+                    &:hover {
+                        @apply bg-blue-200;
+                        color: currentColor !important;
+                    }
+                    &:focus {
+                        @apply bg-blue-200;
+                        color: currentColor !important;
+                    }
+                    &:active {
+                        @apply bg-blue-200;
+                        color: currentColor !important;
+                    }
+                }
+            }
         }
     }
 </style>

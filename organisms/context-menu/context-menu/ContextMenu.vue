@@ -26,8 +26,9 @@
                            :tabindex="index"
                            class="context-content context-item no-drag"
                            :class="{ disabled: item.disabled, [theme]: true }"
+                           target="_blank"
                            :href="item.href"
-                           @click.stop="menuClick(item.name, index, $event)"
+                           @click.stop="item.href ? undefined : menuClick(item.name, index, $event)"
                            @keyup.up="onUpKey(index)"
                            @keyup.down="onDownKey(index)"
                            @keyup.enter="menuClick(item.name, index, $event)"
@@ -234,8 +235,8 @@ export default {
         @mixin context-menu-color gray900, theme('colors.white'), theme('colors.gray.900');
 
         .context-content {
-            padding-left: 1rem;
-            padding-right: 1rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
         }
         .context-header {
             margin-top: 0.875rem;
