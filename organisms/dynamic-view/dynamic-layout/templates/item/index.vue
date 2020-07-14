@@ -25,13 +25,12 @@ import {
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
-import Definition from './definition.vue';
+
 
 export default defineComponent({
     name: 'SDynamicLayoutItem',
     components: {
         PDl,
-        Definition,
         PEmpty,
         PPanelTop,
         PDefinitionTable,

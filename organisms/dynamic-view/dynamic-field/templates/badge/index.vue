@@ -22,6 +22,7 @@ export default {
     render(h, { props }) {
         const outline = _.get(props.options, ['outline_color'], null);
         const shape = _.get(props.options, ['shape'], null);
+        const link = _.get(props.options, 'link', null);
         const ps = {} as any;
         if (shape) {
             ps.shape = BadgeShape[shape];
@@ -33,6 +34,9 @@ export default {
         } else {
             ps.backgroundColor = getColor(_.get(props.options, ['background_color'], null));
             ps.textColor = getColor(_.get(props.options, ['text_color'], null));
+        }
+        if (link) {
+            ps.link = link;
         }
         return h(PBadge, { props: ps }, props.data);
     },
