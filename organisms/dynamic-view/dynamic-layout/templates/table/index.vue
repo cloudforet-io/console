@@ -93,6 +93,14 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        reference: {
+            type: Object,
+            default: null,
+            validator(reference) {
+                if (reference === null) return true;
+                return reference.reference_type && reference.reference_key;
+            },
+        },
         api: {
             type: Object,
             default: null,
