@@ -36,6 +36,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        link: {
+            type: String,
+            default: undefined,
+        },
     },
     render(h, { props, data, children }) {
         const newData = {
@@ -65,7 +69,13 @@ export default {
             newData.class[`badge-${props.styleType}`] = true;
         }
         if (props.outline) newData.class.outline = true;
-        return h('span', newData, children);
+
+        let tag = 'span';
+        if (props.link) {
+            tag = 'a';
+            newData.attrs = { href: props.link };
+        }
+        return h(tag, newData, children);
     },
 };
 </script>
