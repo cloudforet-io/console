@@ -22,6 +22,9 @@
                     <slot name="extra" />
                 </div>
             </div>
+            <slot name="sub-title">
+                <p class="sub-title"> {{ subTitle }}</p>
+            </slot>
         </slot>
         <div class="widget-contents">
             <slot />
@@ -55,12 +58,17 @@ export default {
         width: 100%;
 
         .top {
-            @apply flex items-center mx-6 mt-8 mb-6;
+            @apply flex items-center mx-6 mt-8;
         }
 
         .title {
             @apply text-lg capitalize font-bold mr-2;
             line-height: 120%;
+            margin-bottom: 0.03125rem;
+        }
+
+        .sub-title {
+            @apply mx-6 text-xs mb-4;
         }
 
         .help {

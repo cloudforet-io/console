@@ -159,6 +159,10 @@ export default {
             type: String,
             required: true,
         },
+        formatter: {
+            type: Function,
+            default: undefined,
+        },
     },
     setup(props: DynamicLayoutProps) {
         const defaultInitData = {

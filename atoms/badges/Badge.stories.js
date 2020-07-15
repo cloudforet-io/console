@@ -97,3 +97,45 @@ export const longBadge = () => ({
         ...actions,
     },
 });
+
+export const linkBadge = () => ({
+    components: { PBadge },
+    template: `<PBadge :styleType="styleType"  
+                       :text-color="textColor" 
+                       :backgroundColor="backgroundColor"
+                       :outline="outline"
+                       :link="link"
+    >Badge with link</PBadge>`,
+    props: {
+        styleType: {
+            default: select('styleType', [
+                '',
+                'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
+                'secondary', 'secondary1', 'secondary2',
+                'coral', 'yellow',
+                'gray', 'gray200', 'gray100',
+                'alert', 'safe', 'gray900',
+            ], ''),
+        },
+        textColor: {
+            default: color('textColor', ''),
+        },
+        backgroundColor: {
+            default: color('backgroundColor', ''),
+        },
+        outline: {
+            default: boolean('outline', true),
+        },
+        link: {
+            default: '/?path=/story/atoms-badges--default-case',
+        },
+    },
+    data() {
+        return {
+            ...data,
+        };
+    },
+    methods: {
+        ...actions,
+    },
+});
