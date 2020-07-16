@@ -3,7 +3,6 @@
         <p-icon-button class="text"
                        name="ic_arrow_left"
                        :disabled="thisPage === 1"
-                       color="transparent inherit"
                        @click="update(thisPage-1)"
         />
         <div class="page-number">
@@ -15,7 +14,6 @@
         <p-icon-button class="text"
                        name="ic_arrow_right"
                        :disabled="thisPage === allPage"
-                       color="transparent inherit"
                        @click="update(thisPage+1)"
         />
     </nav>
@@ -59,12 +57,6 @@ export default {
         justify-content: space-between;
         align-items: center;
         flex-wrap:nowrap;
-        .text {
-            color: inherit;
-            &:hover {
-                color: theme('colors.secondary1')
-            }
-        }
         @screen lg{
             @apply min-w-16;
         }
@@ -82,12 +74,6 @@ export default {
             @apply min-w-16;
         }
 
-    }
-    .icon-button {
-        &:not(:disabled):not(.disabled):hover {
-            border-color:transparent;
-            @apply bg-transparent;
-        }
     }
 
 </style>

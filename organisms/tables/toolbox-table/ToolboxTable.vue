@@ -245,9 +245,9 @@ export default {
                 }
                 .right{
                     @apply flex flex-no-wrap w-auto justify-end;
-                    .page-size-dropdown{
-                        &::v-deep .menu-btn{
-                            min-width: 4rem;
+                    .page-size-dropdown::v-deep {
+                        .p-dropdown-btn {
+                            min-width: 6rem;
                         }
                     }
                 }

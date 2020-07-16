@@ -15,12 +15,12 @@
         <div class="extra">
             <slot name="extra">
                 <template v-if="useTotalCount">
-                    <template v-if="useSelectedCount&&selectedCount">
+                    <span v-if="useSelectedCount&&selectedCount">
                         &nbsp;({{ $t('ACTION.SELECTED_OF',{selectedCount,totalCount}) }})
-                    </template>
-                    <template v-else>
+                    </span>
+                    <span v-else>
                         &nbsp;({{ totalCount }})
-                    </template>
+                    </span>
                 </template>
                 <slot name="extra-area" />
             </slot>

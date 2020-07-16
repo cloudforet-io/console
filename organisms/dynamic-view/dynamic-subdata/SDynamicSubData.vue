@@ -97,7 +97,7 @@ export default defineComponent({
         const selected = ref(state.names[0]);
         const selectedLayout = computed<DLSchema>(() => state.layoutData[selected.value]);
         const buttons = computed(() => state.names.map(name => ({
-            name, label: name, vbind: { styleType: 'gray900-hover', outline: selected.value !== name },
+            name, label: name, vbind: { styleType: 'gray900', outline: selected.value !== name },
         })));
         watch(() => state.names, _.debounce((aft, bef) => {
             if (aft && aft[0] && aft.indexOf(selected.value) === -1) {
@@ -120,9 +120,9 @@ export default defineComponent({
 </script>
 <style lang="postcss">
     .fade-enter-active, .fade-leave-active {
-        transition: opacity .2s;
-        .skeleton{
-            transition:opacity 0s;
+        transition: opacity 0.2s;
+        .skeleton {
+            transition: opacity 0s;
         }
     }
     .fade-enter, .fade-leave-to {
