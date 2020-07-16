@@ -19,11 +19,13 @@
         </slot>
         <slot name="right" v-bind="slotBind">
             <div class="right">
-                <span v-if="value" class="delete-btn" @click="onDelete">
-                    <p-i class="icon" name="ic_delete" height="1rem"
-                         width="1rem"
-                    />
-                </span>
+                <slot name="right-delete" v-bind="slotBind">
+                    <span v-if="value" class="delete-btn" @click="onDelete">
+                        <p-i class="icon" name="ic_delete" height="1rem"
+                             width="1rem"
+                        />
+                    </span>
+                </slot>
                 <slot name="right-extra" v-bind="slotBind" />
             </div>
         </slot>
@@ -99,6 +101,7 @@ export default {
         @apply flex items-center border border-gray-300 bg-white text-gray-900 px-3 w-full;
         border-radius: 2px;
         line-height: 2rem;
+        min-width: 0;
         &.disabled {
             @apply border-gray-200 bg-gray-100;
         }
@@ -122,7 +125,7 @@ export default {
         @apply inline-flex;
     }
     .delete-btn {
-        @apply cursor-pointer inline-block;
+        @apply cursor-pointer inline-block flex-shrink-0;
         position: relative;
         border-radius: 100px;
         height: 1rem;
