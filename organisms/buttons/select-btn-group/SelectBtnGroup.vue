@@ -65,38 +65,14 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .p-select-btn-group{
-        white-space:nowrap;
-        overflow-x:auto;
-        scroll-snap-type: x mandatory;
-        display: flex;
-        justify-content: flex-start ;
-        /*-ms-overflow-style: none; !* scroll hide in IE *!*/
-        /*&::-webkit-scrollbar {*/
-        /*    display: none !important; !* scroll hide in window,chrome *!*/
-        /*}*/
-
-        .select-btn{
-            margin-right: 0.5rem;
+    .p-select-btn-group {
+        @apply flex flex-wrap;
+        .p-button {
+            @apply mr-2;
             min-width: auto;
-            display: inline-flex;
-            &.active{
-
+            &:last-of-type {
+                @apply mr-0;
             }
-        }
-
-        .select-next-btn {
-            min-width: auto;
-            display: inline-flex;
-            border-right: none;
-            border-radius: unset;
-        }
-
-        [class~='select-next-btn']:last-of-type  {
-            min-width: auto;
-            display: inline;
-            border-right: 1px solid;
-            border-radius: unset;
         }
     }
 </style>
