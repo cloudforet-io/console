@@ -6,9 +6,14 @@
           v-on="$listeners"
     >
         <input type="checkbox">
-        <p-i class="check-icon" width="1.25rem" height="1.25rem"
-             :name="checkBoxBind"
-        />
+        <slot :slot-scope="$props" name="icon">
+            <p-i class="check-icon" width="1.25rem" height="1.25rem"
+                 :name="checkBoxBind"
+            />
+        </slot>
+        <span v-if="$scopedSlots.default" class="text" @click.stop="onClick">
+            <slot name="default" />
+        </span>
     </span>
 </template>
 
