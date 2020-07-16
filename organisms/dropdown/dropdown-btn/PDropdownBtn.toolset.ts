@@ -1,9 +1,12 @@
+import { ICON_BUTTON_STYLE_TYPE, iconButtonProps } from '@/components/molecules/buttons/PIconButton.toolset';
+
 export const dropdownBtnProps = {
-    disabled: {
+    /* sync */
+    popup: {
         type: Boolean,
         default: false,
     },
-    popup: {
+    disabled: {
         type: Boolean,
         default: false,
     },
@@ -11,6 +14,15 @@ export const dropdownBtnProps = {
         type: Boolean,
         default: false,
     },
+    buttonOnly: {
+        type: Boolean,
+        default: false,
+    },
+    buttonIcon: {
+        type: String,
+        default: undefined,
+    },
+    buttonStyleType: iconButtonProps.styleType,
 };
 
 
@@ -18,4 +30,7 @@ export interface DropdownBtnProps {
     popup: boolean;
     disabled: boolean;
     block: boolean;
+    buttonOnly: boolean;
+    buttonIcon?: string;
+    buttonStyleType?: keyof ICON_BUTTON_STYLE_TYPE;
 }

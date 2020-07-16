@@ -12,7 +12,7 @@ import {
     iconStyleMapping,
     rotatingMapping,
     sizeMapping,
-} from '../../atoms/icons/PiMapping';
+} from './iconMapping.stories.toolset';
 
 const icons = Object.keys(icon.icons);
 
@@ -41,7 +41,6 @@ export const iconButton = () => ({
     :name="name"
     :disabled="disabled"
     :iconStyle="iconStyle"
-    :buttonStyle="buttonStyle"
     :size="size"
     :animation="animation"
     :rotating="rotating"
@@ -70,9 +69,6 @@ export const iconButton = () => ({
         },
         flip: {
             default: select('flip', ['', ...Object.keys(flipMapping)], ''),
-        },
-        buttonStyle: {
-            default: select('style', ['white', 'transparent', 'gray900'], 'white'),
         },
     },
     methods: {

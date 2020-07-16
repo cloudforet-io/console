@@ -143,7 +143,7 @@ export default {
 <style lang="postcss" scoped>
     .extra-btns {
         float: right;
-        .btn {
+        .p-button {
             margin-left: 0.5rem;
         }
     }

@@ -21,11 +21,11 @@
                         />
                     </div>
                     <slot v-if="pageSizeVisible" name="page-size">
-                        <div class="tool page-size-dropdown">
+                        <div class="tool">
                             <PDropdownMenuBtn
                                 class="page-size-dropdown"
                                 :menu="pageSizeOptions"
-                                @clickMenuEvent="changePageSize"
+                                @select="changePageSize"
                             >
                                 {{ proxyPageSize }}
                             </PDropdownMenuBtn>
@@ -110,7 +110,7 @@ export default {
         PIconButton,
         PDropdownMenuBtn,
     },
-    events: ['pageChange', 'clickMenuEvent', 'clickRefresh'],
+    events: ['pageChange', 'select', 'clickRefresh'],
     props: {
         ...gridLayoutProps,
         pagenationVisible: {
@@ -192,9 +192,9 @@ export default {
             }
             .right{
                 @apply inline-flex flex-no-wrap w-auto justify-end;
-                .page-size-dropdown{
-                    &::v-deep .menu-btn{
-                        min-width: 4rem;
+                .page-size-dropdown::v-deep {
+                    .p-dropdown-btn {
+                        min-width: 6rem;
                     }
                 }
                 .tool{

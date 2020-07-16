@@ -1,6 +1,7 @@
 <template>
     <div class="p-autocomplete-search">
-        <p-search ref="searchRef" v-model="proxyValue"
+        <p-search ref="searchRef"
+                  v-model="proxyValue"
                   :placeholder="placeholder"
                   :focused="focused"
                   :disable-icon="disableIcon"
@@ -9,24 +10,28 @@
                   @keyup.esc="allFocusOut"
                   @focus="onSearchFocus"
                   @click.stop="showMenu"
+                  @delete="focusSearch"
                   v-on="$listeners"
         >
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="{...scope}" />
+            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+                <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <template v-if="proxyVisibleMenu">
-            <p-context-menu v-if="menu.length > 0" ref="menuRef"
+        <div v-if="proxyVisibleMenu" class="menu-container">
+            <p-context-menu ref="menuRef"
                             theme="secondary"
                             :menu="menu"
                             :loading="loading"
-                            @clickMenuEvent="onClickMenuItem"
-                            @onEndOfUpKey="focusSearch"
-                            @onEscKey="focusSearch"
+                            @select="onClickMenuItem"
+                            @keyup:up:end="focusSearch"
+                            @keyup:esc="focusSearch"
                             @focus="onFocusMenuItem"
-            />
-            <slot v-else name="no-data" />
-        </template>
+            >
+                <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                    <slot :name="`menu-${slot}`" v-bind="scope" />
+                </template>
+            </p-context-menu>
+        </div>
     </div>
 </template>
 
@@ -43,6 +48,7 @@ import {
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { reduce } from 'lodash';
 
 export default {
     name: 'PAutocompleteSearch',
@@ -52,7 +58,7 @@ export default {
         event: 'update:value',
     },
     props: autocompleteSearchProps,
-    setup(props: AutocompleteSearchProps, { emit }) {
+    setup(props: AutocompleteSearchProps, { emit, slots }) {
         const state: any = reactive({
             searchRef: null,
             menuRef: null,
@@ -76,6 +82,7 @@ export default {
 
         const hideMenu = () => {
             if (state.isAutoMode) state.proxyVisibleMenu = false;
+            emit('menu:hide');
         };
 
         const showMenu = () => {
@@ -101,12 +108,14 @@ export default {
             }
         };
 
-        const windowMousedown = (e: MouseEvent) => {
-            hideMenu();
-            emit('window:click', e);
-        };
-        onMounted(() => window.addEventListener('click', windowMousedown));
-        onUnmounted(() => window.removeEventListener('click', windowMousedown));
+        onMounted(() => {
+            window.addEventListener('click', hideMenu);
+            window.addEventListener('blur', hideMenu);
+        });
+        onUnmounted(() => {
+            window.removeEventListener('click', hideMenu);
+            window.removeEventListener('blur', hideMenu);
+        });
 
         const onFocusMenuItem = (idx: string) => {
             emit('menu:focus', idx);
@@ -115,6 +124,16 @@ export default {
         const onSearchFocus = () => {
             showMenu();
         };
+
+        const menuSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
+            return res;
+        }, {}));
+
+        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+            return res;
+        }, {}));
 
         return {
             ...toRefs(state),
@@ -127,6 +146,8 @@ export default {
             hideMenu,
             onFocusMenuItem,
             onSearchFocus,
+            menuSlots,
+            searchSlots,
         };
     },
 };
@@ -134,7 +155,34 @@ export default {
 
 <style lang="postcss" scoped>
     .p-autocomplete-search {
-        width: 100%;
-        position: relative;
+        @apply w-full relative;
+        .p-search {
+            @apply text-sm font-normal;
+        }
+        .menu-container {
+            @apply w-full relative;
+        }
+        .p-context-menu::v-deep {
+            @apply w-full font-normal;
+            .secondary {
+                &.context-header {
+                    @apply text-secondary;
+                }
+                &.context-item {
+                    &:hover {
+                        @apply bg-blue-200;
+                        color: currentColor !important;
+                    }
+                    &:focus {
+                        @apply bg-blue-200;
+                        color: currentColor !important;
+                    }
+                    &:active {
+                        @apply bg-blue-200;
+                        color: currentColor !important;
+                    }
+                }
+            }
+        }
     }
 </style>

@@ -1,28 +1,26 @@
 <template>
-    <div class="dropdown-btn-container" :class="{block}">
-        <p-button :disabled="disabled"
-                  :class="btnClassObject"
-                  class="dropdown-btn menu-btn"
+    <div class="p-dropdown-btn" :class="{block, 'button-only': buttonOnly}">
+        <p-button v-if="!buttonOnly"
+                  :disabled="disabled"
+                  class="menu-btn"
+                  :class="{active: popup, hovered: mouseover}"
                   @click="onClick"
                   @mouseover="onMouseOver"
                   @mouseout="onMouseOut"
         >
-            <slot />
+            <slot name="default" />
         </p-button>
-        <p-icon-button class="dropdown-btn dropdown-toggle-split"
-                       :class="btnClassObject"
-                       :name="popup ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                       :disabled="disabled"
-                       :color="`transparent ${ disabled ?
-                           colorSets.disabled :
-                           (popup || mouseover ? colorSets.popup : colorSets.mouseover)
-                       }`"
-                       :hover-color="iconHoverColor"
-                       button-style="white"
-                       @click="onClick"
-                       @mouseenter="onMouseOver"
-                       @mouseleave="onMouseOut"
-        />
+        <slot name="icon">
+            <p-icon-button :name="buttonIcon || (popup ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                           :class="{active: popup, hovered: mouseover}"
+                           :style-type="buttonStyleType"
+                           :disabled="disabled"
+                           outline
+                           @click="onClick"
+                           @mouseenter="onMouseOver"
+                           @mouseleave="onMouseOut"
+            />
+        </slot>
     </div>
 </template>
 
@@ -38,35 +36,12 @@ export default defineComponent({
     name: 'PDropdownBtn',
     components: { PButton, PIconButton },
     props: dropdownBtnProps,
-    data() {
-        return {
-            // Consider to specify color according to Jenny's
-            colorSets: {
-                disabled: '#A7A9B2',
-                popup: '#0080FB',
-                mouseover: '#222532',
-            },
-            mouseover: false,
-            iconHoverColor: 'transparent inherit',
-        };
-    },
     setup(props: DropdownBtnProps, { emit }) {
         const state = reactive({
             mouseover: false,
-            iconHoverColor: 'transparent inherit',
-            colorSets: {
-                disabled: '#A7A9B2',
-                popup: '#0080FB',
-                mouseover: '#222532',
-            },
         });
         return {
             ...toRefs(state),
-            btnClassObject: computed(() => ({
-                'dropdown-opened': props.popup,
-                'dropdown-mouseover': state.mouseover,
-                block: props.block,
-            })),
             onClick(event): void {
                 emit('click', event);
                 emit('update:popup', !props.popup);
@@ -83,51 +58,46 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.dropdown-btn-container {
+.p-dropdown-btn {
     display: inline-flex;
+    min-width: 6.5rem;
+    &.button-only {
+        min-width: unset;
+    }
     &.block {
         display: flex;
     }
 }
-.dropdown-btn {
-    @apply bg-white border-gray-300;
-    border-bottom-width: 1px;
-    border-style: solid;
-    min-width: 2rem;
-    font-weight: normal;
-    &:hover {
-        @apply text-secondary;
-    }
-    &.disabled {
-        @apply border-gray-300 bg-gray-200 text-gray-400;
-    }
-    &:not(:disabled):not(.disabled):hover {
-        @apply border-secondary bg-white text-secondary;
-    }
-}
-.dropdown-toggle-split {
-    min-width: 2rem;
-    max-width: 2rem;
-    border-radius: 0 2px 2px 0;
-}
-.menu-btn {
-    @apply text-gray-900 border-gray-300;
-    min-width: 6.5rem;
+
+.menu-btn.p-button {
+    @apply border-gray-300 text-gray-900 px-4 justify-start text-left flex-grow font-normal;
     width: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    min-width: unset;
+    margin-right: -1px;
     border-radius: 2px 0 0 2px;
-    text-align: left;
-    justify-content: flex-start;
-    margin-right: -4px;
-    &.block {
-        width: 100%;
+    &:not(.active).hovered {
+        @apply border-gray-900;
+    }
+    &.active {
+        @apply border-secondary text-secondary;
     }
 }
 
-.dropdown-mouseover, .dropdown-opened {
-    border-color: theme('colors.secondary') !important;
-    color: theme('colors.secondary') !important;
+.p-icon-button.p-button.outline {
+    @apply flex-shrink-0;
+    &:not(.active).hovered {
+        @apply border-gray-900;
+    }
+    &:not(.disabled):hover {
+        border-color: unset;
+        background-color: unset;
+        color: unset;
+    }
+    &.active {
+        @apply border-secondary text-secondary;
+        &:hover {
+            @apply border-secondary text-secondary;
+        }
+    }
 }
-
 </style>

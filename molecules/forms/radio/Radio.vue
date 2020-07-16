@@ -11,11 +11,14 @@
           v-on="$listeners"
     >
         <input type="radio">
-        <slot :slot-scope="$props">
+        <slot :slot-scope="$props" name="icon">
             <p-i class="radio-icon" width="1.25rem" height="1.25rem"
                  :name="iconName"
             />
         </slot>
+        <span v-if="$scopedSlots.default" class="text" @click.stop="onClick">
+            <slot name="default" />
+        </span>
     </span>
 </template>
 
@@ -90,6 +93,14 @@ export default {
     }
     .radio-icon {
         @apply text-gray-300 cursor-pointer;
+    }
+    .text {
+        @apply cursor-pointer;
+    }
+    .disabled {
+        .text {
+            @apply cursor-not-allowed;
+        }
     }
 }
 </style>

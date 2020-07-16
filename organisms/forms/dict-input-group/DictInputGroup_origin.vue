@@ -37,7 +37,7 @@
                 {{ $t('BTN.ADD') }}
             </p-button> -->
 
-            <PIconTextButton style-type="primary-dark"  class="add-btn" 
+            <PIconTextButton style-type="primary-dark"  class="add-btn"
             name="ic_plus_bold"
             @click="addPair"
             >
@@ -202,7 +202,7 @@ export default {
         display: flex;
         flex-wrap:  wrap;
     }
-    .btn{
+    .p-button{
         flex: none;
     }
     .delete-btn{

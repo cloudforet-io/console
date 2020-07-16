@@ -217,7 +217,7 @@ export default {
         .nav-btn-box {
             display: inline-flex;
             align-items: center;
-            .btn {
+            .p-button {
                 margin-left: 1.5rem;
             }
         }

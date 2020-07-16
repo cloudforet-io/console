@@ -9,13 +9,15 @@ import {
 import PAutocompleteSearch from './PAutocompleteSearch.vue';
 import { autocompleteSearchProps, plainAutocompleteHandler } from './PAutocompleteSearch.toolset';
 import casual, { arrayOf } from '../../../../lib/casual';
+import md from './PAutocompleteSearch.md';
 
 export default {
     title: 'organisms/search/AutocompleteSearch',
     component: PAutocompleteSearch,
     parameters: {
+        notes: md,
         info: {
-            summary: '',
+            summary: md,
             components: { PAutocompleteSearch },
         },
         knobs: { escapeHTML: false },
@@ -98,7 +100,7 @@ export const controlCase = () => ({
                              @menu:select="search"
                              @input="input"
                              @mousedown.stop="mousedown"
-                             @window:click="windowClick"
+                             @menu:hide="onMenuHide"
                              class="mt-10"
         >
             
@@ -146,8 +148,8 @@ export const controlCase = () => ({
                 action('mousedown')(e);
                 state.visibleMenu = true;
             },
-            windowClick(e) {
-                action('window:click')(e);
+            onMenuHide(e) {
+                action('menu:hide')(e);
                 state.visibleMenu = false;
             },
         };

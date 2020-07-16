@@ -6,7 +6,7 @@
         :auto-height="autoHeight"
         :disabled="disabled"
         :loading="loading"
-        @clickMenuEvent="changSelectItem"
+        @select="changSelectItem"
         @openMenu="$emit('openMenu')"
     >
         {{ selectItemLabel }}

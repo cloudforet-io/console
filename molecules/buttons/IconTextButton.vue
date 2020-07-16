@@ -1,8 +1,11 @@
 <template>
     <p-button
-        class="icon-button"
-        :class="classObject"
-        v-bind="$props"
+        class="icon-text-button"
+        :style-type="styleType"
+        :disabled="disabled"
+        :size="size"
+        :outline="outline"
+        :href="href"
         v-on="$listeners"
         @mouseenter="onHover(true)"
         @mouseleave="onHover(false)"
@@ -26,40 +29,27 @@
 
 <script lang="ts">
 import {
-    reactive, computed, toRefs, defineComponent,
+    reactive, computed, toRefs,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import ButtonMixin from '@/components/atoms/buttons/ButtonMixin';
 import color from '@/styles/colors';
+import { buttonProps } from '@/components/atoms/buttons/Button.toolset';
 
 
 export default {
     name: 'PIconTextButton',
     components: { PButton, PI },
-    mixins: [ButtonMixin],
     props: {
+        ...buttonProps,
         name: {
             type: String,
             default: '',
-            validator() {
-                /**
-                 * TODO: CREATE PI.map.js FILE FOR VALIDATION.
-                 *       NEED DEFAULT ICON.
-                 */
-                return true;
-            },
         },
         /** @type {string} */
         dir: {
             type: String,
             default: null,
-            validator() {
-                /**
-                 * TODO
-                 */
-                return true;
-            },
         },
         /** @type {boolean} */
         fill: {
@@ -98,7 +88,6 @@ export default {
     setup(props: any) {
         const state: any = reactive({
             isHover: false,
-            classObject: computed(() => [props.buttonStyle]),
         });
         const defaultIconColor = computed(() => {
             if (props.disabled) {

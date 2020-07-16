@@ -28,7 +28,7 @@
                                          :menu="setDropdownMenu(formData.menu)"
                                          block
                                          class="form"
-                                         @clickMenuEvent="onClickMenu"
+                                         @select="onClickMenu"
                     >
                         {{ value || formData.placeholder }}
                     </p-dropdown-menu-btn>
