@@ -10,6 +10,7 @@
                   @keyup.esc="allFocusOut"
                   @focus="onSearchFocus"
                   @click.stop="showMenu"
+                  @delete="focusSearch"
                   v-on="$listeners"
         >
             <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
