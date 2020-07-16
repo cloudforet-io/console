@@ -1,7 +1,8 @@
 <template>
     <p-button
-        class="icon-button"
-        :class="classObject"
+        class="p-icon-button"
+        :class="{solid, [`icon-btn-${styleType}`]: !!styleType}"
+        :outline="outline"
         :disabled="disabled"
         v-on="$listeners"
         @mouseenter="onHover(true)"
@@ -15,7 +16,7 @@
                 :width="width"
                 :height="height"
                 :scale="scale"
-                :color="iconColor"
+                :color="color"
                 :original="original"
                 :title="title"
             />
@@ -29,49 +30,22 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import { iconProps } from '@/components/atoms/icons/PI.toolset';
+import { iconButtonProps } from '@/components/molecules/buttons/PIconButton.toolset';
 
 export default {
     name: 'PIconButton',
     components: { PButton, PI },
-    mixins: [PI],
-    props: {
-        buttonStyle: {
-            type: String,
-            default: 'transparent',
-            validator: value => ['white', 'transparent', 'gray900'].indexOf(value) !== -1,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        hoverColor: {
-            type: String,
-            default: 'transparent inherit',
-        },
-        disabledColor: {
-            type: String,
-            default: 'transparent inherit',
-        },
-    },
+    props: iconButtonProps,
     setup(props: any) {
         const state: any = reactive({
             isHover: false,
-            classObject: computed(() => [props.buttonStyle]),
-        });
-        const iconColor = computed(() => {
-            if (props.disabled) {
-                return props.disabledColor;
-            } if (state.isHover) {
-                return props.hoverColor;
-            }
-            return props.color;
         });
         const onHover = (value) => {
             state.isHover = value;
         };
         return {
             ...toRefs(state),
-            iconColor,
             onHover,
 
         };
@@ -80,49 +54,70 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.icon-button {
-    border-radius: 2px;
-    padding: 0;
-    display: inline-flex;
-    justify-content: center;
-    align-content: center;
+    @define-mixin button-style
+    $solid-bg-color, $solid-text-color, $outline-border-color, $outline-text-color {
+        color: $outline-text-color;
+
+        &.solid {
+            border-radius: 2px;
+            background-color: $solid-bg-color;
+            border-color: transparent;
+            color: $solid-text-color;
+        }
+
+        &.outline {
+            border-radius: 2px;
+            background-color: transparent;
+            border-color: $outline-border-color;
+            color: $outline-text-color;
+        }
+    }
+
+.p-icon-button {
+    @apply rounded-sm p-0 inline-flex justify-center items-center;
     min-width: 2rem;
     max-width: 2rem;
     min-height: 2rem;
     max-height: 2rem;
 
-    @apply text-gray-400;
-    &:hover {
-        @apply text-white;
-    }
-    &.disabled {
-        @apply bg-gray-200;
-        cursor: unset;
-        &:hover {
-            color: inherit;
-        }
-    }
-    &.white {
-        @apply bg-white border-gray-300;
-        &:hover {
-            @apply text-gray-200;
-        }
-    }
-    &.gray900 {
-        @apply bg-gray-900;
-    }
-    &:not(:disabled):not(.disabled):hover {
-        @apply bg-secondary border-secondary;
-    }
-    &.transparent {
-        &.disabled {
-            color: theme('colors.gray.200') !important;
-            border-color: transparent !important;
-            background-color: transparent !important;
-            cursor: unset;
-            &:hover {
-                color: theme('colors.gray.200') !important;
+    &.p-button {
+        background-color: transparent;
+        border-color: transparent;
+        border-radius: 50px;
+
+        &.outline {
+            border-color: theme('colors.gray.300');
+            color: theme('colors.gray.900');
+            &.disabled {
+                background-color: theme('colors.gray.100');
+                border-color: theme('colors.gray.100');
             }
+        }
+
+        &.disabled {
+            cursor: unset;
+            color: theme('colors.gray.300');
+        }
+
+        &.solid, &.outline {
+            &:not(.disabled):hover {
+                background-color: theme('colors.blue.200');
+                border-color: theme('colors.blue.200');
+                color: theme('colors.secondary');
+            }
+        }
+
+
+        /* default */
+        @mixin button-style
+        theme('colors.gray.900'), theme('colors.white'),
+        theme('colors.gray.300'), theme('colors.gray.900');
+
+        /* themes */
+        &.icon-btn-primary-dark {
+            @mixin button-style
+            theme('colors.primary-dark'), theme('colors.white'),
+            theme('colors.primary-dark'), theme('colors.primary-dark');
         }
     }
 }
