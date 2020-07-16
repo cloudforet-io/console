@@ -28,7 +28,7 @@
                            :class="{ disabled: item.disabled, [theme]: true }"
                            target="_blank"
                            :href="item.href"
-                           @click.stop="item.href ? undefined : menuClick(item.name, index, $event)"
+                           @click.stop="menuClick(item.name, index, $event)"
                            @keyup.up="onUpKey(index)"
                            @keyup.down="onDownKey(index)"
                            @keyup.enter="menuClick(item.name, index, $event)"
