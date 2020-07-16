@@ -141,7 +141,7 @@ export class DataTableState<
             sortBy: '',
             sortDesc: true,
             selectIndex: [],
-            loading: false,
+            loading: true,
         };
     }
 
