@@ -31,7 +31,10 @@
                 {{ timestampFormatter(value) }}
             </template>
             <template #col-collect-format="{item}">
-                <p-button outline style-type="gray900" @click.stop="openCollectDataModal(item)">
+                <p-button
+                    :outline="true"
+                    style-type="gray900" @click.stop="openCollectDataModal(item)"
+                >
                     {{ $t('COMMON.COL_DATA') }}
                 </p-button>
             </template>

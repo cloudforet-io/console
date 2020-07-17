@@ -28,7 +28,9 @@
                 <template #toolbox-bottom>
                     <p v-if="apiHandler.gridTS.querySearch.tags.value.length > 0" class="mb-4">
                         <p-badge v-for="(tag, idx) in apiHandler.gridTS.querySearch.tags.value" :key="idx"
-                                 style-type="primary" outline class="filter-tag"
+                                 style-type="primary"
+                                 :outline="true"
+                                 class="filter-tag"
                         >
                             <span>{{ tag.value }}</span>
                             <p-i name="ic_delete" width="1rem"
@@ -68,7 +70,8 @@
                             <div class="card-bottom">
                                 <div v-if="item.labels">
                                     <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray"
-                                             outline class="mr-2 mb-2"
+                                             :outline="true"
+                                             class="mr-2 mb-2"
                                     >
                                         {{ label }}
                                     </p-badge>

@@ -4,8 +4,8 @@
                      :help="$t('DASHBOARD.ACTION.DAILY_UPDATES')"
     >
         <template #default>
-            <div v-if="loading" class="flex items-center overflow-hidden">
-                <p-skeleton width="2rem" height="2rem" class="mr-4" />
+            <div v-if="loading" class="mr-10 flex items-center overflow-hidden">
+                <p-skeleton width="2rem" height="2rem" class="mx-10" />
                 <div class="grid grid-cols-1 gap-1 w-full">
                     <p-skeleton width="80%" height="0.625rem" />
                     <p-skeleton width="100%" height="0.625rem" />

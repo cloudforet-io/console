@@ -50,9 +50,9 @@
                     @changePageNumber="apiHandler.getData()"
                     @changePageSize="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
-                    @card:click="clickCard"
                     @clickExcel="exportToolSet.getData()"
                 >
+                    <!-- @card:click="clickCard"-->
                     <template slot="toolbox-bottom">
                         <div class="mb-6 search">
                             <p-query-search v-model="apiHandler.gridTS.querySearch.state.searchText"
@@ -73,38 +73,40 @@
                         </div>
                     </template>
                     <template #card="{item}">
-                        <div class="left">
-                            <div class="w-12 h-12">
-                                <img v-if="item.icon"
-                                     width="48px" height="48px"
-                                     :src="item.icon"
-                                     :alt="item.name"
-                                >
-                                <img v-else-if="providerStore.state.providers[item.provider]"
-                                     width="48px" height="48px"
-                                     :src="providerStore.state.providers[item.provider].icon"
-                                     :alt="item.provider"
-                                >
-                                <p-i v-else name="ic_provider_other" width="48px"
-                                     height="48px"
-                                />
-                            </div>
-                            <div class="text-content">
-                                <div class="title">
-                                    {{ item.cloud_service_group }}
+                        <router-link :to="getToCloudService(item)">
+                            <div class="left">
+                                <div class="w-12 h-12">
+                                    <img v-if="item.icon"
+                                         width="48px" height="48px"
+                                         :src="item.icon"
+                                         :alt="item.name"
+                                    >
+                                    <img v-else-if="providerStore.state.providers[item.provider]"
+                                         width="48px" height="48px"
+                                         :src="providerStore.state.providers[item.provider].icon"
+                                         :alt="item.provider"
+                                    >
+                                    <p-i v-else name="ic_provider_other" width="48px"
+                                         height="48px"
+                                    />
                                 </div>
-                                <div class="sub-title">
-                                    <span class="sub-title-provider"> {{ item.provider }} </span>
-                                    <span class="sub-title-divider">
-                                        |
-                                    </span>
-                                    <span class="sub-title-name">{{ item.cloud_service_type }}</span>
-                                    <span class="sub-title-count">
-                                        {{ item.cloud_service_count }}
-                                    </span>
+                                <div class="text-content">
+                                    <div class="title">
+                                        {{ item.cloud_service_group }}
+                                    </div>
+                                    <div class="sub-title">
+                                        <span class="sub-title-provider"> {{ item.provider }} </span>
+                                        <span class="sub-title-divider">
+                                            |
+                                        </span>
+                                        <span class="sub-title-name">{{ item.cloud_service_type }}</span>
+                                        <span class="sub-title-count">
+                                            {{ item.cloud_service_count }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </router-link>
                     </template>
                     <template #no-data>
                         <div v-if="apiHandler.gridTS.state.items.length === 0" class="text-center empty-project">
@@ -158,6 +160,8 @@ import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import { Location } from 'vue-router';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
 export default {
     name: 'ServiceAccount',
@@ -251,6 +255,8 @@ export default {
         );
 
         const clickCard = (item) => {
+            console.log('item test', item);
+            console.log('route test', context.root.$route);
             vm.$router.push({
                 name: 'cloudServicePage',
                 params: {
@@ -299,7 +305,6 @@ export default {
                     getter: queryTagsToQueryString,
                 }),
             provider: makeQueryStringComputed(selectProvider, { key: 'provider', disableAutoReplace: true }),
-            g_s: makeQueryStringComputed(ref(undefined), { key: 'g_s' }),
             ...makeQueryStringComputeds(apiHandler.gridTS.syncState, {
                 pageSize: { key: 'g_ps', setter: Number },
                 thisPage: { key: 'g_p', setter: Number },
@@ -333,6 +338,27 @@ export default {
 
         init();
 
+        const getToCloudService = (item) => {
+            const projects: QueryTag[] = [];
+            apiHandler.gridTS.querySearch.tags.value.forEach((tag) => {
+                if (tag.key) {
+                    if (tag.key.name === 'project_id') projects.push(tag);
+                }
+            });
+            const res: Location = {
+                name: 'cloudServicePage',
+                params: {
+                    provider: item.provider,
+                    group: item.cloud_service_group,
+                    name: item.cloud_service_type,
+                },
+                query: {
+                    f: queryTagsToQueryString(projects),
+                },
+            };
+            return res;
+        };
+
         return {
             selectProvider,
             selectProviderName,
@@ -346,6 +372,7 @@ export default {
             exportToolSet,
             newResourceCountName,
             totalResourceCountName,
+            getToCloudService,
             skeletons: _.range(5),
         };
     },
@@ -402,8 +429,15 @@ export default {
     }
 
     >>> .cst-card-item {
-        @apply p-6 flex flex-row justify-between items-center;
-
+        @apply border border-gray-200 rounded;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        a {
+            @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center overflow-visible;
+            &:hover {
+                @apply bg-blue-100;
+                cursor: pointer;
+            }
+        }
         .left {
             @apply inline-flex items-center;
             img {

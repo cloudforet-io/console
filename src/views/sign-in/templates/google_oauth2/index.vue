@@ -1,24 +1,26 @@
 <template>
     <div>
-    <p class="subtitle">Multicloud Managed Service</p> 
-    <div class="user-info">
-        <div class="g-signin2">
-            <div id="g-signin-btn" class="w-full" />
+        <p class="subtitle">
+            Multicloud Managed Service
+        </p>
+        <div class="user-info">
+            <div class="g-signin2">
+                <div id="g-signin-btn" class="w-full" />
+            </div>
+            <div class="btn-divider">
+                <span>OR</span>
+            </div>
+            <div class="flex flex-col mb-4 md:w-full">
+                <p-button :outline="true"
+                          style-type="gray"
+                          type="submit"
+                          size="lg"
+                          @click="goToAdmin"
+                >
+                    Sign in using root account credentials
+                </p-button>
+            </div>
         </div>
-        <div class="btn-divider">
-            <span>OR</span>
-        </div>
-        <div class="flex flex-col mb-4 md:w-full">
-            <p-button outline
-                      style-type="gray"
-                      type="submit"
-                      size="lg"
-                      @click="goToAdmin"
-            >
-                Sign in using root account credentials
-            </p-button>
-        </div>
-    </div>
     </div>
 </template>
 
@@ -99,7 +101,7 @@ export default defineComponent({
         font-size: 0.875rem;
     }
 
-    .btn.btn-outline-gray { 
+    .btn.btn-outline-gray {
         font-size:.875rem;
         font-weight: normal;
     }
@@ -117,7 +119,7 @@ export default defineComponent({
       font-style: normal;
       font-weight: bold;
       font-size: 0.875rem;
-      margin-bottom:1em; 
+      margin-bottom:1em;
     }
     .btn-divider > span {
         margin:.5rem;

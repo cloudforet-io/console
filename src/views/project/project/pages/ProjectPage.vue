@@ -151,7 +151,7 @@
                                          @click.stop="goToServiceAccount"
                                     >
                                         <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
-                                            <p-i name="ic_plus_bold" color="inherit"
+                                            <p-i name="ic_plus"
                                                  width=".75rem" height=".75rem"
                                             />
                                         </div>
@@ -163,7 +163,7 @@
                                              class="provider-icon"
                                         >
                                         <span class="w-6 h-6 bg-blue-100 rounded-full inline-block provider-add-btn" @click.stop="goToServiceAccount">
-                                            <p-i name="ic_plus_bold" color="inherit"
+                                            <p-i name="ic_plus"
                                                  width=".75rem" height=".75rem"
                                             />
                                         </span>
@@ -691,7 +691,12 @@ export default {
         .action-btn {
             @apply ml-auto justify-end;
             height: auto;
+            font-size: 0.75rem;
             line-height: 1.2;
+            &:hover {
+                @apply text-secondary;
+                cursor: pointer;
+            }
         }
     }
 
@@ -730,14 +735,10 @@ export default {
     }
 
     ::v-deep .card-item {
-        @apply bg-white border border-gray-200;
-        border-radius: 2px;
-        cursor: pointer;
+        @apply bg-white border border-gray-200 overflow-visible rounded cursor-pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         &:hover {
             @apply border-l border-gray-200 bg-blue-100;
-            cursor: pointer;
-             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-             border-radius: 4px;
         }
     }
 
@@ -796,9 +797,6 @@ export default {
                     padding: 0.125rem 0.375rem;
                 }
             }
-            .solid {
-                @apply border-l border-gray-100 mt-5 mb-4 ml-0;
-            }
             .project-summary {
                 @apply mb-6;
                 .summary-item-text {
@@ -808,6 +806,9 @@ export default {
                     @apply ml-2 font-bold;
                 }
             }
+        }
+        .solid {
+            @apply border-l border-gray-100 mt-5 mb-4 ml-0;
         }
 
     .empty-providers {

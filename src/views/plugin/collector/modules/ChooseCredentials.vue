@@ -58,7 +58,10 @@
                              }"
                              target="_blank"
                 >
-                    <p-button outline style-type="gray900">
+                    <p-button
+                        :outline="true"
+                        style-type="gray900"
+                    >
                         {{ $t('INVENTORY.MANAGE_CRD') }}
                     </p-button>
                 </router-link>

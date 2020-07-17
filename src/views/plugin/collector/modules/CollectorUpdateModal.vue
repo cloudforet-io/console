@@ -28,7 +28,7 @@
             <p-button class="reset-btn"
                       style-type="primary-dark"
                       size="lg"
-                      outline
+                      :outline="true"
                       :disabled="loading"
                       @click="onClickReset"
             >

@@ -62,7 +62,7 @@
         </div>
         <div class="flex flex-col mb-4 w-full">
             <p-button
-                outline
+                :outline="true"
                 style-type="gray"
                 type="submit"
                 size="lg"

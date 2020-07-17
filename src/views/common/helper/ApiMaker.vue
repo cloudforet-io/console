@@ -68,7 +68,8 @@
                             @delete:all="querySearch.deleteAllTags"
                         />
                     </PFieldGroup>
-                    <PLoadingButton class="ml-4" style-type="primary" outline
+                    <PLoadingButton class="ml-4" style-type="primary"
+                                    :outline="true"
                                     :loading="loading" :disabled="loading"
                                     @click="execute"
                     >

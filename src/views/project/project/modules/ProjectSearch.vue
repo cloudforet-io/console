@@ -378,9 +378,7 @@ export default {
         @apply px-3;
         .p-search {
             overflow-x: hidden;
-            input {
-                @apply flex-grow-0;
-            }
+            overflow-y: hidden;
         }
         .menu-container {
             @apply pr-4;
@@ -402,7 +400,7 @@ export default {
         }
     }
     .menu-item {
-        @apply text-gray-900 cursor-pointer;
+        @apply text-gray-900 cursor-pointer truncate;
         display: flex;
         align-items: center;
         line-height: 1.2;

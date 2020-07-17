@@ -3,6 +3,7 @@
         <p-tooltip-button tooltip="Services"
                           :tooltip-options="{offset: '20px'}"
                           :active="visible"
+                          :theme="'primary'"
                           @click="toggle"
         >
             <template #buttonContents>
@@ -167,6 +168,9 @@ export default {
 .sitemap-container {
     .service-icon {
         @apply text-primary4;
+        &:hover {
+            @apply bg-primary-dark;
+        }
     }
     .activator {
         @apply text-primary4;
@@ -175,9 +179,6 @@ export default {
         border-radius: 2px;
         min-width: 2rem;
         height: 2rem;
-        &:hover, &.active {
-            @apply bg-primary-dark;
-        }
     }
 
     .sitemap {
