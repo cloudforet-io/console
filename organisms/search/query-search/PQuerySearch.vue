@@ -15,7 +15,7 @@
                            @mousedown.stop="showMenu"
                            @menu:hide="hideMenu"
     >
-        <template #left>
+        <template #search-left>
             <span v-if="selectedKey" class="key-tag"
                   :class="{active: isFocused || visibleMenu}"
             >{{ selectedKey.label }}</span>
@@ -153,7 +153,7 @@ export default {
             if (val !== undefined && val !== null) {
                 if (typeof val === 'string') {
                     const str = val.trim();
-                    if (str) emitSearch(str);
+                    emitSearch(str);
                 } else {
                     emitSearch(val);
                 }
