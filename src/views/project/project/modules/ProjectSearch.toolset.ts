@@ -10,13 +10,13 @@ export interface ProjectGroup {
 }
 
 export interface Props {
-    value: string;
+    searchText: string;
     projectGroup: null|ProjectGroup;
 }
 
 export interface SearchResult {
+    projectGroup: ProjectGroup|null;
     value: string;
-    projectGroupId?: string;
 }
 
 

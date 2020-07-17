@@ -167,6 +167,7 @@ export default {
         };
 
         const findNode = async (groupId: string) => {
+            console.debug('find node', groupId);
             await treeApiHandler.getSearchData(groupId, 'PROJECT_GROUP');
         };
 

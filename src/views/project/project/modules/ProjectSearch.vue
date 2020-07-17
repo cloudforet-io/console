@@ -1,6 +1,6 @@
 <template>
     <div class="project-search">
-        <p-autocomplete-search v-model="searchText"
+        <p-autocomplete-search v-model="proxySearchText"
                                theme="secondary"
                                :placeholder="selectedProjectGroup ? 'project' : 'e.g. project/project group'"
                                :disable-icon="!!selectedProjectGroup"
@@ -135,7 +135,7 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
 
 
 interface State {
-    searchText?: string;
+    proxySearchText?: string;
     trimmedValue: string;
     regex: RegExp;
     selectedProjectGroup: null|ProjectGroup;
@@ -160,6 +160,10 @@ export default {
         PAutocompleteSearch,
     },
     props: {
+        searchText: {
+            type: String,
+            default: '',
+        },
         projectGroup: {
             type: Object,
             default: null,
@@ -172,8 +176,8 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state: UnwrapRef<State> = reactive({
-            searchText: '',
-            trimmedValue: computed<string>(() => (typeof state.searchText === 'string' ? state.searchText.trim() : '')),
+            proxySearchText: makeProxy('searchText', props, emit),
+            trimmedValue: computed<string>(() => (typeof state.proxySearchText === 'string' ? state.proxySearchText.trim() : '')),
             regex: computed(() => {
                 if (state.trimmedValue) {
                     return RegExp(state.trimmedValue, 'i');
@@ -242,10 +246,10 @@ export default {
 
         const listProjectGroups = async () => {
             let api = projectGroupListApi;
-            if (state.searchText) {
+            if (state.proxySearchText) {
                 api = projectGroupListApi.setFilter({
                     key: 'name',
-                    value: state.searchText,
+                    value: state.proxySearchText,
                     operator: '',
                 });
             }
@@ -258,10 +262,10 @@ export default {
             let api = props.projectGroup
                 ? scopedProjectListApi.setProjectGroupId(props.projectGroup.id)
                 : projectListApi;
-            if (state.searchText) {
+            if (state.proxySearchText) {
                 api = api.setFilter({
                     key: 'name',
-                    value: state.searchText,
+                    value: state.proxySearchText,
                     operator: '',
                 });
             }
@@ -300,33 +304,36 @@ export default {
             if (state.visibleMenu) await listItems();
         });
 
-        const onSearch = (e: string) => {
-            let val = e;
-            if (typeof e === 'string') val = e.trim();
+
+        const emitSearch = (value?: string, projectGroup: ProjectGroup|null = null) => {
+            let val = value;
+            if (typeof value === 'string') val = value.trim();
             if (!val) val = '';
             const res: SearchResult = {
+                projectGroup: projectGroup || null,
                 value: val,
             };
-            if (state.selectedProjectGroup) {
-                res.projectGroupId = state.selectedProjectGroup.id;
-            }
             emit('search', res);
             hideMenu();
             state.isFocused = false;
         };
 
+        const onSearch = (e) => {
+            emitSearch(state.proxySearchText, props.projectGroup);
+        };
+
         const onMenuSelect = (value: string, idx: number) => {
             const item = state.menu[idx];
             if (item.dataType === 'PROJECT_GROUP') {
-                emit('update:projectGroup', {
+                const projectGroup = {
                     id: item.name as string,
                     name: item.label as string,
-                });
-                state.searchText = '';
-                onSearch(value);
+                };
+                state.proxySearchText = '';
+                emitSearch(value, projectGroup);
                 state.isFocused = true;
             } else {
-                state.searchText = '';
+                state.proxySearchText = '';
             }
         };
 
@@ -342,16 +349,12 @@ export default {
 
         const onDeletePrefix = (e: KeyboardEvent) => {
             if (!(e.target as HTMLInputElement).value) {
-                emit('update:projectGroup', null);
+                emitSearch('');
             }
         };
 
         const onDeleteAll = () => {
-            emit('update:projectGroup', null);
-            const res: SearchResult = {
-                value: '',
-            };
-            emit('search', res);
+            emitSearch('');
         };
 
 
@@ -359,6 +362,7 @@ export default {
             ...toRefs(state),
             onInput,
             onSearch,
+            emitSearch,
             showMenu,
             hideMenu,
             onMenuSelect,

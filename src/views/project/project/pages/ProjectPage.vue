@@ -10,7 +10,8 @@
                         <!--                             width="1rem" height="1rem" class="icon-help"-->
                         <!--                        />-->
                     </header>
-                    <project-search :project-group.sync="searchedProjectGroup"
+                    <project-search :search-text.sync="searchText"
+                                    :project-group="searchedProjectGroup"
                                     @search="onSearch"
                     />
                 </div>
@@ -276,18 +277,20 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
+    makeQueryStringComputed,
     makeQueryStringComputeds,
 } from '@/lib/router-query-string';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import {
     ProjectGroup,
-    ProjectTreeItem,
+    ProjectTreeItem, SearchResult,
 } from '@/views/project/project/modules/ProjectSearch.toolset';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { Location } from 'vue-router';
 
     interface ProjectCardData{
         projectGroupName: string;
@@ -299,6 +302,7 @@ import { MenuItem } from '@/components/organisms/context-menu/context-menu/PCont
     }
 
     interface State {
+        searchText: string;
         items: ProjectCardData[];
         settingMenu: MenuItem[];
         showAllProjects: boolean;
@@ -339,6 +343,7 @@ export default {
         const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
 
         const state: UnwrapRef<State> = reactive({
+            searchText: '',
             items: [],
             settingMenu: [
                 { name: 'edit', label: 'Edit Group Name', type: 'item' },
@@ -478,7 +483,7 @@ export default {
                     project_group: item.project_group_info,
                     tags: item.tags,
                 },
-            });
+            } as Location);
         };
 
         const goToServiceAccount = () => {
@@ -572,81 +577,100 @@ export default {
             }
         };
 
-        /**
-         * Handling Tree Data
-         * */
 
-        const onSelectTreeItem = (e: ProjectTreeItem|null) => {
+        const listProjects = async (value: string|null, group: ProjectGroup|null = null) => {
+            let api;
+
+            if (group) {
+                api = listAction.setId(group.id);
+            } else {
+                api = listAllAction;
+            }
+            if (value) api = api.setFixFilter({ key: 'name', value, operator: '' });
+
+            apiHandler.action = api;
+            apiHandler.resetAll();
+            await apiHandler.getData();
+        };
+
+        /** Query String */
+        const queryRefs = {
+            ...makeQueryStringComputeds(state, {
+                searchedProjectGroup: {
+                    key: 'select_pg',
+                    getter: (item: null|ProjectGroup) => {
+                        if (item) return item.id;
+                        return null;
+                    },
+                    disableSetter: true,
+                },
+            }),
+            search: makeQueryStringComputed(ref(undefined), {
+                key: 'search',
+            }),
+        };
+
+        /** Search */
+        const onSearch = async (res: SearchResult) => {
+            apiHandler.gridTS.syncState.loading = true;
+
+            if ((res.projectGroup && !state.searchedProjectGroup)
+                || (res.projectGroup && state.searchedProjectGroup && res.projectGroup.id !== state.searchedProjectGroup.id)) {
+                await state.treeRef.findNode(res.projectGroup.id);
+            } else if (!res.projectGroup && state.searchedProjectGroup) {
+                await state.treeRef.listNodes();
+            }
+            state.searchedProjectGroup = res.projectGroup;
+            await listProjects(res.value, res.projectGroup);
+
+            queryRefs.search.value = res.value;
+        };
+
+        const onSelectTreeItem = async (e: ProjectTreeItem|null) => {
             state.selectedTreeItem = e;
             if (e) {
                 state.searchedProjectGroup = {
                     id: e.node.data.id,
                     name: e.node.data.name,
                 };
+                await listProjects(state.searchText, state.searchedProjectGroup);
             } else {
-                state.searchedProjectGroup = e;
+                state.searchedProjectGroup = null;
+                await listProjects(state.searchText as string, null);
             }
         };
 
-
-        /** Search */
-        const onSearch = async ({ value, projectGroupId }) => {
-            if (projectGroupId) {
-                await state.treeRef.findNode(projectGroupId);
-            } else {
-                apiHandler.action = (apiHandler.action as QueryAPI<any, any>).setFixFilter({ key: 'name', value, operator: '' });
-                await apiHandler.getData();
-            }
-        };
-
-
-        onMounted(() => {
-            watch(() => state.searchedProjectGroup, (group) => {
-                if (group) {
-                    apiHandler.action = listAction.setId(group.id);
-                    apiHandler.resetAll();
-                    apiHandler.getData();
-                    if (!state.selectedTreeItem
-                        || (state.selectedTreeItem && state.selectedTreeItem.node.data.id !== group.id)) {
-                        state.treeRef.findNode(group.id);
-                    }
-                } else {
-                    // @ts-ignore
-                    apiHandler.action = listAllAction;
-                    apiHandler.resetAll();
-                    apiHandler.getData();
-                    if (state.selectedTreeItem) state.treeRef.listNodes();
-                }
-            });
-        });
-
-
-        /** Query String */
-        makeQueryStringComputeds(state, {
-            searchedProjectGroup: {
-                key: 'select_pg',
-                getter: (item: null|ProjectGroup) => {
-                    if (item) return item.id;
-                    return null;
-                },
-                disableSetter: true,
-            },
-        });
 
         const init = async () => {
+            // set search text by query string
+            state.searchText = vm.$route.query.search as string;
+
+            // set searched project group by query string
             const pgId = vm.$route.query.select_pg as string|null;
+            let projectGroup: ProjectGroup|null = null;
             if (pgId) {
                 const res = await fluentApi.identity().projectGroup().get()
                     .setId(pgId)
                     .execute();
-                state.searchedProjectGroup = {
+
+                projectGroup = {
                     id: pgId,
                     name: res.data.name,
                 };
             }
+            state.searchedProjectGroup = projectGroup;
+
+            // init tree nodes
+            if (projectGroup) await state.treeRef.findNode(projectGroup.id);
+            else await state.treeRef.listNodes();
+
+            // init project data
+            await listProjects(state.searchText, projectGroup);
         };
 
-        init();
+        onMounted(async () => {
+            await init();
+        });
 
         return {
             ...toRefs(state),
