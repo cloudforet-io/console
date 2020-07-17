@@ -99,6 +99,12 @@ export default {
             color: theme('colors.gray.300');
         }
 
+        &:not(.disabled):hover {
+            background-color: theme('colors.blue.200');
+            border-color: theme('colors.blue.200');
+            color: theme('colors.secondary');
+        }
+
         &.solid, &.outline {
             &:not(.disabled):hover {
                 background-color: theme('colors.blue.200');

@@ -89,6 +89,7 @@ export interface DataTableFieldType {
     label?: string;
     sortable?: boolean;
     sortKey?: string;
+    width?: string;
 }
 
 export type DataTableField = string|DataTableFieldType

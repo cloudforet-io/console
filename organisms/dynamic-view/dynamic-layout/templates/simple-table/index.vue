@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, computed, reactive, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
@@ -35,7 +35,7 @@ import {
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
 
 
-export default defineComponent({
+export default {
     name: 'SDynamicLayoutSimpleTable',
     components: {
         PDynamicField,
@@ -143,5 +143,5 @@ export default defineComponent({
             items,
         };
     },
-});
+};
 </script>

@@ -4,7 +4,7 @@
             <SkePSelectBtnGroup v-if="!layouts" class="skeleton mx-4" />
             <p-select-btn-group
                 v-else
-                class="ml-4"
+                class="px-4"
                 :buttons="buttons" :selected.sync="selected"
             />
         </transition>

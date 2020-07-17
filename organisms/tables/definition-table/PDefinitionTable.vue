@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import {
     definitionTableProps,
@@ -42,7 +42,7 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import _ from 'lodash';
 
-export default defineComponent({
+export default {
     name: 'PDefinitionTable',
     components: { PSkeleton, PEmpty, PDefinition },
     props: definitionTableProps,
@@ -59,7 +59,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

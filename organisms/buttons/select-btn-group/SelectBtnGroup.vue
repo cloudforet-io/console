@@ -1,14 +1,16 @@
 <template>
     <div ref="btnGroup" class="p-select-btn-group">
-        <p-button v-for="btn in btnsData"
-                  :key="btn.name"
-                  :style="dynamicStyle"
-                  :class="{ active:selected === btn.name, 'select-btn': !space, 'select-next-btn': space }"
-                  v-bind="btn.vbind"
-                  @click="clickEvent(btn.name)"
-        >
-            {{ btn.label }}
-        </p-button>
+        <div class="btns">
+            <p-button v-for="btn in btnsData"
+                      :key="btn.name"
+                      :style="dynamicStyle"
+                      :class="{ active:selected === btn.name, 'select-btn': !space, 'select-next-btn': space }"
+                      v-bind="btn.vbind"
+                      @click="clickEvent(btn.name)"
+            >
+                {{ btn.label }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -67,12 +69,13 @@ export default defineComponent({
 <style lang="postcss" scoped>
     .p-select-btn-group {
         @apply flex flex-wrap;
+        .btns {
+            margin-right: -0.5rem;
+            margin-bottom: -0.5rem;
+        }
         .p-button {
-            @apply mr-2;
+            @apply mr-2 mb-2;
             min-width: auto;
-            &:last-of-type {
-                @apply mr-0;
-            }
         }
     }
 </style>

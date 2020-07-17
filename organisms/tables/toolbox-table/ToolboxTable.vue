@@ -99,7 +99,7 @@ import {
 } from '@vue/composition-api';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 // eslint-disable-next-line import/named
-import { dataTableProps } from '@/components/organisms/tables/data-table/toolset';
+import { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.toolset';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';

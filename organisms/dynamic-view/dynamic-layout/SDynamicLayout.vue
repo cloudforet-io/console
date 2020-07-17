@@ -3,7 +3,6 @@
         :is="component"
         :name="name"
         :options="options"
-        :reference="reference"
         :data="data"
         :api="api"
         :toolset="toolset"
@@ -50,14 +49,6 @@ export default defineComponent({
         options: {
             type: Object,
             default: () => ({}),
-        },
-        reference: {
-            type: Object,
-            default: null,
-            validator(reference) {
-                if (reference === null) return true;
-                return reference.reference_type && reference.reference_key;
-            },
         },
         data: {
             type: [Object, Array],

@@ -46,7 +46,7 @@ import _ from 'lodash';
 import {
     reactive, toRefs, getCurrentInstance, computed,
 } from '@vue/composition-api';
-import { DataTableState } from '@/components/organisms/tables/data-table/toolset';
+import { DataTableState } from '@/components/organisms/tables/data-table/DataTable.toolset';
 import { makeTrItems } from '@/lib/view-helper';
 import { dictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
