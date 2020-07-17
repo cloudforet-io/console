@@ -429,10 +429,10 @@ export default {
     }
 
     >>> .cst-card-item {
-        @apply border border-gray-200 rounded;
+        @apply border border-gray-200 rounded overflow-visible;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         a {
-            @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center overflow-visible;
+            @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center rounded overflow-hidden;
             &:hover {
                 @apply bg-blue-100;
                 cursor: pointer;
