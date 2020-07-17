@@ -73,14 +73,21 @@
         </template>
         <template #body>
             <slot v-if="loading" name="loading">
-                <p-tr v-for="s in skeletons" :key="s">
-                    <p-td v-if="selectable" class="!pr-0  min-w-4 w-4">
-                        <p-skeleton width="1rem" height="1rem" />
-                    </p-td>
-                    <p-td v-for="(field, index) in fieldsData" :key="index">
-                        <slot :name="'skeleton-'+field.name" :index="index" :field="field">
-                            <p-skeleton />
-                        </slot>
+<!--                <p-tr v-for="s in skeletons" :key="s">-->
+<!--                    <p-td v-if="selectable" class="!pr-0  min-w-4 w-4">-->
+<!--                        <p-skeleton width="1rem" height="1rem" />-->
+<!--                    </p-td>-->
+<!--                    <p-td v-for="(field, index) in fieldsData" :key="index">-->
+<!--                        <slot :name="'skeleton-'+field.name" :index="index" :field="field">-->
+<!--                            <p-skeleton />-->
+<!--                        </slot>-->
+<!--                    </p-td>-->
+<!--                </p-tr>-->
+                <p-tr v-if="loading" key="loading" class="no-data-row">
+                    <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                        <p-lottie name="spinner" :size="2"
+                                  :auto="true"
+                        />
                     </p-td>
                 </p-tr>
             </slot>
