@@ -14,7 +14,9 @@
                    @delete="emitDeleteTag(idx)"
             >
                 <template v-if="tag.key">
-                    <b>{{ tag.key.label }}</b>:{{ tag.operator }} {{ tag.value }}
+                    <span>
+                      <span class="key-label">{{ tag.key.label }}</span>:{{ tag.operator }} {{ tag.value }}
+                    </span>
                 </template>
                 <template v-else>
                     {{ tag.value }}
@@ -52,11 +54,14 @@ export default {
     margin-bottom: 0.37rem;
     .filter {
         @apply mr-4 rounded-sm;
+        font-size: 0.75rem;
+        line-height: 1.8;
     }
     .divider {
-        @apply inline-block my-0 mx-4;
-        height: 1.375rem;
+        @apply inline-block my-0 mx-4 text-gray-200;
+        height: 1rem;
         border-left-width: 1px;
+        margin-top: 0.22rem;
     }
     .delete-btn {
         .tag {
@@ -68,6 +73,9 @@ export default {
         .tag {
             @apply rounded-sm mr-3 mb-3;
         }
+    }
+    .key-label {
+        @apply font-bold;
     }
 }
 </style>

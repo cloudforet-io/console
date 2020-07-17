@@ -63,8 +63,8 @@ export default {
         @apply border bg-white text-gray-900;
         min-height: 2rem;
         height: 2rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
         border-radius: 2px;
         font-size: .875rem;
         line-height: 2rem;

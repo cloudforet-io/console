@@ -15,7 +15,7 @@
                            :class="{active: popup, hovered: mouseover}"
                            :style-type="buttonStyleType"
                            :disabled="disabled"
-                           outline
+                           :outline="true"
                            @click="onClick"
                            @mouseenter="onMouseOver"
                            @mouseleave="onMouseOut"

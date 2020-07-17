@@ -71,7 +71,8 @@
                     </template>
                 </p-grid-layout>
                 <p-button v-if="chartMetrics.length !== metrics.length"
-                          outline style-type="black" class="more-btn"
+                          :outline="true"
+                          style-type="black" class="more-btn"
                           @click="loadChartMetrics"
                 >
                     MORE
