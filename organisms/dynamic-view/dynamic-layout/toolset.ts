@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { Computed, ComputedOrRef } from '@/lib/type';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { DefinitionProps } from '@/components/organisms/definition/PDefinition.toolset';
-import { DataTableFieldType } from '@/components/organisms/tables/data-table/toolset';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/DataTable.toolset';
 
 
 export interface DynamicFieldType<options=any> {
@@ -63,6 +63,7 @@ export const makeFields = (props: DynamicLayoutProps|any) => computed<DataTableF
     sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
     // eslint-disable-next-line camelcase
     sortKey: ds.options?.sort_key,
+    width: ds.options?.width,
 })) : []));
 
 export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicFieldType[] => (props.options.fields ? props.options.fields.map(ds => ({

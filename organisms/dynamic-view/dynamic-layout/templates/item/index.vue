@@ -11,11 +11,9 @@
 
 <script lang="ts">
 import {
-    defineComponent, computed, reactive, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
 import {
     DynamicFieldType,
     DynamicLayoutProps,
@@ -27,11 +25,9 @@ import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 
 
-export default defineComponent({
+export default {
     name: 'SDynamicLayoutItem',
     components: {
-        PDl,
-        PEmpty,
         PPanelTop,
         PDefinitionTable,
     },
@@ -134,5 +130,5 @@ export default defineComponent({
             rootData,
         };
     },
-});
+};
 </script>

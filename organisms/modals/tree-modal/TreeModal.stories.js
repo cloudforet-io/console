@@ -188,7 +188,7 @@ export const useToolSet = () => ({
                     @node:selected="update"
                     @node:unselected="update"
                     >
-                    <div style="display: flex;" class="max-h-1/3 overflow-auto">
+                    <div style="display: flex; max-height: 30%;" class="overflow-auto">
                         <div>
                             <h4>select node</h4>
                             <pre>{{treeTs.metaState.selectedNode}}</pre>

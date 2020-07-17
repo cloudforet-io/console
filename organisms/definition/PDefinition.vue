@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, ref,
+    ref,
 } from '@vue/composition-api';
 import { definitionProps } from '@/components/organisms/definition/PDefinition.toolset';
 import { copyAnyData } from '@/lib/util';
@@ -30,7 +30,7 @@ import { mouseOverState } from '@/lib/compostion-util';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 
-export default defineComponent({
+export default {
     name: 'PDefinition',
     components: { PCopyButton, PDynamicField },
     props: definitionProps,
@@ -47,7 +47,7 @@ export default defineComponent({
             ...mouseOverState(),
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

@@ -5,7 +5,7 @@ import {
     DataTableState,
     DataTableSyncType,
     DataTableToolSet, LinkState,
-} from '@/components/organisms/tables/data-table/toolset';
+} from '@/components/organisms/tables/data-table/DataTable.toolset';
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
 import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';

@@ -12,9 +12,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-
-export default defineComponent({
+export default {
     name: 'PPanelTop',
     props: {
         useTotalCount: {
@@ -26,7 +24,7 @@ export default defineComponent({
             default: 0,
         },
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -38,7 +36,7 @@ export default defineComponent({
         .title {
             @apply font-bold text-2xl;
         }
-        .total-count{
+        .total-count {
             @apply text-gray-500 text-lg;
         }
         .extra {

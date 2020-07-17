@@ -24,20 +24,22 @@ export default {
         const pushData = (data: any): void => {
             datas.push(data);
         };
-        const getValue = (data, paths: string[], callback: (any) => void) => {
+        const getValue = (data, paths: string[], results: any[]): any[] => {
             if (Array.isArray(data)) {
-                for (const idx in data) {
-                    getValue(data[idx], paths, callback);
-                }
+                data.forEach((v, idx) => {
+                    getValue(data[idx], paths, results);
+                });
             } else if (typeof data === 'object') {
-                getValue(data[paths[0]], paths.slice(1), callback);
-            } else if (paths.length === 0) {
-                callback(data);
+                getValue(data[paths[0]], paths.slice(1), results);
+            } else if (paths.length === 0 && data !== '' && data !== null && data !== undefined) {
+                results.push(data);
             }
+
+            return results;
         };
         if (props.options.sub_key) {
             const subKey = props.options.sub_key.split('.');
-            getValue(props.data, subKey, pushData);
+            datas = getValue(props.data, subKey, []);
         } else {
             datas = props.data;
         }
@@ -71,7 +73,7 @@ export default {
 </script>
 
 <style lang="postcss">
-.dynamic-layout-list{
+.dynamic-layout-list {
     line-height: 1.8;
 }
 </style>
