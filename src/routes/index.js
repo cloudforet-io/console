@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import jwt from 'jsonwebtoken';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
@@ -14,7 +15,7 @@ import managementRoute from '@/routes/management/management-route';
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
-
+import { ref } from '@vue/composition-api';
 
 const DynamicLayoutHelper = () => import('@/views/common/helper/DynamicLayoutHelper.vue');
 const QueryHelper = () => import('@/views/common/helper/QueryHelper.vue');
@@ -115,7 +116,21 @@ const router = new VueRouter({
     ],
 });
 
-const hasLogIn = () => !!localStorage.getItem('user/refreshToken');
+const hasLogIn = () => {
+    const refreshTokenData = localStorage.getItem('user/refreshToken');
+    if (refreshTokenData) {
+        try {
+            const refreshToken = JSON.parse(refreshTokenData).data;
+            const decodedToken = jwt.decode(refreshToken);
+            const expireTime = decodedToken.exp;
+            const currentTime = Math.floor(Date.now() / 1000);
+            return (expireTime - currentTime) > 10;
+        } catch (e) {
+            return false;
+        }
+    }
+    return false;
+};
 const isDomainOwner = () => JSON.parse(localStorage.getItem('user/userType')).data === 'DOMAIN_OWNER';
 
 
@@ -132,6 +147,7 @@ router.beforeEach(async (to, from, next) => {
         }
         next();
     } else if (hasLogIn()) {
+        console.log(hasLogIn());
         if (to.meta && to.meta.isDomainOwnerOnly && !isDomainOwner()) {
             next({ name: 'error' });
         }
