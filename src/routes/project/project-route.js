@@ -1,5 +1,4 @@
 import { fluentApi } from '@/lib/fluent-api';
-import { bypassQueryString } from '@/lib/router-query-string';
 
 const ProjectNavBar = () => import('@/views/project/ProjectNavBar');
 const Project = () => import('@/views/project/project/pages/ProjectPage');
@@ -20,13 +19,13 @@ export default {
         {
             path: '/',
             name: PROJECT_MAIN_PAGE_NAME,
-            props: bypassQueryString,
+            props: true,
             component: Project,
         },
         {
             path: ':id',
             name: PROJECT_DETAIL_PAGE_NAME,
-            props: bypassQueryString,
+            props: true,
             component: ProjectDetail,
         },
         {

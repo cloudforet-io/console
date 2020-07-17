@@ -24,11 +24,14 @@
                     <resources-by-region
                         :get-action="resources.server"
                         :project-filter="projectFilter"
+                        :is-server="true"
                     />
                 </template>
                 <template #cloud_service>
                     <resources-by-region
                         :get-action="resources.cloudService"
+                        :project-filter="projectFilter"
+                        :is-server="false"
                     />
                 </template>
             </PTab>
@@ -57,9 +60,7 @@ import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummar
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { FILTER_OPERATOR } from '@/lib/fluent-api';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { makeTrItems } from '@/lib/view-helper';
@@ -125,7 +126,7 @@ export default {
 
         const cloudServiceSummary = new ServiceSummaryWidgetState({
             title: 'cloud services',
-            to: '/inventory/cloud-service',
+            to: `/inventory/cloud-service?f=project_id%3A${projectId.value}&provider=all&g_p=1&g_ps=24`,
             color: secondary1,
             getAction: api => api.setResourceType('identity.Project')
                 .setFilter({
@@ -142,19 +143,43 @@ export default {
                 .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });
 
+        // const DailyUpdates = ({
+        //     server: api => api.setFilter({
+        //         key: 'values.project_id',
+        //         value: projectId.value,
+        //         operator: '=',
+        //     })
+        //         .setTopic('daily_server_updates_by_project'),
+        //     cloudService: api => api.setFilter({
+        //         key: 'values.project_id',
+        //         value: projectId.value,
+        //         operator: '=',
+        //     })
+        //         .setTopic('daily_cloud_service_updates_by_project'),
+        // });
+
         const dailyUpdates = ({
-            server: api => api.setFilter({
-                key: 'values.project_id',
-                value: projectId.value,
-                operator: '=',
-            })
-                .setTopic('daily_server_updates_by_project'),
-            cloudService: api => api.setFilter({
-                key: 'values.project_id',
-                value: projectId.value,
-                operator: '=',
-            })
-                .setTopic('daily_cloud_service_updates_by_project'),
+            server: api => api.setFilter(
+                { key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
+                { key: 'server_type', value: ['BAREMETAL', 'VM', 'HYPERVISOR'], operator: FILTER_OPERATOR.in },
+            )
+                .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
+                    { key: 'server_type', value: ['BAREMETAL', 'VM', 'HYPERVISOR'], operator: FILTER_OPERATOR.in },
+                    { key: 'deleted_at', value: 'now/d - 2d', operator: FILTER_OPERATOR.gtTime },
+                    { key: 'state', value: 'DELETED', operator: FILTER_OPERATOR.in }])
+                .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
+                    { key: 'server_type', value: ['BAREMETAL', 'VM', 'HYPERVISOR'], operator: FILTER_OPERATOR.in },
+                    { key: 'created_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime }], 1)
+            ,
+            cloudService: api => api.setFilter(
+                { key: 'tags.spaceone:is_major', value: 'true', operator: FILTER_OPERATOR.in },
+            )
+                .setJoinFilter( [{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in }])
+                .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
+                    { key: 'deleted_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime },
+                    { key: 'state', value: 'DELETED', operator: FILTER_OPERATOR.in }], 1)
+                .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
+                    { key: 'created_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime }], 2)
         });
 
         const resources = ({

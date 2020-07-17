@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { BaseQuery, BaseQueryState, TimeStamp } from '@/lib/fluent-api/type';
+import {BaseQuery, BaseQueryState, Page, TimeStamp} from '@/lib/fluent-api/type';
 
 /* Stat Query */
 export enum STAT_OPERATORS {
@@ -48,6 +48,15 @@ export interface AggregateState {
 export interface StatSort {
     name: string;
     desc: boolean;
+}
+
+
+export interface StatTopicQueryState<param> extends BaseQueryState<param> {
+    page: Page;
+}
+
+export interface StatTopicQuery extends BaseQuery {
+    page?: Page;
 }
 
 export interface StatQueryState<param> extends BaseQueryState<param> {

@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { AxiosInstance, AxiosResponse } from 'axios';
+import { OPERATOR_MAP } from '@/lib/fluent-api/toolset';
 
 export type ApiMethods = 'post' | 'get' | 'delete' | 'put';
 
@@ -26,13 +27,15 @@ export enum FILTER_OPERATOR {
     gteTime = 'td_gte',
 }
 
-type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|
-    'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq'|'sum';
+
+export type OperatorType = keyof typeof OPERATOR_MAP;
+// type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|
+//     'td_lt'|'td_gt'|'td_lte'|'td_gte'|'in'|'not_in'|'contain_in'|'not_contain'|'eq'|'not_eq'|'sum';
 
 export interface FilterItem extends LongFilterType {
     key: string;
     value: string | Array<string|null> | null;
-    operator: FILTER_OPERATOR | OperatorType;
+    operator: OperatorType;
 }
 
 export interface ShortFilterType {

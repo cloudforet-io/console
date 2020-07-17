@@ -1,22 +1,17 @@
 import { Ref, ref, watch } from '@vue/composition-api';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
-import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { ListType, QueryAPI } from '@/lib/fluent-api';
+import { ActionAPI, ListType, QueryAPI } from '@/lib/fluent-api';
 import {
     QuerySearchGridLayoutToolSet,
     SearchGridLayoutToolSet,
     ToolboxGridLayoutToolSet,
 } from '@/components/organisms/layouts/toolbox-grid-layout/toolset';
-import { AxiosResponse } from 'axios';
-import { QuerySearchTableToolSet } from '@/components/organisms/tables/toolbox-table/toolset';
-import { getArrayQueryString, pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
-import Vue from 'vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-import _ from 'lodash';
-import { isNotEmpty } from '@/lib/util';
-import { makeSearchQuery, makeSearchText } from '@/components/organisms/search/query-search-bar/toolset';
-import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import {
+    ACHandlerMeta,
+    defaultACHandler,
+    getQueryItemsToFilterItems,
+} from '@/lib/api/query-search';
+import { StatTopicQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 
 export abstract class BaseGridFluentAPI<
     parameter = any,
@@ -24,7 +19,7 @@ export abstract class BaseGridFluentAPI<
     initData = any,
     initSyncData = any,
     T extends ToolboxGridLayoutToolSet<initData, initSyncData> = ToolboxGridLayoutToolSet<initData, initSyncData>,
-    action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
+    action extends ActionAPI<any, any> = ActionAPI<parameter, resp>,
     > extends DynamicFluentAPIToolSet<parameter, resp, action> {
     gridTS: T;
 
@@ -36,11 +31,13 @@ export abstract class BaseGridFluentAPI<
         this.gridTS = new ToolboxGridLayoutToolSet<initData, initSyncData>() as T;
     }
 
-    protected getDefaultAction(): action {
-        return this.action
-            .setThisPage(this.gridTS.syncState.thisPage as number)
-            .setPageSize(this.gridTS.syncState.pageSize as number);
-    }
+    protected abstract getDefaultAction(): action
+
+    // protected getDefaultAction(): action {
+    //     return this.action
+    //         .setThisPage(this.gridTS.syncState.thisPage as number)
+    //         .setPageSize(this.gridTS.syncState.pageSize as number);
+    // }
 
     getAction = () => this.getDefaultAction()
 
@@ -59,8 +56,10 @@ export abstract class BaseGridFluentAPI<
         } catch (e) {
             this.gridTS.state.items = [];
             this.gridTS.state.allPage = 1;
+        } finally {
+            this.gridTS.syncState.loading = false;
         }
-        this.gridTS.syncState.loading = false;
+
         // return res;
     };
 
@@ -97,6 +96,12 @@ export class SearchGridFluentAPI<
         this.gridTS = new SearchGridLayoutToolSet(initData, initSyncData) as T;
     }
 
+    protected getDefaultAction(): action {
+        return (this.action as QueryAPI<parameter, resp>)
+            .setThisPage(this.gridTS.syncState.thisPage as number)
+            .setPageSize(this.gridTS.syncState.pageSize as number) as action;
+    }
+
     // @ts-ignore
     getSearchTableDefaultAction: () => action = () => this.getDefaultAction().setKeyword(this.gridTS.searchText.value);
 
@@ -108,17 +113,90 @@ export class SearchGridFluentAPI<
     };
 }
 
-export interface ACHandlerMeta {
-    handlerClass: typeof BaseAutocompleteHandler;
-    args: any;
+export class StatSearchGridFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchGridLayoutToolSet<initData, initSyncData> = SearchGridLayoutToolSet<initData, initSyncData>,
+    action extends StatTopicQueryAPI<any, any> = StatTopicQueryAPI<parameter, resp>,
+    > extends BaseGridFluentAPI<parameter, resp, action> {
+    gridTS: T;
+
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+    ) {
+        super(action);
+        this.gridTS = new SearchGridLayoutToolSet(initData, initSyncData) as T;
+    }
+
+    protected getDefaultAction(): action {
+        return (this.action as StatTopicQueryAPI<parameter, resp>)
+            .setStart(((this.gridTS.syncState.thisPage - 1) * this.gridTS.syncState.pageSize) + 1)
+            .setLimit(this.gridTS.syncState.pageSize as number) as action;
+    }
+
+    getSearchTableDefaultAction: () => action = () => this.getDefaultAction()//.setKeyword(this.gridTS.searchText.value);
+
+    getAction = () => this.getSearchTableDefaultAction();
+
+    resetAll = () => {
+        this.defaultReset();
+        this.gridTS.searchText.value = '';
+    };
 }
-export const defaultACHandler: ACHandlerMeta = {
-    handlerClass: QuerySearchTableACHandler,
-    args: {
-        keys: [],
-        suggestKeys: [],
-    },
-};
+
+export class StatQuerySearchGridFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends QuerySearchGridLayoutToolSet<initData, initSyncData> = QuerySearchGridLayoutToolSet<initData, initSyncData>,
+    action extends StatTopicQueryAPI<parameter, resp> = StatTopicQueryAPI<parameter, resp>,
+    > extends BaseGridFluentAPI<parameter, resp, initData, initSyncData, T, action> {
+    initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
+        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyHandler, acHandlerMeta.valueHandlerMap, acHandlerMeta.suggestKeys, initData, initSyncData) as T;
+        watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
+            if (tags !== preTags && this.action) {
+                await this.getData(true);
+            }
+        }, { lazy: true });
+    }
+
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        acHandlerMeta: ACHandlerMeta = defaultACHandler,
+        initLazy = false,
+    ) {
+        super(action);
+        if (!initLazy) {
+            this.initToolset(initData, initSyncData, acHandlerMeta);
+        }
+    }
+
+    protected getDefaultAction(): action {
+        return (this.action as StatTopicQueryAPI<parameter, resp>)
+            .setStart(this.gridTS.syncState.thisPage as number)
+            .setLimit(this.gridTS.syncState.pageSize as number) as action;
+    }
+
+    getAction = () => {
+        const items = getQueryItemsToFilterItems(this.gridTS.querySearch.tags.value, this.gridTS.querySearch.suggestKeys);
+        return this.getDefaultAction()
+            .setFilter(...items.and)
+            .setFilterOr(...items.or);
+    };
+
+    resetAll = () => {
+        this.defaultReset();
+        this.gridTS.querySearch.syncState.value = '';
+    };
+}
+
 export class QuerySearchGridFluentAPI<
     parameter = any,
     resp extends ListType<any> = ListType<any>,
@@ -127,10 +205,10 @@ export class QuerySearchGridFluentAPI<
     T extends QuerySearchGridLayoutToolSet<initData, initSyncData> = QuerySearchGridLayoutToolSet<initData, initSyncData>,
     action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
     > extends BaseGridFluentAPI<parameter, resp, initData, initSyncData, T, action> {
-    initToolset = (initData, initSyncData, acHandlerMeta, isShow) => {
-        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
+    initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
+        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyHandler, acHandlerMeta.valueHandlerMap, acHandlerMeta.suggestKeys, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
-            if (isShow.value && tags !== preTags) {
+            if (tags !== preTags) {
                 await this.getData(true);
             }
         });
@@ -141,20 +219,30 @@ export class QuerySearchGridFluentAPI<
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         acHandlerMeta: ACHandlerMeta = defaultACHandler,
-        isShow: any = ref(true),
         initLazy = false,
     ) {
         super(action);
         if (!initLazy) {
-            this.initToolset(initData, initSyncData, acHandlerMeta, isShow);
+            this.initToolset(initData, initSyncData, acHandlerMeta);
         }
     }
 
-    getAction = () => this.getDefaultAction().setFilter(...this.gridTS.querySearch.tags.value);
+    protected getDefaultAction(): action {
+        return (this.action as QueryAPI<parameter, resp>)
+            .setThisPage(this.gridTS.syncState.thisPage as number)
+            .setPageSize(this.gridTS.syncState.pageSize as number) as action;
+    }
+
+    getAction = () => {
+        const items = getQueryItemsToFilterItems(this.gridTS.querySearch.tags.value, this.gridTS.querySearch.suggestKeys);
+        return this.getDefaultAction()
+            .setFilter(...items.and)
+            .setFilterOr(...items.or);
+    };
 
     resetAll = () => {
         this.defaultReset();
-        this.gridTS.querySearch.state.searchText = '';
+        this.gridTS.querySearch.syncState.value = '';
     };
 }
 interface QuerySearchQSNameType{
@@ -201,133 +289,4 @@ export const makeQSGridQSProps = (names: QuerySearchQSNameType) => ({
     },
 });
 
-export class RouteSearchGridFluentAPI<
-    parameter = any,
-    resp extends ListType<any> = ListType<any>,
-    initData = any,
-    initSyncData = any,
-    T extends SearchGridLayoutToolSet<initData, initSyncData> = SearchGridLayoutToolSet<initData, initSyncData>,
-    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
-    > extends SearchGridFluentAPI<parameter, resp, initData, initSyncData, T, action> implements RouterAPIToolsetInterface {
-    constructor(
-        action: action,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-        isShow: any = ref(true),
-        public vm: Vue|ComponentInstance,
-        public qsName: QuerySearchQSNameType = DefaultQSGridQSPropsName,
-        public isReady = false,
-        initLazy = false,
-    ) {
-        super(action, initData, initSyncData);
-
-        watch(() => this.gridTS.syncState.thisPage, async (aft, bef) => {
-            if (!_.isEqual(aft, bef)) {
-                await this.routerPush();
-            }
-        });
-    }
-
-    applyAPIRouter = (props: any) => {
-        if (isNotEmpty(props[this.qsName.pageSize])) {
-            this.gridTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
-        }
-        if (isNotEmpty(props[this.qsName.thisPage])) {
-            this.gridTS.syncState.thisPage = Number(props[this.qsName.thisPage]);
-        }
-        const search = props[this.qsName.search];
-        if (isNotEmpty(search)) {
-            this.gridTS.searchText.value = search;
-        }
-        this.isReady = true;
-    };
-
-    routerPush = async () => {
-        const query = {
-            ...this.vm.$route.query,
-            [this.qsName.search]: this.gridTS.searchText.value,
-            [this.qsName.thisPage]: this.gridTS.syncState.thisPage,
-            [this.qsName.pageSize]: this.gridTS.syncState.pageSize,
-        };
-        if (!query[this.qsName.sortBy]) {
-            delete query[this.qsName.sortDesc];
-        }
-        await pushRouterQuery(this.vm, query);
-    }
-
-    getData = async (resetThisPage = false) => {
-        if (this.isReady) {
-            // if (resetThisPage) {
-            //     this.gridTS.syncState.thisPage = 1;
-            // }
-            await this.defaultGetData(resetThisPage);
-            await this.routerPush();
-        }
-    };
-}
-
 export const DefaultQSGridQSProps = makeQSGridQSProps(DefaultQSGridQSPropsName);
-export class RouteQuerySearchGridFluentAPI<
-    parameter = any,
-    resp extends ListType<any> = ListType<any>,
-    initData = any,
-    initSyncData = any,
-    T extends QuerySearchGridLayoutToolSet<initData, initSyncData> = QuerySearchGridLayoutToolSet<initData, initSyncData>,
-    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
-    > extends QuerySearchGridFluentAPI<parameter, resp, initData, initSyncData, T, action> implements RouterAPIToolsetInterface {
-    constructor(
-        action: action,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-        acHandlerMeta: ACHandlerMeta = defaultACHandler,
-        isShow: any = ref(true),
-        public vm: Vue|ComponentInstance,
-        public qsName: QuerySearchQSNameType = DefaultQSGridQSPropsName,
-        public isReady = false,
-        initLazy = false,
-    ) {
-        super(action, initData, initSyncData, acHandlerMeta, true);
-        if (!initLazy) {
-            this.initToolset(initData, initSyncData, acHandlerMeta, isShow);
-        }
-        watch(() => this.gridTS.syncState.thisPage, async (aft, bef) => {
-            if (!_.isEqual(aft, bef)) {
-                await this.routerPush();
-            }
-        });
-    }
-
-    applyAPIRouter = (props: any) => {
-        if (isNotEmpty(props[this.qsName.pageSize])) {
-            this.gridTS.syncState.pageSize = Number(props[this.qsName.pageSize]);
-        }
-        if (isNotEmpty(props[this.qsName.thisPage])) {
-            this.gridTS.syncState.thisPage = Number(props[this.qsName.thisPage]);
-        }
-        const filters = props[this.qsName.filters];
-        if (isNotEmpty(filters)) {
-            this.gridTS.querySearch.tags.value = getArrayQueryString(filters, makeSearchQuery);
-        }
-        this.isReady = true;
-    };
-
-    routerPush = async () => {
-        const query = {
-            ...this.vm.$route.query,
-            [this.qsName.filters]: this.gridTS.querySearch.tags.value?.map(t => makeSearchText(t.key, t.operator, t.value)),
-            [this.qsName.thisPage]: this.gridTS.syncState.thisPage,
-            [this.qsName.pageSize]: this.gridTS.syncState.pageSize,
-        };
-        if (!query[this.qsName.sortBy]) {
-            delete query[this.qsName.sortDesc];
-        }
-        await pushRouterQuery(this.vm, query);
-    }
-
-    getData = async (resetThisPage = false) => {
-        if (this.isReady) {
-            await this.defaultGetData(resetThisPage);
-            await this.routerPush();
-        }
-    };
-}

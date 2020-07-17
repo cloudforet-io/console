@@ -74,7 +74,6 @@ export { default as PSelectDropdown } from './components/organisms/dropdown/sele
 
 // organisms dynamic view
 export { default as PDynamicField } from './components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-export { default as PDynamicView } from './components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 
 // organisms forms
 export { default as PJsonSchemaFieldGroup } from './components/organisms/forms/json-schema-field-group/JsonSchemaFieldGroup.vue';
@@ -83,7 +82,7 @@ import * as PJsonSchemaFormToolSet from './components/organisms/forms/json-schem
 
 // organisms tables
 export { default as PDataTable } from './components/organisms/tables/data-table/DataTable.vue';
-import * as PDataTableToolSet from './components/organisms/tables/data-table/toolset';
+import * as PDataTableToolSet from './components/organisms/tables/data-table/DataTable.toolset';
 export { default as PToolboxTable } from './components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import * as PToolboxTableToolSet from './components/organisms/tables/toolbox-table/toolset';
 

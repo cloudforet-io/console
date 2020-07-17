@@ -4,11 +4,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
-import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
-import { BaseTableAPI } from '@/lib/api/table';
-
-import validate = WebAssembly.validate;
 
 /**
  * make proxy computed that same name as props
@@ -252,14 +248,3 @@ interface TabState {
     activeTab: Ref<string>;
     activeMultiTab: Ref<string>;
 }
-
-export const tabIsShow = (handler: BaseTableAPI<any, any>, state: TabState, tabName: string) => computed(() => {
-    let result = false;
-    if (handler.tableTS.selectState.isSelectOne) {
-        result = state.activeTab.value === tabName;
-    }
-    if (handler.tableTS.selectState.isSelectMulti) {
-        result = state.activeMultiTab.value === tabName;
-    }
-    return result;
-});

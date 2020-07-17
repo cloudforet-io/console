@@ -10,10 +10,10 @@ import {
     JoinStateItem,
     STAT_OPERATORS,
     StatQuery,
-    StatQueryState,
+    StatQueryState, StatTopicQuery, StatTopicQueryState,
     UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
-import { ApiType } from '@/lib/fluent-api/type';
+import { ApiType, Page } from '@/lib/fluent-api/type';
 import _ from 'lodash';
 
 
@@ -39,6 +39,64 @@ export const getInitJoinState = (): JoinStateItem => ({
     query: getInitStatQueryState(),
 });
 
+export const getInitStatTopicQueryState = <parameter=undefined>(): StatTopicQueryState<parameter> => ({
+    page: {
+        start: undefined,
+        limit: undefined,
+    },
+    ...getBaseQueryApiState<parameter>(),
+} as unknown as StatTopicQueryState<parameter>);
+
+export abstract class StatTopicQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
+    protected apiState: StatTopicQueryState<parameter>;
+
+    constructor(
+        api: ApiType,
+        baseUrl: string,
+        initState: any = {},
+        transformer: null|((any) => any) = null,
+    ) {
+        super(api, baseUrl, undefined, transformer);
+        this.apiState = {
+            ...getInitStatTopicQueryState<parameter>(),
+            ...initState,
+        };
+    }
+
+    protected query = (): StatTopicQuery => this.getStatisticsTopicQuery<StatTopicQuery>({} as StatTopicQuery);
+
+    protected getStatisticsTopicQuery<Q extends StatTopicQuery>(query: Q, state?: StatTopicQueryState<any>): Q {
+        const apiState = state || this.apiState;
+        if (apiState.page.start == undefined && apiState.page.limit == undefined) return this.getBaseQuery<Q>(query, state) as Q;
+        query.page = {} as Page;
+        if (apiState.page.start !== undefined) query.page.start = apiState.page.start;
+        if (apiState.page.limit !== undefined) query.page.limit = apiState.page.limit;
+        return this.getBaseQuery<Q>(query, state) as Q;
+    }
+
+    getParameter = (): any => ({
+        query: this.query(),
+        ...this.apiState.extraParameter,
+    });
+
+    setStart(start: number): this {
+        const api = this.clone();
+        api.apiState.page.start = start;
+        return api;
+    }
+
+    setLimit(limit: number): this {
+        const api = this.clone();
+        api.apiState.page.limit = limit;
+        return api;
+    }
+
+    setPage(page: Page): this {
+        const api = this.clone();
+        api.apiState.page = page;
+        return api;
+    }
+}
 
 export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
     protected apiState: StatQueryState<parameter> ;
@@ -159,4 +217,8 @@ export abstract class StatQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
 
 export abstract class StatAction<parameter, resp> extends StatQueryAPI<parameter, resp> {
     protected path = 'stat';
+}
+
+export abstract class StatTopicAction<parameter, resp> extends StatTopicQueryAPI<parameter, resp> {
+    protected path = 'topic';
 }

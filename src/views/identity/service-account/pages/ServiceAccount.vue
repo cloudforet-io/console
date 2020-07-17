@@ -35,12 +35,12 @@
             </p-grid-layout>
         </template>
         <template #default>
-            <template v-if="selectProvider">
+            <template v-if="!!selectProvider">
                 <div class="w-full h-full">
                     <p-horizontal-layout>
-                        <template #container="{ height }">
+                        <template #container="scope">
                             <PPageTitle
-                                :use-selected-count="true" :use-total-count="true" :title="selectProviderItem.name+' Account'"
+                                :use-selected-count="true" :use-total-count="true" :title="`${selectProviderItem ? selectProviderItem.name : ''} Account`"
                                 :total-count="apiHandler.totalCount.value"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                             />
@@ -48,10 +48,15 @@
                                               :toolset="apiHandler"
                                               :options="{fields: accountFields}"
                                               :vbind="{
-                                                  responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
-                                                  showTitle:false,
-                                                  isShowGetData:false,
+                                                  responsiveStyle: {
+                                                      height: scope ? `${scope.height}px` : 'auto',
+                                                      'overflow-y':'auto','overflow-x':'auto'
+                                                  },
+                                                  showTitle: false,
+                                                  isShowGetData: false,
+                                                  resourceType: 'identity.ServiceAccount'
                                               }"
+                                              @search="onSearch"
                             >
                                 <template #toolbox-left>
                                     <PIconTextButton style-type="primary-dark"
@@ -151,6 +156,7 @@
             <p-empty v-else class="header">
                 No Selected Provider
             </p-empty>
+
             <PDoubleCheckModal
                 v-bind="deleteTS.state"
                 :visible.sync="deleteTS.syncState.visible"
@@ -171,7 +177,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -186,40 +192,33 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import {
     SearchTableFluentAPI, TabSearchTableFluentAPI,
-    defaultAdminLayout, DefaultQSTableQSProps,
-    RouteSearchTableFluentAPI,
+    defaultAdminLayout,
 } from '@/lib/api/table';
 import {
-    DefaultQSGridQSProps,
-    RouteSearchGridFluentAPI,
-} from '@/lib/api/grid';
-import {
-    propsCopy,
+    makeQueryStringComputed,
+    makeQueryStringComputeds,
+    queryStringToNumberArray,
+    selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
 import {
-    SelectGridLayoutToolSet,
-    DefaultSingleItemSelectGridQSProps,
-    DefaultMultiItemSelectGridQSProps,
-    GridLayoutState, makeSelectGridQSProps, DefaultSingleItemSelectGridQSPropsName,
+    GridLayoutState,
 } from '@/components/molecules/layouts/grid-layout/toolset';
 import {
-    DefaultMultiItemTabBarQSProps, DefaultMultiItemTabBarQSPropsName,
-    DefaultSingleItemTabBarQSProps, RouterTabBarToolSet,
     TabBarState,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
-import { ProjectNode } from '@/lib/api/tree';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
-import _, { get, zipObject } from 'lodash';
+import {
+    get, zipObject,
+} from 'lodash';
 
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
@@ -227,13 +226,12 @@ import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { projectFormatter } from '@/lib/display-formatter';
 
 enum providerQsName{
     select = 'provider'
 }
 
-const providerQsNameProps = makeSelectGridQSProps(providerQsName);
 
 export default {
     name: 'ServiceAccount',
@@ -253,15 +251,13 @@ export default {
         STagsPanel,
         SDynamicLayout,
     },
-    props: {
-        ...providerQsNameProps,
-        ...DefaultQSTableQSProps,
-        ...DefaultSingleItemTabBarQSProps,
-        ...DefaultMultiItemTabBarQSProps,
-    },
     setup(props, context) {
-        const { project } = useStore();
-        project.getProject();
+        const vm = getCurrentInstance() as ComponentInstance;
+        const projectState = reactive({
+            project: {},
+        });
+        const { project } = (vm as any).$ls;
+
         const resourceCountAPI = fluentApi.identity().serviceAccount().list().setCountOnly();
         const providerListAPI = fluentApi.identity().provider().list().setOnly(
             'name',
@@ -272,19 +268,13 @@ export default {
             'template.service_account.schema',
             'capability.supported_schema',
         );
-        const vm = getCurrentInstance() as ComponentInstance;
-
 
         const selectProvider = ref<string>('');
         const providers = ref<{[key in string]: ProviderModel}>({});
-        const selectProviderItem = computed<ProviderModel>(() => providers.value[selectProvider.value]);
+        const selectProviderItem = computed<ProviderModel|null>(() => (selectProvider.value ? providers.value[selectProvider.value] : null));
         const providerTotalCount = ref({});
 
-        const providerListState = new SelectGridLayoutToolSet(vm,
-            providerQsName,
-            undefined,
-            selectProvider,
-            undefined,
+        const providerListState = new GridLayoutState(
             {
                 items: computed(() => Object.values(providers.value)),
                 cardClass: (item) => {
@@ -299,25 +289,8 @@ export default {
                 columnGap: '0.5rem',
                 rowGap: '0.5rem',
                 fixColumn: 1,
-            });
-
-        // onMounted(async () => {
-        //     const resp = await providerListAPI.execute();
-        //     const prs = resp.data.results.map(item => item.provider);
-        //     providers.value = zipObject(prs, resp.data.results);
-        //     providerTotalCount.value = reactive<any>(zipObject(
-        //         prs,
-        //         Array(prs.length),
-        //     ));
-        //     selectProvider.value = prs[0];
-        //
-        //     prs.forEach((key) => {
-        //         resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).execute().then((res) => {
-        //             providerTotalCount.value[key] = res.data.total_count;
-        //         });
-        //     });
-        // });
-
+            },
+        );
 
         const originDataSource = computed<any[]>(() => {
             if (selectProviderItem.value) {
@@ -349,47 +322,24 @@ export default {
             .setTransformer((resp: AxiosResponse<ServiceAccountListResp>) => {
                 const result = resp;
                 result.data.results = resp.data.results.map((item) => {
-                    item.console_force_data = { project: item.project_info ? project.state.projects[item.project_info.project_id] || item.project_info.project_id : '' };
+                    item.console_force_data = { project: item.project_info ? projectState.project[item.project_info.project_id] : '' };
+                    // item.console_force_data = { project: projectFormatter(item.project_info.project_id) };
                     return item;
                 });
                 return result;
             });
 
-        const ACHandlerMeta = {
-            handlerClass: QuerySearchTableACHandler,
-            args: {
-                keys: ['name'],
-                suggestKeys: ['name'],
-            },
-        };
 
-        const apiHandler = new RouteSearchTableFluentAPI(ListAction, {
+        const apiHandler = new SearchTableFluentAPI(ListAction, {
             shadow: true,
             border: true,
             padding: true,
             selectable: true,
             excelVisible: true,
         },
-        undefined,
-        vm, undefined, undefined);
-        const exportAction = fluentApi.addons().excel().export();
-        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
+        undefined);
 
-        // watch(selectProvider, (after, before) => {
-        //     if (after && after !== before) {
-        //         apiHandler.resetAll();
-        //         apiHandler.action = ListAction.setFixFilter(
-        //             { key: 'provider', operator: '=', value: after },
-        //         );
-        //         apiHandler.getData();
-        //         exportToolSet.action = exportAction.setDataSource(originDataSource.value);
-        //     }
-        // });
-
-        const singleItemTab = new RouterTabBarToolSet(
-            vm,
-            undefined,
-            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+        const singleItemTab = new TabBarState(
             {
                 tabs: makeTrItems([
                     ['detail', 'TAB.DETAILS'],
@@ -398,21 +348,21 @@ export default {
                     ['member', 'TAB.MEMBER'],
                 ]),
             },
+            {
+                activeTab: 'detail',
+            },
         );
-        singleItemTab.syncState.activeTab = 'detail';
 
-        const multiItemTab = new RouterTabBarToolSet(
-            vm,
-            DefaultMultiItemTabBarQSPropsName,
-            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+        const multiItemTab = new TabBarState(
             {
                 tabs: makeTrItems([
                     ['data', 'TAB.SELECTED_DATA'],
                     ['member', 'TAB.MEMBER'],
                 ]),
+            }, {
+                activeTab: 'data',
             },
         );
-        multiItemTab.syncState.activeTab = 'data';
 
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
@@ -444,38 +394,44 @@ export default {
                 .setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
 
             if (data) {
-                await action.setId(data.id).execute()
-                    .then(() => {
-                        context.root.$notify({
-                            group: 'noticeTopRight',
-                            type: 'success',
-                            title: 'Success',
-                            text: 'Project has been successfully changed.',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                    }).catch((e) => {
-                        showErrorMessage('Fail to Change Project', e, context.root);
+                try {
+                    await action.setId(data.id).execute();
+
+                    context.root.$notify({
+                        group: 'noticeTopRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Project has been successfully changed.',
+                        duration: 2000,
+                        speed: 1000,
                     });
+                } catch (e) {
+                    showErrorMessage('Fail to Change Project', e, context.root);
+                } finally {
+                    await project.getProject(true);
+                    projectState.project = project.state.projects;
+                    await apiHandler.getData();
+                }
             } else {
-                await action.setReleaseProject().execute()
-                    .then(() => {
-                        context.root.$notify({
-                            group: 'noticeTopRight',
-                            type: 'success',
-                            title: 'Success',
-                            text: 'Release Project Success',
-                            duration: 2000,
-                            speed: 1000,
-                        });
-                    }).catch((e) => {
-                        showErrorMessage('Fail to Release Project', e, context.root);
+                try {
+                    await action.setReleaseProject().execute();
+                    context.root.$notify({
+                        group: 'noticeTopRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Release Project Success',
+                        duration: 2000,
+                        speed: 1000,
                     });
+                } catch (e) {
+                    showErrorMessage('Fail to Release Project', e, context.root);
+                } finally {
+                    await apiHandler.getData();
+                }
             }
 
             changeProjectState.loading = false;
             changeProjectState.visible = false;
-            await apiHandler.getData();
         };
 
 
@@ -596,7 +552,7 @@ export default {
             secretSchemas: [] as string[],
         });
         const clickSecretAddForm = () => {
-            secretFormState.secretSchemas = selectProviderItem.value.capability.supported_schema;
+            secretFormState.secretSchemas = selectProviderItem.value?.capability.supported_schema as string[];
             secretFormState.secretFormVisible = true;
         };
         const secretFormConfirm = (item) => {
@@ -624,15 +580,15 @@ export default {
                 });
             secretFormState.secretFormVisible = false;
         };
+
         const addServiceAccount = () => {
-            vm?.$router.push({
+            vm.$router.push({
                 name: 'addServiceAccount',
                 params: { provider: selectProvider.value },
                 query: { nextPath: vm.$route.fullPath },
             });
         };
 
-        apiHandler.getData();
         const clickLink = () => {
             const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
             const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
@@ -649,12 +605,7 @@ export default {
                 },
             };
         });
-        // const saApi = computed(() => {
-        //     const id = apiHandler.tableTS.selectState.firstSelectItem.service_account_id;
-        //     return {
-        //         resource: fluentApi.identity().serviceAccount().get().setId(id),
-        //     };
-        // });
+
         const requestProvider = async () => {
             const resp = await providerListAPI.execute();
             const prs = resp.data.results.map(item => item.provider);
@@ -670,46 +621,60 @@ export default {
             });
         };
 
-        const setFixFilter = (provider: string, handler: RouteSearchTableFluentAPI<any, any>, reset = true) => {
-            handler.action = ListAction.setFixFilter(
-                { key: 'provider', operator: '=', value: provider },
-            );
-            exportToolSet.action = exportAction.setDataSource(originDataSource.value);
-            if (reset) {
-                handler.resetAll();
-            }
+
+        /** Query String */
+        const queryRefs = {
+            provider: makeQueryStringComputed(selectProvider, { key: 'provider' }),
+            ...makeQueryStringComputeds(apiHandler.tableTS.syncState, {
+                pageSize: { key: 'ps', setter: Number },
+                thisPage: { key: 'p', setter: Number },
+                sortBy: { key: 'sb' },
+                sortDesc: { key: 'sd', setter: Boolean },
+                selectIndex: {
+                    key: 'sl',
+                    setter: queryStringToNumberArray,
+                    autoReplacer: selectIndexAutoReplacer,
+                },
+            }),
+            ...makeQueryStringComputeds(multiItemTab.syncState, {
+                activeTab: { key: 'mt' },
+            }),
+            ...makeQueryStringComputeds(singleItemTab.syncState, {
+                activeTab: { key: 'st' },
+            }),
+            t_se: makeQueryStringComputed(ref(undefined), { key: 't_se' }),
         };
 
-        const routerHandler = async () => {
-            const prop = propsCopy(props);
+        // apply search keyword to query string only when search event occurred
+        const onSearch = (e) => { queryRefs.t_se.value = e || undefined; };
+
+        /** Init */
+        const init = async () => {
             await requestProvider();
-            if (prop[providerQsName.select]) {
-                providerListState.applyDisplayRouter(prop);
-            } else {
-                providerListState.select.value = providerListState.state.items[0]?.provider;
-                providerListState.isReady.value = true;
+            // useStore();
+            await project.getProject(true);
+            projectState.project = project.state.projects;
+
+            // init search text by query string
+            apiHandler.tableTS.searchText.value = vm.$route.query.t_se as string;
+
+            if (providerListState.state.items.length > 0) {
+                // set selected provider
+                const provider = queryRefs.provider.value;
+                selectProvider.value = provider || providerListState.state.items[0].provider;
+
+                watch(selectProvider, async (after, before) => {
+                    if (after !== before) {
+                        apiHandler.action = ListAction.setFixFilter(
+                            { key: 'provider', operator: '=', value: after },
+                        );
+                        await apiHandler.getData();
+                    }
+                });
             }
-            setFixFilter(providerListState.select.value, apiHandler, false);
-            apiHandler.applyAPIRouter(prop);
-            await apiHandler.getData();
-            apiHandler.applyDisplayRouter(prop);
-            singleItemTab.applyDisplayRouter(prop);
-            multiItemTab.applyDisplayRouter(prop);
         };
 
-        onMounted(async () => {
-            await routerHandler();
-            // const getData = _.debounce(() => apiHandler.getData(), 50);
-            let ready = false;
-            watch(selectProvider, async (after, before) => {
-                if (ready && after && after !== before) {
-                    setFixFilter(after, apiHandler);
-                    await apiHandler.getData();
-                }
-            });
-            ready = true;
-        });
-
+        init();
 
         return {
             apiHandler,
@@ -730,6 +695,7 @@ export default {
             adminApi,
             clickSecretAddForm,
             ...toRefs(secretFormState),
+            ...toRefs(projectState),
             secretFormConfirm,
             providerListState,
             selectProvider,
@@ -738,9 +704,8 @@ export default {
             clickLink,
             adminIsShow,
             defaultAdminLayout,
-            // saApi,
             saLayout,
-            routerHandler,
+            onSearch,
         };
     },
 };
@@ -748,42 +713,38 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         @apply mx-4;
         &:last-child {
             flex-grow: 1;
         }
     }
-    .provider-list{
+    .provider-list {
         @apply w-full px-4 pt-6;
-
     }
-    >>> .provider-card-item{
+    >>> .provider-card-item {
         @apply px-4 py-3 flex items-center justify-between bg-transparent;
 
-        .left{
+        .left {
             @apply flex items-center;
             .title {
                 @apply ml-4 text-base;
             }
         }
-        .right{
-            .total-count{
+        .right {
+            .total-count {
                 @apply w-10 flex h-6 ml-2 justify-center items-center text-white;
                 border-radius: 6.25rem;
                 border-width: 0.0625rem;
-
             }
         }
-        &.selected{
+        &.selected {
             @apply border-blue-500 bg-blue-200 text-blue-500;
-            .left{
-                .title{
+            .left {
+                .title {
                     @apply text-blue-500;
                 }
             }
         }
-
     }
-
 </style>

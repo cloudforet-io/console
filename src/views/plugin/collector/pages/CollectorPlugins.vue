@@ -97,7 +97,6 @@ import {
 import _ from 'lodash';
 
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
@@ -106,13 +105,14 @@ import { fluentApi } from '@/lib/fluent-api';
 import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 
 const repoState = reactive({
     repositories: [] as unknown as RepositoryModel[],
@@ -130,8 +130,6 @@ export const setup = (props, { root }) => {
         sortBy: 'name',
     });
 
-    const isShow = ref(false);
-
     const listApi = fluentApi.repository().plugin().list().setServiceType('inventory.Collector');
 
     const apiHandler = new QuerySearchGridFluentAPI(
@@ -144,13 +142,10 @@ export const setup = (props, { root }) => {
         },
         undefined,
         {
-            handlerClass: QuerySearchTableACHandler,
-            args: {
-                keys: ['labels'],
-                suggestKeys: ['labels'],
-            },
+            keyHandler: getKeyHandler(['labels']),
+            valueHandlerMap: getStatApiValueHandlerMap(['labels'], 'repository.Plugin'),
+            suggestKeys: ['labels'],
         },
-        isShow,
     );
 
     const listPlugins = _.debounce(async () => {
@@ -186,7 +181,6 @@ export const setup = (props, { root }) => {
         }
     });
 
-    onMounted(() => { isShow.value = true; });
 
     return {
         apiHandler,

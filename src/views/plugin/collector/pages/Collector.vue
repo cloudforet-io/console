@@ -7,7 +7,11 @@
         <p-horizontal-layout>
             <template #container="{ height }">
                 <s-dynamic-layout v-bind="mainTableLayout" :toolset="apiHandler"
-                                  :vbind="{responsiveStyle: { height: `${height}px`, overflow: 'auto' }, showTitle: false}"
+                                  :vbind="{
+                                      responsiveStyle: { height: `${height}px`, overflow: 'auto' },
+                                      showTitle: false,
+                                      resourceType: 'inventory.Collector'
+                                  }"
                 >
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
@@ -97,7 +101,7 @@
 /* eslint-disable class-methods-use-this */
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, onMounted,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
@@ -111,23 +115,23 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
-import { DefaultQSTableQSProps, RouteQuerySearchTableFluentAPI } from '@/lib/api/table';
-import {
-    getEnumValues, getValueHandler, makeValueHandlers, makeValuesFetchHandler,
-} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { dateTimeViewType } from '@/lib/data-source';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Component } from 'vue/types/umd';
 import { showErrorMessage } from '@/lib/util';
 import {
-    DefaultMultiItemTabBarQSProps,
-    DefaultMultiItemTabBarQSPropsName,
-    DefaultSingleItemTabBarQSProps,
-    RouterTabBarToolSet,
+    TabBarState,
 } from '@/components/molecules/tabs/tab-bar/toolset';
-import { propsCopy } from '@/lib/router-query-string';
+import {
+    makeQueryStringComputed,
+    makeQueryStringComputeds, queryStringToNumberArray,
+    queryTagsToOriginal,
+    queryTagsToQueryString, selectIndexAutoReplacer,
+} from '@/lib/router-query-string';
+import { getEnumValueHandler, getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 
 const PTab = (): Component => import('@/components/organisms/tabs/tab/Tab.vue') as Component;
 const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/TableCheckModal.vue') as Component;
@@ -157,57 +161,16 @@ export default {
         STagsPanel,
         SDynamicLayout,
     },
-    props: {
-        ...DefaultQSTableQSProps,
-        ...DefaultSingleItemTabBarQSProps,
-        ...DefaultMultiItemTabBarQSProps,
-    },
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
         const collectorApi = fluentApi.inventory().collector();
 
-        // class ACHandler extends QuerySearchTableACHandler {
-        //     get valuesFetchUrl(): string { return '/inventory/collector/list'; }
-        //
-        //     get valuesFetchKeys(): string[] { return ['collector_id', 'name']; }
-        //
-        //     constructor(args: QSTableACHandlerArgs) {
-        //         super(args);
-        //         this.HandlerMap.value = [
-        //             ...makeValuesFetchHandler(
-        //                 context.parent,
-        //                 '/inventory/collector/list',
-        //                 ['collector_id', 'name'],
-        //             ),
-        //             getEnumValues('state', ['ENABLED', 'DISABLED']),
-        //             getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
-        //         ];
-        //     }
-        // }
-
-        // TODO: Apply revision of backend
-        class ACHandler extends QuerySearchTableACHandler {
-            constructor(args: QSTableACHandlerArgs) {
-                super(args);
-                this.HandlerMap.value = [
-                    ...makeValueHandlers(['collector_id', 'name', 'priority'],
-                        fluentApi
-                            .statisticsTest()
-                            .resource()
-                            .stat()
-                            .setResourceType('inventory.Collector')),
-                    getEnumValues('state', ['ENABLED', 'DISABLED']),
-                    getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
-                ];
-            }
-        }
-
         const args = {
             keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
             suggestKeys: ['collector_id', 'name'],
         };
-        const apiHandler = new RouteQuerySearchTableFluentAPI(
+        const apiHandler = new QuerySearchTableFluentAPI(
             collectorApi.list(),
             {
                 selectable: true,
@@ -220,8 +183,15 @@ export default {
                 excelVisible: true,
             },
             undefined,
-            { handlerClass: ACHandler, args },
-            vm,
+            {
+                keyHandler: getKeyHandler(args.keys),
+                valueHandlerMap: {
+                    ...getStatApiValueHandlerMap(args.keys, 'inventory.Collector'),
+                    state: getEnumValueHandler(['ENABLED', 'DISABLED']),
+                    'plugin_info.options.supported_resource_type': getEnumValueHandler(['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+                },
+                suggestKeys: args.suggestKeys,
+            },
         );
 
         const checkModalState: UnwrapRef<{
@@ -248,10 +218,7 @@ export default {
             visible: false,
         });
 
-        const singleItemTab = new RouterTabBarToolSet(
-            vm,
-            undefined,
-            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+        const singleItemTab = new TabBarState(
             {
                 tabs: computed(() => makeTrItems([
                     ['detail', 'PANEL.DETAILS', { keepAlive: true }],
@@ -261,18 +228,21 @@ export default {
                 ],
                 context.parent)),
             },
+            {
+                activeTab: 'detail',
+            },
         );
-        singleItemTab.syncState.activeTab = 'detail';
 
-        const multiItemTab = new RouterTabBarToolSet(vm,
-            DefaultMultiItemTabBarQSPropsName,
-            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+        const multiItemTab = new TabBarState(
             {
                 tabs: makeTrItems([
                     ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
                 ], context.parent),
-            });
-        multiItemTab.syncState.activeTab = 'data';
+            },
+            {
+                activeTab: 'data',
+            },
+        );
 
         const state = reactive({
             dropdown: computed(() => (
@@ -290,7 +260,7 @@ export default {
                 type: 'query-search-table',
                 options: {
                     fields: [
-                        { key: 'name', name: vm.$t('COMMON.NAME') },
+                        { key: 'name', name: vm.$t('COMMON.NAME'), options: { width: '2rem' } },
                         {
                             key: 'state',
                             name: vm.$t('COMMON.STATE'),
@@ -300,7 +270,7 @@ export default {
                                 DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
                             },
                         },
-                        { key: 'priority', name: vm.$t('COMMON.PRIORITY') },
+                        { key: 'priority', name: vm.$t('COMMON.PRIORITY'), options: { width: '30rem' } },
                         {
                             key: 'plugin_info.options.supported_resource_type',
                             name: vm.$t('COMMON.RESOURCE'),
@@ -390,17 +360,32 @@ export default {
         const onClickCollectData = (): void => {
             collectDataState.visible = true;
         };
-        const routerHandler = async () => {
-            const prop = propsCopy(props);
-            apiHandler.applyAPIRouter(prop);
-            await apiHandler.getData();
-            apiHandler.applyDisplayRouter(prop);
-            singleItemTab.applyDisplayRouter(prop);
-            multiItemTab.applyDisplayRouter(prop);
+
+        const queryRefs = {
+            f: makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
+                {
+                    key: 'f',
+                    setter: queryTagsToOriginal,
+                    getter: queryTagsToQueryString,
+                }),
+            ...makeQueryStringComputeds(apiHandler.tableTS.syncState, {
+                pageSize: { key: 'ps', setter: Number },
+                thisPage: { key: 'p', setter: Number },
+                sortBy: { key: 'sb' },
+                sortDesc: { key: 'sd', setter: Boolean },
+                selectIndex: {
+                    key: 'sl',
+                    setter: queryStringToNumberArray,
+                    autoReplacer: selectIndexAutoReplacer,
+                },
+            }),
+            ...makeQueryStringComputeds(multiItemTab.syncState, {
+                activeTab: { key: 'mt' },
+            }),
+            ...makeQueryStringComputeds(singleItemTab.syncState, {
+                activeTab: { key: 'st' },
+            }),
         };
-        onMounted(async () => {
-            await routerHandler();
-        });
 
         return {
             ...toRefs(state),
@@ -409,7 +394,6 @@ export default {
             updateModalState,
             collectDataState,
             checkModalState,
-            ACHandler,
             apiHandler,
             getIcon: (data): void => _.get(data, 'item.tags.icon', ''),
             onClickUpdate,

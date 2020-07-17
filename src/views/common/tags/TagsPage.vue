@@ -31,7 +31,7 @@
             >
                 <template #addButton="scope">
                     <p-icon-text-button
-                        outline style-type="primary" :disabled="scope.disabled"
+                        outline style-type="primary-dark" :disabled="scope.disabled"
                         name="ic_plus_bold"
                         @click="scope.addPair($event)"
                     >
@@ -41,10 +41,10 @@
             </p-dict-input-group>
         </p-pane-layout>
         <div class="buttons">
-            <p-button outline style-type="primary-dark" @click="goBack">
+            <p-button style-type="gray900" :outline="true" @click="goBack">
                 {{ $t('BTN.CANCEL') }}
             </p-button>
-            <p-button style-type="primary" @click="onSave">
+            <p-button style-type="primary-dark" @click="onSave">
                 {{ $t('BTN.SAVE') }}
             </p-button>
         </div>

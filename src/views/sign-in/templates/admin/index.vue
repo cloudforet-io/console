@@ -1,7 +1,7 @@
 <template>
-    <div class="user-info md:min-w-72">
+    <div class="user-info">
         <p v-if="!loginFail" class="subtitle">
-           Multicloud Managed Service 
+            Multicloud Managed Service
         </p>
         <p v-else-if="loginFail" id="errorMsg" class="subtitle">
             Please Confirm your ID or Password.
@@ -54,7 +54,7 @@
             <p-button style-type="primary" type="submit" size="lg"
                       @click="login"
             >
-               Admin Sign in
+                Admin Sign in
             </p-button>
         </div>
     </div>
@@ -155,6 +155,12 @@ export default defineComponent({
 
     #errorMsg {
         color: red;
+    }
+
+    .user-info {
+        @screen md {
+            min-width: 18rem;
+        }
     }
 
 </style>

@@ -50,19 +50,22 @@
                 <PPaneLayout v-else class="p-4">
                     <PJsonSchemaForm v-bind="methodForm.state" :item.sync="methodForm.syncState.item" />
                     <PFieldGroup v-if="hasFilter" label="Filter">
-                        <p-query-search-bar
-                            class="search-bar"
-                            :search-text.sync="querySearch.state.searchText"
-                            :autocomplete-handler="querySearch.acHandler.value"
-                            @newQuery="querySearch.addTag"
+                        <p-query-search v-model="querySearch.syncState.value"
+                                        class="search-bar"
+                                        v-bind="querySearch.state"
+                                        @menu:show="querySearch.onMenuShow"
+                                        @key:input="querySearch.onKeyInput"
+                                        @value:input="querySearch.onValueInput"
+                                        @key:select="querySearch.onKeySelect"
+                                        @search="querySearch.onSearch"
                         />
                         <p-hr v-if="querySearch.tags.value.length !== 0" style="width: 100%;" />
                         <p-query-search-tags
                             v-if="querySearch.tags.value.length !== 0"
                             class="py-2"
                             :tags="querySearch.tags.value"
-                            @deleteTag="querySearch.deleteTag"
-                            @deleteAllTags="querySearch.deleteAllTags"
+                            @delete:tag="querySearch.deleteTag"
+                            @delete:all="querySearch.deleteAllTags"
                         />
                     </PFieldGroup>
                     <PLoadingButton class="ml-4" style-type="primary" outline
@@ -114,12 +117,12 @@ import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonS
 import { JsonSchemaObjectType, JsonSchemaType } from '@/lib/type';
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
-import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
-import { BaseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
+import { QuerySearchToolSet } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
+import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 
 const checkApi = (api: any, target: string, matches: string[]): boolean => {
     // eslint-disable-next-line no-proto
@@ -188,6 +191,7 @@ const METHOD_FORM: MethodForm = {
 export default {
     name: 'DynamicLayoutHelper',
     components: {
+        PQuerySearch,
         PPaneLayout,
         GeneralPageLayout,
         PSelectDropdown,
@@ -195,7 +199,6 @@ export default {
         RawData,
         PJsonSchemaForm,
         PHr,
-        PQuerySearchBar,
         PQuerySearchTags,
         PFieldGroup,
         PLoadingButton,
@@ -319,7 +322,7 @@ export default {
             }),
             result: {},
         });
-        const querySearch = new QuerySearchToolSet(BaseAutocompleteHandler);
+        const querySearch = new QuerySearchToolSet(defaultACHandler.keyHandler, defaultACHandler.valueHandlerMap, defaultACHandler.suggestKeys);
 
         const methodForm = new JsonSchemaFormToolSet();
         watch(() => state.schema, (aft, bef) => {
@@ -358,7 +361,9 @@ export default {
                 }
             });
             if (state.hasFilter && querySearch.tags.value.length > 0) {
-                act = act.setFilter(...querySearch.tags.value);
+                const items = getQueryItemsToFilterItems(querySearch.tags.value, querySearch.suggestKeys);
+                act = act.setFilter(...items.and)
+                    .setFilterOr(...items.or);
             }
             state.loading = true;
             try {
@@ -375,7 +380,7 @@ export default {
         const onServiceSelect = () => {
             state.selectResource = '';
             onResourceSelect();
-            querySearch.state.searchText = '';
+            querySearch.syncState.value = '';
             querySearch.deleteAllTags();
         };
 

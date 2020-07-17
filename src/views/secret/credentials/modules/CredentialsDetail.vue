@@ -1,9 +1,11 @@
 <template>
     <div>
         <p-panel-top>Base Information</p-panel-top>
-        <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
-                        :data_source="baseDataSource"
-        />
+        <p-definition-table :items="defs">
+            <template #data-created_at="{data}">
+                {{ data ? timestampFormatter(data) : '' }}
+            </template>
+        </p-definition-table>
         <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
                       :edit-mode.sync="tagsApi.ts.syncState.editMode"
                       v-on="tagsApi.ts.listeners"
@@ -11,20 +13,24 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 /* eslint-disable camelcase */
 
-import { watch } from '@vue/composition-api';
+import { computed, watch } from '@vue/composition-api';
 import { DictPanelAPI } from '@/lib/api/dict';
 import { fluentApi } from '@/lib/fluent-api';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
+import { makeDefItems } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
+import { timestampFormatter } from '@/lib/util';
 
 export default {
     name: 'PCredentialsDetail',
     components: {
-        PDictPanel, PDynamicView, PPanelTop,
+        PDefinitionTable,
+        PDictPanel,
+        PPanelTop,
     },
     props: {
         item: {
@@ -36,38 +42,16 @@ export default {
         tagResetEvent: String,
     },
     setup(props, { parent }) {
-        const baseDataSource = [
-            { name: 'ID', key: 'secret_id' },
-            { name: 'Name', key: 'name' },
-            { name: 'Secret Type', key: 'secret_type' },
-            {
-                name: 'Created at',
-                key: 'created_at.seconds',
-                view_type: 'datetime',
-                view_option: {
-                    source_type: 'timestamp',
-                    source_format: 'seconds',
-                },
-            },
-            // {
-            //     name: 'Group',
-            //     key: 'secret_groups',
-            //     view_type: 'list',
-            //     view_option: {
-            //         sub_key: 'name',
-            //         delimiter: ' ',
-            //         item: {
-            //             view_type: 'badge',
-            //             view_option: {
-            //                 text_color: '#222532',
-            //                 background_color: '#DCDDE2',
-            //             },
-            //         },
-            //     },
-            // },
-        ];
-
         const tagsApi = new DictPanelAPI(fluentApi.secret().secret());
+
+        const defs = computed(() => {
+            return makeDefItems([
+                { label: 'ID', name: 'secret_id' },
+                { label: 'Name', name: 'name' },
+                { label: 'Secret Type', name: 'secret_type' },
+                { label: 'Created at', name: 'created_at' },
+            ], props.item);
+        });
 
         watch(() => props.item, async (item) => {
             tagsApi.setId(item.secret_id);
@@ -76,8 +60,9 @@ export default {
         });
 
         return {
-            baseDataSource,
             tagsApi,
+            defs,
+            timestampFormatter,
         };
     },
 };

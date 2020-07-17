@@ -10,7 +10,7 @@ import {
     ShortFilterType,
     RawParameterActionState,
     QueryApiState,
-    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface, TreeParameter,
+    BaseQueryState, BaseQuery, ApiType, ActionAPIInterface, TreeParameter, Page,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 import { SEARCH_PREFIX } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
@@ -56,8 +56,9 @@ export abstract class ActionAPI<parameter = any, resp = any> implements ActionAP
     }
 
     setTransformer<returnType = any>(func: (resp: AxiosResponse<resp>) => returnType | Promise<returnType>): this {
-        this.transformer = func;
-        return this.clone();
+        const api = this.clone();
+        api.transformer = func;
+        return api;
     }
 
 
@@ -139,6 +140,9 @@ export const OPERATOR_MAP = Object.freeze({
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
+    '=': 'in', // merge operator
+    '!=': 'not_in', // merge operator
+    $: 'regex',
     td_lt: 'timediff_lt',
     td_gt: 'timediff_gt',
     td_lte: 'timediff_lte',
@@ -149,11 +153,9 @@ export const OPERATOR_MAP = Object.freeze({
     not_contain: 'not_contain', // merge operator
     eq: 'in', // merge operator
     not_eq: 'not_in', // merge operator
-    '=': 'in', // merge operator
-    '!=': 'not_in', // merge operator
-    $: 'regex',
     sum: 'sum',
 });
+
 const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
 type MergeQueryType = { [k: string]: ShortFilterType };
@@ -299,11 +301,16 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
 
     protected query = (): Query => {
         const query: Query = {};
-        if (this.apiState.thisPage !== 0 && this.apiState.pageSize !== 0) {
-            query.page = {
-                start: ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1,
-                limit: this.apiState.pageSize,
-            };
+
+        if (this.apiState.thisPage !== 0 || this.apiState.pageSize !== 0) {
+            const page: Page = {} as Page;
+            if (this.apiState.thisPage !== 0) {
+                page.start = ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1;
+            }
+            if (this.apiState.pageSize !== 0) {
+                page.limit = this.apiState.pageSize;
+            }
+            query.page = page;
         }
         if (this.apiState.sortBy) {
             query.sort = {
@@ -320,7 +327,8 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
         if (this.apiState.keyword) {
             query.keyword = this.apiState.keyword;
         }
-        return this.getBaseQuery<Query>(query) as Query;
+
+        return { ...query, ...this.getBaseQuery<Query>(query) } as Query;
     };
 
     setOnly(...args: string[]): this {
@@ -648,9 +656,11 @@ export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<par
 export abstract class SingleItemQueryAction<parameter, resp> extends QueryAPI<parameter, resp> {
     protected abstract idField: string;
 
-    setId(id: string): this {
-        this.apiState.extraParameter[this.idField] = id;
-        return this.clone();
+    setId(id?: string): this {
+        const api = this.clone();
+        if (id) api.apiState.extraParameter[this.idField] = id;
+        else delete api.apiState.extraParameter[this.idField];
+        return api;
     }
 }
 

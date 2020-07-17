@@ -96,7 +96,9 @@
                         </p-td>
                         <p-td class="text-center">
                             <p-badge :background-color="colors.cloud_services">
-                                {{ item.cloud_services || 0 }}
+                                <router-link :to="`/inventory/cloud-service?f=project_id%3A%3D${item.project_id}`">
+                                    {{ item.cloud_services || 0 }}
+                                </router-link>
                             </p-badge>
                         </p-td>
                     </p-tr>
@@ -129,9 +131,11 @@
                         </router-link>
                     </div>
                 </template>
-                <template #col-cloud_services-format="{value}">
+                <template #col-cloud_services-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        {{ value || 0 }}
+                        <router-link :to="`/inventory/cloud-service?f=project_id%3A%3D${item.project_id}`">
+                            {{ item.cloud_services || 0 }}
+                        </router-link>
                     </div>
                 </template>
             </p-data-table>

@@ -24,35 +24,71 @@
                 <project-dashboard ref="ProjectDashboard" />
             </template>
             <template #member>
-                <p-dynamic-view view_type="query-search-table"
-                                :api-handler="apiHandler"
-                                :data_source="dataSource"
-                                :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
-                                :data="null"
-                                class="tab-bg"
+                <p-toolbox-table class="member-tab"
+                                 v-bind="memberApiHandler.tableTS.state"
+                                 :sort-by.sync="memberApiHandler.tableTS.syncState.sortBy"
+                                 :sort-desc.sync="memberApiHandler.tableTS.syncState.sortDesc"
+                                 :select-index.sync="memberApiHandler.tableTS.syncState.selectIndex"
+                                 :loading.sync="memberApiHandler.tableTS.syncState.loading"
+                                 :this-page.sync="memberApiHandler.tableTS.syncState.thisPage"
+                                 :page-size.sync="memberApiHandler.tableTS.syncState.pageSize"
+                                 @changePageSize="memberApiHandler.getData"
+                                 @changePageNumber="memberApiHandler.getData"
+                                 @clickRefresh="memberApiHandler.getData"
+                                 @changeSort="memberApiHandler.getData"
                 >
                     <template #toolbox-top>
-                        <PPageTitle :title="'Member'" use-total-count :total-count="apiHandler.totalCount.value" />
+                        <p-page-title :title="'Member'" use-total-count :total-count="memberApiHandler.totalCount.value" />
                     </template>
                     <template #toolbox-left>
-                        <div class="flex pr-4 toolbox-left">
-                            <PIconTextButton style-type="primary-dark" class=" mr-4 add-btn"
-                                             name="ic_plus_bold"
-                                             @click="openMemberAddForm()"
+                        <div class="toolbox-left">
+                            <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
+                                                name="ic_plus_bold"
+                                                @click="openMemberAddForm()"
                             >
                                 {{ $t('BTN.ADD') }}
-                            </PIconTextButton>
-                            <p-button
-                                outline
-                                style-type="alert"
-                                :disabled="apiHandler.tableTS.selectState.isNotSelected"
-                                @click="memberDeleteClick"
+                            </p-icon-text-button>
+                            <p-button class="mr-4"
+                                      :outline="true"
+                                      style-type="alert"
+                                      :disabled="memberApiHandler.tableTS.selectState.isNotSelected"
+                                      @click="memberDeleteClick"
                             >
                                 Delete
                             </p-button>
+                            <p-search v-model="memberApiHandler.tableTS.searchText.value" @search="onSearch" @delete="onSearch()" />
                         </div>
                     </template>
-                </p-dynamic-view>
+                </p-toolbox-table>
+                <!--                <p-dynamic-view view_type="query-search-table"-->
+                <!--                                :api-handler="memberApiHandler"-->
+                <!--                                :data_source="memberFields"-->
+                <!--                                :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"-->
+                <!--                                :data="null"-->
+                <!--                                class="tab-bg"-->
+                <!--                >-->
+                <!--                    <template #toolbox-top>-->
+                <!--                        <PPageTitle :title="'Member'" use-total-count :total-count="memberApiHandler.totalCount.value" />-->
+                <!--                    </template>-->
+                <!--                    <template #toolbox-left>-->
+                <!--                        <div class="flex pr-4 toolbox-left">-->
+                <!--                            <PIconTextButton style-type="primary-dark" class=" mr-4 add-btn"-->
+                <!--                                             name="ic_plus_bold"-->
+                <!--                                             @click="openMemberAddForm()"-->
+                <!--                            >-->
+                <!--                                {{ $t('BTN.ADD') }}-->
+                <!--                            </PIconTextButton>-->
+                <!--                            <p-button-->
+                <!--                                outline-->
+                <!--                                style-type="alert"-->
+                <!--                                :disabled="memberApiHandler.tableTS.selectState.isNotSelected"-->
+                <!--                                @click="memberDeleteClick"-->
+                <!--                            >-->
+                <!--                                Delete-->
+                <!--                            </p-button>-->
+                <!--                        </div>-->
+                <!--                    </template>-->
+                <!--                </p-dynamic-view>-->
             </template>
             <template #tag>
                 <s-tags-panel
@@ -103,9 +139,7 @@ import {
     computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 
-import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -114,13 +148,12 @@ import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 
-import { DataSourceItem, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import {
-    QuerySearchTableFluentAPI,
+    SearchTableFluentAPI,
 } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
@@ -130,21 +163,27 @@ import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { showErrorMessage } from '@/lib/util';
 import {
-    DefaultSingleItemTabBarQSProps,
-    RouterTabBarToolSet,
+    TabBarState,
 } from '@/components/molecules/tabs/tab-bar/toolset';
-import { propsCopy } from '@/lib/router-query-string';
+import {
+    makeQueryStringComputed,
+    makeQueryStringComputeds,
+    queryStringToNumberArray,
+    selectIndexAutoReplacer,
+} from '@/lib/router-query-string';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { makeValueHandlers } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
     name: 'ProjectDetail',
     components: {
+        PSearch,
+        PToolboxTable,
         ProjectDashboard,
         PTableCheckModal,
         PButtonModal,
         GeneralPageLayout,
-        PDynamicView,
         STagsPanel,
         PPageTitle,
         PTab,
@@ -154,9 +193,6 @@ export default {
         SProjectCreateFormModal,
         SProjectMemberAddModal,
         PIconTextButton,
-    },
-    props: {
-        ...DefaultSingleItemTabBarQSProps,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -189,10 +225,7 @@ export default {
             }
         });
 
-        const singleItemTab = new RouterTabBarToolSet(
-            vm,
-            undefined,
-            undefined,
+        const singleItemTab = new TabBarState(
             {
                 tabs: computed(() => makeTrItems([
                     ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
@@ -201,65 +234,35 @@ export default {
                 ],
                 context.parent)),
             },
-        );
-        singleItemTab.syncState.activeTab = 'summary';
-
-        // Auto Complete Handler for query search bar
-        const projectKeyAutoCompletes = ['name'];
-        const projectACHandlerMeta = {
-            handlerClass: QuerySearchTableACHandler,
-            args: {
-                keys: projectKeyAutoCompletes,
-                suggestKeys: projectKeyAutoCompletes,
+            {
+                activeTab: 'summary',
             },
-        };
+        );
 
         // List api Handler for query search table
         const MemberListAction = fluentApi.identity().project().memberList().setId(projectId.value);
 
-        class ACHandler extends QuerySearchTableACHandler {
-            constructor(args: QSTableACHandlerArgs) {
-                super(args);
-                this.HandlerMap.value = [
-                    ...makeValueHandlers(['user_id'],
-                        // fluentApi
-                        //     .statisticsTest()
-                        //     .resource()
-                        //     .stat()
-                        //     .setResourceType('identity.Project')
-                        //     .setFixFilter({
-                        //         key: 'project_id',
-                        //         value: projectId.value,
-                        //         operator: FILTER_OPERATOR.in,
-                        //     })),
-                        MemberListAction),
-                ];
-            }
-        }
-        const args = {
-            keys: [
-                'user_id',
-            ],
-            suggestKeys: ['user_id'],
-        };
 
-        const apiHandler = new QuerySearchTableFluentAPI(MemberListAction, {
+        const memberApiHandler = new SearchTableFluentAPI(MemberListAction, {
             shadow: false,
             border: false,
             padding: true,
             selectable: true,
             dragable: true,
-        }, undefined, { handlerClass: ACHandler, args });
+            fields: [
+                { label: 'Name', name: 'user_info.name', type: 'item' },
+                { label: 'State', name: 'user_info.state', type: 'item' },
+                { label: 'ID', name: 'user_info.user_id', type: 'item' },
+                { label: 'Email', name: 'user_info.email', type: 'item' },
+                { label: 'Mobile', name: 'user_info.mobile', type: 'item' },
+                { label: 'Group', name: 'user_info.group', type: 'item' },
+                { label: 'Language', name: 'user_info.language', type: 'item' },
+            ],
+            responsiveStyle: {
+                height: '30rem', overflow: 'auto', padding: 0,
+            },
+        }, undefined);
 
-        const dataSource: DataSourceItem[] = [
-            { name: 'ID', key: 'user_info.user_id' },
-            { name: 'Name', key: 'user_info.name' },
-            { name: 'State', key: 'user_info.state' },
-            { name: 'Email', key: 'user_info.email' },
-            { name: 'Mobile', key: 'user_info.mobile' },
-            { name: 'Group', key: 'user_info.group' },
-            { name: 'Language', key: 'user_info.language' },
-        ];
 
         // Tag
         const tagsApi = new DictPanelAPI(fluentApi.identity().project());
@@ -289,26 +292,24 @@ export default {
             formState.modalContent = 'Are you sure you want to delete this Project?';
         };
 
-        const projectDeleteFormConfirm = () => {
-            fluentApi.identity().project().delete().setId(projectId.value)
-                .execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Delete Project',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                })
-                .catch((e) => {
-                    showErrorMessage('Delete Project Fail', e, context.root);
-                })
-                .finally(() => {
-                        vm?.$router.go(-1);
+        const projectDeleteFormConfirm = async () => {
+            try {
+                await fluentApi.identity().project().delete().setId(projectId.value)
+                    .execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: 'Delete Project',
+                    duration: 2000,
+                    speed: 1000,
                 });
-            formState.projectDeleteFormVisible = false;
+            } catch (e) {
+                showErrorMessage('Delete Project Fail', e, context.root);
+            } finally {
+                formState.projectDeleteFormVisible = false;
+                vm.$router.go(-1);
+            }
         };
 
         const openProjectEditForm = () => {
@@ -316,27 +317,29 @@ export default {
             formState.updateMode = true;
         };
 
-        const projectEditFormConfirm = (input) => {
-            fluentApi.identity().project().update().setParameter({
-                project_id: projectId.value,
-                ...input,
-            })
-                .execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Update Project',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                    item.value.name = input.name;
+        const projectEditFormConfirm = async (input) => {
+            try {
+                await fluentApi.identity().project().update().setParameter({
+                    // eslint-disable-next-line camelcase
+                    project_id: projectId.value,
+                    ...input,
                 })
-                .catch((e) => {
-                    showErrorMessage('Update Project Fail', e, context.root);
+                    .execute();
+
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: 'Update Project',
+                    duration: 2000,
+                    speed: 1000,
                 });
-            formState.projectEditFormVisible = false;
+                item.value.name = input.name;
+            } catch (e) {
+                showErrorMessage('Update Project Fail', e, context.root);
+            } finally {
+                formState.projectEditFormVisible = false;
+            }
         };
 
 
@@ -345,7 +348,7 @@ export default {
         };
 
         const addMember = async () => {
-            await apiHandler.getData();
+            await memberApiHandler.getData();
         };
 
         const deleteTS = new TableCheckModalState({
@@ -361,16 +364,14 @@ export default {
             ],
         });
 
-        const deleteTargetHandler = ref<any>(null);
         const memberDeleteAction = fluentApi.identity().project()
             .removeMember()
             .setId(projectId.value);
 
-        // deleteAction.value = memberDeleteAction.setSubIds(deleteTS.state.items);
         const memberDeleteClick = () => {
             deleteTS.state.mode = 'delete';
             deleteTS.state.action = memberDeleteAction;
-            deleteTS.state.items = apiHandler.tableTS.selectState.selectItems as any[];
+            deleteTS.state.items = memberApiHandler.tableTS.selectState.selectItems as any[];
             deleteTS.state.headerTitle = 'Delete Member';
             deleteTS.state.subTitle = 'Are you sure want to remove a following members from Project?';
             deleteTS.state.themeColor = 'alert';
@@ -378,45 +379,64 @@ export default {
         };
 
         const memberDeleteConfirm = async (items) => {
-            await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Sucessfully Deleted',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                }).catch((e) => {
-                    showErrorMessage('Fail to Delete Member', e, context.root);
-                })
-                .finally(() => {
-                    apiHandler.getData();
+            try {
+                await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: 'Sucessfully Deleted',
+                    duration: 2000,
+                    speed: 1000,
                 });
-            deleteTS.syncState.visible = false;
+            } catch (e) {
+                showErrorMessage('Fail to Delete Member', e, context.root);
+            } finally {
+                deleteTS.syncState.visible = false;
+                await memberApiHandler.getData();
+            }
         };
 
-        const routerHandler = async () => {
-            const prop = propsCopy(props);
-            singleItemTab.applyDisplayRouter(prop);
-        };
-        onMounted(async () => {
-            await routerHandler();
-            // fluentApi.identity().project().get().setId(projectId.value)
-            //     .execute()
-            //     .then((resp) => {
-            //         state.projectGroupId = resp.data.project_group_info.project_group_id;
-            //     });
+        watch(() => singleItemTab.syncState.activeTab, (tab) => {
+            if (tab === 'member') memberApiHandler.getData();
         });
+
+        /** Query String */
+        const queryRefs = {
+            ...makeQueryStringComputeds(singleItemTab.syncState, {
+                activeTab: { key: 'tab' },
+            }),
+            ...makeQueryStringComputeds(memberApiHandler.tableTS.syncState, {
+                selectIndex: {
+                    key: 'member_sl',
+                    setter: queryStringToNumberArray,
+                    autoReplacer: selectIndexAutoReplacer,
+                },
+            }),
+            // eslint-disable-next-line camelcase
+            member_search: makeQueryStringComputed(ref(undefined),
+                { key: 'member_search' }),
+        };
+
+        // apply search keyword to query string only when search event occurred
+        const onSearch = async (e) => {
+            if (!e) memberApiHandler.tableTS.searchText.value = '';
+            await memberApiHandler.getData();
+            queryRefs.member_search.value = e || undefined;
+        };
+
+        const init = () => {
+            // init search text by query string
+            memberApiHandler.tableTS.searchText.value = vm.$route.query.member_search as string;
+        };
+
+        init();
 
         return {
             ...toRefs(state),
             singleItemTab,
-            apiHandler,
-            dataSource,
+            memberApiHandler,
             item,
-            // ...toRefs(singleItemTab),
             tagsApi,
             ...toRefs(formState),
             deleteTS,
@@ -428,13 +448,14 @@ export default {
             addMember,
             memberDeleteClick,
             memberDeleteConfirm,
+            onSearch,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-    .p-page-title{
+    .p-page-title {
         &::v-deep .title {
              @apply text-2xl;
          }
@@ -442,12 +463,12 @@ export default {
              @apply text-base text-gray-400 mt-1;
          }
     }
-    .p-tab{
+    .p-tab {
         &::v-deep {
-                .p-tab-bar{
-                    border-color:#f8f8fc;
+                .p-tab-bar {
+                    border-color: #f8f8fc;
                 }
-                .tab-pane   {
+                .tab-pane {
                     @apply pb-0;
                 }
             }
@@ -457,7 +478,19 @@ export default {
         @apply ml-3 cursor-pointer;
     }
 
-    .tab-bg{
+    .tab-bg {
         @apply bg-white border border-gray-200 rounded-sm pb-8;
+    }
+
+    .member-tab {
+        @apply border border-gray-200;
+    }
+
+    .toolbox-left {
+        @apply w-full flex pr-4 ;
+        .p-search {
+            @apply w-full;
+            max-width: 23.125rem;
+        }
     }
 </style>

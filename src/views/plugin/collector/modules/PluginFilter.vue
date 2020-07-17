@@ -1,8 +1,8 @@
 <template>
     <div class="plugin-filter-container">
         <div class="rows">
-            <p-search class="p-search" :search-text.sync="search" search-placeholder="Enter keyword"
-                      @onSearch="$emit('search', $event)"
+            <p-search class="p-search" v-model="search" placeholder="Enter keyword"
+                      @search="$emit('search', $event)"
             />
         </div>
         <div class="rows">
@@ -38,7 +38,7 @@
 <script lang="ts">
 import { toRefs, reactive } from '@vue/composition-api';
 
-import PSearch from '@/components/molecules/search/Search.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { makeProxy } from '@/lib/compostion-util';

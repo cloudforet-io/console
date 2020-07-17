@@ -46,6 +46,7 @@
                     v-bind="apiHandler.gridTS.state"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
+                    :loading.sync="apiHandler.gridTS.syncState.loading"
                     @changePageNumber="apiHandler.getData()"
                     @changePageSize="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
@@ -53,32 +54,30 @@
                     @clickExcel="exportToolSet.getData()"
                 >
                     <template slot="toolbox-bottom">
-                        <div class="cst-toolbox-bottom">
-                            <p-search v-model="apiHandler.gridTS.searchText.value"
-                                      @search="onSearch" @delete="onSearch()"
+                        <div class="mb-6 search">
+                            <p-query-search v-model="apiHandler.gridTS.querySearch.state.searchText"
+                                            v-bind="apiHandler.gridTS.querySearch.state"
+                                            @menu:show="apiHandler.gridTS.querySearch.onMenuShow"
+                                            @key:input="apiHandler.gridTS.querySearch.onKeyInput"
+                                            @value:input="apiHandler.gridTS.querySearch.onValueInput"
+                                            @key:select="apiHandler.gridTS.querySearch.onKeySelect"
+                                            @search="apiHandler.gridTS.querySearch.onSearch"
                             />
                         </div>
-                    </template>
-                    <template #no-data>
-                        <div class="text-center empty-project">
-                            <img class="w-48 mx-auto pt-19 mb-8" src="@/assets/images/illust_satellite.svg">
-                            <p class="text-primary2 mb-12">
-                                We need your registration for monitoring cloud resources.
-                            </p>
-                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                                class="mx-auto text-center"
-                                                @click="goToServiceAccount"
-                            >
-                                {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
-                            </p-icon-text-button>
+                        <div v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" class="cst-toolbox-bottom">
+                            <p-query-search-tags
+                                :tags="apiHandler.gridTS.querySearch.tags.value"
+                                @delete:tag="apiHandler.gridTS.querySearch.deleteTag"
+                                @delete:all="apiHandler.gridTS.querySearch.deleteAllTags"
+                            />
                         </div>
                     </template>
                     <template #card="{item}">
                         <div class="left">
                             <div class="w-12 h-12">
-                                <img v-if="item.tags['spaceone:icon']"
+                                <img v-if="item.icon"
                                      width="48px" height="48px"
-                                     :src="item.tags['spaceone:icon']"
+                                     :src="item.icon"
                                      :alt="item.name"
                                 >
                                 <img v-else-if="providerStore.state.providers[item.provider]"
@@ -92,19 +91,33 @@
                             </div>
                             <div class="text-content">
                                 <div class="title">
-                                    {{ item.group }}
+                                    {{ item.cloud_service_group }}
                                 </div>
                                 <div class="sub-title">
                                     <span class="sub-title-provider"> {{ item.provider }} </span>
                                     <span class="sub-title-divider">
                                         |
                                     </span>
-                                    <span class="sub-title-name">{{ item.name }}</span>
-                                    <span v-if="statData" class="sub-title-count">
-                                        {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
+                                    <span class="sub-title-name">{{ item.cloud_service_type }}</span>
+                                    <span class="sub-title-count">
+                                        {{ item.cloud_service_count }}
                                     </span>
                                 </div>
                             </div>
+                        </div>
+                    </template>
+                    <template #no-data>
+                        <div v-if="apiHandler.gridTS.state.items.length === 0" class="text-center empty-project">
+                            <img class="empty-project-img" src="@/assets/images/illust_satellite.svg">
+                            <p class="text-primary2 mb-12">
+                                We need your registration for monitoring cloud resources.
+                            </p>
+                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                                class="mx-auto text-center"
+                                                @click="goToServiceAccount"
+                            >
+                                {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                            </p-icon-text-button>
                         </div>
                     </template>
                 </PToolboxGridLayout>
@@ -123,37 +136,41 @@ import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayo
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
-import {
-    SearchGridFluentAPI,
-} from '@/lib/api/grid';
-import { AxiosResponse } from 'axios';
-import { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
+import { StatQuerySearchGridFluentAPI } from '@/lib/api/grid';
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import {
-    makeQueryStringComputed, makeQueryStringComputeds, replaceQuery,
+    makeQueryStringComputed,
+    makeQueryStringComputeds,
+    queryTagsToOriginal,
+    queryTagsToQueryString,
+    replaceQuery,
 } from '@/lib/router-query-string';
-import {
-    GridLayoutState,
-} from '@/components/molecules/layouts/grid-layout/toolset';
+import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PSearch from '@/components/molecules/search/PSearch.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
+import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 
 export default {
     name: 'ServiceAccount',
     components: {
         PIconTextButton,
         PVerticalPageLayout,
-        PSearch,
+        PQuerySearchTags,
+        PQuerySearch,
         PI,
         PToolboxGridLayout,
         PGridLayout,
         PPageTitle,
+        PSkeleton,
     },
     setup(props, context) {
         const {
@@ -163,13 +180,14 @@ export default {
         providerStore.getProvider();
         const providerTotalCount = ref<any>({ all: 0 });
         const cstCountName = 'cloud_service_type_count';
-        const cstCountApi = fluentApi.statisticsTest().resource().stat()
-            .setResourceType('inventory.CloudServiceType')
+        const CountApi = fluentApi.statisticsTest().resource().stat()
+            .setResourceType('identity.Provider')
             .addGroupKey('provider', 'provider')
-            .setJoinKeys(['provider'], 0)
-            .setJoinResourceType('inventory.CloudServiceType', 0)
-            .addJoinGroupKey('provider', 'provider', 0)
-            .addJoinGroupField(cstCountName, STAT_OPERATORS.count, undefined, 0);
+            .setJoinResourceType('inventory.CloudServiceType')
+            .setJoinKeys(['provider'])
+            .addJoinGroupKey('provider', 'provider')
+            .addJoinGroupField('cloud_service_type_count', STAT_OPERATORS.count);
+
         const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
         const selectProvider = ref('all');
         const providerListState = new GridLayoutState(
@@ -201,43 +219,20 @@ export default {
         const totalResourceCountName = 'cloud_service_count';
 
         const newResourceCountName = 'yesterday_cloud_service_count';
-        const metricAPI = fluentApi.statisticsTest().resource().stat()
-            .setResourceType('inventory.CloudServiceType')
 
-            .addGroupKey('name', 'cloud_service_type')
-            .addGroupKey('cloud_service_type_id', 'cloud_service_type_id')
-            .addGroupKey('group', 'cloud_service_group')
-            .addGroupKey('provider', 'provider')
-
-            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'], 0)
-            .setJoinResourceType('inventory.CloudService', 0)
-            .addJoinGroupKey('cloud_service_type', 'cloud_service_type', 0)
-            .addJoinGroupKey('cloud_service_group', 'cloud_service_group', 0)
-            .addJoinGroupKey('provider', 'provider', 0)
-            .addJoinGroupField(totalResourceCountName, STAT_OPERATORS.count, undefined, 0);
+        const listAction = fluentApi.statisticsTest().topic().cloudServiceType()
+            .setStart(1)
+            .setLimit(24)
+            .showAll(true);
 
         const statData = ref<null|any>(null);
 
-        const getMetric = (resp: AxiosResponse<CloudServiceTypeListResp>) => {
-            const ids = resp.data.results.map(item => item.cloud_service_type_id);
-            statData.value = null;
-            metricAPI.setFilter(
-                { key: 'cloud_service_type_id', operator: '=', value: ids },
-            ).execute().then((rp) => {
-                const data = {};
-                rp.data.results.forEach((item) => {
-                    data[item.cloud_service_type_id] = item;
-                });
-                statData.value = data;
-            });
-            return resp;
+        const args = {
+            keys: ['cloud_service_type', 'cloud_service_group', 'provider', 'cloud_service_id', 'project_id', 'data.region_name'],
+            suggestKeys: ['cloud_service_type', 'cloud_service_group', 'provider', 'cloud_service_id', 'project_id', 'data.region_name'],
         };
 
-        const listAction = fluentApi.inventory().cloudServiceType().list()
-            .setOnly('provider', 'group', 'name', 'tags.spaceone:icon', 'cloud_service_type_id')
-            .setTransformer(getMetric);
-
-        const apiHandler = new SearchGridFluentAPI(
+        const apiHandler = new StatQuerySearchGridFluentAPI(
             listAction,
             {
                 cardClass: () => ['card-item', 'cst-card-item'],
@@ -246,6 +241,13 @@ export default {
                 excelVisible: false,
             },
             undefined,
+            {
+                keyHandler: getKeyHandler(args.keys),
+                valueHandlerMap: {
+                    ...getStatApiValueHandlerMap(args.keys, 'inventory.CloudService'),
+                },
+                suggestKeys: args.suggestKeys,
+            },
         );
 
         const clickCard = (item) => {
@@ -253,8 +255,8 @@ export default {
                 name: 'cloudServicePage',
                 params: {
                     provider: item.provider,
-                    group: item.group,
-                    name: item.name,
+                    group: item.cloud_service_group,
+                    name: item.cloud_service_type,
                 },
             });
         };
@@ -275,7 +277,7 @@ export default {
 
 
         const requestProvider = async () => {
-            const resp = await cstCountApi.execute();
+            const resp = await CountApi.execute();
             let total = 0;
             const data: any = { };
             resp.data.results.forEach((item) => {
@@ -290,6 +292,12 @@ export default {
 
         /** Query String */
         const queryRefs = {
+            f: makeQueryStringComputed(apiHandler.gridTS.querySearch.tags,
+                {
+                    key: 'f',
+                    setter: queryTagsToOriginal,
+                    getter: queryTagsToQueryString,
+                }),
             provider: makeQueryStringComputed(selectProvider, { key: 'provider', disableAutoReplace: true }),
             g_s: makeQueryStringComputed(ref(undefined), { key: 'g_s' }),
             ...makeQueryStringComputeds(apiHandler.gridTS.syncState, {
@@ -298,32 +306,20 @@ export default {
             }),
         };
 
-        const onSearch = async (e) => {
-            if (!e) apiHandler.gridTS.searchText.value = '';
-            await apiHandler.getData();
-            queryRefs.g_s.value = e || undefined;
-        };
+        // const onSearch = (e) => { queryRefs.t_se.value = e || undefined; };
 
         /** Init */
         const init = async () => {
             await requestProvider();
-
-            // init search text by query string
-            apiHandler.gridTS.searchText.value = queryRefs.g_s.value || '';
-
-            // init search text by query string
-            apiHandler.gridTS.searchText.value = vm.$route.query.g_s as string;
 
             if (providerListState.state.items.length > 0) {
                 // set selected provider
                 const res = queryRefs.provider.value;
                 selectProvider.value = res || providerListState.state.items[0].provider;
 
-
-                await apiHandler.getData();
                 watch(selectProvider, _.debounce(async (after) => {
                     if (!after) return;
-                    if (after === 'all') listAction.setFixFilter();
+                    if (after === 'all') apiHandler.action = listAction.setFixFilter();
                     else {
                         apiHandler.action = listAction.setFixFilter(
                             { key: 'provider', operator: '=', value: after },
@@ -331,7 +327,7 @@ export default {
                     }
                     await apiHandler.getData();
                     await replaceQuery('provider', after);
-                }, 50), { lazy: true });
+                }, 50));
             }
         };
 
@@ -350,7 +346,7 @@ export default {
             exportToolSet,
             newResourceCountName,
             totalResourceCountName,
-            onSearch,
+            skeletons: _.range(5),
         };
     },
 
@@ -360,7 +356,7 @@ export default {
 
 <style lang="postcss" scoped>
     .cst-toolbox-bottom {
-        @apply flex flex-col-reverse items-start justify-between w-full mb-4;
+        @apply flex flex-col-reverse items-start justify-between w-full;
 
         @screen lg {
             @apply flex-row items-center;
@@ -445,23 +441,19 @@ export default {
             .total-count {
                 @apply font-bold text-2xl;
             }
-            .today-created {
-                @apply border-green-500 flex h-6 ml-2 justify-center items-center mr-2;
-                border-radius: 6.25rem;
-                border-width: 0.0625rem;
-                min-width: 2.5rem;
-                .number {
-                    @apply font-bold text-sm text-green-500 w-auto h-4 text-right;
-                    line-height: 1.0625rem;
-                }
-            }
         }
         &:hover {
-             @apply border-gray-200 bg-blue-100;
-             cursor: pointer;
-         }
+            @apply border-gray-200 bg-blue-100;
+            cursor: pointer;
+        }
     }
     .pagetitle {
         margin-bottom: 0;
+    }
+
+    .empty-project {
+        .empty-project-img {
+            @apply w-48 mx-auto pt-19 mb-8;
+        }
     }
 </style>

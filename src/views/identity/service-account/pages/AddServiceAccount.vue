@@ -141,7 +141,7 @@ import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.v
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
-import SProjectTreePanel from '@/components/organisms/panels/project-tree-panel/SProjectTreePanel_new.vue';
+import SProjectTreePanel from '@/components/organisms/panels/project-tree-panel/SProjectTreePanel.vue';
 import { useStore } from '@/store/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import _ from 'lodash';

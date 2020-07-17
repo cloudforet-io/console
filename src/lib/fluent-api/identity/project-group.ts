@@ -4,19 +4,15 @@ import {
     ResourceActions, SingleDeleteAction, SingleItemQueryAction, SubMultiItemAction, TreeAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType, Tags, TimeStamp,
+    ListType, ProjectGroupInfo, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import project, { ProjectListResp } from '@/lib/fluent-api/identity/project';
 
 const idField = 'project_group_id';
-const idsField = 'project_groups';
 
 interface IdParameter {
     [idField]: string;
 }
 
-
-export type ProjectGroupListResp = ListType<any>
 
 interface CreateParameter extends Tags {
     name: string;
@@ -36,10 +32,10 @@ class Update extends UpdateAction<UpdateParameter, any> {}
 class Delete extends SingleDeleteAction<IdParameter, any> {
     idField = idField;
 }
-class Get extends GetAction<IdParameter, any> {
+class Get extends GetAction<IdParameter, ProjectGroupInfo> {
     idField = idField;
 }
-class List extends ListAction<any, ProjectGroupListResp> {}
+class List extends ListAction<any, ListType<ProjectGroupInfo>> {}
 
 class ListProjects extends SingleItemQueryAction<ExtraParameter, any> {
     path = 'list-projects'
@@ -47,18 +43,21 @@ class ListProjects extends SingleItemQueryAction<ExtraParameter, any> {
     idField = 'project_group_id';
 
     setIncludeProvider(val = true) {
-        this.apiState.extraParameter.include_provider = val;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.extraParameter.include_provider = val;
+        return api;
     }
 
     setRecursive(val) {
-        this.apiState.extraParameter.recursive = val;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.extraParameter.recursive = val;
+        return api;
     }
 
     setProjectGroupId(val) {
-        this.apiState.extraParameter.project_group_id = val;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.extraParameter.project_group_id = val;
+        return api;
     }
 }
 

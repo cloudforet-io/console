@@ -4,7 +4,7 @@ import axios, {
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
-import { dataTableProps } from '@/components/organisms/tables/data-table/toolset';
+import { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.toolset';
 
 const MockAdapter = require('axios-mock-adapter');
 
@@ -119,7 +119,7 @@ export class API {
             return Promise.reject(error);
         });
 
-        createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
+        createAuthRefreshInterceptor(this.instance, refreshAuthLogic, { skipWhileRefreshing: false });
 
         return this.instance;
     }

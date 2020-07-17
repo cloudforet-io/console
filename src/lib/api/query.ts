@@ -1,20 +1,10 @@
 import _ from 'lodash';
 import { readonlyArgs } from '@/lib/type';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
-import { FilterItem, ListAction, QueryAPI } from '@/lib/fluent-api';
-import { StatAction, StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
+import { OPERATOR_MAP, QueryAPI } from '@/lib/fluent-api/toolset';
+import { FilterItem } from '@/lib/fluent-api/type';
+import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 
-export const OPERATOR_MAP = Object.freeze({
-    '': 'contain_in', // merge operator
-    '!': 'not_contain', // merge operator
-    '>': 'gt',
-    '>=': 'gte',
-    '<': 'lt',
-    '<=': 'lte',
-    '=': 'in', // merge operator
-    '!=': 'not_in', // merge operator
-    $: 'regex',
-});
 const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
 interface Sort {
@@ -170,7 +160,6 @@ export function setActionByQuery
         }
         if (itemLimit) api = api.setPageSize(itemLimit);
     }
-
 
 
     if (searchQuery.value) api = api.setFilter(searchQuery);

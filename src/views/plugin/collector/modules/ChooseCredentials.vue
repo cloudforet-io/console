@@ -34,9 +34,9 @@
                         </span>
                     </p-col>
                     <p-col>
-                        <p-search :search-text.sync="searchText"
-                                  search-placeholder="Credential / Credential Group"
-                                  @onSearch="listCredentials"
+                        <p-search v-model="searchText"
+                                  placeholder="Credential / Credential Group"
+                                  @search="listCredentials"
                         />
                     </p-col>
                 </p-row>
@@ -82,11 +82,11 @@ import PBadge from '@/components/atoms/badges/Badge.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
-import PSearch from '@/components/molecules/search/Search.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PDictList from '@/components/molecules/lists/DictList.vue';
-import {defaultQuery} from "@/lib/api/query";
+import { defaultQuery } from '@/lib/api/query';
 
 export default {
     name: 'ChooseCredentials',

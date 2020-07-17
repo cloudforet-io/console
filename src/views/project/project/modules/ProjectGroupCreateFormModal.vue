@@ -11,28 +11,27 @@
     >
         <template #body>
             <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
-<!--            <PFieldGroup-->
-<!--                label="Tags"-->
-<!--            >-->
-<!--                <p-dict-input-group-->
-<!--                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"-->
-<!--                    v-bind="tagsTS.state"-->
-<!--                    :items.sync="tagsTS.syncState.items"-->
-<!--                    v-on="tagsTS.events"-->
-<!--                />-->
-<!--            </PFieldGroup>-->
+            <!--            <PFieldGroup-->
+            <!--                label="Tags"-->
+            <!--            >-->
+            <!--                <p-dict-input-group-->
+            <!--                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"-->
+            <!--                    v-bind="tagsTS.state"-->
+            <!--                    :items.sync="tagsTS.syncState.items"-->
+            <!--                    v-on="tagsTS.events"-->
+            <!--                />-->
+            <!--            </PFieldGroup>-->
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
+
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import {
     makeProxy,
 } from '@/lib/compostion-util';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
-import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 import {
     CustomKeywords,
     JsonSchemaFormToolSet,
@@ -41,13 +40,20 @@ import {
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
+import { showErrorMessage } from '@/lib/util';
+import { watch } from '@vue/composition-api';
+import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
 
+interface Props {
+    visible: boolean;
+    updateMode: boolean;
+    id?: string;
+    parent: ProjectGroup|null;
+}
 export default {
     name: 'ProjectGroupCreateFormModal',
     components: {
         PButtonModal,
-        PFieldGroup,
-        PDictInputGroup,
         PJsonSchemaForm,
     },
     directives: {
@@ -62,30 +68,25 @@ export default {
             type: Boolean,
             default: false,
         },
-        schemaNames: {
-            type: Array,
-            default: () => ([]),
-        },
-        item: {
-            type: Object,
-            default: () => ({
-                properties: {},
-            }),
-        },
         updateMode: {
             type: Boolean,
             default: false,
         },
-        currentGroup: {
+        parent: {
+            type: Object,
+            default: null,
+        },
+        id: {
             type: String,
-            default: '',
+            default: undefined,
         },
     },
-    setup(props, context) {
-        const tagsTS = new DictIGToolSet({
-            showValidation: true,
-        });
-        const fixFormTS = new JsonSchemaFormToolSet();
+    setup(props: Props, context) {
+        // const tagsTS = new DictIGToolSet({
+        //     showValidation: true,
+        // });
+
+        let fixFormTS = new JsonSchemaFormToolSet();
 
         const checkNameUnique = (...args: any[]) => fluentApi.identity().projectGroup().list()
             .setFilter({ key: 'name', operator: '=', value: args[1] })
@@ -109,34 +110,107 @@ export default {
             longName: new CustomValidator(checkNameLength, 'Should not be longer than 40 characters'),
         };
 
-        const sch = new JsonSchemaObjectType(undefined, undefined, true);
-        if (props.updateMode) {
-            sch.addStringProperty('name', 'Name', true, props.currentGroup, { uniqueName: true, longName: true });
-        } else {
+
+        const getProjectGroup = async () => {
+            const res = await fluentApi.identity().projectGroup().get()
+                .setId(props.id as string)
+                .setOnly('project_group_id', 'name')
+                .execute();
+            fixFormTS.syncState.item.project_group_id = res.data.project_group_id;
+            fixFormTS.syncState.item.name = res.data.name;
+        };
+
+        const resetForm = () => {
+            fixFormTS.syncState.item.project_group_id = '';
+            fixFormTS.syncState.item.name = '';
+        };
+
+        const initForm = async () => {
+            fixFormTS = new JsonSchemaFormToolSet();
+            const sch = new JsonSchemaObjectType(undefined, undefined, true);
             sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true, longName: true });
-        }
-        fixFormTS.setProperty(sch, ['name'], validation);
+            fixFormTS.setProperty(sch, ['name'], validation);
+            if (props.id) await getProjectGroup();
+            else {
+                resetForm();
+            }
+        };
+
+        watch(() => props.id, async (id) => {
+            await initForm();
+        });
+
+        const createProjectGroup = async (item) => {
+            try {
+                const params = item;
+                if (props.parent) params.parent_project_group_id = props.parent.id;
+                const res = await fluentApi.identity().projectGroup().create()
+                    .setParameter(params)
+                    .execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: 'Create Project Group',
+                    duration: 2000,
+                    speed: 1000,
+                });
+
+                context.emit('create', {
+                    id: res.data.project_group_id,
+                    name: item.name,
+                } as ProjectGroup, props);
+            } catch (e) {
+                showErrorMessage('Fail to Create Project Group', e, context.root);
+            }
+        };
+
+        const updateProjectGroup = async (item) => {
+            try {
+                const params = item;
+                if (props.id) params.project_group_id = props.id;
+                await fluentApi.identity().projectGroup().update().setParameter(params)
+                    .execute();
+
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: 'Update Project Group',
+                    duration: 2000,
+                    speed: 1000,
+                });
+
+                context.emit('update', {
+                    id: props.id,
+                    name: item.name,
+                } as ProjectGroup, props);
+            } catch (e) {
+                showErrorMessage('Fail to Update Project Group', e, context.root);
+            }
+        };
+        const projectGroupFormConfirm = async (item) => {
+            if (!props.updateMode) {
+                await createProjectGroup(item);
+            } else {
+                await updateProjectGroup(item);
+            }
+        };
         const confirm = async () => {
             const fixFormValid = await fixFormTS.formState.validator();
-            if (tagsTS.allValidation() && fixFormValid) {
+            if (fixFormValid) {
                 const item = {
                     name: fixFormTS.syncState.item.name,
-                    tags: tagsTS.vdState.newDict,
                 };
-                context.emit('confirm', item);
+                await projectGroupFormConfirm(item);
             }
         };
 
         return {
             proxyVisible: makeProxy('visible', props, context.emit),
-            tagsTS,
             fixFormTS,
             confirm,
         };
     },
 };
 </script>
-
-<style scoped>
-
-</style>

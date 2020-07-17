@@ -1,5 +1,4 @@
 import { fluentApi } from '@/lib/fluent-api';
-import { bypassQueryString } from '@/lib/router-query-string';
 
 const Plugin = () => import('@/views/plugin/plugin');
 const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
@@ -34,7 +33,7 @@ export default {
                 {
                     path: '/',
                     name: 'collectorMain',
-                    props: bypassQueryString,
+                    props: true,
                     component: Collector,
                 },
                 {

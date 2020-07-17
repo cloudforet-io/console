@@ -1,10 +1,7 @@
 <template>
     <general-page-layout>
-         <PPageTitle title="Credentials" />
-                    <!-- use-total-count use-selected-count
-                    :total-count="apiHandler.totalCount.value"
-                    :selected-count="apiHandler.tableTS.selectState.selectItems.length" -->
-       
+        <PPageTitle title="Credentials" />
+
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -53,7 +50,7 @@
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getCredentials" />
+                            <p-search v-model="searchText" @search="getCredentials" />
                         </div>
                     </template>
                     <template #col-created_at-format="data">
@@ -118,7 +115,9 @@
     </general-page-layout>
 </template>
 
-<script>
+<script lang="ts">
+/* eslint-disable camelcase */
+
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
@@ -130,15 +129,16 @@ import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus'
 import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import _ from 'lodash';
 
-const PTab = () => import('@/components/organisms/tabs/tab/Tab');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
-const PSearch = () => import('@/components/molecules/search/Search');
-const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
+const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
+const PSearch = () => import('@/components/molecules/search/PSearch.vue');
+const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail.vue');
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 const PPageTitle = () => import('@/components/organisms/title/page-title/PageTitle.vue');
 
 export const getDataInputType = () => {
@@ -200,6 +200,7 @@ export const credentialsSetup = (props, context, eventName) => {
     });
     const state = requestToolboxTableMetaReactive();
 
+    // @ts-ignore
     state.sortBy = 'name';
 
     const dynamicFormState = reactive({
@@ -232,6 +233,7 @@ export const credentialsSetup = (props, context, eventName) => {
     const getSelectCredentialsIds = computed(() => {
         const ids = [];
         getSelectedCredentialsItems.value.forEach((item) => {
+            // @ts-ignore
             ids.push(item.server_id);
         });
         return ids;
@@ -247,6 +249,7 @@ export const credentialsSetup = (props, context, eventName) => {
     });
 
     const clickCreate = () => {
+        // @ts-ignore
         credentialsFormState.updateMode = false;
         credentialsFormState.headerTitle = 'Create Credentials';
         credentialsFormState.item = null;
@@ -292,6 +295,7 @@ export const credentialsSetup = (props, context, eventName) => {
     };
 
     const clickDelete = () => {
+        // @ts-ignore
         const selectedItemName = tableState.items[tableState.selectIndex].name;
         doubleState.origin = selectedItemName;
         doubleState.title = `Type ${selectedItemName} to confirm`;
@@ -332,6 +336,7 @@ export const credentialsSetup = (props, context, eventName) => {
         selectedSchemaId: null,
         selectedScheme: null,
         searchQueries: computed(() => {
+            // @ts-ignore
             if (state.selectedScheme) return [];// [new SearchQuery('name', '=', schemaState.selectedSchemaName)];
             return [];
         }),
@@ -409,14 +414,14 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         margin-left: 1rem;
         &:last-child {
             flex-grow: 1;
         }
     }
 
-    #empty-space{
+    #empty-space {
         @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
@@ -424,8 +429,8 @@ export default {
     }
     .p-label {
         @apply text-gray-900;
-        left-margin: 0.5rem;
-        margin-bottom:5px;
+        margin-left: 0.5rem;
+        margin-bottom: 5px;
         margin-right: 0.5rem;
     }
 </style>

@@ -7,7 +7,3 @@ export default {
     name: 'Identity',
 };
 </script>
-
-<style lang="postcss" scoped>
-
-</style>

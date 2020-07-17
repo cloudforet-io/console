@@ -23,15 +23,18 @@ export default {
 
 <style lang="postcss" scoped>
     .widget::v-deep {
-        @apply border-0;
-        .top {
-            @apply mt-0 mb-4 mx-0;
+        &.widget-layout {
+            @apply border-0 border-transparent;
+            .top {
+                @apply mt-0 mb-4 mx-0;
+            }
+            .title {
+                @apply text-base;
+            }
+            .widget-contents {
+                @apply p-0;
+            }
         }
-        .title {
-            @apply text-base;
-        }
-        .widget-contents {
-            @apply p-0;
-        }
+
     }
 </style>

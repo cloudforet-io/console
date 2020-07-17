@@ -1,15 +1,10 @@
 /* eslint-disable camelcase */
 import { AxiosResponse } from 'axios';
-import { ref, watch } from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 import { DynamicFluentAPIToolSet, getDataAPI } from '@/lib/api/toolset';
-// @ts-ignore
 import { ClassTypeOf } from '@/lib/type';
 import TreeItem, { TreeToolSet } from '@/components/molecules/tree-origin/ToolSet';
-import { ActionAPI, ListType, TreeAction } from '@/lib/fluent-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-import Vue from 'vue';
-import { pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
-import { isNotEmpty } from '@/lib/util';
+import { TreeAction } from '@/lib/fluent-api';
 
 export interface TreeResp<T> {
     items: T[];

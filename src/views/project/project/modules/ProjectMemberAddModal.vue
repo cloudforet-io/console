@@ -2,21 +2,33 @@
     <p-button-modal
         header-title="Add Member"
         :centered="true"
-        size="xl"
+        size="lg"
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
         @confirm="confirm($event)"
     >
         <template #body>
-            <p-dynamic-view view_type="query-search-table"
-                            :api-handler="apiHandler"
-                            :data_source="dataSource"
-                            :vbind="{responsiveStyle:{'overflow-y':'auto','overflow-x':'auto', 'padding':'-1rem'}}"
-                            :data="null"
-                            v-bind="apiHandler.tableTS.selectState.selectItems"
-                            @rowLeftClick="onSelect"
-            />
+            <p-toolbox-table v-bind="apiHandler.tableTS.state"
+                             :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+                             :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+                             :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+                             :loading.sync="apiHandler.tableTS.syncState.loading"
+                             :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+                             :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+                             @changePageSize="apiHandler.getData"
+                             @changePageNumber="apiHandler.getData"
+                             @clickRefresh="apiHandler.getData"
+                             @changeSort="apiHandler.getData"
+                             @rowLeftClick="onSelect"
+            >
+                <template #toolbox-left>
+                    <p-search v-model="apiHandler.tableTS.searchText.value" @search="onSearch" @delete="onSearch()" />
+                </template>
+            </p-toolbox-table>
+            <p class="tag-title">
+                Added Members
+            </p>
             <p-box-layout class="tag-container">
                 <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
                        class="tag"
@@ -36,20 +48,20 @@ import {
 } from '@/lib/compostion-util';
 import PTag from '@/components/molecules/tags/Tag.vue';
 import { tagList } from '@/components/molecules/tags/toolset';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import { DataSourceItem, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { QuerySearchTableFluentAPI } from '@/lib/api/table';
+import { fluentApi } from '@/lib/fluent-api';
+import { SearchTableFluentAPI } from '@/lib/api/table';
 import { reactive, toRefs } from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import { showErrorMessage } from '@/lib/util';
-import { makeValueHandlers } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
     name: 'ProjectMemberAddModal',
     components: {
+        PSearch,
+        PToolboxTable,
         PButtonModal,
-        PDynamicView,
         PBoxLayout,
         PTag,
     },
@@ -81,100 +93,80 @@ export default {
             tagTools: tagList(null),
         });
         const proxyVisible = makeProxy('visible', props, context.emit);
-        // const memberKeyAutoCompletes = ['user_id', 'name', 'email'];
-        const project_id = context.root.$route.params.id;
+        const projectId = context.root.$route.params.id;
 
-        // const memberACHandlerMeta = {
-        //     handlerClass: QuerySearchTableACHandler,
-        //     args: {
-        //         keys: memberKeyAutoCompletes,
-        //         suggestKeys: memberKeyAutoCompletes,
-        //     },
-        // };
 
         // List api Handler for query search table
-
-        class ACHandler extends QuerySearchTableACHandler {
-            constructor(args: QSTableACHandlerArgs) {
-                super(args);
-                this.HandlerMap.value = [
-                    // ...makeValueHandlers<QueryAPI<any,any>>([
-                    //     'name',
-                    // ], projectGroupAPI.listProjects().setRecursive(true)),
-                    ...makeValueHandlers(['user_id', 'name', 'email'],
-                        fluentApi
-                            .statisticsTest()
-                            .resource()
-                            .stat()
-                            .setResourceType('identity.User')),
-                ];
-            }
-        }
-        const args = {
-            keys: [
-                'user_id', 'name', 'email',
-            ],
-            suggestKeys: ['user_id', 'name', 'email'],
-        };
-
         const MemberListAction = fluentApi.identity().user().list();
-        const apiHandler = new QuerySearchTableFluentAPI(MemberListAction, {
+        const apiHandler = new SearchTableFluentAPI(MemberListAction, {
             shadow: false,
             border: false,
             padding: true,
             selectable: false,
             dragable: false,
-        }, undefined, { handlerClass: ACHandler, args });
-
-        const dataSource: DataSourceItem[] = [
-            { name: 'ID', key: 'user_id' },
-            { name: 'Name', key: 'name' },
-            { name: 'Email', key: 'email' },
-        ];
+            fields: [
+                { label: 'Name', name: 'name', type: 'item' },
+                { label: 'ID', name: 'user_id', type: 'item' },
+                { label: 'Email', name: 'email', type: 'item' },
+            ],
+            responsiveStyle: { height: '19rem', overflow: 'auto', padding: '-1rem' },
+        });
 
         const onSelect = (item) => {
             formState.tagTools.addTag(item.user_id);
         };
 
-        const confirm = () => {
+        const confirm = async () => {
             const users = formState.tagTools.tags;
-            fluentApi.identity().project().addMember().setId(project_id)
-                .setSubIds(users)
-                .execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Add Member',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                })
-                .catch((e) => {
-                    showErrorMessage('Fail to Add Member', e, context.root);
-                })
-                .finally(() => {
-                    context.emit('confirm');
-                    proxyVisible.value = false;
+            try {
+                await fluentApi.identity().project().addMember().setId(projectId)
+                    .setSubIds(users)
+                    .execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: 'Add Member',
+                    duration: 2000,
+                    speed: 1000,
                 });
+            } catch (e) {
+                showErrorMessage('Fail to Add Member', e, context.root);
+            } finally {
+                context.emit('confirm');
+                proxyVisible.value = false;
+            }
         };
+
+        const onSearch = async (val?: string) => {
+            if (!val) apiHandler.tableTS.searchText.value = '';
+            await apiHandler.getData();
+        };
+
+        const init = () => {
+            apiHandler.getData();
+        };
+
+        init();
+
         return {
             ...toRefs(formState),
             apiHandler,
-            dataSource,
             confirm,
             onSelect,
             proxyVisible,
+            onSearch,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-
+    .tag-title {
+        @apply font-semibold leading-normal text-sm mb-1 mt-8;
+    }
     .tag-container {
-        height: 120px;
+        height: 7.5rem;
         .tag {
             @apply bg-white border border-primary;
         }

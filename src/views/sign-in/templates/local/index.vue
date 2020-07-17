@@ -160,7 +160,7 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .btn.btn-outline-gray { 
+    .p-button.outline {
         font-size:.875rem;
         font-weight:normal;
     }
@@ -190,7 +190,7 @@ export default defineComponent({
       font-style: normal;
       font-weight: bold;
       font-size: 0.875rem;
-      margin-bottom:1em; 
+      margin-bottom:1em;
     }
     .btn-divider > span {
         margin:.5rem;

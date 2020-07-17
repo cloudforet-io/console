@@ -1,12 +1,11 @@
 import { fluentApi } from '@/lib/fluent-api';
-import { bypassQueryString } from '@/lib/router-query-string';
 
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
-const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
+const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType_new.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {
@@ -31,7 +30,6 @@ export default {
                 {
                     path: '/',
                     name: 'server',
-                    props: bypassQueryString,
                     component: Server,
                 },
                 {
@@ -53,7 +51,6 @@ export default {
                 {
                     path: '/',
                     name: 'cloudServiceMain',
-                    props: bypassQueryString,
                     component: CloudService,
                 },
                 {
@@ -68,7 +65,7 @@ export default {
                         {
                             path: '/',
                             name: 'cloudServicePage',
-                            props: bypassQueryString,
+                            props: true,
                             component: CloudServicePage,
                         },
                         {

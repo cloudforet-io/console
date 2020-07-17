@@ -157,6 +157,7 @@ export default {
                     ts.state.data = res.data.results.map((item, index) => ({
                         name: item.region_name,
                         count: item.count,
+                        provider: item.provider,
                         icon: providers[item.provider].icon,
                         color: colors[index],
                     }));
@@ -176,17 +177,20 @@ export default {
                 skeletons: _.range(4),
                 defaultItems,
                 onSelected(item) {
-                    if (props.projectFilter) {
+                    if (props.projectFilter && props.isServer) {
                         vm.$router.push({
                             path: `/inventory/server?&f=data.compute.region_name%3A${item.name}${props.projectFilter}`,
                         });
-                    } else {
+                    }
+                    if (props.projectFilter && !props.isServer) {
                         vm.$router.push({
-                            path: '/inventory/cloud-service',
+                            path: `/inventory/cloud-service?provider=${item.provider}${props.projectFilter}&f=data.region_name%3A${item.name}`,
                         });
                     }
                 },
             };
+            ///inventory/cloud-service?f=project_id%3A&f=project_id%3A%3Dproject-22ba4e072a5f&f=data.region_name%3Aap-northeast-2
+            ///inventory/cloud-service?f=project_id%3A%3Dproject-22ba4e072a5f&f=data.region_name%3Aap-northeast-2
     },
 };
 </script>

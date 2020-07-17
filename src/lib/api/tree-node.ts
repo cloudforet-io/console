@@ -1,12 +1,11 @@
 /* eslint-disable camelcase,@typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios';
 import { DynamicAPI } from '@/lib/api/toolset';
-// @ts-ignore
-import { ResourceActions, TreeAction } from '@/lib/fluent-api/toolset';
+import { TreeAction } from '@/lib/fluent-api/toolset';
 import {
     TreeNodeToolSet,
     getDefaultNode,
-    BaseNodeStateType, TreeNodeProps, TreeItem, InitTreeNode, TreeNode, getTreeItem,
+    BaseNodeStateType, TreeNodeProps, TreeItem, TreeNode, getTreeItem,
 } from '@/components/molecules/tree/PTreeNode.toolset';
 import { TreeResp, TreeSearchAction } from '@/lib/fluent-api';
 import {
@@ -14,13 +13,6 @@ import {
 } from '@/lib/fluent-api/identity/project';
 import { find, findIndex, isEqual } from 'lodash';
 import { computed, reactive, watch } from '@vue/composition-api';
-import Vue from 'vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { tree } from '@/lib/api/index';
-import { isNotEmpty } from '@/lib/util';
-import { pushRouterQuery, RouterAPIToolsetInterface } from '@/lib/router-query-string';
-import { DefaultQSGridQSPropsName, makeQSGridQSProps } from '@/lib/api/grid';
-import Tree from '@/components/molecules/tree-origin/Tree.vue';
 
 
 export interface TreeApiActions<treeAction, searchAction> {
@@ -185,7 +177,7 @@ export class ProjectTreeFluentAPI<
                 if (key !== -1) {
                     const nextParent = getTreeItem(key, idx + 1, children[key], parent);
                     nextParent.node.children = await this.getRecursiveData(ids, idx + 1, nextParent);
-                    nextParent.node.state.expanded = !!nextParent.node.children;
+                    nextParent.node.state.expanded = (idx < ids.length - 2);
                 }
             }
             return children;
@@ -198,7 +190,7 @@ export class ProjectTreeFluentAPI<
         if (itemIdx !== -1) {
             const item = getTreeItem(itemIdx, 0, rootItems[itemIdx]);
             item.node.children = await this.getRecursiveData(ids, idx, item);
-            item.node.state.expanded = !!item.node.children;
+            item.node.state.expanded = (idx !== ids.length - 1);
         }
         return rootItems;
     }
@@ -231,64 +223,3 @@ export const makeTreeQSProps = (names: TreeQSNameType) => ({
 });
 
 export const DefaultQSTreeProps = makeTreeQSProps(DefaultTreeQSPropsName);
-
-export class RouteProjectTreeFluentAPI<
-    state extends ProjectNodeState = ProjectNodeState,
-    initData = any, initSyncData = any,
-    treeAction extends ProjectTree = ProjectTree,
-    T extends TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData> = TreeNodeToolSet<ProjectItemResp, state, initData, initSyncData>
-    > extends ProjectTreeFluentAPI<state, initData, initSyncData, treeAction, T> implements RouterAPIToolsetInterface {
-    constructor(
-        treeActions: TreeApiActions<treeAction, TreeSearchAction<ProjectTreeParameter, TreeSearchResp>>,
-        initData: initData = {} as initData,
-        public vm: Vue|ComponentInstance,
-        public qsName: TreeQSNameType = DefaultTreeQSPropsName,
-        public isReady = false,
-    ) {
-        super(treeActions, initData);
-        watch(() => this.ts.metaState.firstSelectedNode, async (aft, bef) => {
-            if (aft && !isEqual(aft.node.data.id, bef?.node.data.id)) {
-                await this.routerPush();
-            }
-        });
-    }
-
-    applyAPIRouter = (props: TreeQSNameType) => {
-        const select = props[this.qsName.select];
-        const search = props[this.qsName.search];
-        // if (isNotEmpty(select)) {
-        //     this.ts.metaState.selectedNodes = select;
-        // }
-        this.isReady = true;
-    };
-
-    applyDisplayRouter = async (props: TreeQSNameType) => {
-        const pgId = props[this.qsName.select];
-        if (pgId) {
-            await this.getSearchData(pgId, 'PROJECT_GROUP');
-            if (this.ts.metaState.firstSelectedNode) this.ts.setNodeState(this.ts.metaState.firstSelectedNode, { expanded: false });
-        } else {
-            await this.defaultGetData();
-            if (this.ts.metaState.nodes[0]) {
-                const item = getTreeItem(0, 0, this.ts.metaState.nodes[0]);
-                this.ts.metaState.selectedNodes = [item];
-                this.ts.setNodeState(item, { selected: true });
-            }
-        }
-    }
-
-    routerPush = async () => {
-        const query = {
-            ...this.vm.$route.query,
-            [this.qsName.select]: this.ts.metaState.firstSelectedNode?.node.data.id,
-        };
-        await pushRouterQuery(this.vm, query);
-    }
-
-    getData = async (item?: TreeItem<ProjectItemResp, state>): Promise<void> => {
-        if (this.isReady) {
-            await this.defaultGetData(item);
-            await this.routerPush();
-        }
-    }
-}

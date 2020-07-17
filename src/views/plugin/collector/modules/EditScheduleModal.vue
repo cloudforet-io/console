@@ -11,11 +11,11 @@
         <template #body>
             <p-field-group :label="$t('COMMON.NAME')">
                 <br>
-                <p-text-input v-model="name" class="w-3/5" />
+                <p-text-input v-model="name" class="name" />
             </p-field-group>
             <p-field-group :label="$t('COMMON.TIMEZONE')">
                 <p-select-dropdown v-model="timezone" :items="timezones"
-                                   class="w-3/5"
+                                   class="timezone"
                                    @input="changeTimezone"
                 />
             </p-field-group>
@@ -261,6 +261,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    .name, .timezone {
+        width: 60%;
+    }
     .all-btn {
         @apply text-black border-gray-300;
         margin-right: 0.5rem;

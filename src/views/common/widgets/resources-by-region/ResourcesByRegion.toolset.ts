@@ -10,21 +10,27 @@ export const resourceByRegionProps = {
         type: String,
         default: '',
     },
+    isServer: {
+        type: Boolean,
+        default: true,
+    },
 };
 
 export interface ResourcesByRegionProps {
     getAction(api: Stat<any>): Stat<any>;
     projectFilter: string;
+    isServer: boolean;
 }
 
 @StateToolSet<ResourcesByRegionProps>()
 export class ServiceAccountsWidgetState {
     state: ResourcesByRegionProps;
 
-    static initState(): ResourcesByRegionProps {
+    static initState(): { isServer: boolean; projectFilter: string; getAction: (action) => Stat<any> } {
         return {
             getAction: action => action.setResourceType('identity.ServiceAccount'),
             projectFilter: '',
+            isServer: true,
         };
     }
 

@@ -14,10 +14,10 @@
                                   name="cloudService"
                                   :options="options"
                                   :vbind="{
-                                      responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
-                                      showTitle:false,
-                                      exportFields:mergeFields,
-
+                                      responsiveStyle: {'height': height+'px', overflow: 'auto'},
+                                      showTitle: false,
+                                      exportFields: mergeFields,
+                                      resourceType: 'inventory.CloudService'
                                   }"
                 >
                     <template #toolbox-left>
@@ -118,7 +118,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
+    reactive, toRefs, computed, watch, getCurrentInstance, onUnmounted,
 } from '@vue/composition-api';
 import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -128,8 +128,7 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
-    defaultAdminLayout, defaultHistoryLayout, DefaultQSTableQSProps,
-    RouteQuerySearchTableFluentAPI,
+    defaultAdminLayout, defaultHistoryLayout, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
@@ -140,8 +139,7 @@ import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import {
-    DefaultMultiItemTabBarQSProps, DefaultMultiItemTabBarQSPropsName,
-    DefaultSingleItemTabBarQSProps, RouterTabBarToolSet,
+    TabBarState,
 } from '@/components/molecules/tabs/tab-bar/toolset';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
@@ -154,9 +152,17 @@ import baseInfoSchema from '@/metadata-schema/view/inventory/cloud_service/sub_d
 import { get, debounce } from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { propsCopy } from '@/lib/router-query-string';
+import {
+    selectIndexAutoReplacer,
+    makeQueryStringComputed,
+    makeQueryStringComputeds, queryStringToNumberArray,
+    queryTagsToOriginal,
+    queryTagsToQueryString,
+} from '@/lib/router-query-string';
 import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -178,7 +184,6 @@ export default {
         SDynamicSubData,
         STagsPanel,
         PDropdownMenuBtn,
-        // PTableCheckModal,
         PEmpty,
         SProjectTreeModal,
         SCollectModal,
@@ -197,9 +202,6 @@ export default {
             type: String,
             required: true,
         },
-        ...DefaultQSTableQSProps,
-        ...DefaultSingleItemTabBarQSProps,
-        ...DefaultMultiItemTabBarQSProps,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -222,12 +224,6 @@ export default {
             options: computed(() => ({
                 fields: state.fields,
             })),
-            // exportDataSource: computed(() => [
-            //     ...state.originDataSource,
-            //     {
-            //         name: 'project', key: 'project_id', view_type: 'text', view_option: {},
-            //     },
-            // ]),
         });
 
         const { project } = useStore();
@@ -247,7 +243,7 @@ export default {
                 { key: 'cloud_service_type', operator: '=', value: props.name },
             );
 
-        const apiHandler = new RouteQuerySearchTableFluentAPI(
+        const apiHandler = new QuerySearchTableFluentAPI(
             csListAction,
             {
                 shadow: true,
@@ -259,13 +255,9 @@ export default {
             },
             undefined,
             undefined,
-            vm,
         );
 
-        const singleItemTab = new RouterTabBarToolSet(
-            vm,
-            undefined,
-            computed(() => apiHandler.tableTS.selectState.isSelectOne),
+        const singleItemTab = new TabBarState(
             {
                 tabs: makeTrItems([
                     ['detail', 'TAB.DETAILS'],
@@ -275,13 +267,12 @@ export default {
                     ['monitoring', 'TAB.MONITORING'],
                 ]),
             },
+            {
+                activeTab: 'detail',
+            },
         );
-        singleItemTab.syncState.activeTab = 'detail';
 
-        const multiItemTab = new RouterTabBarToolSet(
-            vm,
-            DefaultMultiItemTabBarQSPropsName,
-            computed(() => apiHandler.tableTS.selectState.isSelectMulti),
+        const multiItemTab = new TabBarState(
             {
                 tabs: makeTrItems([
                     ['data', 'TAB.SELECTED_DATA'],
@@ -289,8 +280,10 @@ export default {
                     ['monitoring', 'TAB.MONITORING'],
                 ]),
             },
+            {
+                activeTab: 'data',
+            },
         );
-        multiItemTab.syncState.activeTab = 'data';
 
 
         const getFields = async (provider, group, name) => {
@@ -306,16 +299,13 @@ export default {
             }
             state.originFields = resp.data.results[0].metadata?.view?.table?.layout?.options?.fields || [];
             const keys = state.originFields.map(i => i.key);
-            apiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
-            apiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
+            apiHandler.tableTS.querySearch.keyHandler = getKeyHandler(keys);
+            apiHandler.tableTS.querySearch.valueHandlerMap = getStatApiValueHandlerMap(keys, 'inventory.CloudService');
+            apiHandler.tableTS.querySearch.suggestKeys = keys;
         };
+
         getFields(props.provider, props.group, props.name);
-        // const exportAction = fluentApi.addons().excel().export();
-        // const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
-        // onMounted(async () => {
-        //     await getDataSource(props.provider, props.group, props.name);
-        //     exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
-        // });
+
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
@@ -467,16 +457,30 @@ export default {
             }
         });
 
-        const routerHandler = async () => {
-            const prop = propsCopy(props);
-            apiHandler.applyAPIRouter(prop);
-            await apiHandler.getData();
-            apiHandler.applyDisplayRouter(prop);
-            singleItemTab.applyDisplayRouter(prop);
-            multiItemTab.applyDisplayRouter(prop);
-        };
-        onMounted(async () => {
-            await routerHandler();
+
+        /** Query String */
+        makeQueryStringComputeds(apiHandler.tableTS.syncState, {
+            pageSize: { key: 'ps', setter: Number },
+            thisPage: { key: 'p', setter: Number },
+            sortBy: { key: 'sb' },
+            sortDesc: { key: 'sd', setter: Boolean },
+            selectIndex: {
+                key: 'sl',
+                setter: queryStringToNumberArray,
+                autoReplacer: selectIndexAutoReplacer,
+            },
+        });
+        makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
+            {
+                key: 'f',
+                setter: queryTagsToOriginal,
+                getter: queryTagsToQueryString,
+            });
+        makeQueryStringComputeds(multiItemTab.syncState, {
+            activeTab: { key: 'mt' },
+        });
+        makeQueryStringComputeds(singleItemTab.syncState, {
+            activeTab: { key: 'st' },
         });
 
 
@@ -514,35 +518,32 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .cloud-service-page-nav{
+    .cloud-service-page-nav {
         @apply flex items-center justify-between mb-6;
-        .left{
+        .left {
             @apply flex;
-            .title{
+            .title {
                 line-height: 1.8125rem;
-                .group{
+                .group {
                     @apply text-2xl text-gray-500 ;
                 }
-                .name{
+                .name {
                     @apply text-2xl font-bold;
                 }
-
             }
         }
-
     }
-    .left-toolbox-item{
+
+    .left-toolbox-item {
         margin-left: 1rem;
         &:last-child {
             flex-grow: 1;
         }
     }
 
-    #empty-space{
+    #empty-space {
+        @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
-        @apply text-primary2;
-        /*color: $primary2;*/
-        /*font: 24px/32px Arial;*/
     }
 </style>

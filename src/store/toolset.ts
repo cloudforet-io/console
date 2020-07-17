@@ -201,7 +201,6 @@ class ProjectStore extends Store<ProjectState> {
         if (this.isExpiration() || force) {
             const result = {};
             try {
-                // console.debug('request project names');
                 const res = await projectAPI.list().setOnly('project_id', 'name', 'project_group').execute();
                 res.data.results.forEach((project) => {
                     result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
@@ -212,6 +211,21 @@ class ProjectStore extends Store<ProjectState> {
             }
             this.state.projects = result;
         }
+    }
+
+    Projects= async () => {
+        const projectAPI = fluentApi.identity().project();
+        const result = {};
+        try {
+            const res = await projectAPI.list().setOnly('project_id', 'name', 'project_group').execute();
+            res.data.results.forEach((project) => {
+                result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
+            });
+            this.state.ttl = DateTime.local().plus({ hours: 1 });
+        } catch (e) {
+            console.error(e);
+        }
+        this.state.projects = result;
     }
 }
 export interface ProviderInfo{
