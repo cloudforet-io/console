@@ -50,7 +50,7 @@
                     <p-radio class="mr-2"
                              :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
                              :value="true" @click="releaseProject"
-                    /><span class="cursor-pointer" @click="releaseProject">No Select Project</span>
+                    /><span class="cursor-pointer" @click="releaseProject">Select no Project</span>
                 </div>
             </div>
         </template>

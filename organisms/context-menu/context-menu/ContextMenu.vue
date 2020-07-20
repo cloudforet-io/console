@@ -26,7 +26,6 @@
                            :tabindex="index"
                            class="context-content context-item no-drag"
                            :class="{ disabled: item.disabled, [theme]: true }"
-                           target="_blank"
                            :href="item.href"
                            @click.stop="menuClick(item.name, index, $event)"
                            @keyup.up="onUpKey(index)"
