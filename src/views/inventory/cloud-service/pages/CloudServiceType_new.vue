@@ -339,10 +339,11 @@ export default {
         init();
 
         const getToCloudService = (item) => {
-            const projects: QueryTag[] = [];
+            const filters: QueryTag[] = [];
             apiHandler.gridTS.querySearch.tags.value.forEach((tag) => {
                 if (tag.key) {
-                    if (tag.key.name === 'project_id') projects.push(tag);
+                    if (tag.key.name === 'project_id') filters.push(tag);
+                    else if (tag.key.name === 'data.region_name') filters.push(tag);
                 }
             });
             const res: Location = {
@@ -353,7 +354,7 @@ export default {
                     name: item.cloud_service_type,
                 },
                 query: {
-                    f: queryTagsToQueryString(projects),
+                    f: queryTagsToQueryString(filters),
                 },
             };
             return res;
