@@ -1,13 +1,13 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PDataTable from './DataTable.vue';
-import md from './DataTable.md';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
+import { DataTableToolSet } from '@/components/organisms/tables/data-table/DataTable.toolset';
+import md from './DataTable.md';
+import PDataTable from './DataTable.vue';
 
 export default {
     title: 'organisms/tables/datatable',

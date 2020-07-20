@@ -1,5 +1,5 @@
 <script>
-import PBadge from '@/components/atoms/badges/Badge';
+import PBadge from '@/components/atoms/badges/PBadge';
 import { getBindClass } from '@/components/utils/functional';
 
 export default {

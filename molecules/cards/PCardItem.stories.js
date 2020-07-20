@@ -1,6 +1,6 @@
 import { withKnobs, text } from '@storybook/addon-knobs/vue';
 import PCardItem from '@/components/molecules/cards/PCardItem.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 

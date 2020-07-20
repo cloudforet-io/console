@@ -1,8 +1,8 @@
 import {
     select, text, color, boolean,
 } from '@storybook/addon-knobs/vue';
-import { BadgeShape } from '@/components/atoms/badges/toolset';
-import PBadge from './Badge.vue';
+import { BadgeShape } from '@/components/atoms/badges/PBadge.toolset';
+import PBadge from './PBadge.vue';
 
 export default {
     title: 'atoms/badges',

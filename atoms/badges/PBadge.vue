@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/components/utils/functional';
-import { BadgeShape } from '@/components/atoms/badges/toolset';
+import { BADGE_STYLE, BadgeShape } from '@/components/atoms/badges/PBadge.toolset';
 
 export default {
     name: 'PBadge',
@@ -11,13 +11,7 @@ export default {
             type: String,
             default: 'primary',
             validator(value) {
-                return [
-                    'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
-                    'secondary', 'secondary1', 'secondary2',
-                    'coral', 'yellow',
-                    'gray', 'gray200', 'gray100',
-                    'alert', 'safe', 'gray900',
-                ].indexOf(value) !== -1;
+                return Object.keys(BADGE_STYLE).indexOf(value) !== -1;
             },
         },
         textColor: {
@@ -89,16 +83,15 @@ export default {
     line-height: 0.875rem;
     letter-spacing: 0.02rem;
     padding: 0.1875rem 0.5rem 0.1875rem 0.5rem;
+
     @apply text-white bg-gray;
-    &.badge-round{
+    &.badge-round {
         border-radius: 100px;
     }
-    &.badge-square{
+    &.badge-square {
         border-radius: 2px;
     }
-
 }
-
 
 @define-mixin badge-color $theme, $color, $opposite-color {
     .badge-$(theme) {
@@ -118,19 +111,15 @@ export default {
 @mixin badge-color primary2, theme('colors.primary2'), theme('colors.white');
 @mixin badge-color primary3, theme('colors.primary3'), theme('colors.white');
 @mixin badge-color primary4, theme('colors.primary4'), theme('colors.white');
-
 @mixin badge-color secondary, theme('colors.secondary'), theme('colors.white');
 @mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white');
 @mixin badge-color secondary2, theme('colors.secondary2'), theme('colors.white');
-
 @mixin badge-color alert, theme('colors.alert'), theme('colors.white');
 @mixin badge-color safe, theme('colors.safe'), theme('colors.white');
 @mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white');
-
 @mixin badge-color gray, theme('colors.gray.default'), theme('colors.white');
 @mixin badge-color gray200, theme('colors.gray.200'), theme('colors.gray.900');
 @mixin badge-color gray100, theme('colors.gray.100'), theme('colors.gray.default');
-
 @mixin badge-color coral, theme('colors.coral.default'), theme('colors.white');
 @mixin badge-color yellow, theme('colors.yellow.default'), theme('colors.white');
 

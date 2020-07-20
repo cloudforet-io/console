@@ -16,7 +16,7 @@ import _ from 'lodash';
 import {
     ref, reactive, Ref, defineComponent,
 } from '@vue/composition-api';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default defineComponent({

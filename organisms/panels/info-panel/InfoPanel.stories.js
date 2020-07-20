@@ -3,7 +3,7 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { makeTrItems } from '@/lib/view-helper';
 
 export default {

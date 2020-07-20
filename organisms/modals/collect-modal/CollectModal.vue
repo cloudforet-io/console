@@ -76,7 +76,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import { fluentApi } from '@/lib/fluent-api';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import {
     collectModalProps, CollectModalPropsType,
 } from '@/components/organisms/modals/collect-modal/CollectModal.toolset';

@@ -1,8 +1,8 @@
 <script lang="ts">
 import _ from 'lodash';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { getColor } from '@/components/organisms/dynamic-view/dynamic-field/toolset';
-import { BadgeShape } from '@/components/atoms/badges/toolset';
+import { BadgeShape } from '@/components/atoms/badges/PBadge.toolset';
 
 export default {
     name: 'PDynamicFieldBadge',
