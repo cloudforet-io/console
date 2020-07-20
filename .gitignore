@@ -1,6 +1,8 @@
 # Config
-public/config/production.json
-public/config/development.json
+!public/config/default.json
+!public/config/development.json.sample
+public/config/*
+
 
 # Logs
 npm-debug.log*

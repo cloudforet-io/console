@@ -147,7 +147,6 @@ router.beforeEach(async (to, from, next) => {
         }
         next();
     } else if (hasLogIn()) {
-        console.log(hasLogIn());
         if (to.meta && to.meta.isDomainOwnerOnly && !isDomainOwner()) {
             next({ name: 'error' });
         }
