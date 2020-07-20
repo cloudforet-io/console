@@ -321,7 +321,7 @@ export default {
                 // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
-        apiHandler.getData();
+        // apiHandler.getData();
 
 
         const csIsNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
@@ -365,7 +365,7 @@ export default {
             await apiHandler.getData();
         };
 
-        const csGetDataAction = fluentApi.inventory().cloudService().getData();
+        // const csGetDataAction = fluentApi.inventory().cloudService().getData();
 
         const collectModalState = reactive({
             collectModalVisible: false,
@@ -499,7 +499,7 @@ export default {
             clickProject,
             changeProjectState,
             changeProject,
-            csGetDataAction,
+            // csGetDataAction,
             ...toRefs(collectModalState),
             clickCollectData,
             singleItemTab,

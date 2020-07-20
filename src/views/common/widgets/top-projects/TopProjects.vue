@@ -78,7 +78,7 @@
                         </p-td>
 
                         <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
-                            <router-link :to="`/project?g_p=1&g_ps=24&t_se=${item.project_group_id}`">
+                            <router-link :to="`/project?select_pg=${item.project_group_id}`">
                                 {{ item.project_group }}
                             </router-link>
                         </p-td>
@@ -107,7 +107,7 @@
                 <!-- others -->
                 <template #col-project_group="{index, field, item}">
                     <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}">
-                        <router-link :to="`/project?g_p=1&g_ps=24&t_se=${item.project_group_id}`">
+                        <router-link :to="`/project?select_pg=${item.project_group_id}`">
                             {{ item.project_group }}
                         </router-link>
                     </p-td>
