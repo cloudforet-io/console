@@ -61,7 +61,7 @@ import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import { propsMixin } from '@/components/molecules/modals/Modal.vue';
 import { setup as contentModalSetup } from '../content-modal/ContentModal.vue';
 import {
@@ -69,7 +69,7 @@ import {
 } from '@/lib/compostion-util';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);

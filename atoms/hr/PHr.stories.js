@@ -1,6 +1,6 @@
-import PHr from '@/components/atoms/hr/Hr';
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
+import PHr from '@/components/atoms/hr/PHr.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
 
 export default {
     title: 'atoms/hr',

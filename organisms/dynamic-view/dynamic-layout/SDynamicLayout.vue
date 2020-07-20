@@ -24,7 +24,7 @@ import {
     computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { Computed } from '@/lib/type';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import _ from 'lodash';
 import { DynamicLayoutProps } from './toolset';
 

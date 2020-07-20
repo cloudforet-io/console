@@ -25,14 +25,14 @@
                 name="head"
                 :fields="fieldsData"
             >
-                <p-tr>
-                    <p-th v-if="selectable" class="all-select">
-                        <PCheckBox v-if="multiSelect"
-                                   v-model="allState"
-                                   @change="selectAllToggle"
+                <tr>
+                    <th v-if="selectable" class="all-select">
+                        <p-check-box v-if="multiSelect"
+                                     v-model="allState"
+                                     @change="selectAllToggle"
                         />
-                    </p-th>
-                    <p-th
+                    </th>
+                    <th
                         v-for="(field, index) in fieldsData"
                         :key="index"
                         :style="field.style ||{}"
@@ -67,36 +67,36 @@
                                 </template>
                             </span>
                         </slot>
-                    </p-th>
-                </p-tr>
+                    </th>
+                </tr>
             </slot>
         </template>
         <template #body>
             <slot v-if="loading" name="loading">
-<!--                <p-tr v-for="s in skeletons" :key="s">-->
-<!--                    <p-td v-if="selectable" class="!pr-0  min-w-4 w-4">-->
-<!--                        <p-skeleton width="1rem" height="1rem" />-->
-<!--                    </p-td>-->
-<!--                    <p-td v-for="(field, index) in fieldsData" :key="index">-->
-<!--                        <slot :name="'skeleton-'+field.name" :index="index" :field="field">-->
-<!--                            <p-skeleton />-->
-<!--                        </slot>-->
-<!--                    </p-td>-->
-<!--                </p-tr>-->
-                <p-tr v-if="loading" key="loading" class="no-data-row">
-                    <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                <!--                <tr v-for="s in skeletons" :key="s">-->
+                <!--                    <td v-if="selectable" class="!pr-0  min-w-4 w-4">-->
+                <!--                        <p-skeleton width="1rem" height="1rem" />-->
+                <!--                    </td>-->
+                <!--                    <td v-for="(field, index) in fieldsData" :key="index">-->
+                <!--                        <slot :name="'skeleton-'+field.name" :index="index" :field="field">-->
+                <!--                            <p-skeleton />-->
+                <!--                        </slot>-->
+                <!--                    </td>-->
+                <!--                </tr>-->
+                <tr v-if="loading" key="loading" class="no-data-row">
+                    <td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                         <p-lottie name="spinner" :size="2"
                                   :auto="true"
                         />
-                    </p-td>
-                </p-tr>
+                    </td>
+                </tr>
             </slot>
             <slot v-else-if="showNoData" name="no-data" :fields="fieldsData">
-                <p-tr key="noData" class="no-data-row">
-                    <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                <tr key="noData" class="no-data-row">
+                    <td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                         {{ $t('ORGANISMS.NO_DATA') }}
-                    </p-td>
-                </p-tr>
+                    </td>
+                </tr>
             </slot>
             <slot v-else name="body" :items="items">
                 <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
@@ -107,33 +107,33 @@
                           :index="index"
                           :fields="fieldsName"
                     >
-                        <p-tr :key="index" :data-index="index"
-                              :class="{'tr-selected': isSelected(index)} "
-                              v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
-                              @click.left="rowLeftClick( item, index, $event )"
-                              @click.right="rowRightClick( item, index, $event )"
-                              @click.middle="rowMiddleClick( item, index, $event )"
-                              @mouseover="rowMouseOver(item,index, $event)"
-                              @mouseout="rowMouseOut(item,index, $event)"
+                        <tr :key="index" :data-index="index"
+                            :class="{'tr-selected': isSelected(index)} "
+                            v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
+                            @click.left="rowLeftClick( item, index, $event )"
+                            @click.right="rowRightClick( item, index, $event )"
+                            @click.middle="rowMiddleClick( item, index, $event )"
+                            @mouseover="rowMouseOver(item,index, $event)"
+                            @mouseout="rowMouseOut(item,index, $event)"
                         >
-                            <p-td v-if="selectable"
-                                  class="select-checkbox"
-                                  @click.stop.prevent="selectClick"
-                                  @mouseenter="hoverIndex=index"
-                                  @mouseleave="hoverIndex=null"
+                            <td v-if="selectable"
+                                class="select-checkbox"
+                                @click.stop.prevent="selectClick"
+                                @mouseenter="hoverIndex=index"
+                                @mouseleave="hoverIndex=null"
                             >
-                                <PCheckBox v-if="multiSelect"
-                                           v-model="proxySelectIndex"
-                                           :value="index"
-                                           :hovered="hoverIndex===index"
+                                <p-check-box v-if="multiSelect"
+                                             v-model="proxySelectIndex"
+                                             :value="index"
+                                             :hovered="hoverIndex===index"
                                 />
                                 <p-radio v-else
                                          v-model="proxySelectIndex[0]"
                                          :value="index"
                                          :hovered="hoverIndex===index"
                                 />
-                            </p-td>
-                            <template v-for="field in fieldsName">
+                            </td>
+                            <template v-for="(field, i) in fieldsName">
                                 <slot
                                     :name="'col-'+field"
                                     :item="item"
@@ -141,7 +141,7 @@
                                     :index="index"
                                     :field="field"
                                 >
-                                    <p-td onselectstart="return true">
+                                    <td :key="i" onselectstart="return true">
                                         <slot
                                             :name="'col-'+field+'-format'"
                                             :item="item"
@@ -151,10 +151,10 @@
                                         >
                                             {{ getValueFunc(item,field) }}
                                         </slot>
-                                    </p-td>
+                                    </td>
                                 </slot>
                             </template>
-                        </p-tr>
+                        </tr>
                     </slot>
                 </slot>
             </slot>
@@ -172,15 +172,12 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PTable from '@/components/molecules/tables/Table.vue';
-import PTr from '@/components/atoms/table/Tr.vue';
-import PTd from '@/components/atoms/table/Td.vue';
-import PTh from '@/components/atoms/table/Th.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { copyAnyData, selectToCopyToClipboard } from '@/lib/util';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { dataTableProps, DataTableSetupProps } from './DataTable.toolset';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
@@ -209,11 +206,8 @@ const loadingHandler = (props) => {
 export default {
     name: 'PDataTable',
     components: {
-        PSkeleton,
+        // PSkeleton,
         PTable,
-        PTd,
-        PTh,
-        PTr,
         PI,
         PCheckBox,
         PCopyButton,

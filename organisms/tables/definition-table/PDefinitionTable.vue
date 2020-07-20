@@ -38,8 +38,8 @@ import {
     DefinitionTableProps,
 } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import _ from 'lodash';
 
 export default {

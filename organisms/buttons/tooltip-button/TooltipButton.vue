@@ -23,7 +23,7 @@
 <script>
 import _ from 'lodash';
 import PTooltip from '@/components/molecules/tooltips/Tooltip.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
     name: 'PTooltipButton',
@@ -87,7 +87,7 @@ export default {
         border-radius: 2px;
         border: 0;
         min-width: 32px;
-        line-height:1; 
+        line-height:1;
         @mixin theme primary-dark, theme('colors.primary-dark');
         @mixin theme transparent, transparent;
     }

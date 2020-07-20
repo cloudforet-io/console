@@ -49,7 +49,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import { propsMixin } from '@/components/molecules/modals/Modal.vue';
 import { makeByPass, makeProxy } from '@/lib/compostion-util';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 
 const setup = (props, context) => {

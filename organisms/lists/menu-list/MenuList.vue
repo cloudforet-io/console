@@ -37,7 +37,7 @@
 import _ from 'lodash';
 import PMenuItem from '@/components/molecules/menu-item/MenuItem.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 const ACTIVATOR_MENU_SPACE = -8;
 
@@ -131,7 +131,7 @@ export default {
         border-radius: 2px;
         border: 0px;
         min-width: 32px;
-        line-height:1; 
+        line-height:1;
         &:hover, &.active {
             @apply bg-primary-dark;
         }

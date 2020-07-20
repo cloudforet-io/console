@@ -13,7 +13,7 @@ import {
     DictIGState, DictIGToolSet, dictValidation,
     toDictItems,
 } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { DictPanelAPI } from '@/lib/api/dict';
 
 export default {

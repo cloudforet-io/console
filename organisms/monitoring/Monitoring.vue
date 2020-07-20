@@ -111,7 +111,7 @@ import { getTimestamp } from '@/lib/util';
 import PMetricChart from '@/components/organisms/charts/metric-chart/MetricChart.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
     name: 'SMonitoring',

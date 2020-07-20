@@ -1,17 +1,17 @@
 <template>
-    <p-dl class="content-container">
+    <dl class="content-container">
         <template v-for="(def, idx) in defs">
             <div :key="idx" :class="{'content-list': !getFullLengthUsability(def), 'content-full-list': getFullLengthUsability(def)}">
                 <slot name="details">
                     <span class="content">
-                        <p-dt :class="{'label':true, 'label-common': !getFullLengthUsability(def), 'label-full': getFullLengthUsability(def)}">
+                        <dt :class="{'label':true, 'label-common': !getFullLengthUsability(def), 'label-full': getFullLengthUsability(def)}">
                             {{ def.label }}
-                        </p-dt>
+                        </dt>
                         <span class="data"
                               @mouseleave="mouseInOut(idx, false)"
                         >
-                            <p-dd :ref="'dd-'+def.name"
-                                  @mouseenter="mouseInOut(idx, true)"
+                            <dd :ref="'dd-'+def.name"
+                                @mouseenter="mouseInOut(idx, true)"
                             >
                                 <slot :name="`def-${def.name}-format`"
                                       :value="item[def.name] || ''"
@@ -20,7 +20,7 @@
                                 >
                                     {{ item[def.name] || '' }}
                                 </slot>
-                            </p-dd>
+                            </dd>
                             <p-copy-button v-if="activeArr(idx, def) && isCopyFlagged(def)"
                                            class="copy-btn"
                                            :value="getValue(def.name)"
@@ -30,23 +30,17 @@
                 </slot>
             </div>
         </template>
-    </p-dl>
+    </dl>
 </template>
 
-<script>
-import _ from 'lodash';
-import PDt from '@/components/atoms/lists/dl-list/Dt.vue';
-import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
-import PDd from '@/components/atoms/lists/dl-list/Dd.vue';
+<script lang="ts">
+import { get } from 'lodash';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 
 export default {
     name: 'PPanelContent',
     components: {
         PCopyButton,
-        PDt,
-        PDl,
-        PDd,
     },
     props: {
         defs: {
@@ -69,23 +63,23 @@ export default {
         };
     },
     created() {
-        this.setActiveArray();
+        (this as any).setActiveArray();
     },
     methods: {
         activeArr(idx, def) {
-            return this.active[idx] && this.$refs[`dd-${def.name}`][0].innerText;
+            return (this as any).active[idx] && (this as any).$refs[`dd-${def.name}`][0].innerText;
         },
         setActiveArray() {
-            this.active = Array(this.defs.length).fill(false);
+            (this as any).active = Array((this as any).defs.length).fill(false);
         },
         getFullLengthUsability(definition) {
-            return (_.get(definition, 'full') === true);
+            return (get(definition, 'full') === true);
         },
         isCopyFlagged(definition) {
-            return (_.get(definition, 'copyFlag') === true);
+            return (get(definition, 'copyFlag') === true);
         },
         mouseInOut(idx, flag) {
-            this.$set(this.active, idx, flag);
+            (this as any).$set((this as any).active, idx, flag);
         },
         getTextContent(el, text = '') {
             if (el.childElementCount === 0) {
@@ -102,7 +96,7 @@ export default {
             return this.getTextContent(el.firstElementChild);
         },
         getValue(name) {
-            const ref = this.$refs[`dd-${name}`];
+            const ref = (this as any).$refs[`dd-${name}`];
             return ref ? this.getTextContent(ref[0]).trim() : '';
         },
     },
@@ -135,10 +129,8 @@ export default {
             text-align: left;
             word-break: break-word;
             padding: 0 1rem;
-            text-align: left;
             font-weight: bold;
             min-width: 10rem;
-
         }
         .label-common {
             width: 25%;
@@ -162,7 +154,7 @@ export default {
             flex: 1;
             height: 1rem;
             .p-copy-btn {
-                top: -.3rem;
+                top: -0.3rem;
             }
         }
     }

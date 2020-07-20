@@ -5,7 +5,7 @@ import {
 } from '@storybook/addon-knobs';
 import { autoProps } from '@sb/storybook-util';
 import PContentModal from '@/components/organisms/modals/content-modal/ContentModal.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { sizeMapping } from '@/components/molecules/modals/toolset';
 

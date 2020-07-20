@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/components/utils/functional';
-import { skeletonProps } from '@/components/atoms/skeletons/Skeleton.toolset';
+import { skeletonProps } from '@/components/atoms/skeletons/PSkeleton.toolset';
 
 const isEmptyVNode = (nodes) => {
     if (!nodes) return true;

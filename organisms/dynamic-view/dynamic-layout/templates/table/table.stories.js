@@ -4,7 +4,7 @@ import SDynamicLayoutTable from '@/components/organisms/dynamic-view/dynamic-lay
 
 import { computed, ref } from '@vue/composition-api';
 import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/table/table.md';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 
 export default {

@@ -1,5 +1,5 @@
 <script>
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { getBindClass } from '@/components/utils/functional';
 
 export default {

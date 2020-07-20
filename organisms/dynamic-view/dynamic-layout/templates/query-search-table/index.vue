@@ -86,7 +86,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 
-import PHr from '@/components/atoms/hr/Hr.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import {
     ActionAPI, fluentApi, QueryAPI, ResourceActions,

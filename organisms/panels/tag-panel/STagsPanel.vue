@@ -27,7 +27,7 @@ import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
     name: 'STagsPanel',

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import PInputText from '@/components/atoms/inputs/TextInput.vue';
+import PInputText from '@/components/atoms/inputs/PTextInput.vue';
 
 export default {
     name: 'PDictInput',

@@ -31,15 +31,15 @@ import {
     reactive, toRefs, computed, defineComponent, ref, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { ResourceActions } from '@/lib/fluent-api';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import { DLSchema } from '@/lib/type';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SkePSelectBtnGroup from '@/components/molecules/skeletons/SkePSelectBtnGroup.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 interface Props{
     resourceApi: ResourceActions<any>;

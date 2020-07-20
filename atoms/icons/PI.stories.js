@@ -1,6 +1,6 @@
 import { text, select, boolean } from '@storybook/addon-knobs/vue';
 import icon from 'vue-svgicon';
-import PI from './PI.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     title: 'atoms/icon',

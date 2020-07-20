@@ -100,7 +100,7 @@ import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';

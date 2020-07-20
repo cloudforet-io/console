@@ -2,7 +2,7 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import PEmpty from './Empty.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 export default {
     title: 'atoms/Empty',

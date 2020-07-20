@@ -1,7 +1,7 @@
 import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTableCheckModel from './TableCheckModal.vue';
 import { sizeMapping } from '../../../molecules/modals/toolset';
 

@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { makeVModelProxy } from '@/lib/compostion-util';
 
 export default defineComponent({

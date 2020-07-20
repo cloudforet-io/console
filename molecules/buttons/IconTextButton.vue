@@ -32,9 +32,9 @@ import {
     reactive, computed, toRefs,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import color from '@/styles/colors';
-import { buttonProps } from '@/components/atoms/buttons/Button.toolset';
+import { buttonProps } from '@/components/atoms/buttons/PButton.toolset';
 
 
 export default {

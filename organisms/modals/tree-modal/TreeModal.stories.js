@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { ref } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTreeModal from './TreeModal.vue';
 import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/toolset';
 import TreeItem, { TreeState } from '@/components/molecules/tree-origin/ToolSet';

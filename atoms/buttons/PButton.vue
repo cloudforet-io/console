@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/components/utils/functional';
-import { ButtonProps } from '@/components/atoms/buttons/Button.toolset';
+import { ButtonProps } from '@/components/atoms/buttons/PButton.toolset';
 
 export default {
     name: 'PButton',

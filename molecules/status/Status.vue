@@ -11,7 +11,7 @@
 
 <script>
 import PI from '@/components/atoms/icons/PI.vue';
-import PLabel from '@/components/atoms/labels/Label.vue';
+import PLabel from '@/components/atoms/labels/PLabel.vue';
 import { computed } from '@vue/composition-api';
 
 const fontAwesomePrefix = RegExp('fa-');

@@ -19,7 +19,7 @@ import {
     reactive, computed, toRefs,
     defineComponent,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { Props, BtnType } from './SelectBtnGroup.toolset';
 
 export default defineComponent({

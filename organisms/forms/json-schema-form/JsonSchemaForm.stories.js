@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';

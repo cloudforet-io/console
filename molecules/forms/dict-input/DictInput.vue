@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import PInputText from '@/components/atoms/inputs/TextInput.vue';
+import PInputText from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import { dictInputProps, DictInputPropsInterface }
     from '@/components/molecules/forms/dict-input/DictInput.toolset';

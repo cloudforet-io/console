@@ -4,9 +4,9 @@ import {
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { skeletonProps } from '@/components/atoms/skeletons/Skeleton.toolset';
+import { skeletonProps } from '@/components/atoms/skeletons/PSkeleton.toolset';
 
 export default {
     title: 'atoms/skeletons/ItemSkeleton',

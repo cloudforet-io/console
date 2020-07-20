@@ -1,4 +1,4 @@
-import PLabel from './Label.vue';
+import PLabel from '@/components/atoms/labels/PLabel.vue';
 
 
 export default {

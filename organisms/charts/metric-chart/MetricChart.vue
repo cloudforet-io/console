@@ -32,7 +32,7 @@ import _ from 'lodash';
 import { gray } from '@/styles/colors';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import { chartTimestampFormatter } from '@/lib/util';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ChartColor, ChartDataSets } from 'chart.js';

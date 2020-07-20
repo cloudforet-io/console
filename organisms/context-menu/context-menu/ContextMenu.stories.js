@@ -2,7 +2,7 @@ import { action } from '@storybook/addon-actions';
 import { object, select } from '@storybook/addon-knobs';
 import { ref } from '@vue/composition-api';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import md from './ContextMenu.md';
 import style from './PContextMenu.stories.scss';

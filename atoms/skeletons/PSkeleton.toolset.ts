@@ -1,4 +1,4 @@
-import { primary3, gray } from '@/styles/colors';
+import { primary3, gray } from '@/components/styles/colors';
 
 export const skeletonProps = {
     loading: {

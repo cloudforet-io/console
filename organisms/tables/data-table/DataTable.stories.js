@@ -1,10 +1,7 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PTr from '@/components/atoms/table/Tr.vue';
-import PTd from '@/components/atoms/table/Td.vue';
-import PTh from '@/components/atoms/table/Th.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { DataTableToolSet } from '@/components/organisms/tables/data-table/DataTable.toolset';
 import md from './DataTable.md';
 import PDataTable from './DataTable.vue';
@@ -241,7 +238,7 @@ export const rowVBind = () => ({
 
 export const customRowSlot = () => ({
     components: {
-        PDataTable, PTr, PTh, PTd,
+        PDataTable,
     },
     mixins: [mockupMixin],
     template: `
@@ -256,13 +253,12 @@ export const customRowSlot = () => ({
     @rowMouseOut="rowMouseOut"
 >
 <template slot="row"  slot-scope="data">
-<p-tr  style="color: #0f69ff;">
-    <p-td v-for="field in data.fields">
+<tr  style="color: #0f69ff;">
+    <td v-for="field in data.fields">
         {{data.item[field]}}
-    </p-td>
-</p-tr>
+    </td>
+</tr>
 </template>
-</p-tr>
 </PDataTable>
 `,
     data() {
@@ -278,7 +274,7 @@ export const customRowSlot = () => ({
 
 export const customColSlot = () => ({
     components: {
-        PDataTable, PTr, PTh, PTd, PButton,
+        PDataTable, PButton,
     },
     mixins: [mockupMixin],
     template: `
@@ -293,9 +289,9 @@ export const customColSlot = () => ({
     @rowMouseOut="rowMouseOut"
 >
 <template slot="col-email"  slot-scope="data">
-    <p-td style="color: #0f69ff;" >
+    <td style="color: #0f69ff;" >
         <p-button styleType="primary" @click.stop="sendEmail(data.item,data.index,$event)">send email</p-button>
-    </p-td>
+    </td>
 </template>
 </PDataTable>
         </div>

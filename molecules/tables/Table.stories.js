@@ -1,8 +1,5 @@
 import { select, boolean } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
-import PTr from '@/components/atoms/table/Tr.vue';
-import PTd from '@/components/atoms/table/Td.vue';
-import PTh from '@/components/atoms/table/Th.vue';
 import PTable from '@/components/molecules/tables/Table.vue';
 
 export default {
@@ -18,7 +15,7 @@ export default {
 
 export const table = () => ({
     components: {
-        PTable, PTr, PTd, PTh,
+        PTable,
     },
     template: `
             <p-table 
@@ -34,18 +31,18 @@ export const table = () => ({
                 
             >
             <template #head>
-            <p-tr>
-                <p-th>name</p-th>
-                <p-th>phone</p-th>
-                <p-th>email</p-th>
-            </p-tr>
+            <tr>
+                <th>name</th>
+                <th>phone</th>
+                <th>email</th>
+            </tr>
             </template>
             <template #body>
-                <p-tr v-for="(d, key) in dataMap" :key="key">
-                    <p-td>{{ d[0] }}</p-td>
-                    <p-td>{{ d[1] }}</p-td>
-                    <p-td>{{ d[2] }}</p-td>
-                </p-tr>
+                <tr v-for="(d, key) in dataMap" :key="key">
+                    <td>{{ d[0] }}</td>
+                    <td>{{ d[1] }}</td>
+                    <td>{{ d[2] }}</td>
+                </tr>
             </template>
             </p-table>
             `,

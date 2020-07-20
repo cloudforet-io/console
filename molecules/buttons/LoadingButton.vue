@@ -16,7 +16,7 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {

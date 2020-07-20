@@ -90,7 +90,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import {
     ProgressWizardProps,
     progressWizardProps,

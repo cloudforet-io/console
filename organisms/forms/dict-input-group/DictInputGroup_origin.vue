@@ -56,7 +56,7 @@ import PDictInput from '@/components/molecules/forms/dict-input/DictInput_origin
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 const mergeDict = dict => _.transform(dict, (result, pair) => {

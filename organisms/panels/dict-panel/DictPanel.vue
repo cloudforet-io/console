@@ -52,7 +52,7 @@ import { dictPanelProps, DictPanelPropsType } from '@/components/organisms/panel
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import {

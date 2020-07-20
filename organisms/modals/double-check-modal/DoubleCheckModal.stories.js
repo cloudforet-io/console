@@ -1,6 +1,6 @@
 import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { ref } from '@vue/composition-api';
 import PDoubleCheckModal from './DoubleCheckModal.vue';
 
