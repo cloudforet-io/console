@@ -21,10 +21,18 @@
                     <router-link :to="item.href">
                         <hr v-if="item.created_count || item.deleted_count" style="width: 100%;">
                         <div v-if="item.created_count || item.deleted_count" class="card-contents">
-                            <p-lazy-img :img-url="iconUrl(item)"
-                                        width="2rem" height="2rem"
-                                        class="mr-2"
-                            />
+                            <div v-if="!item.isServer">
+                                <p-lazy-img :img-url="iconUrl(item)"
+                                            width="2rem" height="2rem"
+                                            class="mr-2"
+                                />
+                            </div>
+                            <div v-else-if="item.isServer">
+                                <p-i name="ic_server"
+                                     width="2rem" height="2rem"
+                                     class="mr-2 rounded-sm"
+                                />
+                            </div>
                             <div class="daily-update-contents">
                                 <div class="group">
                                     {{ item.group }} <span>({{ item.count || 0 }})</span>
@@ -56,6 +64,7 @@
 <script lang="ts">
 import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
@@ -112,6 +121,7 @@ export default {
         PWidgetLayout,
         PGridLayout,
         PLazyImg,
+        PI,
         PSkeleton,
     },
     props: {
@@ -232,7 +242,6 @@ export default {
                         group: 'Server',
                         type: d.server_type,
                         count: d.total_count,
-                        defaultIcon: 'ic_server',
                         isServer: true,
                         created_count: d.created_count,
                         deleted_count: d.deleted_count,
@@ -255,7 +264,6 @@ export default {
                         group: 'Server',
                         type: d.server_type,
                         count: d.total_count,
-                        defaultIcon: 'ic_server',
                         isServer: true,
                         created_count: d.created_count,
                         deleted_count: d.deleted_count,
@@ -280,10 +288,7 @@ export default {
 
         return {
             ...toRefs(state),
-            iconUrl: (item): string => {
-                if (item.isServer) return 'ic_server';
-                return item.icon || providerStore.state.providers[item.provider]?.icon || '';
-            },
+            iconUrl: (item): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
         };
     },
 };
