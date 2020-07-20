@@ -31,7 +31,7 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 import { selectableListProps, SelectableListPropsType, MapperKeyType } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
-import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
+import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { makeProxy } from '@/lib/compostion-util';
 

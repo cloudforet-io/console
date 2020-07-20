@@ -9,9 +9,9 @@ import {
 import casual from '@/lib/casual';
 import PI from '@/components/atoms/icons/PI.vue';
 import { clone } from 'lodash';
-import PTreeNode from './PTreeNode.vue';
-import { treeNodeProps, TreeNodeToolSet } from './PTreeNode.toolset';
-import md from './PTreeNode.md';
+import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
+import { treeNodeProps, TreeNodeToolSet } from '@/components/molecules/tree/PTreeNode.toolset';
+import md from '@/components/molecules/tree/PTreeNode.md';
 import style from './PTreeNodes.stories.scss';
 
 export default {

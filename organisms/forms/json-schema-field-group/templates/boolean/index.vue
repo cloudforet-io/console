@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import { makeVModelProxy } from '@/lib/compostion-util';
 
 export default defineComponent({

@@ -1,6 +1,6 @@
 <script lang="ts">
 import _ from 'lodash';
-import PStatus from '@/components/molecules/status/Status.vue';
+import PStatus from '@/components/molecules/status/PStatus.vue';
 import { getColor } from '@/components/organisms/dynamic-view/dynamic-field/toolset';
 
 export default {

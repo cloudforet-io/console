@@ -15,8 +15,8 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import PPanelContent from '@/components/molecules/panel/panel-content/PanelContent.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PPanelContent from '@/components/molecules/panel/panel-content/PPanelContent.vue';
 
 export default defineComponent({
     name: 'PInfoPanel',

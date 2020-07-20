@@ -31,10 +31,10 @@ import {
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 // @ts-ignore
-import PTag from '@/components/molecules/tags/Tag.vue';
-import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
+import PTag from '@/components/molecules/tags/PTag.vue';
+import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { tagList } from '@/components/molecules/tags/toolset';
+import { tagList } from '@/components/molecules/tags/PTag.toolset';
 
 export default defineComponent({
     name: 'PTagsInput',

@@ -1,7 +1,7 @@
 <template>
     <div class="s-dynamic-subdata my-8">
         <transition name="fade" mode="out-in">
-            <SkePSelectBtnGroup v-if="!layouts" class="skeleton mx-4" />
+            <PSelectBtnGroupSkeleton v-if="!layouts" class="skeleton mx-4" />
             <p-select-btn-group
                 v-else
                 class="px-4"
@@ -35,10 +35,10 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { ResourceActions } from '@/lib/fluent-api';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { DLSchema } from '@/lib/type';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SkePSelectBtnGroup from '@/components/molecules/skeletons/SkePSelectBtnGroup.vue';
+import PSelectBtnGroupSkeleton from '@/components/molecules/skeletons/PSelectBtnGroupSkeleton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 interface Props{
@@ -53,7 +53,7 @@ interface Props{
 export default defineComponent({
     name: 'SDynamicSubData',
     components: {
-        PSelectBtnGroup, PEmpty, PButton, PPanelTop, SDynamicLayout, SkePSelectBtnGroup, PSkeleton,
+        PSelectBtnGroup, PEmpty, PButton, PPanelTop, SDynamicLayout, PSelectBtnGroupSkeleton, PSkeleton,
     },
     props: {
         resourceApi: {

@@ -1,6 +1,6 @@
 import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
-import { ICON_BUTTON_STYLE_TYPE, iconButtonProps } from '@/components/molecules/buttons/PIconButton.toolset';
-import {dropdownBtnProps} from "@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.toolset";
+import { ICON_BUTTON_STYLE_TYPE } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
+import { dropdownBtnProps } from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.toolset';
 
 export const dropdownMenuBtnProps = {
     menu: {

@@ -6,5 +6,4 @@ export interface Props {
     buttons: Array<string|BtnType>;
     selected: string;
     space?: boolean;
-    dynamicStyle?: Record<string, any>;
 }

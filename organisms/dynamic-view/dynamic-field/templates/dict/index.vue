@@ -1,6 +1,6 @@
 <script lang="ts">
 import _ from 'lodash';
-import PDictList from '@/components/molecules/lists/DictList.vue';
+import PDictList from '@/components/molecules/lists/PDictList.vue';
 
 export default {
     name: 'PDynamicFieldDict',

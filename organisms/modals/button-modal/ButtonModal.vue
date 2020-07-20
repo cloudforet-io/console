@@ -68,7 +68,7 @@ import { computed, defineComponent } from '@vue/composition-api';
 // @ts-ignore
 import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
+import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export const setup = (props, context) => {

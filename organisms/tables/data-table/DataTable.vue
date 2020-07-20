@@ -171,7 +171,7 @@ import {
     toRefs, computed, reactive, watch, onMounted, Ref, ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PTable from '@/components/molecules/tables/Table.vue';
+import PTable from '@/components/molecules/tables/PTable.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { copyAnyData, selectToCopyToClipboard } from '@/lib/util';
@@ -180,9 +180,9 @@ import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { dataTableProps, DataTableSetupProps } from './DataTable.toolset';
 
-const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
-const PRadio = () => import('@/components/molecules/forms/radio/Radio.vue');
-const PCopyButton = () => import('@/components/molecules/buttons/CopyButton.vue');
+const PCheckBox = () => import('@/components/molecules/forms/checkbox/PCheckBox.vue');
+const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
+const PCopyButton = () => import('@/components/molecules/buttons/copy-button/PCopyButton.vue');
 
 
 const loadingHandler = (props) => {

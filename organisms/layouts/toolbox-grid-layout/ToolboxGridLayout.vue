@@ -69,13 +69,13 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
-import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/toolset';
+import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 
 const setTools = (props, context) => {
     const state = reactive({

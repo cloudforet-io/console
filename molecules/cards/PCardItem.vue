@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { cardItemProps } from '@/components/molecules/cards/PCardItem.toolset';
 import { defineComponent } from '@vue/composition-api';

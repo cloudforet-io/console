@@ -38,7 +38,7 @@
 <script>
 import { reactive, toRefs, computed } from '@vue/composition-api';
 import { Util } from '@/lib/global-util';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { makeProxy } from '@/lib/compostion-util';

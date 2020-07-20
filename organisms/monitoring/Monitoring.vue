@@ -97,7 +97,7 @@ import {
 } from '@/styles/colors';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import _ from 'lodash';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { BtnType } from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.toolset';
@@ -109,7 +109,7 @@ import { GetMetricData, MetricList } from '@/lib/fluent-api/monitoring/metric';
 import moment, { Moment } from 'moment';
 import { getTimestamp } from '@/lib/util';
 import PMetricChart from '@/components/organisms/charts/metric-chart/MetricChart.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 

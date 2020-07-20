@@ -9,7 +9,7 @@ import {
     computed, defineComponent, ref, watch, Ref, onMounted,
 } from '@vue/composition-api';
 import { editor } from 'monaco-editor';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
 
 interface MEComponent{
     editor: editor.IEditor;

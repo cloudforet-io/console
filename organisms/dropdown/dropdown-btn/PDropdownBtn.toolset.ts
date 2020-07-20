@@ -1,4 +1,4 @@
-import { ICON_BUTTON_STYLE_TYPE, iconButtonProps } from '@/components/molecules/buttons/PIconButton.toolset';
+import { ICON_BUTTON_STYLE_TYPE, iconButtonProps } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
 
 export const dropdownBtnProps = {
     /* sync */

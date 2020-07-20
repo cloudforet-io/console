@@ -3,7 +3,6 @@
         <div class="btns">
             <p-button v-for="btn in btnsData"
                       :key="btn.name"
-                      :style="dynamicStyle"
                       :class="{ active:selected === btn.name, 'select-btn': !space, 'select-next-btn': space }"
                       v-bind="btn.vbind"
                       @click="clickEvent(btn.name)"
@@ -31,10 +30,6 @@ export default defineComponent({
         space: {
             type: Boolean,
             default: false,
-        },
-        dynamicStyle: {
-            type: Object,
-            default: null,
         },
     },
     setup(props: Props, context) {

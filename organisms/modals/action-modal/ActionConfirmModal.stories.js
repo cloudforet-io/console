@@ -2,7 +2,7 @@ import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { sizeMapping } from '@/components/molecules/modals/toolset';
+import { sizeMapping } from '@/components/molecules/modals/PModal.toolset';
 import PTableCheckModel from './ActionConfirmModal.vue';
 
 export default {

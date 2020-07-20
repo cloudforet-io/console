@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTableCheckModel from './TableCheckModal.vue';
-import { sizeMapping } from '../../../molecules/modals/toolset';
+import { sizeMapping } from '../../../molecules/modals/PModal.toolset';
 
 export default {
     title: 'organisms/modals/table-check-modal',

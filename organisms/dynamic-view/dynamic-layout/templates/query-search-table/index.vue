@@ -98,7 +98,7 @@ import {
     makeFields,
     makeTableSlots,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import { getKeyHandler, KeyItem } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { ACHandlerMeta, getStatApiValueHandlerMap } from '@/lib/api/query-search';

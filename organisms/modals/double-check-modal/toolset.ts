@@ -9,7 +9,7 @@ import {
 } from '@/lib/toolset';
 import {
     ModalState, ModalStateType, ModalSyncStateType, ModalToolSet,
-} from '@/components/molecules/modals/toolset';
+} from '@/components/molecules/modals/PModal.toolset';
 
 
 export type DoubleCheckModalSyncStateType = ModalSyncStateType

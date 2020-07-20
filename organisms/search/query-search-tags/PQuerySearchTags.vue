@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import PTag from '@/components/molecules/tags/Tag.vue';
+import PTag from '@/components/molecules/tags/PTag.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import {
     QuerySearchTagsProps,

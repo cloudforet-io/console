@@ -11,7 +11,7 @@
 import {
     computed, reactive, watch,
 } from '@vue/composition-api';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { checkCanGetData, DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PMarkDown from '@/components/molecules/markdown/PMarkDown.vue';

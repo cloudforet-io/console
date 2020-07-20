@@ -69,7 +69,7 @@ import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 export default {
     name: 'SProjectTreeModal',

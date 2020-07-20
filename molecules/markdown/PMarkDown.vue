@@ -7,7 +7,7 @@ import {
     computed, reactive, watch,
 } from '@vue/composition-api';
 import nunjucks from 'nunjucks';
-import _ from 'lodash';
+import { get } from 'lodash';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const marked = require('marked');
@@ -17,6 +17,7 @@ marked.setOptions({
     breaks: true,
     pedantic: false,
     highlight(code, language) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require
         const hljs = require('highlight.js');
         const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
         const result = hljs.highlight(validLanguage, code);
@@ -42,7 +43,7 @@ export default {
         },
     },
     setup(props) {
-        const getI18nMd = (md: any) => _.get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
+        const getI18nMd = (md: any) => get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
         const md = computed(() => {
             let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
             if (props.data) {
@@ -59,85 +60,81 @@ export default {
 </script>
 
 <style lang="postcss">
-.p-mark-down{
+.p-mark-down {
     @apply w-full border-black text-gray-900 ;
-    table{
-        td,th{
+    table {
+        td,th {
             @apply px-4 py-2;
         }
-        thead{
-            tr{
-                th, td{
+        thead {
+            tr {
+                th, td {
                     @apply border-black border-t border-b font-bold;
                 }
             }
         }
-        tbody{
-            tr{
-                td,th{
+        tbody {
+            tr {
+                td,th {
                     @apply border-gray-300 border-b;
                 }
-
             }
-
         }
     }
     a {
         @apply text-blue-600;
-        &:hover{ @apply underline; }
+        &:hover { @apply underline; }
     }
-    code{
+    code {
         @apply bg-gray-200 rounded-sm px-1;
         font-family: courier, monospace;
     }
-    pre{
-        code{
+    pre {
+        code {
             all: inherit;
         }
     }
-    ul{
+    ul {
         @apply list-disc block;
-        margin-block-start: .5rem;
-        margin-block-end: .5rem;
-        margin-inline-start: 0px;
-        margin-inline-end: 0px;
+        margin-block-start: 0.5rem;
+        margin-block-end: 0.5rem;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
         padding-inline-start: 2rem;
 
-        ul{
+        ul {
             list-style: circle;
         }
     }
-    ol{
+    ol {
         @apply block list-decimal ;
-        margin-block-start: .5rem;
-        margin-block-end: .5rem;
-        margin-inline-start: 0px;
-        margin-inline-end: 0px;
+        margin-block-start: 0.5rem;
+        margin-block-end: 0.5rem;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
         padding-inline-start: 2rem;
     }
     h1, h2, h3, h4 {
         @apply font-bold ;
     }
-    h1{
+    h1 {
         @apply text-3xl mb-4 mt-8;
     }
-    h2{
+    h2 {
         @apply text-2xl mb-3 mt-8;
     }
-    h3{
+    h3 {
         @apply text-xl mb-2 mt-8;
     }
-    h4{
+    h4 {
         @apply text-base mb-2 mt-5;
     }
-    h5, h6{
+    h5, h6 {
         @apply text-base mb-2 mt-5 ;
     }
-    p, ul > li, ol >li{
+    p, ul > li, ol > li {
         @apply text-sm leading-tight ;
     }
-
 }
-
 
 </style>

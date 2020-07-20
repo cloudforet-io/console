@@ -28,7 +28,7 @@ import {
     reactive, toRefs, computed, defineComponent, Ref,
 } from '@vue/composition-api';
 // @ts-ignore
-import PModal, { propsMixin } from '@/components/molecules/modals/Modal.vue';
+import PModal, { propsMixin } from '@/components/molecules/modals/PModal.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 

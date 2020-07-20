@@ -1,7 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import { reactive, toRefs } from '@vue/composition-api';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
-import { makeTrItems } from '@/lib/view-helper';
+import { makeItems } from '@/components/utils/generator';
 
 export default {
     title: 'organisms/buttons/select-btn-group',
@@ -107,20 +107,16 @@ export const withTrHelper = () => ({
 </div>`,
     setup(_, { parent }) {
         const state = reactive({
-            btns: makeTrItems([
-                ['ip', 'COMMON.IP'],
-                ['cidr', 'WORD.CIDR'],
-                ['mac', 'COMMON.MAC'],
-                ['network', 'COMMON.NETWORK'],
-                ['project', 'COMMON.PROJECT'],
-                ['region', 'COMMON.REGION', { vbind: { disabled: true } }],
-            ],
-            parent,
-            {
-                vbind: {
-                    styleType: 'primary',
-                    outline: true,
-                },
+            btns: makeItems([
+                ['ip', 'IP'],
+                ['cidr', 'CIDR'],
+                ['mac', 'MAC'],
+                ['network', 'NETWORK'],
+                ['project', 'PROJECT'],
+                ['region', 'REGION', { disabled: true }],
+            ], {
+                styleType: 'primary',
+                outline: true,
             }),
             selected: 'ip',
         });
@@ -150,20 +146,16 @@ export const scroll = () => ({
 </div>`,
     setup(_, { parent }) {
         const state = reactive({
-            btns: makeTrItems([
-                ['ip', 'COMMON.IP'],
-                ['cidr', 'WORD.CIDR'],
-                ['mac', 'COMMON.MAC'],
-                ['network', 'COMMON.NETWORK'],
-                ['project', 'COMMON.PROJECT'],
-                ['region', 'COMMON.REGION', { vbind: { disabled: true } }],
-            ],
-            parent,
-            {
-                vbind: {
-                    styleType: 'primary',
-                    outline: true,
-                },
+            btns: makeItems([
+                ['ip', 'IP'],
+                ['cidr', 'CIDR'],
+                ['mac', 'MAC'],
+                ['network', 'NETWORK'],
+                ['project', 'PROJECT'],
+                ['region', 'REGION', { disabled: true }],
+            ], {
+                styleType: 'primary',
+                outline: true,
             }),
             selected: 'ip',
         });

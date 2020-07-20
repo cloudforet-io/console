@@ -2,17 +2,16 @@ import { action } from '@storybook/addon-actions';
 import { text, select, boolean } from '@storybook/addon-knobs/vue';
 
 import icon from 'vue-svgicon';
-import PIconButton from './IconButton.vue';
-import PIconTextButton from './IconTextButton.vue';
-
-import PCopyButton from './CopyButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 
 import {
     animationMapping, flipMapping,
     iconStyleMapping,
     rotatingMapping,
     sizeMapping,
-} from './iconMapping.stories.toolset';
+} from './Button.stories.toolset';
 
 const icons = Object.keys(icon.icons);
 

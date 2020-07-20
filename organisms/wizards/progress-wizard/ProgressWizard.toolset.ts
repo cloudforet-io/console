@@ -1,7 +1,7 @@
 import {
     progressTabBarProps,
     ProgressTabBarProps,
-} from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar.toolset';
+} from '@/components/molecules/tabs/progress-tab-bar/PProgressTabBar.toolset';
 
 export const progressWizardProps = {
     ...progressTabBarProps,

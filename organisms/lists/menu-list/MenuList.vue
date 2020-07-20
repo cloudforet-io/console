@@ -35,7 +35,7 @@
 
 <script>
 import _ from 'lodash';
-import PMenuItem from '@/components/molecules/menu-item/MenuItem.vue';
+import PMenuItem from '@/components/molecules/menu-item/PMenuItem.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 

@@ -62,7 +62,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
-import { propsMixin } from '@/components/molecules/modals/Modal.vue';
+import { propsMixin } from '@/components/molecules/modals/PModal.vue';
 import { setup as contentModalSetup } from '../content-modal/ContentModal.vue';
 import {
     makeByPass, makeProxy, formValidation, requiredValidation, Validation,

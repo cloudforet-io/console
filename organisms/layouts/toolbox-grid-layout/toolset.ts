@@ -8,14 +8,14 @@ import {
     GridLayoutPropsType,
     GridLayoutState,
     GridLayoutStateType, GridLayoutSyncStateType,
-} from '@/components/molecules/layouts/grid-layout/toolset';
+} from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import { getAllPage } from '@/components/organisms/pagenations/toolset';
 import {
     KeyHandler,
     QuerySearchToolSet,
     ValueHandlerMap,
 } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
-import { ChangeTagCallBack } from '@/components/molecules/tags/toolset';
+import { ChangeTagCallBack } from '@/components/molecules/tags/PTag.toolset';
 
 export interface ToolBoxGridLayoutStateType extends GridLayoutStateType{
     pagenationVisible: boolean;

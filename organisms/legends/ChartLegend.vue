@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import PStatus from '@/components/molecules/status/Status';
+import PStatus from '@/components/molecules/status/PStatus';
 
 export default {
     name: 'PChartLegend',

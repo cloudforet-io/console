@@ -66,7 +66,7 @@ import {
 import {
     ActionAPI, QueryAPI, GetDataAction, fluentApi,
 } from '@/lib/fluent-api';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import _ from 'lodash';
 

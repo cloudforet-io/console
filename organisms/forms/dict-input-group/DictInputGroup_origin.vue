@@ -52,12 +52,12 @@ import _ from 'lodash';
 import {
     toRefs, reactive, ref, watch, computed,
 } from '@vue/composition-api';
-import PDictInput from '@/components/molecules/forms/dict-input/DictInput_origin.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
+import PDictInput from '@/components/molecules/forms/dict-input/DictInput_deprecated.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 const mergeDict = dict => _.transform(dict, (result, pair) => {
     result[pair.name] = pair.value;

@@ -29,7 +29,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { DropdownBtnProps, dropdownBtnProps } from './PDropdownBtn.toolset';
 
 export default defineComponent({

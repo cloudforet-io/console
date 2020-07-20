@@ -19,7 +19,7 @@
     </nav>
 </template>
 <script>
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 
 export default {
     name: 'PTextButton',

@@ -1,5 +1,5 @@
 import { computed, reactive, Ref } from '@vue/composition-api';
-import { TableState, tableProps, TablePropsType } from '@/components/molecules/tables/toolset';
+import { TableState, tableProps, TablePropsType } from '@/components/molecules/tables/PTable.toolset';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';

@@ -50,10 +50,10 @@ import { DataTableState } from '@/components/organisms/tables/data-table/DataTab
 import { makeTrItems } from '@/lib/view-helper';
 import { dictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
+import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import {
     dictValidation,

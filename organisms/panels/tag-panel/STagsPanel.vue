@@ -26,7 +26,7 @@ import {
 import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {

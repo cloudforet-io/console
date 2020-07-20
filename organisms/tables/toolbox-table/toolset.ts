@@ -19,7 +19,7 @@ import {
     QuerySearchToolSet,
     ValueHandlerMap,
 } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
-import { ChangeTagCallBack } from '@/components/molecules/tags/toolset';
+import { ChangeTagCallBack } from '@/components/molecules/tags/PTag.toolset';
 import { getAllPage } from '../../pagenations/toolset';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{

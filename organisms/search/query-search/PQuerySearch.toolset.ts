@@ -1,4 +1,4 @@
-import { ChangeTagCallBack, TagToolSet } from '@/components/molecules/tags/toolset';
+import { ChangeTagCallBack, TagToolSet } from '@/components/molecules/tags/PTag.toolset';
 import {
     computed, reactive, ref, Ref,
 } from '@vue/composition-api';

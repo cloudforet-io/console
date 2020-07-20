@@ -22,14 +22,14 @@
 </template>
 
 <script lang="ts">
-import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar.vue';
+import PTabBar from '@/components/molecules/tabs/tab-bar/PTabBar.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import {
     computed, defineComponent,
 } from '@vue/composition-api';
 import {
     isOne, tabBarProps, TabBarProps, TabItem,
-} from '@/components/molecules/tabs/tab-bar/toolset';
+} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 
 export default defineComponent({
     name: 'PTab',

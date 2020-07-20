@@ -20,7 +20,7 @@ import {
     makeDefs,
     DynamicLayoutApiProp, checkCanGetData, changeSetOnlys,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 

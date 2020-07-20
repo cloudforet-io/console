@@ -33,7 +33,7 @@
 import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-import { propsMixin } from '@/components/molecules/modals/Modal.vue';
+import { propsMixin } from '@/components/molecules/modals/PModal.vue';
 import { makeByPass, makeProxy } from '@/lib/compostion-util';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 

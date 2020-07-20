@@ -27,7 +27,7 @@ import {
 import { definitionProps } from '@/components/organisms/definition/PDefinition.toolset';
 import { copyAnyData } from '@/lib/util';
 import { mouseOverState } from '@/lib/compostion-util';
-import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 
 export default {

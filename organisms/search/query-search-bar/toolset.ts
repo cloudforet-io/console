@@ -1,7 +1,7 @@
 import {
     computed, reactive, ref, Ref,
 } from '@vue/composition-api';
-import { TagToolSet } from '@/components/molecules/tags/toolset';
+import { TagToolSet } from '@/components/molecules/tags/PTag.toolset';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
 import { QueryItem } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { OperatorType } from '@/lib/fluent-api';

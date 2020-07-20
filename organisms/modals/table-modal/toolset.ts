@@ -3,7 +3,7 @@ import {
 } from '@/lib/toolset';
 import {
     ModalState, ModalStateType, ModalSyncStateType, ModalToolSet,
-} from '@/components/molecules/modals/toolset';
+} from '@/components/molecules/modals/PModal.toolset';
 import { MultiItemAction } from '@/lib/fluent-api';
 
 

@@ -101,7 +101,7 @@ import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 // eslint-disable-next-line import/named
 import { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.toolset';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { makeProxy } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named

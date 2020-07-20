@@ -45,9 +45,9 @@ import {
 
 import { makeProxy } from '@/lib/compostion-util';
 
-const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
-const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
-const PIconTextButton = () => import('@/components/molecules/buttons/IconTextButton.vue');
+const PDictInput = () => import('@/components/molecules/forms/dict-input/PDictInput.vue');
+const PIconButton = () => import('@/components/molecules/buttons/icon-button/PIconButton.vue');
+const PIconTextButton = () => import('@/components/molecules/buttons/icon-text-button/PIconTextButton.vue');
 
 
 export default {

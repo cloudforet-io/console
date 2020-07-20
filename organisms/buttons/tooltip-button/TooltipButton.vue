@@ -22,7 +22,7 @@
 
 <script>
 import _ from 'lodash';
-import PTooltip from '@/components/molecules/tooltips/Tooltip.vue';
+import PTooltip from '@/components/molecules/tooltips/PTooltip.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
