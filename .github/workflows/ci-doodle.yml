@@ -1,9 +1,13 @@
-name: SpaceONE CI exp
+name: SpaceONE CI doodle
 
 on:
   push:
     branches:
-      - release
+      - master
+
+    # force no tag
+    tags:
+  workflow_dispatch:
 jobs:
   initialize:
     if: github.repository_owner == 'spaceone-dev'
@@ -82,12 +86,14 @@ jobs:
         run: |
           bash set_env.sh
 
-      - name: Upload docker
+      - name: Upload the docker image on ECR
         if: env.DOCKER_UPLOAD == 'true'
-        uses: docker/build-push-action@v1
+        uses: kciter/aws-ecr-action@v1
         with:
-          repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}-exp
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          workdir: ${{ env.LOCATION_DOCKERFILE }}
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ROOT_ID }}
+          repo: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
+          region: ap-northeast-2
           tags: latest,${{ env.VERSION }}
+          create_repo: false

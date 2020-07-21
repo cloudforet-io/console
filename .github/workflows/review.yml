@@ -4,7 +4,8 @@ name: SpaceONE Review
 on:
   pull_request:
     branches:
-      - release
+      - master
+  workflow_dispatch:
 jobs:
   review:
     runs-on: ubuntu-latest

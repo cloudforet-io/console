@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 jobs:
   cd:
     if: github.repository_owner == 'spaceone-dev'

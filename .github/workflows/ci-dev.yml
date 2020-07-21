@@ -3,13 +3,22 @@ name: SpaceONE CI dev
 on:
   push:
     branches:
-      - master
+      - mater
+
+    # recusive wild card
+    tags:
+      - "**"
+  workflow_dispatch:
+
 jobs:
   initialize:
     if: github.repository_owner == 'spaceone-dev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: olegtarasov/get-tag@v2
+        id: getTag
+
       - name: Set environment virables
         env:
           # 이 곳에서 환경변수를 통해 설정 관리
@@ -29,7 +38,7 @@ jobs:
           echo "::set-env name=LOCATION_VERSION::$LOCATION_VERSION"
           echo "::set-env name=LOCATION_DOCKERFILE::$LOCATION_DOCKERFILE"
 
-          echo "::set-env name=VERSION::$(cat $LOCATION_VERSION/VERSION).${{ github.run_id }}"
+          echo "::set-env name=VERSION::${{ steps.getTag.outputs.tag }}"
           echo "$(cat $LOCATION_VERSION/VERSION).${{ github.run_id }}">$LOCATION_VERSION/VERSION
           EOF
 

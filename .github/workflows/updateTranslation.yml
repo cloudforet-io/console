@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - 'src/translations/language-pack/**'
-      -
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
