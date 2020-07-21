@@ -3,7 +3,8 @@ name: SpaceONE CI dev
 on:
   push:
     branches:
-      - mater
+      - master
+      - hotfix
 
     # recusive wild card
     tags:
