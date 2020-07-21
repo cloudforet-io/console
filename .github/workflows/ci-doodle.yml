@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-
-    # force no tag
-    tags:
   workflow_dispatch:
 jobs:
   initialize:
