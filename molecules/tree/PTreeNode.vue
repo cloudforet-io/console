@@ -92,7 +92,7 @@ import {
     computed, getCurrentInstance, onMounted, reactive, ref,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
-import { makeProxy } from '@/components/utils/composition';
+import { makeProxy } from '@/components/util/composition-helpers';
 import {
     forEach,
 } from 'lodash';

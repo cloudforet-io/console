@@ -7,7 +7,7 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { definitionProps } from '@/components/organisms/definition/PDefinition.toolset';
-import PDefinition from './PDefinition.vue';
+import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 
 export default {
     title: 'organisms/Definition',

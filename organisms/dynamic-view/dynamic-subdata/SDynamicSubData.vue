@@ -1,7 +1,7 @@
 <template>
     <div class="s-dynamic-subdata my-8">
         <transition name="fade" mode="out-in">
-            <PSelectBtnGroupSkeleton v-if="!layouts" class="skeleton mx-4" />
+            <p-select-btn-group-skeleton v-if="!layouts" class="skeleton mx-4" />
             <p-select-btn-group
                 v-else
                 class="px-4"
@@ -13,29 +13,23 @@
                 <p-skeleton width="20rem" height="2rem" class="mx-4 mt-8 mb-4" />
                 <p-skeleton width="100%" height="15rem" class="w-full" />
             </div>
-            <SDynamicLayout
+            <s-dynamic-layout
                 v-else
                 v-bind="selectedLayout"
                 :api="api"
                 :is-show="isShow"
             />
         </transition>
-        <!--        <p-empty v-if="layouts&&names.length == 0" class="my-8">-->
-        <!--            No data-->
-        <!--        </p-empty>-->
     </div>
 </template>
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, defineComponent, ref, watch,
+    reactive, toRefs, computed, ref, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 import { ResourceActions } from '@/lib/fluent-api';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { DLSchema } from '@/lib/type';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PSelectBtnGroupSkeleton from '@/components/molecules/skeletons/PSelectBtnGroupSkeleton.vue';
@@ -50,10 +44,10 @@ interface Props{
 
 }
 
-export default defineComponent({
+export default {
     name: 'SDynamicSubData',
     components: {
-        PSelectBtnGroup, PEmpty, PButton, PPanelTop, SDynamicLayout, PSelectBtnGroupSkeleton, PSkeleton,
+        PSelectBtnGroup, SDynamicLayout, PSelectBtnGroupSkeleton, PSkeleton,
     },
     props: {
         resourceApi: {
@@ -97,7 +91,7 @@ export default defineComponent({
         const selected = ref(state.names[0]);
         const selectedLayout = computed<DLSchema>(() => state.layoutData[selected.value]);
         const buttons = computed(() => state.names.map(name => ({
-            name, label: name, vbind: { styleType: 'gray900', outline: selected.value !== name },
+            name, label: name, styleType: 'gray900', outline: selected.value !== name,
         })));
         watch(() => state.names, _.debounce((aft, bef) => {
             if (aft && aft[0] && aft.indexOf(selected.value) === -1) {
@@ -116,7 +110,7 @@ export default defineComponent({
 
         };
     },
-});
+};
 </script>
 <style lang="postcss">
     .fade-enter-active, .fade-leave-active {

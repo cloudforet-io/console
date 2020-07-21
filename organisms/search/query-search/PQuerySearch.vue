@@ -33,11 +33,11 @@ import {
 } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/components/utils/composition';
+import { makeProxy } from '@/components/util/composition-helpers';
 import {
     find,
 } from 'lodash';
-import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { OperatorType } from '@/lib/fluent-api';
 

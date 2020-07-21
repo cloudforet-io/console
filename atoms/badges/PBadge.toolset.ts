@@ -1,4 +1,4 @@
-export enum BadgeShape {
+export enum BADGE_SHAPE {
     ROUND='round',
     SQUARE='square',
 }
@@ -21,4 +21,13 @@ export enum BADGE_STYLE {
     alert = 'alert',
     safe = 'safe',
     gray900 = 'gray900',
+}
+
+export interface BadgeProps {
+    styleType: keyof BADGE_STYLE;
+    textColor?: string;
+    backgroundColor?: string;
+    shape: keyof typeof BADGE_SHAPE;
+    outline: boolean;
+    link?: string;
 }

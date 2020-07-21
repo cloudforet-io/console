@@ -25,10 +25,10 @@ import {
     ref,
 } from '@vue/composition-api';
 import { definitionProps } from '@/components/organisms/definition/PDefinition.toolset';
-import { copyAnyData } from '@/lib/util';
-import { mouseOverState } from '@/lib/compostion-util';
+import { copyAnyData } from '@/components/util/helpers';
+import { mouseOverState } from '@/components/util/composition-helpers';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
-import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
+import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 
 export default {
     name: 'PDefinition',
@@ -61,9 +61,9 @@ export default {
         @apply text-blue-500;
     }
 }
-.key, .value{
+.key, .value {
     @apply py-2 px-4 text-sm;
-    line-height:1.45;
+    line-height: 1.45;
     cursor: unset;
 }
 

@@ -37,13 +37,13 @@
 <script lang="ts">
 import { size } from 'lodash';
 import { ref, computed } from '@vue/composition-api';
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import {
     ProgressTabBarProps,
     progressTabBarProps,
 } from '@/components/molecules/tabs/progress-tab-bar/PProgressTabBar.toolset';
-import { makeProxy } from '@/components/utils/composition';
+import { makeProxy } from '@/components/util/composition-helpers';
 
 export default {
     name: 'PProgressTabBar',

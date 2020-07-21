@@ -26,6 +26,7 @@ import {
 import { Computed } from '@/lib/type';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import _ from 'lodash';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { DynamicLayoutProps } from './toolset';
 
 
@@ -77,35 +78,32 @@ export default defineComponent({
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
-            isLoading: false,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)),
+            isLoading: true,
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
         });
 
-        const getComponent = () => {
-            // @ts-ignore
-            state.loader().then(() => {
-                // @ts-ignore
-                state.component = () => state.loader();
-            })
-                .catch(() => {
-                    // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/item/index.vue');
-                }).finally(() => {
-                    state.isLoading = false;
-                });
+        const getComponent = async () => {
+            try {
+                await state.loader();
+                state.component = async () => state.loader();
+            } catch (e) {
+                state.component = () => import('./templates/item/index.vue');
+            } finally {
+                state.isLoading = false;
+            }
         };
 
+        watch(() => [props.type, props.name], (aft, bef) => {
+            if (!_.isEqual(aft, bef)) {
+                state.isLoading = true;
+                getComponent();
+            }
+        }, { lazy: true });
 
-        onMounted((): void => {
-            // @ts-ignore
-            getComponent();
-            watch(() => [props.type, props.name], (aft, bef) => {
-                if (!_.isEqual(aft, bef)) {
-                    state.isLoading = true;
-                    getComponent();
-                }
-            });
+        onMounted(async () => {
+            await getComponent();
         });
+
         return {
             ...toRefs(state),
         };

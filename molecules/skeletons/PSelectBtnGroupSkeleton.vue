@@ -1,6 +1,6 @@
 <script>
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { getBindClass } from '@/components/utils/functional';
+import { getBindClass } from '@/components/util/functional-helpers';
 
 export default {
     name: 'PSelectBtnGroupSkeleton',

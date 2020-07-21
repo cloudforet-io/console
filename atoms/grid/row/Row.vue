@@ -1,5 +1,5 @@
 <script>
-import { getBindClass, mergeBind } from '@/components/utils/functional';
+import { getBindClass, mergeBind } from '@/components/util/functional-helpers';
 
 export default {
     name: 'PRow',

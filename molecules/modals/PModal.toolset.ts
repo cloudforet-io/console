@@ -1,7 +1,7 @@
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/components/utils/component-toolset';
+} from '@/components/util/toolset-helpers';
 
 export enum sizeMapping {
     sm='modal-sm',

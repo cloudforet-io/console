@@ -8,9 +8,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import { makeVModelProxy } from '@/lib/compostion-util';
+import { computed } from '@vue/composition-api';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import { makeVModelProxy } from '@/components/util/composition-helpers';
 
 
 export default {

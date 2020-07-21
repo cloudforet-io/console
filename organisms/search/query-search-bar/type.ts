@@ -1,5 +1,5 @@
 import { FilterItem } from '@/lib/fluent-api/type';
-import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 
 export interface SearchQueryType {
     key: string;

@@ -8,7 +8,7 @@ import {
 } from '@storybook/addon-knobs/vue';
 import { definitionTableProps } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
-import casual, { arrayOf } from '@/lib/casual';
+import casual, { arrayOf } from '@/components/util/casual';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 export default {

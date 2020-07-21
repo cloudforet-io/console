@@ -5,7 +5,7 @@ import VueI18n from 'vue-i18n';
 
 import {
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/components/utils/component-toolset';
+} from '@/components/util/toolset-helpers';
 
 interface DictInputType {
     keyInvalid?: boolean;

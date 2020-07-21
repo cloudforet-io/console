@@ -28,7 +28,7 @@ import {
 import { windowEventMount } from '@/lib/compostion-util';
 
 import PSearch from '@/components/molecules/search/PSearch.vue';
-import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
+import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     SEARCH_PREFIX,
     searchContextType,

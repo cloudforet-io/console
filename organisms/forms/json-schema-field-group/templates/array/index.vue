@@ -1,5 +1,5 @@
 <template>
-    <PTagsInput
+    <p-tags-input
         :tags.sync="proxyValue"
         class="w-full"
         :placeholder="schema.examples?schema.examples[0]||'':''"
@@ -8,13 +8,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-import { makeVModelProxy } from '@/lib/compostion-util';
-import PTagsInput from '@/components/organisms/forms/tags-input/TagsInput.vue';
-import _ from 'lodash';
+import PTagsInput from '@/components/organisms/forms/tags-input/PTagsInput.vue';
+import { get } from 'lodash';
+import { makeVModelProxy } from '@/components/util/composition-helpers';
 
 
-export default defineComponent({
+export default {
     name: 'ArrayForm',
     components: { PTagsInput },
     model: {
@@ -37,7 +36,7 @@ export default defineComponent({
     },
     setup(props, context) {
         let proxyValue;
-        const arrayType = _.get(props.schema, ['items', 'type']);
+        const arrayType = get(props.schema, ['items', 'type']);
         switch (arrayType) {
         case 'integer':
             proxyValue = makeVModelProxy(undefined, undefined, (val: string[]) => val.map((v => parseInt(v))).filter(obj => obj));
@@ -53,5 +52,5 @@ export default defineComponent({
             proxyValue,
         };
     },
-});
+};
 </script>

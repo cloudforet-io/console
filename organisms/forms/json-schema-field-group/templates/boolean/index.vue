@@ -7,11 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import { makeVModelProxy } from '@/lib/compostion-util';
+import { makeVModelProxy } from '@/components/util/composition-helpers';
 
-export default defineComponent({
+export default {
     name: 'BooleanForm',
     components: { PRadio },
     model: {
@@ -37,11 +36,11 @@ export default defineComponent({
         };
     },
 
-});
+};
 </script>
 
 <style lang="postcss">
-.is-invalid-radio{
+.is-invalid-radio {
     @apply text-red;
 }
 </style>

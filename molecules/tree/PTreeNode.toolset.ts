@@ -2,7 +2,7 @@
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/components/utils/component-toolset';
+} from '@/components/util/toolset-helpers';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
     computed, reactive,

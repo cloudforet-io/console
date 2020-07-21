@@ -8,7 +8,7 @@ import {
     ACFunction,
     AutoCompleteData,
 } from '@/components/organisms/search/query-search-bar/type';
-import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 import { ListAction, QueryAPI } from '@/lib/fluent-api/toolset';
 

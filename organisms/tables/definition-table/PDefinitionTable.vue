@@ -40,7 +40,7 @@ import {
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import _ from 'lodash';
+import { every, range } from 'lodash';
 
 export default {
     name: 'PDefinitionTable',
@@ -48,8 +48,8 @@ export default {
     props: definitionTableProps,
     setup(props: DefinitionTableProps, { emit }) {
         const state = reactive({
-            isNoData: computed(() => _.every(props.items, def => !def.data)),
-            skeletons: computed(() => _.range(props.skeletonRows)),
+            isNoData: computed(() => every(props.items, def => !def.data)),
+            skeletons: computed(() => range(props.skeletonRows)),
         });
         return {
             ...toRefs(state),
@@ -65,7 +65,7 @@ export default {
 <style lang="postcss" scoped>
 table {
     @apply w-full;
-    td{
+    td {
         line-height: 1.8;
     }
 }
@@ -74,6 +74,7 @@ table {
         &:first-child {
             @apply border-r-2 border-white;
         }
+
         @apply bg-violet-100;
     }
 }

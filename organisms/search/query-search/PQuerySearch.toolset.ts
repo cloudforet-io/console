@@ -3,7 +3,7 @@ import {
     computed, reactive, ref, Ref,
 } from '@vue/composition-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import {
     FILTER_OPERATOR, OperatorType, Query,
 } from '@/lib/fluent-api';

@@ -1,6 +1,6 @@
 <script lang="ts">
-import { getBindClass } from '@/components/utils/functional';
-import { BADGE_STYLE, BadgeShape } from '@/components/atoms/badges/PBadge.toolset';
+import { getBindClass } from '@/components/util/functional-helpers';
+import { BADGE_STYLE, BADGE_SHAPE } from '@/components/atoms/badges/PBadge.toolset';
 
 export default {
     name: 'PBadge',
@@ -24,7 +24,7 @@ export default {
         },
         shape: {
             type: String,
-            default: BadgeShape.ROUND,
+            default: BADGE_SHAPE.ROUND,
         },
         outline: {
             type: Boolean,

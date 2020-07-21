@@ -1,6 +1,6 @@
 import {
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/components/utils/component-toolset';
+} from '@/components/util/toolset-helpers';
 
 export const gridLayoutProps = {
     cardMinWidth: {

@@ -1,4 +1,4 @@
-export enum ButtonStyleType {
+export enum BUTTON_STYLE {
     primary = 'primary',
     'primary-dark' = 'primary-dark',
     primary1 = 'primary1',
@@ -20,17 +20,21 @@ export enum ButtonStyleType {
     safe = 'safe',
 }
 
+export enum BUTTON_SIZE {
+    sm = 'sm',
+    lg = 'lg'
+}
 
 export interface ButtonProps {
-    href?: string;
+    link?: string;
     disabled?: boolean;
     outline?: boolean;
-    styleType?: keyof ButtonStyleType;
-    size?: 'sm' | 'lg';
+    styleType?: keyof BUTTON_STYLE;
+    size?: keyof BUTTON_SIZE;
 }
 
 export const buttonProps = {
-    href: {
+    link: {
         type: String,
         default: undefined,
     },
@@ -47,7 +51,7 @@ export const buttonProps = {
         default: undefined,
         validator(value) {
             if (value === undefined) return true;
-            return Object.keys(ButtonStyleType).indexOf(value) !== -1;
+            return Object.keys(BUTTON_STYLE).indexOf(value) !== -1;
         },
     },
     size: {
@@ -56,8 +60,7 @@ export const buttonProps = {
         validator(value) {
             return [
                 undefined,
-                'sm',
-                'lg',
+                ...Object.keys(BUTTON_SIZE),
             ].indexOf(value) !== -1;
         },
     },

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getBindClass } from '@/components/utils/functional';
+import { getBindClass } from '@/components/util/functional-helpers';
 import { ButtonProps } from '@/components/atoms/buttons/PButton.toolset';
 
 export default {
@@ -13,7 +13,7 @@ export default {
                 'p-button': true,
                 disabled: !!attrs.disabled,
                 outline: !!attrs.outline,
-                link: !!attrs.href,
+                link: !!attrs.link,
             };
             if (attrs.size) {
                 cls[attrs.size] = true;
@@ -24,7 +24,7 @@ export default {
             return cls;
         }
 
-        const tag = props.href ? 'a' : 'div';
+        const tag = props.link ? 'a' : 'div';
 
         return h(tag, {
             ...data,

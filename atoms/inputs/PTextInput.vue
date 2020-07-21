@@ -1,5 +1,5 @@
 <script>
-import { getBindClass } from '@/components/utils/functional';
+import { getBindClass } from '@/components/util/functional-helpers';
 
 export default {
     name: 'PTextInput',

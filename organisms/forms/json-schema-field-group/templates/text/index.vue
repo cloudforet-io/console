@@ -15,11 +15,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { makeVModelProxy } from '@/lib/compostion-util';
+import { makeVModelProxy } from '@/components/util/composition-helpers';
 
-export default defineComponent({
+export default {
     name: 'StringForm',
     components: { PTextInput },
     model: {
@@ -55,5 +54,5 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>

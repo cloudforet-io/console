@@ -41,7 +41,7 @@ import {
 } from '@vue/composition-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PI from '@/components/atoms/icons/PI.vue';
-import { makeByPassListeners, makeProxy } from '@/components/utils/composition';
+import { makeByPassListeners, makeProxy } from '@/components/util/composition-helpers';
 
 export default {
     name: 'PSearch',

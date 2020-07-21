@@ -5,7 +5,7 @@
         :disabled="disabled"
         :size="size"
         :outline="outline"
-        :href="href"
+        :link="link"
         v-on="$listeners"
         @mouseenter="onHover(true)"
         @mouseleave="onHover(false)"

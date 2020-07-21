@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { lazyImgProps, LazyImgPropsType } from '@/components/organisms/lazy-img/PLazyImg.toolset';

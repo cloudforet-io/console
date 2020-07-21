@@ -1,7 +1,5 @@
-import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
-import { ACFunction } from '@/components/organisms/search/query-search-bar/type';
-import { get } from 'lodash';
-import Fuse, { FuseOptions, FuseResultWithScore } from 'fuse.js';
+import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import Fuse, { FuseOptions } from 'fuse.js';
 
 export const autocompleteSearchProps = {
     value: {

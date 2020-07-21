@@ -1,8 +1,8 @@
-import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/lib/toolset';
+} from '@/components/util/toolset-helpers';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export const selectDropdownProps = {

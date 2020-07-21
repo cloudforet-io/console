@@ -6,10 +6,10 @@ import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import PAutocompleteSearch from './PAutocompleteSearch.vue';
-import { autocompleteSearchProps, plainAutocompleteHandler } from './PAutocompleteSearch.toolset';
-import casual, { arrayOf } from '../../../../lib/casual';
-import md from './PAutocompleteSearch.md';
+import casual, { arrayOf } from '@/components/util/casual';
+import md from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.md';
+import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
+import { autocompleteSearchProps, plainAutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
 
 export default {
     title: 'organisms/search/AutocompleteSearch',

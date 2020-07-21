@@ -41,11 +41,11 @@ import {
     autocompleteSearchProps,
     AutocompleteSearchProps,
 } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
-import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
+import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy, windowEventMount } from '@/lib/compostion-util';
+import { makeProxy } from '@/components/util/composition-helpers';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { reduce } from 'lodash';

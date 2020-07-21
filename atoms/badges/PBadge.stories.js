@@ -1,7 +1,7 @@
 import {
     select, text, color, boolean,
 } from '@storybook/addon-knobs/vue';
-import { BadgeShape } from '@/components/atoms/badges/PBadge.toolset';
+import { BADGE_SHAPE } from '@/components/atoms/badges/PBadge.toolset';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 
 export default {
@@ -39,7 +39,7 @@ export const DefaultCase = () => ({
             default: text('text', 'badge'),
         },
         shape: {
-            default: select('shape', [BadgeShape.ROUND, BadgeShape.SQUARE], BadgeShape.ROUND),
+            default: select('shape', [BADGE_SHAPE.ROUND, BADGE_SHAPE.SQUARE], BADGE_SHAPE.ROUND),
         },
         textColor: {
             default: color('textColor', ''),
