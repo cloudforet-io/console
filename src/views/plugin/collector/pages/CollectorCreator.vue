@@ -43,14 +43,14 @@ import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PProgressWizard from '@/components/organisms/wizards/progress-wizard/ProgressWizard.vue';
+import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { JsonSchemaObjectType } from '@/lib/type';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { showErrorMessage } from '@/lib/util';
 
-const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue');
+const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/PDictInputGroup_deprecated.vue');
 const ConfigureCollector = () => import('@/views/plugin/collector/modules/ConfigureCollector.vue');
 const ConfirmCredentials = () => import('@/views/plugin/collector/modules/ConfirmCredentials.vue');
 

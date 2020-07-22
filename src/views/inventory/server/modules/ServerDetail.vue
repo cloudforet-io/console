@@ -1,5 +1,5 @@
 <template>
-    <SDynamicSubData
+    <s-dynamic-sub-data
         :layouts="mergeLayouts"
         :resource-api="resourceApi"
         :select-id="selectId"
@@ -12,10 +12,9 @@
 import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import {
-    computed,
-    defineComponent, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import _ from 'lodash';
+import { get, debounce } from 'lodash';
 import baseInfoSchema from '@/metadata-schema/view/inventory/server/sub_data/layouts/base_info.json';
 
 const rawLayout = {
@@ -190,7 +189,7 @@ const rawLayout = {
 //         type: 'table',
 //     }];
 
-export default defineComponent({
+export default {
     name: 'PServerDetail',
     components: {
         SDynamicSubData,
@@ -224,13 +223,13 @@ export default defineComponent({
                 const resp = await fluentApi.inventory().server().get().setId(props.selectId)
                     .setOnly('metadata.view.sub_data.layouts')
                     .execute();
-                layouts = _.get(resp.data, 'metadata.view.sub_data.layouts', []);
+                layouts = get(resp.data, 'metadata.view.sub_data.layouts', []);
                 // layouts = defaultLayouts;
                 cache[props.selectId] = layouts;
             }
             state.layouts = layouts;
         };
-        const getLayout = _.debounce(getLayoutFunc, 50);
+        const getLayout = debounce(getLayoutFunc, 50);
 
         let watchStop = null as unknown as any;
         watch(() => props.isShow, (aft, bef) => {
@@ -254,5 +253,5 @@ export default defineComponent({
             ...toRefs(state),
         };
     },
-});
+};
 </script>

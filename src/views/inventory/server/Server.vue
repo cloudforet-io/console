@@ -1,13 +1,13 @@
 <template>
     <general-page-layout>
-        <PPageTitle title="Server"
-                    use-total-count use-selected-count
-                    :total-count="apiHandler.totalCount.value"
-                    :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+        <p-page-title title="Server"
+                      use-total-count use-selected-count
+                      :total-count="apiHandler.totalCount.value"
+                      :selected-count="apiHandler.tableTS.selectState.selectItems.length"
         />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <SDynamicLayout
+                <s-dynamic-layout
                     v-bind="mainTableLayout"
                     :toolset="apiHandler"
                     :is-show="isReady"
@@ -19,14 +19,14 @@
                     }"
                 >
                     <template #toolbox-left>
-                        <PIconTextButton style-type="primary-dark"
-                                         name="ic_plus_bold"
-                                         :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
-                                         @click="clickCollectData"
+                        <p-icon-text-button style-type="primary-dark"
+                                            name="ic_plus_bold"
+                                            :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                            @click="clickCollectData"
                         >
                             {{ $t('BTN.COLLECT_DATA') }}
-                        </PIconTextButton>
-                        <PDropdownMenuBtn
+                        </p-icon-text-button>
+                        <p-dropdown-menu-btn
                             id="server-dropdown-btn"
                             class="left-toolbox-item mr-4"
                             :menu="dropdown"
@@ -38,9 +38,9 @@
                             @click-link="apiHandler.tableTS.linkState.openLink()"
                         >
                             {{ $t('BTN.ACTION') }}
-                        </PDropdownMenuBtn>
+                        </p-dropdown-menu-btn>
                     </template>
-                </SDynamicLayout>
+                </s-dynamic-layout>
             </template>
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne"
@@ -61,22 +61,22 @@
                 />
             </template>
             <template #admin>
-                <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
-                                v-bind="defaultAdminLayout"
+                <s-dynamic-layout :api="adminApi"
+                                  :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
+                                  v-bind="defaultAdminLayout"
                 />
             </template>
             <template #history>
-                <SDynamicLayout :api="historyApi"
-                                :is-show="historyIsShow" :name="$t('TAB.HISTORY')"
-                                v-bind="defaultHistoryLayout"
+                <s-dynamic-layout :api="historyApi"
+                                  :is-show="historyIsShow" :name="$t('TAB.HISTORY')"
+                                  v-bind="defaultHistoryLayout"
                 />
             </template>
             <template #monitoring>
                 <s-monitoring v-bind="monitoringTS.state" />
             </template>
         </p-tab>
-        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab">
+        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab">
             <template #data>
                 <p-data-table
                     :fields="multiSelectFields"
@@ -92,15 +92,15 @@
                 </p-data-table>
             </template>
             <template #admin>
-                <SDynamicLayout :api="adminApi"
-                                :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
-                                v-bind="defaultAdminLayout"
+                <s-dynamic-layout :api="adminApi"
+                                  :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
+                                  v-bind="defaultAdminLayout"
                 />
             </template>
             <template #monitoring>
                 <s-monitoring v-bind="monitoringTS.state" />
             </template>
-        </PTab>
+        </p-tab>
 
         <div v-else id="empty-space">
             Select a Server above for details.
@@ -137,36 +137,35 @@
 import {
     computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PStatus from '@/components/molecules/status/Status.vue';
+import PStatus from '@/components/molecules/status/PStatus.vue';
 import {
     platformBadgeFormatter, serverStateFormatter, showErrorMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
-import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
+import PTableCheckModal from '@/components/organisms/modals/action-modal/PActionConfirmModal.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
     defaultAdminLayout,
     defaultHistoryLayout,
     QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
-import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
+import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import { fluentApi, MultiItemAction } from '@/lib/fluent-api';
 import { ServerListResp, ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
-import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
-import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import baseTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     makeQueryStringComputed,
@@ -175,8 +174,8 @@ import {
 } from '@/lib/router-query-string';
 import {
     TabBarState,
-} from '@/components/molecules/tabs/tab-bar/toolset';
-import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
+} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { get } from 'lodash';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import {
@@ -189,11 +188,13 @@ import {
 } from '@/lib/api/query-search';
 import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
-
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
+import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 
 export default {
     name: 'Server',
     components: {
+        SDynamicLayout,
         GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
@@ -206,7 +207,6 @@ export default {
         SProjectTreeModal,
         SCollectModal,
         SMonitoring,
-        SDynamicLayout,
         STagsPanel,
         PPageTitle,
     },
@@ -266,7 +266,7 @@ export default {
             {
                 selectable: true,
                 sortable: true,
-                dragable: true,
+                draggable: true,
                 hover: true,
                 responsive: true,
                 settingVisible: false,

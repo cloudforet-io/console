@@ -1,4 +1,4 @@
-import { DictPanelToolSet } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
+import { DictPanelToolSet } from '@/views/common/tags/dict-panel/PDictPanel.toolset';
 import {
     DictResource,
 } from '@/lib/fluent-api';

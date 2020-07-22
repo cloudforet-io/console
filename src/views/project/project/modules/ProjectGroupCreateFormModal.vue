@@ -28,7 +28,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import {
     makeProxy,
 } from '@/lib/compostion-util';
@@ -37,7 +37,7 @@ import {
     JsonSchemaFormToolSet,
     CustomValidator,
 } from '@/components/organisms/forms/json-schema-form/toolset';
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
 import { showErrorMessage } from '@/lib/util';

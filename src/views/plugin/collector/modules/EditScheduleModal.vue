@@ -52,11 +52,11 @@ import _ from 'lodash';
 import moment from 'moment';
 import { makeProxy } from '@/lib/compostion-util';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 import { showErrorMessage } from '@/lib/util';

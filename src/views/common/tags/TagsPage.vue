@@ -57,21 +57,21 @@
 import {
     reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { DictPanelAPI } from '@/lib/api/dict';
 import {
     DictItem,
     dictValidation,
     getNewDict,
     toDictItems,
-} from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+} from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 import _ from 'lodash';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 export default {
     name: 'CloudServicePage',

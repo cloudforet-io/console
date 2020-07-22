@@ -137,11 +137,11 @@ import {
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
+import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 import { StatQuerySearchGridFluentAPI } from '@/lib/api/grid';
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds,
@@ -149,17 +149,17 @@ import {
     queryTagsToQueryString,
     replaceQuery,
 } from '@/lib/router-query-string';
-import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 

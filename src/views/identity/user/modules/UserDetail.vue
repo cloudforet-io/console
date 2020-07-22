@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PStatus from '@/components/molecules/status/Status.vue';
+import PInfoPanel from '@/components/organisms/panels/info-panel/PInfoPanel.vue';
+import PStatus from '@/components/molecules/status/PStatus.vue';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 

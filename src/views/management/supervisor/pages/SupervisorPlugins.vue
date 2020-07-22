@@ -67,26 +67,26 @@
 
 <script lang="ts">
 import { computed, reactive } from '@vue/composition-api';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 
 
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
-import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
+import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
+import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
+import PDictPanel from '@/views/common/tags/dict-panel/PDictPanel_deprecated.vue';
 import { showErrorMessage } from '@/lib/util';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { defaultACHandler, getStatApiValueHandlerMap } from '@/lib/api/query-search';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import { makeDefItems } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import {
     makeQueryStringComputed,

@@ -64,13 +64,13 @@
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import _ from 'lodash';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 

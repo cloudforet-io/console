@@ -123,23 +123,23 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import { fluentApi, Resource } from '@/lib/fluent-api';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
-import RawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
+import RawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
 import ServerSD from '@/metadata-schema/view/inventory/server/sub_data/layouts/base_info.json';
 import ServerTable from '@/metadata-schema/view/inventory/server/table/layout/base_table.json';
 import CloudServiceSD from '@/metadata-schema/view/inventory/cloud_service/sub_data/layouts/base_info.json';
 import CloudServiceTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
-import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { parser } from '@/lib/api/code-generater';
 
 const checkApi = (api: any, target: string, matches: string[]): boolean => {

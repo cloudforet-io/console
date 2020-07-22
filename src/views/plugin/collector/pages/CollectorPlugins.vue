@@ -99,21 +99,21 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
+import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PCardItem from '@/components/molecules/cards/PCardItem.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 

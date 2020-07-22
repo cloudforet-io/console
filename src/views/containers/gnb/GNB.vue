@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import PTooltip from '@/components/molecules/tooltips/Tooltip';
+import PTooltip from '@/components/molecules/tooltips/PTooltip';
 import PI from '@/components/atoms/icons/PI';
 import SiteMap from './modules/SiteMap';
 import LanguageMenu from './modules/LanguageMenu';

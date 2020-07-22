@@ -252,15 +252,15 @@ import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayo
 import {
     get, zipObject, range, reverse,
 } from 'lodash';
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
+import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import {
     FILTER_OPERATOR, fluentApi, QueryAPI,
 } from '@/lib/fluent-api';
@@ -270,7 +270,7 @@ import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
 import { SearchGridFluentAPI } from '@/lib/api/grid';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
@@ -286,10 +286,10 @@ import {
     ProjectTreeItem, SearchResult,
 } from '@/views/project/project/modules/ProjectSearch.toolset';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { Location } from 'vue-router';
 
     interface ProjectCardData{

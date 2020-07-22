@@ -20,11 +20,11 @@
                 </div>
             </template>
             <template #no-data="{fields}">
-                <p-tr key="noData" class="bg-primary3">
-                    <p-td :colspan="fields.length" class="text-gray">
+                <tr key="noData" class="bg-primary3">
+                    <td :colspan="fields.length" class="text-gray">
                         {{ $t('DASHBOARD.ACTION.NO_RUN') }}
-                    </p-td>
-                </p-tr>
+                    </td>
+                </tr>
             </template>
             <template #col-name-format="{value}">
                 <p-i class="working-icon" name="ic_working" height="1rem"
@@ -43,24 +43,20 @@
 import {
     computed, getCurrentInstance, toRefs,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { getTimezone } from '@/lib/util';
 import moment from 'moment';
 import { FILTER_OPERATOR, fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { DataTableToolSet } from '@/components/organisms/tables/data-table/DataTable.toolset';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import PTr from '@/components/atoms/table/Tr.vue';
-import PTd from '@/components/atoms/table/Td.vue';
+import { DataTableToolSet } from '@/components/organisms/tables/data-table/PDataTable.toolset';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { JOB_STATE } from '@/lib/fluent-api/inventory/job';
 
 export default {
     name: 'SCollectingRuns',
     components: {
-        PTd,
-        PTr,
         PSkeleton,
         PWidgetLayout,
         PI,

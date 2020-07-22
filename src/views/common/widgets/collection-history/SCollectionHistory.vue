@@ -20,14 +20,14 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import {
     coral, gray, primary, black,
 } from '@/styles/colors';
 import _ from 'lodash';
 import { SBarChart } from '@/lib/chart/bar-chart';
-import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import moment from 'moment';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';

@@ -10,7 +10,7 @@
                     :fields="fields"
                     :selectable="true"
                     :sortable="true"
-                    :dragable="true"
+                    :draggable="true"
                     :hover="true"
                     :responsive="true"
                     :sort-by.sync="sortBy"
@@ -121,25 +121,25 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/PToolboxTable.util';
 import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import _ from 'lodash';
 
-const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
+const PTab = () => import('@/components/organisms/tabs/tab/PTab.vue');
+const PDataTable = () => import('@/components/organisms/tables/data-table/PDataTable.vue');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/PToolboxTable.vue');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue');
 const PSearch = () => import('@/components/molecules/search/PSearch.vue');
 const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail.vue');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
-const PPageTitle = () => import('@/components/organisms/title/page-title/PageTitle.vue');
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/PActionConfirmModal.vue');
+const PPageTitle = () => import('@/components/organisms/title/page-title/PPageTitle.vue');
 
 export const getDataInputType = () => {
     const currentURL = window.location.href;

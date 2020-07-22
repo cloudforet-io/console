@@ -63,11 +63,11 @@
 
 <script lang="ts">
 import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';

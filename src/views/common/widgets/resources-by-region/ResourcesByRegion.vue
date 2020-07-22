@@ -50,12 +50,12 @@ import {
     computed,
     getCurrentInstance, Ref, toRefs, watch,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
+import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import { SPieChart } from '@/lib/chart/pie-chart';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import {

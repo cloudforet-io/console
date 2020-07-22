@@ -62,7 +62,7 @@ import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashb
 import { blue, secondary, secondary1 } from '@/styles/colors';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { FILTER_OPERATOR } from '@/lib/fluent-api';
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
 import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';

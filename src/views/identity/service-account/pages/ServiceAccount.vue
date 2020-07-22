@@ -180,15 +180,15 @@ import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
-import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import {
     SearchTableFluentAPI, TabSearchTableFluentAPI,
@@ -202,13 +202,13 @@ import {
 } from '@/lib/router-query-string';
 import {
     GridLayoutState,
-} from '@/components/molecules/layouts/grid-layout/toolset';
+} from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import {
     TabBarState,
-} from '@/components/molecules/tabs/tab-bar/toolset';
+} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
-import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
-import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
+import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.toolset';
+import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
 import { useStore } from '@/store/toolset';
@@ -220,9 +220,9 @@ import {
     get, zipObject,
 } from 'lodash';
 
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';

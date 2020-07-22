@@ -2,16 +2,16 @@
     <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
-                <PPageTitle :title="$route.params.name"
-                            child
-                            use-total-count
-                            use-selected-count :total-count="apiHandler.totalCount.value"
-                            :selected-count="apiHandler.tableTS.selectState.selectItems.length"
-                            @goBack="$router.go(-1)"
+                <p-page-title :title="$route.params.name"
+                              child
+                              use-total-count
+                              use-selected-count :total-count="apiHandler.totalCount.value"
+                              :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+                              @goBack="$router.go(-1)"
                 />
-                <s-dynamic-layout type="query-search-table"
+                <s-dynamic-layout name="cloudService"
+                                  type="query-search-table"
                                   :toolset="apiHandler"
-                                  name="cloudService"
                                   :options="options"
                                   :vbind="{
                                       responsiveStyle: {'height': height+'px', overflow: 'auto'},
@@ -20,30 +20,45 @@
                                       resourceType: 'inventory.CloudService'
                                   }"
                 >
+                    <!--                                  type="query-search-table"-->
+                    <!--                                  :data="apiHandler.tableTS.state.items"-->
+                    <!--                                  :options="options"-->
+                    <!--                                  :extra="{-->
+                    <!--                                      loading: apiHandler.tableTS.syncState.loading,-->
+                    <!--                                      selectIndex: apiHandler.tableTS.syncState.selectIndex,-->
+                    <!--                                      sortBy: apiHandler.tableTS.syncState.sortBy,-->
+                    <!--                                      sortDesc: apiHandler.tableTS.syncState.sortDesc-->
+                    <!--                                  }"-->
+                    <!--                                  @clickRefresh="apiHandler.onRefresh"-->
+                    <!--                                  @changeSort="apiHandler.onChangeSort"-->
+                    <!--                                  @changePageSize="apiHandler.onChangePageSize"-->
+                    <!--                                  @changePageNumber="apiHandler.onChangePageNumber"-->
+                    <!--                                  @select="apiHandler.tableTS.onSelect"-->
+                    <!--                >-->
                     <template #toolbox-left>
-                        <PIconTextButton style-type="primary-dark"
-                                         name="ic_plus_bold"
-                                         :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
-                                         @click="clickCollectData"
+                        <p-icon-text-button style-type="primary-dark"
+                                            name="ic_plus_bold"
+                                            :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                            @click="clickCollectData"
                         >
                             {{ $t('BTN.COLLECT_DATA') }}
-                        </PIconTextButton>
+                        </p-icon-text-button>
 
-                        <PDropdownMenuBtn
+                        <p-dropdown-menu-btn
                             class="left-toolbox-item mr-4"
                             :menu="csDropdownMenu"
                             @click-project="clickProject"
                             @click-link="apiHandler.tableTS.linkState.openLink()"
                         >
                             Action
-                        </PDropdownMenuBtn>
+                        </p-dropdown-menu-btn>
                     </template>
                 </s-dynamic-layout>
             </template>
         </p-horizontal-layout>
-        <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
+        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
             <template #detail>
-                <SDynamicSubData
+                <s-dynamic-sub-data
                     :layouts="mergeLayouts"
                     :resource-api="resourceApi"
                     :select-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id||''"
@@ -73,10 +88,10 @@
             <template #monitoring>
                 <s-monitoring v-bind="monitoringTS.state" />
             </template>
-        </PTab>
-        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
-              :tabs="multiItemTab.state.tabs"
-              :active-tab.sync="multiItemTab.syncState.activeTab"
+        </p-tab>
+        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
+               :tabs="multiItemTab.state.tabs"
+               :active-tab.sync="multiItemTab.syncState.activeTab"
         >
             <template #data>
                 <s-dynamic-layout
@@ -98,7 +113,7 @@
             <template #monitoring>
                 <s-monitoring v-bind="monitoringTS.state" />
             </template>
-        </PTab>
+        </p-tab>
         <p-empty v-else style="height: auto; margin-top: 4rem;">
             No Selected Item
         </p-empty>
@@ -123,34 +138,36 @@ import {
 import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import {
     defaultAdminLayout, defaultHistoryLayout, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 
-import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
+import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
-import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
-import PEmpty from '@/components/atoms/empty/Empty.vue';
+import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import {
     TabBarState,
-} from '@/components/molecules/tabs/tab-bar/toolset';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
+} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
+import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
+
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
 import baseTable from '@/metadata-schema/view/inventory/cloud_service/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import baseInfoSchema from '@/metadata-schema/view/inventory/cloud_service/sub_data/layouts/base_info.json';
 import { get, debounce } from 'lodash';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     selectIndexAutoReplacer,
@@ -159,7 +176,7 @@ import {
     queryTagsToOriginal,
     queryTagsToQueryString,
 } from '@/lib/router-query-string';
-import { MonitoringToolSet } from '@/components/organisms/monitoring/Monitoring.toolset';
+import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
@@ -177,6 +194,7 @@ export default {
     components: {
         GeneralPageLayout,
         PHorizontalLayout,
+        PDynamicLayout,
         SDynamicLayout,
         PPageTitle,
         PIconTextButton,
@@ -250,7 +268,7 @@ export default {
                 border: true,
                 padding: true,
                 selectable: true,
-                dragable: true,
+                draggable: true,
                 excelVisible: true,
             },
             undefined,
@@ -458,6 +476,12 @@ export default {
         });
 
 
+        const monitoringTS = new MonitoringToolSet(
+            'cloud_service_id',
+            'inventory.CloudService',
+            computed(() => apiHandler.tableTS.selectState.selectItems),
+        );
+
         /** Query String */
         makeQueryStringComputeds(apiHandler.tableTS.syncState, {
             pageSize: { key: 'ps', setter: Number },
@@ -483,12 +507,13 @@ export default {
             activeTab: { key: 'st' },
         });
 
+        /** Init */
+        const init = async () => {
+            await apiHandler.getData();
+        };
 
-        const monitoringTS = new MonitoringToolSet(
-            'cloud_service_id',
-            'inventory.CloudService',
-            computed(() => apiHandler.tableTS.selectState.selectItems),
-        );
+        init();
+
 
         return {
             ...toRefs(state),

@@ -32,8 +32,8 @@ import {
     ServiceSummaryPropsType, Trend, Value,
 } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 import AnimatedNumber from 'animated-number-vue';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import { gray, blue } from '@/styles/colors';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import _ from 'lodash';

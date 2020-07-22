@@ -84,11 +84,11 @@ import moment from 'moment';
 import { showErrorMessage, timestampFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/TableCheckModal.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { fluentApi } from '@/lib/fluent-api';
 
 export default {

@@ -108,12 +108,12 @@ import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
 import _ from 'lodash';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -123,7 +123,7 @@ import { Component } from 'vue/types/umd';
 import { showErrorMessage } from '@/lib/util';
 import {
     TabBarState,
-} from '@/components/molecules/tabs/tab-bar/toolset';
+} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray,
@@ -133,9 +133,9 @@ import {
 import { getEnumValueHandler, getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 
-const PTab = (): Component => import('@/components/organisms/tabs/tab/Tab.vue') as Component;
-const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/TableCheckModal.vue') as Component;
-const STagsPanel = (): Component => import('@/components/organisms/panels/tag-panel/STagsPanel.vue') as Component;
+const PTab = (): Component => import('@/components/organisms/tabs/tab/PTab.vue') as Component;
+const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/PTableCheckModal.vue') as Component;
+const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
 const CollectorDetail = (): Component => import('@/views/plugin/collector/modules/CollectorDetail.vue') as Component;
@@ -175,7 +175,7 @@ export default {
             {
                 selectable: true,
                 sortable: true,
-                dragable: true,
+                draggable: true,
                 hover: true,
                 responsive: true,
                 settingVisible: false,

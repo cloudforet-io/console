@@ -19,8 +19,8 @@
 import { computed, watch } from '@vue/composition-api';
 import { DictPanelAPI } from '@/lib/api/dict';
 import { fluentApi } from '@/lib/fluent-api';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PDictPanel from '@/views/common/tags/dict-panel/PDictPanel.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import { makeDefItems } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
 import { timestampFormatter } from '@/lib/util';

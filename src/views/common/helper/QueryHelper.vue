@@ -29,11 +29,11 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
-import RawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
+import RawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import { parser } from '@/lib/api/code-generater';
 
 

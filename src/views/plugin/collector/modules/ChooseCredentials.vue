@@ -84,11 +84,11 @@ import { makeProxy } from '@/lib/compostion-util';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PDictList from '@/components/molecules/lists/DictList.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PDictList from '@/components/molecules/lists/PDictList.vue';
 import { defaultQuery } from '@/lib/api/query';
 
 export default {

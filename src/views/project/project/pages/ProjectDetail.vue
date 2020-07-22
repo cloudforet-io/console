@@ -140,12 +140,12 @@ import {
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 
 import { fluentApi } from '@/lib/fluent-api';
@@ -153,18 +153,18 @@ import {
     SearchTableFluentAPI,
 } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
-import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/TableCheckModal.vue';
+import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { showErrorMessage } from '@/lib/util';
 import {
     TabBarState,
-} from '@/components/molecules/tabs/tab-bar/toolset';
+} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds,
@@ -172,7 +172,7 @@ import {
     selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
@@ -248,7 +248,7 @@ export default {
             border: false,
             padding: true,
             selectable: true,
-            dragable: true,
+            draggable: true,
             fields: [
                 { label: 'Name', name: 'user_info.name', type: 'item' },
                 { label: 'State', name: 'user_info.state', type: 'item' },

@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
 import SCollectingRuns from '@/views/common/widgets/collecting-runs/SCollectingRuns.vue';
 

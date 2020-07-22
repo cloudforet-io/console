@@ -8,7 +8,7 @@
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/RouteBreadcrumb.vue';
+import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/PRouteBreadcrumb.vue';
 
 export const setRouteState = (routes, currentIdx) => reactive({
     currentIdx: currentIdx || 1,

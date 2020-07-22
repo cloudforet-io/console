@@ -17,7 +17,7 @@ import {
     reactive, toRefs, computed, getCurrentInstance, defineComponent, watch,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
-import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
+import PMenuList from '@/components/organisms/lists/menu-list/PMenuList.vue';
 import { LANGUAGES } from '@/lib/global-enums';
 
 export default defineComponent({

@@ -23,7 +23,7 @@
 import {
     reactive, toRefs, computed, defineComponent,
 } from '@vue/composition-api';
-import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
+import PMenuList from '@/components/organisms/lists/menu-list/PMenuList.vue';
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { useStore } from '@/store/toolset';

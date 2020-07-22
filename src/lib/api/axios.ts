@@ -4,7 +4,7 @@ import axios, {
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
-import { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.toolset';
+import { dataTableProps } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 
 const MockAdapter = require('axios-mock-adapter');
 

@@ -59,9 +59,9 @@ import {
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
 
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 

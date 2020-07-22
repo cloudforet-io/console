@@ -120,14 +120,14 @@
 <script lang="ts">
 
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
-import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
+import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 import {
     CustomKeywords,
     JsonSchemaFormToolSet,
     CustomValidator,
 } from '@/components/organisms/forms/json-schema-form/toolset';
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
 import {
@@ -136,12 +136,12 @@ import {
 } from '@vue/composition-api';
 import { AxiosResponse } from 'axios';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
-import SProjectTreePanel from '@/components/organisms/panels/project-tree-panel/SProjectTreePanel.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
+import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import { useStore } from '@/store/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import _ from 'lodash';

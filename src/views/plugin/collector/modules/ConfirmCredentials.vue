@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { makeTrItems } from '@/lib/view-helper';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import {
     computed, reactive, toRefs, watch,

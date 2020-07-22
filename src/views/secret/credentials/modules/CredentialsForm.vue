@@ -71,31 +71,11 @@
                             </p-label>
                             <p-select-btn-group style="min-width: 6rem"
                                                 :space="true"
-                                                :dynamic-style="{'min-width': '96px', 'display': 'inline-flex'}"
                                                 :buttons="inputTypeItems"
                                                 :selected.sync="selectedInputType"
                                                 @clickButton="onChangeInputType"
                             />
-                            <!--                            <PFieldGroup v-if="selectedInputType === 'Form'"-->
-                            <!--                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.form"-->
-                            <!--                                         :invalid="validateRightHalfJsonAPI.invalidState.form"-->
-                            <!--                            >-->
-                            <!--                                <template v-slot:default="{invalid}">-->
-                            <!--                                    <div v-if="dynamicForm.length > 0" class="form-editor">-->
-                            <!--                                        <p-dynamic-form v-for="(fm, idx) in dynamicForm" :key="idx"-->
-                            <!--                                                        v-model="values[fm.key]"-->
-                            <!--                                                        :form="fm"-->
-                            <!--                                                        :invalid="showValidation && vdApi.invalidState[fm.key]"-->
-                            <!--                                                        :invalid-text="vdApi.invalidMsg[fm.key]"-->
-                            <!--                                                        :validatable="true"-->
-                            <!--                                                        @change="onOptionChange(fm.key)"-->
-                            <!--                                        />-->
-                            <!--                                    </div>-->
-                            <!--                                    <div v-else style="display:block" class="form-editor invalid-feedback">-->
-                            <!--                                        * {{ $t('SECRET.NO_FORMAT') }}-->
-                            <!--                                    </div>-->
-                            <!--                                </template>-->
-                            <!--                            </PFieldGroup>-->
+<!--                            :dynamic-style="{'min-width': '96px', 'display': 'inline-flex'}"-->
 
                             <PFieldGroup
                                 :invalid-text="validateLeftHalfAPI.invalidMsg.data"
@@ -120,23 +100,23 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
-import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
+import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
 import {
     formValidation, makeProxy, requiredValidation, jsonParseValidation, credentialsNameValidation,
 } from '@/lib/compostion-util';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup_deprecated.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import CardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
-import PLabel from '@/components/atoms/labels/Label.vue';
-import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import CardLayout from '@/components/molecules/layouts/card-layout/PCardLayout.vue';
+import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
+import PLabel from '@/components/atoms/labels/PLabel.vue';
+import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
 import _ from 'lodash';
 
 
@@ -180,7 +160,7 @@ const setup = (props, context) => {
                 ['Json'],
                 // ['Form'],
             ],
-            context.parent, { vbind: { styleType: 'gray900', outline: true } });
+            context.parent, { styleType: 'gray900', outline: true });
         }),
         selectedInputType: 'Json',
     });

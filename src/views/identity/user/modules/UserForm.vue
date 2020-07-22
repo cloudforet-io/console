@@ -143,10 +143,10 @@
 <script>
 
 import { reactive, computed } from '@vue/composition-api';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
 import {
     formValidation,
     makeProxy,
@@ -157,12 +157,12 @@ import {
     lengthMinValidation,
     checkTimeZoneValidation, noEmptySpaceValidation,
 } from '@/lib/compostion-util';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup_deprecated.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 const components = {
     PButtonModal,

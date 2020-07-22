@@ -12,7 +12,7 @@
                     :fields="fields"
                     :selectable="true"
                     :sortable="true"
-                    :dragable="true"
+                    :draggable="true"
                     :hover="true"
                     :responsive="true"
                     :sort-by.sync="sortBy"
@@ -134,31 +134,31 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
-import PStatus from '@/components/molecules/status/Status.vue';
-import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
+import PStatus from '@/components/molecules/status/PStatus.vue';
+import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/PToolboxTable.util';
 import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import userEventBus from '@/views/identity/user/UserEventBus';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';
-import PTag from '@/components/molecules/tags/Tag.vue';
-import { tagList } from '@/components/molecules/tags/toolset';
+import PTag from '@/components/molecules/tags/PTag.vue';
+import { tagList } from '@/components/molecules/tags/PTag.toolset';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
-import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 
-const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
+const PTab = () => import('@/components/organisms/tabs/tab/PTab.vue');
+const PDataTable = () => import('@/components/organisms/tables/data-table/PDataTable.vue');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/PToolboxTable.vue');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue');
 const PUserDetail = () => import('@/views/identity/user/modules/UserDetail.vue');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/PActionConfirmModal.vue');
 
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([

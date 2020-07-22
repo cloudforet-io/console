@@ -10,7 +10,7 @@ import {
     QuerySearchTableToolSet,
     SearchTableToolSet,
     ToolboxTableToolSet,
-} from '@/components/organisms/tables/toolbox-table/toolset';
+} from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
 import {
     BaseApiState, transformHandlerType, getDataAPI, DynamicFluentAPIToolSet,
 } from '@/lib/api/toolset';
@@ -34,6 +34,26 @@ export abstract class BaseTableFluentAPI<
     tableTS: T;
 
     totalCount: Ref<number>;
+
+    onChangeSort = async (sortBy: string, sortDesc: boolean) => {
+        this.tableTS.onChangeSort(sortBy, sortDesc);
+        await this.getData();
+    };
+
+    onChangePageSize = async (size: number) => {
+        this.tableTS.onChangePageSize(size);
+        await this.getData();
+    }
+
+    onChangePageNumber = async (number: number) => {
+        this.tableTS.onChangePageNumber(number);
+        await this.getData();
+    }
+
+    onRefresh = async () => {
+        await this.getData(true);
+    }
+
 
     protected constructor(action: action) {
         super(action);

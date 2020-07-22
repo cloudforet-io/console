@@ -73,8 +73,8 @@ import PAutocompleteSearch from '@/components/organisms/search/autocomplete-sear
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/components/utils/composition';
-import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { makeProxy } from '@/components/util/composition-helpers';
+import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { fluentApi, ProjectGroupInfo } from '@/lib/fluent-api';
@@ -116,7 +116,7 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
                 label: item.name,
                 name: d.type === 'PROJECT' ? item.project_id : item.project_group_id,
                 icon: d.icon,
-                href: d.type === 'PROJECT' ? `/project/${item.project_id}` : undefined,
+                link: d.type === 'PROJECT' ? `/project/${item.project_id}` : undefined,
                 dataType: d.type,
             });
         });

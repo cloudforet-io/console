@@ -33,7 +33,7 @@ import { makeProxy } from '@/lib/compostion-util';
 
 import { fluentApi } from '@/lib/fluent-api';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';

@@ -106,21 +106,21 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import {
     ActionAPI,
     fluentApi, QueryAPI, Resource, SingleItemAction,
 } from '@/lib/fluent-api';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import RawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import RawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaObjectType, JsonSchemaType } from '@/lib/type';
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
-import PHr from '@/components/atoms/hr/Hr.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
+import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
 import { QuerySearchToolSet } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';

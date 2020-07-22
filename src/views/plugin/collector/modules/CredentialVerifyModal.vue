@@ -51,8 +51,8 @@ import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
 import CollectorEventBus from '@/views/plugin/collector/CollectorEventBus';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 

@@ -122,7 +122,7 @@ import {
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
+import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 import {
     SearchGridFluentAPI,
 } from '@/lib/api/grid';
@@ -130,18 +130,18 @@ import { AxiosResponse } from 'axios';
 import { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import {
     makeQueryStringComputed, makeQueryStringComputeds, replaceQuery,
 } from '@/lib/router-query-string';
 import {
     GridLayoutState,
-} from '@/components/molecules/layouts/grid-layout/toolset';
+} from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {

@@ -39,8 +39,8 @@
 import { toRefs, reactive } from '@vue/composition-api';
 
 import PSearch from '@/components/molecules/search/PSearch.vue';
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import _ from 'lodash';
 

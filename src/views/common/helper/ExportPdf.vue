@@ -323,8 +323,8 @@
 import {
     computed, getCurrentInstance, reactive, toRefs, watch, ref, Ref, onMounted,
 } from '@vue/composition-api';
-import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import { parser } from '@/lib/api/code-generater';
 import VueHtml2pdf from 'vue-html2pdf';
 import html2pdf from 'html2pdf.js';

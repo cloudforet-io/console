@@ -18,8 +18,8 @@
 import {
     toRefs, reactive, computed, defineComponent, getCurrentInstance,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
 
 

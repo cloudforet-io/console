@@ -55,12 +55,12 @@ import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { getBaseNodeState, getDefaultNode, TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { ProjectNodeState, ProjectTreeFluentAPI } from '@/lib/api/tree-node';
+import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { fluentApi } from '@/lib/fluent-api';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { ProjectGroup, ProjectTreeItem } from '@/views/project/project/modules/ProjectSearch.toolset';
 import { debounce } from 'lodash';
 

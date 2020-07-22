@@ -29,7 +29,7 @@ import {
     defineComponent, getCurrentInstance, onMounted, reactive,
 } from '@vue/composition-api';
 import { CombinedVueInstance } from 'vue/types/vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 // @ts-ignore
 const { gapi } = window;

@@ -72,52 +72,52 @@
 
                 <!-- top 1 row -->
                 <template #row-0="{index, fields, item}">
-                    <p-tr>
-                        <p-td class="text-center">
+                    <tr>
+                        <td class="text-center">
                             <p-i name="ic_top1" />
-                        </p-td>
+                        </td>
 
-                        <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
+                        <td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
                             <router-link :to="`/project?select_pg=${item.project_group_id}`">
                                 {{ item.project_group }}
                             </router-link>
-                        </p-td>
-                        <p-td v-tooltip.bottom="{content: item.project, delay: {show: 500}}" class="project-field">
+                        </td>
+                        <td v-tooltip.bottom="{content: item.project, delay: {show: 500}}" class="project-field">
                             <router-link :to="`/project/${item.project_id}?st=summary`">
                                 {{ item.project }}
                             </router-link>
-                        </p-td>
-                        <p-td class="text-center">
+                        </td>
+                        <td class="text-center">
                             <p-badge :background-color="colors.servers">
                                 <router-link :to="`/inventory/server?p=1&ps=15&f=project_id%3A%3D${item.project_id}`">
                                     {{ item.servers || 0 }}
                                 </router-link>
                             </p-badge>
-                        </p-td>
-                        <p-td class="text-center">
+                        </td>
+                        <td class="text-center">
                             <p-badge :background-color="colors.cloud_services">
                                 <router-link :to="`/inventory/cloud-service?f=project_id%3A%3D${item.project_id}`">
                                     {{ item.cloud_services || 0 }}
                                 </router-link>
                             </p-badge>
-                        </p-td>
-                    </p-tr>
+                        </td>
+                    </tr>
                 </template>
 
                 <!-- others -->
                 <template #col-project_group="{index, field, item}">
-                    <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}">
+                    <td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}">
                         <router-link :to="`/project?select_pg=${item.project_group_id}`">
                             {{ item.project_group }}
                         </router-link>
-                    </p-td>
+                    </td>
                 </template>
                 <template #col-project="{index, field, item}">
-                    <p-td v-tooltip.bottom="{content: item.project, delay: {show: 500}}">
+                    <td v-tooltip.bottom="{content: item.project, delay: {show: 500}}">
                         <router-link :to="`/project/${item.project_id}?st=summary`">
                             {{ item.project }}
                         </router-link>
-                    </p-td>
+                    </td>
                 </template>
                 <template #col-rank-format="{index}">
                     <div class="text-center">
@@ -149,21 +149,19 @@ import _ from 'lodash';
 import {
     computed, getCurrentInstance, reactive, Ref, toRefs, watch,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/Badge.vue';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import {
     black, gray, secondary, secondary1,
 } from '@/styles/colors';
-import PTr from '@/components/atoms/table/Tr.vue';
-import PTd from '@/components/atoms/table/Td.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
-import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import Chart, { ChartDataSets } from 'chart.js';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -175,8 +173,6 @@ export default {
         PWidgetLayout,
         PBadge,
         PDataTable,
-        PTr,
-        PTd,
         PI,
         PChartLoader,
         PSkeleton,

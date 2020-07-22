@@ -42,18 +42,18 @@
 </template>
 
 <script lang="ts">
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import {
     makeProxy,
 } from '@/lib/compostion-util';
-import PTag from '@/components/molecules/tags/Tag.vue';
-import { tagList } from '@/components/molecules/tags/toolset';
+import PTag from '@/components/molecules/tags/PTag.vue';
+import { tagList } from '@/components/molecules/tags/PTag.toolset';
 import { fluentApi } from '@/lib/fluent-api';
 import { SearchTableFluentAPI } from '@/lib/api/table';
 import { reactive, toRefs } from '@vue/composition-api';
-import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
+import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
 import { showErrorMessage } from '@/lib/util';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
@@ -103,7 +103,7 @@ export default {
             border: false,
             padding: true,
             selectable: false,
-            dragable: false,
+            draggable: false,
             fields: [
                 { label: 'Name', name: 'name', type: 'item' },
                 { label: 'ID', name: 'user_id', type: 'item' },

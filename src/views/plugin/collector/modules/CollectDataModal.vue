@@ -88,18 +88,18 @@ import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 // @ts-ignore
-import { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import { setValidation } from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
-import { MenuItem } from '@/components/organisms/context-menu/context-menu/PContextMenu.toolset';
+import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { showErrorMessage } from '@/lib/util';
 
 interface State {

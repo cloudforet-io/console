@@ -45,8 +45,8 @@ import {
 import _ from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import ConfigureCollector from '@/views/plugin/collector/modules/ConfigureCollector.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';

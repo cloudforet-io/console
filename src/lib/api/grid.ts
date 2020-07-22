@@ -5,7 +5,7 @@ import {
     QuerySearchGridLayoutToolSet,
     SearchGridLayoutToolSet,
     ToolboxGridLayoutToolSet,
-} from '@/components/organisms/layouts/toolbox-grid-layout/toolset';
+} from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.toolset';
 import {
     ACHandlerMeta,
     defaultACHandler,

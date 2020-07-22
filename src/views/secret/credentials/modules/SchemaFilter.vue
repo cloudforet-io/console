@@ -16,7 +16,7 @@
 <script>
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
 

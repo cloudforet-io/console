@@ -131,8 +131,8 @@
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {

@@ -43,11 +43,11 @@
                     </div>
                 </template>
                 <template #col-service_account_name="{index, field, item}">
-                    <p-td v-tooltip.bottom="{content: item.service_account_name, delay: {show: 500}}">
+                    <td v-tooltip.bottom="{content: item.service_account_name, delay: {show: 500}}">
                         <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}&t_se=${item.service_account_name}`">
                             {{ item.service_account_name || 0 }}
                         </router-link>
-                    </p-td>
+                    </td>
                 </template>
                 <template #col-server_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
@@ -76,11 +76,10 @@
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { gray, secondary, secondary1 } from '@/styles/colors';
-import PTd from '@/components/atoms/table/Td.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
@@ -90,7 +89,6 @@ export default {
     components: {
         PWidgetLayout,
         PDataTable,
-        PTd,
     },
     setup(props, context) {
         const projectId = computed<string>(() => context.root.$route.params.id as string);
