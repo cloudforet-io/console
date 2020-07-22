@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { Computed, ComputedOrRef } from '@/lib/type';
 import { DynamicFluentAPIToolSet } from '@/lib/api/toolset';
 import { DefinitionProps } from '@/components/organisms/definition/PDefinition.toolset';
-import { DataTableFieldType } from '@/components/organisms/tables/data-table/DataTable.toolset';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import { getTimezone } from '@/lib/util';
 
 

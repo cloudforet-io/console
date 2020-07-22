@@ -5,8 +5,8 @@
         :options="options"
         :data="data"
         :api="api"
-        :toolset="toolset"
         :is-show="isShow"
+        :extra="extra"
         v-bind="vbind"
         :is-loading="isLoading"
         v-on="$listeners"
@@ -21,11 +21,12 @@
 /* eslint-disable camelcase,vue/prop-name-casing,@typescript-eslint/camelcase */
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { isEqual } from 'lodash';
 import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/PDynamicLayout.toolset';
+import { makeProxy } from '@/components/util/composition-helpers';
 
 
 export default {
@@ -48,20 +49,37 @@ export default {
             type: [Object, Array],
             default: null,
         },
+        api: {
+            type: Object,
+            default: null,
+        },
+        isShow: {
+            type: Boolean,
+            default: true,
+        },
+        vbind: {
+            type: Object,
+            default: () => ({
+                initData: {},
+            }),
+        },
+        extra: {
+            type: Object,
+            default: () => ({}),
+        },
     },
-    setup(props: DynamicLayoutProps) {
+    setup(props: DynamicLayoutProps, { emit }) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
             isLoading: true,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)),
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
         });
 
         const getComponent = async () => {
-            state.isLoading = true;
             try {
-                // @ts-ignore
-                state.component = await (() => state.loader());
+                await state.loader();
+                state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/item/index.vue');
             } finally {
@@ -71,8 +89,13 @@ export default {
 
         watch(() => [props.type, props.name], (aft, bef) => {
             if (!isEqual(aft, bef)) {
+                state.isLoading = true;
                 getComponent();
             }
+        }, { lazy: true });
+
+        onMounted(async () => {
+            await getComponent();
         });
 
         return {

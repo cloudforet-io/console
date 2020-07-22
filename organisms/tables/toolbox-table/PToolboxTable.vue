@@ -60,7 +60,7 @@
             :sortable="sortable"
             :selectable="selectable"
             :multi-select="multiSelect"
-            :dragable="false"
+            :draggable="false"
             :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
@@ -95,15 +95,16 @@
 <script lang="ts">
 import { flatMap } from 'lodash';
 import {
-    computed, ref,
+    computed, getCurrentInstance, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.toolset';
+import { dataTableProps } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import PTextPagination from '@/components/organisms/pagination/PTextPagination.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import { makeProxy } from '@/components/util/composition-helpers';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 
 export default {
@@ -173,17 +174,22 @@ export default {
         },
     },
     setup(props: ToolBoxTableSetupProps, { emit }) {
-        const pageSizeOptions = computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
-        const proxyPageSize = makeProxy('pageSize', props, emit);
-        const proxyThisPage = makeProxy('thisPage', props, emit);
-        const proxySelectIndex = makeProxy('selectIndex', props, emit);
-        const proxySortBy = makeProxy('sortBy', props, emit);
-        const proxySortDesc = makeProxy('sortDesc', props, emit);
+        const vm = getCurrentInstance() as ComponentInstance;
+
+        const state = reactive({
+            pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
+            proxyPageSize: makeOptionalProxy('pageSize', vm),
+            proxyThisPage: makeOptionalProxy('thisPage', vm),
+            proxySelectIndex: makeOptionalProxy('SelectIndex', vm),
+            proxySortBy: makeOptionalProxy('sortBy', vm),
+            proxySortDesc: makeOptionalProxy('sortDesc', vm),
+        });
+
         const changePageSize = (size) => {
             const sizeNum = Number(size);
             if (props.pageSize !== sizeNum) {
-                proxyPageSize.value = sizeNum;
-                proxyThisPage.value = 1;
+                state.proxyPageSize = sizeNum;
+                state.proxyThisPage = 1;
                 emit('changePageSize', sizeNum);
             }
         };
@@ -193,16 +199,12 @@ export default {
         const table = ref(null);
         // @ts-ignore
         const getSelectItem = () => table.getSelectItem();
+
         const changeSort = () => {
-            proxyThisPage.value = 1;
+            state.proxyThisPage = 1;
         };
         return {
-            pageSizeOptions,
-            proxyPageSize,
-            proxyThisPage,
-            proxySelectIndex,
-            proxySortBy,
-            proxySortDesc,
+            ...toRefs(state),
             changePageSize,
             changePageNumber,
             getSelectItem,

@@ -41,17 +41,16 @@ export default {
         // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)),
+            components: [],
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
         });
-        onMounted((): void => {
-            state.loader()
-                .then(() => {
-                    state.component = () => state.loader();
-                })
-                .catch(() => {
-                    // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/text/index.vue');
-                });
+        onMounted(async () => {
+            try {
+                // TODO: data array -> list
+                state.component = async () => state.loader();
+            } catch (e) {
+                state.component = () => import('./templates/text/index.vue');
+            }
         });
         return {
             ...toRefs(state),

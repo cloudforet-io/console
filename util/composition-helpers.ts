@@ -48,6 +48,29 @@ export const makeProxy = <T extends any>(name: string, props: any, emit: any): R
     },
 });
 
+/**
+ * make proxy computed or a value if there's no listener for tracking sync
+ * @param name
+ * @param props
+ * @param emit
+ * @return {Ref<*>}
+ */
+export function makeOptionalProxy<T extends any>(name: string, vm: ComponentInstance): Ref<T>|T {
+    if (vm.$listeners[`update:${name}`]) {
+        return computed({
+            get: () => vm.$props[name],
+            set: (val) => {
+                if (vm.$emit) {
+                    vm.$emit(`update:${name}`, val);
+                } else {
+                    vm.$emit(val);
+                }
+            },
+        });
+    }
+    return vm.$props[name];
+}
+
 
 export function makeVModelProxy<T extends any>(name = 'value', event = 'input', transform: ((val: any) => any)|null = null): Ref<T> {
     const vm = getCurrentInstance() as ComponentInstance;

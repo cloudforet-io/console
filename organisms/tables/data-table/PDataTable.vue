@@ -180,7 +180,7 @@ import { copyAnyData, selectToCopyToClipboard } from '@/components/util/helpers'
 import { makeProxy, windowEventMount } from '@/components/util/composition-helpers';
 // eslint-disable-next-line import/named
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { dataTableProps, DataTableSetupProps } from './DataTable.toolset';
+import { dataTableProps, DataTableSetupProps } from './PDataTable.toolset';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/PCheckBox.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
@@ -225,7 +225,13 @@ export default {
             dragSelect: null,
             thHoverIndex: null,
         });
-        const proxySelectIndex = makeProxy('selectIndex', props, context.emit);
+        const proxySelectIndex: Ref<number[]> = computed({
+            set(val) {
+                context.emit('update:selectIndex', val);
+                context.emit('select', val);
+            },
+            get() { return props.selectIndex; },
+        }) as unknown as Ref<number[]>;
         const fieldsData: Ref<any> = computed(() => {
             const data = flatMap(props.fields, (value: string|object) => {
                 if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
@@ -323,7 +329,7 @@ export default {
                     return;
                 }
                 if (event.shiftKey) {
-                    if (!props.dragable) {
+                    if (!props.draggable) {
                         checkboxToggle(index);
                     }
                     return;
@@ -345,19 +351,23 @@ export default {
         };
         const theadClick = (field, index, event) => {
             if (props.sortable && field.sortable) {
-                const sortBy = field.sortKey || field.name;
+                let sortBy = field.sortKey || field.name;
+                const sortDesc = props.sortDesc;
+
                 if (props.sortBy !== sortBy) {
                     context.emit('update:sortBy', sortBy);
-                    if (!props.sortDesc) {
+                    if (!sortDesc) {
                         context.emit('update:sortDesc', true);
                     }
                 } else {
-                    if (!props.sortDesc) {
+                    if (!sortDesc) {
+                        sortBy = '';
                         context.emit('update:sortBy', '');
                     }
-                    context.emit('update:sortDesc', !props.sortDesc);
+                    context.emit('update:sortDesc', !sortDesc);
                 }
-                context.emit('changeSort');
+
+                context.emit('changeSort', sortBy, sortDesc);
             }
             context.emit('theadClick', field, index, event);
         };
@@ -400,7 +410,7 @@ export default {
 
         let dragSelect = null;
         onMounted(() => {
-            if (props.selectable && props.dragable) {
+            if (props.selectable && props.draggable) {
                 // @ts-ignore
                 dragSelect = new DragSelect({
                     selectables: dragSelectAbles.value as any[],
@@ -415,7 +425,7 @@ export default {
         }
 
         watch(() => props.items, () => {
-            if (props.selectable && props.dragable && props.items) {
+            if (props.selectable && props.draggable && props.items) {
                 context.root.$nextTick((() => {
                     // @ts-ignore
                     dragSelect.setSelectables(dragSelectAbles.value);

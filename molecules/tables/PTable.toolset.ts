@@ -4,6 +4,7 @@ import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900', 'primary4'];
+
 export const tableProps = {
     tableStyleType: {
         type: String,

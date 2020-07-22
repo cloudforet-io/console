@@ -2,9 +2,9 @@ import { computed, reactive, Ref } from '@vue/composition-api';
 import { TableState, tableProps, TablePropsType } from '@/components/molecules/tables/PTable.toolset';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/lib/toolset';
-import _ from 'lodash';
-import { Computed } from '@/lib/type';
+} from '@/components/util/toolset-helpers';
+import { get } from 'lodash';
+import { Computed } from '@/components/util/type';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
@@ -16,7 +16,7 @@ export const dataTableProps = {
         type: Boolean,
         default: false,
     },
-    dragable: {
+    draggable: {
         type: Boolean,
         default: false,
     },
@@ -58,7 +58,7 @@ export const dataTableProps = {
     },
     /**
      * @name multiSelect
-     * @description When it's 'false', should NOT give value 'true' to 'dragable' prop.
+     * @description When it's 'false', should NOT give value 'true' to 'draggable' prop.
      */
     multiSelect: {
         type: Boolean,
@@ -70,7 +70,7 @@ export interface DataTablePropsType extends TablePropsType {
     fields?: any[] | Readonly<any[]>;
     items?: any[];
     sortable?: boolean;
-    dragable?: boolean;
+    draggable?: boolean;
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
     colCopy?: boolean;
@@ -97,7 +97,7 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     fields: DataTableField[];
     items: any[];
     sortable: boolean;
-    dragable: boolean;
+    draggable: boolean;
     rowClickMultiSelectMode: boolean;
     selectable: boolean;
     selectIndex: any[]|number;
@@ -126,7 +126,7 @@ export class DataTableState<
             fields: [],
             items: [],
             sortable: false,
-            dragable: false,
+            draggable: false,
             rowClickMultiSelectMode: false,
             selectable: false,
 
@@ -196,8 +196,8 @@ export interface LinkState {
 export const initLinkState = (selectState: DataTableSelectState): LinkState => {
     const link: Ref<Readonly<string|undefined>> = computed((): string|undefined => {
         if (selectState.isSelectOne) {
-            return _.get(selectState.firstSelectItem, 'data.reference.link')
-                || _.get(selectState.firstSelectItem, 'reference.external_link');
+            return get(selectState.firstSelectItem, 'data.reference.link')
+                || get(selectState.firstSelectItem, 'reference.external_link');
         }
         return undefined;
     });

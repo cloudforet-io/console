@@ -2,7 +2,7 @@ import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { DataTableToolSet } from '@/components/organisms/tables/data-table/DataTable.toolset';
+import { DataTableToolSet } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import md from '@/components/organisms/tables/data-table/PDataTable.md';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 
