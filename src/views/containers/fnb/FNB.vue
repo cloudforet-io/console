@@ -1,15 +1,23 @@
 <template>
     <div class="fnb h-11 sm:h-10 ">
         <div class="fnb-contents flex flex-col sm:flex-row">
-            <div class="flex-1 sm:flex-auto"><span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2020 Megazone Cloud Inc.</span></div>
+            <div class="flex-1 sm:flex-auto">
+                <span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2020 Megazone Cloud Inc.</span>
+            </div>
             <div class="sm:flex-col-reverse ">
                 <span class="email">
-                    <p-i name="ic_footer_email" width="1rem" height="1rem" color="gray-200" />
-                    <a href="mailto:support@spaceone.dev">support@spaceone.dev</a>
+                    <p-i name="ic_footer_email" width="1rem" height="1rem"
+                         color="gray-200"
+                    />
+                    <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                 </span>
-                <span class="divider"></span>
+                <span class="divider" />
                 <span class="policy" @click="showTemp">Privacy Policy</span>
-                <transition name="fade"><span v-if="temp" class="footerMsg" transition="expand" @click="showTemp">Will be updated</span></transition>
+                <transition name="fade">
+                    <span v-if="temp" class="footerMsg" transition="expand"
+                          @click="showTemp"
+                    >Will be updated</span>
+                </transition>
             </div>
         </div>
     </div>
@@ -20,14 +28,14 @@ import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'FNB',
+    components: {
+        PI,
+    },
     props: {
         width: {
             type: String,
-            default: '100%', 
+            default: '100%',
         },
-    },
-    components: {
-        PI,
     },
     data() {
         return {
@@ -36,10 +44,10 @@ export default {
     },
     methods: {
         showTemp() {
-            this.temp =!this.temp;
-            var self = this;
-            setTimeout(function() {
-                self.temp=false;
+            this.temp = !this.temp;
+            const self = this;
+            setTimeout(() => {
+                self.temp = false;
             }, 1500);
         },
     },
@@ -76,4 +84,3 @@ export default {
         }
     }
 </style>
-

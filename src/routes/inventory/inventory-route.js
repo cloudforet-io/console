@@ -1,6 +1,7 @@
 import { fluentApi } from '@/lib/fluent-api';
 
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
+const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
@@ -32,13 +33,13 @@ export default {
                     name: 'server',
                     component: Server,
                 },
-                {
-                    path: ':resourceId/tags',
-                    name: 'serverTags',
-                    meta: { label: 'tags' },
-                    props: true,
-                    component: TagsPage,
-                },
+                // {
+                //     path: ':resourceId/tags',
+                //     name: 'serverTags',
+                //     meta: { label: 'tags' },
+                //     props: true,
+                //     component: TagsPage,
+                // },
             ],
         },
         {
@@ -52,6 +53,14 @@ export default {
                     path: '/',
                     name: 'cloudServiceMain',
                     component: CloudService,
+                },
+                {
+                    path: 'search',
+                    name: 'cloudServiceSearch',
+                    meta: {
+                        label: 'search',
+                    },
+                    component: CloudServiceSearch,
                 },
                 {
                     path: ':provider/:group/:name',
@@ -68,13 +77,13 @@ export default {
                             props: true,
                             component: CloudServicePage,
                         },
-                        {
-                            path: ':resourceId/tags',
-                            name: 'cloudServicePageTags',
-                            meta: { label: 'tags' },
-                            props: true,
-                            component: TagsPage,
-                        },
+                        // {
+                        //     path: ':resourceId/tags',
+                        //     name: 'cloudServicePageTags',
+                        //     meta: { label: 'tags' },
+                        //     props: true,
+                        //     component: TagsPage,
+                        // },
                     ],
                 },
             ],

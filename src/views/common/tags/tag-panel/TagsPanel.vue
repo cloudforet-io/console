@@ -16,6 +16,12 @@
             :items="items"
             :col-copy="true"
         />
+        <s-tags-page
+            v-if="tagEditPageVisible"
+            :resource-id="resourceIdValue"
+            @close="closeTag"
+            @update="updateTag"
+        />
     </div>
 </template>
 
@@ -28,10 +34,13 @@ import { makeTrItems } from '@/lib/view-helper/index';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import STagsPage from '@/views/common/tags/TagsPage.vue';
 
 export default {
     name: 'STagsPanel',
-    components: { PDataTable, PPanelTop, PButton },
+    components: {
+        PDataTable, PPanelTop, PButton, STagsPage,
+    },
     props: {
         action: {
             type: Object,
@@ -63,22 +72,28 @@ export default {
             ], vm),
             tags: {},
             items: computed(() => map(state.tags, (v, k) => ({ name: k, value: v })) || []),
+            resourceIdValue: props.resourceId,
         });
-        const editTag = () => {
-            vm.$router.push({
-                name: props.tagPageName,
-                params: { resourceId: props.resourceId },
-                query: {
-                    nextPath: vm?.$route.fullPath,
-                },
-            });
-        };
+        const tagState = reactive({
+            tagEditPageVisible: false,
+        });
         const getTagData = debounce(async () => {
             state.tags = {};
             const resp = await state.api.get().setId(props.resourceId).setOnly('tags').execute();
             state.tags = resp.data.tags;
         }, 200);
 
+        const editTag = async () => {
+            tagState.tagEditPageVisible = true;
+        };
+        const closeTag = async () => {
+            console.debug('close');
+            tagState.tagEditPageVisible = false;
+        };
+        const updateTag = async () => {
+            await getTagData();
+            tagState.tagEditPageVisible = false;
+        };
         onMounted(async () => {
             if (props.isShow && props.resourceId) {
                 await getTagData();
@@ -91,8 +106,10 @@ export default {
         });
         return {
             ...toRefs(state),
+            ...toRefs(tagState),
             editTag,
-
+            closeTag,
+            updateTag,
         };
     },
 };

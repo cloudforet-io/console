@@ -1,7 +1,7 @@
 <template>
     <general-page-layout>
         <div class="top flex">
-            <PPageTitle :title="item.name" child @goBack="$router.go(-1)" />
+            <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
             <p-icon-button name="ic_transhcan"
                            width="1.5rem" height="1.5rem" class="delete-btn"
                            @click="openProjectDeleteForm"
@@ -17,8 +17,8 @@
                            :value="projectId"
             />
         </p>
-        <PTab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
-              :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
+        <p-tab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
+               :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
         >
             <template #summary>
                 <project-dashboard ref="ProjectDashboard" />
@@ -60,35 +60,6 @@
                         </div>
                     </template>
                 </p-toolbox-table>
-                <!--                <p-dynamic-view view_type="query-search-table"-->
-                <!--                                :api-handler="memberApiHandler"-->
-                <!--                                :data_source="memberFields"-->
-                <!--                                :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"-->
-                <!--                                :data="null"-->
-                <!--                                class="tab-bg"-->
-                <!--                >-->
-                <!--                    <template #toolbox-top>-->
-                <!--                        <PPageTitle :title="'Member'" use-total-count :total-count="memberApiHandler.totalCount.value" />-->
-                <!--                    </template>-->
-                <!--                    <template #toolbox-left>-->
-                <!--                        <div class="flex pr-4 toolbox-left">-->
-                <!--                            <PIconTextButton style-type="primary-dark" class=" mr-4 add-btn"-->
-                <!--                                             name="ic_plus_bold"-->
-                <!--                                             @click="openMemberAddForm()"-->
-                <!--                            >-->
-                <!--                                {{ $t('BTN.ADD') }}-->
-                <!--                            </PIconTextButton>-->
-                <!--                            <p-button-->
-                <!--                                outline-->
-                <!--                                style-type="alert"-->
-                <!--                                :disabled="memberApiHandler.tableTS.selectState.isNotSelected"-->
-                <!--                                @click="memberDeleteClick"-->
-                <!--                            >-->
-                <!--                                Delete-->
-                <!--                            </p-button>-->
-                <!--                        </div>-->
-                <!--                    </template>-->
-                <!--                </p-dynamic-view>-->
             </template>
             <template #tag>
                 <s-tags-panel
@@ -98,7 +69,7 @@
                     class="tab-bg"
                 />
             </template>
-        </PTab>
+        </p-tab>
         <p-button-modal
             :header-title="headerTitle"
             :centered="true"
@@ -119,13 +90,13 @@
                 </p>
             </template>
         </p-button-modal>
-        <SProjectCreateFormModal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
-                                 :update-mode="updateMode" :project-group-id="projectGroupId"
-                                 :current-project="projectName"
-                                 @confirm="projectEditFormConfirm($event)"
+        <s-project-create-form-modal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
+                                     :update-mode="updateMode" :project-group-id="projectGroupId"
+                                     :current-project="projectName"
+                                     @confirm="projectEditFormConfirm($event)"
         />
-        <SProjectMemberAddModal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="addMember()" />
-        <PTableCheckModal
+        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="addMember()" />
+        <p-table-check-modal
             v-bind="deleteTS.state"
             :size="'lg'"
             :visible.sync="deleteTS.syncState.visible"
@@ -263,8 +234,8 @@ export default {
             },
         }, undefined);
 
-
         // Tag
+
         const tagsApi = new DictPanelAPI(fluentApi.identity().project());
         const loadTag = async () => {
             tagsApi.setId(projectId.value);
@@ -385,7 +356,7 @@ export default {
                     group: 'noticeTopRight',
                     type: 'success',
                     title: 'Success',
-                    text: 'Sucessfully Deleted',
+                    text: 'Successfully Deleted',
                     duration: 2000,
                     speed: 1000,
                 });

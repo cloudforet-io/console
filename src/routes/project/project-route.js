@@ -28,12 +28,12 @@ export default {
             props: true,
             component: ProjectDetail,
         },
-        {
-            path: ':resourceId/tags',
-            name: PROJECT_TAG_PAGE_NAME,
-            meta: { label: 'tags' },
-            props: true,
-            component: TagsPage,
-        },
+        // {
+        //     path: ':resourceId/tags',
+        //     name: PROJECT_TAG_PAGE_NAME,
+        //     meta: { label: 'tags' },
+        //     props: true,
+        //     component: TagsPage,
+        // },
     ],
 };

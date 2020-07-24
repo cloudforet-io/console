@@ -36,13 +36,13 @@ export default {
                     props: true,
                     component: Collector,
                 },
-                {
-                    path: ':resourceId/tags',
-                    name: 'collectorTags',
-                    meta: { label: 'tags' },
-                    props: true,
-                    component: TagsPage,
-                },
+                // {
+                //     path: ':resourceId/tags',
+                //     name: 'collectorTags',
+                //     meta: { label: 'tags' },
+                //     props: true,
+                //     component: TagsPage,
+                // },
                 {
                     path: 'create',
                     name: 'createCollector',

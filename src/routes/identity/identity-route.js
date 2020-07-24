@@ -34,13 +34,13 @@ export default {
                     props: true,
                     component: ServiceAccount,
                 },
-                {
-                    path: ':resourceId/tags',
-                    name: 'serviceAccountTags',
-                    meta: { label: 'tags' },
-                    props: true,
-                    component: TagsPage,
-                },
+                // {
+                //     path: ':resourceId/tags',
+                //     name: 'serviceAccountTags',
+                //     meta: { label: 'tags' },
+                //     props: true,
+                //     component: TagsPage,
+                // },
                 {
                     path: 'add/:provider',
                     name: 'addServiceAccount',
