@@ -18,8 +18,9 @@ export const collectorLinkFormatter = async (baseUrl, referenceKey) => {
 };
 
 export const serviceAccountLinkFormatter = async (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}?`
-}
+    const queryString = `${baseUrl}/search`;
+    return queryString;
+};
 
 
 export const RouterMap = {
@@ -40,12 +41,12 @@ export const RouterMap = {
         },
     'identity.ServiceAccount':
         {
-            basueUrl: '/identity/service-account',
+            baseUrl: '/identity/service-account',
             formatter: serviceAccountLinkFormatter,
-        }
+        },
 };
 
-export const referenceRouter = async (referenceType, referenceKey) => {
+export const referenceRouter = async (referenceType, referenceKey): Promise<string> => {
     const { baseUrl, formatter } = RouterMap[referenceType];
     const link = await formatter(baseUrl, referenceKey);
     return link;

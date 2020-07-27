@@ -4,7 +4,7 @@ import AwsHealth from '@/lib/fluent-api/add-ons/aws-health';
 import PageDiscovery from '@/lib/fluent-api/add-ons/page-discovery';
 import AutoComplete from '@/lib/fluent-api/add-ons/autocomplete';
 
-export default class AddOns extends Service implements ServiceResources<'excel'> {
+export default class AddOns extends Service implements ServiceResources<'excel'|'pageDiscovery'> {
     protected name = 'add-ons';
 
     excel() { return new Excel(this.api, this.name); }

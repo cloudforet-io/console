@@ -1,0 +1,142 @@
+{
+  "name": "Base Information",
+  "type": "item",
+  "options": {
+    "fields": [{
+      "key": "cloud_service_id",
+      "name": "ID"
+    },{
+      "key": "provider",
+      "name": "Provider",
+      "type": "enum",
+      "options": {
+        "aws": {
+          "type": "badge",
+          "options": {
+            "color": "white",
+            "background_color": "#FF9900"
+          }
+        },
+        "google_cloud": {
+          "type": "badge",
+          "options": {
+            "color": "white",
+            "background_color": "#4285F4"
+          }
+        },
+        "azure": {
+          "type": "badge",
+          "options": {
+            "color": "white",
+            "background_color": "#00BCF2"
+          }
+        }
+      }
+    },{
+      "key": "cloud_service_group",
+      "name": "Cloud Service Group"
+    },{
+      "key": "cloud_service_group",
+      "name": "Cloud Service Type"
+    },{
+      "key": "collection_info.state",
+      "name": "Collection State",
+      "type": "enum",
+      "options": {
+        "ACTIVE": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "image": "ic_state_active"
+            }
+          }
+        },
+        "DUPLICATED": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "image": "ic_state_duplicated"
+            }
+          }
+        },
+        "DISCONNECTED": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "image": "ic_state_disconnected"
+            }
+          }
+        },
+        "MANUAL": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "image": "ic_state_manual"
+            }
+          }
+        }
+      }
+    },{
+      "key": "reference.resource_id",
+      "name": "Resource ID"
+    },{
+      "key": "project_id",
+      "name": "Project"
+    },{
+      "key": "collection_info.service_accounts",
+      "name": "Service Accounts",
+      "type": "list",
+      "options": {
+        "item": {
+          "type": "badge",
+          "options": {
+            "outline_color": "violet.500"
+          }
+        },
+        "delimiter": "  "
+      }
+    },{
+      "key": "collection_info.secrets",
+      "name": "Secrets",
+      "type": "list",
+      "options": {
+        "item": {
+          "type": "badge",
+          "options": {
+            "outline_color": "violet.500"
+          }
+        },
+        "delimiter": "  "
+      }
+    },{
+      "key": "collection_info.collectors",
+      "name": "Collected by",
+      "type": "list",
+      "options": {
+        "item": {
+          "type": "badge",
+            "options": {
+              "outline_color": "violet.500"
+            }
+        },
+        "delimiter": "  "
+      }
+    },{
+      "key": "created_at.seconds",
+      "name": "Created",
+      "type": "datetime",
+      "options": {
+        "source_type": "timestamp",
+        "source_format": "seconds"
+      }
+    },{
+      "key": "updated_at.seconds",
+      "name": "Updated",
+      "type": "datetime",
+      "options": {
+        "source_type": "timestamp",
+        "source_format": "seconds"
+      }
+    }]
+  }
+}

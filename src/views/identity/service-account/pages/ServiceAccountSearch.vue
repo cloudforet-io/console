@@ -1,4 +1,6 @@
-<template />
+<template>
+    <div />
+</template>
 
 <script lang="ts">
 

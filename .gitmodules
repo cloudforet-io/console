@@ -1,9 +1,6 @@
 [submodule "src/assets"]
 	path = src/assets
 	url = https://github.com/spaceone-dev/console-assets.git
-[submodule "src/metadata-schema"]
-	path = src/metadata-schema
-	url = https://github.com/spaceone-dev/metadata-schema
 [submodule "src/components"]
 	path = src/components
 	url = https://github.com/spaceone-dev/spaceone-design-system.git
