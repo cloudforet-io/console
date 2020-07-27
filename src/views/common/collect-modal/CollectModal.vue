@@ -44,7 +44,6 @@
                                   :loading="resourceLoading"
                                   :items="selectedResources"
                                   table-style-type="light"
-                                  :top-border="false"
                                   bordered
                                   class="right-table"
                     >
@@ -254,9 +253,12 @@ export default {
 .right-container {
     padding-left: 0.5rem;
     height: 100%;
-    .right-table {
+    .p-data-table::v-deep {
         @apply overflow-auto;
         max-height: calc(450px * 0.85);
+        th {
+            @apply relative border-t-0;
+        }
     }
     .all-resource-msg {
         @apply bg-black text-white;

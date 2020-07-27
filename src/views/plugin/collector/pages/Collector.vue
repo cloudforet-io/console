@@ -8,10 +8,11 @@
             <template #container="{ height }">
                 <s-dynamic-layout v-bind="mainTableLayout" :toolset="apiHandler"
                                   :vbind="{
-                                      responsiveStyle: { height: `${height}px`, overflow: 'auto' },
                                       showTitle: false,
-                                      resourceType: 'inventory.Collector'
+                                      resourceType: 'inventory.Collector',
+                                      layoutFixed: true
                                   }"
+                                  :style="{height: `${height}px`}"
                 >
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
@@ -20,16 +21,16 @@
                         >
                             {{ $t('BTN.CREATE') }}
                         </p-icon-text-button>
-                        <PDropdownMenuBtn class="left-toolbox-item"
-                                          :menu="dropdown"
-                                          @click-update="onClickUpdate"
-                                          @click-enable="onClickEnable"
-                                          @click-disable="onClickDisable"
-                                          @click-delete="onClickDelete"
-                                          @click-collectData="onClickCollectData"
+                        <p-dropdown-menu-btn class="left-toolbox-item"
+                                             :menu="dropdown"
+                                             @click-update="onClickUpdate"
+                                             @click-enable="onClickEnable"
+                                             @click-disable="onClickDisable"
+                                             @click-delete="onClickDelete"
+                                             @click-collectData="onClickCollectData"
                         >
                             {{ $t('BTN.ACTION') }}
-                        </PDropdownMenuBtn>
+                        </p-dropdown-menu-btn>
                     </template>
                     <template #col-name-format="data">
                         <p-lazy-img :img-url="getIcon(data)"
@@ -175,9 +176,7 @@ export default {
             {
                 selectable: true,
                 sortable: true,
-                draggable: true,
                 hover: true,
-                responsive: true,
                 settingVisible: false,
                 useCursorLoading: true,
                 excelVisible: true,
@@ -260,7 +259,7 @@ export default {
                 type: 'query-search-table',
                 options: {
                     fields: [
-                        { key: 'name', name: vm.$t('COMMON.NAME'), options: { width: '2rem' } },
+                        { key: 'name', name: vm.$t('COMMON.NAME'), options: { width: '14rem' } },
                         {
                             key: 'state',
                             name: vm.$t('COMMON.STATE'),
@@ -268,19 +267,31 @@ export default {
                             options: {
                                 ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
                                 DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
+                                width: '7rem',
                             },
                         },
-                        { key: 'priority', name: vm.$t('COMMON.PRIORITY'), options: { width: '30rem' } },
+                        { key: 'priority', name: vm.$t('COMMON.PRIORITY'), options: { width: '5.5rem' } },
                         {
-                            key: 'plugin_info.options.supported_resource_type',
-                            name: vm.$t('COMMON.RESOURCE'),
-                            type: 'list',
+                            key: 'last_collected_at.seconds',
+                            name: vm.$t('COMMON.LAST_COL'),
+                            type: 'datetime',
                             options: {
-                                item: { type: 'badge' }, delimiter: ' ',
+                                source_type: 'timestamp',
+                                source_format: 'seconds',
+                                width: '9rem',
                             },
                         },
-                        { key: 'last_collected_at.seconds', name: vm.$t('COMMON.LAST_COL'), ...dateTimeViewType },
-                        { key: 'created_at.seconds', name: vm.$t('COMMON.CREATED'), ...dateTimeViewType },
+                        {
+                            key: 'created_at.seconds',
+                            name: vm.$t('COMMON.CREATED'),
+                            width: '9rem',
+                            type: 'datetime',
+                            options: {
+                                source_type: 'timestamp',
+                                source_format: 'seconds',
+                                width: '9rem',
+                            },
+                        },
                     ],
                 },
             })),

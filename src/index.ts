@@ -79,9 +79,14 @@ import * as PToolboxTableToolSet from './components/organisms/tables/toolbox-tab
 
 // tool sets
 export {
+    // @ts-ignore
     PDictInputToolset,
+    // @ts-ignore
     PTableToolset,
+    // @ts-ignore
     PJsonSchemaFormToolSet,
+    // @ts-ignore
     PDataTableToolSet,
+    // @ts-ignore
     PToolboxTableToolSet,
 };

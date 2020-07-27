@@ -166,10 +166,9 @@ export class SubDataFluentAPI<
         super(
             action,
             {
-                striped: true,
+                striped: false,
                 border: false,
                 shadow: false,
-                padding: false,
                 selectable: false,
                 excelVisible: true,
                 ...initData,

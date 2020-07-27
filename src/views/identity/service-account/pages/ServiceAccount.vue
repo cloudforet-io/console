@@ -47,11 +47,11 @@
                             <s-dynamic-layout type="table"
                                               :toolset="apiHandler"
                                               :options="{fields: accountFields}"
-                                              :vbind="{
-                                                  responsiveStyle: {
+                                              :style="{
                                                       height: scope ? `${scope.height}px` : 'auto',
                                                       'overflow-y':'auto','overflow-x':'auto'
-                                                  },
+                                                  }"
+                                              :vbind="{
                                                   showTitle: false,
                                                   isShowGetData: false,
                                                   resourceType: 'identity.ServiceAccount'
@@ -100,9 +100,6 @@
                                 :name="$t('TAB.CREDENTIALS')"
                                 :toolset="secretApiHandler"
                                 :options="{fields: secretDataSource}"
-                                :vbind="{
-                                    responsiveStyle:{ 'overflow-y':'auto','overflow-x':'auto'},
-                                }"
                             >
                                 <template #toolbox-left>
                                     <PIconTextButton style-type="primary-dark"
@@ -333,7 +330,6 @@ export default {
         const apiHandler = new SearchTableFluentAPI(ListAction, {
             shadow: true,
             border: true,
-            padding: true,
             selectable: true,
             excelVisible: true,
         },
@@ -445,7 +441,6 @@ export default {
                 striped: true,
                 border: false,
                 shadow: false,
-                padding: false,
                 multiSelect: false,
             },
         );

@@ -12,11 +12,11 @@
                     :toolset="apiHandler"
                     :is-show="isReady"
                     :vbind="{
-                        responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'},
                         showTitle:false,
                         resourceType: 'inventory.Server',
                         // exportFields:mergeFields,
                     }"
+                    :style="{'height': height+'px'}"
                 >
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
@@ -64,12 +64,14 @@
                 <s-dynamic-layout :api="adminApi"
                                   :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                   v-bind="defaultAdminLayout"
+                                  :style="{borderWidth: 0}"
                 />
             </template>
             <template #history>
                 <s-dynamic-layout :api="historyApi"
                                   :is-show="historyIsShow" :name="$t('TAB.HISTORY')"
                                   v-bind="defaultHistoryLayout"
+                                  :style="{borderWidth: 0}"
                 />
             </template>
             <template #monitoring>
@@ -95,6 +97,7 @@
                 <s-dynamic-layout :api="adminApi"
                                   :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                   v-bind="defaultAdminLayout"
+                                  :style="{borderWidth: 0}"
                 />
             </template>
             <template #monitoring>
@@ -266,9 +269,7 @@ export default {
             {
                 selectable: true,
                 sortable: true,
-                draggable: true,
                 hover: true,
-                responsive: true,
                 settingVisible: false,
                 useCursorLoading: true,
                 excelVisible: true,

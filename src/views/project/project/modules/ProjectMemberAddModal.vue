@@ -16,6 +16,9 @@
                              :loading.sync="apiHandler.tableTS.syncState.loading"
                              :this-page.sync="apiHandler.tableTS.syncState.thisPage"
                              :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+                             :style="{
+                                 height: '19rem', padding: '-1rem'
+                             }"
                              @changePageSize="apiHandler.getData"
                              @changePageNumber="apiHandler.getData"
                              @clickRefresh="apiHandler.getData"
@@ -101,15 +104,12 @@ export default {
         const apiHandler = new SearchTableFluentAPI(MemberListAction, {
             shadow: false,
             border: false,
-            padding: true,
             selectable: false,
-            draggable: false,
             fields: [
                 { label: 'Name', name: 'name', type: 'item' },
                 { label: 'ID', name: 'user_id', type: 'item' },
                 { label: 'Email', name: 'email', type: 'item' },
             ],
-            responsiveStyle: { height: '19rem', overflow: 'auto', padding: '-1rem' },
         });
 
         const onSelect = (item) => {

@@ -7,8 +7,6 @@
                           :bordered="false"
                           :loading="loading"
                           :items="data"
-                          :top-border="false"
-                          class="data-table"
             >
                 <!-- th -->
                 <template #th-server_count="{field}">
@@ -208,11 +206,9 @@ export default {
         @apply flex items-center justify-center uppercase font-bold px-1;
         font-size: 0.75rem;
     }
-    .data-table::v-deep {
-        .p-table {
-            table-layout: fixed;
-            font-size: 0.875rem;
-        }
+    .p-data-table::v-deep {
+        table-layout: fixed;
+        font-size: 0.875rem;
         tr {
             &:nth-child(2n+1) {
                  @apply bg-primary4;
@@ -225,6 +221,7 @@ export default {
              }
         }
         th {
+            @apply relative border-0;
             &:first-child {
                  width: 5.6rem;
              }

@@ -6,11 +6,9 @@
             </div>
         </template>
         <p-data-table :items="items" :loading="loading" :fields="fields"
-                      :top-border="false"
                       :striped="false"
                       bordered
                       table-style-type="primary4"
-                      class="data-table"
                       @rowLeftClick="onRowClick"
         >
             <template #skeleton-name>
@@ -127,13 +125,16 @@ export default {
 .working-icon {
     animation: spin 2s linear infinite;
 }
-.data-table::v-deep {
+.p-data-table::v-deep {
     overflow-y: auto;
     td:first-child {
         @apply cursor-pointer;
     }
-    th .th-contents {
-        @apply text-gray;
+    th {
+        @apply relative border-0;
+        .th-contents {
+            @apply text-gray;
+        }
     }
 }
 

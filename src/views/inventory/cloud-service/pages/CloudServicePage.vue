@@ -20,15 +20,17 @@
                                       resourceType: 'inventory.CloudService'
                                   }"
                 >
+                    <!--                <p-dynamic-layout name="cloudService"-->
                     <!--                                  type="query-search-table"-->
                     <!--                                  :data="apiHandler.tableTS.state.items"-->
                     <!--                                  :options="options"-->
+                    <!--                                  :loading="apiHandler.tableTS.syncState.loading"-->
                     <!--                                  :extra="{-->
-                    <!--                                      loading: apiHandler.tableTS.syncState.loading,-->
                     <!--                                      selectIndex: apiHandler.tableTS.syncState.selectIndex,-->
                     <!--                                      sortBy: apiHandler.tableTS.syncState.sortBy,-->
-                    <!--                                      sortDesc: apiHandler.tableTS.syncState.sortDesc-->
+                    <!--                                      sortDesc: apiHandler.tableTS.syncState.sortDesc,-->
                     <!--                                  }"-->
+                    <!--                                  :style="{'height': height+'px'}"-->
                     <!--                                  @clickRefresh="apiHandler.onRefresh"-->
                     <!--                                  @changeSort="apiHandler.onChangeSort"-->
                     <!--                                  @changePageSize="apiHandler.onChangePageSize"-->
@@ -266,9 +268,7 @@ export default {
             {
                 shadow: true,
                 border: true,
-                padding: true,
                 selectable: true,
-                draggable: true,
                 excelVisible: true,
             },
             undefined,
@@ -482,6 +482,7 @@ export default {
             computed(() => apiHandler.tableTS.selectState.selectItems),
         );
 
+
         /** Query String */
         makeQueryStringComputeds(apiHandler.tableTS.syncState, {
             pageSize: { key: 'ps', setter: Number },
@@ -491,7 +492,6 @@ export default {
             selectIndex: {
                 key: 'sl',
                 setter: queryStringToNumberArray,
-                autoReplacer: selectIndexAutoReplacer,
             },
         });
         makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
@@ -507,13 +507,28 @@ export default {
             activeTab: { key: 'st' },
         });
 
+        // const listCloudServiceData = async () => {
+        //     try {
+        //         const res = await apiHandler.getAction().execute();
+        //         apiHandler.tableTS.state.items = res.data.results;
+        //         apiHandler.totalCount.value = res.data.total_count;
+        //         apiHandler.tableTS.setAllPage(res.data.total_count);
+        //     } catch (e) {
+        //         apiHandler.tableTS.state.items = [];
+        //         apiHandler.tableTS.state.allPage = 1;
+        //         apiHandler.totalCount.value = 0;
+        //     } finally {
+        //         apiHandler.tableTS.syncState.loading = false;
+        //     }
+        // };
+
         /** Init */
         const init = async () => {
+            // await listCloudServiceData();
             await apiHandler.getData();
         };
 
         init();
-
 
         return {
             ...toRefs(state),

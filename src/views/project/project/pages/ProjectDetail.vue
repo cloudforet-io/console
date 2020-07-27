@@ -32,6 +32,7 @@
                                  :loading.sync="memberApiHandler.tableTS.syncState.loading"
                                  :this-page.sync="memberApiHandler.tableTS.syncState.thisPage"
                                  :page-size.sync="memberApiHandler.tableTS.syncState.pageSize"
+                                 :style="{height: '30rem', padding: 0}"
                                  @changePageSize="memberApiHandler.getData"
                                  @changePageNumber="memberApiHandler.getData"
                                  @clickRefresh="memberApiHandler.getData"
@@ -217,9 +218,7 @@ export default {
         const memberApiHandler = new SearchTableFluentAPI(MemberListAction, {
             shadow: false,
             border: false,
-            padding: true,
             selectable: true,
-            draggable: true,
             fields: [
                 { label: 'Name', name: 'user_info.name', type: 'item' },
                 { label: 'State', name: 'user_info.state', type: 'item' },
@@ -229,9 +228,6 @@ export default {
                 { label: 'Group', name: 'user_info.group', type: 'item' },
                 { label: 'Language', name: 'user_info.language', type: 'item' },
             ],
-            responsiveStyle: {
-                height: '30rem', overflow: 'auto', padding: 0,
-            },
         }, undefined);
 
         // Tag

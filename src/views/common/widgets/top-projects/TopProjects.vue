@@ -35,13 +35,8 @@
                           :selectable="false"
                           :loading="loading"
                           :items="data"
-                          :top-border="false"
                           :bordered="false"
-                          :responsive-style="{
-                              overflow: 'auto',
-                              marginTop: '1rem'
-                          }"
-                          class="data-table"
+                          :style="{marginTop: '1rem'}"
             >
                 <template #skeleton-rank>
                     <p-skeleton width="1.5rem" height="1.5rem" />
@@ -395,14 +390,14 @@ export default {
 .p-badge {
     @apply font-bold;
 }
-.data-table::v-deep {
-    .p-table {
-        table-layout: fixed;
-        font-size: 0.875rem;
-    }
-    tr {
-        &:nth-child(2n+1) {
-            @apply bg-primary4;
+.p-data-table::v-deep {
+    table-layout: fixed;
+    font-size: 0.875rem;
+    tbody {
+        tr {
+            &:nth-child(2n+1) {
+                @apply bg-primary4;
+            }
         }
     }
     td {
@@ -412,6 +407,7 @@ export default {
         }
     }
     th {
+        @apply relative border-0;
         .th-contents {
             @apply text-gray;
         }
@@ -432,8 +428,8 @@ export default {
         }
     }
 }
-.getstarted{
-    padding-left:1.2rem;
+.getstarted {
+    padding-left: 1.2rem;
     width: 100%;
     max-width: 12rem;
 }
