@@ -1,18 +1,17 @@
 <template>
     <p-toolbox-table
-        v-if="!isLoading"
         class="p-dynamic-layout-query-search-table"
+        v-bind="extra"
         :items="data"
         :fields="fields"
-        :loading="extra.loading"
-        :select-index="extra.selectIndex"
+        :loading="loading"
         sortable
         selectable
-        :sort-by="extra.sortBy"
-        :sort-desc="extra.sortDesc"
-        :this-page.sync="toolboxTable.syncState.thisPage"
-        :page-size.sync="toolboxTable.syncState.pageSize"
-        :responsive-style="responsiveStyle"
+        :select-index.sync="selectIndex"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
+        :this-page.sync="thisPage"
+        :page-size.sync="pageSize"
         v-on="$listeners"
     >
         <!--        @changePageSize="getData"-->
@@ -34,27 +33,29 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item hidden lg:block">
-                <p-query-search v-model="proxySearchText"
-                                v-bind="querySearchToolset.state"
-                                @menu:show="querySearchToolset.onMenuShow"
-                                @key:input="querySearchToolset.onKeyInput"
-                                @value:input="querySearchToolset.onValueInput"
-                                @key:select="querySearchToolset.onKeySelect"
-                                @search="querySearchToolset.onSearch"
+                <p-query-search v-model="searchText"
+                                :key-items="keyItems"
+                                :value-item="valueItems"
+                                @menu:show="onMenuShow"
+                                @key:input="onKeyInput"
+                                @value:input="onValueInput"
+                                @key:select="onKeySelect"
+                                @search="onSearch"
                 />
             </div>
         </template>
         <template #toolbox-bottom>
             <div class="flex flex-col flex-1">
-                <p-query-search v-model="proxySearchText"
+                <p-query-search v-model="searchText"
                                 class="block lg:hidden mt-4"
                                 :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
-                                v-bind="querySearchToolset.state"
-                                @menu:show="querySearchToolset.onMenuShow"
-                                @key:input="querySearchToolset.onKeyInput"
-                                @value:input="querySearchToolset.onValueInput"
-                                @key:select="querySearchToolset.onKeySelect"
-                                @search="querySearchToolset.onSearch"
+                                :key-items="keyItems"
+                                :value-item="valueItems"
+                                @menu:show="onMenuShow"
+                                @key:input="onKeyInput"
+                                @value:input="onValueInput"
+                                @key:select="onKeySelect"
+                                @search="onSearch"
                 />
                 <div v-if="tags.length !==0" class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
                     <p-hr style="width: 100%;" />
@@ -77,34 +78,64 @@
 
 <script lang="ts">
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, toRefs, ref,
 } from '@vue/composition-api';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 
 import PHr from '@/components/atoms/hr/PHr.vue';
-import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import {
-    ActionAPI, fluentApi, QueryAPI, ResourceActions,
-} from '@/lib/fluent-api';
-import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
-import {
-    checkCanGetData,
-    DynamicLayoutProps,
-    makeFields,
-    makeTableSlots,
-} from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import {
-    getKeyHandler,
-    KeyItem,
-    QuerySearchToolSet,
+    KeyHandler,
+    KeyItem, QueryItem,
 } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
-import { ACHandlerMeta, defaultACHandler, getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import { ToolboxTableState } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
+import { debounce } from 'lodash';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
+import { getTimezone } from '@/lib/util';
+import { DynamicField } from '@/components/organisms/dynamic-field/type';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
+const defaultACHandler = {
+    keyHandler: async inputText => [],
+    valueHandlerMap: {},
+    suggestKeys: [],
+};
+
+const makeFields = (props: DynamicLayoutProps|any) => computed<DataTableFieldType[]>(() => {
+    if (!props.options.fields) return [];
+
+    return props.options.fields.map(ds => ({
+        name: ds.key,
+        label: ds.name,
+        sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
+        // eslint-disable-next-line camelcase
+        sortKey: ds.options?.sort_key,
+        width: ds.options?.width,
+    }));
+});
+
+const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): DynamicField[] => (
+    props.options.fields ? props.options.fields.map((ds) => {
+        const res = {
+            ...ds,
+            name: `col-${ds.key}-format`,
+        };
+        if (res.type === 'datetime') {
+            if (!res.extra) res.extra = {};
+            if (!res.extra.timezone) res.extra.timezone = getTimezone();
+        }
+        return res;
+    }) : []));
+
+const bindExtraDataOrInit = (name: string, props: DynamicLayoutProps, init?: any) => {
+    if (props.extra[name]) return computed(() => props.extra[name]);
+    return props.extra[name] || init;
+};
 
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
@@ -129,136 +160,105 @@ export default {
             type: Array,
             default: () => [],
         },
-        api: {
-            type: Object,
-            default: null,
-        },
-        isShow: {
-            type: Boolean,
-            default: true,
-        },
-        isLoading: {
-            type: Boolean,
-            default: true,
-        },
         showTitle: {
             type: Boolean,
             default: true,
-        },
-        responsiveStyle: {
-            type: Object,
-            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
         exportFields: {
             type: Array,
             default: null,
         },
-        isShowGetData: {
+        loading: {
             type: Boolean,
             default: true,
         },
-        resourceType: {
-            type: String,
-            required: true,
-        },
         extra: {
             type: Object,
-            default: () => ({}),
+            default: () => ({
+            }),
         },
     },
     setup(props: DynamicLayoutProps, { emit }) {
-        const toolboxTable = new ToolboxTableState();
-        const querySearchToolset = new QuerySearchToolSet(defaultACHandler.keyHandler, defaultACHandler.valueHandlerMap, defaultACHandler.suggestKeys);
-
-
-        /** ************************************************ */
-
-        const defaultInitData = {
-            selectable: false,
-            excelVisible: true,
-        };
-        const fields = makeFields(props);
-        const slots = makeTableSlots(props);
-        const getAction = () => {
-            let action: ActionAPI;
-            if (props.api?.resource instanceof ActionAPI) {
-                action = props.api.resource;
-            } else {
-                action = (props.api?.resource as ResourceActions<'list'>).list();
-            }
-            const getAct = props.api?.getAction;
-            if (getAct) {
-                action = getAct(action) as QueryAPI<any, any>;
-            }
-            return action as QueryAPI<any, any>;
-        };
-        const getKeys = () => fields.value.map(field => field.name);
-        const makeApiToolset = () => {
-            const keys = getKeys();
-            const keyItems: KeyItem[] = fields.value.map(field => ({ label: field.label || field.name, name: field.name }));
-            const acMeta: ACHandlerMeta = {
-                keyHandler: async (val: string) => {
-                    let res = keyItems;
-                    if (val) {
-                        res = keyItems.reduce((result, item) => {
-                            if (item.label.includes(val) || item.name.includes(val)) result.push(item);
-                            return result;
-                        }, [] as KeyItem[]);
-                    }
-
-                    return res;
-                },
-                valueHandlerMap: getStatApiValueHandlerMap(
-                    keys,
-                    props.resourceType as string,
-                ),
-                suggestKeys: keys,
-
-            };
-            return new QuerySearchTableFluentAPI(
-                getAction(),
-                defaultInitData,
-                undefined,
-                acMeta,
-            );
-        };
+        const vm = getCurrentInstance() as ComponentInstance;
         const state = reactive({
-            isToolsetMode: computed(() => !!props.toolset),
+            /* table */
+            fields: makeFields(props),
+            selectIndex: bindExtraDataOrInit('selectIndex', props),
+            sortBy: bindExtraDataOrInit('sortBy', props),
+            sortDesc: bindExtraDataOrInit('sortDesc', props),
+            thisPage: bindExtraDataOrInit('thisPage', props),
+            pageSize: bindExtraDataOrInit('pageSize', props),
+            slots: makeTableSlots(props),
+
+            /* query search */
+            keyItems: bindExtraDataOrInit('keyItems', props, []) as KeyItem[],
+            valueItems: bindExtraDataOrInit('valueItems', props, []),
+            keyHandler: bindExtraDataOrInit('keyHandler', props, defaultACHandler.keyHandler) as KeyHandler,
+            valueHandlerMap: bindExtraDataOrInit('valueHandlerMap', props, defaultACHandler.valueHandlerMap),
+            tags: bindExtraDataOrInit('tags', props, []) as QueryTag[],
+            searchText: bindExtraDataOrInit('searchText', props) as string,
+
         });
-        const exportAction = fluentApi.addons().excel().export();
+
+        const onKeyInput = debounce(async (val: string) => {
+            state.keyItems = await state.keyHandler(val);
+        }, 200);
+
+        const onValueInput = debounce(async (val: string, keyItem: KeyItem) => {
+            state.valueItems = await state.valueHandlerMap[keyItem.name](val, keyItem) || [];
+        }, 200);
+
+        const onMenuShow = async (val: string, keyItem?: KeyItem) => {
+            if (keyItem) await onValueInput(val, keyItem);
+            else await onKeyInput(val);
+        };
+
+        const onKeySelect = async (keyItem: KeyItem) => {
+            state.valueItems = await state.valueHandlerMap[keyItem.name]('', keyItem);
+        };
 
 
-        const apiWatchStop: any = null;
-        const optionsWatchStop: any = null;
-
-
-
-        const proxySearchText = computed({
-            get: () => querySearchToolset.syncState.value,
-            set: (value) => {
-                if (value !== querySearchToolset.syncState.value) {
-                    querySearchToolset.syncState.value = value;
-                }
-            },
+        const validation = (query: QueryItem): boolean => (state.tags as unknown as QueryTag[]).every((tag) => {
+            if (tag.key && query.key) {
+                return (query.key.name !== tag.key.name
+                    || query.operator !== tag.operator
+                    || query.value !== tag.value);
+            }
+            if (!tag.key && !query.key) {
+                return query.value !== tag.value;
+            }
+            return true;
         });
 
-        const tags = computed(() => querySearchToolset.tags.value || []);
-        const deleteTag = (event) => {
-            querySearchToolset.deleteTag(event);
+        const setTags = (tags: QueryItem[]): void => {
+            (state.tags as unknown as QueryTag[]) = tags;
+        };
+
+        const onSearch = async (query?: QueryItem) => {
+            const val = query;
+            if (!val) return;
+            if (validation(val)) return;
+            setTags([...(state.tags as unknown as QueryTag[]), val]);
+        };
+
+        const deleteTag = (idx: number) => {
+            const updatedTags = [...state.tags] as unknown as QueryTag[];
+            updatedTags.splice(idx, 1);
+            setTags(updatedTags);
         };
         const deleteAllTags = () => {
-            querySearchToolset.deleteAllTags();
+            setTags([]);
         };
+
         return {
             ...toRefs(state),
-            fields,
-            slots,
-            proxySearchText,
-            tags,
+            onKeyInput,
+            onValueInput,
+            onMenuShow,
+            onKeySelect,
+            onSearch,
             deleteTag,
             deleteAllTags,
-            toolboxTable,
-            querySearchToolset,
         };
     },
 };

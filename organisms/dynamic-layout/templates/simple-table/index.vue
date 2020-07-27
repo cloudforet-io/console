@@ -8,7 +8,6 @@
             {{ name }}
         </p-panel-top>
         <p-data-table :items="items" :fields="fields" :col-copy="colCopy"
-                      :responsive-style="responsiveStyle"
                       v-on="$listeners"
         >
             <template v-for="slot of slots" v-slot:[slot.name]="{value}">
@@ -75,10 +74,6 @@ export default {
         colCopy: {
             type: Boolean,
             default: false,
-        },
-        responsiveStyle: {
-            type: Object,
-            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
     },
     setup(props: DynamicLayoutProps) {

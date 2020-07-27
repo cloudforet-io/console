@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding, 'toolbox-border': border}">
+    <div class="p-toolbox-table">
         <div class="toolbox">
             <div v-if="$slots['toolbox-top']" class="toolbox-block toolbox-top">
                 <slot name="toolbox-top" />
@@ -60,28 +60,20 @@
             :sortable="sortable"
             :selectable="selectable"
             :multi-select="multiSelect"
-            :draggable="false"
             :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
             :table-style-type="tableStyleType"
-            :thead-style-type="theadStyleType"
-            :responsive-style="responsiveStyle"
-            :table-style="tableStyle"
-            :tbody-style="tbodyStyle"
-            :thead-style="theadStyle"
-            :tfoot-style="tfootStyle"
             :striped="striped"
             :bordered="bordered"
             :hover="hover"
-            :small="small"
-            :background="background"
-            :top-border="topBorder"
-            :responsive="responsive"
             :loading="loading"
             :use-cursor-loading="useCursorLoading"
             :skeleton-rows="pageSize"
+            :layout-fixed="layoutFixed"
+            :row-height-fixed="rowHeightFixed"
+            :width-fixed="widthFixed"
             v-on="$listeners"
             @changeSort="changeSort"
         >
@@ -164,14 +156,6 @@ export default {
             type: Array,
             default: () => [15, 30, 45],
         },
-        padding: {
-            type: Boolean,
-            default: true,
-        },
-        toolboxBackground: {
-            type: Boolean,
-            default: true,
-        },
     },
     setup(props: ToolBoxTableSetupProps, { emit }) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -203,26 +187,33 @@ export default {
         const changeSort = () => {
             state.proxyThisPage = 1;
         };
+
+        // const testLoading = ref(true);
+        // const clickRefreshTest = () => {
+        //     testLoading.value = true;
+        //     setTimeout(() => {
+        //         testLoading.value = false;
+        //     }, 1000);
+        // };
         return {
             ...toRefs(state),
             changePageSize,
             changePageNumber,
             getSelectItem,
             changeSort,
+            // testLoading,
+            // clickRefreshTest,
         };
     },
 };
 </script>
 
-<style lang="postcss" scoped>
-    .toolbox-border {
-        @apply border border-gray-200 rounded-sm;
-    }
+<style lang="postcss">
+    .p-toolbox-table {
+        @apply flex flex-col bg-white border border-gray-200 rounded-sm;
 
-    .toolbox-table {
-        @apply overflow-visible;
-        &.background {
-            @apply bg-white;
+        .p-data-table {
+            @apply overflow-auto;
         }
 
         .toolbox {
@@ -257,23 +248,19 @@ export default {
                 @apply mt-4;
             }
         }
-        &.no-padding {
-            padding: 0;
-        }
-    }
-
-    .tool {
-        @apply inline;
-
-        @screen md {
-            @apply ml-4;
-        }
-    }
-    .md-hide-tool {
-        @apply hidden;
-
-        @screen md {
+        .tool {
             @apply inline;
+
+            @screen md {
+                @apply ml-4;
+            }
+        }
+        .md-hide-tool {
+            @apply hidden;
+
+            @screen md {
+                @apply inline;
+            }
         }
     }
 </style>

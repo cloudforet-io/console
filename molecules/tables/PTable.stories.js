@@ -20,14 +20,10 @@ export const table = () => ({
     template: `
             <p-table 
                 :tableStyleType="tableStyleType"
-                :theadStyleType="theadStyleType"
                 :striped="striped"
                 :bordered="bordered"
                 :hover="hover"
-                :small="small"
                 :background="background"
-                :topBorder="topBorder"
-                :responsive="responsive"
                 
             >
             <template #head>
@@ -48,13 +44,7 @@ export const table = () => ({
             `,
     props: {
         tableStyleType: {
-            default: select('tableStyleType', ['', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900', 'primary4'], ''),
-        },
-        theadStyleType: {
-            default: select('theadStyleType', ['', 'light', 'gray900'], ''),
-        },
-        responsive: {
-            default: select('responsive', ['', true, 'sma', 'md', 'lg', 'xl'], ''),
+            default: select('tableStyleType', ['default', 'light', 'primary4'], 'default'),
         },
         bordered: {
             default: boolean('bordered', true),
@@ -65,14 +55,8 @@ export const table = () => ({
         hover: {
             default: boolean('hover', true),
         },
-        small: {
-            default: boolean('small', true),
-        },
         background: {
             default: boolean('background', true),
-        },
-        topBorder: {
-            default: boolean('topBorder', true),
         },
     },
     created() {

@@ -214,7 +214,7 @@ export const rowVBind = () => ({
     methods: {
         ...actions,
         getUser(step) {
-            const bindClass = step % 2 === 0 ? 'table-gray900' : 'table-light';
+            const bindClass = step % 2 === 0 ? 'gray900' : 'light';
             return {
                 name: faker.name.firstName(),
                 phone: faker.phone.phoneNumberFormat(),

@@ -81,7 +81,9 @@ export interface DynamicField {
 }
 
 /** Props type for Dynamic field component */
-export interface DynamicFieldProps extends Pick<DynamicField, 'type'|'options'> {
+export interface DynamicFieldProps extends Pick<DynamicField, 'type'|'options'|'reference'> {
     data: any;
     extra: any; // a set of extra props for each component
+    beforeCreate?: any;
 }
+

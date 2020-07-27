@@ -36,6 +36,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
     },
     setup(props: DynamicFieldProps) {
         // noinspection TypeScriptCheckImport
@@ -47,6 +51,7 @@ export default {
         onMounted(async () => {
             try {
                 // TODO: data array -> list
+                if (props.beforeCreate) await props.beforeCreate(props);
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/text/index.vue');

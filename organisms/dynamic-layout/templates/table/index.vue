@@ -11,7 +11,6 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-        :responsive-style="responsiveStyle"
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
@@ -121,10 +120,6 @@ export default {
             type: Boolean,
             required: true,
         },
-        responsiveStyle: {
-            type: Object,
-            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
-        },
         exportFields: {
             type: Array,
             default: null,
@@ -139,7 +134,6 @@ export default {
             selectable: false,
             excelVisible: true,
             shadow: false,
-            border: false,
         };
         let apiHandler: SearchTableFluentAPI = props.toolset as SearchTableFluentAPI
             || new SearchTableFluentAPI(null as unknown as QueryAPI<any, any>, defaultInitData);
@@ -241,14 +235,14 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
     &:last-child {
          flex-grow: 1;
      }
     }
-.s-dynamic-layout-table{
-    >>> .toolbox{
-        .toolbox-bottom{
+.s-dynamic-layout-table {
+    >>> .toolbox {
+        .toolbox-bottom {
             @apply mt-0;
         }
     }

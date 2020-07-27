@@ -16,10 +16,6 @@ export const dataTableProps = {
         type: Boolean,
         default: false,
     },
-    draggable: {
-        type: Boolean,
-        default: false,
-    },
     rowClickMultiSelectMode: {
         type: Boolean,
         default: false,
@@ -56,10 +52,6 @@ export const dataTableProps = {
         type: Number,
         default: 5,
     },
-    /**
-     * @name multiSelect
-     * @description When it's 'false', should NOT give value 'true' to 'draggable' prop.
-     */
     multiSelect: {
         type: Boolean,
         default: true,
@@ -70,7 +62,6 @@ export interface DataTablePropsType extends TablePropsType {
     fields?: any[] | Readonly<any[]>;
     items?: any[];
     sortable?: boolean;
-    draggable?: boolean;
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
     colCopy?: boolean;
@@ -97,7 +88,6 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     fields: DataTableField[];
     items: any[];
     sortable: boolean;
-    draggable: boolean;
     rowClickMultiSelectMode: boolean;
     selectable: boolean;
     selectIndex: any[]|number;
@@ -126,7 +116,6 @@ export class DataTableState<
             fields: [],
             items: [],
             sortable: false,
-            draggable: false,
             rowClickMultiSelectMode: false,
             selectable: false,
 

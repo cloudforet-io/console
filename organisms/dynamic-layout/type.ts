@@ -57,5 +57,6 @@ export interface DynamicLayout {
 /** Props type for Dynamic layout component */
 export interface DynamicLayoutProps extends Required<DynamicLayout> {
     data: any;
+    extra: any;
+    beforeCreate?: (props: DynamicLayoutProps) => void|Promise<void>;
 }
-

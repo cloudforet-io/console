@@ -11,9 +11,9 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-        :responsive-style="responsiveStyle"
         :setting-visible="false"
         :use-cursor-loading="true"
+        ::layout-fixed="layoutFixed"
         v-on="$listeners"
         @changePageSize="getData"
         @changePageNumber="getData"
@@ -121,10 +121,6 @@ export default {
             type: Boolean,
             required: true,
         },
-        responsiveStyle: {
-            type: Object,
-            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
-        },
         exportFields: {
             type: Array,
             default: null,
@@ -132,6 +128,10 @@ export default {
         isShowGetData: {
             type: Boolean,
             default: true,
+        },
+        layoutFixed: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DynamicLayoutProps, { emit }) {

@@ -11,8 +11,9 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-        :responsive-style="responsiveStyle"
-
+        :layout-fixed="layoutFixed"
+        :row-height-fixed="rowHeightFixed"
+        :width-fixed="widthFixed"
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
@@ -143,10 +144,6 @@ export default {
             type: Boolean,
             default: true,
         },
-        responsiveStyle: {
-            type: Object,
-            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
-        },
         exportFields: {
             type: Array,
             default: null,
@@ -159,9 +156,17 @@ export default {
             type: String,
             required: true,
         },
-        formatter: {
-            type: Function,
-            default: undefined,
+        layoutFixed: {
+            type: Boolean,
+            default: false,
+        },
+        rowHeightFixed: {
+            type: Boolean,
+            default: true,
+        },
+        widthFixed: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DynamicLayoutProps) {

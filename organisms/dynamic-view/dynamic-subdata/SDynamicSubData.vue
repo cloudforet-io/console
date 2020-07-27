@@ -15,6 +15,7 @@
             </div>
             <s-dynamic-layout
                 v-else
+                class="s-dynamic-layout"
                 v-bind="selectedLayout"
                 :api="api"
                 :is-show="isShow"
@@ -121,5 +122,11 @@ export default {
     }
     .fade-enter, .fade-leave-to {
         opacity: 0;
+    }
+
+    .s-dynamic-layout {
+        &.p-toolbox-table {
+            @apply border-transparent;
+        }
     }
 </style>

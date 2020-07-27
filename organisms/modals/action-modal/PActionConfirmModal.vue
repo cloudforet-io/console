@@ -23,6 +23,7 @@
                 </h4>
                 <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
                               :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+                              :style="{'max-height': '100px'}"
                 />
                 <div v-if="doubleConfirm" style="width: 100%;">
                     <p-hr />
@@ -167,11 +168,6 @@ export default {
         subTitle: String,
         fields: Array,
         items: Array,
-        responsiveStyle: {
-            type: Object,
-            default: () => ({ 'max-height': '100px', 'overflow-y': 'auto', 'overflow-x': 'auto' }),
-
-        },
     },
     setup(props, context) {
         return setup(props, context);

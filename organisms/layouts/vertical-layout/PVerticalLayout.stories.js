@@ -50,7 +50,6 @@ export const tableCase = () => ({
                             :shadow="false"
                             :border="false"
                             :padding="true"
-                            :draggable="false"
                             :multi-select="false"
                             :setting-visible="false"
                             :sortable="true"

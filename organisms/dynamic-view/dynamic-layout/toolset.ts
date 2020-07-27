@@ -46,7 +46,6 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     data: any;
     isShow: boolean;
     isLoading: boolean;
-    responsiveStyle?: any;
     exportFields?: any[];
     isShowGetData?: boolean;
     resourceType?: string;

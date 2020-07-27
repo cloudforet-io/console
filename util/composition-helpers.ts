@@ -40,11 +40,7 @@ export const makeByEvent = (emit: any, name: string) => (...event: any) => {
 export const makeProxy = <T extends any>(name: string, props: any, emit: any): Ref<T> => computed({
     get: () => props[name],
     set: (val) => {
-        if (emit) {
-            emit(`update:${name}`, val);
-        } else {
-            emit(val);
-        }
+        emit(`update:${name}`, val);
     },
 });
 
@@ -60,11 +56,7 @@ export function makeOptionalProxy<T extends any>(name: string, vm: ComponentInst
         return computed({
             get: () => vm.$props[name],
             set: (val) => {
-                if (vm.$emit) {
-                    vm.$emit(`update:${name}`, val);
-                } else {
-                    vm.$emit(val);
-                }
+                vm.$emit(`update:${name}`, val);
             },
         });
     }

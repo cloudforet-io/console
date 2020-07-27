@@ -23,13 +23,10 @@ export interface ToolBoxTablePropsType extends DataTablePropsType{
     paginationVisible?: boolean;
     pageSizeVisible?: boolean;
     shadow?: boolean;
-    border?: boolean;
     settingVisible?: boolean;
     refreshVisible?: boolean;
     allPage?: number;
     pageNationValues?: number[];
-    padding?: boolean;
-    toolboxBackground?: boolean;
 }
 export interface ToolBoxTableSyncType extends DataTableSyncType {
     pageSize?: number;
@@ -40,13 +37,10 @@ export interface ToolBoxTableSetupProps extends ToolBoxTablePropsType, ToolBoxTa
     paginationVisible: boolean;
     pageSizeVisible: boolean;
     shadow: boolean;
-    border: boolean;
     settingVisible: boolean;
     refreshVisible: boolean;
     allPage: number;
     pageNationValues: number[];
-    padding: boolean;
-    toolboxBackground: boolean;
     pageSize: number;
     thisPage: number;
 }
@@ -65,16 +59,12 @@ export class ToolboxTableState<
             paginationVisible: true,
             pageSizeVisible: true,
             shadow: true,
-            border: true,
             allPage: 1,
             settingVisible: false,
             excelVisible: false,
             refreshVisible: true,
             pageNationValues: undefined,
-            padding: true,
-            toolboxBackground: true,
             sortable: true,
-            draggable: true,
             rowClickMultiSelectMode: true,
             selectable: true,
         };
