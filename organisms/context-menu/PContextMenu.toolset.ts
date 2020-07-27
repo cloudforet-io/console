@@ -1,7 +1,8 @@
 export enum CONTEXT_MENU_TYPE {
     divider = 'divider',
     header = 'header',
-    item = 'item'
+    item = 'item',
+    info = 'info',
 }
 
 export interface MenuItem {
@@ -10,11 +11,14 @@ export interface MenuItem {
     type: keyof typeof CONTEXT_MENU_TYPE;
     disabled?: boolean;
     link?: string;
+    target?: string;
+    value?: string;
 }
 
 export enum CONTEXT_MENU_THEME {
     secondary = 'secondary',
     gray900 = 'gray900',
+    white = 'white',
 }
 
 export const contextMenuProps = {

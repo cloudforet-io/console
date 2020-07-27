@@ -27,6 +27,7 @@
                            class="context-content context-item no-drag"
                            :class="{ disabled: item.disabled, [theme]: true }"
                            :href="item.link"
+                           :target="item.target"
                            @click.stop="menuClick(item.name, index, $event)"
                            @keyup.up="onUpKey(index)"
                            @keyup.down="onDownKey(index)"
@@ -34,11 +35,15 @@
                         >
                             <slot name="item--format" v-bind="{...$props, uuid, item, index}">
                                 <slot :name="`item-${item.name}-format`" v-bind="{...$props, uuid, item, index}">
-                                    {{ item.label }}
+                                    <span>{{ item.label }}</span>
+                                    <p-i v-if="item.target === '_blank'" class="external-link-icon" name="ic_external-link" />
                                 </slot>
                             </slot>
                         </a>
                     </slot>
+                </slot>
+                <slot v-else-if="item.type==='info'" name="info">
+                    <slot name="info--format" />
                 </slot>
                 <slot v-else-if="item.type==='divider'" name="divider" v-bind="{...$props, uuid, item, index}">
                     <slot :name="`divider-${item.name}`" v-bind="{...$props, uuid, item, index}">
@@ -71,6 +76,7 @@ import {
     computed, ref, onMounted, Ref,
 } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import {
     ContextMenuProps,
     contextMenuProps,
@@ -102,7 +108,7 @@ const setAutoHeight = (props) => {
 export default {
     name: 'PContextMenu',
     events: ['select', 'keyup:up:end', 'keyup:down:end', 'keyup:esc'],
-    components: { PLottie },
+    components: { PLottie, PI },
     props: contextMenuProps,
     setup(props: ContextMenuProps, context) {
         const uuid = `${Math.random()}`.slice(2);
@@ -154,56 +160,51 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 
-    @define-mixin context-item-them $theme, $color, $hover-bg-color, $hover-color, $active-bg-color, $active-color, $disabled-color {
-        &.$(theme) {
-            color: $color;
+    @define-mixin context-item-theme $color, $hover-bg-color, $hover-color, $active-bg-color, $active-color, $disabled-color {
+        color: $color;
+        &:hover {
+            background-color: $hover-bg-color;
+            color: $hover-color !important;
+        }
+        &:focus {
+            background-color: $hover-bg-color;
+            color: $hover-color !important;
+        }
+        &:active {
+            background-color: $active-bg-color;
+            color: $active-color !important;
+        }
+        &.disabled {
+            color: $disabled-color !important;
+            &:hover, &:focus {
+                background-color: transparent;
+                color: $disabled-color !important;
+            }
+        }
+        &.empty {
+            color: $disabled-color !important;
+            cursor: default;
             &:hover {
-                background-color: $hover-bg-color;
-                color: $hover-color !important;
-            }
-            &:focus {
-                background-color: $hover-bg-color;
-                color: $hover-color !important;
-            }
-            &:active {
-                background-color: $active-bg-color;
-                color: $active-color !important;
-            }
-            &.disabled {
+                background-color: transparent;
                 color: $disabled-color !important;
-                &:hover, &:focus {
-                    background-color: transparent;
-                    color: $disabled-color !important;
-                }
-            }
-            &.empty {
-                color: $disabled-color !important;
-                cursor: default;
-                &:hover {
-                    background-color: transparent;
-                    color: $disabled-color !important;
-                }
             }
         }
     }
 
-    @define-mixin context-header-theme $theme, $color {
-        &.$(theme) {
-            color: $color;
+    @define-mixin context-header-theme $color {
+        color: $color;
+    }
+
+    @define-mixin context-menu-color $bg-color, $border-color {
+        background-color: $bg-color;
+        border: 1px solid $border-color;
+        .context-divider {
+            border-top-color: $border-color;
         }
     }
 
-    @define-mixin context-menu-color $theme, $bg-color, $border-color {
-        &.$(theme) {
-            background-color: $bg-color;
-            border: 1px solid $border-color;
-            .context-divider {
-                border-top-color: $border-color;
-            }
-        }
-    }
     .no-drag {
         user-select: none;
     }
@@ -230,21 +231,60 @@ export default {
             border-top-style: solid;
         }
 
-        @mixin context-menu-color secondary, theme('colors.white'), theme('colors.secondary');
-        @mixin context-menu-color gray900, theme('colors.white'), theme('colors.gray.900');
+        &.secondary {
+            @mixin context-menu-color theme('colors.white'), theme('colors.secondary');
+        }
+        &.gray900 {
+            @mixin context-menu-color theme('colors.white'), theme('colors.gray.900');
+        }
+        &.white {
+            @apply bg-white text-gray-900 text-sm;
+            top: 2.5rem;
+            left: -1.125rem;
+            min-width: 10rem;
+            white-space: pre;
+            border: 1px solid #DCDDE2;
+            box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+
+            .context-item {
+                line-height: 2rem;
+                padding: 0 0.5rem;
+                border-radius: 0.25rem;
+                &:hover {
+                    /*@apply bg-primary4 text-primary;*/
+                    @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
+                    theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+                }
+            }
+            .context-divider {
+                @mixin context-menu-color theme('colors.white'), theme('colors.gray.200');
+                /*border-top-style: solid;*/
+            }
+        }
+        &.right-align {
+            right: 0.625rem;
+            left: auto;
+        }
 
         .context-content {
             padding-left: 0.5rem;
             padding-right: 0.5rem;
         }
+
+
         .context-header {
             margin-top: 0.875rem;
             margin-bottom: 0.25rem;
             font-weight: bold;
             font-size: 0.75rem;
 
-            @mixin context-header-theme secondary, theme('colors.gray.900');
-            @mixin context-header-theme gray900, theme('colors.gray.400');
+            &.secondary {
+                @mixin context-header-theme theme('colors.gray.900');
+            }
+            &.gray900 {
+                @mixin context-header-theme theme('colors.gray.400');
+            }
         }
         .context-item {
             display: block;
@@ -258,9 +298,22 @@ export default {
             }
             white-space: nowrap;
 
-            @mixin context-item-them secondary, theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
-                                     theme('colors.secondary'), theme('colors.gray.200');
-            @mixin context-item-them gray900, theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'), theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+            .external-link-icon {
+                position: absolute;
+                right: 1rem;
+                width: 1rem !important;
+                height: 1rem !important;
+                margin-top: 0.4rem;
+            }
+
+            &.secondary {
+                @mixin context-item-theme theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
+                theme('colors.secondary'), theme('colors.gray.200');
+            }
+            &.gray900 {
+                @mixin context-item-theme theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
+                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+            }
         }
     }
 
