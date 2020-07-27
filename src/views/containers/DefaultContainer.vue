@@ -3,7 +3,7 @@
         <GNB class="gnb" />
 
         <div class="app-body">
-            <router-view name="lnb" />
+            <!--            <router-view name="lnb" />-->
 
             <main class="main">
                 <router-view name="main" />
@@ -38,8 +38,9 @@ export default {
         overflow-y: hidden;
         width: 100vw;
         .gnb {
-            display: inline-block;
-            height: 100vh;
+            position: fixed;
+            width: 100vw;
+            height: 3rem;
             z-index: 100;
         }
         .app-body {
@@ -48,6 +49,7 @@ export default {
             overflow-y: auto;
             height: 100vh;
             width: 100%;
+            padding-top: 3rem;
             .main {
                 height: 100%;
                 margin: 0;
