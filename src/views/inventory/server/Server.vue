@@ -14,7 +14,7 @@
                     :vbind="{
                         showTitle:false,
                         resourceType: 'inventory.Server',
-                        // exportFields:mergeFields,
+                        exportFields:mergeFields,
                     }"
                     :style="{'height': height+'px'}"
                 >
@@ -249,6 +249,19 @@ export default {
             ],
             suggestKeys: ['server_id', 'name', 'primary_ip_address'],
         };
+
+        const state = reactive({
+            originFields: [],
+            mergeFields: computed(() => [
+                ...state.originFields,
+                ...baseTable.options.fields,
+            ]),
+            fields: computed(() => state.mergeFields.map(field => filedMap[field.key] || field)),
+            options: computed(() => ({
+                fields: state.fields,
+            })),
+        });
+
         // const { project } = useStore();
         //
         // project.getProject();
@@ -580,6 +593,7 @@ export default {
         init();
 
         return {
+            ...toRefs(state),
             ...toRefs(projectState),
             singleItemTab,
             multiItemTab,

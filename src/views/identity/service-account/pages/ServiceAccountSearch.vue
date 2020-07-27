@@ -9,16 +9,16 @@ import {
 } from '@vue/composition-api';
 
 export default {
-    name: 'CloudServiceSearch',
+    name: 'ServiceAccountSearch',
     setup() {
         const vm = getCurrentInstance() as ComponentInstance;
         const url = ref('');
         const getDynamicLink = async () => {
-            const result = await fluentApi.addons().pageDiscovery().get().setId('vpc-0494b1f302cb92153')
-                .setResourceType('inventory.CloudService')
+            const result = await fluentApi.addons().pageDiscovery().get().setId('sa-50889b1079bc')
+                .setResourceType('identity.ServiceAccount')
                 .execute();
             const baseUrl = result.data.url;
-            url.value = `${baseUrl}/?f=vpc-0494b1f302cb92153`;
+            url.value = `${baseUrl}&t_se=sa-50889b1079bc`;
             await vm.$router.push(vm.$data.url);
         };
         getDynamicLink();

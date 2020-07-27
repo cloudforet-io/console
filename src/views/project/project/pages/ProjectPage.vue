@@ -479,9 +479,9 @@ export default {
                 name: 'projectDetail',
                 params: {
                     id: item.project_id,
-                    name: item.name,
-                    project_group: item.project_group_info,
-                    tags: item.tags,
+                    // name: item.name,
+                    // project_group: item.project_group_info,
+                    // tags: item.tags,
                 },
             } as Location);
         };

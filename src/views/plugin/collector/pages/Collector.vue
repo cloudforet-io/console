@@ -246,13 +246,13 @@ export default {
         const state = reactive({
             dropdown: computed(() => (
                 makeTrItems([
-                    ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
+                    ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti || apiHandler.tableTS.selectState.isNotSelected }],
                     [null, null, { type: 'divider' }],
                     ['enable', 'BTN.ENABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
                     ['disable', 'BTN.DISABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
                     ['delete', 'BTN.DELETE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
                     [null, null, { type: 'divider' }],
-                    ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti }],
+                    ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti || apiHandler.tableTS.selectState.isNotSelected }],
                 ], null, { type: 'item' }))),
             mainTableLayout: computed(() => ({
                 name: vm.$t('WORD.COLLECTOR'),
