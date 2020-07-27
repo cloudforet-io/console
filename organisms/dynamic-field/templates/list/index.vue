@@ -4,7 +4,7 @@ import {
 } from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { getBindClass } from '@/components/util/functional-helpers';
-import { DynamicFieldProps, ListOptions } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldOptions, DynamicFieldProps, ListOptions } from '@/components/organisms/dynamic-field/type';
 
 
 export default {
@@ -28,11 +28,17 @@ export default {
     render(h, { props, data: compData }) {
         const listOptions: ListOptions = props.options || {};
 
+        const options: DynamicFieldOptions = {
+            ...listOptions.item?.options,
+        };
+        if (listOptions.link) options.link = listOptions.link;
+
         const childOptions: Omit<DynamicFieldProps, 'data'> = {
             type: listOptions.item ? listOptions.item.type : 'text',
-            options: listOptions.item ? listOptions.item.options : undefined,
+            options,
             extra: props.extra,
         };
+
 
         let childrenData: any[] = [];
 

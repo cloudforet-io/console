@@ -39,6 +39,7 @@ export default {
         }
         if (link) {
             ps.link = link;
+            ps.target = '_blank';
         }
         return h(PBadge, { props: ps }, props.data);
     },

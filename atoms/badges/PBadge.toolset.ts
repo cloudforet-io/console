@@ -30,4 +30,5 @@ export interface BadgeProps {
     shape: keyof typeof BADGE_SHAPE;
     outline: boolean;
     link?: string;
+    target?: string;
 }

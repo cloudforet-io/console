@@ -34,6 +34,10 @@ export default {
             type: String,
             default: undefined,
         },
+        target: {
+            type: String,
+            default: undefined,
+        },
     },
     render(h, { props, data, children }) {
         const newData = {
@@ -67,7 +71,7 @@ export default {
         let tag = 'span';
         if (props.link) {
             tag = 'a';
-            newData.attrs = { href: props.link };
+            newData.attrs = { href: props.link, target: props.target };
         }
         return h(tag, newData, children);
     },

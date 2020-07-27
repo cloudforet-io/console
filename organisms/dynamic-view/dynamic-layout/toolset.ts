@@ -14,6 +14,12 @@ export interface DynamicFieldType<options=any> {
     type: string;
     key: string;
     name: string;
+    reference?: {
+        // eslint-disable-next-line camelcase
+        reference_type: string;
+        // eslint-disable-next-line camelcase
+        reference_key?: string;
+    };
     options?: {
         link?: string;
         sortable?: boolean;
