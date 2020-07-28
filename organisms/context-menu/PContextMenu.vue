@@ -243,7 +243,7 @@ export default {
             left: -1.125rem;
             min-width: 10rem;
             white-space: pre;
-            border: 1px solid #DCDDE2;
+            border: 1px solid theme('colors.gray.200');
             box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
             padding: 0.5rem;
 
