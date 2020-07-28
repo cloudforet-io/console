@@ -2,27 +2,7 @@
     <div class="menu-container">
         <div class="left">
             <div class="menu-lap mx-4">
-                <div class="menu-button all opacity"
-                     :class="{opened: openedMenu === 'all'}"
-                     @click="showMenu('all')"
-                >
-                    <p-i class="menu-icon"
-                         name="ic_gnb_service_2"
-                         color="inherit transparent"
-                         width="2rem" height="2rem"
-                    />
-                </div>
-                <p-context-menu
-                    v-if="openedMenu === 'all'"
-                    class="white"
-                    :menu="allMenu"
-                >
-                    <template #item--format="{item}">
-                        <router-link :to="item.link">
-                            <div>{{ item.label }}</div>
-                        </router-link>
-                    </template>
-                </p-context-menu>
+                <site-map />
             </div>
             <div class="menu-lap mr-10">
                 <router-link to="/dashboard">
@@ -39,7 +19,7 @@
             >
                 <div class="menu-button opacity mr-4 lg:mr-8"
                      :class="{opened: dItem.menu.length > 0 && openedMenu === dItem.key, selected: selectedMenu === dItem.key}"
-                     @click="showMenu(dItem.key)"
+                     @click.stop="toggleMenu(dItem.key)"
                 >
                     <span v-if="dItem.menu.length > 0">{{ dItem.key }}</span>
                     <router-link v-else :to="dItem.link">
@@ -53,11 +33,12 @@
                 </div>
                 <p-context-menu
                     v-if="openedMenu === dItem.key && dItem.menu.length > 0"
+                    v-click-outside="hideMenu"
                     class="white"
                     :menu="dItem.menu"
                 >
                     <template #item--format="{item}">
-                        <router-link :to="item.link">
+                        <router-link :to="item.link" @click.native="hideMenu">
                             <div>{{ item.label }}</div>
                         </router-link>
                     </template>
@@ -67,9 +48,9 @@
 
         <div class="right">
             <div class="menu-lap">
-                <div class="menu-button support"
+                <div class="menu-button opacity"
                      :class="{opened: openedMenu === 'support'}"
-                     @click.stop="showMenu('support')"
+                     @click.stop="toggleMenu('support')"
                 >
                     <p-i class="menu-icon"
                          name="ic_support"
@@ -78,6 +59,7 @@
                 </div>
                 <p-context-menu
                     v-if="openedMenu === 'support'"
+                    v-click-outside="hideMenu"
                     class="white right-align"
                     :menu="supportMenu"
                 >
@@ -86,7 +68,7 @@
             </div>
             <div class="menu-lap account">
                 <div class="menu-button account"
-                     @click.stop="showMenu('account')"
+                     @click.stop="toggleMenu('account')"
                 >
                     <div class="menu-icon"
                          :class="{opened: openedMenu === 'account'}"
@@ -94,9 +76,9 @@
                 </div>
                 <p-context-menu
                     v-if="openedMenu === 'account'"
+                    v-click-outside="hideMenu"
                     class="white right-align"
                     :menu="accountMenu"
-                    @click.prevent.self
                 >
                     <template #info--format>
                         <div class="context-info">
@@ -137,11 +119,13 @@
 </template>
 
 <script lang="ts">
+import vClickOutside from 'v-click-outside';
 import PI from '@/components/atoms/icons/PI.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
+import SiteMap from '@/views/containers/gnb/modules/SiteMap_new.vue';
 import {
-    reactive, onMounted, toRefs, getCurrentInstance, computed,
+    reactive, toRefs, getCurrentInstance, computed,
 } from '@vue/composition-api';
 import { fluentApi } from '@/lib/fluent-api';
 
@@ -151,6 +135,10 @@ export default {
         PI,
         ProfileModal,
         PContextMenu,
+        SiteMap,
+    },
+    directives: {
+        clickOutside: vClickOutside.directive,
     },
     setup() {
         const vm: any = getCurrentInstance();
@@ -165,17 +153,6 @@ export default {
             userState,
             openedMenu: null,
             selectedMenu: computed(() => vm?.$route.path.match(/\/(\w+)/)[1]),
-            allMenu: [
-                {
-                    type: 'item', label: 'Dashboard', name: 'profile', link: '/dashboard',
-                },
-                {
-                    type: 'item', label: 'Project', name: 'project', link: '/project',
-                },
-                {
-                    type: 'item', label: 'Inventory', name: 'inventory', link: '/inventory',
-                },
-            ],
             defaultMenuList: [
                 {
                     key: 'project',
@@ -214,7 +191,7 @@ export default {
                     link: '/plugin',
                     menu: [
                         {
-                            type: 'item', label: 'Collector', name: 'collector', link: '/plugin',
+                            type: 'item', label: 'Collector', name: 'collector', link: '/plugin/collector',
                         },
                     ],
                 },
@@ -271,9 +248,13 @@ export default {
         const showMenu = (menu) => {
             state.openedMenu = menu;
         };
-        // const toggleMenu = () => {
-        //
-        // }
+        const toggleMenu = (menu) => {
+            if (state.openedMenu === menu) {
+                hideMenu();
+            } else {
+                showMenu(menu);
+            }
+        };
 
         // account
         const params: any = {};
@@ -324,15 +305,10 @@ export default {
             else if (key === 'profile') openProfile();
         };
 
-        onMounted(() => {
-            window.addEventListener('click', hideMenu, true);
-            // window.addEventListener('blur', hideMenu);
-        });
-
         return {
             ...toRefs(state),
             hideMenu,
-            showMenu,
+            toggleMenu,
             doAction,
         };
     },
@@ -343,8 +319,11 @@ export default {
 .menu-container {
     @apply bg-white;
     display: flex !important;
-    line-height: 3rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+    .left, .right {
+        line-height: 3rem;
+    }
 
     .right {
         position: absolute;
@@ -386,19 +365,6 @@ export default {
                 opacity: 1;
             }
 
-            &.all {
-                .menu-icon {
-                    width: 2rem;
-                    height: 2rem;
-                }
-            }
-            &.support {
-                &.opened {
-                }
-                &:hover {
-                    @apply text-primary;
-                }
-            }
             &.account {
                 .menu-icon {
                     width: 2rem;
