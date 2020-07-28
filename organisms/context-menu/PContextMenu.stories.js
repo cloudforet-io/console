@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { object, select } from '@storybook/addon-knobs';
-import { ref } from '@vue/composition-api';
+import { reactive, ref, toRefs } from '@vue/composition-api';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -25,6 +25,7 @@ const actions = {
     clickUpdate: action('update:select'),
     clickCollect: action('collect:select'),
     clickRemove: action('remove:select'),
+    clickLink: action('click:select'),
     menuSelect: action('select'),
     onEndOfUpKey: action('keyup:up:end'),
     onEndOfDownKey: action('keyup:down:end'),
@@ -33,7 +34,7 @@ const actions = {
 
 const knobs = {
     theme: {
-        default: select('theme', ['secondary', 'gray900'], 'secondary'),
+        default: select('theme', ['secondary', 'gray900', 'white'], 'secondary'),
     },
     menu: {
         default: object('menu', [
@@ -283,3 +284,53 @@ export const slotCase = () => ({
     },
 }
 );
+
+
+export const whiteCase = () => ({
+    components: { PContextMenu, PI },
+    template: `
+<div>
+    <p-context-menu 
+            style="position:static; width:15.125rem;"
+            ref="contextRef"
+            :menu="menu"
+            theme="white"
+            @click:select='clickLink'
+    >
+        <template #info--format>
+            <div class="context-info">
+                <p-i class="mr-1" name="admin" style="border-radius: 0.625rem" />
+                <span class="value">admin@admin.com</span>
+            </div>
+        </template>
+        <template #divider>
+            <div class="border my-2" />
+        </template>
+    </p-context-menu>
+<!--    ContextMenu에 버튼이 아닌 텍스트를 넣고 싶은 경우, info 타입을 적용한 뒤, #info&#45;&#45;format 안에 해당 내용을 넣으면 됩니다.-->
+</div>`,
+    setup() {
+        const state = reactive({
+            menu: [
+                {
+                    type: 'info', label: 'info', name: 'info', disabled: false,
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    type: 'item', label: 'one', name: 'one', disabled: false,
+                },
+                {
+                    type: 'item', label: 'two', name: 'two', disabled: false,
+                },
+                {
+                    type: 'item', label: 'three', name: 'three', disabled: false,
+                },
+            ],
+        });
+        return {
+            ...toRefs(state),
+        };
+    },
+});

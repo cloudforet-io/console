@@ -12,7 +12,6 @@ export interface MenuItem {
     disabled?: boolean;
     link?: string;
     target?: string;
-    value?: string;
 }
 
 export enum CONTEXT_MENU_THEME {
