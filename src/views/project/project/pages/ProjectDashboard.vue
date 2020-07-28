@@ -19,7 +19,7 @@
         <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
              lg:row-start-3 resources-tab"
         >
-            <PTab :tabs="tabs" :active-tab.sync="activeTab">
+            <p-tab :tabs="tabs" :active-tab.sync="activeTab">
                 <template #server>
                     <resources-by-region
                         :get-action="resources.server"
@@ -34,7 +34,7 @@
                         :is-server="false"
                     />
                 </template>
-            </PTab>
+            </p-tab>
         </div>
         <service-accounts-table
             class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9 lg:row-start-4"
@@ -47,7 +47,7 @@
                        :project-filter="projectFilter"
         />
         <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
-                              row-start-5 row-end-8 sm:row-start-3 sm:row-end-4 lg:row-start-3
+                              row-start-5 row-end-8 sm:row-start-3 sm:row-end-5 lg:row-start-3
                               health-dashboard"
         />
     </div>
@@ -169,17 +169,16 @@ export default {
                     { key: 'state', value: 'DELETED', operator: FILTER_OPERATOR.in }])
                 .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
                     { key: 'server_type', value: ['BAREMETAL', 'VM', 'HYPERVISOR'], operator: FILTER_OPERATOR.in },
-                    { key: 'created_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime }], 1)
-            ,
+                    { key: 'created_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime }], 1),
             cloudService: api => api.setFilter(
                 { key: 'tags.spaceone:is_major', value: 'true', operator: FILTER_OPERATOR.in },
             )
-                .setJoinFilter( [{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in }])
+                .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in }])
                 .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
                     { key: 'deleted_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime },
                     { key: 'state', value: 'DELETED', operator: FILTER_OPERATOR.in }], 1)
                 .setJoinFilter([{ key: 'project_id', value: projectId.value, operator: FILTER_OPERATOR.in },
-                    { key: 'created_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime }], 2)
+                    { key: 'created_at', value: 'now/d', operator: FILTER_OPERATOR.gtTime }], 2),
         });
 
         const resources = ({
@@ -241,7 +240,7 @@ export default {
     }
 
     .health-dashboard {
-        height: 30rem;
+        height: 46.75rem;
     }
 
 </style>

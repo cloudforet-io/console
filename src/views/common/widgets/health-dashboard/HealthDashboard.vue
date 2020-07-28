@@ -10,11 +10,23 @@
                     <p-skeleton width="100%" height="0.625rem" />
                 </div>
             </div>
-            <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
-                <img class="w-40 mx-auto mb-4" src="@/assets/images/illust_astronaut_walking2.svg">
-                <p class="no-issue-text">
-                    No Issue
-                </p>
+            <div v-else-if="data.length === 0" class="empty-content">
+                <div class="info-text">
+                    <p>
+                        You can use the AWS Health Dashboard if you have a Business or Enterprise support plan of AWS.
+                    </p>
+                    <br>
+                    <p>
+                        Still cannot use this? If you have a proper plan, let us know.
+                        <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
+                    </p>
+                </div>
+                <div class="background-lap">
+                    <img class="logo" src="@/assets/icons/ic_provider_aws.svg">
+                    <p class="text">
+                        Check your AWS Support Plans first.
+                    </p>
+                </div>
             </div>
             <p-grid-layout v-else :items="data"
                            row-gap="0.5rem" column-gap="0"
@@ -155,6 +167,42 @@ export default {
              @apply mt-6;
         }
     }
+
+    .empty-content {
+        position: relative;
+        height: 100%;
+
+        .info-text {
+            @apply text-gray-900;
+            position: absolute;
+            top: 0;
+            z-index: 1;
+            font-size: 0.875rem;
+            a {
+                @apply text-blue-600;
+                text-decoration: underline;
+            }
+        }
+        .background-lap {
+            position: absolute;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            flex-direction: column;
+            justify-content: center;
+            .logo {
+                opacity: 0.3;
+                width: 5.5rem;
+                margin: 0 auto;
+            }
+            .text {
+                @apply text-gray-300 text-center;
+                font-size: 1rem;
+            }
+        }
+    }
 }
 .group-name {
     @apply text-base font-bold text-blue-700 mb-1 truncate leading-tight;
@@ -164,12 +212,6 @@ export default {
 }
 .count {
     @apply text-lg text-center font-bold;
-}
-
-.no-issue-text {
-    @apply text-center;
-    font-size: 1.5rem;
-    color: #DCDBEA;
 }
 
 .count-info {
