@@ -6,10 +6,9 @@
             </div>
             <div class="menu-lap mr-10">
                 <router-link to="/dashboard">
-                    <img class="inline-block w-8 h-8 mr-2" src="@/assets/images/brand/brand_logo.png">
-                    <img class="h-3 hidden md:inline-block lg:inline-block"
+                    <img class="brand-logo" src="@/assets/images/brand/brand_logo.png">
+                    <img class="brand-logo-text hidden md:inline-block lg:inline-block"
                          src="@/assets/images/brand/SpaceONE_logoTypeA.png"
-                         height="2rem"
                     >
                 </router-link>
             </div>
@@ -84,7 +83,7 @@
                         <div class="context-info">
                             <p-i v-if="isDomainOwner" class="icon" name="admin" />
                             <p-i v-else class="icon" name="user" />
-                            <span class="value">{{ userState.email }}</span>
+                            <span class="value">{{ email }}</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Role</span>
@@ -93,19 +92,26 @@
                         </div>
                         <div class="context-info">
                             <span class="label">Time zone</span>
-                            <span class="value">{{ userState.timezone }}</span>
+                            <span class="value">{{ timezone }}</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Language</span>
-                            <span class="value">{{ userState.language }}</span>
+                            <span class="value">{{ language }}</span>
                         </div>
                     </template>
                     <template #divider>
                         <div class="border" />
                     </template>
                     <template #item--format="{item}">
-                        <div @click="doAction(item.name)">
-                            {{ item.label }}
+                        <div v-if="item.name === 'profile'">
+                            <div @click="openProfile">
+                                {{ item.label }}
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div @click="logOutAction">
+                                {{ item.label }}
+                            </div>
                         </div>
                     </template>
                 </p-context-menu>
@@ -128,6 +134,9 @@ import {
     reactive, toRefs, getCurrentInstance, computed,
 } from '@vue/composition-api';
 import { fluentApi } from '@/lib/fluent-api';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { useStore } from '@/store/toolset';
+// import "vue-router/types/vue";
 
 export default {
     name: 'GNB',
@@ -141,18 +150,16 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     setup() {
-        const vm: any = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentInstance;
+        const { user, logout } = useStore();
         const userState = reactive({
             name: '',
             email: '',
-            group: '',
             language: '',
             timezone: '',
         });
         const state = reactive({
-            userState,
             openedMenu: null,
-            selectedMenu: computed(() => vm?.$route.path.match(/\/(\w+)/)[1]),
             defaultMenuList: [
                 {
                     key: 'project',
@@ -201,26 +208,26 @@ export default {
                     type: 'item',
                     label: 'User Guide',
                     name: 'user-guide',
-                    href: 'https://spaceone-dev.gitbook.io/user-guide/',
+                    link: 'https://spaceone-dev.gitbook.io/user-guide/',
                     target: '_blank',
                 },
                 {
                     type: 'item',
                     label: 'API Guide',
                     name: 'api-guide',
-                    href: 'https://spaceone-dev.gitbook.io/spaceone-apis',
+                    link: 'https://spaceone-dev.gitbook.io/spaceone-apis',
                     target: '_blank',
                 },
                 {
                     type: 'item',
                     label: 'GitHub',
                     name: 'github',
-                    href: 'https://github.com/spaceone-dev/console',
+                    link: 'https://github.com/spaceone-dev/console',
                     target: '_blank',
                 },
-                {
-                    type: 'item', label: 'Send Feedback', name: 'send-feedback',
-                },
+                // {
+                //     type: 'item', label: 'Send Feedback', name: 'send-feedback', disabled: true,
+                // },
             ],
             accountMenu: [
                 {
@@ -238,8 +245,12 @@ export default {
             ],
             // account
             profileVisible: false,
-            userId: computed(() => vm.$ls.user.state.userId),
-            isDomainOwner: computed(() => vm.$ls.user.state.isDomainOwner),
+            userId: computed(() => user.state.userId),
+            isDomainOwner: computed(() => user.state.isDomainOwner),
+        });
+        const selectedMenu = computed(() => {
+            const pathRegex = vm.$route.path.match(/\/(\w+)/);
+            return pathRegex ? pathRegex[1] : null;
         });
 
         const hideMenu = () => {
@@ -262,11 +273,10 @@ export default {
             const res = await fluentApi.identity().user().get().setId(id)
                 .execute();
             try {
-                state.userState.name = res.data.name;
-                state.userState.email = res.data.email;
-                state.userState.group = res.data.group;
-                state.userState.language = res.data.language;
-                state.userState.timezone = res.data.timezone;
+                userState.name = res.data.name;
+                userState.email = res.data.email;
+                userState.language = res.data.language;
+                userState.timezone = res.data.timezone;
             } catch (e) {
                 console.error(e);
             }
@@ -275,11 +285,10 @@ export default {
             const res = await fluentApi.identity().domainOwner().get().setId(id)
                 .execute();
             try {
-                state.userState.name = res.data.name;
-                state.userState.email = res.data.email;
-                state.userState.group = res.data.group;
-                state.userState.language = res.data.language;
-                state.userState.timezone = res.data.timezone;
+                userState.name = res.data.name;
+                userState.email = res.data.email;
+                userState.language = res.data.language;
+                userState.timezone = res.data.timezone;
             } catch (e) {
                 console.error(e);
             }
@@ -298,18 +307,17 @@ export default {
             state.profileVisible = true;
         };
         const logOutAction = async () => {
-            vm.$ls.logout(vm);
-        };
-        const doAction = (key) => {
-            if (key === 'logout') logOutAction();
-            else if (key === 'profile') openProfile();
+            logout(vm);
         };
 
         return {
             ...toRefs(state),
+            ...toRefs(userState),
+            selectedMenu,
             hideMenu,
             toggleMenu,
-            doAction,
+            openProfile,
+            logOutAction,
         };
     },
 };
@@ -345,8 +353,20 @@ export default {
             }
         }
 
+        .brand-logo {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            margin-right: 0.5rem;
+        }
+        .brand-logo-text {
+            height: 0.75rem;
+        }
         .menu-button {
-            @apply relative text-gray-900 text-sm cursor-pointer;
+            @apply text-gray-900;
+            position: relative;
+            font-size: .875rem;
+            cursor: pointer;
             text-decoration: none;
             text-transform: capitalize;
 

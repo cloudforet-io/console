@@ -331,5 +331,6 @@ export const useStore = () => {
         domain: DomainStore;
         project: ProjectStore;
         provider: ProviderStore;
+        logout: Function;
     };
 };
