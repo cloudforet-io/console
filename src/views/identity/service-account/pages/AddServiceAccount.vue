@@ -1,6 +1,9 @@
 <template>
     <general-page-layout>
-        <PPageTitle
+        <div class="page-navigation">
+            <p-page-navigation :routes="route" />
+        </div>
+        <p-page-title
             class="mb-6"
             title="Add Service Account"
             child
@@ -19,12 +22,12 @@
                     />
                 </div>
             </template>
-        </PPageTitle>
+        </p-page-title>
         <p-pane-layout v-if="description" class="panel">
             <div class="title">
                 Help
             </div>
-            <SDynamicLayout v-bind="description" :vbind="{showTitle:false}" />
+            <s-dynamic-layout v-bind="description" :vbind="{showTitle:false}" />
         </p-pane-layout>
 
         <p-pane-layout class="panel">
@@ -32,8 +35,8 @@
                 Base Information
             </div>
             <div class="form-box">
-                <PJsonSchemaForm v-bind="actFixFormTS.state" :item.sync="actFixFormTS.syncState.item" />
-                <PJsonSchemaForm v-bind="actJscTS.state" :item.sync="actJscTS.syncState.item" />
+                <p-json-schema-form v-bind="actFixFormTS.state" :item.sync="actFixFormTS.syncState.item" />
+                <p-json-schema-form v-bind="actJscTS.state" :item.sync="actJscTS.syncState.item" />
             </div>
             <div class="text-lg font-bold mb-2 mt-8" style="line-height: 120%;">
                 {{ $t('PANEL.TAG') }}
@@ -71,10 +74,10 @@
                 Credentials
             </div>
             <div class="form-box">
-                <PJsonSchemaForm v-bind="crdFixFormTS.state" :item.sync="crdFixFormTS.syncState.item" />
+                <p-json-schema-form v-bind="crdFixFormTS.state" :item.sync="crdFixFormTS.syncState.item" />
             </div>
 
-            <PFieldGroup
+            <p-field-group
                 label="Secret Type"
                 required
             >
@@ -87,23 +90,23 @@
                         {{ name }}
                     </div>
                 </div>
-            </PFieldGroup>
+            </p-field-group>
             <div class="custom-schema-box">
                 <div class="form-box">
-                    <PJsonSchemaForm v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
+                    <p-json-schema-form v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
                 </div>
             </div>
         </p-pane-layout>
-        <SProjectTreePanel ref="projectRef" class="panel"
-                           :resource-name="$t('WORD.SERVICE_ACCOUNT')"
-                           :target-name="actFixFormTS.syncState.item.name"
+        <s-project-tree-panel ref="projectRef" class="panel"
+                              :resource-name="$t('WORD.SERVICE_ACCOUNT')"
+                              :target-name="actFixFormTS.syncState.item.name"
         >
             <template #top>
                 <div class="mb-6">
                     <span class="title">Project</span><span>  (optional)</span>
                 </div>
             </template>
-        </SProjectTreePanel>
+        </s-project-tree-panel>
 
         <div class="bottom">
             <p-button class="item" style-type="primary" @click="confirm">
@@ -132,11 +135,12 @@ import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
 import {
     computed,
-    getCurrentInstance, onMounted, reactive, ref, watch,
+    getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import { AxiosResponse } from 'axios';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -238,6 +242,7 @@ export default {
     name: 'SSecretCreateFormModal',
     components: {
         PPageTitle,
+        PPageNavigation,
         PFieldGroup,
         PDictInputGroup,
         PJsonSchemaForm,
@@ -282,6 +287,11 @@ export default {
             schemaNames,
             description,
         } = credentialsFormSetup(props);
+
+        const routeState = reactive({
+            route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
+                { name: 'Add Service Account', path: `/identity/service-account/add/${props.provider}` }],
+        });
 
         const goBack = () => {
             const nextPath = vm?.$route.query.nextPath as string|undefined;
@@ -349,13 +359,14 @@ export default {
                             });
                     })
                     .catch((eResp) => {
-                        console.error(eResp)
+                        console.error(eResp);
                         showErrorMessage('Request Fail', eResp, context.root);
                     });
             }
         };
 
         return {
+            ...toRefs(routeState),
             tagsTS,
             crdFormTS,
             crdFixFormTS,

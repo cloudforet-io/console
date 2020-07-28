@@ -39,7 +39,10 @@
                 <div class="w-full h-full">
                     <p-horizontal-layout>
                         <template #container="scope">
-                            <PPageTitle
+                            <div class="page-navigation">
+                                <p-page-navigation :routes="route" />
+                            </div>
+                            <p-page-title
                                 :use-selected-count="true" :use-total-count="true" :title="`${selectProviderItem ? selectProviderItem.name : ''} Account`"
                                 :total-count="apiHandler.totalCount.value"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
@@ -48,9 +51,9 @@
                                               :toolset="apiHandler"
                                               :options="{fields: accountFields}"
                                               :style="{
-                                                      height: scope ? `${scope.height}px` : 'auto',
-                                                      'overflow-y':'auto','overflow-x':'auto'
-                                                  }"
+                                                  height: scope ? `${scope.height}px` : 'auto',
+                                                  'overflow-y':'auto','overflow-x':'auto'
+                                              }"
                                               :vbind="{
                                                   showTitle: false,
                                                   isShowGetData: false,
@@ -59,14 +62,14 @@
                                               @search="onSearch"
                             >
                                 <template #toolbox-left>
-                                    <PIconTextButton style-type="primary-dark"
-                                                     name="ic_plus_bold"
-                                                     @click="addServiceAccount"
+                                    <p-icon-text-button style-type="primary-dark"
+                                                        name="ic_plus_bold"
+                                                        @click="addServiceAccount"
                                     >
                                         {{ $t('BTN.ADD') }}
-                                    </PIconTextButton>
+                                    </p-icon-text-button>
 
-                                    <PDropdownMenuBtn
+                                    <p-dropdown-menu-btn
                                         class="left-toolbox-item"
                                         :menu="dropdown"
                                         @click-delete="accountDeleteClick"
@@ -74,12 +77,12 @@
                                         @click-link="clickLink"
                                     >
                                         Action
-                                    </PDropdownMenuBtn>
+                                    </p-dropdown-menu-btn>
                                 </template>
                             </s-dynamic-layout>
                         </template>
                     </p-horizontal-layout>
-                    <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
+                    <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
                         <template #detail>
                             <s-dynamic-layout
                                 class="mb-8"
@@ -102,12 +105,12 @@
                                 :options="{fields: secretDataSource}"
                             >
                                 <template #toolbox-left>
-                                    <PIconTextButton style-type="primary-dark"
-                                                     name="ic_plus_bold"
-                                                     @click="clickSecretAddForm()"
+                                    <p-icon-text-button style-type="primary-dark"
+                                                        name="ic_plus_bold"
+                                                        @click="clickSecretAddForm()"
                                     >
                                         {{ $t('BTN.ADD') }}
-                                    </PIconTextButton>
+                                    </p-icon-text-button>
                                     <p-button
                                         class="left-toolbox-item"
                                         style-type="alert"
@@ -125,10 +128,10 @@
                                               v-bind="defaultAdminLayout"
                             />
                         </template>
-                    </PTab>
-                    <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
-                          :tabs="multiItemTab.state.tabs"
-                          :active-tab.sync="multiItemTab.syncState.activeTab"
+                    </p-tab>
+                    <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
+                           :tabs="multiItemTab.state.tabs"
+                           :active-tab.sync="multiItemTab.syncState.activeTab"
                     >
                         <template #data>
                             <s-dynamic-layout
@@ -144,7 +147,7 @@
                                               v-bind="defaultAdminLayout"
                             />
                         </template>
-                    </PTab>
+                    </p-tab>
                     <p-empty v-else style="height: auto; margin-top: 4rem;">
                         No Selected Item
                     </p-empty>
@@ -154,7 +157,7 @@
                 No Selected Provider
             </p-empty>
 
-            <PDoubleCheckModal
+            <p-double-check-modal
                 v-bind="deleteTS.state"
                 :visible.sync="deleteTS.syncState.visible"
                 @confirm="deleteConfirm"
@@ -164,8 +167,8 @@
                                   :loading="changeProjectState.loading"
                                   @confirm="changeProject"
             />
-            <SSecretCreateFormModal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
-                                    @confirm="secretFormConfirm($event)"
+            <s-secret-create-form-modal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
+                                        @confirm="secretFormConfirm($event)"
             />
         </template>
     </p-vertical-page-layout>
@@ -224,6 +227,7 @@ import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynami
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { projectFormatter } from '@/lib/display-formatter';
+import PPageNavigation from "@/components/molecules/page-navigation/PPageNavigation.vue";
 
 enum providerQsName{
     select = 'provider'
@@ -247,6 +251,7 @@ export default {
         PPageTitle,
         STagsPanel,
         SDynamicLayout,
+        PPageNavigation,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -270,6 +275,10 @@ export default {
         const providers = ref<{[key in string]: ProviderModel}>({});
         const selectProviderItem = computed<ProviderModel|null>(() => (selectProvider.value ? providers.value[selectProvider.value] : null));
         const providerTotalCount = ref({});
+
+        const routeState = reactive({
+            route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' }],
+        });
 
         const providerListState = new GridLayoutState(
             {
@@ -691,6 +700,7 @@ export default {
             clickSecretAddForm,
             ...toRefs(secretFormState),
             ...toRefs(projectState),
+            ...toRefs(routeState),
             secretFormConfirm,
             providerListState,
             selectProvider,

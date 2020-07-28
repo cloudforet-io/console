@@ -11,14 +11,14 @@
                            @click="openProjectEditForm"
             />
         </div>
-        <p class="float-right text-gray-500 -my-6">
+        <p class="copy-project-id">
             <b>Project ID:</b> {{ projectId }}
             <p-copy-button class="ml-2"
                            :value="projectId"
             />
         </p>
         <p-tab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
-               :style="{'background':'#f8f8fc', 'border-width':0+'px'}"
+               class="tab-content"
         >
             <template #summary>
                 <project-dashboard ref="ProjectDashboard" />
@@ -440,6 +440,15 @@ export default {
                 }
             }
         }
+
+    .tab-content {
+        background: theme('colors.primary4');
+        border-width: 0;
+    }
+
+    .copy-project-id {
+        @apply float-right text-gray-500 -my-6;
+    }
 
     .delete-btn {
         @apply ml-3 cursor-pointer;

@@ -5,7 +5,7 @@ const AddServiceAccount = () => import('@/views/identity/service-account/pages/A
 const Identity = () => import('@/views/identity/Identity');
 
 const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
-const User = () => import('@/views/identity/user/User');
+const User = () => import('@/views/identity/user/User_new');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccount');
 const ServiceAccountSearch = () => import('@/views/identity/service-account/pages/ServiceAccountSearch');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
@@ -44,7 +44,7 @@ export default {
                 // },
                 {
                     path: 'search',
-                    name: 'cloudServiceSearch',
+                    name: 'serviceAccountSearch',
                     meta: {
                         label: 'search',
                     },

@@ -1,5 +1,8 @@
 <template>
     <general-page-layout>
+        <div class="page-navigation">
+            <p-page-navigation :routes="route" />
+        </div>
         <p-page-title title="Server"
                       use-total-count use-selected-count
                       :total-count="apiHandler.totalCount.value"
@@ -193,6 +196,7 @@ import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
     name: 'Server',
@@ -212,6 +216,7 @@ export default {
         SMonitoring,
         STagsPanel,
         PPageTitle,
+        PPageNavigation,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -260,6 +265,10 @@ export default {
             options: computed(() => ({
                 fields: state.fields,
             })),
+        });
+
+        const routeState = reactive({
+            route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Server', path: '/inventory/server' }],
         });
 
         // const { project } = useStore();
@@ -594,6 +603,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(routeState),
             ...toRefs(projectState),
             singleItemTab,
             multiItemTab,

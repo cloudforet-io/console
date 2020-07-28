@@ -35,14 +35,14 @@
             </p-grid-layout>
         </template>
         <template #default>
-            <div class="text-xs text-gray-500 mb-1">
-                Cloud Service Provider
+            <div class="page-navigation">
+                <p-page-navigation :routes="route" />
             </div>
-            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value"
-                        class="pagetitle"
+            <p-page-title :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value"
+                          class="pagetitle"
             />
             <div class="cloud-services">
-                <PToolboxGridLayout
+                <p-toolbox-grid-layout
                     v-bind="apiHandler.gridTS.state"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
@@ -122,7 +122,7 @@
                             </p-icon-text-button>
                         </div>
                     </template>
-                </PToolboxGridLayout>
+                </p-toolbox-grid-layout>
             </div>
         </template>
     </p-vertical-page-layout>
@@ -132,7 +132,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, ref, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
@@ -162,6 +162,8 @@ import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/PRouteBreadcrumb.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -175,6 +177,7 @@ export default {
         PGridLayout,
         PPageTitle,
         PSkeleton,
+        PPageNavigation,
     },
     setup(props, context) {
         const {
@@ -221,8 +224,11 @@ export default {
         );
         const selectProviderName = computed(() => _.find(providerListState.state.items, { provider: selectProvider.value }).name);
         const totalResourceCountName = 'cloud_service_count';
-
         const newResourceCountName = 'yesterday_cloud_service_count';
+
+        const routeState = reactive({
+            route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' }],
+        });
 
         const listAction = fluentApi.statisticsTest().topic().cloudServiceType()
             .setStart(1)
@@ -255,8 +261,6 @@ export default {
         );
 
         const clickCard = (item) => {
-            console.log('item test', item);
-            console.log('route test', context.root.$route);
             vm.$router.push({
                 name: 'cloudServicePage',
                 params: {
@@ -361,6 +365,7 @@ export default {
         };
 
         return {
+            ...toRefs(routeState),
             selectProvider,
             selectProviderName,
             apiHandler,

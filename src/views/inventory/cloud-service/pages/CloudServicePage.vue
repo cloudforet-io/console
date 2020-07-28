@@ -2,6 +2,9 @@
     <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
+                <div class="page-navigation">
+                    <p-page-navigation :routes="route" />
+                </div>
                 <p-page-title :title="$route.params.name"
                               child
                               use-total-count
@@ -182,6 +185,7 @@ import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset'
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -197,6 +201,7 @@ export default {
         GeneralPageLayout,
         PHorizontalLayout,
         PDynamicLayout,
+        PPageNavigation,
         SDynamicLayout,
         PPageTitle,
         PIconTextButton,
@@ -244,6 +249,11 @@ export default {
             options: computed(() => ({
                 fields: state.fields,
             })),
+        });
+
+        const routeState = reactive({
+            route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' },
+                { name: `${props.name}`, path: `/inventory/cloud-service/${props.provider}/${props.group}/${props.name}` }],
         });
 
         const { project } = useStore();
@@ -532,6 +542,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(routeState),
             ...toRefs(dynamicLayoutState),
             subDataIsShow,
             apiHandler,

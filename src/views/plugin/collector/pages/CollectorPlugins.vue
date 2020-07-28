@@ -10,6 +10,9 @@
             </div>
         </template>
         <template #default>
+            <div class="page-navigation">
+                <p-page-navigation :routes="route" />
+            </div>
             <p-toolbox-grid-layout v-bind="apiHandler.gridTS.state"
                                    :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                                    :page-size.sync="apiHandler.gridTS.syncState.pageSize"
@@ -77,12 +80,12 @@
                                     </p-badge>
                                 </div>
                                 <div class="btns">
-                                    <PIconTextButton style-type="primary-dark"
-                                                     name="ic_plus_bold"
-                                                     @click="onPluginCreate(item)"
+                                    <p-icon-text-button style-type="primary-dark"
+                                                        name="ic_plus_bold"
+                                                        @click="onPluginCreate(item)"
                                     >
                                         {{ $t('BTN.CREATE') }}
-                                    </PIconTextButton>
+                                    </p-icon-text-button>
                                 </div>
                             </div>
                         </template>
@@ -104,6 +107,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
@@ -131,6 +135,10 @@ export const setup = (props, { root }) => {
             { type: 'item', label: 'Recent', name: 'created_at' },
         ],
         sortBy: 'name',
+    });
+
+    const routeState = reactive({
+        route: [{ name: 'Plugin', path: '/plugin'}, { name: 'Collector', path: '/plugin/collector'}, { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
     });
 
     const listApi = fluentApi.repository().plugin().list().setServiceType('inventory.Collector');
@@ -188,6 +196,7 @@ export const setup = (props, { root }) => {
     return {
         apiHandler,
         ...toRefs(state),
+        ...toRefs(routeState),
         repoState,
         listPlugins,
         onPluginCreate,
@@ -212,6 +221,7 @@ export default {
     name: 'CollectorPlugins',
     components: {
         PVerticalPageLayout,
+        PPageNavigation,
         PSkeleton,
         PEmpty,
         PCardItem,

@@ -1,5 +1,8 @@
 <template>
     <general-page-layout>
+        <div class="page-navigation">
+            <p-page-navigation :routes="route" />
+        </div>
         <p-icon-text-button name="ic_back" class="text-2xl mb-6 p-0"
                             icon-color="transparent inherit"
                             width="1.5rem" height="1.5rem"
@@ -49,6 +52,7 @@ import { fluentApi } from '@/lib/fluent-api';
 import { JsonSchemaObjectType } from '@/lib/type';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { showErrorMessage } from '@/lib/util';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/PDictInputGroup_deprecated.vue');
 const ConfigureCollector = () => import('@/views/plugin/collector/modules/ConfigureCollector.vue');
@@ -63,6 +67,7 @@ export default {
         ConfigureCollector,
         ConfirmCredentials,
         PDictInputGroup,
+        PPageNavigation,
     },
     setup(props, { refs, root, parent }) {
         const state: any = reactive({
@@ -77,6 +82,10 @@ export default {
             supportedSchema: [],
         });
 
+        const routeState = reactive({
+            route: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' },
+                { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
+        });
 
         const pluginApi = fluentApi.repository().plugin();
 
@@ -185,6 +194,7 @@ export default {
         return {
             tabState,
             ...toRefs(state),
+            ...toRefs(routeState),
             onCancel,
             onConfirm,
             onChangeStep,

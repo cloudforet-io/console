@@ -33,14 +33,17 @@
         <template #default>
             <div>
                 <div class="parents-info">
-                    <template v-if="parentGroups.length > 0">
-                        <span v-for="(pg, i) in parentGroups" :key="i" class="group-name">
-                            <span class="text link" @click="searchedProjectGroup = pg">{{ pg.name }}</span>
-                            <p-i v-if="i < parentGroups.length - 1" class="mx-1"
-                                 name="ic_breadcrum_arrow"
-                            />
-                        </span>
-                    </template>
+                    <!--                    <template v-if="parentGroups.length > 0">-->
+                    <!--                        <span v-for="(pg, i) in parentGroups" :key="i" class="group-name">-->
+                    <!--                            <span class="text link" @click="searchedProjectGroup = pg">{{ pg.name }}</span>-->
+                    <!--                            <p-i v-if="i < parentGroups.length - 1" class="mx-1"-->
+                    <!--                                 name="ic_breadcrumb_arrow"-->
+                    <!--                            />-->
+                    <!--                        </span>-->
+                    <!--                    </template>-->
+                    <span v-if="projectGroupNavigation.length > 0" class="group-name">
+                        <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
+                    </span>
                     <span v-else class="group-name">
                         <span class="text">Projects</span>
                     </span>
@@ -201,21 +204,21 @@
             <!--                    </p-button>-->
             <!--                </div>-->
             <!--            </div>-->
-            <SProjectGroupCreateFormModal v-if="projectGroupFormVisible"
-                                          :id="updateMode && searchedProjectGroup ?
-                                              searchedProjectGroup.id : undefined"
-                                          :parent="createTargetNode ? createTargetNode.node.data
-                                              : null"
-                                          :visible.sync="projectGroupFormVisible"
-                                          :update-mode="updateMode"
-                                          @create="onProjectGroupCreate"
-                                          @update="onProjectGroupUpdate"
+            <s-project-group-create-form-modal v-if="projectGroupFormVisible"
+                                               :id="updateMode && searchedProjectGroup ?
+                                                   searchedProjectGroup.id : undefined"
+                                               :parent="createTargetNode ? createTargetNode.node.data
+                                                   : null"
+                                               :visible.sync="projectGroupFormVisible"
+                                               :update-mode="updateMode"
+                                               @create="onProjectGroupCreate"
+                                               @update="onProjectGroupUpdate"
             />
-            <SProjectCreateFormModal v-if="projectFormVisible && searchedProjectGroup"
-                                     :visible.sync="projectFormVisible"
-                                     :current-project="searchedProjectGroup.id"
-                                     :project-group-id="searchedProjectGroup.id"
-                                     @confirm="projectFormConfirm($event)"
+            <s-project-create-form-modal v-if="projectFormVisible && searchedProjectGroup"
+                                         :visible.sync="projectFormVisible"
+                                         :current-project="searchedProjectGroup.id"
+                                         :project-group-id="searchedProjectGroup.id"
+                                         @confirm="projectFormConfirm($event)"
             />
             <p-button-modal
                 :header-title="headerTitle"
@@ -258,6 +261,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
@@ -309,6 +313,7 @@ import { Location } from 'vue-router';
         searchedProjectGroup: ProjectGroup|null;
         selectedTreeItem: ProjectTreeItem|null;
         parentGroups: Readonly<ProjectGroup[]>;
+        projectGroupNavigation: any; // TODO: routeNavigation type
         treeRef: any;
     }
 
@@ -324,6 +329,7 @@ const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): Projec
 export default {
     name: 'ProjectPage',
     components: {
+        PPageNavigation,
         PDropdownMenuBtn,
         PButton,
         ProjectGroupTree,
@@ -358,6 +364,19 @@ export default {
                 } return [];
             }),
             treeRef: null,
+            projectGroupNavigation: computed(() => {
+                const result = state.parentGroups.map(d => ({
+                    name: d.name,
+                    data: d,
+                }));
+                if (state.searchedProjectGroup) {
+                    result.push({
+                        name: state.searchedProjectGroup.name,
+                        data: state.searchedProjectGroup,
+                    });
+                }
+                return result;
+            }),
         });
 
         const formState = reactive({
@@ -550,6 +569,11 @@ export default {
             formState.projectGroupFormVisible = false;
         };
 
+        const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
+            state.searchedProjectGroup = item.data;
+            await state.treeRef.findNode(item.data.id);
+        };
+
         const openProjectForm = () => {
             formState.projectFormVisible = true;
         };
@@ -691,6 +715,7 @@ export default {
             onSelectTreeItem,
             onProjectGroupUpdate,
             onProjectGroupCreate,
+            onProjectGroupNavClick,
         };
     },
 };

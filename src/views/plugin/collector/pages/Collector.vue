@@ -1,5 +1,8 @@
 <template>
     <general-page-layout class="collector-page">
+        <div class="page-navigation">
+            <p-page-navigation :routes="route" />
+        </div>
         <p-page-title :title="$t('WORD.COLLECTOR')"
                       use-total-count
                       :total-count="apiHandler.totalCount.value"
@@ -133,6 +136,7 @@ import {
 } from '@/lib/router-query-string';
 import { getEnumValueHandler, getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 const PTab = (): Component => import('@/components/organisms/tabs/tab/PTab.vue') as Component;
 const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/PTableCheckModal.vue') as Component;
@@ -161,6 +165,7 @@ export default {
         CollectorSchedules,
         STagsPanel,
         SDynamicLayout,
+        PPageNavigation,
     },
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
@@ -316,6 +321,10 @@ export default {
             })),
         });
 
+        const routeState = reactive({
+            route: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
+        });
+
         const onClickUpdate = (): void => {
             updateModalState.visible = true;
         };
@@ -400,6 +409,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(routeState),
             singleItemTab,
             multiItemTab,
             updateModalState,
