@@ -114,12 +114,13 @@
                             <p class="text-primary2 mb-12">
                                 We need your registration for monitoring cloud resources.
                             </p>
-                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                                class="mx-auto text-center"
-                                                @click="goToServiceAccount"
-                            >
-                                {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
-                            </p-icon-text-button>
+                            <router-link :to="`/identity/service-account/?provider=${selectProvider}`">
+                                <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                                    class="mx-auto text-center"
+                                >
+                                    {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                                </p-icon-text-button>
+                            </router-link>
                         </div>
                     </template>
                 </p-toolbox-grid-layout>
@@ -271,12 +272,6 @@ export default {
             });
         };
 
-        const goToServiceAccount = () => {
-            vm.$router.push({
-                name: 'serviceAccount',
-            });
-        };
-
         const dataSource = [
             { name: 'provider', key: 'provider' },
             { name: 'group', key: 'group' },
@@ -370,7 +365,6 @@ export default {
             selectProviderName,
             apiHandler,
             clickCard,
-            goToServiceAccount,
             providerStore,
             statData,
             providerListState,
