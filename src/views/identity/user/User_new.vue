@@ -158,12 +158,12 @@ import {
     TabBarState,
 } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import { fluentApi } from '@/lib/fluent-api';
-import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import {getKeyHandler} from "@/lib/component-utils/query-search";
 
 const PTab = () => import('@/components/organisms/tabs/tab/PTab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/PDataTable.vue');
