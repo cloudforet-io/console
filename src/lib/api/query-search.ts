@@ -1,14 +1,12 @@
-import {
-    KeyHandler,
-    KeyItem, QueryItem,
-    ValueHandler,
-    ValueHandlerMap,
-} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 import { FILTER_OPERATOR, FilterItem } from '@/lib/fluent-api/type';
 import { fluentApi } from '@/lib/fluent-api';
 import { get } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import {
+    KeyItem, QueryItem, ValueItem,
+} from '@/components/organisms/search/query-search/type';
+import { KeyHandler, ValueHandler, ValueHandlerMap } from '@/lib/component-utils/query-search/type';
 
 
 export interface ACHandlerMeta {
@@ -18,7 +16,10 @@ export interface ACHandlerMeta {
 }
 
 export const defaultACHandler: ACHandlerMeta = {
-    keyHandler: async inputText => [],
+    keyHandler: async inputText => ({
+        results: [],
+        totalCount: 0,
+    }),
     valueHandlerMap: {},
     suggestKeys: [],
 };
@@ -58,7 +59,13 @@ export const getStatAction: getValueHandlerActionType<StatQueryAPI<any, any>> = 
 export function getStatApiValueHandler(
     resourceType: string,
     getAction: getValueHandlerActionType<StatQueryAPI<any, any>> = getStatAction,
-    formatter: (res: any) => string[] = res => res.data.results as string[],
+    formatter: (res: any) => {
+        results: ValueItem[];
+        totalCount: number;
+    } = res => ({
+        results: res.data.results.map(d => ({ label: d, name: d })),
+        totalCount: res.data.total_count,
+    }),
 ): ValueHandler {
     return async (val: string, keyItem: KeyItem) => {
         const res = await getAction(
@@ -74,7 +81,13 @@ export function getStatApiValueHandlerMap(
     keys: string[],
     resourceType: string,
     getAction: getValueHandlerActionType<StatQueryAPI<any, any>> = getStatAction,
-    formatter: (res: any) => string[] = res => res.data.results as string[],
+    formatter: (res: any) => {
+        results: ValueItem[];
+        totalCount: number;
+    } = res => ({
+        results: res.data.results.map(d => ({ label: d, name: d })),
+        totalCount: res.data.total_count,
+    }),
 ): ValueHandlerMap {
     const map = {};
     keys.forEach((key) => {
@@ -96,13 +109,13 @@ export const getQueryItemsToFilterItems = (tags: QueryItem[], suggestKeys?: stri
         if (q.key !== null && q.key !== undefined) {
             and.push({
                 key: q.key?.name as string,
-                value: q.value,
+                value: q.value?.label || q.value?.name || '',
                 operator: '',
             });
         } else if (suggestKeys) {
             setFilterOrWithSuggestKeys({
                 key: '',
-                value: q.value,
+                value: q.value?.label || q.value?.name || '',
                 operator: q.operator,
             }, suggestKeys, or);
         }
@@ -118,15 +131,16 @@ export const parseTag = (text: string): QueryTag => {
     const parsed = tagRegex.exec(text);
 
     const key: string|undefined = get(parsed, 'groups.key', undefined);
-    const keyItem: KeyItem|undefined = key ? { name: key, label: key } : undefined;
+    const keyItem: KeyItem|undefined = key ? { label: key, name: key } : undefined;
 
     const operator = get(parsed, 'groups.operator', '').trim();
 
     const value = parsed ? get(parsed, 'groups.value', '').trim() : text.trim();
+    const valueItem: ValueItem = { label: value, name: value };
 
     return {
         key: keyItem,
         operator,
-        value,
+        value: valueItem,
     };
 };

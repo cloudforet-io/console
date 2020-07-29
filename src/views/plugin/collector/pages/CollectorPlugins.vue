@@ -118,8 +118,8 @@ import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import {getKeyHandler} from "@/lib/component-utils/query-search";
 
 const repoState = reactive({
     repositories: [] as unknown as RepositoryModel[],

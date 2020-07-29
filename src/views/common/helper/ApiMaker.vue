@@ -1,18 +1,18 @@
 <template>
     <general-page-layout class="h-screen">
-        <PPageTitle class="mt-4">
+        <p-page-title class="mt-4">
             <template #title>
                 <i class="fas fa-database text-blue-400 " /> Choose Action
             </template>
-        </PPageTitle>
-        <PPaneLayout>
+        </p-page-title>
+        <p-pane-layout>
             <div class="tab-content toolbar">
                 <div class="tool-area">
                     <div class="label">
                         서비스
                     </div>
                     <div>
-                        <PSelectDropdown v-model="selectService" :items="serviceList" @onSelected="onServiceSelect" />
+                        <p-select-dropdown v-model="selectService" :items="serviceList" @onSelected="onServiceSelect" />
                     </div>
                 </div>
                 <div class="tool-area">
@@ -20,8 +20,8 @@
                         리소스
                     </div>
                     <div>
-                        <PSelectDropdown v-model="selectResource" :disabled="!selectService" :items="resourceList"
-                                         @onSelected="onResourceSelect"
+                        <p-select-dropdown v-model="selectResource" :disabled="!selectService" :items="resourceList"
+                                           @onSelected="onResourceSelect"
                         />
                     </div>
                 </div>
@@ -30,26 +30,26 @@
                         액션
                     </div>
                     <div>
-                        <PSelectDropdown v-model="selectAction" :disabled="!selectResource" :items="actionList" />
+                        <p-select-dropdown v-model="selectAction" :disabled="!selectResource" :items="actionList" />
                     </div>
                 </div>
             </div>
-        </PPaneLayout>
+        </p-pane-layout>
         <div class="flex w-full">
             <div class="w-1/2">
-                <PPageTitle class="mt-8">
+                <p-page-title class="mt-8">
                     <template #title>
                         <i class="fas fa-smile-wink text-yellow-400" /> Parameter
                     </template>
-                </PPageTitle>
-                <PPaneLayout v-if="!(selectResource&&selectService&&selectAction)">
+                </p-page-title>
+                <p-pane-layout v-if="!(selectResource&&selectService&&selectAction)">
                     <div class="p-8 text-lg font-bold border-red-800 bg-red-100 text-red-500">
                         <i class="fas fa-exclamation-triangle" /> &nbsp;액션을 선택해주세요!
                     </div>
-                </PPaneLayout>
-                <PPaneLayout v-else class="p-4">
-                    <PJsonSchemaForm v-bind="methodForm.state" :item.sync="methodForm.syncState.item" />
-                    <PFieldGroup v-if="hasFilter" label="Filter">
+                </p-pane-layout>
+                <p-pane-layout v-else class="p-4">
+                    <p-json-schema-form v-bind="methodForm.state" :item.sync="methodForm.syncState.item" />
+                    <p-field-group v-if="hasFilter" label="Filter">
                         <p-query-search v-model="querySearch.syncState.value"
                                         class="search-bar"
                                         v-bind="querySearch.state"
@@ -67,38 +67,38 @@
                             @delete:tag="querySearch.deleteTag"
                             @delete:all="querySearch.deleteAllTags"
                         />
-                    </PFieldGroup>
-                    <PLoadingButton class="ml-4" style-type="primary"
-                                    :outline="true"
-                                    :loading="loading" :disabled="loading"
-                                    @click="execute"
+                    </p-field-group>
+                    <p-loading-button class="ml-4" style-type="primary"
+                                      :outline="true"
+                                      :loading="loading" :disabled="loading"
+                                      @click="execute"
                     >
                         Execute
-                    </PLoadingButton>
-                </PPaneLayout>
+                    </p-loading-button>
+                </p-pane-layout>
             </div>
             <div class="w-1/2">
-                <PPageTitle class="mt-8">
+                <p-page-title class="mt-8">
                     <template #title>
                         <i class="fas fa-smile-wink text-yellow-400" /> Request Config
                     </template>
-                </PPageTitle>
-                <PPaneLayout>
-                    <RawData class="parameter-raw-data" :item="parameter" />
-                </PPaneLayout>
+                </p-page-title>
+                <p-pane-layout>
+                    <raw-data class="parameter-raw-data" :item="parameter" />
+                </p-pane-layout>
             </div>
         </div>
-        <PPageTitle class="mt-8">
+        <p-page-title class="mt-8">
             <template #title>
                 <i class="fas fa-smile-wink text-yellow-400" /> Result
             </template>
-        </PPageTitle>
-        <PPaneLayout>
-            <RawData
+        </p-page-title>
+        <p-pane-layout>
+            <raw-data
                 :item="typeof result === 'object'?result.data:undefined"
                 :raw="typeof result === 'string'?result:undefined"
             />
-        </PPaneLayout>
+        </p-pane-layout>
     </general-page-layout>
 </template>
 <script lang="ts">
@@ -121,9 +121,9 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
-import { QuerySearchToolSet } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
+import { QuerySearchToolSet } from '@/lib/component-utils/query-search';
 
 const checkApi = (api: any, target: string, matches: string[]): boolean => {
     // eslint-disable-next-line no-proto

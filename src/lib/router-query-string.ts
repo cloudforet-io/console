@@ -150,8 +150,8 @@ export const queryTagsToQueryString: Getter = (tags: QueryTag[]): RouteQueryStri
     if (Array.isArray(tags)) {
         return tags.map((tag) => {
             let item;
-            if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value}`;
-            else item = `${tag.value}`;
+            if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
+            else item = `${tag.value?.name}`;
             return item;
         });
     }

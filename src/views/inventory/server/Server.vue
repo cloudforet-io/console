@@ -185,10 +185,6 @@ import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset'
 import { get } from 'lodash';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import {
-    getEnumValueHandler,
-    getKeyHandler, QueryItem,
-} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
-import {
     getStatApiValueHandler,
     getStatApiValueHandlerMap,
 } from '@/lib/api/query-search';
@@ -196,6 +192,11 @@ import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import {
+    getEnumValueHandler,
+    getKeyHandler,
+    makeQuerySearchHandlersWithSearchSchema,
+} from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
@@ -245,12 +246,16 @@ export default {
 
         const args = {
             keys: [
-                'server_id',
-                'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
-                'data.os.os_arch', 'data.os.os_details', 'data.os.os_version',
-                'data.base.memory', 'data.base.core', 'data.platform.type',
-                'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
-                'collection_info.state',
+                ['server_id', 'ID'],
+                ['name', 'Name'],
+                ['state', 'State'],
+                ['primary_ip_address', 'Primary IP'],
+                ['server_type', 'Server Type'],
+                ['os_type', 'OS Type'],
+                ['project_id', 'Project'],
+                ['data.compute.instance_name', 'Instance'],
+                ['data.compute.instance_id', 'Instance ID'],
+                ['collection_info.state', 'Collection State'],
             ],
             suggestKeys: ['server_id', 'name', 'primary_ip_address'],
         };
@@ -297,23 +302,37 @@ export default {
                 excelVisible: true,
             },
             undefined,
-            {
-                keyHandler: getKeyHandler(args.keys),
-                valueHandlerMap: {
-                    ...getStatApiValueHandlerMap([
-                        'server_id', 'name', 'primary_ip_address',
-                        'data.compute.instance_name', 'data.compute.instance_id',
-                        'data.vm.vm_name', 'data.vm.vm_id',
-                    ],
-                    'inventory.Server'),
-                    state: getEnumValueHandler(['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
-                    os_type: getEnumValueHandler(['LINUX', 'WINDOWS']),
-                    'collection_info.state': getEnumValueHandler(['MANUAL', 'ACTIVE', 'DISCONNECTED']),
-                    server_type: getEnumValueHandler(['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
-                    project_id: getStatApiValueHandler('identity.Project'),
-                },
-                suggestKeys: args.suggestKeys,
-            },
+            makeQuerySearchHandlersWithSearchSchema({
+                title: 'Properties',
+                items: [
+                    { key: 'server_id', name: 'ID' },
+                    { key: 'name', name: 'Name' },
+                    { key: 'state', name: 'State', enums: ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'] },
+                    { key: 'primary_ip_address', name: 'Primary IP' },
+                    { key: 'server_type', name: 'Server Type', enums: ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN'] },
+                    { key: 'os_type', name: 'OS Type', enums: ['LINUX', 'WINDOWS'] },
+                    { key: 'project_id', name: 'Project', reference: 'identity.Project' },
+                    { key: 'data.compute.instance_name', name: 'Instance' },
+                    { key: 'data.compute.instance_id', name: 'Instance ID' },
+                    { key: 'collection_info.state', name: 'Collection State', enums: ['MANUAL', 'ACTIVE', 'DISCONNECTED'] },
+                ],
+            }, 'inventory.Server'),
+            // {
+            // keyHandler: getKeyHandler(args.keys),
+            // valueHandlerMap: {
+            //     ...getStatApiValueHandlerMap([
+            //         'server_id', 'name', 'primary_ip_address',
+            //         'data.compute.instance_name', 'data.compute.instance_id',
+            //     ],
+            //     'inventory.Server'),
+            //     state: getEnumValueHandler(['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
+            //     os_type: getEnumValueHandler(['LINUX', 'WINDOWS']),
+            //     'collection_info.state': getEnumValueHandler(['MANUAL', 'ACTIVE', 'DISCONNECTED']),
+            //     server_type: getEnumValueHandler(['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
+            //     project_id: getStatApiValueHandler('identity.Project'),
+            // },
+            // suggestKeys: args.suggestKeys,
+            // },
         );
 
 

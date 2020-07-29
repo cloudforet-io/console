@@ -1,25 +1,33 @@
 /* eslint-disable camelcase */
 import {
     GetAction, Resource,
-    ResourceActions,
+    ResourceActions, SetParameterAction,
 } from '@/lib/fluent-api/toolset';
+import { ListType } from '@/lib/fluent-api';
 
 const idField = 'search';
 interface IdParameter {
     [idField]: string;
 }
 
-export interface PageDiscoveryTypeModel extends IdParameter {
+export interface AutocompleteItem {
     id: string;
     name: string;
 }
 
-class Get extends GetAction<any, PageDiscoveryTypeModel> {
-    idField = idField;
+class Get extends SetParameterAction<any, ListType<AutocompleteItem>> {
+    protected path = 'get';
 
     setResourceType(resource: string) {
-        this.apiState.parameter.resource_type = resource;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.resource_type = resource;
+        return api;
+    }
+
+    setSearch(search: string) {
+        const api = this.clone();
+        api.apiState.parameter.search = search;
+        return api;
     }
 
     setLimit(limit: number): this {

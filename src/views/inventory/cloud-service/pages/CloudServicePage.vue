@@ -183,8 +183,8 @@ import {
 } from '@/lib/router-query-string';
 import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import { getKeyHandler } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 const rawLayout = {

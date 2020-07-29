@@ -158,11 +158,11 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQ
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { getKeyHandler } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { getKeyHandler } from '@/lib/component-utils/query-search';
 import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/PRouteBreadcrumb.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 

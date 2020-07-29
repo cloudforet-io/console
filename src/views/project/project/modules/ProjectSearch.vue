@@ -24,17 +24,18 @@
                 </div>
             </template>
             <template #menu-loading>
-                <p-lottie class="mt-6" name="spinner" auto
-                          :size="1.5"
-                />
+                <span />
+                <!--                <p-lottie class="mt-6" name="spinner" auto-->
+                <!--                          :size="1.5"-->
+                <!--                />-->
             </template>
             <template #menu-no-data>
                 <div class="text-center">
-                    <p class="no-data-text">
-                        No results match your search.<br>
-                        Try again with a different term.
-                    </p>
-                    <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
+                    <!--                    <p class="no-data-text">-->
+                    <!--                        No results match your search.<br>-->
+                    <!--                        Try again with a different term.-->
+                    <!--                    </p>-->
+                    <!--                    <img src="@/assets/images/illust_satellite.svg" class="no-data-img">-->
                 </div>
             </template>
             <template #menu-item--format="{item}">
@@ -295,7 +296,8 @@ export default {
         const onInput = debounce(async (e?) => {
             if (!state.visibleMenu) showMenu();
             await listItems();
-        }, 50);
+            if (state.projectGroupItems.length === 0 && state.projectItems.length === 0) hideMenu();
+        }, 300);
 
         watch(() => props.projectGroup, async (pg) => {
             if (pg) {
@@ -387,7 +389,7 @@ export default {
         .menu-container {
             @apply pr-4;
             .p-context-menu {
-                min-height: 15rem;
+                /*min-height: 2rem;*/
             }
         }
     }
