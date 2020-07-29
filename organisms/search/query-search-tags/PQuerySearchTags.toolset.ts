@@ -1,4 +1,4 @@
-import { QueryItem } from '@/components/organisms/search/query-search/PQuerySearch.toolset';
+import { QueryItem } from '@/components/organisms/search/query-search/type';
 
 export const querySearchTagsProps = {
     tags: {

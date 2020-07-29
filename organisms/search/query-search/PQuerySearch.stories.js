@@ -8,7 +8,6 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import PQuerySearch from './PQuerySearch.vue';
-import { querySearchProps } from './PQuerySearch.toolset';
 import casual, { arrayOf } from '../../../../lib/casual';
 
 export default {
@@ -23,6 +22,33 @@ export default {
     },
 };
 
+const querySearchProps = {
+    value: {
+        type: String,
+        default: '',
+        required: true,
+    },
+    placeholder: {
+        type: String,
+        default: 'Search',
+    },
+    focused: {
+        type: Boolean,
+        default: true,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    keyItems: {
+        type: Array,
+        default: () => [],
+    },
+    valueItems: {
+        type: Array,
+        default: () => [],
+    },
+};
 
 export const defaultCase = () => ({
     components: { PQuerySearch },
@@ -82,7 +108,7 @@ export const defaultCase = () => ({
         };
 
         const valueHandler = (inputText, keyItem) => {
-            const items = valueItems[keyItem.name];
+            const items = valueItems[keyItem.key];
             let res = items;
             if (inputText) {
                 res = items.reduce((result, d) => {

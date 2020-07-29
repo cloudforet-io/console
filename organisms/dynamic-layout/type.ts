@@ -2,17 +2,8 @@
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
 
 /** Metadata schema types for Dynamic layout */
-export enum DYNAMIC_LAYOUT_TYPE {
-'item' = 'item',
-'simple-table' = 'simple-table',
-'table' = 'table',
-'query-search-table' = 'query-search-table',
-'raw' = 'raw',
-'markdown' = 'markdown',
-'list' = 'list',
-}
-
-export type DynamicLayoutType = keyof typeof DYNAMIC_LAYOUT_TYPE;
+export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'
+    |'raw'|'markdown'|'list';
 
 export interface CommonOptions {
     root_path?: string;

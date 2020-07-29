@@ -25,22 +25,22 @@
 
 <script lang="ts">
 
-import {
-    KeyItem,
-    QueryItem,
-    QuerySearchProps,
-    querySearchProps,
-} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/components/util/composition-helpers';
 import {
     find,
 } from 'lodash';
-import { CONTEXT_MENU_TYPE, MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { OperatorType } from '@/lib/fluent-api';
+import {
+    KeyItem, QueryItem, QuerySearchProps, ValueItem,
+} from '@/components/organisms/search/query-search/type';
 
+interface MenuItem<T> extends ContextMenuItem {
+    data?: T;
+}
 
 interface State {
     searchRef: any;
@@ -49,9 +49,9 @@ interface State {
     proxyValue: string;
     selectedKey: KeyItem|null;
     operator: OperatorType;
-    keyMenu: Readonly<MenuItem[]>;
-    valueMenu: Readonly<MenuItem[]>;
-    menu: Readonly<MenuItem[]>;
+    keyMenu: Readonly<MenuItem<KeyItem>[]>;
+    valueMenu: Readonly<MenuItem<ValueItem>[]>;
+    menu: Readonly<MenuItem<KeyItem|ValueItem>[]>;
 }
 
 export default {
@@ -61,7 +61,37 @@ export default {
         prop: 'value',
         event: 'update:value',
     },
-    props: querySearchProps,
+    props: {
+        value: {
+            type: String,
+            default: '',
+            required: true,
+        },
+        placeholder: {
+            type: String,
+            default: 'Search',
+        },
+        focused: {
+            type: Boolean,
+            default: true,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        keyItems: {
+            type: Array,
+            default: () => [],
+        },
+        valueItems: {
+            type: Array,
+            default: () => [],
+        },
+        totalCount: {
+            type: Number,
+            default: 0,
+        },
+    },
     setup(props: QuerySearchProps, { emit }) {
         const state: UnwrapRef<State> = reactive({
             searchRef: null,
@@ -72,26 +102,28 @@ export default {
             operator: '',
             keyMenu: computed(() => [
                 {
-                    label: `Key (${props.keyItems.length})`,
+                    label: `Key (${props.totalCount})`,
                     type: CONTEXT_MENU_TYPE.header,
                 },
                 ...props.keyItems.map(d => ({
                     label: d.label,
                     name: d.name,
                     type: CONTEXT_MENU_TYPE.item,
+                    data: d,
                 })),
             ]),
             valueMenu: computed(() => {
                 if (state.selectedKey === null) return [];
                 return [
                     {
-                        label: `${state.selectedKey.label} (${props.valueItems.length})`,
+                        label: `${state.selectedKey.label} (${props.totalCount})`,
                         type: CONTEXT_MENU_TYPE.header,
                     },
                     ...props.valueItems.map(d => ({
-                        label: `${state.selectedKey?.label}:${state.operator} ${d}`,
-                        name: d,
+                        label: `${state.selectedKey?.label}:${state.operator} ${d.label}`,
+                        name: d.name,
                         type: CONTEXT_MENU_TYPE.item,
+                        data: d,
                     })),
                 ];
             }),
@@ -101,10 +133,14 @@ export default {
             }),
         });
 
-        const findKey = (val: string): null|KeyItem => {
-            const res = find(state.keyMenu as unknown as KeyItem[],
-                (item: KeyItem) => (item.label === val || item.name === val));
-            return res || null;
+        const findKey = (val: string): KeyItem|undefined => {
+            const value = val.toLowerCase();
+            const res = find(state.keyMenu,
+                (item: MenuItem<KeyItem>) => (item.type === 'item'
+                    && ((item.label && item.label.toLowerCase() === value)
+                    || (item.name && item.name.toLowerCase() === value)))) as MenuItem<KeyItem>|null;
+
+            return res ? res.data : undefined;
         };
 
         const showMenu = () => {
@@ -126,7 +162,7 @@ export default {
             emit('key:select', state.selectedKey);
         };
 
-        const emitSearch = (val: string) => {
+        const emitSearch = (val: ValueItem) => {
             emit('search', {
                 key: state.selectedKey,
                 value: val,
@@ -144,16 +180,16 @@ export default {
 
             if (state.selectedKey) emitValueInput(val);
             else if (val.length > 1 && e.data === ':') {
-                state.selectedKey = findKey(val.substring(0, val.length - 1));
+                state.selectedKey = findKey(val.substring(0, val.length - 1)) || null;
                 if (state.selectedKey) emitKeySelect();
             } else emitKeyInput(val);
         };
 
-        const onSearch = (val?: any) => {
+        const onSearch = (val?: ValueItem|string|null) => {
             if (val !== undefined && val !== null) {
                 if (typeof val === 'string') {
                     const str = val.trim();
-                    emitSearch(str);
+                    emitSearch({ label: str, name: str });
                 } else {
                     emitSearch(val);
                 }
@@ -162,10 +198,14 @@ export default {
 
         const onMenuSelect = (value: string, idx: number) => {
             if (state.selectedKey) {
-                const val = state.valueMenu[idx].name as any;
+                const val = state.valueMenu[idx].data;
                 onSearch(val);
             } else {
-                state.selectedKey = state.keyMenu[idx] as KeyItem;
+                const selected = state.keyMenu[idx];
+                state.selectedKey = {
+                    label: selected.label as string,
+                    name: selected.name as string,
+                };
                 emitKeySelect();
                 showMenu();
             }

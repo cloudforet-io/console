@@ -4,14 +4,14 @@
          @keyup.esc="$emit('keyup:esc',$event)"
     >
         <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
-            <div class="context-content context-item no-drag">
+            <div key="loading" class="context-content context-item no-drag">
                 <slot name="loading-format" v-bind="{...$props, uuid}">
                     <p-lottie name="spinner" auto :size="1" />
                 </slot>
             </div>
         </slot>
         <slot v-else-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
-            <div class="context-content context-item no-drag empty" :class="theme">
+            <div key="no-data" class="context-content context-item no-drag empty" :class="theme">
                 <slot name="no-data-format" v-bind="{...$props, uuid}">
                     {{ $t('COMMON.NO_ITEM') }}
                 </slot>

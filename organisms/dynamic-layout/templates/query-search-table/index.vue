@@ -88,10 +88,6 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import {
-    KeyHandler,
-    KeyItem, QueryItem,
-} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { ToolboxTableState } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
 import { debounce } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
@@ -99,6 +95,8 @@ import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDa
 import { getTimezone } from '@/lib/util';
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
+import {KeyHandler} from "@/lib/component-utils/query-search/type";
 
 const defaultACHandler = {
     keyHandler: async inputText => [],
@@ -201,7 +199,8 @@ export default {
         });
 
         const onKeyInput = debounce(async (val: string) => {
-            state.keyItems = await state.keyHandler(val);
+            const res = await state.keyHandler(val);
+            state.keyItems = res.results;
         }, 200);
 
         const onValueInput = debounce(async (val: string, keyItem: KeyItem) => {

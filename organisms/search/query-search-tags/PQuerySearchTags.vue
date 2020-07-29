@@ -10,16 +10,15 @@
         </div>
         <div class="divider" />
         <div class="tags">
-            <p-tag v-for="(tag, idx) in tags" :key="`${idx}-${tag.key ? tag.key.name: tag.value}`" class="tag"
+            <p-tag v-for="(tag, idx) in tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`" class="tag"
                    @delete="emitDeleteTag(idx)"
             >
-                <template v-if="tag.key">
-                    <span>
-                      <span class="key-label">{{ tag.key.label }}</span>:{{ tag.operator }} {{ tag.value }}
-                    </span>
-                </template>
+                <span v-if="tag.key">
+                    <span class="key-label">{{ tag.key.label || tag.key.name }}</span>
+                    :{{ tag.operator }} {{ tag.value.label || tag.value.name }}
+                </span>
                 <template v-else>
-                    {{ tag.value }}
+                    {{ tag.value.label || tag.value.name }}
                 </template>
             </p-tag>
         </div>

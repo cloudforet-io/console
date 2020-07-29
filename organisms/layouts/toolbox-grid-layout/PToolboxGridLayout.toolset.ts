@@ -9,12 +9,9 @@ import {
     GridLayoutStateType, GridLayoutSyncStateType,
 } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import { getAllPage } from '@/components/organisms/pagination/PTextPagination.toolset';
-import {
-    KeyHandler,
-    QuerySearchToolSet,
-    ValueHandlerMap,
-} from '@/components/organisms/search/query-search/PQuerySearch.toolset';
 import { ChangeTagCallBack } from '@/components/molecules/tags/PTag.toolset';
+import { QuerySearchToolSet } from '@/lib/component-utils/query-search';
+import { KeyHandler, ValueHandlerMap } from '@/lib/component-utils/query-search/type';
 
 export interface ToolBoxGridLayoutStateType extends GridLayoutStateType{
     paginationVisible: boolean;
