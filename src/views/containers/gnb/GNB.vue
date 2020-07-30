@@ -6,9 +6,9 @@
             </div>
             <div class="menu-lap mr-6 md:mr-10 lg:mr-10">
                 <router-link to="/dashboard">
-                    <img class="brand-logo" src="@/assets/images/brand/brand_logo.png">
+                    <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden md:inline-block lg:inline-block"
-                         src="@/assets/images/brand/SpaceONE_logoTypeA.png"
+                         src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
                     >
                 </router-link>
             </div>
@@ -382,7 +382,7 @@ export default {
             height: 2rem;
         }
         .brand-logo-text {
-            height: 0.75rem;
+            height: 0.875rem;
             margin-left: 0.5rem;
         }
         .menu-button {
