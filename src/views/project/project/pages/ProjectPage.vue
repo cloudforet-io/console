@@ -32,12 +32,9 @@
                     <span v-if="projectGroupNavigation.length > 0" class="group-name">
                         <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
                     </span>
-                    <span v-else class="group-name">
-                        <span class="text">Projects</span>
-                    </span>
                 </div>
                 <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
-                                  : 'All Projects'"
+                                  : 'All Project'"
                               use-total-count
                               :total-count="apiHandler.totalCount.value"
                 >
@@ -78,7 +75,7 @@
                                  class="text-base truncate leading-tight"
                             >
                                 <p-check-box v-model="showAllProjects">
-                                    <span class="show-all">Show All Projects</span>
+                                    <span class="show-all">Show All Project</span>
                                 </p-check-box>
                             </div>
                         </div>
@@ -346,7 +343,13 @@ export default {
                         data: state.searchedProjectGroup,
                     });
                 }
-                return result;
+                return [
+                    {
+                        name: 'Project',
+                        data: null as any,
+                    },
+                    ...result,
+                ];
             }),
         });
 
@@ -464,22 +467,11 @@ export default {
         /**
              * Click Card Item
              */
-        const onClickCard = (item) => {
-            vm.$router.push({
-                name: 'projectDetail',
-                params: {
-                    id: item.project_id,
-                },
-            } as Location);
-        };
-
         const goToProjectDetail = (item) => {
-            const navigation = state.projectGroupNavigation.map(d => ({ name: d.name, data: d }));
             const res: Location = {
                 name: 'projectDetail',
                 params: {
                     id: item.project_id,
-                    navigation,
                 },
             };
             return res;
@@ -550,8 +542,12 @@ export default {
         };
 
         const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
-            state.searchedProjectGroup = item.data;
-            await state.treeRef.findNode(item.data.id);
+            if (item.data) {
+                state.searchedProjectGroup = item.data;
+                await state.treeRef.findNode(item.data.id);
+            } else {
+                await state.treeRef.listNodes();
+            }
         };
 
         const openProjectForm = () => {
@@ -680,7 +676,6 @@ export default {
             ...toRefs(state),
             ...toRefs(formState),
             skeletons: range(3),
-            // onClickCard,
             goToProjectDetail,
             goToServiceAccount,
             cardSummary,
@@ -744,8 +739,9 @@ export default {
     }
 
     .parents-info {
-        @apply flex items-center mb-3 text-gray-900;
+        @apply flex items-center text-gray-900;
         height: 1rem;
+        margin-bottom: 0.5rem;
         .group-name {
             @apply inline-flex items-center text-xs;
         }
@@ -800,7 +796,7 @@ export default {
         .project {
             @apply mb-4;
             .project-group-name {
-                @apply text-gray-500 text-xs mb-1;
+                @apply text-gray-500 text-xs;
             }
             #project-name {
                 @apply text-lg font-bold truncate pb-6 overflow-hidden;

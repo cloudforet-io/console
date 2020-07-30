@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-tree-node data="All Projects" :state.sync="treeAllState"
+        <p-tree-node data="All Project" :state.sync="treeAllState"
                      disable-toggle
                      @row:click="resetSelectedNodes"
         >

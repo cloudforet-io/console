@@ -405,6 +405,7 @@ export default {
                 .setFilter({ key: 'project_group_id', value: res.data.open_path, operator: FILTER_OPERATOR.in })
                 .execute();
             state.pageNavigation = [
+                { name: 'Project', path: '/project' },
                 ...projectGroupName.data.results.map(d => ({
                     name: d.name,
                     path: `/project?select_pg=${d.project_group_id}`,
@@ -464,7 +465,7 @@ export default {
         }
 
     .tab-content {
-        border-width: 0;
+        border: none;
     }
 
     .copy-project-id {
