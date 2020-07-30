@@ -72,12 +72,12 @@
                             <p-i name="ic_top1" />
                         </td>
 
-                        <td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
+                        <td class="project-field">
                             <router-link :to="`/project?select_pg=${item.project_group_id}`">
                                 {{ item.project_group }}
                             </router-link>
                         </td>
-                        <td v-tooltip.bottom="{content: item.project, delay: {show: 500}}" class="project-field">
+                        <td class="project-field">
                             <router-link :to="`/project/${item.project_id}?st=summary`">
                                 {{ item.project }}
                             </router-link>
@@ -101,14 +101,14 @@
 
                 <!-- others -->
                 <template #col-project_group="{index, field, item}">
-                    <td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}">
+                    <td>
                         <router-link :to="`/project?select_pg=${item.project_group_id}`">
                             {{ item.project_group }}
                         </router-link>
                     </td>
                 </template>
                 <template #col-project="{index, field, item}">
-                    <td v-tooltip.bottom="{content: item.project, delay: {show: 500}}">
+                    <td>
                         <router-link :to="`/project/${item.project_id}?st=summary`">
                             {{ item.project }}
                         </router-link>

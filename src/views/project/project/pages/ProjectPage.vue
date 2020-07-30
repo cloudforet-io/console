@@ -5,10 +5,6 @@
                 <div class="side-item">
                     <header>
                         <span class="title">Search</span>
-                        <!--                        <p-i v-tooltip.bottom="{content: '', delay: {show: 500}}"-->
-                        <!--                             name="ic_tooltip"-->
-                        <!--                             width="1rem" height="1rem" class="icon-help"-->
-                        <!--                        />-->
                     </header>
                     <project-search :search-text.sync="searchText"
                                     :project-group="searchedProjectGroup"
@@ -33,14 +29,6 @@
         <template #default>
             <div>
                 <div class="parents-info">
-                    <!--                    <template v-if="parentGroups.length > 0">-->
-                    <!--                        <span v-for="(pg, i) in parentGroups" :key="i" class="group-name">-->
-                    <!--                            <span class="text link" @click="searchedProjectGroup = pg">{{ pg.name }}</span>-->
-                    <!--                            <p-i v-if="i < parentGroups.length - 1" class="mx-1"-->
-                    <!--                                 name="ic_breadcrumb_arrow"-->
-                    <!--                            />-->
-                    <!--                        </span>-->
-                    <!--                    </template>-->
                     <span v-if="projectGroupNavigation.length > 0" class="group-name">
                         <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
                     </span>
@@ -55,14 +43,6 @@
                 >
                     <template #extra-area>
                         <div class="btns">
-                            <!--                            <p-icon-button v-if="searchedProjectGroup" name="ic_transhcan"-->
-                            <!--                                           width="1.5rem" height="1.5rem" class="delete-btn"-->
-                            <!--                                           @click="openProjectGroupDeleteForm"-->
-                            <!--                            />-->
-                            <!--                            <p-icon-button v-if="searchedProjectGroup" name="ic_edit-text"-->
-                            <!--                                           width="1.5rem" height="1.5rem" class="edit-btn"-->
-                            <!--                                           @click="openProjectGroupEditForm"-->
-                            <!--                            />-->
                             <p-dropdown-menu-btn v-if="searchedProjectGroup"
                                                  :menu="settingMenu"
                                                  button-only
@@ -91,7 +71,6 @@
                     @changePageNumber="apiHandler.getData()"
                     @changePageSize="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
-                    @card:click.self="onClickCard"
                 >
                     <template #toolbox-left>
                         <div class="flex items-center">
@@ -102,16 +81,6 @@
                                     <span class="show-all">Show All Projects</span>
                                 </p-check-box>
                             </div>
-                            <!--                                <div class="tool-left-btn">-->
-                            <!--                                    <p-icon-text-button v-if="searchedProjectGroup"-->
-                            <!--                                                        style-type="primary-dark"-->
-                            <!--                                                        name="ic_plus_bold"-->
-                            <!--                                                        @click="openProjectForm"-->
-                            <!--                                    >-->
-                            <!--                                        {{ $t('INVENTORY.CRT_PROJ') }}-->
-                            <!--                                    </p-icon-text-button>-->
-                            <!--                                </div>-->
-                            <!--                            <div class="tool-right-checkbox" />-->
                         </div>
                     </template>
                     <template #no-data>
@@ -123,59 +92,61 @@
                         </div>
                     </template>
                     <template #card="{item}">
-                        <div v-if="item">
-                            <div class="project-description">
-                                <div class="project">
-                                    <div class="project-group-name">
-                                        <template v-if="parentGroups.length > 0">
-                                            {{ parentGroups[parentGroups.length - 1].name }} >
-                                        </template>
-                                        {{ item.project_group_info.name }}
-                                    </div>
-                                    <p id="project-name">
-                                        {{ item.name }}
-                                    </p>
-
-                                    <div class="project-summary">
-                                        <div v-if="cardSummary[item.project_id]" class="summary-item">
-                                            <span class="summary-item-text">Server</span><span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span>
-                                            <span class="mx-2 text-gray-300 divider">|</span>
-                                            <span class="summary-item-text">Cloud Services<span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
+                        <router-link :to="goToProjectDetail(item)">
+                            <div v-if="item">
+                                <div class="project-description">
+                                    <div class="project">
+                                        <div class="project-group-name">
+                                            <template v-if="parentGroups.length > 0">
+                                                {{ parentGroups[parentGroups.length - 1].name }} >
+                                            </template>
+                                            {{ item.project_group_info.name }}
                                         </div>
-                                        <div v-else class="loading">
-                                            <div v-for="v in skeletons" :key="v" class="flex items-center pb-2">
-                                                <p-skeleton class="flex-grow" />
-                                                <p-skeleton width="1.5rem" height="1.5rem" class="ml-5 flex-shrink-0" />
+                                        <p id="project-name">
+                                            {{ item.name }}
+                                        </p>
+
+                                        <div class="project-summary">
+                                            <div v-if="cardSummary[item.project_id]" class="summary-item">
+                                                <span class="summary-item-text">Server</span><span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span>
+                                                <span class="mx-2 text-gray-300 divider">|</span>
+                                                <span class="summary-item-text">Cloud Services<span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
+                                            </div>
+                                            <div v-else class="loading">
+                                                <div v-for="v in skeletons" :key="v" class="flex items-center pb-2">
+                                                    <p-skeleton class="flex-grow" />
+                                                    <p-skeleton width="1.5rem" height="1.5rem" class="ml-5 flex-shrink-0" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <hr class="solid">
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
-                                         @click.stop="goToServiceAccount"
-                                    >
-                                        <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
-                                            <p-i name="ic_plus"
-                                                 width=".75rem" height=".75rem"
-                                            />
-                                        </div>
-                                        <span class="ml-2"> Add Service Account</span>
-                                    </div>
-                                    <div v-else-if="item.force_console_data.providers" class="providers">
-                                        <span>Service Accounts</span>
-                                        <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
-                                             class="provider-icon"
+                                        <hr class="solid">
+                                        <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
+                                             @click.stop="goToServiceAccount"
                                         >
-                                        <span class="w-6 h-6 bg-blue-100 rounded-full inline-block provider-add-btn" @click.stop="goToServiceAccount">
-                                            <p-i name="ic_plus"
-                                                 width=".75rem" height=".75rem"
-                                            />
-                                        </span>
-                                        <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
+                                            <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
+                                                <p-i name="ic_plus"
+                                                     width=".75rem" height=".75rem"
+                                                />
+                                            </div>
+                                            <span class="ml-2"> Add Service Account</span>
+                                        </div>
+                                        <div v-else-if="item.force_console_data.providers" class="providers">
+                                            <span>Service Accounts</span>
+                                            <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
+                                                 class="provider-icon"
+                                            >
+                                            <span class="w-6 h-6 bg-blue-100 rounded-full inline-block provider-add-btn" @click.stop="goToServiceAccount">
+                                                <p-i name="ic_plus"
+                                                     width=".75rem" height=".75rem"
+                                                />
+                                            </span>
+                                            <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </router-link>
                     </template>
                 </p-toolbox-grid-layout>
             </div>
@@ -282,7 +253,7 @@ import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     makeQueryStringComputed,
-    makeQueryStringComputeds,
+    makeQueryStringComputeds, queryTagsToQueryString,
 } from '@/lib/router-query-string';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import {
@@ -498,11 +469,20 @@ export default {
                 name: 'projectDetail',
                 params: {
                     id: item.project_id,
-                    // name: item.name,
-                    // project_group: item.project_group_info,
-                    // tags: item.tags,
                 },
             } as Location);
+        };
+
+        const goToProjectDetail = (item) => {
+            const navigation = state.projectGroupNavigation.map(d => ({ name: d.name, data: d }));
+            const res: Location = {
+                name: 'projectDetail',
+                params: {
+                    id: item.project_id,
+                    navigation,
+                },
+            };
+            return res;
         };
 
         const goToServiceAccount = () => {
@@ -700,7 +680,8 @@ export default {
             ...toRefs(state),
             ...toRefs(formState),
             skeletons: range(3),
-            onClickCard,
+            // onClickCard,
+            goToProjectDetail,
             goToServiceAccount,
             cardSummary,
             projectSummary,

@@ -1,5 +1,6 @@
 <template>
     <general-page-layout>
+        <p-page-navigation :routes="pageNavigation" />
         <div class="top flex">
             <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
             <p-icon-button name="ic_transhcan"
@@ -120,7 +121,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
 
-import { fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import {
     SearchTableFluentAPI,
 } from '@/lib/api/table';
@@ -146,6 +147,7 @@ import {
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
     name: 'ProjectDetail',
@@ -165,6 +167,7 @@ export default {
         SProjectCreateFormModal,
         SProjectMemberAddModal,
         PIconTextButton,
+        PPageNavigation,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -174,6 +177,7 @@ export default {
             projectName: '',
             projectGroupId: '',
             projectId,
+            pageNavigation: [],
         });
 
         const getProject = async (id) => {
@@ -392,9 +396,27 @@ export default {
             queryRefs.member_search.value = e || undefined;
         };
 
+        const getPageNavigation = async () => {
+            const res = await fluentApi.identity().project().treeSearch()
+                .setItemType('PROJECT')
+                .setItemId(projectId.value)
+                .execute();
+            const projectGroupName = await fluentApi.identity().projectGroup().list()
+                .setFilter({ key: 'project_group_id', value: res.data.open_path, operator: FILTER_OPERATOR.in })
+                .execute();
+            state.pageNavigation = [
+                ...projectGroupName.data.results.map(d => ({
+                    name: d.name,
+                    path: `/project?select_pg=${d.project_group_id}`,
+                })),
+                { name: state.projectName },
+            ] as any;
+        };
+
         const init = () => {
             // init search text by query string
             memberApiHandler.tableTS.searchText.value = vm.$route.query.member_search as string;
+            getPageNavigation();
         };
 
         init();
@@ -442,12 +464,12 @@ export default {
         }
 
     .tab-content {
-        background: theme('colors.primary4');
         border-width: 0;
     }
 
     .copy-project-id {
         @apply float-right text-gray-500 -my-6;
+        font-size: 0.875rem;
     }
 
     .delete-btn {
@@ -466,7 +488,7 @@ export default {
         @apply w-full flex pr-4 ;
         .p-search {
             @apply w-full;
-            max-width: 23.125rem;
+            /*max-width: 23.125rem;*/
         }
     }
 </style>

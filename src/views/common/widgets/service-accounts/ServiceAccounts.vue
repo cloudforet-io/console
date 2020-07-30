@@ -25,11 +25,7 @@
                                            default-icon="ic_provider_other"
                         >
                             <template #contents>
-                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
-                                     class="mx-2 text-base truncate leading-tight"
-                                >
-                                    {{ item.name }}
-                                </div>
+                                {{ item.name }}
                             </template>
                             <template #extra>
                                 <p-badge :background-color="item.color" class="count">

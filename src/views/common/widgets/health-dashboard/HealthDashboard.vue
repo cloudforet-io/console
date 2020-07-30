@@ -13,11 +13,11 @@
             <div v-else-if="data.length === 0" class="empty-content">
                 <div class="info-text">
                     <p>
-                        You can use the AWS Health Dashboard if you have a Business or Enterprise support plan of AWS.
+                        You can use the AWS Health Dashboard<br> if you have a Business or Enterprise support plan of AWS.
                     </p>
                     <br>
                     <p>
-                        Still cannot use this? If you have a proper plan, let us know.
+                        Still cannot use this? <br>If you have a proper plan, let us know.<br>
                         <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                     </p>
                 </div>
@@ -178,6 +178,7 @@ export default {
             top: 0;
             z-index: 1;
             font-size: 0.875rem;
+            line-height: 120%;
             a {
                 @apply text-blue-600;
                 text-decoration: underline;
