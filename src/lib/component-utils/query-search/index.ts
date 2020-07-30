@@ -20,6 +20,8 @@ import {
     SearchKeyGroup,
 } from '@/lib/component-utils/query-search/type';
 import { fluentApi } from '@/lib/fluent-api';
+import { getStatApiValueHandler } from '@/lib/api/query-search';
+import { AutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
 
 
 type KeyParam = Array<string[]|string>
@@ -35,25 +37,50 @@ export function getEnumValueHandler(keys: KeyParam): ValueHandler {
         const res: ValueItem[] = [...keyItems];
         const regex = RegExp(val, 'i');
 
-        forEach(keys, (enumItem) => {
-            if (Array.isArray(enumItem)) {
-                if ((regex.exec(enumItem[0]) || regex.exec(enumItem[1]))) res.push({ label: enumItem[1], name: enumItem[0] });
-            } else if (regex.exec(enumItem)) res.push({ label: enumItem, name: enumItem });
-        });
+        if (val) {
+            forEach(keyItems, (d) => {
+                if ((regex.exec(d.label) || regex.exec(d.name))) res.push(d);
+            });
+        }
+
         return {
             results: res,
-            totalCount: keys.length,
+            totalCount: keyItems.length,
         };
     };
 }
 
-export function makeValueHandlerWithReference(resourceType: string): ValueHandler {
-    const api = fluentApi.addons().autocomplete().get().setResourceType(resourceType);
-    return async (inputText: string, keyItem: KeyItem) => {
+export function makeAutocompleteHandlerWithReference(resourceType: string, distinct?: string, limit?: number): AutocompleteHandler {
+    let api = fluentApi.addons().autocomplete().get()
+        .setResourceType(resourceType)
+        .setLimit(limit || 10);
+    if (distinct) api = api.setDistinct(distinct);
+    return async (inputText: string) => {
         try {
             const res = await api.setSearch(inputText).execute();
             return {
-                results: res.data.results.map(d => ({ label: d.name, name: d.id })),
+                results: res.data.results.map(d => ({ label: d.name, name: d.key, type: 'item' })),
+                totalCount: res.data.total_count,
+            };
+        } catch (e) {
+            return {
+                results: [],
+                totalCount: 0,
+            };
+        }
+    };
+}
+
+export function makeValueHandlerWithReference(resourceType: string, distinct?: string, limit?: number): ValueHandler {
+    let api = fluentApi.addons().autocomplete().get()
+        .setResourceType(resourceType)
+        .setLimit(limit || 10);
+    if (distinct) api = api.setDistinct(distinct);
+    return async (inputText: string) => {
+        try {
+            const res = await api.setSearch(inputText).execute();
+            return {
+                results: res.data.results.map(d => ({ label: d.name, name: d.key })),
                 totalCount: res.data.total_count,
             };
         } catch (e) {
@@ -68,8 +95,8 @@ export function makeValueHandlerWithReference(resourceType: string): ValueHandle
 export function makeValueHandlerMapWithReference(keys: KeyParam, resourceType: string): ValueHandlerMap {
     const res = {};
     keys.forEach((k) => {
-        if (Array.isArray(k)) res[k[0]] = makeValueHandlerWithReference(resourceType);
-        else res[k] = makeValueHandlerWithReference(resourceType);
+        if (Array.isArray(k)) res[k[0]] = makeValueHandlerWithReference(resourceType, k[0]);
+        else res[k] = makeValueHandlerWithReference(resourceType, k);
     });
     return res;
 }
@@ -112,7 +139,10 @@ export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, 
         if (d.enums) {
             res.valueHandlerMap[d.key] = makeValueHandlerWithSearchEnums(d.enums);
         } else {
-            res.valueHandlerMap[d.key] = makeValueHandlerWithReference(d.reference || resourceType);
+            res.valueHandlerMap[d.key] = makeValueHandlerWithReference(
+                d.reference || resourceType,
+                d.reference ? d.key : undefined,
+            );
         }
     });
 
@@ -162,7 +192,7 @@ export class QuerySearchToolSet extends TagToolSet<QueryTag> {
                 || query.value !== tag.value);
         }
         if (!tag.key && !query.key) {
-            return query.value !== tag.value;
+            return query.value.name !== tag.value.name;
         }
         return true;
     });

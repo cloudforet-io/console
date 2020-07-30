@@ -3,7 +3,7 @@ import {
     GetAction, Resource,
     ResourceActions, SetParameterAction,
 } from '@/lib/fluent-api/toolset';
-import { ListType } from '@/lib/fluent-api';
+import { ListType } from '@/lib/fluent-api/type';
 
 const idField = 'search';
 interface IdParameter {
@@ -11,7 +11,7 @@ interface IdParameter {
 }
 
 export interface AutocompleteItem {
-    id: string;
+    key: string;
     name: string;
 }
 
@@ -24,6 +24,12 @@ class Get extends SetParameterAction<any, ListType<AutocompleteItem>> {
         return api;
     }
 
+    setDistinct(distinct: string) {
+        const api = this.clone();
+        api.apiState.parameter.distinct = distinct;
+        return api;
+    }
+
     setSearch(search: string) {
         const api = this.clone();
         api.apiState.parameter.search = search;
@@ -32,7 +38,9 @@ class Get extends SetParameterAction<any, ListType<AutocompleteItem>> {
 
     setLimit(limit: number): this {
         const api = this.clone();
-        api.apiState.parameter.options.limit = limit;
+        api.apiState.parameter.options = {
+            limit,
+        };
         return api;
     }
 }

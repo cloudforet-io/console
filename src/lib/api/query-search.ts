@@ -72,7 +72,7 @@ export function getStatApiValueHandler(
 
 
 export function getStatApiValueHandlerMap(
-    keys: string[],
+    keys: Array<string[]|string>,
     resourceType: string,
     getAction: getValueHandlerActionType<StatQueryAPI<any, any>> = getStatAction,
     formatter: (res: any) => {
@@ -85,7 +85,8 @@ export function getStatApiValueHandlerMap(
 ): ValueHandlerMap {
     const map = {};
     keys.forEach((key) => {
-        map[key] = getStatApiValueHandler(resourceType, getAction, formatter);
+        if (Array.isArray(key)) map[key[0]] = getStatApiValueHandler(resourceType, getAction, formatter);
+        else map[key] = getStatApiValueHandler(resourceType, getAction, formatter);
     });
     return map;
 }
@@ -96,15 +97,15 @@ export const setFilterOrWithSuggestKeys = (query: FilterItem, keyItems: KeyItem[
     });
 };
 
-export const getQueryItemsToFilterItems = (tags: QueryItem[], keyItems?: KeyItem[]): {and: FilterItem[]; or: FilterItem[]} => {
+export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[]): {and: FilterItem[]; or: FilterItem[]} => {
     const and: FilterItem[] = [];
     const or: FilterItem[] = [];
     tags.forEach((q) => {
-        if (q.key !== null && q.key !== undefined) {
+        if (q.key !== null && q.key !== undefined && !q.invalid) {
             and.push({
                 key: q.key?.name as string,
                 value: q.value?.label || q.value?.name || '',
-                operator: '',
+                operator: q.operator,
             });
         } else if (keyItems) {
             setFilterOrWithSuggestKeys({

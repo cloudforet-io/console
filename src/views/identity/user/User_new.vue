@@ -45,29 +45,19 @@
                             Action
                         </p-dropdown-menu-btn>
                         <div class="left-toolbox-item hidden lg:block">
-                            <p-query-search v-model="apiHandler.tableTS.searchText"
-                                            v-bind="apiHandler.tableTS.querySearch.state"
-                                            :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
-                                            @search="apiHandler.tableTS.querySearch.onSearch"
+                            <p-autocomplete-search v-model="searchText"
+                                                   :handler="autocompleteHandler"
+                                                   @search="onSearch"
                             />
                         </div>
                     </template>
                     <template #toolbox-bottom>
                         <div class="flex flex-col flex-1">
-                            <p-query-search v-model="apiHandler.tableTS.searchText"
-                                            class="block lg:hidden mt-4"
-                                            :class="{ 'mb-4': apiHandler.tableTS.querySearch.tags.value.length===0}"
-                                            v-bind="apiHandler.tableTS.querySearch.state"
-                                            :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
-                                            @search="apiHandler.tableTS.querySearch.onSearch"
+                            <p-autocomplete-search v-model="searchText"
+                                                   class="block lg:hidden mt-4"
+                                                   :handler="autocompleteHandler"
+                                                   @search="onSearch"
                             />
-                            <div v-if="apiHandler.tableTS.querySearch.tags.value.length !==0">
-                                <p-query-search-tags
-                                    :tags="apiHandler.tableTS.querySearch.tags.value"
-                                    @delete:tag="apiHandler.tableTS.querySearch.deleteTag"
-                                    @delete:all="apiHandler.tableTS.querySearch.deleteAllTags"
-                                />
-                            </div>
                         </div>
                     </template>
                     <template #col-state-format="{value}">
@@ -136,27 +126,26 @@ import {
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import {
-    timestampFormatter, getValue, userStateFormatter, showErrorMessage,
+    getValue, userStateFormatter, showErrorMessage,
 } from '@/lib/util';
 import { map } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
-    QuerySearchTableFluentAPI,
+    SearchTableFluentAPI,
 } from '@/lib/api/table';
 import {
     TabBarState,
 } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import { fluentApi } from '@/lib/fluent-api';
-import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
+import {
+    makeAutocompleteHandlerWithReference,
+} from '@/lib/component-utils/query-search';
+import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/PTab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/PDataTable.vue');
@@ -173,10 +162,8 @@ export default {
         getValue,
     },
     components: {
+        PAutocompleteSearch,
         PPageNavigation,
-        PQuerySearchTags,
-        PHr,
-        PQuerySearch,
         PIconTextButton,
         GeneralPageLayout,
         PUserForm,
@@ -238,7 +225,7 @@ export default {
             .setSortBy(state.sortBy)
             .setSortDesc(state.sortDesc);
 
-        const apiHandler = new QuerySearchTableFluentAPI(
+        const apiHandler = new SearchTableFluentAPI(
             userListApi,
             {
                 selectable: true,
@@ -248,11 +235,14 @@ export default {
                 settingVisible: false,
                 userCursorLoading: true,
             }, undefined,
-            {
-                keyItems: makeKeyItems(['user_id', 'name']),
-                valueHandlerMap: makeValueHandlerMapWithReference(['user_id', 'name'], 'identity.User'),
-            },
         );
+
+        const searchText = ref('');
+        const autocompleteHandler = makeAutocompleteHandlerWithReference('identity.User');
+        const onSearch = async (val?: string) => {
+            apiHandler.tableTS.searchText.value = val || '';
+            await apiHandler.getData();
+        };
 
         apiHandler.getData();
 
@@ -493,6 +483,9 @@ export default {
             disableUser,
             clickDelete,
             deleteUser,
+            searchText,
+            autocompleteHandler,
+            onSearch,
         };
     },
 };

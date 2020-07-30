@@ -56,6 +56,7 @@
                     <template slot="toolbox-bottom">
                         <div class="mb-6 search">
                             <p-query-search v-model="apiHandler.gridTS.querySearch.state.searchText"
+                                            :key-items="apiHandler.gridTS.querySearch.state.keyItems"
                                             :value-handler-map="apiHandler.gridTS.querySearch.valueHandlerMap"
                                             @search="apiHandler.gridTS.querySearch.onSearch"
                             />

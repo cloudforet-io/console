@@ -226,7 +226,10 @@ export default {
             {
                 keyItems: makeKeyItems(args.keys),
                 valueHandlerMap: {
-                    ...makeValueHandlerMapWithReference(['collector_id', 'name', 'plugin_info.options.supported_resource_type'], 'inventory.Collector'),
+                    ...makeValueHandlerMapWithReference([
+                        ['collector_id', 'ID'],
+                        ['name', 'Name']],
+                    'inventory.Collector'),
                     state: getEnumValueHandler(['ENABLED', 'DISABLED']),
                     'plugin_info.options.supported_resource_type': getEnumValueHandler(['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
                 },

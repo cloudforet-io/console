@@ -118,7 +118,8 @@ import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { makeKeyItems, makeValueHandlerWithReference } from '@/lib/component-utils/query-search';
+import { makeKeyItems } from '@/lib/component-utils/query-search';
+import { getStatApiValueHandler } from '@/lib/api/query-search';
 
 const repoState = reactive({
     repositories: [] as unknown as RepositoryModel[],
@@ -154,7 +155,7 @@ export const setup = (props, { root }) => {
         {
             keyItems: makeKeyItems(['labels']),
             valueHandlerMap: {
-                label: makeValueHandlerWithReference('repository.Plugin'),
+                label: getStatApiValueHandler('repository.Plugin'),
             },
         },
     );

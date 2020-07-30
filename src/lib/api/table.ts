@@ -144,60 +144,6 @@ export class SearchTableFluentAPI<
     };
 }
 
-export class SubDataFluentAPI<
-    parameter = any,
-    resp extends ListType<any> = ListType<any>,
-    initData = any,
-    initSyncData = any,
-    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
-    action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
-    > extends SearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
-    getAction = () => this.getSearchTableDefaultAction()
-        .setKeyPath(this.keyPath.value)
-        .setId(this.resourceId.value);
-
-    constructor(
-        action: action,
-        protected keyPath: forceRefArg<string>,
-        protected resourceId: forceRefArg<string>,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-    ) {
-        super(
-            action,
-            {
-                striped: false,
-                border: false,
-                shadow: false,
-                selectable: false,
-                excelVisible: true,
-                ...initData,
-            }, // sub api can't support only query
-            initSyncData,
-        );
-        onMounted(() => {
-            watch([this.resourceId, this.keyPath], async (origin, before) => {
-                let id;
-                let path;
-                let preId;
-                let prePath;
-                if (origin) {
-                    id = origin[0];
-                    path = origin[1];
-                }
-                if (before) {
-                    preId = before[0];
-                    prePath = before[1];
-                }
-
-                if (id && path && (id !== preId || path !== prePath)) {
-                    await this.getData();
-                }
-            });
-        });
-    }
-}
-
 
 export class TabSearchTableFluentAPI<
     parameter = any,

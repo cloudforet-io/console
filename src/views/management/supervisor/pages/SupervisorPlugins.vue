@@ -1,8 +1,8 @@
 <template>
     <general-page-layout>
-        <PPageTitle title="Plugins"
-                    use-total-count
-                    :total-count="apiHandler.totalCount.value"
+        <p-page-title title="Plugins"
+                      use-total-count
+                      :total-count="apiHandler.totalCount.value"
         />
         <p-horizontal-layout>
             <template #container="{ height }">
@@ -35,9 +35,9 @@
                 </p-toolbox-table>
             </template>
         </p-horizontal-layout>
-        <PTab v-if="apiHandler.tableTS.selectState.isSelectOne"
-              :tabs="singleItemTab.state.tabs"
-              :active-tab.sync="singleItemTab.syncState.activeTab"
+        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne"
+               :tabs="singleItemTab.state.tabs"
+               :active-tab.sync="singleItemTab.syncState.activeTab"
         >
             <template #detail>
                 <p-panel-top>{{ pluginDetails.name }}</p-panel-top>
@@ -47,10 +47,10 @@
             <template #rawData>
                 <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
-        </PTab>
-        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
-              :tabs="multiItemTab.state.tabs"
-              :active-tab.sync="multiItemTab.syncState.activeTab"
+        </p-tab>
+        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
+               :tabs="multiItemTab.state.tabs"
+               :active-tab.sync="multiItemTab.syncState.activeTab"
         >
             <template #data>
                 <p-data-table :items="apiHandler.tableTS.selectState.selectItems"
@@ -58,7 +58,7 @@
                               col-copy
                 />
             </template>
-        </PTab>
+        </p-tab>
     </general-page-layout>
 </template>
 
@@ -78,7 +78,6 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PDictPanel from '@/views/common/tags/dict-panel/PDictPanel_deprecated.vue';
 import { showErrorMessage } from '@/lib/util';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import { defaultACHandler, getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
@@ -91,7 +90,7 @@ import {
     queryTagsToOriginal,
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
-import {makeKeyItems, makeValueHandlerMapWithReference} from "@/lib/component-utils/query-search";
+import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
 
 export default {
     name: 'Supervisor',
