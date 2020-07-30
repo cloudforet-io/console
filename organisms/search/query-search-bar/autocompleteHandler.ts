@@ -18,12 +18,6 @@ export class SearchQuery implements SearchQueryType {
 
 export const SEARCH_PREFIX = 'Search';
 
-export const setFilterOrWithSuggestKeys = (query: FilterItem, suggestKeys: string[], filterOr: FilterItem[]): void => {
-    suggestKeys.forEach((key) => {
-        filterOr.push({ ...query, key });
-    });
-};
-
 export const searchContextType = Object.freeze({
     Key: Symbol('Key'),
     Value: Symbol('Value'),
@@ -79,11 +73,6 @@ export class BaseAutocompleteHandler {
         return [];
     }
 }
-
-export const getValues = (contextType, inputText, searchQuery): AutoCompleteData => {
-    const prefix = `${searchQuery.key}:${searchQuery.operator}`;
-    return [searchQuery.key, [`${prefix} ${searchQuery.value}`]];
-};
 
 export const getEnumValues = (key, values): ACFunction => (contextType: CONTEXT_MENU_TYPE, inputText: string, searchQuery: FilterItem): AutoCompleteData => {
     if (searchQuery.key === key) {
@@ -191,16 +180,6 @@ export function getValueHandler<api extends StatQueryAPI<any, any>|QueryAPI<any,
     };
 }
 
-/**
- * * @description Get Auto Complete Handler List for values
- */
-
-export function makeValueHandlers<api extends StatQueryAPI<any, any>|QueryAPI<any, any> = StatQueryAPI<any, any>>(valuesFetchKeys: string[], action: api): ACFunction[] {
-    if (valuesFetchKeys.length > 0) {
-        return _.flatMap(valuesFetchKeys, key => getValueHandler(key, action));
-    }
-    return [];
-}
 
 /**
  * @param parent

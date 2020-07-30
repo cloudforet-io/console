@@ -111,7 +111,6 @@ export class QuerySearchGridLayoutToolSet<initData, initSyncData> extends Toolbo
     constructor(
         keyItems: KeyItem[],
         valueHandlerMap: ValueHandlerMap,
-        suggestKeys: string[],
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         lazy = false,
