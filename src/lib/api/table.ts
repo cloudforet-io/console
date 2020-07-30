@@ -281,7 +281,7 @@ export class QuerySearchTableFluentAPI<
     action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
     > extends BaseTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
     initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
-        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.keyHandler, acHandlerMeta.valueHandlerMap, acHandlerMeta.suggestKeys, initData, initSyncData) as T;
+        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.keyItems, acHandlerMeta.valueHandlerMap, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
             if (tags !== preTags && this.action) {
                 await this.getData(true);
@@ -304,7 +304,7 @@ export class QuerySearchTableFluentAPI<
 
     getAction = () => {
         if (Array.isArray(this.tableTS.querySearch.tags.value)) {
-            const items = getQueryItemsToFilterItems(this.tableTS.querySearch.tags.value, this.tableTS.querySearch.suggestKeys);
+            const items = getQueryItemsToFilterItems(this.tableTS.querySearch.tags.value, this.tableTS.querySearch.state.keyItems);
             return this.getDefaultAction()
                 .setFilter(...items.and)
                 .setFilterOr(...items.or);

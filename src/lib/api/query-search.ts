@@ -4,24 +4,18 @@ import { fluentApi } from '@/lib/fluent-api';
 import { get } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import {
-    KeyItem, QueryItem, ValueItem,
+    KeyItem, QueryItem, ValueHandler, ValueHandlerMap, ValueItem,
 } from '@/components/organisms/search/query-search/type';
-import { KeyHandler, ValueHandler, ValueHandlerMap } from '@/lib/component-utils/query-search/type';
 
 
 export interface ACHandlerMeta {
-    keyHandler: KeyHandler;
+    keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
-    suggestKeys: string[];
 }
 
 export const defaultACHandler: ACHandlerMeta = {
-    keyHandler: async inputText => ({
-        results: [],
-        totalCount: 0,
-    }),
+    keyItems: [],
     valueHandlerMap: {},
-    suggestKeys: [],
 };
 
 type getValueHandlerActionType<T> = (
@@ -96,13 +90,13 @@ export function getStatApiValueHandlerMap(
     return map;
 }
 
-export const setFilterOrWithSuggestKeys = (query: FilterItem, suggestKeys: string[], filterOr: FilterItem[]): void => {
-    suggestKeys.forEach((key) => {
-        filterOr.push({ ...query, key });
+export const setFilterOrWithSuggestKeys = (query: FilterItem, keyItems: KeyItem[], filterOr: FilterItem[]): void => {
+    keyItems.forEach((keyItem) => {
+        filterOr.push({ ...query, key: keyItem.name });
     });
 };
 
-export const getQueryItemsToFilterItems = (tags: QueryItem[], suggestKeys?: string[]): {and: FilterItem[]; or: FilterItem[]} => {
+export const getQueryItemsToFilterItems = (tags: QueryItem[], keyItems?: KeyItem[]): {and: FilterItem[]; or: FilterItem[]} => {
     const and: FilterItem[] = [];
     const or: FilterItem[] = [];
     tags.forEach((q) => {
@@ -112,12 +106,12 @@ export const getQueryItemsToFilterItems = (tags: QueryItem[], suggestKeys?: stri
                 value: q.value?.label || q.value?.name || '',
                 operator: '',
             });
-        } else if (suggestKeys) {
+        } else if (keyItems) {
             setFilterOrWithSuggestKeys({
                 key: '',
                 value: q.value?.label || q.value?.name || '',
                 operator: q.operator,
-            }, suggestKeys, or);
+            }, keyItems, or);
         }
     });
 

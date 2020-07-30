@@ -16,8 +16,8 @@
                                   type="query-search-table"
                                   :toolset="apiHandler"
                                   :options="options"
+                                  :style="{'height': height+'px'}"
                                   :vbind="{
-                                      responsiveStyle: {'height': height+'px', overflow: 'auto'},
                                       showTitle: false,
                                       exportFields: mergeFields,
                                       resourceType: 'inventory.CloudService'
@@ -175,7 +175,6 @@ import { get, debounce } from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
-    selectIndexAutoReplacer,
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray,
     queryTagsToOriginal,
@@ -183,8 +182,7 @@ import {
 } from '@/lib/router-query-string';
 import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
-import { getKeyHandler } from '@/lib/component-utils/query-search';
+import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 const rawLayout = {
@@ -327,9 +325,8 @@ export default {
             }
             state.originFields = resp.data.results[0].metadata?.view?.table?.layout?.options?.fields || [];
             const keys = state.originFields.map(i => i.key);
-            apiHandler.tableTS.querySearch.keyHandler = getKeyHandler(keys);
-            apiHandler.tableTS.querySearch.valueHandlerMap = getStatApiValueHandlerMap(keys, 'inventory.CloudService');
-            apiHandler.tableTS.querySearch.suggestKeys = keys;
+            apiHandler.tableTS.querySearch.state.keyItems = makeKeyItems(keys);
+            apiHandler.tableTS.querySearch.valueHandlerMap = makeValueHandlerMapWithReference(keys, 'inventory.CloudService');
         };
 
         getFields(props.provider, props.group, props.name);

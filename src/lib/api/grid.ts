@@ -138,7 +138,7 @@ export class StatSearchGridFluentAPI<
             .setLimit(this.gridTS.syncState.pageSize as number) as action;
     }
 
-    getSearchTableDefaultAction: () => action = () => this.getDefaultAction()//.setKeyword(this.gridTS.searchText.value);
+    getSearchTableDefaultAction: () => action = () => this.getDefaultAction()// .setKeyword(this.gridTS.searchText.value);
 
     getAction = () => this.getSearchTableDefaultAction();
 
@@ -157,7 +157,7 @@ export class StatQuerySearchGridFluentAPI<
     action extends StatTopicQueryAPI<parameter, resp> = StatTopicQueryAPI<parameter, resp>,
     > extends BaseGridFluentAPI<parameter, resp, initData, initSyncData, T, action> {
     initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
-        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyHandler, acHandlerMeta.valueHandlerMap, acHandlerMeta.suggestKeys, initData, initSyncData) as T;
+        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyItems, acHandlerMeta.valueHandlerMap, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
             if (tags !== preTags && this.action) {
                 await this.getData(true);
@@ -185,7 +185,7 @@ export class StatQuerySearchGridFluentAPI<
     }
 
     getAction = () => {
-        const items = getQueryItemsToFilterItems(this.gridTS.querySearch.tags.value, this.gridTS.querySearch.suggestKeys);
+        const items = getQueryItemsToFilterItems(this.gridTS.querySearch.tags.value, this.gridTS.querySearch.state.keyItems);
         return this.getDefaultAction()
             .setFilter(...items.and)
             .setFilterOr(...items.or);
@@ -206,7 +206,7 @@ export class QuerySearchGridFluentAPI<
     action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
     > extends BaseGridFluentAPI<parameter, resp, initData, initSyncData, T, action> {
     initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
-        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyHandler, acHandlerMeta.valueHandlerMap, acHandlerMeta.suggestKeys, initData, initSyncData) as T;
+        this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyItems, acHandlerMeta.valueHandlerMap, initData, initSyncData) as T;
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
             if (tags !== preTags) {
                 await this.getData(true);
@@ -234,7 +234,7 @@ export class QuerySearchGridFluentAPI<
     }
 
     getAction = () => {
-        const items = getQueryItemsToFilterItems(this.gridTS.querySearch.tags.value, this.gridTS.querySearch.suggestKeys);
+        const items = getQueryItemsToFilterItems(this.gridTS.querySearch.tags.value, this.gridTS.querySearch.state.keyItems);
         return this.getDefaultAction()
             .setFilter(...items.and)
             .setFilterOr(...items.or);

@@ -57,10 +57,6 @@
                         <div class="mb-6 search">
                             <p-query-search v-model="apiHandler.gridTS.querySearch.state.searchText"
                                             v-bind="apiHandler.gridTS.querySearch.state"
-                                            @menu:show="apiHandler.gridTS.querySearch.onMenuShow"
-                                            @key:input="apiHandler.gridTS.querySearch.onKeyInput"
-                                            @value:input="apiHandler.gridTS.querySearch.onValueInput"
-                                            @key:select="apiHandler.gridTS.querySearch.onKeySelect"
                                             @search="apiHandler.gridTS.querySearch.onSearch"
                             />
                         </div>
@@ -158,12 +154,10 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQ
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
-import { getKeyHandler } from '@/lib/component-utils/query-search';
-import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/PRouteBreadcrumb.vue';
+import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
@@ -253,11 +247,10 @@ export default {
             },
             undefined,
             {
-                keyHandler: getKeyHandler(args.keys),
+                keyItems: makeKeyItems(args.keys),
                 valueHandlerMap: {
-                    ...getStatApiValueHandlerMap(args.keys, 'inventory.CloudService'),
+                    ...makeValueHandlerMapWithReference(args.keys, 'inventory.CloudService'),
                 },
-                suggestKeys: args.suggestKeys,
             },
         );
 

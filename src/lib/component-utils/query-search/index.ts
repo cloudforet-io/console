@@ -1,21 +1,23 @@
 import {
-    KeyItem, QueryItem, QuerySearchState, QuerySearchSyncState, ValueItem,
+    KeyItem,
+    QueryItem,
+    QuerySearchProps,
+    QuerySearchState,
+    QuerySearchSyncState,
+    ValueHandler,
+    ValueHandlerMap,
+    ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import {
-    debounce, forEach, map, size,
+    forEach, map, size,
 } from 'lodash';
 import { ChangeTagCallBack, TagToolSet } from '@/components/molecules/tags/PTag.toolset';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { reactive, ref, Ref } from '@vue/composition-api';
 import {
-    KeyHandler,
-    SearchAutocompleteHelper,
     SearchEnumItem,
     SearchEnums,
     SearchKeyGroup,
-    SearchKeyOptions,
-    ValueHandler,
-    ValueHandlerMap,
 } from '@/lib/component-utils/query-search/type';
 import { fluentApi } from '@/lib/fluent-api';
 
@@ -26,67 +28,21 @@ export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
     return { name: d, label: d };
 });
 
-export function getKeyHandler(keys: KeyParam): KeyHandler {
+export function getEnumValueHandler(keys: KeyParam): ValueHandler {
     const keyItems = makeKeyItems(keys);
 
-    return async (val: string) => {
-        let res = keyItems;
-        if (val) {
-            res = keyItems.reduce((result, item) => {
-                if (item.label.includes(val) || item.name.includes(val)) result.push(item);
-                return result;
-            }, [] as KeyItem[]);
-        }
-
-        return {
-            results: res,
-            totalCount: keys.length,
-        };
-    };
-}
-
-export function getEnumValueHandler(enums: string[]): ValueHandler {
     return async (val: string, keyItem: KeyItem) => {
-        const res: ValueItem[] = [];
-        forEach(enums, (enumItem) => {
-            if (typeof enumItem === 'string' && enumItem.includes(val)) res.push({ label: enumItem, name: enumItem });
+        const res: ValueItem[] = [...keyItems];
+        const regex = RegExp(val, 'i');
+
+        forEach(keys, (enumItem) => {
+            if (Array.isArray(enumItem)) {
+                if ((regex.exec(enumItem[0]) || regex.exec(enumItem[1]))) res.push({ label: enumItem[1], name: enumItem[0] });
+            } else if (regex.exec(enumItem)) res.push({ label: enumItem, name: enumItem });
         });
         return {
             results: res,
-            totalCount: enums.length,
-        };
-    };
-}
-export const defaultSearchAutocompleteHelper: SearchAutocompleteHelper = Object.freeze({
-    keyHandler: async text => ({
-        results: [],
-        totalCount: 0,
-    }),
-    valueHandlerMap: {},
-    suggestKeys: [],
-});
-
-export function makeKeyHandlerWithSearchKeyOptions(keyOptions: SearchKeyOptions[]): KeyHandler {
-    const allItems = keyOptions.map(d => ({ label: d.name, name: d.key, dataType: d.data_type }));
-
-    return async (val: string) => {
-        let keyItems: KeyItem[] = allItems;
-
-        if (val) {
-            const regex = RegExp(val, 'i');
-            keyItems = keyOptions.reduce((result, d) => {
-                if (regex.exec(d.name) || regex.exec(d.key)) {
-                    result.push({
-                        label: d.name, name: d.key, dataType: d.data_type,
-                    });
-                }
-                return result;
-            }, [] as KeyItem[]);
-        }
-
-        return {
-            results: keyItems,
-            totalCount: keyOptions.length,
+            totalCount: keys.length,
         };
     };
 }
@@ -109,6 +65,15 @@ export function makeValueHandlerWithReference(resourceType: string): ValueHandle
     };
 }
 
+export function makeValueHandlerMapWithReference(keys: KeyParam, resourceType: string): ValueHandlerMap {
+    const res = {};
+    keys.forEach((k) => {
+        if (Array.isArray(k)) res[k[0]] = makeValueHandlerWithReference(resourceType);
+        else res[k] = makeValueHandlerWithReference(resourceType);
+    });
+    return res;
+}
+
 export function makeValueHandlerWithSearchEnums(
     enums: SearchEnums,
 ): ValueHandler {
@@ -122,8 +87,7 @@ export function makeValueHandlerWithSearchEnums(
     });
 
     return async (inputText: string, keyItem: KeyItem) => {
-        let res: ValueItem[] = allItems;
-
+        let res: ValueItem[] = [...allItems];
         if (inputText) {
             const regex = RegExp(inputText, 'i');
             res = allItems.reduce((result, d) => {
@@ -139,10 +103,10 @@ export function makeValueHandlerWithSearchEnums(
     };
 }
 
-export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, resourceType: string): SearchAutocompleteHelper {
-    const res = { ...defaultSearchAutocompleteHelper };
+export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, resourceType: string): Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> {
+    const res: Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> = { keyItems: [], valueHandlerMap: {} };
 
-    res.keyHandler = makeKeyHandlerWithSearchKeyOptions(schema.items);
+    res.keyItems = schema.items.map(d => ({ label: d.name, name: d.key, dataType: d.data_type }));
 
     schema.items.forEach((d) => {
         if (d.enums) {
@@ -152,8 +116,6 @@ export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, 
         }
     });
 
-    res.suggestKeys = schema.items.map(d => d.key);
-
     return res;
 }
 
@@ -161,64 +123,32 @@ export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, 
 export class QuerySearchToolSet extends TagToolSet<QueryTag> {
     state: QuerySearchState = reactive({
         keyItems: [],
-        valueItems: [],
         placeholder: 'Search',
-        loading: false,
         focused: true,
-        totalCount: 0,
+        valueHandlerMap: {},
     });
 
     syncState: QuerySearchSyncState = reactive({
         value: '',
     }) as unknown as QuerySearchSyncState
 
-    keyHandler: KeyHandler;
-
     valueHandlerMap: ValueHandlerMap;
-
-    suggestKeys: string[];
-
-    onMenuShow = async (val: string, keyItem?: KeyItem) => {
-        if (keyItem) await this.onValueInput(val, keyItem);
-        else await this.onKeyInput(val);
-    }
-
-    onKeySelect = async (keyItem: KeyItem) => {
-        const res = await this.valueHandlerMap[keyItem.name]('', keyItem);
-        this.state.valueItems = res.results;
-        this.state.totalCount = res.totalCount;
-    }
-
-    onKeyInput = debounce(async (val: string) => {
-        const res = await this.keyHandler(val);
-        this.state.keyItems = res.results;
-        this.state.totalCount = res.totalCount;
-    }, 200)
-
-    onValueInput = debounce(async (val: string, keyItem: KeyItem) => {
-        const res = await this.valueHandlerMap[keyItem.name](val, keyItem) || [];
-        this.state.valueItems = res.results;
-        this.state.totalCount = res.totalCount;
-    }, 200)
 
     onSearch = async (query: QueryItem) => {
         this.addTag(query);
     }
 
     constructor(
-        keyHandler: KeyHandler,
+        keyItems: KeyItem[],
         valueHandlerMap: ValueHandlerMap,
-        suggestKeys: string[],
         tags: Ref<any[]> = ref([]),
         checkDuplicate = true,
         changeTagCallBack?: ChangeTagCallBack,
     ) {
         super(tags, checkDuplicate, changeTagCallBack);
-        this.keyHandler = keyHandler;
+        this.state.keyItems = keyItems;
         this.valueHandlerMap = valueHandlerMap;
-        this.suggestKeys = suggestKeys;
     }
-
 
     addTag = (val: QueryItem) => {
         if (this.checkDuplicate && !this.validation(val)) return;

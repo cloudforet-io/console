@@ -23,10 +23,7 @@
                         <p-query-search v-model="apiHandler.tableTS.querySearch.syncState.value"
                                         class="w-full"
                                         v-bind="apiHandler.tableTS.querySearch.state"
-                                        @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
-                                        @key:input="apiHandler.tableTS.querySearch.onKeyInput"
-                                        @value:input="apiHandler.tableTS.querySearch.onValueInput"
-                                        @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                        :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
                                         @search="apiHandler.tableTS.querySearch.onSearch"
                         />
                     </template>
@@ -94,6 +91,7 @@ import {
     queryTagsToOriginal,
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
+import {makeKeyItems, makeValueHandlerMapWithReference} from "@/lib/component-utils/query-search";
 
 export default {
     name: 'Supervisor',
@@ -159,11 +157,10 @@ export default {
 
             undefined,
             {
-                keyHandler: defaultACHandler.keyHandler,
-                valueHandlerMap: getStatApiValueHandlerMap(
+                keyItems: makeKeyItems(pluginKeyAutoCompletes),
+                valueHandlerMap: makeValueHandlerMapWithReference(
                     pluginKeyAutoCompletes, 'plugin.Supervisor',
                 ),
-                suggestKeys: pluginKeyAutoCompletes,
             },
         );
 

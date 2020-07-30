@@ -118,8 +118,7 @@ import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
-import {getKeyHandler} from "@/lib/component-utils/query-search";
+import { makeKeyItems, makeValueHandlerWithReference } from '@/lib/component-utils/query-search';
 
 const repoState = reactive({
     repositories: [] as unknown as RepositoryModel[],
@@ -138,7 +137,7 @@ export const setup = (props, { root }) => {
     });
 
     const routeState = reactive({
-        route: [{ name: 'Plugin', path: '/plugin'}, { name: 'Collector', path: '/plugin/collector'}, { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
+        route: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }, { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
     });
 
     const listApi = fluentApi.repository().plugin().list().setServiceType('inventory.Collector');
@@ -153,9 +152,10 @@ export const setup = (props, { root }) => {
         },
         undefined,
         {
-            keyHandler: getKeyHandler(['labels']),
-            valueHandlerMap: getStatApiValueHandlerMap(['labels'], 'repository.Plugin'),
-            suggestKeys: ['labels'],
+            keyItems: makeKeyItems(['labels']),
+            valueHandlerMap: {
+                label: makeValueHandlerWithReference('repository.Plugin'),
+            },
         },
     );
 

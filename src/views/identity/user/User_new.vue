@@ -47,10 +47,7 @@
                         <div class="left-toolbox-item hidden lg:block">
                             <p-query-search v-model="apiHandler.tableTS.searchText"
                                             v-bind="apiHandler.tableTS.querySearch.state"
-                                            @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
-                                            @key:input="apiHandler.tableTS.querySearch.onKeyInput"
-                                            @value:input="apiHandler.tableTS.querySearch.onValueInput"
-                                            @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                            :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
                                             @search="apiHandler.tableTS.querySearch.onSearch"
                             />
                         </div>
@@ -61,10 +58,7 @@
                                             class="block lg:hidden mt-4"
                                             :class="{ 'mb-4': apiHandler.tableTS.querySearch.tags.value.length===0}"
                                             v-bind="apiHandler.tableTS.querySearch.state"
-                                            @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
-                                            @key:input="apiHandler.tableTS.querySearch.onKeyInput"
-                                            @value:input="apiHandler.tableTS.querySearch.onValueInput"
-                                            @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                            :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
                                             @search="apiHandler.tableTS.querySearch.onSearch"
                             />
                             <div v-if="apiHandler.tableTS.querySearch.tags.value.length !==0">
@@ -158,12 +152,11 @@ import {
     TabBarState,
 } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import { fluentApi } from '@/lib/fluent-api';
-import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import {getKeyHandler} from "@/lib/component-utils/query-search";
+import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
 
 const PTab = () => import('@/components/organisms/tabs/tab/PTab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/PDataTable.vue');
@@ -256,9 +249,8 @@ export default {
                 userCursorLoading: true,
             }, undefined,
             {
-                keyHandler: getKeyHandler(['user_id', 'name']),
-                valueHandlerMap: getStatApiValueHandlerMap(['user_id', 'name'], ''),
-                suggestKeys: ['user_id', 'name'],
+                keyItems: makeKeyItems(['user_id', 'name']),
+                valueHandlerMap: makeValueHandlerMapWithReference(['user_id', 'name'], 'identity.User'),
             },
         );
 

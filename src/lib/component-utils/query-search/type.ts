@@ -26,24 +26,3 @@ export interface SearchKeyGroup {
     items: SearchKeyOptions[];
     options?: object;
 }
-
-
-/** query search helper(handlers) types */
-export type KeyHandler = (inputText: string) => Promise<{
-    results: KeyItem[];
-    totalCount: number;
-}>;
-export type ValueHandler = (inputText: string, keyItem: KeyItem) => Promise<{
-    results: ValueItem[];
-    totalCount: number;
-}>;
-
-export interface ValueHandlerMap {
-    [key: string]: ValueHandler;
-}
-
-export interface SearchAutocompleteHelper {
-    keyHandler: KeyHandler;
-    valueHandlerMap: ValueHandlerMap;
-    suggestKeys: string[];
-}

@@ -184,17 +184,8 @@ import {
 import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { get } from 'lodash';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import {
-    getStatApiValueHandler,
-    getStatApiValueHandlerMap,
-} from '@/lib/api/query-search';
-import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import {
-    getEnumValueHandler,
-    getKeyHandler,
     makeQuerySearchHandlersWithSearchSchema,
 } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';

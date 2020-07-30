@@ -53,10 +53,6 @@
                         <p-query-search v-model="querySearch.syncState.value"
                                         class="search-bar"
                                         v-bind="querySearch.state"
-                                        @menu:show="querySearch.onMenuShow"
-                                        @key:input="querySearch.onKeyInput"
-                                        @value:input="querySearch.onValueInput"
-                                        @key:select="querySearch.onKeySelect"
                                         @search="querySearch.onSearch"
                         />
                         <p-hr v-if="querySearch.tags.value.length !== 0" style="width: 100%;" />
@@ -323,7 +319,7 @@ export default {
             }),
             result: {},
         });
-        const querySearch = new QuerySearchToolSet(defaultACHandler.keyHandler, defaultACHandler.valueHandlerMap, defaultACHandler.suggestKeys);
+        const querySearch = new QuerySearchToolSet([], {});
 
         const methodForm = new JsonSchemaFormToolSet();
         watch(() => state.schema, (aft, bef) => {
@@ -362,7 +358,7 @@ export default {
                 }
             });
             if (state.hasFilter && querySearch.tags.value.length > 0) {
-                const items = getQueryItemsToFilterItems(querySearch.tags.value, querySearch.suggestKeys);
+                const items = getQueryItemsToFilterItems(querySearch.tags.value, querySearch.state.keyItems);
                 act = act.setFilter(...items.and)
                     .setFilterOr(...items.or);
             }
@@ -400,25 +396,20 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .tab-content{
-        @apply  p-4 ;
-
+    .tab-content {
+        @apply p-4 ;
     }
-    .toolbar{
+    .toolbar {
         @apply flex ;
-        .tool-area{
+        .tool-area {
             @apply flex flex-col min-w-6 mr-4;
 
-            .label{
+            .label {
                 @apply align-middle py-2 font-bold;
-
-            }
-            .content{
-
             }
         }
     }
-    .parameter-raw-data{
+    .parameter-raw-data {
         height: 30rem !important;
     }
 </style>

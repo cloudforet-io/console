@@ -42,6 +42,36 @@
                         {{ data.value }}
                     </template>
                 </s-dynamic-layout>
+                <!--                <p-query-search-table :fields="mainTable.fields"-->
+                <!--                                      :items="mainTable.items" :loading="mainTable.loading"-->
+                <!--                                      :value-handler-map="handlers.valueHandlerMap"-->
+                <!--                                      :key-handler="handlers.keyHandler"-->
+                <!--                >-->
+                <!--                    <template #toolbox-left>-->
+                <!--                        <p-icon-text-button style-type="primary-dark"-->
+                <!--                                            name="ic_plus_bold"-->
+                <!--                                            @click="$router.push({path: '/plugin/collector/create/plugins'})"-->
+                <!--                        >-->
+                <!--                            {{ $t('BTN.CREATE') }}-->
+                <!--                        </p-icon-text-button>-->
+                <!--                        <p-dropdown-menu-btn class="left-toolbox-item"-->
+                <!--                                             :menu="dropdown"-->
+                <!--                                             @click-update="onClickUpdate"-->
+                <!--                                             @click-enable="onClickEnable"-->
+                <!--                                             @click-disable="onClickDisable"-->
+                <!--                                             @click-delete="onClickDelete"-->
+                <!--                                             @click-collectData="onClickCollectData"-->
+                <!--                        >-->
+                <!--                            {{ $t('BTN.ACTION') }}-->
+                <!--                        </p-dropdown-menu-btn>-->
+                <!--                    </template>-->
+                <!--                    <template #col-name-format="data">-->
+                <!--                        <p-lazy-img :img-url="getIcon(data)"-->
+                <!--                                    width="1.5rem" height="1.5rem" class="mr-2"-->
+                <!--                        />-->
+                <!--                        {{ data.value }}-->
+                <!--                    </template>-->
+                <!--                </p-query-search-table>-->
             </template>
         </p-horizontal-layout>
 
@@ -134,9 +164,14 @@ import {
     queryTagsToOriginal,
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
-import { getStatApiValueHandlerMap } from '@/lib/api/query-search';
-import { getEnumValueHandler, getKeyHandler } from '@/lib/component-utils/query-search';
+import {
+    getEnumValueHandler,
+    makeKeyItems,
+    makeQuerySearchHandlersWithSearchSchema, makeValueHandlerMapWithReference,
+} from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
+import { QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 
 const PTab = (): Component => import('@/components/organisms/tabs/tab/PTab.vue') as Component;
 const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/PTableCheckModal.vue') as Component;
@@ -150,6 +185,7 @@ const CollectorSchedules = (): Component => import('@/views/plugin/collector/mod
 export default {
     name: 'Collector',
     components: {
+        PQuerySearchTable,
         PPageTitle,
         GeneralPageLayout,
         PLazyImg,
@@ -188,13 +224,12 @@ export default {
             },
             undefined,
             {
-                keyHandler: getKeyHandler(args.keys),
+                keyItems: makeKeyItems(args.keys),
                 valueHandlerMap: {
-                    ...getStatApiValueHandlerMap(args.keys, 'inventory.Collector'),
+                    ...makeValueHandlerMapWithReference(['collector_id', 'name', 'plugin_info.options.supported_resource_type'], 'inventory.Collector'),
                     state: getEnumValueHandler(['ENABLED', 'DISABLED']),
                     'plugin_info.options.supported_resource_type': getEnumValueHandler(['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
                 },
-                suggestKeys: args.suggestKeys,
             },
         );
 
@@ -325,6 +360,35 @@ export default {
             })),
         });
 
+        const handlers = makeQuerySearchHandlersWithSearchSchema({
+            title: 'Properties',
+            items: [
+                { key: 'server_id', name: 'ID' },
+                { key: 'name', name: 'Name' },
+                { key: 'state', name: 'State', enums: ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'] },
+                { key: 'primary_ip_address', name: 'Primary IP' },
+                { key: 'server_type', name: 'Server Type', enums: ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN'] },
+                { key: 'os_type', name: 'OS Type', enums: ['LINUX', 'WINDOWS'] },
+                { key: 'project_id', name: 'Project', reference: 'identity.Project' },
+                { key: 'data.compute.instance_name', name: 'Instance' },
+                { key: 'data.compute.instance_id', name: 'Instance ID' },
+                { key: 'collection_info.state', name: 'Collection State', enums: ['MANUAL', 'ACTIVE', 'DISCONNECTED'] },
+            ],
+        }, 'inventory.Server');
+
+        const mainTable: Partial<QuerySearchTableProps> = reactive({
+            fields: [
+                { name: 'name', label: 'Name', width: '14rem' },
+                { name: 'state', label: 'State', width: '7rem' },
+                { name: 'priority', label: 'Priority', width: '14rem' },
+                { name: 'last_collected_at.seconds', label: 'Last Collected', width: '9rem' },
+                { name: 'created_at.seconds', label: 'Created', width: '9rem' },
+            ],
+            items: [],
+            loading: true,
+
+        });
+
         const routeState = reactive({
             route: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
         });
@@ -413,6 +477,8 @@ export default {
 
         return {
             ...toRefs(state),
+            mainTable,
+            handlers,
             ...toRefs(routeState),
             singleItemTab,
             multiItemTab,
