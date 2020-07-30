@@ -69,7 +69,7 @@ export default {
         @apply mb-6 inline-flex content-start items-center;
         .title{
             @apply font-bold;
-            font-size: 2rem;
+            font-size: 1.5rem;
             line-height: 120%;
             &.child{
                 font-size: 1.5rem;

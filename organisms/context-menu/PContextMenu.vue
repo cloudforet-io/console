@@ -251,7 +251,7 @@ export default {
                 line-height: 2rem;
                 padding: 0 0.5rem;
                 border-radius: 0.25rem;
-                &:hover {
+                &:hover, &:focus {
                     /*@apply bg-primary4 text-primary;*/
                     @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
                     theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');

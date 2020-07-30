@@ -52,8 +52,10 @@ export default {
 
 <style lang="postcss">
     .p-page-navigation {
+        margin-bottom: 0.5rem;
+
         .link {
-            @apply text-xs text-gray-900 mb-1 cursor-pointer;
+            @apply text-xs text-gray-900 cursor-pointer;
             opacity: 0.5;
 
             &:hover {
@@ -62,9 +64,9 @@ export default {
         }
 
         .arrow-icon {
+            @apply text-gray-200;
             margin-left: 0.25rem;
             margin-right: 0.25rem;
-            opacity: 0.5;
         }
     }
 </style>
