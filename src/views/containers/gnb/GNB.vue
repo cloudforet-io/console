@@ -75,7 +75,7 @@
                      @click.stop="toggleMenu('account')"
                 >
                     <div class="menu-icon"
-                         :class="[{opened: openedMenu === 'account'}, isDomainOwner ? 'admin' : 'user']"
+                         :class="[{opened: openedMenu === 'account'}, isDomainOwner ? 'admin' : 'member']"
                     />
                 </div>
                 <p-context-menu
