@@ -6,12 +6,7 @@
                   :focused="focused"
                   :disable-icon="disableIcon"
                   :is-focused.sync="proxyIsFocused"
-                  @keyup.down="focusMenu"
-                  @keyup.esc="allFocusOut"
-                  @focus="onSearchFocus"
-                  @click.stop="showMenu"
-                  @delete="focusSearch"
-                  v-on="$listeners"
+                  v-on="searchListeners"
         >
             <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
@@ -20,7 +15,7 @@
         <div v-if="proxyVisibleMenu" class="menu-container">
             <p-context-menu ref="menuRef"
                             theme="secondary"
-                            :menu="menu"
+                            :menu="filteredMenu"
                             :loading="loading"
                             @select="onClickMenuItem"
                             @keyup:up:end="focusSearch"
@@ -43,11 +38,10 @@ import {
 } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
+    computed, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@/components/util/composition-helpers';
+import { makeByPassListeners, makeProxy } from '@/components/util/composition-helpers';
 import PSearch from '@/components/molecules/search/PSearch.vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { reduce } from 'lodash';
 
 export default {
@@ -58,19 +52,18 @@ export default {
         event: 'update:value',
     },
     props: autocompleteSearchProps,
-    setup(props: AutocompleteSearchProps, { emit, slots }) {
+    setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const state: any = reactive({
             searchRef: null,
             menuRef: null,
-            proxyValue: makeProxy('value', props, emit),
+            proxyValue: props.value !== undefined ? makeProxy('value', props, emit) : '',
             isAutoMode: computed(() => props.visibleMenu === undefined),
             proxyVisibleMenu: props.visibleMenu === undefined
                 ? false
                 : makeProxy('visibleMenu', props, emit),
             proxyIsFocused: makeProxy('isFocused', props, emit),
+            filteredMenu: props.handler ? [] : computed(() => props.menu),
         });
-
-        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
 
         const focusSearch = () => {
             if (state.searchRef) state.searchRef.focus();
@@ -90,7 +83,7 @@ export default {
         };
 
         const focusMenu = () => {
-            if (props.menu.length === 0) return;
+            if (state.filteredMenu.length === 0) return;
             showMenu();
             if (state.menuRef) state.menuRef.focus();
         };
@@ -100,21 +93,20 @@ export default {
             hideMenu();
         };
 
-        const onClickMenuItem = (name, idx) => {
-            if (vm.$listeners['menu:select']) emit('menu:select', props.menu[idx].label, idx);
-            else {
-                state.proxyValue = props.menu[idx].label;
-                hideMenu();
+        const onWindowKeydown = (e: KeyboardEvent) => {
+            if (state.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.code)) {
+                e.preventDefault();
             }
         };
-
         onMounted(() => {
             window.addEventListener('click', hideMenu);
             window.addEventListener('blur', hideMenu);
+            window.addEventListener('keydown', onWindowKeydown, false);
         });
         onUnmounted(() => {
             window.removeEventListener('click', hideMenu);
             window.removeEventListener('blur', hideMenu);
+            window.removeEventListener('keydown', onWindowKeydown, false);
         });
 
         const onFocusMenuItem = (idx: string) => {
@@ -135,6 +127,70 @@ export default {
             return res;
         }, {}));
 
+        const onInput = async (val: string, e) => {
+            if (!state.proxyVisibleMenu) showMenu();
+
+            if (props.handler) {
+                const res = await props.handler(val);
+                state.filteredMenu = res.results;
+            }
+            emit('input', val, e);
+        };
+
+        const emitSearch = (val?: string) => {
+            emit('search', val);
+        };
+
+        const onSearch = (val?: string) => {
+            emitSearch(val);
+            hideMenu();
+        };
+
+        const onClickMenuItem = (name, idx) => {
+            if (listeners['menu:select']) {
+                emit('menu:select', name, idx);
+            } else {
+                state.proxyValue = state.filteredMenu[idx].label;
+                emitSearch(name);
+                hideMenu();
+            }
+        };
+
+        const init = async () => {
+            if (props.handler) {
+                const res = await props.handler('');
+                state.filteredMenu = res.results;
+            }
+        };
+
+        const onDelete = () => {
+            emitSearch('');
+            focusSearch();
+        };
+
+        const searchListeners = {
+            ...listeners,
+            keyup(e) {
+                if (e.code === 'ArrowDown') focusMenu();
+                else if (e.code === 'Escape') allFocusOut();
+                makeByPassListeners(listeners, 'keyup', e);
+            },
+            focus(e) {
+                onSearchFocus();
+                makeByPassListeners(listeners, 'focus', e);
+            },
+            click(e: MouseEvent) {
+                e.stopPropagation();
+                showMenu();
+                makeByPassListeners(listeners, 'click', e);
+            },
+            delete: onDelete,
+            search: onSearch,
+            input: onInput,
+        };
+
+        init();
+
         return {
             ...toRefs(state),
             allFocusOut,
@@ -148,6 +204,10 @@ export default {
             onSearchFocus,
             menuSlots,
             searchSlots,
+            onInput,
+            onDelete,
+            onSearch,
+            searchListeners,
         };
     },
 };

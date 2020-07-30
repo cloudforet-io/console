@@ -5,7 +5,6 @@ export const autocompleteSearchProps = {
     value: {
         type: String,
         default: '',
-        required: true,
     },
     placeholder: {
         type: String,
@@ -13,7 +12,7 @@ export const autocompleteSearchProps = {
     },
     focused: {
         type: Boolean,
-        default: true,
+        default: false,
     },
     disableIcon: {
         type: Boolean,
@@ -35,6 +34,10 @@ export const autocompleteSearchProps = {
         type: Boolean,
         default: undefined,
     },
+    handler: {
+        type: Function,
+        default: null,
+    },
 };
 export interface AutocompleteSearchState {
     placeholder: string;
@@ -48,7 +51,14 @@ export interface AutocompleteSearchSyncState {
     visibleMenu?: boolean;
     isFocused?: boolean;
 }
+
+export type AutocompleteHandler = (inputText: string) => Promise<{
+    results: MenuItem[];
+    totalCount: number;
+}>
+
 export interface AutocompleteSearchProps extends AutocompleteSearchState, AutocompleteSearchSyncState {
+    handler?: AutocompleteHandler;
 }
 
 

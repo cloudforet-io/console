@@ -1,6 +1,6 @@
 <template>
     <p-autocomplete-search ref="searchRef"
-                           v-model="proxyValue"
+                           :value="searchText"
                            :placeholder="placeholder"
                            :loading="loading"
                            :disable-icon="!!selectedKey"
@@ -19,6 +19,7 @@
             <span v-if="selectedKey" class="key-tag"
                   :class="{active: isFocused || visibleMenu}"
             >{{ selectedKey.label }}</span>
+            <span v-if="operator" class="operator-tag">{{ operator }}</span>
         </template>
     </p-autocomplete-search>
 </template>
@@ -27,15 +28,13 @@
 
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/components/util/composition-helpers';
 import {
     find, debounce,
 } from 'lodash';
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { OperatorType } from '@/lib/fluent-api';
 import {
-    KeyItem, QueryItem, QuerySearchProps, ValueItem,
+    KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 
 interface MenuItem<T> extends ContextMenuItem {
@@ -58,6 +57,8 @@ interface State {
     valueMenu: Readonly<MenuItem<ValueItem>[]>;
     menu: Readonly<MenuItem<KeyItem|ValueItem>[]>;
 }
+
+const operators = ['!', '>', '>=', '<', '<=', '=', '!=', '$'];
 
 export default {
     name: 'PQuerySearch',
@@ -96,10 +97,6 @@ export default {
             isFocused: props.focused,
             loading: false,
             searchText: props.value,
-            proxyValue: computed({
-                get() { return state.searchText; },
-                set(val) { emit('update:value', val); },
-            }),
             selectedKey: null,
             operator: '',
             totalCount: computed(() => {
@@ -125,7 +122,7 @@ export default {
                 if (state.selectedKey === null) return [];
                 return [
                     {
-                        label: `${state.selectedKey.label} (${state.totalCount})`,
+                        label: `${state.selectedKey.label} (${state.valueTotalCount})`,
                         type: CONTEXT_MENU_TYPE.header,
                     },
                     ...state.filteredValueItems.map(d => ({
@@ -145,10 +142,10 @@ export default {
         const onKeyInput = debounce(async (val: string) => {
             let keyItems: KeyItem[] = [...props.keyItems];
 
-            if (!state.selectedKey && state.searchText) {
-                const regex = RegExp(state.searchText, 'i');
+            if (!state.selectedKey && val) {
+                const regex = RegExp(val, 'i');
                 keyItems = props.keyItems.reduce((result, d) => {
-                    if (regex.exec(d.label) || regex.exec(d.name)) result.push(d);
+                    if (regex.test(d.label) || regex.test(d.name)) result.push(d);
                     return result;
                 }, [] as KeyItem[]);
             }
@@ -181,9 +178,17 @@ export default {
             return res ? res.data : undefined;
         };
 
-        const hideMenu = () => { state.visibleMenu = false; };
+        const hideMenu = () => {
+            state.visibleMenu = false;
+            // state.valueTotalCount = 0;
+            // state.filteredKeyItems = [];
+            // state.filteredValueItems = [];
+        };
         const focus = () => { state.isFocused = true; };
-        const clearText = () => { state.searchText = ''; };
+        const clearText = () => {
+            state.searchText = '';
+            state.operator = '';
+        };
 
 
         const showMenu = async () => {
@@ -193,19 +198,9 @@ export default {
         };
 
 
-        const onKeySelect = async (keyItem: KeyItem) => {
+        const onKeySelect = (keyItem: KeyItem) => {
             clearText();
             focus();
-            // const handler = props.valueHandlerMap[keyItem.name];
-            // if (handler) {
-            //     console.debug('onKeySelect: value handler execute')
-            //     const res = await handler('', keyItem);
-            //     state.filteredValueItems = res.results;
-            //     state.valueTotalCount = res.totalCount;
-            // } else {
-            //     state.filteredValueItems = [];
-            //     state.valueTotalCount = 0;
-            // }
         };
 
         const emitSearch = (val: ValueItem) => {
@@ -221,27 +216,46 @@ export default {
             }
         };
 
+        const findAndSetKey = async (val: string) => {
+            state.selectedKey = findKey(val.substring(0, val.length - 1)) || null;
+            if (state.selectedKey) {
+                onKeySelect(state.selectedKey);
+                await onValueInput('');
+            }
+        };
+
+        const setOperator = (operator: OperatorType) => {
+            if (state.operator) {
+                if (state.operator.length === 1 && !['=', '$'].includes(state.operator)) {
+                    state.searchText = state.searchText.substring(0, state.searchText.length - 1);
+                    state.operator += operator;
+                }
+            } else {
+                state.searchText = state.searchText.substring(0, state.searchText.length - 1);
+                state.operator = operator;
+            }
+        };
+
 
         const onInput = async (rawVal: string, e) => {
-            state.searchText = rawVal;
             const val = rawVal.trim();
-            // if (!state.visibleMenu) state.visibleMenu = true;
+            state.searchText = val;
 
-            if (state.selectedKey) await onValueInput('');
-            else if (val.length > 1 && e.data === ':') {
-                state.selectedKey = findKey(val.substring(0, val.length - 1)) || null;
-                if (state.selectedKey) await onKeySelect(state.selectedKey);
-            } else await onKeyInput(val);
+            if (state.selectedKey) {
+                if (val.length > 0 && val.length < 3 && operators.includes(e.data)) {
+                    setOperator(e.data);
+                }
+                await onValueInput(state.searchText);
+            } else if (val.length > 1 && e.data === ':') await findAndSetKey(val);
+            else await onKeyInput(val);
         };
 
         const onSearch = (val?: ValueItem|string|null) => {
-            if (val !== undefined && val !== null) {
-                if (typeof val === 'string') {
-                    const str = val.trim();
-                    emitSearch({ label: str, name: str });
-                } else {
-                    emitSearch(val);
-                }
+            if (val && typeof val === 'object') {
+                emitSearch(val);
+            } else {
+                const str = typeof val === 'string' ? val.trim() : '';
+                if (str || state.selectedKey) emitSearch({ label: str, name: str });
             }
         };
 
@@ -260,8 +274,16 @@ export default {
             }
         };
 
+        const removeOperator = () => {
+            if (state.operator.length === 2) state.operator = state.operator.substring(0, 1) as OperatorType;
+            else state.operator = '';
+        };
+
         const onDelete = async (e) => {
-            if (state.selectedKey && !e.target.value) {
+            if (e.target.value) return;
+
+            if (state.operator) removeOperator();
+            else if (state.selectedKey) {
                 state.selectedKey = null;
                 await onKeyInput('');
             }
@@ -289,5 +311,10 @@ export default {
     &.active {
         @apply bg-blue-300;
     }
+}
+.operator-tag {
+    @apply mr-2;
+    height: 1.125rem;
+    line-height: 1.125rem;
 }
 </style>

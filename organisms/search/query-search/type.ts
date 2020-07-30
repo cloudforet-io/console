@@ -52,4 +52,3 @@ export interface QuerySearchListeners {
     onValueInput?: (val: string, keyItem: KeyItem) => Promise<void>|void;
     onSearch?: (query: QueryItem) => Promise<void>|void;
 }
-

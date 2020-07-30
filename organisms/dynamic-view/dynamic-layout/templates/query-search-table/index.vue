@@ -40,6 +40,7 @@
                 <p-query-search v-model="proxySearchText"
                                 v-bind="apiHandler.tableTS.querySearch.state"
                                 :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
+                                @keyup.down.stop=""
                                 @search="apiHandler.tableTS.querySearch.onSearch"
                 />
             </div>
@@ -94,7 +95,7 @@ import {
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import { ACHandlerMeta, getStatApiValueHandlerMap } from '@/lib/api/query-search';
+import { ACHandlerMeta } from '@/lib/api/query-search';
 import { makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
 
 
@@ -242,7 +243,7 @@ export default {
                             if (aft && aft !== bef) {
                                 const keys = getKeys();
                                 apiHandler.tableTS.querySearch.state.keyItems = getKeyItems(keys);
-                                apiHandler.tableTS.querySearch.valueHandlerMap = getStatApiValueHandlerMap(keys, props.resourceType as string);
+                                apiHandler.tableTS.querySearch.valueHandlerMap = makeValueHandlerMapWithReference(keys, props.resourceType as string);
                                 exportToolSet.action = exportAction.setDataSource(aft.fields || []);
                                 await resetAction();
                             }
