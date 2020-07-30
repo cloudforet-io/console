@@ -2,9 +2,9 @@
     <div class="menu-container">
         <div class="left">
             <div class="menu-lap mx-4">
-                <site-map />
+                <site-map :is-domain-owner="isDomainOwner" />
             </div>
-            <div class="menu-lap mr-10">
+            <div class="menu-lap mr-6 md:mr-10 lg:mr-10">
                 <router-link to="/dashboard">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.png">
                     <img class="brand-logo-text hidden md:inline-block lg:inline-block"
@@ -16,19 +16,24 @@
                  :key="idx"
                  class="menu-lap"
             >
-                <div class="menu-button opacity mr-4 lg:mr-8"
-                     :class="{opened: dItem.menu.length > 0 && openedMenu === dItem.key, selected: selectedMenu === dItem.key}"
+                <div v-if="!dItem.isAdminMenu || isDomainOwner"
+                     class="menu-button opacity mr-4 lg:mr-8"
+                     :class="[{
+                         opened: dItem.menu.length > 0 && openedMenu === dItem.key,
+                         selected: dItem.parentRoutes.includes(selectedMenu)
+                     }]"
                      @click.stop="toggleMenu(dItem.key)"
                 >
-                    <span v-if="dItem.menu.length > 0">{{ dItem.key }}</span>
+                    <span v-if="dItem.menu.length > 0">
+                        {{ dItem.key }}
+                        <p-i class="arrow-button"
+                             :name="openedMenu === dItem.key ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                             width="1rem" height="1rem"
+                        />
+                    </span>
                     <router-link v-else :to="dItem.link">
                         {{ dItem.key }}
                     </router-link>
-                    <p-i class="arrow-button"
-                         :class="dItem.menu.length > 0 ? 'visible' : 'invisible'"
-                         :name="openedMenu === dItem.key ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                         width="1rem" height="1rem"
-                    />
                 </div>
                 <p-context-menu
                     v-if="openedMenu === dItem.key && dItem.menu.length > 0"
@@ -65,12 +70,12 @@
                     <template #item--format="{item}" />
                 </p-context-menu>
             </div>
-            <div class="menu-lap account">
+            <div class="menu-lap account ml-6">
                 <div class="menu-button account"
                      @click.stop="toggleMenu('account')"
                 >
                     <div class="menu-icon"
-                         :class="{opened: openedMenu === 'account'}"
+                         :class="[{opened: openedMenu === 'account'}, isDomainOwner ? 'admin' : 'user']"
                     />
                 </div>
                 <p-context-menu
@@ -136,7 +141,6 @@ import {
 import { fluentApi } from '@/lib/fluent-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { useStore } from '@/store/toolset';
-// import "vue-router/types/vue";
 
 export default {
     name: 'GNB',
@@ -164,11 +168,15 @@ export default {
                 {
                     key: 'project',
                     link: '/project',
+                    isAdminMenu: false,
+                    parentRoutes: ['project'],
                     menu: [],
                 },
                 {
                     key: 'inventory',
                     link: '/inventory',
+                    isAdminMenu: false,
+                    parentRoutes: ['inventory'],
                     menu: [
                         {
                             type: 'item', label: 'Server', name: 'server', link: '/inventory/server',
@@ -181,6 +189,8 @@ export default {
                 {
                     key: 'identity',
                     link: '/identity',
+                    isAdminMenu: false,
+                    parentRoutes: ['identity'],
                     menu: [
                         {
                             type: 'item', label: 'Service Account', name: 'service-account', link: '/identity/service-account',
@@ -196,9 +206,25 @@ export default {
                 {
                     key: 'plugin',
                     link: '/plugin',
+                    isAdminMenu: false,
+                    parentRoutes: ['plugin'],
                     menu: [
                         {
                             type: 'item', label: 'Collector', name: 'collector', link: '/plugin/collector',
+                        },
+                    ],
+                },
+                {
+                    key: 'management',
+                    link: '/management',
+                    isAdminMenu: true,
+                    parentRoutes: ['management', 'secret'],
+                    menu: [
+                        {
+                            type: 'item', label: 'Plugin', name: 'plugin', link: '/management/supervisor/plugins',
+                        },
+                        {
+                            type: 'item', label: 'Credentials', name: 'credentials', link: '/secret/credentials',
                         },
                     ],
                 },
@@ -327,7 +353,7 @@ export default {
 .menu-container {
     @apply bg-white;
     display: flex !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     .left, .right {
         line-height: 3rem;
@@ -337,10 +363,7 @@ export default {
         position: absolute;
         display: inline-flex;
         right: 0;
-
-        .menu-button {
-            margin: 0 1vw;
-        }
+        padding-right: 1.5rem;
     }
 
     .menu-lap {
@@ -357,10 +380,10 @@ export default {
             display: inline-block;
             width: 2rem;
             height: 2rem;
-            margin-right: 0.5rem;
         }
         .brand-logo-text {
             height: 0.75rem;
+            margin-left: 0.5rem;
         }
         .menu-button {
             @apply text-gray-900;
@@ -390,9 +413,16 @@ export default {
                     width: 2rem;
                     height: 2rem;
                     overflow: hidden;
-                    background: url('~@/assets/icons/user.svg') no-repeat center center;
                     background-size: cover;
+                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
                     margin-top: 0.5rem;
+
+                    &.admin {
+                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
+                    }
+                    &.member {
+                        background: url('~@/assets/icons/user.svg') no-repeat center center;
+                    }
 
                     &.opened {
                         box-shadow: inset 0 0 0 2px theme('colors.primary');
@@ -406,6 +436,8 @@ export default {
         }
         .p-context-menu {
             .border {
+                @apply border-gray-200;
+                border-top: none;
                 margin: 0.5rem;
             }
             .context-info {

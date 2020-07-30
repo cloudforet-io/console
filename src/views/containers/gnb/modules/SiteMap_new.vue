@@ -14,20 +14,22 @@
             <ul v-for="(aItem, aIdx) in allMenu"
                 :key="aIdx"
             >
-                <router-link :to="aItem.link">
-                    <li class="menu" @click="hide">
-                        {{ aItem.label }}
-                    </li>
-                </router-link>
-                <div v-if="aItem.subMenus.length > 0">
-                    <div v-for="(sItem, sIdx) in aItem.subMenus"
-                         :key="sIdx"
-                    >
-                        <router-link :to="sItem.link">
-                            <li class="submenu" @click="hide">
-                                {{ sItem.label }}
-                            </li>
-                        </router-link>
+                <div v-if="!aItem.isAdminMenu || isDomainOwner">
+                    <router-link :to="aItem.link">
+                        <li class="menu" @click="hide">
+                            {{ aItem.label }}
+                        </li>
+                    </router-link>
+                    <div v-if="aItem.subMenus.length > 0">
+                        <div v-for="(sItem, sIdx) in aItem.subMenus"
+                             :key="sIdx"
+                        >
+                            <router-link :to="sItem.link">
+                                <li class="submenu" @click="hide">
+                                    {{ sItem.label }}
+                                </li>
+                            </router-link>
+                        </div>
                     </div>
                 </div>
             </ul>
@@ -48,15 +50,26 @@ export default {
     directives: {
         clickOutside: vClickOutside.directive,
     },
+    props: {
+        isDomainOwner: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup() {
         const state = reactive({
             visible: false,
             allMenu: [
-                { label: 'Dashboard', link: '/dashboard', subMenus: [] },
-                { label: 'Project', link: '/project', subMenus: [] },
+                {
+                    label: 'Dashboard', link: '/dashboard', isAdminMenu: false, subMenus: [],
+                },
+                {
+                    label: 'Project', link: '/project', isAdminMenu: false, subMenus: [],
+                },
                 {
                     label: 'Inventory',
                     link: '/inventory',
+                    isAdminMenu: false,
                     subMenus: [
                         { label: 'Server', link: '/inventory/server' },
                         { label: 'Cloud Service', link: '/inventory/cloud-service' },
@@ -65,6 +78,7 @@ export default {
                 {
                     label: 'Identity',
                     link: '/identity',
+                    isAdminMenu: false,
                     subMenus: [
                         { label: 'Service Account', link: '/identity/service-account' },
                         { label: 'User', link: '/identity/user' },
@@ -73,8 +87,18 @@ export default {
                 {
                     label: 'Plugin',
                     link: '/plugin',
+                    isAdminMenu: false,
                     subMenus: [
                         { label: 'Collector', link: '/plugin/collector' },
+                    ],
+                },
+                {
+                    label: 'Management',
+                    link: '/management',
+                    isAdminMenu: true,
+                    subMenus: [
+                        { label: 'Plugin', link: '/management/supervisor/plugins' },
+                        { label: 'Credentials', link: '/secret/credentials' },
                     ],
                 },
             ],
