@@ -169,9 +169,9 @@ export default {
 <style lang="postcss" scoped>
     .page-mask {
         @apply absolute flex left-0 w-full h-full;
-        z-index: 999;
+        z-index: 99;
         bottom: $fnb-height;
-        transition: opacity 0.3s ease;
+        /*transition: opacity 0.3s ease;*/
         max-height: calc(100vh - ($gnb-height + $fnb-height));
         min-height: calc(100vh - ($gnb-height + $fnb-height));
         max-width: 100vw;

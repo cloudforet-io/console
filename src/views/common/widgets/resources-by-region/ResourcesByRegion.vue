@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Resources By Region" class="resources-by-region">
+    <p-widget-layout title="Resources by Region" class="resources-by-region">
         <div class="reverse">
             <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
