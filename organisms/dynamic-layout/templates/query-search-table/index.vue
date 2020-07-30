@@ -35,11 +35,7 @@
             <div class="left-toolbox-item hidden lg:block">
                 <p-query-search v-model="searchText"
                                 :key-items="keyItems"
-                                :value-item="valueItems"
-                                @menu:show="onMenuShow"
-                                @key:input="onKeyInput"
-                                @value:input="onValueInput"
-                                @key:select="onKeySelect"
+                                :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
             </div>
@@ -50,11 +46,7 @@
                                 class="block lg:hidden mt-4"
                                 :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
                                 :key-items="keyItems"
-                                :value-item="valueItems"
-                                @menu:show="onMenuShow"
-                                @key:input="onKeyInput"
-                                @value:input="onValueInput"
-                                @key:select="onKeySelect"
+                                :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
                 <div v-if="tags.length !==0" class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
@@ -88,21 +80,12 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import { ToolboxTableState } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
-import { debounce } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import { getTimezone } from '@/lib/util';
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
-import {KeyHandler} from "@/lib/component-utils/query-search/type";
-
-const defaultACHandler = {
-    keyHandler: async inputText => [],
-    valueHandlerMap: {},
-    suggestKeys: [],
-};
+import { QueryItem } from '@/components/organisms/search/query-search/type';
 
 const makeFields = (props: DynamicLayoutProps|any) => computed<DataTableFieldType[]>(() => {
     if (!props.options.fields) return [];
@@ -189,32 +172,11 @@ export default {
             slots: makeTableSlots(props),
 
             /* query search */
-            keyItems: bindExtraDataOrInit('keyItems', props, []) as KeyItem[],
-            valueItems: bindExtraDataOrInit('valueItems', props, []),
-            keyHandler: bindExtraDataOrInit('keyHandler', props, defaultACHandler.keyHandler) as KeyHandler,
-            valueHandlerMap: bindExtraDataOrInit('valueHandlerMap', props, defaultACHandler.valueHandlerMap),
+            valueHandlerMap: bindExtraDataOrInit('valueHandlerMap', props, {}),
             tags: bindExtraDataOrInit('tags', props, []) as QueryTag[],
             searchText: bindExtraDataOrInit('searchText', props) as string,
 
         });
-
-        const onKeyInput = debounce(async (val: string) => {
-            const res = await state.keyHandler(val);
-            state.keyItems = res.results;
-        }, 200);
-
-        const onValueInput = debounce(async (val: string, keyItem: KeyItem) => {
-            state.valueItems = await state.valueHandlerMap[keyItem.name](val, keyItem) || [];
-        }, 200);
-
-        const onMenuShow = async (val: string, keyItem?: KeyItem) => {
-            if (keyItem) await onValueInput(val, keyItem);
-            else await onKeyInput(val);
-        };
-
-        const onKeySelect = async (keyItem: KeyItem) => {
-            state.valueItems = await state.valueHandlerMap[keyItem.name]('', keyItem);
-        };
 
 
         const validation = (query: QueryItem): boolean => (state.tags as unknown as QueryTag[]).every((tag) => {
@@ -251,10 +213,6 @@ export default {
 
         return {
             ...toRefs(state),
-            onKeyInput,
-            onValueInput,
-            onMenuShow,
-            onKeySelect,
             onSearch,
             deleteTag,
             deleteAllTags,

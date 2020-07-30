@@ -3,7 +3,7 @@
         <p-panel-top v-if="showTitle">
             {{ name }}
         </p-panel-top>
-        <PMarkDown :markdown="options.markdown||''" :data="rootData" :language="language" />
+        <p-mark-down :markdown="options.markdown||''" :data="rootData" :language="language" />
     </div>
 </template>
 

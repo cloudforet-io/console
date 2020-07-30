@@ -29,7 +29,7 @@ import PAutocompleteSearch from '@/components/organisms/search/autocomplete-sear
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/components/util/composition-helpers';
 import {
-    find,
+    find, debounce,
 } from 'lodash';
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -46,9 +46,14 @@ interface State {
     searchRef: any;
     visibleMenu: boolean;
     isFocused: boolean;
-    proxyValue: string;
+    loading: boolean;
+    searchText: string;
     selectedKey: KeyItem|null;
     operator: OperatorType;
+    totalCount: number;
+    valueTotalCount: number;
+    filteredKeyItems: KeyItem[];
+    filteredValueItems: ValueItem[];
     keyMenu: Readonly<MenuItem<KeyItem>[]>;
     valueMenu: Readonly<MenuItem<ValueItem>[]>;
     menu: Readonly<MenuItem<KeyItem|ValueItem>[]>;
@@ -75,21 +80,13 @@ export default {
             type: Boolean,
             default: true,
         },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
         keyItems: {
             type: Array,
             default: () => [],
         },
-        valueItems: {
-            type: Array,
-            default: () => [],
-        },
-        totalCount: {
-            type: Number,
-            default: 0,
+        valueHandlerMap: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props: QuerySearchProps, { emit }) {
@@ -97,15 +94,27 @@ export default {
             searchRef: null,
             visibleMenu: false,
             isFocused: props.focused,
-            proxyValue: makeProxy('value', props, emit),
+            loading: false,
+            searchText: props.value,
+            proxyValue: computed({
+                get() { return state.searchText; },
+                set(val) { emit('update:value', val); },
+            }),
             selectedKey: null,
             operator: '',
+            totalCount: computed(() => {
+                if (state.selectedKey) return 0;
+                return props.keyItems.length;
+            }),
+            valueTotalCount: 0,
+            filteredKeyItems: [],
+            filteredValueItems: [],
             keyMenu: computed(() => [
                 {
-                    label: `Key (${props.totalCount})`,
+                    label: `Key (${state.totalCount})`,
                     type: CONTEXT_MENU_TYPE.header,
                 },
-                ...props.keyItems.map(d => ({
+                ...state.filteredKeyItems.map(d => ({
                     label: d.label,
                     name: d.name,
                     type: CONTEXT_MENU_TYPE.item,
@@ -116,10 +125,10 @@ export default {
                 if (state.selectedKey === null) return [];
                 return [
                     {
-                        label: `${state.selectedKey.label} (${props.totalCount})`,
+                        label: `${state.selectedKey.label} (${state.totalCount})`,
                         type: CONTEXT_MENU_TYPE.header,
                     },
-                    ...props.valueItems.map(d => ({
+                    ...state.filteredValueItems.map(d => ({
                         label: `${state.selectedKey?.label}:${state.operator} ${d.label}`,
                         name: d.name,
                         type: CONTEXT_MENU_TYPE.item,
@@ -133,6 +142,35 @@ export default {
             }),
         });
 
+        const onKeyInput = debounce(async (val: string) => {
+            let keyItems: KeyItem[] = [...props.keyItems];
+
+            if (!state.selectedKey && state.searchText) {
+                const regex = RegExp(state.searchText, 'i');
+                keyItems = props.keyItems.reduce((result, d) => {
+                    if (regex.exec(d.label) || regex.exec(d.name)) result.push(d);
+                    return result;
+                }, [] as KeyItem[]);
+            }
+
+            state.filteredKeyItems = keyItems;
+        }, 150);
+
+        const onValueInput = debounce(async (inputText: string): Promise<void> => {
+            if (state.selectedKey) {
+                const handler = props.valueHandlerMap[state.selectedKey.name];
+                if (handler) {
+                    const res = await handler(inputText, state.selectedKey);
+                    state.valueTotalCount = res.totalCount;
+                    state.filteredValueItems = res.results;
+                    return;
+                }
+            }
+
+            state.valueTotalCount = 0;
+            state.filteredValueItems = [];
+        }, 150);
+
         const findKey = (val: string): KeyItem|undefined => {
             const value = val.toLowerCase();
             const res = find(state.keyMenu,
@@ -143,23 +181,31 @@ export default {
             return res ? res.data : undefined;
         };
 
-        const showMenu = () => {
-            emit('menu:show', state.proxyValue, state.selectedKey);
-            state.visibleMenu = true;
-        };
         const hideMenu = () => { state.visibleMenu = false; };
         const focus = () => { state.isFocused = true; };
-
-        const clearText = () => { state.proxyValue = ''; };
-
-        const emitKeyInput = (val: string) => { emit('key:input', val); };
-        const emitValueInput = (val: string) => { emit('value:input', val, state.selectedKey); };
+        const clearText = () => { state.searchText = ''; };
 
 
-        const emitKeySelect = () => {
+        const showMenu = async () => {
+            if (state.selectedKey) await onValueInput(state.searchText);
+            await onKeyInput(state.searchText);
+            state.visibleMenu = true;
+        };
+
+
+        const onKeySelect = async (keyItem: KeyItem) => {
             clearText();
             focus();
-            emit('key:select', state.selectedKey);
+            // const handler = props.valueHandlerMap[keyItem.name];
+            // if (handler) {
+            //     console.debug('onKeySelect: value handler execute')
+            //     const res = await handler('', keyItem);
+            //     state.filteredValueItems = res.results;
+            //     state.valueTotalCount = res.totalCount;
+            // } else {
+            //     state.filteredValueItems = [];
+            //     state.valueTotalCount = 0;
+            // }
         };
 
         const emitSearch = (val: ValueItem) => {
@@ -169,20 +215,23 @@ export default {
                 operator: state.operator,
             } as QueryItem);
             clearText();
-            state.selectedKey = null;
-            hideMenu();
+            if (state.selectedKey) {
+                state.selectedKey = null;
+                hideMenu();
+            }
         };
 
 
-        const onInput = (rawVal: string, e) => {
+        const onInput = async (rawVal: string, e) => {
+            state.searchText = rawVal;
             const val = rawVal.trim();
-            if (!state.visibleMenu) showMenu();
+            // if (!state.visibleMenu) state.visibleMenu = true;
 
-            if (state.selectedKey) emitValueInput(val);
+            if (state.selectedKey) await onValueInput('');
             else if (val.length > 1 && e.data === ':') {
                 state.selectedKey = findKey(val.substring(0, val.length - 1)) || null;
-                if (state.selectedKey) emitKeySelect();
-            } else emitKeyInput(val);
+                if (state.selectedKey) await onKeySelect(state.selectedKey);
+            } else await onKeyInput(val);
         };
 
         const onSearch = (val?: ValueItem|string|null) => {
@@ -206,15 +255,15 @@ export default {
                     label: selected.label as string,
                     name: selected.name as string,
                 };
-                emitKeySelect();
+                onKeySelect(state.selectedKey);
                 showMenu();
             }
         };
 
-        const onDelete = (e) => {
+        const onDelete = async (e) => {
             if (state.selectedKey && !e.target.value) {
                 state.selectedKey = null;
-                emitKeyInput('');
+                await onKeyInput('');
             }
         };
 

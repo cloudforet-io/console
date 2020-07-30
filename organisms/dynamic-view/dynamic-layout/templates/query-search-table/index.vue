@@ -23,7 +23,6 @@
         @changeSort="getData"
         @clickExcel="exportExcel"
     >
-        >
         <template #toolbox-top>
             <slot v-if="showTitle||$scopedSlots['toolbox-top']" name="toolbox-top">
                 <p-panel-top v-if="showTitle"
@@ -40,10 +39,7 @@
             <div class="left-toolbox-item hidden lg:block">
                 <p-query-search v-model="proxySearchText"
                                 v-bind="apiHandler.tableTS.querySearch.state"
-                                @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
-                                @key:input="apiHandler.tableTS.querySearch.onKeyInput"
-                                @value:input="apiHandler.tableTS.querySearch.onValueInput"
-                                @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
                                 @search="apiHandler.tableTS.querySearch.onSearch"
                 />
             </div>
@@ -54,10 +50,7 @@
                                 class="block lg:hidden mt-4"
                                 :class="{ 'mb-4':!!$scopedSlots['toolbox-bottom']&&tags.length===0}"
                                 v-bind="apiHandler.tableTS.querySearch.state"
-                                @menu:show="apiHandler.tableTS.querySearch.onMenuShow"
-                                @key:input="apiHandler.tableTS.querySearch.onKeyInput"
-                                @value:input="apiHandler.tableTS.querySearch.onValueInput"
-                                @key:select="apiHandler.tableTS.querySearch.onKeySelect"
+                                :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
                                 @search="apiHandler.tableTS.querySearch.onSearch"
                 />
                 <div v-if="tags.length !==0" class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
@@ -102,8 +95,7 @@ import {
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import { ACHandlerMeta, getStatApiValueHandlerMap } from '@/lib/api/query-search';
-import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { getKeyHandler } from '@/lib/component-utils/query-search';
+import { makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
 
 
 export default {
@@ -191,29 +183,15 @@ export default {
             return action as QueryAPI<any, any>;
         };
         const getKeys = () => fields.value.map(field => field.name);
+        const getKeyItems = keys => keys.map(field => ({ label: field.label || field.name, name: field.name }));
         const makeApiToolset = () => {
             const keys = getKeys();
-            const keyItems: KeyItem[] = fields.value.map(field => ({ label: field.label || field.name, name: field.name }));
             const acMeta: ACHandlerMeta = {
-                keyHandler: async (val: string) => {
-                    let res = keyItems;
-                    if (val) {
-                        res = keyItems.reduce((result, item) => {
-                            if (item.label.includes(val) || item.name.includes(val)) result.push(item);
-                            return result;
-                        }, [] as KeyItem[]);
-                    }
-
-                    return {
-                        results: res,
-                        totalCount: keyItems.length,
-                    };
-                },
-                valueHandlerMap: getStatApiValueHandlerMap(
+                keyItems: getKeyItems(fields.value),
+                valueHandlerMap: makeValueHandlerMapWithReference(
                     keys,
                     props.resourceType as string,
                 ),
-                suggestKeys: keys,
 
             };
             return new QuerySearchTableFluentAPI(
@@ -262,9 +240,8 @@ export default {
                         optionsWatchStop = watch(() => props.options, async (aft, bef) => {
                             if (aft && aft !== bef) {
                                 const keys = getKeys();
-                                apiHandler.tableTS.querySearch.keyHandler = getKeyHandler(keys);
+                                apiHandler.tableTS.querySearch.state.keyItems = getKeyItems(keys);
                                 apiHandler.tableTS.querySearch.valueHandlerMap = getStatApiValueHandlerMap(keys, props.resourceType as string);
-                                apiHandler.tableTS.querySearch.suggestKeys = keys;
                                 exportToolSet.action = exportAction.setDataSource(aft.fields || []);
                                 await resetAction();
                             }

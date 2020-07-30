@@ -15,3 +15,8 @@ export interface QueryTag extends QueryItem {
 export interface QuerySearchTagsProps {
     tags: QueryTag[];
 }
+
+export interface QuerySearchTagsListeners {
+    'delete:tag'?: (idx: number) => void|Promise<void>;
+    'delete:all'?: () => void|Promise<void>;
+}

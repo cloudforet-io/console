@@ -124,7 +124,7 @@ export default {
         },
         settingVisible: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         refreshVisible: {
             type: Boolean,

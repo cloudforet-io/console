@@ -1,4 +1,19 @@
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
+import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+
+export interface QuerySearchTableProps {
+    fields: DataTableFieldType[];
+    items: any[];
+    loading: boolean;
+    sortBy: string; // sync
+    sortDesc: boolean; // sync
+    selectIndex: number[]; // sync
+    thisPage: number; // sync
+    pageSize: number; // sync
+    totalCount: number;
+    keyItems: KeyItem[];
+    valueHandlerMap: ValueHandlerMap;
+}
 
 export interface QuerySearchTableListeners {
     rowLeftClick?: (rowData: any, index: number, event: MouseEvent) => void;
@@ -15,3 +30,14 @@ export interface QuerySearchTableListeners {
     clickRefresh?: (event: MouseEvent) => void;
     select?: (selectIndex: number[]) => void;
 }
+
+/** Page */
+/**
+ * <pquerysearchtabe v-on="listeners"/>
+ */
+
+const listeners: QuerySearchTableListeners = {
+    select: (selectIndex) => {
+        console.debug(selectIndex);
+    },
+};

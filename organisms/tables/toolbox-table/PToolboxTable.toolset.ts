@@ -14,7 +14,7 @@ import { Computed } from '@/components/util/type';
 import { ChangeTagCallBack } from '@/components/molecules/tags/PTag.toolset';
 import { getAllPage } from '@/components/organisms/pagination/PTextPagination.toolset';
 import { QuerySearchToolSet } from '@/lib/component-utils/query-search';
-import { KeyHandler, ValueHandlerMap } from '@/lib/component-utils/query-search/type';
+import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{
     paginationVisible?: boolean;
@@ -148,18 +148,16 @@ export class QuerySearchTableToolSet<initData, initSyncData> extends ToolboxTabl
     querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
 
     static initToolSet(_this: any,
-        keyHandler: KeyHandler,
+        keyItems: KeyItem[],
         valueHandlerMap: ValueHandlerMap,
-        suggestKeys: string[],
         changeTagCallBack?: ChangeTagCallBack) {
         ToolboxTableToolSet.initToolSet(_this);
-        _this.querySearch = new QuerySearchToolSet(keyHandler, valueHandlerMap, suggestKeys, undefined, undefined, changeTagCallBack);
+        _this.querySearch = new QuerySearchToolSet(keyItems, valueHandlerMap, undefined, undefined, changeTagCallBack);
     }
 
     constructor(
-        keyHandler: KeyHandler,
+        keyItems: KeyItem[],
         valueHandlerMap: ValueHandlerMap,
-        suggestKeys: string[],
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         lazy = false,
@@ -167,7 +165,7 @@ export class QuerySearchTableToolSet<initData, initSyncData> extends ToolboxTabl
     ) {
         super(initData, initSyncData, true);
         if (!lazy) {
-            QuerySearchTableToolSet.initToolSet(this, keyHandler, valueHandlerMap, suggestKeys, changeTagCallBack);
+            QuerySearchTableToolSet.initToolSet(this, keyItems, valueHandlerMap, changeTagCallBack);
         }
     }
 }
