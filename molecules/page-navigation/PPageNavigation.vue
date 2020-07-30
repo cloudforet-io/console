@@ -6,7 +6,8 @@
                     <router-link class="menu"
                                  :to="getPath(route)"
                     >
-                        <span class="inline-block link">{{ route.name }}</span>
+                        <span v-if="idx !== routes.length - 1" class="inline-block link">{{ route.name }}</span>
+                        <span v-else class="inline-block current-page">{{ route.name }}</span>
                         <span v-if="idx < routes.length - 1">
                             <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                                  class="arrow-icon" color="inherit white"
@@ -15,7 +16,10 @@
                     </router-link>
                 </span>
                 <span v-else>
-                    <span class="inline-block link" @click="$emit('click', route, idx)">{{ route.name }}</span>
+                    <span v-if="idx !== routes.length - 1" class="inline-block link"
+                          @click="$emit('click', route, idx)"
+                    >{{ route.name }}</span>
+                    <span v-else class="inline-block current-page">{{ route.name }}</span>
                     <span v-if="idx < routes.length - 1">
                         <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                              class="arrow-icon"
@@ -61,6 +65,11 @@ export default {
             &:hover {
                 opacity: 1;
             }
+        }
+
+        .current-page {
+            @apply text-xs text-gray-900 cursor-default;
+            opacity: 0.5;
         }
 
         .arrow-icon {
