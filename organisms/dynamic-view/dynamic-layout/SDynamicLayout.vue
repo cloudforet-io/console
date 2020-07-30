@@ -82,7 +82,7 @@ export default defineComponent({
             component: null as any,
             isLoading: true,
             loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
-            fields: props.options.fields || [],
+            fields: computed(() => props.options.fields || []),
             mergedOptions: computed(() => ({ ...props.options, fields: state.fields })),
         });
 
@@ -90,15 +90,15 @@ export default defineComponent({
             try {
                 // reference to link fields pre-process
 
-                for (const field of state.fields) {
-                    if (field.reference) {
-                        // eslint-disable-next-line no-await-in-loop
-                        field.options.link = await referenceRouter(
-                            field.reference.reference_type,
-                            field.reference.reference_key,
-                        );
-                    }
-                }
+                // for (const field of state.fields) {
+                //     if (field.reference) {
+                //         // eslint-disable-next-line no-await-in-loop
+                //         field.options.link = await referenceRouter(
+                //             field.reference.reference_type,
+                //             field.reference.reference_key,
+                //         );
+                //     }
+                // }
 
                 await state.loader();
                 state.component = async () => state.loader();

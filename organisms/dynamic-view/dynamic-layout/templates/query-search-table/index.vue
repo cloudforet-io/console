@@ -182,12 +182,12 @@ export default {
             }
             return action as QueryAPI<any, any>;
         };
-        const getKeys = () => fields.value.map(field => field.name);
+        const getKeys = (): string[] => fields.value.map(field => field.name);
         const getKeyItems = keys => keys.map(field => ({ label: field.label || field.name, name: field.name }));
         const makeApiToolset = () => {
             const keys = getKeys();
-            const acMeta: ACHandlerMeta = {
-                keyItems: getKeyItems(fields.value),
+            const acMeta = {
+                keyItems: getKeyItems(keys),
                 valueHandlerMap: makeValueHandlerMapWithReference(
                     keys,
                     props.resourceType as string,
@@ -198,6 +198,7 @@ export default {
                 getAction(),
                 defaultInitData,
                 undefined,
+                // @ts-ignore
                 acMeta,
             );
         };
