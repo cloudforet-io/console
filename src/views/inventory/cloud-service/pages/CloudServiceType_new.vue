@@ -56,7 +56,7 @@
                     <template slot="toolbox-bottom">
                         <div class="mb-6 search">
                             <p-query-search v-model="apiHandler.gridTS.querySearch.state.searchText"
-                                            v-bind="apiHandler.gridTS.querySearch.state"
+                                            :value-handler-map="apiHandler.gridTS.querySearch.valueHandlerMap"
                                             @search="apiHandler.gridTS.querySearch.onSearch"
                             />
                         </div>
@@ -234,7 +234,6 @@ export default {
 
         const args = {
             keys: ['cloud_service_type', 'cloud_service_group', 'provider', 'cloud_service_id', 'project_id', 'data.region_name'],
-            suggestKeys: ['cloud_service_type', 'cloud_service_group', 'provider', 'cloud_service_id', 'project_id', 'data.region_name'],
         };
 
         const apiHandler = new StatQuerySearchGridFluentAPI(

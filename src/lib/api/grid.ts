@@ -158,6 +158,8 @@ export class StatQuerySearchGridFluentAPI<
     > extends BaseGridFluentAPI<parameter, resp, initData, initSyncData, T, action> {
     initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
         this.gridTS = new QuerySearchGridLayoutToolSet(acHandlerMeta.keyItems, acHandlerMeta.valueHandlerMap, initData, initSyncData) as T;
+        // @ts-ignore
+        console.debug('gridTS', this.gridTS.state.cardClass());
         watch(this.gridTS.querySearch.tags, async (tags, preTags) => {
             if (tags !== preTags && this.action) {
                 await this.getData(true);
