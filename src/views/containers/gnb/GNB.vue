@@ -92,8 +92,8 @@
                         </div>
                         <div class="context-info">
                             <span class="label">Role</span>
-                            <span v-if="isDomainOwner" class="value">Project Admin</span>
-                            <span v-else class="value">Project Member</span>
+                            <span v-if="isDomainOwner" class="value">Root Admin</span>
+                            <span v-else class="value">Domain Admin</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Time zone</span>
@@ -248,7 +248,7 @@ export default {
                     type: 'item',
                     label: 'GitHub',
                     name: 'github',
-                    link: 'https://github.com/spaceone-dev/console',
+                    link: 'https://github.com/spaceone-dev',
                     target: '_blank',
                 },
                 // {
