@@ -15,9 +15,10 @@
                     :toolset="apiHandler"
                     :is-show="isReady"
                     :vbind="{
-                        showTitle:false,
+                        showTitle: false,
                         resourceType: 'inventory.Server',
-                        exportFields:mergeFields,
+                        exportFields: mergeFields,
+                        // width: '1020px'
                     }"
                     :style="{'height': height+'px'}"
                 >

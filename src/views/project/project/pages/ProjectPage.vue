@@ -605,9 +605,9 @@ export default {
                     disableSetter: true,
                 },
             }),
-            search: makeQueryStringComputed(ref(undefined), {
-                key: 'search',
-            }),
+            // search: makeQueryStringComputed(ref(undefined), {
+            //     key: 'search',
+            // }),
         };
 
         /** Search */
@@ -623,7 +623,7 @@ export default {
             state.searchedProjectGroup = res.projectGroup;
             await listProjects(res.value, res.projectGroup);
 
-            queryRefs.search.value = res.value;
+            // queryRefs.search.value = res.value;
         };
 
         const onSelectTreeItem = async (e: ProjectTreeItem|null) => {

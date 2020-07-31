@@ -13,7 +13,7 @@
                                   :vbind="{
                                       showTitle: false,
                                       resourceType: 'inventory.Collector',
-                                      layoutFixed: true
+                                      width: '1020px'
                                   }"
                                   :style="{height: `${height}px`}"
                 >
@@ -212,6 +212,16 @@ export default {
             keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
             suggestKeys: ['collector_id', 'name'],
         };
+        const handlers = makeQuerySearchHandlersWithSearchSchema({
+            title: 'Properties',
+            items: [
+                { key: 'collector_id', name: 'ID' },
+                { key: 'name', name: 'Name' },
+                { key: 'state', name: 'State', enums: ['ENABLED', 'DISABLED'] },
+                { key: 'plugin_info.options.supported_resource_type', name: 'Resource Type', enums: ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS'] },
+            ],
+        }, 'inventory.Collector');
+
         const apiHandler = new QuerySearchTableFluentAPI(
             collectorApi.list(),
             {
@@ -362,22 +372,6 @@ export default {
                 },
             })),
         });
-
-        const handlers = makeQuerySearchHandlersWithSearchSchema({
-            title: 'Properties',
-            items: [
-                { key: 'server_id', name: 'ID' },
-                { key: 'name', name: 'Name' },
-                { key: 'state', name: 'State', enums: ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'] },
-                { key: 'primary_ip_address', name: 'Primary IP' },
-                { key: 'server_type', name: 'Server Type', enums: ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN'] },
-                { key: 'os_type', name: 'OS Type', enums: ['LINUX', 'WINDOWS'] },
-                { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                { key: 'data.compute.instance_name', name: 'Instance' },
-                { key: 'data.compute.instance_id', name: 'Instance ID' },
-                { key: 'collection_info.state', name: 'Collection State', enums: ['MANUAL', 'ACTIVE', 'DISCONNECTED'] },
-            ],
-        }, 'inventory.Server');
 
         const mainTable: Partial<QuerySearchTableProps> = reactive({
             fields: [
