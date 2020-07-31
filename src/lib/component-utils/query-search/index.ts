@@ -141,7 +141,7 @@ export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, 
         } else {
             res.valueHandlerMap[d.key] = makeValueHandlerWithReference(
                 d.reference || resourceType,
-                d.reference ? d.key : undefined,
+                d.reference ? undefined : d.key,
             );
         }
     });
@@ -154,7 +154,7 @@ export class QuerySearchToolSet extends TagToolSet<QueryTag> {
     state: QuerySearchState = reactive({
         keyItems: [],
         placeholder: 'Search',
-        focused: true,
+        focused: false,
         valueHandlerMap: {},
     });
 
