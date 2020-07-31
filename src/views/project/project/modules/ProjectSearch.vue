@@ -52,9 +52,9 @@
                     <template v-else>
                         <span>{{ item.label }}</span>
                     </template>
-                    <template v-if="item.dataType === 'PROJECT'">
-                        <span class="link-icon"><p-i name="ic_external-link" height="0.875rem" width="0.875rem" /></span>
-                    </template>
+<!--                    <template v-if="item.dataType === 'PROJECT'">-->
+<!--                        <span class="link-icon"><p-i name="ic_external-link" height="0.875rem" width="0.875rem" /></span>-->
+<!--                    </template>-->
                 </div>
             </template>
             <template #menu-header-more="{item}">
