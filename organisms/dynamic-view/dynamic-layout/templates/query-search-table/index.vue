@@ -11,9 +11,9 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-        :layout-fixed="layoutFixed"
+        :width="width"
+        :col-width="colWidth"
         :row-height-fixed="rowHeightFixed"
-        :width-fixed="widthFixed"
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
@@ -150,17 +150,17 @@ export default {
             type: String,
             required: true,
         },
-        layoutFixed: {
-            type: Boolean,
-            default: false,
+        width: {
+            type: String,
+            default: undefined,
         },
         rowHeightFixed: {
             type: Boolean,
             default: true,
         },
-        widthFixed: {
-            type: Boolean,
-            default: false,
+        colWidth: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props: DynamicLayoutProps) {

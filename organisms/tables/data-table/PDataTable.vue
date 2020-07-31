@@ -5,13 +5,19 @@
                    striped: striped,
                    bordered: bordered,
                    'no-hover': !hover,
-                   'layout-fixed': layoutFixed,
-                   'width-fixed': widthFixed,
                    [tableStyleType]: true,
+               }"
+               :style="{
+                   width: getTableWidth()
                }"
         >
             <thead>
                 <slot name="head" :fields="fieldsData">
+                    <!--                    <tr v-if="loading || items.length === 0">-->
+                    <!--                        <th :colspan="selectable? fieldsData.length +1 :fieldsData.length">-->
+                    <!--                            <span class="th-contents">&zwnj;</span>-->
+                    <!--                        </th>-->
+                    <!--                    </tr>-->
                     <tr>
                         <th v-if="selectable" class="all-select">
                             <p-check-box v-if="multiSelect"
@@ -23,7 +29,8 @@
                             v-for="(field, index) in fieldsData"
                             :key="index"
                             :style="{
-                                minWidth: field.width || undefined
+                                minWidth: field.width || undefined,
+                                width: field.width || undefined,
                             }"
                             :class="{'fix-width': colCopy}"
                             @click="theadClick(field, index, $event)"
@@ -61,16 +68,16 @@
             </thead>
             <tbody>
                 <slot v-if="loading" name="loading">
-                    <!--                <tr v-for="s in skeletons" :key="s">-->
-                    <!--                    <td v-if="selectable" class="!pr-0  min-w-4 w-4">-->
-                    <!--                        <p-skeleton width="1rem" height="1rem" />-->
-                    <!--                    </td>-->
-                    <!--                    <td v-for="(field, index) in fieldsData" :key="index">-->
-                    <!--                        <slot :name="'skeleton-'+field.name" :index="index" :field="field">-->
-                    <!--                            <p-skeleton />-->
-                    <!--                        </slot>-->
-                    <!--                    </td>-->
-                    <!--                </tr>-->
+                    <!--                    <tr v-for="s in skeletons" :key="s">-->
+                    <!--                        <td v-if="selectable" class="!pr-0  min-w-4 w-4">-->
+                    <!--                            &lt;!&ndash;                                <p-skeleton width="1rem" height="1rem" />&ndash;&gt;-->
+                    <!--                        </td>-->
+                    <!--                        <td v-for="(field, index) in fieldsData" :key="index">-->
+                    <!--                            <slot :name="'skeleton-'+field.name" :index="index" :field="field">-->
+                    <!--                                &lt;!&ndash;                                    <p-skeleton />&ndash;&gt;-->
+                    <!--                            </slot>-->
+                    <!--                        </td>-->
+                    <!--                    </tr>-->
                     <tr v-if="loading" key="loading" class="tr-no-data">
                         <td :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                             <p-lottie name="spinner" :size="2"
@@ -131,7 +138,9 @@
                                       :index="index"
                                       :field="field"
                                 >
-                                    <td :key="i">
+                                    <td :key="i"
+                                        v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
+                                    >
                                         <slot
                                             :name="'col-'+field+'-format'"
                                             :item="item"
@@ -167,7 +176,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { copyAnyData, selectToCopyToClipboard } from '@/components/util/helpers';
 import { windowEventMount } from '@/components/util/composition-helpers';
 import { tableProps } from '@/components/molecules/tables/PTable.toolset';
-import { DataTableSetupProps } from './PDataTable.toolset';
+import { DataTableField, DataTableSetupProps } from './PDataTable.toolset';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/PCheckBox.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
@@ -446,6 +455,47 @@ export default {
             return (item, field) => get(item, field, '');
         });
 
+        const getTableWidth = () => {
+            if (props.width) return props.width;
+            if (!props.colWidth) return undefined;
+            const num = props.colWidth.match(/\d+/g);
+            const unit = props.colWidth.match(/[a-zA-Z]+/g);
+            if (num && unit) return `${Number(num[0]) * props.fields.length}${unit[0]}`;
+            return undefined;
+        };
+
+        const trElements = computed(() => {
+            if (!state.table) return null;
+
+            const trEls = (state.table as any).children[1];
+            if (!trEls) return null;
+
+            if (trEls.children) return Array.from(trEls.children);
+            return null;
+        });
+        const getTooltipContent = (item: any, field: DataTableField, rowIndex: number, colIndex: number) => {
+            let res;
+            if (typeof field === 'string') res = item[field];
+            else res = item[field.name];
+
+            if (trElements.value) {
+                // console.debug('tbodyEl.', trElements.value);
+            }
+            // let result = '';
+            // const arr = Array.from(copyTargetElement.value as any[]);
+            // arr.forEach((el) => {
+            //     // @ts-ignore
+            //     const children = Array.from(el.children);
+            //     children.forEach((td, colIdx) => {
+            //         if (colIdx === colIndex) {
+            //             // @ts-ignore
+            //             result += `${td.innerText}\t`;
+            //         }
+            //     });
+            // });
+            return '';
+        };
+
 
         return {
             ...toRefs(state),
@@ -467,6 +517,8 @@ export default {
             clickColCopy,
             getValueFunc,
             skeletons,
+            getTableWidth,
+            getTooltipContent,
         };
     },
 
@@ -510,17 +562,12 @@ export default {
     }
 
     .p-data-table {
-        @apply overflow-auto h-full w-full;
+        @apply overflow-auto h-full w-full relative;
         table {
             @apply min-w-full;
             border-collapse: separate;
             border-spacing: 0;
-            &.layout-fixed {
-                table-layout: fixed;
-            }
-            &.width-fixed {
-                @apply w-full;
-            }
+            table-layout: fixed;
         }
         th {
             position: sticky;
@@ -549,7 +596,10 @@ export default {
                 }
             }
             &.all-select {
-                @apply w-4 py-1 pl-4 max-w-15 min-w-15;
+                @apply py-1 pl-4;
+                width: 2.5rem;
+                min-width: 2.5rem;
+                max-width: 2.5rem;
             }
         }
         td {
@@ -577,6 +627,10 @@ export default {
         .select-checkbox {
             @apply cursor-pointer min-w-4 w-4;
         }
+
+        /*.loading-spinner {*/
+        /*    @apply absolute w-full h-full justify-center items-center;*/
+        /*}*/
 
         /* themes */
         .default {

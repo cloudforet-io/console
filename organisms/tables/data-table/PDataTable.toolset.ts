@@ -98,6 +98,9 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     multiSelect: boolean;
     sortBy: string;
     sortDesc: boolean;
+    width?: string;
+    colWidth?: string;
+    rowHeightFixed: boolean;
 }
 
 @StateToolSet<DataTablePropsType>()

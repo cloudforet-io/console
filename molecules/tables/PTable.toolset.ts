@@ -25,17 +25,17 @@ export const tableProps = {
         type: Boolean,
         default: false,
     },
-    layoutFixed: {
-        type: Boolean,
-        default: false,
+    width: {
+        type: String,
+        default: undefined,
+    },
+    colWidth: {
+        type: String,
+        default: undefined,
     },
     rowHeightFixed: {
         type: Boolean,
         default: true,
-    },
-    widthFixed: {
-        type: Boolean,
-        default: false,
     },
 };
 

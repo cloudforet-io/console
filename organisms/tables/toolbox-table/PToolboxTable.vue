@@ -71,9 +71,9 @@
             :loading="loading"
             :use-cursor-loading="useCursorLoading"
             :skeleton-rows="pageSize"
-            :layout-fixed="layoutFixed"
+            :width="width"
+            :col-width="colWidth"
             :row-height-fixed="rowHeightFixed"
-            :width-fixed="widthFixed"
             v-on="$listeners"
             @changeSort="changeSort"
         >

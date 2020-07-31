@@ -13,7 +13,9 @@
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
         :setting-visible="false"
         :use-cursor-loading="true"
-        ::layout-fixed="layoutFixed"
+        :width="width"
+        :col-width="colWidth" l
+        :row-height-fixed="rowHeightFixed"
         v-on="$listeners"
         @changePageSize="getData"
         @changePageNumber="getData"
@@ -129,9 +131,17 @@ export default {
             type: Boolean,
             default: true,
         },
-        layoutFixed: {
+        width: {
+            type: String,
+            default: undefined,
+        },
+        rowHeightFixed: {
             type: Boolean,
-            default: false,
+            default: true,
+        },
+        colWidth: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props: DynamicLayoutProps, { emit }) {
