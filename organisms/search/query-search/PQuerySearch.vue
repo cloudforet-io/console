@@ -79,7 +79,7 @@ export default {
         },
         focused: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         keyItems: {
             type: Array,
