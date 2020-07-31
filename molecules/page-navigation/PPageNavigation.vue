@@ -22,7 +22,7 @@
                     <span v-else class="inline-block current-page">{{ route.name }}</span>
                     <span v-if="idx < routes.length - 1">
                         <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
-                             class="arrow-icon"
+                             class="arrow-icon" color="inherit white"
                         />
                     </span>
                 </span>
