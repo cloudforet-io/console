@@ -263,7 +263,7 @@ export default {
             }
         }
         &.right-align {
-            right: 0.625rem;
+            right: 0;
             left: auto;
         }
 
