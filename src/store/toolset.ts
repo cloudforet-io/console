@@ -152,7 +152,7 @@ class DomainStore extends Store<DomainState> {
         const { hostname } = window.location;
         this.state.domainName = hostname.split('.')[0];
         const param = {
-            name: process.env.NODE_ENV === 'development' ? config.get('DOMAIN_NAME') : this.state.domainName,
+            name: config.get('DOMAIN_NAME_REF') === 'hostname' ? this.state.domainName : config.get('DOMAIN_NAME'),
         };
         const resp = await api.newInstance().post('/identity/domain/list', param);
         const domain = _.get(resp, 'data.results.0', null);
