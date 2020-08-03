@@ -104,13 +104,13 @@ export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[
         if (q.key !== null && q.key !== undefined && !q.invalid) {
             and.push({
                 key: q.key?.name as string,
-                value: q.value?.label || q.value?.name || '',
+                value: q.value?.name || '',
                 operator: q.operator,
             });
         } else if (keyItems) {
             setFilterOrWithSuggestKeys({
                 key: '',
-                value: q.value?.label || q.value?.name || '',
+                value: q.value?.name || '',
                 operator: q.operator,
             }, keyItems, or);
         }
