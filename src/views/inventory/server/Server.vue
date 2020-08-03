@@ -297,34 +297,146 @@ export default {
             makeQuerySearchHandlersWithSearchSchema({
                 title: 'Properties',
                 items: [
-                    { key: 'server_id', name: 'ID' },
+                    { key: 'server_id', name: 'Server ID' },
                     { key: 'name', name: 'Name' },
-                    { key: 'state', name: 'State', enums: ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'] },
-                    { key: 'primary_ip_address', name: 'Primary IP' },
-                    { key: 'server_type', name: 'Server Type', enums: ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN'] },
-                    { key: 'os_type', name: 'OS Type', enums: ['LINUX', 'WINDOWS'] },
+                    { key: 'ip_addresses', name: 'IP Address' },
+                    {
+                        key: 'state',
+                        name: 'Life Cycle',
+                        enums: {
+                            INSERVICE: {
+                                label: 'In-Service',
+                            },
+                            MAINTENANCE: {
+                                label: 'Maintenance',
+                            },
+                            CLOSED: {
+                                label: 'Closed',
+                            },
+                            DELETED: {
+                                label: 'Deleted',
+                            },
+                        },
+                    },
+                    {
+                        key: 'collection_info.state',
+                        name: 'Collection State',
+                        enums: {
+                            ACTIVE: {
+                                label: 'Active',
+                            },
+                            DISCONNECTED: {
+                                label: 'Disconnected',
+                            },
+                            MANUAL: {
+                                label: 'Manual',
+                            },
+                        },
+                    },
                     { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                    { key: 'data.compute.instance_name', name: 'Instance' },
-                    { key: 'data.compute.instance_id', name: 'Instance ID' },
-                    { key: 'collection_info.state', name: 'Collection State', enums: ['MANUAL', 'ACTIVE', 'DISCONNECTED'] },
+                    { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
+                    { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
+                    {
+                        key: 'provider',
+                        name: 'Provider',
+                        enums: {
+                            aws: {
+                                label: 'AWS',
+                            },
+                            google_cloud: {
+                                label: 'Google Cloud',
+                            },
+                            azure: {
+                                label: 'Azure',
+                            },
+                            openstack: {
+                                label: 'OpenStack',
+                            },
+                            vmware: {
+                                label: 'VMWare',
+                            },
+                        },
+                    },
+                    { key: 'reference.resource_id', name: 'Resource ID' },
+                    {
+                        key: 'os_type',
+                        name: 'OS Type',
+                        enums: {
+                            LINUX: {
+                                label: 'Linux',
+                            },
+                            WINDOWS: {
+                                label: 'Windows',
+                            },
+                        },
+                    },
+                    { key: 'data.os.os_distro', name: 'OS Distro' },
+                    { key: 'data.os.os_arch', name: 'OS Architecture' },
+                    {
+                        key: 'sever_type',
+                        name: 'Server Type',
+                        enums: {
+                            VM: {
+                                label: 'VM',
+                            },
+                            BAREMETAL: {
+                                label: 'Baremetal',
+                            },
+                            HYPERVISOR: {
+                                label: 'Hypervisor',
+                            },
+                            UNKNOWN: {
+                                label: 'Unknown',
+                            },
+                        },
+                    },
+                    { key: 'data.compute.instance_id', name: 'Instance ID', data_type: 'float' },
+                    {
+                        key: 'data.compute.instance_state',
+                        name: 'Instance State',
+                        enums: {
+                            running: {
+                                label: 'Running',
+                            },
+                            stopped: {
+                                label: 'Stopped',
+                            },
+                            pending: {
+                                label: 'Pending',
+                            },
+                            stopping: {
+                                label: 'Stopping',
+                            },
+                            'shutting-down': {
+                                label: 'Shutting-down',
+                            },
+                            terminated: {
+                                label: 'Terminated',
+                            },
+                        },
+                    },
+                    { key: 'data.compute.instance_type', name: 'Instance Type' },
+                    { key: 'data.compute.keypair', name: 'Key Pair' },
+                    { key: 'data.compute.image', name: 'Image' },
+                    { key: 'data.compute.az', name: 'Availability Zone' },
+                    { key: 'data.compute.account_id', name: 'Account ID' },
+                    { key: 'nics.mac_address', name: 'MAC Address' },
+                    { key: 'nics.public_ip_address', name: 'Public IP Address' },
+                    { key: 'nics.tags.public_dns', name: 'Public DNS' },
+                    { key: 'data.vpc.vpc_id', name: 'VPC ID' },
+                    { key: 'data.vpc.vpc_name', name: 'VPC Name' },
+                    { key: 'data.subnet.subnet_id', name: 'Subnet ID' },
+                    { key: 'data.subnet.subnet_name', name: 'Subnet Name' },
+                    { key: 'data.load_balancers.name', name: 'ELB Name' },
+                    { key: 'data.load_balancers.dns', name: 'ELB DNS' },
+                    { key: 'data.auto_scaling_group.name', name: 'Auto Scaling Group' },
+                    // { key: 'data.hardware.core', name: 'Core', data_type: 'integer' },
+                    // { key: 'data.hardware.memory', name: 'Memory', data_type: 'float' },
+                    // { key: 'created_at', name: 'Created', data_type: 'datetime' },
+                    // { key: 'updated_at', name: 'Updated', data_type: 'datetime' },
+                    // { key: 'deleted_at', name: 'Deleted', data_type: 'datetime' },
                 ],
             }, 'inventory.Server'),
-            // {
-            // keyHandler: getKeyHandler(args.keys),
-            // valueHandlerMap: {
-            //     ...getStatApiValueHandlerMap([
-            //         'server_id', 'name', 'primary_ip_address',
-            //         'data.compute.instance_name', 'data.compute.instance_id',
-            //     ],
-            //     'inventory.Server'),
-            //     state: getEnumValueHandler(['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
-            //     os_type: getEnumValueHandler(['LINUX', 'WINDOWS']),
-            //     'collection_info.state': getEnumValueHandler(['MANUAL', 'ACTIVE', 'DISCONNECTED']),
-            //     server_type: getEnumValueHandler(['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
-            //     project_id: getStatApiValueHandler('identity.Project'),
-            // },
-            // suggestKeys: args.suggestKeys,
-            // },
         );
 
 

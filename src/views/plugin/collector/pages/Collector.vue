@@ -215,10 +215,16 @@ export default {
         const handlers = makeQuerySearchHandlersWithSearchSchema({
             title: 'Properties',
             items: [
-                { key: 'collector_id', name: 'ID' },
+                { key: 'collector_id', name: 'Collector ID' },
                 { key: 'name', name: 'Name' },
                 { key: 'state', name: 'State', enums: ['ENABLED', 'DISABLED'] },
-                { key: 'plugin_info.options.supported_resource_type', name: 'Resource Type', enums: ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS'] },
+                // { key: 'priority', name: 'Priority', data_type: 'integer' },
+                { key: 'plugin_info.options.supported_resource_type', name: 'Resource Type' },
+                { key: 'plugin_info.plugin_id', name: 'Plugin ID' },
+                { key: 'plugin_info.version', name: 'Plugin Version' },
+                { key: 'provider', name: 'Provider' },
+                // { key: 'created_at', name: 'Created', data_type: 'datetime' },
+                // { key: 'last_collected_at', name: 'Last Collected', data_type: 'datetime' },
             ],
         }, 'inventory.Collector');
 
@@ -233,17 +239,18 @@ export default {
                 excelVisible: true,
             },
             undefined,
-            {
-                keyItems: makeKeyItems(args.keys),
-                valueHandlerMap: {
-                    ...makeValueHandlerMapWithReference([
-                        ['collector_id', 'ID'],
-                        ['name', 'Name']],
-                    'inventory.Collector'),
-                    state: getEnumValueHandler(['ENABLED', 'DISABLED']),
-                    'plugin_info.options.supported_resource_type': getEnumValueHandler(['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
-                },
-            },
+            handlers,
+            // {
+            //     keyItems: makeKeyItems(args.keys),
+            //     valueHandlerMap: {
+            //         ...makeValueHandlerMapWithReference([
+            //             ['collector_id', 'ID'],
+            //             ['name', 'Name']],
+            //         'inventory.Collector'),
+            //         state: getEnumValueHandler(['ENABLED', 'DISABLED']),
+            //         'plugin_info.options.supported_resource_type': getEnumValueHandler(['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+            //     },
+            // },
         );
 
         const checkModalState: UnwrapRef<{

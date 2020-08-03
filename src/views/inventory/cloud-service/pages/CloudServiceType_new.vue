@@ -158,7 +158,11 @@ import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
-import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
+import {
+    makeKeyItems,
+    makeQuerySearchHandlersWithSearchSchema,
+    makeValueHandlerMapWithReference
+} from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
@@ -246,12 +250,20 @@ export default {
                 excelVisible: false,
             },
             undefined,
-            {
-                keyItems: makeKeyItems(args.keys),
-                valueHandlerMap: {
-                    ...makeValueHandlerMapWithReference(args.keys, 'inventory.CloudService'),
+            makeQuerySearchHandlersWithSearchSchema(
+                {
+                    title: 'Properties',
+                    items: [
+                        { key: 'cloud_service_type', name: 'Cloud Service Type' },
+                        { key: 'cloud_service_group', name: 'Cloud Service Group' },
+                        { key: 'project_id', name: 'Project', reference: 'identity.Project' },
+                        { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
+                        { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
+                        { key: 'data.region_name', name: 'Region' },
+                    ],
                 },
-            },
+                'inventory.CloudService',
+            ),
         );
 
         const clickCard = (item) => {
