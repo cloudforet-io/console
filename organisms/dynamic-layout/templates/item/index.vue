@@ -1,7 +1,9 @@
 <template>
-    <div v-if="!isLoading">
+    <div>
         <p-panel-top>{{ name }}</p-panel-top>
-        <p-definition-table :items="defs" v-on="$listeners">
+        <p-definition-table :fields="fields" :data="rootData" :loading="isLoading"
+                            v-on="$listeners"
+        >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="{...scope, rootData}" />
             </template>
@@ -24,9 +26,8 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 
-
 export default {
-    name: 'SDynamicLayoutItem',
+    name: 'PDynamicLayoutItem',
     components: {
         PPanelTop,
         PDefinitionTable,
@@ -125,6 +126,7 @@ export default {
         const noData = computed(() => every(defs.value, def => !def.data));
         return {
             defs,
+            fields,
             noData,
             rootData,
         };
