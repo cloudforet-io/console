@@ -104,22 +104,6 @@
                                 :toolset="secretApiHandler"
                                 :options="{fields: secretDataSource}"
                             >
-                                <template #toolbox-left>
-                                    <p-icon-text-button style-type="primary-dark"
-                                                        name="ic_plus_bold"
-                                                        @click="clickSecretAddForm()"
-                                    >
-                                        {{ $t('BTN.ADD') }}
-                                    </p-icon-text-button>
-                                    <p-button
-                                        class="left-toolbox-item"
-                                        style-type="alert"
-                                        :disabled="secretApiHandler.tableTS.selectState.isNotSelected"
-                                        @click="secretDeleteClick"
-                                    >
-                                        {{ $t('BTN.DELETE') }}
-                                    </p-button>
-                                </template>
                             </s-dynamic-layout>
                         </template>
                         <template #member>
@@ -447,6 +431,7 @@ export default {
             secretListAction,
             secretIsShow,
             {
+                selectable: false,
                 striped: true,
                 border: false,
                 shadow: false,

@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
-import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 import pluginRoute from '@/routes/plugin/plugin-route';
 import projectRoute from '@/routes/project/project-route';
@@ -82,7 +81,6 @@ const router = new VueRouter({
                 dashboardRoute,
                 identityRoute,
                 inventoryRoute,
-                secretRoute,
                 pluginRoute,
                 projectRoute,
                 managementRoute,

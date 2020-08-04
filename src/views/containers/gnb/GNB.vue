@@ -218,13 +218,10 @@ export default {
                     key: 'management',
                     link: '/management',
                     isAdminMenu: true,
-                    parentRoutes: ['management', 'secret'],
+                    parentRoutes: ['management'],
                     menu: [
                         {
                             type: 'item', label: 'Plugin', name: 'plugin', link: '/management/supervisor/plugins',
-                        },
-                        {
-                            type: 'item', label: 'Credentials', name: 'credentials', link: '/secret/credentials',
                         },
                     ],
                 },
