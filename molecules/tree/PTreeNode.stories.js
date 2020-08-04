@@ -97,7 +97,7 @@ export const defaultCase = () => ({
         state: true,
     }),
     template: `
-        <div style="width: 80vw; padding: 4rem 0;">
+        <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
             <div>
                 <p>Node Click: selection</p>
                 <p>Toggle Click: expand</p>
@@ -179,7 +179,7 @@ export const apiCase = () => ({
         state: true,
     }),
     template: `
-        <div style="display: flex; width: 80vw; padding: 4rem 0;">
+        <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
             <div class="bg-coral-100 w-1/2">
                 <PTreeNode v-bind="$props"
                            :data.sync="state.data"
@@ -231,7 +231,7 @@ export const slotCase = () => ({
         state: true,
     }, { data: text }),
     template: `
-        <div style="width: 80vw; padding: 4rem 0;">
+        <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
             <div>
                 <ul class="mb-4">
                     <li>row: <span class="color row"></span></li>
@@ -313,7 +313,7 @@ export const levelSlotCase = () => ({
         state: true,
     }, { data: text }),
     template: `
-    <div style="display: flex; width: 80vw; padding: 4rem 0;">
+    <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
             <PTreeNode v-bind="$props"
                        :data.sync="state.data"
@@ -350,7 +350,7 @@ export const customEventListener = () => ({
         state: true,
     }, { data: text }),
     template: `
-    <div style="display: flex; width: 80vw; padding: 4rem 0;">
+    <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
             <PTreeNode v-bind="$props"
                        :data.sync="state.data"
@@ -388,7 +388,7 @@ export const customEventListener = () => ({
 export const HelperToolSetUsage = () => ({
     components: { PTreeNode },
     template: `
-        <div style="width: 80vw; padding: 4rem 0;">
+        <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
             <div class="flex">
                 <div class="bg-coral-100 w-1/2">
                     <PTreeNode v-bind="ts.state"

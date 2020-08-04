@@ -107,7 +107,7 @@ export const defaultCase = () => ({
 export const slotCase = () => ({
     components: { PContextMenu, PEmpty, PI },
     template: `
-<div class="flex">
+<div class="context-menu-story flex">
     <!--  position:static 은 스토리북에서 편하게 보기 위해 임시로 주었습니다.  -->
     <div class="ml-4">
         <p class="mb-2 font-bold">Slot Types</p>
@@ -289,7 +289,7 @@ export const slotCase = () => ({
 export const whiteCase = () => ({
     components: { PContextMenu, PI },
     template: `
-<div>
+<div class="context-menu-story">
     <p-context-menu 
             style="position:static; width:15.125rem;"
             ref="contextRef"

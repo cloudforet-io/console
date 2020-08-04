@@ -11,29 +11,29 @@
                      :page-size.sync="proxyPageSize"
                      use-cursor-loading
                      sortable
-                     v-on="$listeners"
+                     selectable
+                     @changePageSize="onChangePageSize"
+                     @changePageNumber="onChangePageNumber"
+                     @changeSort="onChangeSort"
+                     @select="onSelect"
+                     @clickRefresh="emitChange()"
+                     @clickExcel="emitExport()"
     >
-        <!--        @changePageSize="getData"-->
-        <!--        @changePageNumber="getData"-->
-        <!--        @clickRefresh="getData"-->
-        <!--        @changeSort="getData"-->
-        <!--        @clickExcel="exportExcel"-->
-
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item hidden lg:block">
-                <p-query-search v-model="searchText"
-                                :key-items="keyItems"
+                <p-query-search :key-items="keyItems"
+                                :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
             </div>
         </template>
         <template #toolbox-bottom>
             <div class="flex flex-col flex-1">
-                <p-query-search v-model="searchText"
-                                class="block lg:hidden mt-4"
+                <p-query-search class="block lg:hidden mt-4"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
                                 :key-items="keyItems"
+                                :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
                 <div v-if="tags.length > 0" class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
@@ -69,7 +69,7 @@ import {
     QuerySearchTagsListeners,
     QueryTag,
 } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
-import { QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
+import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -116,35 +116,40 @@ export default {
             type: Number,
             default: 0,
         },
-        keyHandler: {
-            type: Function,
-            default: () => {
-                //
-            },
+        keyItems: {
+            type: Array,
+            default: () => [],
         },
         valueHandlerMap: {
             type: Object,
             default: () => ({}),
         },
+        queryTags: {
+            type: Array,
+            default: () => [],
+        },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentInstance;
-        const tableState = reactive({
+
+        const state = reactive({
+            /** table */
             allPage: computed(() => Math.ceil(props.totalCount / props.pageSize) || 1),
             proxySortBy: makeOptionalProxy('sortBy', vm),
             proxySortDesc: makeOptionalProxy('sortDesc', vm),
             proxySelectIndex: makeOptionalProxy('selectIndex', vm),
             proxyThisPage: makeOptionalProxy('thisPage', vm),
             proxyPageSize: makeOptionalProxy('pageSize', vm),
-        });
-
-        const state = reactive({
-            searchText: '',
-            keyItems: [] as KeyItem[],
-            valueItems: [] as ValueItem[],
-            searchLoading: false,
-            searchTotalCount: 0,
-            tags: [] as QueryTag[],
+            /** search */
+            tags: props.queryTags as QueryTag[],
+            /** others */
+            options: computed<Options>(() => ({
+                sortBy: state.proxySortBy,
+                sortDesc: state.proxySortDesc,
+                thisPage: state.proxyThisPage,
+                pageSize: state.proxyPageSize,
+                queryTags: state.tags,
+            })),
             slotNames: computed(() => {
                 const res: string[] = [];
                 forEach(slots, (func, name) => {
@@ -154,6 +159,7 @@ export default {
             }),
         });
 
+        /** Search & tags */
         const validation = (query: QueryItem): boolean => (state.tags as unknown as QueryTag[]).every((tag) => {
             if (tag.key && query.key) {
                 return (query.key.name !== tag.key.name
@@ -166,13 +172,6 @@ export default {
             return true;
         });
 
-        const onSearch = async (query: QueryItem) => {
-            if (!validation(query)) return;
-            // @ts-ignore
-            state.tags = [...state.tags, query];
-        };
-
-
         const deleteTag = (idx: number) => {
             state.tags.splice(idx, 1);
         };
@@ -181,14 +180,76 @@ export default {
             state.tags = [];
         };
 
+        /** Event emitter */
+        const emitChange = (options?: Partial<Options>) => {
+            emit('change', {
+                ...state.options,
+                ...options,
+            } as Options);
+        };
+
+        const emitExport = () => {
+            emit('export');
+        };
+
+        const emitSelect = () => {
+            emit('select', [...state.proxySelectIndex]);
+        };
+
+        /** Table event listeners */
+        const onChangePageSize = (pageSize: number) => {
+            emitChange({ pageSize });
+        };
+
+        const onChangePageNumber = (thisPage: number) => {
+            emitChange({ thisPage });
+        };
+
+        const onChangeSort = (sortBy: string, sortDesc: boolean) => {
+            emitChange({ sortBy, sortDesc });
+        };
+
+        const onSelect = (selectIndex: number[]) => {
+            state.selectIndex = [...selectIndex];
+            emitSelect();
+        };
+
+        /** Search event listeners */
+        const onSearch = async (query: QueryItem) => {
+            if (!validation(query)) return;
+            // TODO: convert queryItem to queryTag with datatype
+            // @ts-ignore
+            state.tags = [...state.tags, query];
+            emitChange({ queryTags: state.tags });
+        };
+
         return {
-            ...toRefs(tableState),
             ...toRefs(state),
-            onSearch,
             deleteTag,
             deleteAllTags,
-
+            emitChange,
+            emitExport,
+            onChangePageSize,
+            onChangePageNumber,
+            onChangeSort,
+            onSelect,
+            onSearch,
         };
     },
 };
 </script>
+
+<style lang="postcss">
+    .p-query-search-table {
+        .left-toolbox-item {
+            &:last-child {
+                flex-grow: 1;
+            }
+        }
+        >>> .toolbox {
+            .toolbox-bottom {
+                @apply mt-0;
+            }
+        }
+    }
+</style>
