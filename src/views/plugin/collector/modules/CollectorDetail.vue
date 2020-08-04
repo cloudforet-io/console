@@ -1,34 +1,34 @@
 <template>
-    <s-dynamic-layout v-bind="layout"
-                      :api="api"
-                      :vbind="{colCopy: true}"
-                      @copy:name="onCopyName"
-    >
-        <template v-slot:[slotName]="{data, rootData}">
-            <span class="inline-flex items-center">
-                <p-lazy-img :img-url="rootData.tags.icon" width="1rem" height="1rem" />
-                <span class="ml-2 leading-none">{{ data }}</span>
-            </span>
-        </template>
-    </s-dynamic-layout>
+    <div>
+        <p-panel-top>{{ name }}</p-panel-top>
+        <p-definition-table :fields="fields" :data="data" :loading="isLoading"
+                            :skeleton-rows="7" v-on="$listeners"
+        >
+            <template #data-name>
+                <p-lazy-img :img-url="data.tags.icon" width="1rem" height="1rem" />
+                <span class="ml-2 leading-none">{{ data.name }}</span>
+            </template>
+        </p-definition-table>
+    </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, getCurrentInstance,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import { copyAnyData } from '@/lib/util';
 
 export default {
     name: 'CollectorDetail',
     components: {
+        PPanelTop,
+        PDefinitionTable,
         PLazyImg,
-        SDynamicLayout,
     },
     props: {
         collectorId: {
@@ -39,7 +39,9 @@ export default {
     setup(props) {
         const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
         const state = reactive({
-            baseInfoFields: computed(() => [
+            name: vm.$t('WORD.BASE_INFO'),
+            isLoading: true,
+            fields: computed(() => [
                 { name: vm.$t('WORD.ID'), key: 'collector_id' },
                 { name: vm.$t('COMMON.NAME'), key: 'name' },
                 { name: vm.$t('SERVICE.PROVIDER'), key: 'provider' },
@@ -49,57 +51,29 @@ export default {
                     key: 'plugin_info.options.supported_resource_type',
                     type: 'list',
                     options: {
-                        item: {
-                            // type: 'badge',
-                        },
+                        item: {},
                         delimiter: ', ',
                     },
                 },
                 { name: vm.$t('COMMON.LAST_COL'), key: 'last_collected_at.seconds', ...dateTimeViewType },
                 { name: vm.$t('COMMON.CREATED'), key: 'created_at.seconds', ...dateTimeViewType },
             ]),
-            filtersFields: computed(() => [
-                { name: vm.$t('COMMON.NAME'), key: 'name' },
-                { name: vm.$t('WORD.KEY'), key: 'key' },
-                { name: vm.$t('COMMON.TYPE'), key: 'type' },
-                { name: vm.$t('COMMON.RESOURCE'), key: 'resource_type' },
-            ]),
-            layouts: computed(() => ([
-                {
-                    name: vm.$t('WORD.BASE_INFO'),
-                    type: 'item',
-                    options: {
-                        fields: state.baseInfoFields,
-                    },
-                },
-                {
-                    name: vm.$t('PANEL.FILTER_FORMAT'),
-                    type: 'simple-table',
-                    options: {
-                        // eslint-disable-next-line camelcase
-                        root_path: 'plugin_info.options.filter_format',
-                        fields: state.filtersFields,
-                    },
-                },
-            ])),
-            layout: computed(() => ({
-                name: 'Base Information',
-                type: 'list',
-                options: {
-                    layouts: state.layouts,
-                },
-            })),
-            api: computed(() => ({
-                resource: fluentApi.inventory().collector().get().setId(props.collectorId)
-                    .setFixOnly('tags'),
-            })),
-            slotName: computed(() => `${vm.$t('WORD.BASE_INFO')}-data-name`),
+            data: {},
         });
+
+        const getCollectorDetailData = async () => {
+            const res = await fluentApi.inventory().collector().get().setId(props.collectorId)
+                .execute();
+            state.isLoading = false;
+            if (res.data) state.data = res.data;
+        };
+
+        watch(() => props.collectorId, () => {
+            getCollectorDetailData();
+        });
+
         return {
             ...toRefs(state),
-            onCopyName(item) {
-                copyAnyData(item.data);
-            },
         };
     },
 };
