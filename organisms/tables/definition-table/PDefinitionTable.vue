@@ -1,5 +1,5 @@
 <template>
-    <fragment>
+    <div class="p-definition-table">
         <slot v-if="isNoData" name="empty">
             <p-empty v-if="isNoData" class="py-8">
                 No Data
@@ -26,31 +26,63 @@
                 </template>
             </tbody>
         </table>
-    </fragment>
+    </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    definitionTableProps,
-    DefinitionTableProps,
-} from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
+    DefinitionTableProps, DefinitionData,
+} from '@/components/organisms/tables/definition-table/type';
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { every, range } from 'lodash';
+import { every, range, get } from 'lodash';
+import { DynamicField } from '@/components/organisms/dynamic-field/type';
+import { DefinitionProps } from '@/components/organisms/definition/type';
+
+const makeDefItems = (fields: DynamicField[], data?: DefinitionData): DefinitionProps[] => fields.map(item => ({
+    name: item.key,
+    label: item.name,
+    type: item.type,
+    options: item.options,
+    data: get(data, item.key, ''),
+}));
 
 export default {
     name: 'PDefinitionTable',
     components: { PSkeleton, PEmpty, PDefinition },
-    props: definitionTableProps,
+    props: {
+        fields: {
+            type: Array,
+            default: () => [],
+        },
+        data: {
+            type: Object,
+            default: undefined,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        skeletonRows: {
+            type: Number,
+            default: 5,
+        },
+    },
     setup(props: DefinitionTableProps, { emit }) {
         const state = reactive({
-            isNoData: computed(() => every(props.items, def => !def.data)),
+            isNoData: computed(() => every(state.items, def => !def.data)),
             skeletons: computed(() => range(props.skeletonRows)),
+            items: [] as DefinitionProps[],
         });
+
+        watch(() => props.data, () => {
+            state.items = makeDefItems(props.fields, props.data);
+        });
+
         return {
             ...toRefs(state),
             onCopy(bind, idx) {
@@ -62,20 +94,23 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-table {
-    @apply w-full;
-    td {
-        line-height: 1.8;
-    }
-}
-.def-row:nth-child(2n+1)::v-deep {
-    td {
-        &:first-child {
-            @apply border-r-2 border-white;
+<style lang="postcss">
+.p-definition-table {
+    table {
+        @apply w-full;
+        td {
+            @apply border-white;
+            line-height: 1.8;
         }
+    }
+    .def-row:nth-child(2n+1) {
+        td {
+            &:first-child {
+                @apply border-r-2 border-white;
+            }
 
-        @apply bg-violet-100;
+            @apply bg-violet-100;
+        }
     }
 }
 </style>

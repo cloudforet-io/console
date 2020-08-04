@@ -24,7 +24,7 @@
 import {
     ref,
 } from '@vue/composition-api';
-import { definitionProps } from '@/components/organisms/definition/PDefinition.toolset';
+import { DefinitionProps } from '@/components/organisms/definition/type';
 import { copyAnyData } from '@/components/util/helpers';
 import { mouseOverState } from '@/components/util/composition-helpers';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
@@ -33,8 +33,30 @@ import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vu
 export default {
     name: 'PDefinition',
     components: { PCopyButton, PDynamicField },
-    props: definitionProps,
-    setup(props, { emit }) {
+    props: {
+        name: {
+            type: String,
+            required: true,
+        },
+        label: {
+            type: String,
+            default: '',
+        },
+        data: {
+            type: [String, Object, Array, Boolean, Number],
+            default: undefined,
+        },
+        options: {
+            type: Object,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            default: (): any => ({}),
+        },
+        type: {
+            type: String,
+            default: 'text',
+        },
+    },
+    setup(props: DefinitionProps, { emit }) {
         const field = ref<HTMLFormElement>(null);
 
         const copy = (): void => {

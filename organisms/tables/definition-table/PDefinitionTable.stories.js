@@ -4,7 +4,7 @@ import {
 import { action } from '@storybook/addon-actions';
 import { getKnobProps } from '@sb/storybook-util';
 import {
-    text, number, select, object, boolean,
+    text, number, select, object, boolean, array,
 } from '@storybook/addon-knobs/vue';
 import { definitionTableProps } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
@@ -23,21 +23,38 @@ export default {
     },
 };
 
-
 export const defaultCase = () => ({
     components: { PDefinitionTable },
-    props: getKnobProps(definitionTableProps, {
-        items: arrayOf(10, () => ({
-            name: casual.word,
-            data: casual.word,
-        })),
-    }),
+    props: {
+        fields: {
+            default: object('fields', [
+                { name: 'id', key: 'collector_id' },
+                { name: 'name', key: 'name' },
+                { name: 'provider', key: 'provider' },
+            ]),
+        },
+        data: {
+            default: object('data', {
+                // eslint-disable-next-line camelcase
+                collector_id: 'collector-6746d641c98b',
+                name: 'collector name',
+                provider: 'aws',
+            }),
+        },
+        loading: {
+            default: boolean('loading', false),
+        },
+        skeletonRows: {
+            default: number('skeletonRows', 5),
+        },
+    },
     template: `
     <div style="width: 80vw; background-color: white;">
         <PDefinitionTable v-bind="$props"></PDefinitionTable>
     </div>`,
     setup(props, context) {
-        const state = reactive({});
+        const state = reactive({
+        });
 
         return {
             ...toRefs(state),
