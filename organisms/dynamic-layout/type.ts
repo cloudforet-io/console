@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
+import { QuerySearchTableOptions } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 
 /** Metadata schema types for Dynamic layout */
 export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'
@@ -18,10 +19,6 @@ export interface SimpleTableOptions extends CommonOptions {
 }
 
 export interface TableOptions extends CommonOptions {
-    fields: DynamicField[];
-}
-
-export interface QuerySearchTableOptions {
     fields: DynamicField[];
 }
 
@@ -50,4 +47,6 @@ export interface DynamicLayoutProps extends Required<DynamicLayout> {
     data: any;
     extra: any;
     beforeCreate?: (props: DynamicLayoutProps) => void|Promise<void>;
+    fetchHandler: (fetchOptions: any) => any|Promise<any>;
+    timezone?: string;
 }
