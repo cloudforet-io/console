@@ -1,33 +1,39 @@
 <template>
     <div>
-        <p-panel-top>{{ name }}</p-panel-top>
-        <p-definition-table :fields="fields" :data="data" :loading="isLoading"
+        <p-panel-top>{{ baseState.name }}</p-panel-top>
+        <p-definition-table :fields="baseState.fields" :data="baseState.data" :loading="baseState.isLoading"
                             :skeleton-rows="7" v-on="$listeners"
         >
             <template #data-name>
-                <p-lazy-img :img-url="data.tags.icon" width="1rem" height="1rem" />
-                <span class="ml-2 leading-none">{{ data.name }}</span>
+                <p-lazy-img :img-url="baseState.data.tags.icon" width="1rem" height="1rem" />
+                <span class="ml-2 leading-none">{{ baseState.data.name }}</span>
             </template>
         </p-definition-table>
+        <p-panel-top :use-total-count="true" :total-count="filterState.items? filterState.items.length:0">
+            {{ filterState.name }}
+        </p-panel-top>
+        <p-data-table :items="filterState.items" :fields="filterState.fields" v-on="$listeners" />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import { get } from 'lodash';
 
 export default {
     name: 'CollectorDetail',
     components: {
         PPanelTop,
         PDefinitionTable,
+        PDataTable,
         PLazyImg,
     },
     props: {
@@ -37,17 +43,17 @@ export default {
         },
     },
     setup(props) {
-        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
-        const state = reactive({
-            name: vm.$t('WORD.BASE_INFO'),
+        // Base Information
+        const baseState = reactive({
+            name: 'Base Information',
             isLoading: true,
             fields: computed(() => [
-                { name: vm.$t('WORD.ID'), key: 'collector_id' },
-                { name: vm.$t('COMMON.NAME'), key: 'name' },
-                { name: vm.$t('SERVICE.PROVIDER'), key: 'provider' },
-                { name: vm.$t('COMMON.PRIORITY'), key: 'priority' },
+                { name: 'ID', key: 'collector_id' },
+                { name: 'Name', key: 'name' },
+                { name: 'Provider', key: 'provider' },
+                { name: 'Priority', key: 'priority' },
                 {
-                    name: vm.$t('COMMON.RESOURCE'),
+                    name: 'Resource Type',
                     key: 'plugin_info.options.supported_resource_type',
                     type: 'list',
                     options: {
@@ -55,25 +61,37 @@ export default {
                         delimiter: ', ',
                     },
                 },
-                { name: vm.$t('COMMON.LAST_COL'), key: 'last_collected_at.seconds', ...dateTimeViewType },
-                { name: vm.$t('COMMON.CREATED'), key: 'created_at.seconds', ...dateTimeViewType },
+                { name: 'Last Collected', key: 'last_collected_at.seconds', ...dateTimeViewType },
+                { name: 'Create', key: 'created_at.seconds', ...dateTimeViewType },
             ]),
             data: {},
         });
-
         const getCollectorDetailData = async () => {
             const res = await fluentApi.inventory().collector().get().setId(props.collectorId)
                 .execute();
-            state.isLoading = false;
-            if (res.data) state.data = res.data;
+            baseState.isLoading = false;
+            if (res.data) baseState.data = res.data;
         };
-
         watch(() => props.collectorId, () => {
             getCollectorDetailData();
         });
 
+        // Filter Format
+        const filterState = reactive({
+            name: 'Filter Format',
+            fields: computed(() => [
+                { label: 'Name', name: 'name' },
+                { label: 'Key', name: 'key' },
+                { label: 'Type', name: 'type' },
+                { label: 'Resource Type', name: 'resource_type' },
+            ]),
+            rootPath: 'plugin_info.options.filter_format',
+            items: computed(() => get(baseState.data, filterState.rootPath, [])),
+        });
+
         return {
-            ...toRefs(state),
+            baseState,
+            filterState,
         };
     },
 };
