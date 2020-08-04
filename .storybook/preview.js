@@ -17,7 +17,6 @@ import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
 import Fragment from "vue-fragment";
 
-import "@/styles/style.scss";
 import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
 
@@ -25,7 +24,7 @@ import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
 import {axiosInstance} from '@sb/mockApi'
-import { fluentApi } from '@/lib/fluent-api'
+import "@/styles/style.scss";
 
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
