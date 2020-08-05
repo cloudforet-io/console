@@ -16,12 +16,23 @@ interface IdParameter {
 }
 
 export interface SupervisorPluginModel extends IdParameter, Tags {
-    version: string;
-    state: string;
+    // version: string;
+    // state: string;
+    // endpoint: string;
+    // managed: boolean;
+    // supervisor_id: string;
+    // supervisor_name: string;
     endpoint: string;
+    endpoints: Array<string | undefined>;
     managed: boolean;
+    // eslint-disable-next-line camelcase
+    plugin_id: string;
+    state: string;
+    // eslint-disable-next-line camelcase
     supervisor_id: string;
+    // eslint-disable-next-line camelcase
     supervisor_name: string;
+    version: string;
 }
 
 export type SupervisorListResp = ListType<SupervisorPluginModel>
