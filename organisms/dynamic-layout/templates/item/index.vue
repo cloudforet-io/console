@@ -15,15 +15,13 @@
 import {
     computed, reactive, watch,
 } from '@vue/composition-api';
-import { get, every } from 'lodash';
+import { get } from 'lodash';
 import {
-    DynamicFieldType,
-    DynamicLayoutProps,
-    makeDefs,
-    DynamicLayoutApiProp, checkCanGetData, changeSetOnlys,
+    DynamicLayoutProps, DynamicLayoutApiProp, checkCanGetData, changeSetOnlys,
 } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
+import { DefinitionField } from '@/components/organisms/tables/definition-table/type';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 
 export default {
@@ -63,7 +61,14 @@ export default {
             isApiMode: computed(() => !!props.api),
             data: {},
         });
-        const fields = computed<DynamicFieldType[]>(() => props.options.fields || []);
+        const fields = computed<DefinitionField[]>(() => {
+            if (props.options.fields) {
+                return props.options.fields.map(d => ({
+                    label: d.name, name: d.key, type: d.type, options: d.options,
+                } as DefinitionField));
+            }
+            return [];
+        });
         const onlyKeys = computed<string[]>(() => {
             if (props.options.fields) {
                 if (props.options.root_path) {
@@ -122,12 +127,8 @@ export default {
             }
             return readonlyData.value;
         });
-        const defs = makeDefs(fields, rootData);
-        const noData = computed(() => every(defs.value, def => !def.data));
         return {
-            defs,
             fields,
-            noData,
             rootData,
         };
     },
