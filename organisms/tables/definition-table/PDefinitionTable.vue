@@ -34,7 +34,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    DefinitionTableProps, DefinitionData,
+    DefinitionTableProps, DefinitionData, DefinitionField
 } from '@/components/organisms/tables/definition-table/type';
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
@@ -43,12 +43,9 @@ import { every, range, get } from 'lodash';
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
 import { DefinitionProps } from '@/components/organisms/definition/type';
 
-const makeDefItems = (fields: DynamicField[], data?: DefinitionData): DefinitionProps[] => fields.map(item => ({
-    name: item.key,
-    label: item.name,
-    type: item.type,
-    options: item.options,
-    data: get(data, item.key, ''),
+const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): DefinitionProps[] => fields.map(item => ({
+    ...item,
+    data: get(data, item.name, ''),
 }));
 
 export default {

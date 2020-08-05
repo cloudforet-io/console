@@ -64,6 +64,9 @@ export default {
                 color: $text-color;
             }
         }
+        &.disabled {
+            @apply bg-gray-200 text-gray-400 border-gray-100;
+        }
         &.link {
             border-color: transparent;
         }
@@ -91,7 +94,7 @@ export default {
     }
 
     &.disabled {
-        @apply bg-gray-200 text-gray-400 border-gray-100;
+        @apply bg-gray-200 text-gray-400 border-gray-100 cursor-default;
     }
 
     &.outline {
