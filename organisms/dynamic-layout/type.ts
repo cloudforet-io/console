@@ -23,22 +23,27 @@ export interface TableOptions extends CommonOptions {
     fields: DynamicField[];
 }
 
-export interface QuerySearchTableOptions {
+export interface QuerySearchTableOptions extends CommonOptions {
     fields: DynamicField[];
 }
 
 export type RawOptions = CommonOptions
 
-export interface MarkdownOptions {
+export interface MarkdownOptions extends CommonOptions {
     markdown: string|{
         en: string;
         ko: string;
     };
 }
 
+export interface ListOptions extends CommonOptions {
+    layouts: DynamicLayout[];
+}
+
 export type DynamicLayoutOptions =
     ItemOptions | SimpleTableOptions | TableOptions |
-    QuerySearchTableOptions | RawOptions | MarkdownOptions
+    QuerySearchTableOptions | RawOptions | MarkdownOptions |
+    ListOptions
 
 
 export interface DynamicLayout {

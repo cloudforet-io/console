@@ -1,15 +1,12 @@
-```typescript
 import {
     ListOptions,
     DynamicLayoutOptions,
     DynamicLayoutProps,
     DynamicLayoutTemplateProps,
-} from 'DynamicLayout';
+} from '@/components/organisms/dynamic-layout/type';
 
 export type ListDynamicLayoutProps<T=any> = DynamicLayoutTemplateProps<
     DynamicLayoutProps<any, DynamicLayoutOptions, T>,
     ListOptions,
     T
 >
-
-```
