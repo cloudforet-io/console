@@ -1,6 +1,9 @@
-import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+### Types
+
+```typescript
+import { DataTableFieldType } from 'DataTable';
+import { KeyItem, ValueHandlerMap } from 'QuerySearch';
+import { QueryTag } from 'QuerySearchTags';
 
 export interface QuerySearchTableProps {
     fields: DataTableFieldType[];
@@ -17,7 +20,7 @@ export interface QuerySearchTableProps {
     queryTags: QueryTag[];
 }
 
-export interface Options {
+interface Options {
     sortBy: string;
     sortDesc: boolean;
     thisPage: number;
@@ -25,8 +28,11 @@ export interface Options {
     queryTags: QueryTag[];
 }
 
-export interface QuerySearchTableListeners {
+interface listeners {
+    // Emitted when options are changed
     change?: (options: Readonly<Options>, changedOptions: Readonly<Options>) => void|Promise<void>;
     export?: () => void|Promise<void>;
     select?: (selectIndex: number[]) => void|Promise<void>;
 }
+
+```

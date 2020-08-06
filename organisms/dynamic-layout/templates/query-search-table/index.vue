@@ -8,14 +8,14 @@
         <!--            {{ name }}-->
         <!--        </p-panel-top>-->
         <p-query-search-table :fields="fields"
-                              :items="items"
+                              :items="data"
                               :loading="loading"
+                              :total-count="totalCount"
                               :sort-by="sortBy"
                               :sort-desc="sortDesc"
                               :select-index="selectIndex"
                               :this-page="thisPage"
                               :page-size="pageSize"
-                              :total-count="totalCount"
                               :key-items="keyItems"
                               :value-handler-map="valueHandlerMap"
                               :query-tags="queryTags"
@@ -31,9 +31,6 @@
                 </slot>
             </template>
         </p-query-search-table>
-        <pre>
-            {{ dynamicFieldSlots }}
-        </pre>
     </div>
 </template>
 
@@ -41,7 +38,7 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
+import { DynamicLayoutProps, QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
@@ -49,21 +46,7 @@ import { Options, QuerySearchTableProps } from '@/components/organisms/tables/qu
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-
-const makeFields = (props: DynamicLayoutProps|any): DataTableFieldType[] => computed(() => {
-    if (!props.options.fields) return [];
-
-    return props.options.fields.map(ds => ({
-        name: ds.key,
-        label: ds.name,
-        sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
-        // eslint-disable-next-line camelcase
-        sortKey: ds.options?.sort_key,
-        width: ds.options?.width,
-    }));
-}) as unknown as DataTableFieldType[];
-
+import { KeyItem } from '@/components/organisms/search/query-search/type';
 
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
@@ -81,10 +64,25 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        extra: {
+        data: {
+            type: Array,
+            default: undefined,
+        },
+        loading: {
+            type: Boolean,
+            default: undefined,
+        },
+        totalCount: {
+            type: Number,
+            default: undefined,
+        },
+        timezone: {
+            type: String,
+            default: undefined,
+        },
+        initProps: {
             type: Object,
-            default: () => ({
-            }),
+            default: undefined,
         },
         fetchHandler: {
             type: Function,
@@ -97,38 +95,57 @@ export default {
         },
     },
     setup(props: QuerySearchDynamicLayoutProps, { emit }) {
-        const state: UnwrapRef<QuerySearchTableProps> = reactive({
-            fields: makeFields(props),
-            items: [],
-            loading: false,
-            sortBy: props.extra.sortBy || '',
-            sortDesc: props.extra.sortDesc || true,
-            selectIndex: props.extra.selectIndex || [],
-            thisPage: props.extra.thisPage || 1,
-            pageSize: props.extra.pageSize || 15,
-            totalCount: props.extra.totalCount || 0,
-            keyItems: props.extra.keyItems || [],
-            valueHandlerMap: props.extra.valueHandlerMap || {},
-            queryTags: props.extra.queryTags || [],
-        });
+        const state = reactive({
+            fields: computed(() => {
+                if (!props.options.fields) return [];
 
-        const onChange = async (options: Options) => {
-            state.loading = true;
-            try {
-                state.items = await props.fetchHandler(options);
-            } catch (e) {
-                state.items = [];
-            } finally {
-                state.loading = false;
-            }
-        };
+                return props.options.fields.map(ds => ({
+                    name: ds.key,
+                    label: ds.name,
+                    sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
+                    // eslint-disable-next-line camelcase
+                    sortKey: ds.options?.sort_key,
+                    width: ds.options?.width,
+                }));
+            }),
+            sortBy: props.initProps?.sortBy || '',
+            sortDesc: props.initProps?.sortDesc || true,
+            selectIndex: props.initProps?.selectIndex || [],
+            thisPage: props.initProps?.thisPage || 1,
+            pageSize: props.initProps?.pageSize || 15,
+            keyItems: computed<KeyItem[]>(() => {
+                if (props.initProps?.keyItems) return props.initProps?.keyItems;
+                if (!props.options.fields) return [];
+
+                return props.options.fields.map(d => ({ label: d.name, name: d.key }));
+            }),
+            valueHandlerMap: props.initProps?.valueHandlerMap || {},
+            queryTags: props.initProps?.queryTags || [],
+        });
 
         const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
             const res = {};
             if (!props.options.fields) return res;
 
             props.options.fields.forEach((ds: DynamicField, i) => {
-                const item = { ...ds, extra: {} as any };
+                const item = { ...ds, initProps: {} as any };
+
+                if (ds.type === 'datetime') {
+                    if (!item.initProps.timezone) item.initProps.timezone = props.timezone || 'UTC';
+                }
+
+                res[`col-${ds.key}-format`] = item;
+            });
+
+            return res;
+        });
+
+        const onChange = () => {
+            emit('fetch', state);
+        };
+
+        emit('init', state);
+
 
                 if (ds.type === 'datetime') {
                     if (!item.extra.timezone) item.extra.timezone = props.timezone || 'UTC';

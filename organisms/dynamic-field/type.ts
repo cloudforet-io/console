@@ -23,6 +23,7 @@ export interface CommonOptions {
     tooltip?: string;
     sortable?: boolean;
     sort_key?: string;
+    width?: string;
 }
 
 export interface BadgeOptions extends CommonOptions {

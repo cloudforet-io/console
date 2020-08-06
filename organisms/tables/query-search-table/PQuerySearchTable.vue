@@ -59,20 +59,14 @@ import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearc
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import {
-    computed, getCurrentInstance, reactive, Ref, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { debounce, forEach, isEqual } from 'lodash';
-import {
-    KeyItem, QueryItem, QuerySearchListeners, ValueItem,
-} from '@/components/organisms/search/query-search/type';
-import {
-    QuerySearchTagsListeners,
-    QueryTag,
-} from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { forEach } from 'lodash';
+import { QueryItem } from '@/components/organisms/search/query-search/type';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
-import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export default {
     name: 'PQuerySearchTable',
@@ -141,7 +135,7 @@ export default {
             proxyThisPage: makeOptionalProxy('thisPage', vm),
             proxyPageSize: makeOptionalProxy('pageSize', vm),
             /** search */
-            tags: props.queryTags as QueryTag[],
+            tags: makeOptionalProxy('queryTags', vm),
             /** others */
             options: computed<Options>(() => ({
                 sortBy: state.proxySortBy,
@@ -159,33 +153,12 @@ export default {
             }),
         });
 
-        /** Search & tags */
-        const validation = (query: QueryItem): boolean => (state.tags as unknown as QueryTag[]).every((tag) => {
-            if (tag.key && query.key) {
-                return (query.key.name !== tag.key.name
-                    || query.operator !== tag.operator
-                    || query.value !== tag.value);
-            }
-            if (!tag.key && !query.key) {
-                return query.value !== tag.value;
-            }
-            return true;
-        });
-
-        const deleteTag = (idx: number) => {
-            state.tags.splice(idx, 1);
-        };
-
-        const deleteAllTags = () => {
-            state.tags = [];
-        };
-
         /** Event emitter */
         const emitChange = (options?: Partial<Options>) => {
-            emit('change', {
+            emit('change', Object.freeze({
                 ...state.options,
                 ...options,
-            } as Options);
+            }), Object.freeze({ ...options }));
         };
 
         const emitExport = () => {
@@ -215,6 +188,28 @@ export default {
         };
 
         /** Search event listeners */
+        const validation = (query: QueryItem): boolean => (state.tags as unknown as QueryTag[]).every((tag) => {
+            if (tag.key && query.key) {
+                return (query.key.name !== tag.key.name
+                    || query.operator !== tag.operator
+                    || query.value !== tag.value);
+            }
+            if (!tag.key && !query.key) {
+                return query.value !== tag.value;
+            }
+            return true;
+        });
+
+        const deleteTag = (idx: number) => {
+            state.tags.splice(idx, 1);
+            emitChange({ queryTags: state.tags });
+        };
+
+        const deleteAllTags = () => {
+            state.tags = [];
+            emitChange({ queryTags: state.tags });
+        };
+
         const onSearch = async (query: QueryItem) => {
             if (!validation(query)) return;
             // TODO: convert queryItem to queryTag with datatype

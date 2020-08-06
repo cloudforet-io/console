@@ -77,8 +77,9 @@ export const defaultCase = () => ({
     template: `
     <div style="width: 95vw;" class="flex">
         <query-search-table v-bind="$props" 
-                            :fetch-handler="fetchHandler"
                             style="width: 65%;"
+                            @init="onInit"
+                            @fetch="onFetch"
         >
         </query-search-table>
         <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">
@@ -107,7 +108,12 @@ export const defaultCase = () => ({
 
         return {
             ...toRefs(state),
-            fetchHandler,
+            onInit() {
+
+            },
+            onFetch() {
+
+            }
         };
     },
 });

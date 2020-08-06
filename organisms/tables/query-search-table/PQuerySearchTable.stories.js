@@ -8,13 +8,15 @@ import {
 import casual, { arrayOf } from '@/components/util/casual';
 import { KeyItem, ValueItem } from '@/components/organisms/search/query-search/type';
 import PQuerySearchTable from './PQuerySearchTable.vue';
+import md from './PQuerySearchTable.md';
 
 export default {
     title: 'organisms/tables/QuerySearchTable',
     component: PQuerySearchTable,
     parameters: {
+        notes: md,
         info: {
-            summary: '',
+            summary: md,
             components: { PQuerySearchTable },
         },
         knobs: { escapeHTML: false },
@@ -47,14 +49,6 @@ export const defaultCase = () => ({
                 { name: 'name', label: 'Name' },
                 { name: 'group', label: 'Group' },
             ]),
-        },
-        items: {
-            default: object('items', arrayOf(10, () => ({
-                id: casual.uuid, name: casual.word, group: casual.word,
-            }))),
-        },
-        loading: {
-            default: boolean('loading', false),
         },
         sortBy: {
             default: text('sortBy', 'id'),
@@ -97,17 +91,35 @@ export const defaultCase = () => ({
     template: `
     <div style="width: 80vw;">
         <PQuerySearchTable v-bind="$props"
+                           :items="items"
+                           :loading="loading"
                            @change="onChange"
                            @export="onExport"
                            @select="onSelect"
         ></PQuerySearchTable>
     </div>`,
     setup(props, context) {
-        const state = reactive({});
+        const state = reactive({
+            items: [],
+            loading: true,
+        });
+
+        const getData = async () => {
+            state.loading = true;
+            state.items = await new Promise(resolve => setTimeout(() => resolve(arrayOf(10, () => ({
+                id: casual.uuid, name: casual.word, group: casual.word,
+            }))), 1000));
+            state.loading = false;
+        };
+
+        getData();
 
         return {
             ...toRefs(state),
-            onChange: action('change'),
+            onChange: (...args) => {
+                action('change')(...args);
+                getData();
+            },
             onExport: action('export'),
             onSelect: action('select'),
         };

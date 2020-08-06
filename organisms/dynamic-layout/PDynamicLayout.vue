@@ -5,7 +5,7 @@
         :options="options"
         :data="data"
         :loading="loading"
-        :extra="extra"
+        :initProps="initProps"
         v-on="$listeners"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -43,13 +43,13 @@ export default {
         },
         data: {
             type: [Object, Array],
-            default: null,
+            default: undefined,
         },
         loading: {
             type: Boolean,
-            default: true,
+            default: false,
         },
-        extra: {
+        initProps: {
             type: Object,
             default: () => ({}),
         },
@@ -62,7 +62,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: DynamicLayoutProps, { emit }) {
+    setup(props: DynamicLayoutProps<any, any, any, any>, { emit }) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,

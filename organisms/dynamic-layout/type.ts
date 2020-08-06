@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
-import { QuerySearchTableOptions } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
+import { Options as QuerySearchTableFetchOptions, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 /** Metadata schema types for Dynamic layout */
 export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'
@@ -43,10 +44,31 @@ export interface DynamicLayout {
 }
 
 /** Props type for Dynamic layout component */
-export interface DynamicLayoutProps extends Required<DynamicLayout> {
-    data: any;
-    extra: any;
-    beforeCreate?: (props: DynamicLayoutProps) => void|Promise<void>;
-    fetchHandler: (fetchOptions: any) => any|Promise<any>;
+export interface DynamicLayoutProps<InitProps, Options, FetchOptions, Data> {
+    name: string;
+    type: DynamicLayoutType;
+    options: Options;
+    data?: Data;
+    loading?: boolean;
+    totalCount?: number;
+    initProps?: InitProps; // a set of init values of extra props for each component
+    timezone?: string;
+    beforeCreate?: (props: InitProps) => void|Promise<void>;
+}
+
+export interface DynamicLayoutTemplateProps<InitProps, Options, Data> {
+    name: string;
+    options: Options;
+    data?: Data;
+    loading?: boolean;
+    totalCount?: number;
+    initProps?: InitProps;
     timezone?: string;
 }
+
+// Query Search Table
+export type QuerySearchDynamicLayoutProps<T=any> = DynamicLayoutTemplateProps<
+    QuerySearchTableProps,
+    QuerySearchTableOptions,
+    T[]
+>
