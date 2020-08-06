@@ -5,7 +5,9 @@
         :options="options"
         :data="data"
         :loading="loading"
-        :initProps="initProps"
+        :total-count="totalCount"
+        :timezone="timezone"
+        :init-props="initProps"
         v-on="$listeners"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -47,22 +49,26 @@ export default {
         },
         loading: {
             type: Boolean,
-            default: false,
+            default: undefined,
         },
-        initProps: {
-            type: Object,
-            default: () => ({}),
+        totalCount: {
+            type: Number,
+            default: undefined,
+        },
+        timezone: {
+            type: String,
+            default: undefined,
         },
         beforeCreate: {
             type: Function,
             default: undefined,
         },
-        beforeRender: {
-            type: Function,
+        initProps: {
+            type: Object,
             default: undefined,
         },
     },
-    setup(props: DynamicLayoutProps<any, any, any, any>, { emit }) {
+    setup(props: DynamicLayoutProps<any, any>, { emit }) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,

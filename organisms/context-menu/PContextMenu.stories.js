@@ -32,39 +32,6 @@ const actions = {
     onEscKey: action('keyup:esc'),
 };
 
-const knobs = {
-    theme: {
-        default: select('theme', ['secondary', 'gray900', 'white'], 'secondary'),
-    },
-    menu: {
-        default: object('menu', [
-            {
-                type: 'item', label: 'add', name: 'add', disabled: false,
-            },
-            {
-                type: 'item', label: 'hello', name: 'hello', disabled: false,
-            },
-            { type: 'divider' },
-            { type: 'header', label: 'this is header' },
-            {
-                type: 'item', label: 'update', name: 'update', disabled: false,
-            },
-            {
-                type: 'item', label: 'delete', name: 'delete', disabled: true,
-            },
-            { type: 'divider' },
-            {
-                type: 'item', label: 'collect', name: 'collect', disabled: false,
-            },
-            { type: 'divider' },
-            {
-                type: 'item', label: 'remove', name: 'remove', disabled: false,
-            },
-
-
-        ]),
-    },
-};
 
 export const defaultCase = () => ({
     components: { PContextMenu },
@@ -93,7 +60,39 @@ export const defaultCase = () => ({
         <button @click="contextRef.focus()">자동 포커싱</button>
     </div>
 </div>`,
-    props: knobs,
+    props: {
+        theme: {
+            default: select('theme', ['secondary', 'gray900', 'white'], 'secondary'),
+        },
+        menu: {
+            default: object('menu', [
+                {
+                    type: 'item', label: 'add', name: 'add', disabled: false,
+                },
+                {
+                    type: 'item', label: 'hello', name: 'hello', disabled: false,
+                },
+                { type: 'divider' },
+                { type: 'header', label: 'this is header' },
+                {
+                    type: 'item', label: 'update', name: 'update', disabled: false,
+                },
+                {
+                    type: 'item', label: 'delete', name: 'delete', disabled: true,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'collect', name: 'collect', disabled: false,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'remove', name: 'remove', disabled: false,
+                },
+
+
+            ]),
+        },
+    },
     setup() {
         const contextRef = ref(null);
         return {
@@ -274,7 +273,39 @@ export const slotCase = () => ({
     </div>
     
 </div>`,
-    props: knobs,
+    props: {
+        theme: {
+            default: select('theme', ['secondary', 'gray900', 'white'], 'secondary'),
+        },
+        menu: {
+            default: object('menu', [
+                {
+                    type: 'item', label: 'add', name: 'add', disabled: false,
+                },
+                {
+                    type: 'item', label: 'hello', name: 'hello', disabled: false,
+                },
+                { type: 'divider' },
+                { type: 'header', label: 'this is header' },
+                {
+                    type: 'item', label: 'update', name: 'update', disabled: false,
+                },
+                {
+                    type: 'item', label: 'delete', name: 'delete', disabled: true,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'collect', name: 'collect', disabled: false,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'remove', name: 'remove', disabled: false,
+                },
+
+
+            ]),
+        },
+    },
     setup() {
         const contextRef = ref(null);
         return {

@@ -19,6 +19,7 @@
                               :key-items="keyItems"
                               :value-handler-map="valueHandlerMap"
                               :query-tags="queryTags"
+                              @select="onSelect"
                               @change="onChange"
                               v-on="$listeners"
         >
@@ -38,15 +39,20 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { DynamicLayoutProps, QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
-import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
+import {
+    DynamicLayoutEventListeners,
+    DynamicLayoutFetchOptions,
+} from '@/components/organisms/dynamic-layout/type';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
+import {
+    Options as QuerySearchTableFetchOptions,
+} from '@/components/organisms/tables/query-search-table/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { forEach } from 'lodash';
+import { QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
@@ -112,6 +118,15 @@ export default {
             }),
             valueHandlerMap: props.initProps?.valueHandlerMap || {},
             queryTags: props.initProps?.queryTags || [],
+            /** dynamic layout fetch options */
+            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({
+                sortBy: state.sortBy,
+                sortDesc: state.sortDesc,
+                pageStart: state.thisPage,
+                pageLimit: state.pageSize,
+                queryTags: state.queryTags,
+                selectIndex: state.selectIndex,
+            })),
         });
 
         const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
@@ -131,16 +146,32 @@ export default {
             return res;
         });
 
-        const onChange = () => {
-            emit('fetch', state);
+        const onSelect = (selectIndex: number[]) => {
+            state.selectIndex = selectIndex;
+            emit('select', selectIndex);
         };
 
-        emit('init', state);
+        const onChange = (options: QuerySearchTableFetchOptions, changedOptions: Partial<QuerySearchTableFetchOptions>) => {
+            const changedFetchOptions: Partial<DynamicLayoutFetchOptions> = {};
+            forEach(changedOptions, (d, k) => {
+                state[k] = d;
+                if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
+                else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
+            });
+
+            const args: Parameters<DynamicLayoutEventListeners['fetch']> = [
+                state.fetchOptions, changedFetchOptions,
+            ];
+            emit('fetch', ...args);
+        };
+
+        emit('init', state.fetchOptions);
 
 
         return {
             ...toRefs(state),
             onChange,
+            onSelect,
             dynamicFieldSlots,
         };
     },

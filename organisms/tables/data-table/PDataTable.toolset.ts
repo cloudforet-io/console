@@ -103,6 +103,8 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     rowHeightFixed: boolean;
 }
 
+export type DataTableProps = DataTableSetupProps;
+
 @StateToolSet<DataTablePropsType>()
 @SyncStateToolSet<DataTableSyncType>()
 export class DataTableState<

@@ -1,17 +1,25 @@
 /* eslint-disable camelcase */
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SDynamicLayoutItem from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/index.vue';
-
-import { object } from '@storybook/addon-knobs';
-import { ref } from '@vue/composition-api';
-import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/item.md';
-import { fluentApi } from '@/lib/fluent-api';
+import {
+    toRefs, reactive, ref, computed,
+} from '@vue/composition-api';
+import { action } from '@storybook/addon-actions';
+import { getKnobProps } from '@sb/storybook-util';
+import {
+    text, number, select, object, boolean,
+} from '@storybook/addon-knobs/vue';
+import list from './index.vue';
+import md from './list.md';
 
 export default {
     title: 'organisms/dynamic-layout/list',
-    component: SDynamicLayoutItem,
+    component: list,
     parameters: {
         notes: md,
+        info: {
+            summary: md,
+            components: { list },
+        },
+        knobs: { escapeHTML: false },
     },
 };
 
@@ -211,88 +219,35 @@ const defaultLayout = {
     },
 };
 
+
 export const defaultCase = () => ({
-    components: { SDynamicLayout },
-    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    components: { list },
     props: {
-        layout: {
-            type: Object,
-            default: object('layout', defaultLayout, 'layout'),
+        name: {
+            default: text('name', defaultLayout.name),
+        },
+        options: {
+            default: object('options', defaultLayout.options),
+        },
+        timezone: {
+            default: text('timezone', 'UTC'),
         },
         data: {
-            type: Object,
-            default: object('data', data, 'data'),
+            default: object('data', data),
         },
-
     },
-
-});
-
-const rootPathLayout = {
-    name: 'EC2 Instance',
-    type: 'item',
-    options: {
-        root_path: 'data.compute',
-        fields: [{
-            name: 'Instance ID',
-            key: 'instance_name',
-        }, {
-            name: 'Region',
-            key: 'region',
-        }, {
-            name: 'Instance State',
-            key: 'instance_state',
-            type: 'enum',
-            options: {
-                running: {
-                    type: 'state',
-                    options: {
-                        icon: {
-                            color: 'green',
-                        },
-                    },
-                },
-                'shutting-down': {
-                    type: 'state',
-                    options: {
-                        icon: {
-                            color: 'red',
-                        },
-                    },
-                },
-            },
-        }],
-    },
-};
-export const rootPath = () => ({
-    components: { SDynamicLayout },
-    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
-    setup() {
-        return {
-            layout: rootPathLayout,
-            data,
-        };
-    },
-});
-
-export const apiMode = () => ({
-    components: { SDynamicLayout },
-    template: `<div class="w-screen bg-white">
-        <span>
-        <input type="checkbox" v-model="isShow"> is show    
-        </span>
-        <SDynamicLayout v-bind="layout" :is-show="isShow" :api="api" ref="item"/>
+    template: `
+    <div style="width: 80vw;">
+        <list v-bind="$props" @init="onInit" @fetch="onFetch" @select="onSelect"></list>
     </div>`,
+    setup(props, context) {
+        const state = reactive({});
 
-    setup() {
-        const isShow = ref(true);
         return {
-            layout: rootPathLayout,
-            api: {
-                resource: fluentApi.inventory().server(),
-                getAction: action => action.setId('dynamicTest'),
-            },
-            isShow,
+            ...toRefs(state),
+            onInit: action('init'),
+            onFetch: action('fetch'),
+            onSelect: action('select'),
         };
     },
 });

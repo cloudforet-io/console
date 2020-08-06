@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
-import { Options as QuerySearchTableFetchOptions, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 
 /** Metadata schema types for Dynamic layout */
 export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'
@@ -23,22 +23,27 @@ export interface TableOptions extends CommonOptions {
     fields: DynamicField[];
 }
 
-export interface QuerySearchTableOptions {
+export interface QuerySearchTableOptions extends CommonOptions {
     fields: DynamicField[];
 }
 
 export type RawOptions = CommonOptions
 
-export interface MarkdownOptions {
+export interface MarkdownOptions extends CommonOptions {
     markdown: string|{
         en: string;
         ko: string;
     };
 }
 
+export interface ListOptions extends CommonOptions {
+    layouts: DynamicLayout[];
+}
+
 export type DynamicLayoutOptions =
     ItemOptions | SimpleTableOptions | TableOptions |
-    QuerySearchTableOptions | RawOptions | MarkdownOptions
+    QuerySearchTableOptions | RawOptions | MarkdownOptions |
+    ListOptions
 
 
 export interface DynamicLayout {
@@ -47,32 +52,37 @@ export interface DynamicLayout {
     options?: DynamicLayoutOptions;
 }
 
-/** Props type for Dynamic layout component */
-export interface DynamicLayoutProps<InitProps, Options, FetchOptions, Data> {
+/** Props for Dynamic layout component */
+export interface DynamicLayoutProps<InitProps, Options> {
     name: string;
     type: DynamicLayoutType;
     options: Options;
-    data?: Data;
+    data?: any;
     loading?: boolean;
     totalCount?: number;
-    initProps?: InitProps; // a set of init values of extra props for each component
     timezone?: string;
-    beforeCreate?: (props: InitProps) => void|Promise<void>;
-}
-
-export interface DynamicLayoutTemplateProps<InitProps, Options, Data> {
-    name: string;
-    options: Options;
-    data?: Data;
-    loading?: boolean;
-    totalCount?: number;
+    beforeCreate?: (props: any) => void|Promise<void>;
     initProps?: InitProps;
-    timezone?: string;
 }
 
-// Query Search Table
-export type QuerySearchDynamicLayoutProps<T=any> = DynamicLayoutTemplateProps<
-    QuerySearchTableProps,
-    QuerySearchTableOptions,
-    T[]
->
+export interface DynamicLayoutFetchOptions {
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    queryTags?: QueryTag[];
+    selectIndex?: number[];
+    searchText?: string;
+}
+
+/** Dynamic Layout Event Listeners */
+export interface DynamicLayoutEventListeners {
+    init: (options: DynamicLayoutFetchOptions) => void|Promise<void>;
+    fetch: (options: DynamicLayoutFetchOptions,
+             changedOptions: DynamicLayoutFetchOptions) => void|Promise<void>;
+    select: (selectIndex: number[]) => void|Promise<void>;
+}
+
+/** Props for each template component that matches to dynamic layout types */
+export type DynamicLayoutTemplateProps<InitProps, Options> =
+    Omit<DynamicLayoutProps<InitProps, Options>, 'type' | 'beforeCreate'>;
