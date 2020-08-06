@@ -68,7 +68,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: DynamicLayoutProps<any, any, any>, { emit }) {
+    setup(props: DynamicLayoutProps<any, any>, { emit }) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,

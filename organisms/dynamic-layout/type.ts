@@ -53,11 +53,11 @@ export interface DynamicLayout {
 }
 
 /** Props for Dynamic layout component */
-export interface DynamicLayoutProps<InitProps, Options, Data> {
+export interface DynamicLayoutProps<InitProps, Options> {
     name: string;
     type: DynamicLayoutType;
     options: Options;
-    data?: Data;
+    data?: any;
     loading?: boolean;
     totalCount?: number;
     timezone?: string;
@@ -66,22 +66,23 @@ export interface DynamicLayoutProps<InitProps, Options, Data> {
 }
 
 export interface DynamicLayoutFetchOptions {
-    sortBy: string;
-    sortDesc: boolean;
-    pageStart: number;
-    pageLimit: number;
-    queryTags: QueryTag[];
-    selectIndex: number[];
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    queryTags?: QueryTag[];
+    selectIndex?: number[];
+    searchText?: string;
 }
 
 /** Dynamic Layout Event Listeners */
 export interface DynamicLayoutEventListeners {
     init: (options: DynamicLayoutFetchOptions) => void|Promise<void>;
     fetch: (options: DynamicLayoutFetchOptions,
-             changedOptions: Partial<DynamicLayoutFetchOptions>) => void|Promise<void>;
+             changedOptions: DynamicLayoutFetchOptions) => void|Promise<void>;
     select: (selectIndex: number[]) => void|Promise<void>;
 }
 
 /** Props for each template component that matches to dynamic layout types */
-export type DynamicLayoutTemplateProps<InitProps, Options, Data> =
-    Omit<DynamicLayoutProps<InitProps, Options, Data>, 'type' | 'beforeCreate'>;
+export type DynamicLayoutTemplateProps<InitProps, Options> =
+    Omit<DynamicLayoutProps<InitProps, Options>, 'type' | 'beforeCreate'>;

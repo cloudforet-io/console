@@ -1,11 +1,10 @@
 ```typescript
 import { DynamicLayoutTemplateProps, ItemOptions } from 'DynmaicLayout';
-import { DefinitionData, DefinitionTableProps } from 'DefinitionTable';
+import { DefinitionTableProps } from 'DefinitionTable';
 
-export type ItemDynamicLayoutProps<T=any> = DynamicLayoutTemplateProps<
+export type ItemDynamicLayoutProps = DynamicLayoutTemplateProps<
     Partial<DefinitionTableProps>,
     ItemOptions,
-    DefinitionData
     >
 
 ```

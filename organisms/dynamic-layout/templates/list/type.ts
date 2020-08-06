@@ -5,8 +5,7 @@ import {
     DynamicLayoutTemplateProps,
 } from '@/components/organisms/dynamic-layout/type';
 
-export type ListDynamicLayoutProps<T=any> = DynamicLayoutTemplateProps<
-    DynamicLayoutProps<any, DynamicLayoutOptions, T>,
-    ListOptions,
-    T
+export type ListDynamicLayoutProps = DynamicLayoutTemplateProps<
+    DynamicLayoutProps<any, DynamicLayoutOptions>,
+    ListOptions
 >

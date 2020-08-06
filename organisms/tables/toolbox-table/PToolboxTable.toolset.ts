@@ -42,6 +42,8 @@ export interface ToolBoxTableSetupProps extends ToolBoxTablePropsType, ToolBoxTa
     thisPage: number;
 }
 
+export type ToolboxTableProps = ToolBoxTableSetupProps
+
 @StateToolSet<ToolBoxTablePropsType>()
 @SyncStateToolSet<ToolBoxTableSyncType>()
 export class ToolboxTableState<

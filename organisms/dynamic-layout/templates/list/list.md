@@ -6,10 +6,9 @@ import {
     DynamicLayoutTemplateProps,
 } from 'DynamicLayout';
 
-export type ListDynamicLayoutProps<T=any> = DynamicLayoutTemplateProps<
-    DynamicLayoutProps<any, DynamicLayoutOptions, T>,
+export type ListDynamicLayoutProps = DynamicLayoutTemplateProps<
+    DynamicLayoutProps<any, DynamicLayoutOptions>,
     ListOptions,
-    T
 >
 
 ```
