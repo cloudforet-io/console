@@ -23,6 +23,10 @@ export interface TableOptions extends CommonOptions {
     fields: DynamicField[];
 }
 
+export interface QuerySearchTableOptions {
+    fields: DynamicField[];
+}
+
 export type RawOptions = CommonOptions
 
 export interface MarkdownOptions {

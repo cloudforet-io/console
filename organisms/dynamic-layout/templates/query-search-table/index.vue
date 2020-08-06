@@ -84,15 +84,6 @@ export default {
             type: Object,
             default: undefined,
         },
-        fetchHandler: {
-            type: Function,
-            // eslint-disable-next-line no-empty-function
-            default: (fetchOptions) => {},
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
     },
     setup(props: QuerySearchDynamicLayoutProps, { emit }) {
         const state = reactive({
@@ -146,16 +137,6 @@ export default {
 
         emit('init', state);
 
-
-                if (ds.type === 'datetime') {
-                    if (!item.extra.timezone) item.extra.timezone = props.timezone || 'UTC';
-                }
-
-                res[`col-${ds.key}-format`] = item;
-            });
-
-            return res;
-        });
 
         return {
             ...toRefs(state),
