@@ -42,36 +42,6 @@
                         {{ data.value }}
                     </template>
                 </s-dynamic-layout>
-                <!--                <p-query-search-table :fields="mainTable.fields"-->
-                <!--                                      :items="mainTable.items" :loading="mainTable.loading"-->
-                <!--                                      :value-handler-map="handlers.valueHandlerMap"-->
-                <!--                                      :key-handler="handlers.keyHandler"-->
-                <!--                >-->
-                <!--                    <template #toolbox-left>-->
-                <!--                        <p-icon-text-button style-type="primary-dark"-->
-                <!--                                            name="ic_plus_bold"-->
-                <!--                                            @click="$router.push({path: '/plugin/collector/create/plugins'})"-->
-                <!--                        >-->
-                <!--                            {{ $t('BTN.CREATE') }}-->
-                <!--                        </p-icon-text-button>-->
-                <!--                        <p-dropdown-menu-btn class="left-toolbox-item"-->
-                <!--                                             :menu="dropdown"-->
-                <!--                                             @click-update="onClickUpdate"-->
-                <!--                                             @click-enable="onClickEnable"-->
-                <!--                                             @click-disable="onClickDisable"-->
-                <!--                                             @click-delete="onClickDelete"-->
-                <!--                                             @click-collectData="onClickCollectData"-->
-                <!--                        >-->
-                <!--                            {{ $t('BTN.ACTION') }}-->
-                <!--                        </p-dropdown-menu-btn>-->
-                <!--                    </template>-->
-                <!--                    <template #col-name-format="data">-->
-                <!--                        <p-lazy-img :img-url="getIcon(data)"-->
-                <!--                                    width="1.5rem" height="1.5rem" class="mr-2"-->
-                <!--                        />-->
-                <!--                        {{ data.value }}-->
-                <!--                    </template>-->
-                <!--                </p-query-search-table>-->
             </template>
         </p-horizontal-layout>
 
