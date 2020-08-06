@@ -8,13 +8,15 @@ import {
 } from '@storybook/addon-knobs/vue';
 import casual, { arrayOf } from '@/components/util/casual';
 import QuerySearchTable from './index.vue';
+import md from './query-search-table.md';
 
 export default {
     title: 'organisms/dynamic-layout/query-search-table',
     component: QuerySearchTable,
     parameters: {
+        notes: md,
         info: {
-            summary: '',
+            summary: md,
             components: { QuerySearchTable },
         },
         knobs: { escapeHTML: false },
@@ -67,9 +69,6 @@ export const defaultCase = () => ({
         options: {
             default: object('options', defaultLayout.options),
         },
-        extra: {
-            default: object('extra', {}),
-        },
         timezone: {
             default: text('timezone', 'UTC'),
         },
@@ -78,42 +77,57 @@ export const defaultCase = () => ({
     <div style="width: 95vw;" class="flex">
         <query-search-table v-bind="$props" 
                             style="width: 65%;"
+                            :data="data"
+                            :loading="loading"
+                            :total-count="totalCount"
                             @init="onInit"
                             @fetch="onFetch"
+                            @select="onSelect"
         >
         </query-search-table>
         <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">
-            {{items}}
+            {{data}}
         </pre>
     </div>`,
     setup(props, context) {
         const state = reactive({
-            items: [],
+            data: [],
+            loading: true,
+            totalCount: 0,
         });
 
-        const fetchHandler = async () => {
-            state.items = arrayOf(10, () => ({
-                // eslint-disable-next-line camelcase
-                server_id: casual.uuid,
-                data: {
-                    compute: {
-                        region: casual.state,
+        const onFetch = async (options, changed) => {
+            state.loading = true;
+            state.data = await new Promise((resolve) => {
+                setTimeout(() => {
+                    state.totalCount = casual.integer(0);
+                    resolve(arrayOf(options.pageLimit, () => ({
                         // eslint-disable-next-line camelcase
-                        instance_state: casual.random_element(['ACTIVE', 'DISCONNECTED']),
-                    },
-                },
-            }));
-            return state.items;
+                        server_id: casual.uuid,
+                        data: {
+                            compute: {
+                                region: casual.state,
+                                // eslint-disable-next-line camelcase
+                                instance_state: casual.random_element(['ACTIVE', 'DISCONNECTED']),
+                            },
+                        },
+                    })));
+                }, 1000);
+            });
+            state.loading = false;
         };
 
         return {
             ...toRefs(state),
-            onInit() {
-
+            onInit(...args) {
+                action('init')(...args);
+                onFetch(...args);
             },
-            onFetch() {
-
-            }
+            onFetch(...args) {
+                action('fetch')(...args);
+                onFetch(...args);
+            },
+            onSelect: action('select'),
         };
     },
 });

@@ -1,15 +1,18 @@
 /* eslint-disable camelcase */
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SDynamicLayoutTable from '@/components/organisms/dynamic-view/dynamic-layout/templates/table/index.vue';
-
-import { computed, ref } from '@vue/composition-api';
-import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/table/table.md';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import { fluentApi } from '@/lib/fluent-api';
+import {
+    computed, reactive, ref, toRefs,
+} from '@vue/composition-api';
+import casual, { arrayOf } from '@/components/util/casual';
+import { action } from '@storybook/addon-actions';
+import {
+    text, number, select, object, boolean,
+} from '@storybook/addon-knobs/vue';
+import md from './table.md';
+import PDynamicLayoutTable from './index.vue';
 
 export default {
     title: 'organisms/dynamic-layout/table',
-    component: SDynamicLayoutTable,
+    component: PDynamicLayoutTable,
     parameters: {
         notes: md,
     },
@@ -40,20 +43,14 @@ const defaultLayout = {
             },
             {
                 name: 'Protocol',
-                key: 'port',
-            },
-
-
-            {
-                name: 'Protocol',
-                key: 'prtocol',
+                key: 'protocol',
                 type: 'enum',
                 options: {
                     TCP: {
                         type: 'state',
                         options: {
                             icon: {
-                                color: 'green',
+                                image: 'ic_admin',
                             },
                         },
                     },
@@ -61,7 +58,7 @@ const defaultLayout = {
                         type: 'state',
                         options: {
                             icon: {
-                                color: 'red',
+                                image: 'ic_alert',
                             },
                         },
                     },
@@ -70,48 +67,76 @@ const defaultLayout = {
     },
 };
 
-const changeLayout = {
-    name: 'SubData Layouts',
-    type: 'table',
-    options: {
-        root_path: 'metadata.view.sub_data.layouts',
-        fields: [
-            {
-                name: 'Name',
-                key: 'name',
-            },
-            {
-                name: 'Type',
-                key: 'type',
-            },
-            {
-                name: 'Fields',
-                key: 'options.fields',
-                type: 'list',
-                options: {
-                    sub_key: 'name',
-                },
-            }],
+export const defaultCase = () => ({
+    components: { PDynamicLayoutTable },
+    props: {
+        name: {
+            default: text('name', defaultLayout.name),
+        },
+        options: {
+            default: object('options', defaultLayout.options),
+        },
+        timezone: {
+            default: text('timezone', 'UTC'),
+        },
     },
-};
-export const apiMode = () => ({
-    components: { SDynamicLayout, PButton },
     template: `
-        <div  class="w-screen bg-white">
-            <p-button style-type="primary" @click="layoutChange = !layoutChange">Change layout</p-button>
-            <SDynamicLayout v-bind="layout" :api="api" :is-show="isShow" />
+        <div style="width: 95vw;" class="flex">
+            <PDynamicLayoutTable v-bind="$props"
+                                 style="width: 65%;"
+                                 :data="data"
+                                 :loading="loading"
+                                 :total-count="totalCount"
+                                 @init="onInit"
+                                 @fetch="onFetch"
+                                 @select="onSelect"
+            >
+            </PDynamicLayoutTable>
+            <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">
+                {{data}}
+            </pre>
         </div>`,
-    setup() {
-        const isShow = ref(true);
-        const layoutChange = ref(true);
+    setup(props, context) {
+        const state = reactive({
+            data: [],
+            loading: true,
+            totalCount: 0,
+        });
+
+        const onFetch = async (options, changed) => {
+            state.loading = true;
+            state.data = await new Promise((resolve) => {
+                setTimeout(() => {
+                    state.totalCount = casual.integer(0);
+                    const res = {
+                        data: {
+                            security_group_rules: arrayOf(options.pageLimit,
+                                () => ({
+                                    security_group_name: casual.name,
+                                    port_range_max: casual.integer(0),
+                                    port_range_min: casual.integer(0),
+                                    port: casual.integer(0),
+                                    protocol: casual.random_element(['TCP', 'UDP']),
+                                })),
+                        },
+                    };
+                    resolve(res);
+                }, 1000);
+            });
+            state.loading = false;
+        };
+
         return {
-            layoutChange,
-            layout: computed(() => (layoutChange.value ? defaultLayout : changeLayout)),
-            api: {
-                resource: fluentApi.inventory().server(),
+            ...toRefs(state),
+            onInit(...args) {
+                action('init')(...args);
+                onFetch(...args);
             },
-            isShow,
+            onFetch(...args) {
+                action('fetch')(...args);
+                onFetch(...args);
+            },
+            onSelect: action('select'),
         };
     },
-
 });

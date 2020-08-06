@@ -1,17 +1,21 @@
 <template>
-    <div v-if="!isLoading">
+    <div>
         <p-panel-top
-            v-if="showTitle"
             :use-total-count="true"
-            :total-count="items? items.length:0"
+            :total-count="totalCount"
         >
             {{ name }}
         </p-panel-top>
-        <p-data-table :items="items" :fields="fields" :col-copy="colCopy"
+        <p-data-table v-bind="initProps" :items="rootData" :fields="fields"
                       v-on="$listeners"
         >
-            <template v-for="slot of slots" v-slot:[slot.name]="{value}">
-                <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
+            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
+                <slot :name="slotName" v-bind="data">
+                    <p-dynamic-field :key="item.name"
+                                     v-bind="item"
+                                     :data="data.value"
+                    />
+                </slot>
             </template>
         </p-data-table>
     </div>
@@ -19,23 +23,19 @@
 
 <script lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
-import _ from 'lodash';
+import { get } from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import {
-    checkCanGetData,
-    DynamicLayoutApiProp,
-    DynamicLayoutProps,
-    makeFields, makeTableSlots,
-} from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-import { GetAction, ResourceActions } from '@/lib/fluent-api';
+import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { SimpleTableDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/simple-table/type';
+import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
 
 
 export default {
-    name: 'SDynamicLayoutSimpleTable',
+    name: 'PDynamicLayoutSimpleTable',
     components: {
         PDynamicField,
         PDataTable,
@@ -52,90 +52,71 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [Object, Array],
-            default: null,
+            type: [Array, Object],
+            default: undefined,
         },
-        api: {
+        loading: {
+            type: Boolean,
+            default: undefined,
+        },
+        totalCount: {
+            type: Number,
+            default: undefined,
+        },
+        timezone: {
+            type: String,
+            default: undefined,
+        },
+        initProps: {
             type: Object,
-            default: null,
-        },
-        isShow: {
-            type: Boolean,
-            default: true,
-        },
-        isLoading: {
-            type: Boolean,
-            required: true,
-        },
-        showTitle: {
-            type: Boolean,
-            default: true,
-        },
-        colCopy: {
-            type: Boolean,
-            default: false,
+            default: undefined,
         },
     },
-    setup(props: DynamicLayoutProps) {
+    setup(props: SimpleTableDynamicLayoutProps, { emit }) {
         const state = reactive({
-            isApiMode: computed(() => !!props.api),
-            data: {},
-        });
-        const fields = makeFields(props);
+            fields: computed(() => {
+                if (!props.options.fields) return [];
 
-
-        const getData = async () => {
-            if (checkCanGetData(props)) {
-                let action: GetAction<any, any>;
-                if (props.api?.resource instanceof GetAction) {
-                    action = props.api.resource;
-                } else {
-                    action = (props.api?.resource as ResourceActions<'get'>).get() as GetAction<any, any>;
-                }
-                if (props.api?.getAction) {
-                    action = props.api.getAction(action) as GetAction<any, any>;
-                }
+                return props.options.fields.map(ds => ({
+                    name: ds.key,
+                    label: ds.name,
+                    sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
+                    // eslint-disable-next-line camelcase
+                    sortKey: ds.options?.sort_key,
+                    width: ds.options?.width,
+                }));
+            }),
+            rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    action = action.setOnly(props.options.root_path);
+                    return get(props.data, props.options.root_path);
                 }
-                const resp = await action.execute();
-                state.data = resp.data || {};
-            }
-        };
-        // const getData = _.debounce(getDataFunc, 50);
+                return props.data;
+            }),
+            /** others */
+            dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
+                const res = {};
+                if (!props.options.fields) return res;
 
-        let apiWatchStop: any = null;
-        watch(() => state.isApiMode, (after, before) => {
-            if (after !== before) {
-                if (after) {
-                    // @ts-ignore
-                    apiWatchStop = watch(() => [props.isShow, props.api], (aft, bef) => {
-                        const isShow: boolean = aft[0] as boolean;
-                        const beforeIsShow = bef ? bef[0] : false;
-                        const afterApi: DynamicLayoutApiProp = aft[1] as DynamicLayoutApiProp;
-                        const beforeApi: undefined|DynamicLayoutApiProp = bef ? bef[1] as DynamicLayoutApiProp : undefined;
-                        if ((isShow && isShow !== beforeIsShow) || (afterApi.resource !== beforeApi?.resource || afterApi.getAction !== beforeApi?.getAction)) {
-                            getData();
-                        }
-                    });
-                } else if (apiWatchStop) {
-                    apiWatchStop();
-                }
-            }
+                props.options.fields.forEach((ds: DynamicField, i) => {
+                    const item = { ...ds, initProps: {} as any };
+
+                    if (ds.type === 'datetime') {
+                        if (!item.initProps.timezone) item.initProps.timezone = props.timezone || 'UTC';
+                    }
+
+                    res[`col-${ds.key}-format`] = item;
+                });
+
+                return res;
+            }),
+            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({
+
+            })),
         });
 
-        const readonlyData = computed(() => (state.isApiMode ? state.data : props.data));
-        const items = computed(() => {
-            if (props.options.root_path) {
-                return _.get(readonlyData.value, props.options.root_path, []);
-            }
-            return readonlyData.value;
-        });
-        const slots = makeTableSlots(props);
+        emit('init', state.fetchOptions);
         return {
-            fields,
-            slots,
-            items,
+            ...toRefs(state),
         };
     },
 };
