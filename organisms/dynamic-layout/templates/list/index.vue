@@ -1,16 +1,19 @@
 <template>
-    <div v-if="!isLoading">
-        <s-dynamic-layout v-for="(layout,idx) in options.layouts||[]" :key="idx"
-                          v-bind="layout"
-                          :api="api"
-                          :data="data"
-                          :is-show="isShow" :is-loading="isLoading"
-                          v-on="$listeners"
-        >
-            <template v-for="(slot) of slotNames" v-slot:[slot]="scope">
-                <slot :name="`${name}-${slot}`" v-bind="scope" />
-            </template>
-        </s-dynamic-layout>
+    <div>
+        <p-dynamic-layout>
+
+        </p-dynamic-layout>
+<!--        <s-dynamic-layout v-for="(layout,idx) in options.layouts||[]" :key="idx"-->
+<!--                          v-bind="layout"-->
+<!--                          :api="api"-->
+<!--                          :data="data"-->
+<!--                          :is-show="isShow" :is-loading="isLoading"-->
+<!--                          v-on="$listeners"-->
+<!--        >-->
+<!--            <template v-for="(slot) of slotNames" v-slot:[slot]="scope">-->
+<!--                <slot :name="`${name}-${slot}`" v-bind="scope" />-->
+<!--            </template>-->
+<!--        </s-dynamic-layout>-->
     </div>
 </template>
 
@@ -18,10 +21,11 @@
 import { computed, getCurrentInstance } from '@vue/composition-api';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { map, replace } from 'lodash';
+import PDynamicLayout from "@/components/organisms/dynamic-layout/PDynamicLayout.vue";
 
 export default {
     name: 'SDynamicLayoutList',
-    components: { SDynamicLayout },
+    components: {PDynamicLayout, SDynamicLayout },
     props: {
         name: {
             type: String,
