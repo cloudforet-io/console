@@ -1,13 +1,16 @@
 /* eslint-disable camelcase */
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SDynamicLayoutSimpleTable from '@/components/organisms/dynamic-view/dynamic-layout/templates/simple-table/index.vue';
-
-import { object } from '@storybook/addon-knobs';
-import md from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.md';
+import {
+    text, number, select, object, boolean,
+} from '@storybook/addon-knobs/vue';
+import { action } from '@storybook/addon-actions';
+import { reactive, toRefs } from '@vue/composition-api';
+import casual, { arrayOf } from '@/components/util/casual';
+import md from './simple-table.md';
+import PDynamicLayoutSimpleTable from './index.vue';
 
 export default {
     title: 'organisms/dynamic-layout/simple-table',
-    component: SDynamicLayoutSimpleTable,
+    component: PDynamicLayoutSimpleTable,
     parameters: {
         notes: md,
     },
@@ -124,7 +127,7 @@ const defaultLayout = {
                 key: 'port_range_min',
             },
             {
-                name: 'nested',
+                name: 'Nested',
                 key: 'nested.child',
             },
             {
@@ -133,20 +136,14 @@ const defaultLayout = {
             },
             {
                 name: 'Protocol',
-                key: 'port',
-            },
-
-
-            {
-                name: 'Protocol',
-                key: 'prtocol',
+                key: 'protocol',
                 type: 'enum',
                 options: {
                     TCP: {
                         type: 'state',
                         options: {
                             icon: {
-                                color: 'green',
+                                image: 'ic_admin',
                             },
                         },
                     },
@@ -154,7 +151,7 @@ const defaultLayout = {
                         type: 'state',
                         options: {
                             icon: {
-                                color: 'red',
+                                image: 'ic_alert',
                             },
                         },
                     },
@@ -164,18 +161,61 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { SDynamicLayout },
-    template: '<div  class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    components: { PDynamicLayoutSimpleTable },
     props: {
-        layout: {
-            type: Object,
-            default: object('layout', defaultLayout, 'layout'),
+        name: {
+            default: text('name', defaultLayout.name),
         },
-        data: {
-            type: Object,
-            default: object('data', data, 'data'),
+        options: {
+            default: object('options', defaultLayout.options),
         },
-
+        timezone: {
+            default: text('timezone', 'UTC'),
+        },
     },
+    template: `
+        <div class="w-screen bg-white">
+            <PDynamicLayoutSimpleTable v-bind="$props"
+                                       :data="data"
+                                       :totalCount="totalCount"
+                                       @init="onInit"/>
+        </div>
+        `,
+    setup() {
+        const state = reactive({
+            data: [],
+            totalCount: 0,
+        });
 
+        const onFetch = async (options, changed) => {
+            state.data = await new Promise((resolve) => {
+                setTimeout(() => {
+                    state.totalCount = casual.integer(0, 25);
+                    const res = {
+                        data: {
+                            security_group_rules: arrayOf(state.totalCount,
+                                () => ({
+                                    security_group_name: casual.name,
+                                    port_range_max: casual.integer(0),
+                                    port_range_min: casual.integer(0),
+                                    port: casual.integer(0),
+                                    protocol: casual.random_element(['TCP', 'UDP']),
+                                    nested: {
+                                        child: casual.word,
+                                    },
+                                })),
+                        },
+                    };
+                    resolve(res);
+                }, 1000);
+            });
+        };
+        return {
+            ...toRefs(state),
+            onInit(...args) {
+                action('init')(...args);
+                onFetch(...args);
+            },
+        };
+    },
 });

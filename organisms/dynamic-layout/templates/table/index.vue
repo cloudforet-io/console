@@ -21,14 +21,14 @@
                      @clickExcel="emitExport()"
     >
         <template #toolbox-top>
-            <!--            <slot v-if="$scopedSlots['toolbox-top']" name="toolbox-top">-->
-            <!--                <p-panel-top style="margin: 0; margin-top: 0.5rem;"-->
-            <!--                             :use-total-count="true"-->
-            <!--                             :total-count="totalCount"-->
-            <!--                >-->
-            <!--                    {{ name }}-->
-            <!--                </p-panel-top>-->
-            <!--            </slot>-->
+            <slot v-if="$scopedSlots['toolbox-top']" name="toolbox-top">
+                <p-panel-top style="margin: 0; margin-top: 0.5rem;"
+                             :use-total-count="true"
+                             :total-count="totalCount"
+                >
+                    {{ name }}
+                </p-panel-top>
+            </slot>
         </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
