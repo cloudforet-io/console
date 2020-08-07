@@ -17,15 +17,6 @@
                 <slot :name="`${name}-${slot}`" v-bind="scope" />
             </template>
         </p-dynamic-layout>
-        <!--        <s-dynamic-layout v-for="(layout,idx) in options.layouts||[]" :key="idx"-->
-        <!--                          v-bind="layout"-->
-        <!--                          :api="api"-->
-        <!--                          :data="data"-->
-        <!--                          :is-show="isShow" :is-loading="isLoading"-->
-        <!--                          v-on="$listeners"-->
-        <!--        >-->
-
-        <!--        </s-dynamic-layout>-->
     </div>
 </template>
 
