@@ -5,11 +5,11 @@ import {
 import { action } from '@storybook/addon-actions';
 import { ref } from '@vue/composition-api';
 import md from './raw.md';
-import PDynamicLayoutRaw from './index.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
     title: 'organisms/dynamic-layout/raw',
-    component: PDynamicLayoutRaw,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
     },
@@ -85,10 +85,10 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { PDynamicLayoutRaw },
+    components: { PDynamicLayout },
     template: `
         <div class="w-screen bg-white">
-            <PDynamicLayoutRaw v-bind="$props" @init="onInit" />
+            <PDynamicLayout v-bind="$props" type="raw" @init="onInit" />
         </div>
     `,
     props: {
@@ -121,10 +121,10 @@ const rootPathLayout = {
 };
 
 export const rootPathCase = () => ({
-    components: { PDynamicLayoutRaw },
+    components: { PDynamicLayout },
     template: `
         <div class="w-screen bg-white">
-            <PDynamicLayoutRaw v-bind="$props" @init="onInit" />
+            <PDynamicLayout v-bind="$props" type="raw" @init="onInit" />
         </div>
     `,
     props: {

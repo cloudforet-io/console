@@ -6,25 +6,21 @@ import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import list from './index.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from './list.md';
 
 export default {
     title: 'organisms/dynamic-layout/list',
-    component: list,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
-        info: {
-            summary: md,
-            components: { list },
-        },
         knobs: { escapeHTML: false },
     },
 };
 
 
 export const defaultCase = () => ({
-    components: { list },
+    components: { PDynamicLayout },
     props: {
         name: {
             default: text('name', 'List!'),
@@ -373,10 +369,11 @@ export const defaultCase = () => ({
     },
     template: `
     <div style="width: 80vw;">
-        <list v-bind="$props" 
-              @init="onInit" 
-              @fetch="onFetch" 
-              @select="onSelect"></list>
+        <PDynamicLayout v-bind="$props" 
+                        type="list"
+                          @init="onInit" 
+                          @fetch="onFetch" 
+                          @select="onSelect"/>
     </div>`,
     setup(props, context) {
         const state = reactive({});

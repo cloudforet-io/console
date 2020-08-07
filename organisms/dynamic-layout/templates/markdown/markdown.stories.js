@@ -4,25 +4,26 @@ import {
 } from '@storybook/addon-knobs';
 import { reactive, toRefs } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from './markdown.md';
-import PDynamicLayoutMarkdown from './index.vue';
 
 export default {
     title: 'organisms/dynamic-layout/markdown',
-    component: PDynamicLayoutMarkdown,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
     },
 };
 
 export const defaultCase = () => ({
-    components: { PDynamicLayoutMarkdown },
+    components: { PDynamicLayout },
     template: `
         <div class="w-screen bg-white">
-            <PDynamicLayoutMarkdown :name="name" 
-                                    :options="options" 
-                                    :timezone="timezone"
-                                    @init="onInit"
+            <PDynamicLayout :name="name" 
+                            type="markdown"
+                            :options="options" 
+                            :timezone="timezone"
+                            @init="onInit"
             />
         </div>`,
     props: {
@@ -179,14 +180,15 @@ export const defaultCase = () => ({
 
 
 export const templateMode = () => ({
-    components: { PDynamicLayoutMarkdown },
+    components: { PDynamicLayout },
     template: `
         <div class="w-screen bg-white">
-            <PDynamicLayoutMarkdown :name="name" 
-                                    :options="options" 
-                                    :timezone="timezone"
-                                    :data="data"
-                                    @init="onInit"
+            <PDynamicLayout :name="name" 
+                            type="markdown"
+                            :options="options" 
+                            :timezone="timezone"
+                            :data="data"
+                            @init="onInit"
             />
         </div>
     `,
@@ -285,14 +287,15 @@ export const templateMode = () => ({
 });
 
 export const i18nMode = () => ({
-    components: { PDynamicLayoutMarkdown },
+    components: { PDynamicLayout },
     template: `
         <div class="w-screen bg-white">
             <p>If there's no matched language in markdown, first language markdown would be rendered.</p>
-            <PDynamicLayoutMarkdown :name="name" 
-                                    :options="options"
-                                    :init-props="{ language }"
-                                    @init="onInit"
+            <PDynamicLayout :name="name" 
+                            type="markdown"
+                            :options="options"
+                            :init-props="{ language }"
+                            @init="onInit"
             />
         </div>
     `,
