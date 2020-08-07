@@ -7,12 +7,12 @@ import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from './table.md';
-import PDynamicLayoutTable from './index.vue';
 
 export default {
     title: 'organisms/dynamic-layout/table',
-    component: PDynamicLayoutTable,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
     },
@@ -68,7 +68,7 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { PDynamicLayoutTable },
+    components: { PDynamicLayout },
     props: {
         name: {
             default: text('name', defaultLayout.name),
@@ -82,16 +82,17 @@ export const defaultCase = () => ({
     },
     template: `
         <div style="width: 95vw;" class="flex">
-            <PDynamicLayoutTable v-bind="$props"
-                                 style="width: 65%;"
-                                 :data="data"
-                                 :loading="loading"
-                                 :total-count="totalCount"
-                                 @init="onInit"
-                                 @fetch="onFetch"
-                                 @select="onSelect"
+            <PDynamicLayout v-bind="$props"
+                             style="width: 65%;"
+                            type="table"
+                             :data="data"
+                             :loading="loading"
+                             :total-count="totalCount"
+                             @init="onInit"
+                             @fetch="onFetch"
+                             @select="onSelect"
             >
-            </PDynamicLayoutTable>
+            </PDynamicLayout>
             <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">
                 {{data}}
             </pre>

@@ -3,242 +3,377 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import list from './index.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from './list.md';
 
 export default {
     title: 'organisms/dynamic-layout/list',
-    component: list,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
-        info: {
-            summary: md,
-            components: { list },
-        },
         knobs: { escapeHTML: false },
-    },
-};
-
-const data = {
-    name: 'cloudone-dev-eks-cluster-adm-worker',
-    primary_ip_address: '172.16.16.100',
-    server_type: 'VM',
-    os_type: 'LINUX',
-    data: {
-        compute: {
-            az: 'ap-northeast-2a',
-            security_groups: [],
-            instance_state: 'running',
-            instance_type: 'm5.2xlarge',
-            image: 'amazon-eks-node-1.14-v20190927',
-            region: 'ap-northeast-2',
-            launched_at: '2020-04-13',
-            account_id: '072548720675',
-            keypair: '...',
-            instance_name: 'cloudone-dev-eks-cluster-adm-worker',
-        },
-        aws: {
-            lifecycle: 'norma',
-            ebs_oprimized: false,
-            iam_instance_profile: {
-                name: 'cloudone-dev-EKSAdminWorkerRole',
-                arn: 'arn:aws:iam::072548720675:instance-profile/cloudone-dev-EKSAdminWorkerRole',
-                id: 'AIPARBZB5UARS3CO3KSQF',
-            },
-        },
-        auto_scaling_group: {
-            name: 'cloudone-dev-eks-cluster-adm-worker',
-            arn: '...',
-            launch_configuration_name: 'cloudone-dev-eks-cluster_woker0120200115104205194400000001',
-            launch_configuration_arn: '...',
-        },
-        os: {
-            os_distro: 'amazonlinux',
-            os_arch: 'x86_64',
-        },
-        hardware: {
-            core: 8,
-            memory: 32,
-        },
-        security_group_rules: [
-            {
-                port_range_min: 80,
-                port_range_max: 80,
-                port: '80',
-                security_group_name: 'web security group',
-                security_group_id: '...',
-                remote_cidr: '172.16.0.0/16',
-                direction: 'inbound',
-                prtocol: 'TCP',
-                remote: '172.16.0.0/16',
-            },
-        ],
-    },
-    reference: {
-        resource_id: 'arn:aws:ec2:ap-northeast-2:072548720675:instance/i-0745c928020bed89f',
-        external_link: 'https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#Instances:instanceId=i-0745c928020bed89f',
-    },
-    metadata: {
-        view: {
-            sub_data: {
-                layouts: [{
-                    name: 'AWS EC2',
-                    type: 'list',
-                    options: [{
-                        name: 'EC2 Instance',
-                        type: 'item',
-                        options: {
-                            fields: [{
-                                name: 'Instance ID',
-                                key: 'data.compute.instance_name',
-                            }, {
-                                name: 'Region',
-                                key: 'data.compute.region',
-                            }, {
-                                name: 'Instance State',
-                                key: 'data.compute.instance_state',
-                                type: 'enum',
-                                options: {
-                                    running: {
-                                        type: 'state',
-                                        options: {
-                                            icon: {
-                                                image: 'round',
-                                                color: 'green',
-                                            },
-                                        },
-                                    },
-                                    'shutting-down': {
-                                        type: 'state',
-                                        options: {
-                                            icon: {
-                                                image: 'round',
-                                                color: 'red',
-                                            },
-                                        },
-                                    },
-                                },
-                            }],
-                        },
-                    }, {
-                        name: 'Auto Scaling Group',
-                        type: 'item',
-                        options: {
-                            fields: [{
-                                name: 'Auto Scaling Group',
-                                key: 'data.auto_scaling_group.name',
-                            }, {
-                                name: 'Launch Template',
-                                key: 'data.auto_scaling_group.launch_configuration_name',
-                            }, {
-                                name: 'Launch Template',
-                                key: 'data.auto_scaling_group.launch_configuration_name',
-                            }],
-                        },
-                    }],
-                }, {
-                    name: 'Security Group',
-                    type: 'table',
-                    options: {
-                        root_path: 'data.security_group_rules',
-                        fields: [{
-                            name: 'Direction',
-                            key: 'direction',
-                            type: 'enum',
-                            options: {
-                                outbound: {
-                                    type: 'badge',
-                                    options: {
-                                        color: 'blue',
-                                    },
-                                },
-                                inbound: {
-                                    type: 'badge',
-                                    options: {
-                                        color: 'red',
-                                    },
-                                },
-                            },
-                        }, {
-                            name: 'Name',
-                            key: 'security_group_name',
-                        }, {
-                            name: 'Remote',
-                            key: 'Remote',
-                        }, {
-                            name: 'Port',
-                            key: 'port',
-                        }, {
-                            name: 'Protocol',
-                            key: 'protocol',
-                        }],
-                    },
-                }],
-            },
-        },
-    },
-};
-
-const defaultLayout = {
-    name: 'EC2 Instance',
-    type: 'item',
-    options: {
-        fields: [{
-            name: 'Instance ID',
-            key: 'data.compute.instance_name',
-        }, {
-            name: 'Region',
-            key: 'data.compute.region',
-        }, {
-            name: 'Instance State',
-            key: 'data.compute.instance_state',
-            type: 'enum',
-            options: {
-                running: {
-                    type: 'state',
-                    options: {
-                        icon: {
-                            color: 'green',
-                        },
-                    },
-                },
-                'shutting-down': {
-                    type: 'state',
-                    options: {
-                        icon: {
-                            color: 'red',
-                        },
-                    },
-                },
-            },
-        }],
     },
 };
 
 
 export const defaultCase = () => ({
-    components: { list },
+    components: { PDynamicLayout },
     props: {
         name: {
-            default: text('name', defaultLayout.name),
+            default: text('name', 'List!'),
         },
         options: {
-            default: object('options', defaultLayout.options),
+            default: object('options', {
+                layouts: [{
+                    name: 'Base Information',
+                    type: 'item',
+                    options: {
+                        fields: [{
+                            key: 'server_id',
+                            name: 'ID',
+                        }, {
+                            key: 'name',
+                            name: 'Name',
+                        }, {
+                            key: 'primary_ip_address',
+                            name: 'Primary IP',
+                        }, {
+                            key: 'collection_info.state',
+                            name: 'Collection State',
+                            type: 'enum',
+                            options: {
+                                ACTIVE: {
+                                    type: 'state',
+                                    options: {
+                                        icon: {
+                                            image: 'ic_state_active',
+                                        },
+                                    },
+                                },
+                                DUPLICATED: {
+                                    type: 'state',
+                                    options: {
+                                        icon: {
+                                            image: 'ic_state_duplicated',
+                                        },
+                                    },
+                                },
+                                DISCONNECTED: {
+                                    type: 'state',
+                                    options: {
+                                        icon: {
+                                            image: 'ic_state_disconnected',
+                                        },
+                                    },
+                                },
+                                MANUAL: {
+                                    type: 'state',
+                                    options: {
+                                        icon: {
+                                            image: 'ic_state_manual',
+                                        },
+                                    },
+                                },
+                            },
+                        }, {
+                            key: 'state',
+                            name: 'Life Cycle',
+                            type: 'enum',
+                            options: {
+                                INSERVICE: {
+                                    type: 'state',
+                                    options: {
+                                        icon: {
+                                            color: 'green.500',
+                                        },
+                                    },
+                                },
+                                MAINTENANCE: {
+                                    type: 'state',
+                                    options: {
+                                        icon: {
+                                            color: 'yellow.500',
+                                        },
+                                    },
+                                },
+                                CLOSED: {
+                                    type: 'state',
+                                    options: {
+                                        text_color: 'red.500',
+                                        icon: {
+                                            color: 'red.500',
+                                        },
+                                    },
+                                },
+                                DELETED: {
+                                    type: 'state',
+                                    options: {
+                                        text_color: 'gray.500',
+                                        icon: {
+                                            color: 'gray.500',
+                                        },
+                                    },
+                                },
+                            },
+                        }, {
+                            key: 'reference.resource_id',
+                            name: 'Resource ID',
+                        }, {
+                            key: 'os_type',
+                            name: 'OS Type',
+                        }, {
+                            key: 'server_type',
+                            name: 'Server Type',
+                            type: 'enum',
+                            options: {
+                                VM: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'indigo.500',
+                                    },
+                                },
+                                BAREMETAL: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'coral.600',
+                                    },
+                                },
+                                HYPERVISOR: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'peacock.500',
+                                    },
+                                },
+                                UNKNOWN: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'gray.500',
+                                    },
+                                },
+                            },
+                        }, {
+                            key: 'project_id',
+                            name: 'Project',
+                        }, {
+                            key: 'provider',
+                            name: 'Provider',
+                            type: 'enum',
+                            options: {
+                                aws: {
+                                    type: 'badge',
+                                    options: {
+                                        color: 'white',
+                                        background_color: '#FF9900',
+                                    },
+                                },
+                                google_cloud: {
+                                    type: 'badge',
+                                    options: {
+                                        color: 'white',
+                                        background_color: '#4285F4',
+                                    },
+                                },
+                                azure: {
+                                    type: 'badge',
+                                    options: {
+                                        color: 'white',
+                                        background_color: '#00BCF2',
+                                    },
+                                },
+                            },
+                        }, {
+                            key: 'collection_info.service_accounts',
+                            name: 'Service Accounts',
+                            type: 'list',
+                            reference: {
+                                reference_type: 'identity.ServiceAccount',
+                            },
+                            options: {
+                                item: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'violet.500',
+                                    },
+                                },
+                                delimiter: '  ',
+                            },
+                        }, {
+                            key: 'collection_info.secrets',
+                            name: 'Secrets',
+                            type: 'list',
+                            options: {
+                                item: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'violet.500',
+                                    },
+                                },
+                                delimiter: '  ',
+                            },
+                        }, {
+                            key: 'collection_info.collectors',
+                            name: 'Collected by',
+                            type: 'list',
+                            options: {
+                                item: {
+                                    type: 'badge',
+                                    options: {
+                                        outline_color: 'violet.500',
+                                    },
+                                },
+                                delimiter: '  ',
+                            },
+                        }, {
+                            key: 'created_at.seconds',
+                            name: 'Created',
+                            type: 'datetime',
+                            options: {
+                                source_type: 'timestamp',
+                                source_format: 'seconds',
+                            },
+                        }, {
+                            key: 'updated_at.seconds',
+                            name: 'Updated',
+                            type: 'datetime',
+                            options: {
+                                source_type: 'timestamp',
+                                source_format: 'seconds',
+                            },
+                        }, {
+                            key: 'deleted_at.seconds',
+                            name: 'Deleted',
+                            type: 'datetime',
+                            options: {
+                                source_type: 'timestamp',
+                                source_format: 'seconds',
+                            },
+                        }],
+                    },
+                }, {
+                    name: 'Operation System',
+                    type: 'item',
+                    options: {
+                        root_path: 'data.os',
+                        fields: [{
+                            key: 'os_distro',
+                            name: 'OS Distribution',
+                        }, {
+                            key: 'os_arch',
+                            name: 'OS Architecture',
+                        }, {
+                            key: 'os_details',
+                            name: 'OS Version Details',
+                        }, {
+                            key: 'os_license',
+                            name: 'OS License',
+                        }],
+                    },
+                }, {
+                    name: 'Hardware',
+                    type: 'item',
+                    options: {
+                        root_path: 'data.hardware',
+                        fields: [{
+                            key: 'core',
+                            name: 'Core',
+                        }, {
+                            key: 'memory',
+                            name: 'Memory',
+                        }, {
+                            key: 'serial_number',
+                            name: 'Serial Number',
+                        }, {
+                            key: 'manufacturer',
+                            name: 'Manufacturer',
+                        }, {
+                            key: 'model',
+                            name: 'Server Model',
+                        }, {
+                            key: 'cpu_model',
+                            name: 'CPU Model',
+                        }, {
+                            key: 'cpu_arch',
+                            name: 'CPU Architecture',
+                        }, {
+                            key: 'cpu_socket',
+                            name: 'CPU Socket',
+                        }, {
+                            key: 'core_per_socket',
+                            name: 'Core per Socket',
+                        }, {
+                            key: 'memory_count',
+                            name: 'Memory Count',
+                        }, {
+                            key: 'hyper_threading',
+                            name: 'Hyper-threading',
+                        }, {
+                            key: 'bios_version',
+                            name: 'Bios Version',
+                        }, {
+                            key: 'bios_released_at',
+                            name: 'Bios Released',
+                        }],
+                    },
+                }],
+            }),
         },
         timezone: {
             default: text('timezone', 'UTC'),
         },
         data: {
-            default: object('data', data),
+            default: object('data', {
+                nics: [],
+                disks: [],
+                server_id: 'server-cb8ebd06742f',
+                name: '',
+                state: 'INSERVICE',
+                primary_ip_address: '172.16.16.58',
+                ip_addresses: [],
+                server_type: 'VM',
+                os_type: 'LINUX',
+                provider: 'aws',
+                region_code: '',
+                region_type: '',
+                data: {
+                    os: {
+                        os_distro: 'amazonlinux',
+                        os_arch: 'x86_64',
+                    },
+                    hardware: { memory: 16, core: 4 },
+                },
+                metadata: {},
+                reference: {
+                    resource_id: 'arn:aws:ec2:ap-northeast-2:257706363616:instance/i-094985f71d3bc30a7',
+                    external_link: '',
+                },
+                tags: {},
+                collection_info: {
+                    service_accounts: ['sa-ebc86e9cea28'],
+                    state: 'ACTIVE',
+                    collectors: ['collector-6746d641c98b'],
+                    pinned_keys: [],
+                    collected_at: null,
+                    change_history: [],
+                    secrets: ['secret-5545c9db0a42'],
+                },
+                project_id: 'project-18655561c535',
+                domain_id: '',
+                created_at: { seconds: '1595497991', nanos: 452000000 },
+                updated_at: { seconds: '1596773009', nanos: 956000000 },
+                deleted_at: null,
+            }),
         },
     },
     template: `
     <div style="width: 80vw;">
-        <list v-bind="$props" @init="onInit" @fetch="onFetch" @select="onSelect"></list>
+        <PDynamicLayout v-bind="$props" 
+                        type="list"
+                          @init="onInit" 
+                          @fetch="onFetch" 
+                          @select="onSelect"/>
     </div>`,
     setup(props, context) {
         const state = reactive({});

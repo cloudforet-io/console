@@ -109,9 +109,7 @@ export default {
 
                 return res;
             }),
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({
-
-            })),
+            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
         });
 
         emit('init', state.fetchOptions);

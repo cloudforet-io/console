@@ -8,35 +8,26 @@
                           :loading="loading"
                           :total-count="totalCount"
                           :timezone="timezone"
-                          :init-props="initProps"
-                          @init="$emit('init', ...arguments, layout.name, idx)"
-                          @fetch="$emit('fetch', ...arguments, layout.name, idx)"
-                          @select="$emit('select', ...arguments, layout.name, idx)"
+                          :init-props="initPropsMap[layout.name]"
+                          v-on="getListeners(layout.name, idx)"
         >
             <template v-for="(slot) of slotNames" v-slot:[slot]="scope">
                 <slot :name="`${name}-${slot}`" v-bind="scope" />
             </template>
         </p-dynamic-layout>
-        <!--        <s-dynamic-layout v-for="(layout,idx) in options.layouts||[]" :key="idx"-->
-        <!--                          v-bind="layout"-->
-        <!--                          :api="api"-->
-        <!--                          :data="data"-->
-        <!--                          :is-show="isShow" :is-loading="isLoading"-->
-        <!--                          v-on="$listeners"-->
-        <!--        >-->
-
-        <!--        </s-dynamic-layout>-->
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { map, replace, get } from 'lodash';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { ListDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/list/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type';
+import { makeByPassListeners } from '@/components/util/composition-helpers';
+import { list } from 'postcss';
 
 export default {
     name: 'PDynamicLayoutList',
@@ -51,7 +42,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: Array,
+            type: [Array, Object],
             default: undefined,
         },
         loading: {
@@ -71,7 +62,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: ListDynamicLayoutProps, { slots }) {
+    setup(props: ListDynamicLayoutProps, { slots, listeners }) {
         const state = reactive({
             layouts: computed<DynamicLayout[]>(() => props.options.layouts || []),
             rootData: computed(() => {
@@ -79,10 +70,25 @@ export default {
                 return get(props.data, props.options.root_path, undefined);
             }),
             slotNames: computed(() => (map(slots, (slot: string, name) => replace(name, `${props.name}-`, '')))),
+            initPropsMap: computed(() => props.initProps || {}),
         });
 
         return {
             ...toRefs(state),
+            getListeners(name, idx) {
+                return {
+                    ...listeners,
+                    init(...args) {
+                        makeByPassListeners(listeners, 'init', ...args, name, idx);
+                    },
+                    fetch(...args) {
+                        makeByPassListeners(listeners, 'fetch', ...args, name, idx);
+                    },
+                    select(...args) {
+                        makeByPassListeners(listeners, 'select', ...args, name, idx);
+                    },
+                };
+            },
         };
     },
 };
