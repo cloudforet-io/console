@@ -1,5 +1,5 @@
 <template>
-    <div class="p-mark-down" v-html="md" />
+    <div class="p-markdown" v-html="md" />
 </template>
 
 <script lang="ts">
@@ -9,6 +9,7 @@ import {
 import nunjucks from 'nunjucks';
 import { get } from 'lodash';
 import DOMPurify from 'dompurify';
+import { MarkdownProps } from '@/components/molecules/markdown/type';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const marked = require('marked');
 
@@ -27,7 +28,7 @@ marked.setOptions({
 const DEFAULT_LANGUAGE = 'en';
 
 export default {
-    name: 'PMarkDown',
+    name: 'PMarkdown',
     props: {
         markdown: {
             type: [String, Object],
@@ -35,14 +36,14 @@ export default {
         },
         data: {
             type: Object,
-            default: null,
+            default: undefined,
         },
         language: {
             type: String,
             default: 'en',
         },
     },
-    setup(props) {
+    setup(props: MarkdownProps) {
         const getI18nMd = (md: any) => get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
         const md = computed(() => {
             let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
@@ -60,7 +61,7 @@ export default {
 </script>
 
 <style lang="postcss">
-.p-mark-down {
+.p-markdown {
     @apply w-full border-black text-gray-900 ;
     table {
         td,th {

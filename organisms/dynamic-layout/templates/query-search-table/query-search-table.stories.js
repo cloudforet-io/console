@@ -7,18 +7,14 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import casual, { arrayOf } from '@/components/util/casual';
-import QuerySearchTable from './index.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from './query-search-table.md';
 
 export default {
     title: 'organisms/dynamic-layout/query-search-table',
-    component: QuerySearchTable,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
-        info: {
-            summary: md,
-            components: { QuerySearchTable },
-        },
         knobs: { escapeHTML: false },
     },
 };
@@ -61,7 +57,7 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { QuerySearchTable },
+    components: { PDynamicLayout },
     props: {
         name: {
             default: text('name', defaultLayout.name),
@@ -75,16 +71,19 @@ export const defaultCase = () => ({
     },
     template: `
     <div style="width: 95vw;" class="flex">
-        <query-search-table v-bind="$props" 
-                            style="width: 65%;"
-                            :data="data"
-                            :loading="loading"
-                            :total-count="totalCount"
-                            @init="onInit"
-                            @fetch="onFetch"
-                            @select="onSelect"
+        <PDynamicLayout style="width: 65%;"
+                        :name="name"
+                        :options="options"
+                        :timezone="timezone"
+                        type="query-search-table"
+                        :data="data"
+                        :loading="loading"
+                        :total-count="totalCount"
+                        @init="onInit"
+                        @fetch="onFetch"
+                        @select="onSelect"
         >
-        </query-search-table>
+        </PDynamicLayout>
         <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">
             {{data}}
         </pre>

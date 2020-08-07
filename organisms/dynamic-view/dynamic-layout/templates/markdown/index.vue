@@ -3,7 +3,7 @@
         <p-panel-top v-if="showTitle">
             {{ name }}
         </p-panel-top>
-        <p-mark-down :markdown="options.markdown||''" :data="rootData" :language="language" />
+        <p-markdown :markdown="options.markdown||''" :data="rootData" :language="language" />
     </div>
 </template>
 
@@ -14,14 +14,14 @@ import {
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { checkCanGetData, DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
-import PMarkDown from '@/components/molecules/markdown/PMarkDown.vue';
+import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
 import _ from 'lodash';
 
 
 export default {
     name: 'SDynamicLayoutItem',
     components: {
-        PPanelTop, PMarkDown,
+        PPanelTop, PMarkdown,
     },
     props: {
         name: {

@@ -1,14 +1,13 @@
 <template>
     <div class="p-dynamic-layout-query-search-table">
-        <!--        <p-panel-top v-if="showTitle"-->
-        <!--                     class="panel-top"-->
-        <!--                     :use-total-count="true"-->
-        <!--                     :total-count="totalCount"-->
-        <!--        >-->
-        <!--            {{ name }}-->
-        <!--        </p-panel-top>-->
+        <p-panel-top class="panel-top"
+                     :use-total-count="true"
+                     :total-count="totalCount"
+        >
+            {{ name }}
+        </p-panel-top>
         <p-query-search-table :fields="fields"
-                              :items="data"
+                              :items="rootData"
                               :loading="loading"
                               :total-count="totalCount"
                               :sort-by="sortBy"
@@ -21,7 +20,6 @@
                               :query-tags="queryTags"
                               @select="onSelect"
                               @change="onChange"
-                              v-on="$listeners"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
@@ -51,7 +49,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { forEach } from 'lodash';
+import {forEach, get} from 'lodash';
 import { QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 
 export default {
@@ -127,6 +125,12 @@ export default {
                 queryTags: state.queryTags,
                 selectIndex: state.selectIndex,
             })),
+            rootData: computed<any[]>(() => {
+                if (props.options.root_path) {
+                    return get(props.data, props.options.root_path);
+                }
+                return props.data;
+            }),
         });
 
         const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {

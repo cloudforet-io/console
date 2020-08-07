@@ -6,11 +6,11 @@ import { action } from '@storybook/addon-actions';
 import { reactive, toRefs } from '@vue/composition-api';
 import casual, { arrayOf } from '@/components/util/casual';
 import md from './simple-table.md';
-import PDynamicLayoutSimpleTable from './index.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
     title: 'organisms/dynamic-layout/simple-table',
-    component: PDynamicLayoutSimpleTable,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
     },
@@ -161,7 +161,7 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { PDynamicLayoutSimpleTable },
+    components: { PDynamicLayout },
     props: {
         name: {
             default: text('name', defaultLayout.name),
@@ -175,10 +175,11 @@ export const defaultCase = () => ({
     },
     template: `
         <div class="w-screen bg-white">
-            <PDynamicLayoutSimpleTable v-bind="$props"
-                                       :data="data"
-                                       :totalCount="totalCount"
-                                       @init="onInit"/>
+            <PDynamicLayout v-bind="$props"
+                            type="simple-table"
+                           :data="data"
+                           :totalCount="totalCount"
+                           @init="onInit"/>
         </div>
         `,
     setup() {

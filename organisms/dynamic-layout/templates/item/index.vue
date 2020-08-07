@@ -20,6 +20,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import { DefinitionData, DefinitionField } from '@/components/organisms/tables/definition-table/type';
 import { ItemDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/item/type';
+import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
 
 export default {
     name: 'PDynamicLayoutItem',
@@ -71,11 +72,10 @@ export default {
                 }
                 return props.data;
             }),
+            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
         });
 
-        console.debug('rootData', state.rootData);
-
-        emit('init');
+        emit('init', state.fetchOptions);
 
         return {
             ...toRefs(state),

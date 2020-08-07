@@ -6,7 +6,10 @@
         >
             {{ name }}
         </p-panel-top>
-        <p-data-table v-bind="initProps" :items="rootData" :fields="fields"
+        <p-data-table v-bind="initProps"
+                      :items="rootData"
+                      :fields="fields"
+                      :loading="loading"
                       v-on="$listeners"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
@@ -109,9 +112,7 @@ export default {
 
                 return res;
             }),
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({
-
-            })),
+            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
         });
 
         emit('init', state.fetchOptions);

@@ -2,12 +2,13 @@
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs';
-import PDynamicLayoutItem from './index.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
+import { action } from '@storybook/addon-actions';
 import md from './item.md';
 
 export default {
     title: 'organisms/dynamic-layout/item',
-    component: PDynamicLayoutItem,
+    component: PDynamicLayout,
     parameters: {
         notes: md,
     },
@@ -66,7 +67,12 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { PDynamicLayoutItem },
+    components: { PDynamicLayout },
+    template: `<div class="w-full bg-white">
+        <PDynamicLayout v-bind="$props" type="item"
+                        @init="onInit"
+        />
+    </div>`,
     props: {
         name: {
             default: text('name', defaultLayout.name),
@@ -139,11 +145,12 @@ export const defaultCase = () => ({
                 },
             }),
         },
-
     },
-    template: `<div class="w-full bg-white">
-        <PDynamicLayoutItem v-bind="$props" />
-    </div>`,
+    setup() {
+        return {
+            onInit: action('init'),
+        };
+    },
 });
 
 const rootPathLayout = {
@@ -200,7 +207,12 @@ const rootPathLayout = {
 };
 
 export const rootPathCase = () => ({
-    components: { PDynamicLayoutItem },
+    components: { PDynamicLayout },
+    template: `<div class="w-full bg-white">
+        <PDynamicLayout v-bind="$props" type="item"
+                        @init="onInit"
+        />
+    </div>`,
     props: {
         name: {
             default: text('name', rootPathLayout.name),
@@ -273,9 +285,10 @@ export const rootPathCase = () => ({
                 },
             }),
         },
-
     },
-    template: `<div class="w-full bg-white">
-        <PDynamicLayoutItem v-bind="$props" />
-    </div>`,
+    setup() {
+        return {
+            onInit: action('init'),
+        };
+    },
 });
