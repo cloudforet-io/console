@@ -71,15 +71,17 @@ export const defaultCase = () => ({
     },
     template: `
     <div style="width: 95vw;" class="flex">
-        <PDynamicLayout v-bind="$props" 
-                            style="width: 65%;"
-                            type="query-search-table"
-                            :data="data"
-                            :loading="loading"
-                            :total-count="totalCount"
-                            @init="onInit"
-                            @fetch="onFetch"
-                            @select="onSelect"
+        <PDynamicLayout style="width: 65%;"
+                        :name="name"
+                        :options="options"
+                        :timezone="timezone"
+                        type="query-search-table"
+                        :data="data"
+                        :loading="loading"
+                        :total-count="totalCount"
+                        @init="onInit"
+                        @fetch="onFetch"
+                        @select="onSelect"
         >
         </PDynamicLayout>
         <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">

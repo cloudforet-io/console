@@ -369,11 +369,13 @@ export const defaultCase = () => ({
     },
     template: `
     <div style="width: 80vw;">
-        <PDynamicLayout v-bind="$props" 
+        <PDynamicLayout :name="name"
+                        :options="options"
+                        :timezone="timezone"
                         type="list"
-                          @init="onInit" 
-                          @fetch="onFetch" 
-                          @select="onSelect"/>
+                        @init="onInit" 
+                        @fetch="onFetch" 
+                        @select="onSelect"/>
     </div>`,
     setup(props, context) {
         const state = reactive({});
