@@ -16,7 +16,7 @@ interface MEComponent{
 }
 
 
-export default defineComponent({
+export default {
     name: 'PRawData',
     components: {
         PMonacoEditor,
@@ -28,7 +28,7 @@ export default defineComponent({
         },
         raw: {
             type: String,
-            default: null,
+            default: undefined,
         },
     },
     setup(props) {
@@ -48,13 +48,11 @@ export default defineComponent({
         };
     },
 
-});
+};
 </script>
-<style lang="postcss" scoped>
-    .p-raw-data{
+<style lang="postcss">
+    .p-raw-data {
         @apply w-auto;
         height: 65vh;
     }
-
-
 </style>

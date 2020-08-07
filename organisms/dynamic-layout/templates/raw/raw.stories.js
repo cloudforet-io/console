@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SDynamicLayoutRaw from '@/components/organisms/dynamic-view/dynamic-layout/templates/raw/index.vue';
-
-import { object } from '@storybook/addon-knobs';
+import {
+    boolean, object, text, select,
+} from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
 import { ref } from '@vue/composition-api';
-import md from '@/components/organisms/dynamic-view/dynamic-layout/templates/item/item.md';
-import { fluentApi } from '@/lib/fluent-api';
+import md from './raw.md';
+import PDynamicLayoutRaw from './index.vue';
 
 export default {
     title: 'organisms/dynamic-layout/raw',
-    component: SDynamicLayoutRaw,
+    component: PDynamicLayoutRaw,
     parameters: {
         notes: md,
     },
@@ -74,105 +74,6 @@ const data = {
         resource_id: 'arn:aws:ec2:ap-northeast-2:072548720675:instance/i-0745c928020bed89f',
         external_link: 'https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#Instances:instanceId=i-0745c928020bed89f',
     },
-    metadata: {
-        view: {
-            sub_data: {
-                layouts: [{
-                    name: 'AWS EC2',
-                    type: 'list',
-                    options: [{
-                        name: 'EC2 Instance',
-                        type: 'item',
-                        options: {
-                            fields: [{
-                                name: 'Instance ID',
-                                key: 'data.compute.instance_name',
-                            }, {
-                                name: 'Region',
-                                key: 'data.compute.region',
-                            }, {
-                                name: 'Instance State',
-                                key: 'data.compute.instance_state',
-                                type: 'enum',
-                                options: {
-                                    running: {
-                                        type: 'state',
-                                        options: {
-                                            icon: {
-                                                image: 'round',
-                                                color: 'green',
-                                            },
-                                        },
-                                    },
-                                    'shutting-down': {
-                                        type: 'state',
-                                        options: {
-                                            icon: {
-                                                image: 'round',
-                                                color: 'red',
-                                            },
-                                        },
-                                    },
-                                },
-                            }],
-                        },
-                    }, {
-                        name: 'Auto Scaling Group',
-                        type: 'item',
-                        options: {
-                            fields: [{
-                                name: 'Auto Scaling Group',
-                                key: 'data.auto_scaling_group.name',
-                            }, {
-                                name: 'Launch Template',
-                                key: 'data.auto_scaling_group.launch_configuration_name',
-                            }, {
-                                name: 'Launch Template',
-                                key: 'data.auto_scaling_group.launch_configuration_name',
-                            }],
-                        },
-                    }],
-                }, {
-                    name: 'Security Group',
-                    type: 'table',
-                    options: {
-                        root_path: 'data.security_group_rules',
-                        fields: [{
-                            name: 'Direction',
-                            key: 'direction',
-                            type: 'enum',
-                            options: {
-                                outbound: {
-                                    type: 'badge',
-                                    options: {
-                                        color: 'blue',
-                                    },
-                                },
-                                inbound: {
-                                    type: 'badge',
-                                    options: {
-                                        color: 'red',
-                                    },
-                                },
-                            },
-                        }, {
-                            name: 'Name',
-                            key: 'security_group_name',
-                        }, {
-                            name: 'Remote',
-                            key: 'Remote',
-                        }, {
-                            name: 'Port',
-                            key: 'port',
-                        }, {
-                            name: 'Protocol',
-                            key: 'protocol',
-                        }],
-                    },
-                }],
-            },
-        },
-    },
 };
 
 const defaultLayout = {
@@ -184,20 +85,31 @@ const defaultLayout = {
 };
 
 export const defaultCase = () => ({
-    components: { SDynamicLayout },
-    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
+    components: { PDynamicLayoutRaw },
+    template: `
+        <div class="w-screen bg-white">
+            <PDynamicLayoutRaw v-bind="$props" @init="onInit" />
+        </div>
+    `,
     props: {
-        layout: {
-            type: Object,
-            default: object('layout', defaultLayout, 'layout'),
+        name: {
+            default: text('name', 'Raw Data'),
+        },
+        options: {
+            default: object('options', {}),
+        },
+        timezone: {
+            default: text('timezone', 'UTC'),
         },
         data: {
-            type: Object,
-            default: object('data', data, 'data'),
+            default: object('data', data),
         },
-
     },
-
+    setup() {
+        return {
+            onInit: action('init'),
+        };
+    },
 });
 
 const rootPathLayout = {
@@ -207,35 +119,33 @@ const rootPathLayout = {
         root_path: 'data.compute',
     },
 };
-export const rootPath = () => ({
-    components: { SDynamicLayout },
-    template: '<div class="w-screen bg-white"><SDynamicLayout v-bind="layout" :data="data" /></div>',
-    setup() {
-        return {
-            layout: rootPathLayout,
-            data,
-        };
+
+export const rootPathCase = () => ({
+    components: { PDynamicLayoutRaw },
+    template: `
+        <div class="w-screen bg-white">
+            <PDynamicLayoutRaw v-bind="$props" @init="onInit" />
+        </div>
+    `,
+    props: {
+        name: {
+            default: text('name', 'Root Path Raw Data'),
+        },
+        options: {
+            default: object('options', {
+                root_path: 'data.compute',
+            }),
+        },
+        timezone: {
+            default: text('timezone', 'UTC'),
+        },
+        data: {
+            default: object('data', data),
+        },
     },
-});
-
-export const apiMode = () => ({
-    components: { SDynamicLayout },
-    template: `<div class="w-screen bg-white">
-        <span>
-        <input type="checkbox" v-model="isShow"> is show    
-        </span>
-        <SDynamicLayout v-bind="layout" :is-show="isShow" :api="api" ref="item"/>
-    </div>`,
-
     setup() {
-        const isShow = ref(true);
         return {
-            layout: rootPathLayout,
-            api: {
-                resource: fluentApi.inventory().server(),
-                getAction: action => action.setId('dynamicTest'),
-            },
-            isShow,
+            onInit: action('init'),
         };
     },
 });
