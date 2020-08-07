@@ -1,8 +1,6 @@
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
-export interface QuerySearchTableProps {
+export interface SearchTableProps {
     fields: DataTableFieldType[];
     items: any[];
     loading: boolean;
@@ -12,9 +10,7 @@ export interface QuerySearchTableProps {
     thisPage: number; // sync
     pageSize: number; // sync
     totalCount: number;
-    keyItems: KeyItem[];
-    valueHandlerMap: ValueHandlerMap;
-    queryTags: QueryTag[]; // sync
+    searchText: string; // sync
 }
 
 export interface Options {
@@ -22,10 +18,10 @@ export interface Options {
     sortDesc: boolean;
     thisPage: number;
     pageSize: number;
-    queryTags: QueryTag[];
+    searchText: string;
 }
 
-export interface QuerySearchTableListeners {
+export interface SearchTableListeners {
     change?: (options: Readonly<Options>, changedOptions: Readonly<Options>) => void|Promise<void>;
     export?: () => void|Promise<void>;
     select?: (selectIndex: number[]) => void|Promise<void>;

@@ -22,7 +22,7 @@
     >
         <template #toolbox-top>
             <slot v-if="$scopedSlots['toolbox-top']" name="toolbox-top">
-                <p-panel-top style="margin: 0; margin-top: 0.5rem;"
+                <p-panel-top v-if="name" style="margin: 0; margin-top: 0.5rem;"
                              :use-total-count="true"
                              :total-count="totalCount"
                 >

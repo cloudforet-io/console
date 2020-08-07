@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top>{{ name }}</p-panel-top>
+        <p-panel-top v-if="name">{{ name }}</p-panel-top>
         <p-definition-table :fields="fields" :data="rootData" :loading="loading"
                             v-on="$listeners"
         >

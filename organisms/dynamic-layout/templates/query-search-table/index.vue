@@ -1,6 +1,6 @@
 <template>
     <div class="p-dynamic-layout-query-search-table">
-        <p-panel-top class="panel-top"
+        <p-panel-top class="panel-top" v-if="name"
                      :use-total-count="true"
                      :total-count="totalCount"
         >

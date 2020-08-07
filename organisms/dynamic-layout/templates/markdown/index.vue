@@ -1,6 +1,6 @@
 <template>
     <div class="p-dynamic-layout-markdown">
-        <p-panel-top>
+        <p-panel-top v-if="name">
             {{ name }}
         </p-panel-top>
         <p-markdown :markdown="options.markdown || ''"

@@ -2,45 +2,28 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
+import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import casual, { arrayOf } from '@/components/util/casual';
-import PQuerySearchTable from './PQuerySearchTable.vue';
-import md from './PQuerySearchTable.md';
+import PSearchTable from './PSearchTable.vue';
 
 export default {
-    title: 'organisms/tables/QuerySearchTable',
-    component: PQuerySearchTable,
+    title: 'organisms/tables/SearchTable',
+    component: PSearchTable,
     parameters: {
-        notes: md,
         info: {
-            summary: md,
-            components: { PQuerySearchTable },
+            summary: '',
+            components: { PSearchTable },
         },
         knobs: { escapeHTML: false },
     },
 };
 
-const getHandler = items => async (inputText, keyItem) => {
-    const allItems = items.map(d => ({ name: d, label: d }));
-    let res = [...allItems];
-    const regex = RegExp(inputText, 'i');
-
-    if (inputText) {
-        res = allItems.reduce((result, d) => {
-            if (regex.test(d.label) || regex.test(d.name)) result.push(d);
-            return result;
-        }, []);
-    }
-    return {
-        results: res,
-        totalCount: allItems.length,
-    };
-};
 
 export const defaultCase = () => ({
-    components: { PQuerySearchTable },
+    components: { PSearchTable },
     props: {
         fields: {
             default: object('fields', [
@@ -64,38 +47,19 @@ export const defaultCase = () => ({
         totalCount: {
             default: number('totalCount', 50),
         },
-        keyItems: {
-            default: object('keyItems', [
-                { name: 'id', label: 'ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'group', label: 'Group' },
-            ]),
-        },
-        valueHandlerMap: {
-            default: object('valueHandlerMap', {
-                id: getHandler(arrayOf(10, () => casual.word)),
-                name: getHandler(arrayOf(10, () => casual.word)),
-                group: getHandler(arrayOf(10, () => casual.word)),
-            }),
-        },
-        queryTags: {
-            default: object('queryTags', [
-                {
-                    operator: '',
-                    value: { name: 'wanjin', label: 'Wanjin Noh' },
-                },
-            ]),
+        searchText: {
+            default: text('searchText', 'Search Text'),
         },
     },
     template: `
     <div style="width: 80vw;">
-        <PQuerySearchTable v-bind="$props"
-                           :items="items"
-                           :loading="loading"
-                           @change="onChange"
-                           @export="onExport"
-                           @select="onSelect"
-        ></PQuerySearchTable>
+        <PSearchTable v-bind="$props"
+                      :items="items"
+                      :loading="loading"
+                      @change="onChange"
+                      @export="onExport"
+                      @select="onSelect"
+        ></PSearchTable>
     </div>`,
     setup(props, context) {
         const state = reactive({

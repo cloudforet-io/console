@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <p-panel-top>
+        <p-panel-top v-if="name">
             {{ name }}
         </p-panel-top>
         <p-raw-data class="mx-4" :item="rootData" />
