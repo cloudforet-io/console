@@ -217,6 +217,28 @@ export const showErrorMessage = (errorTitle, error, root) => {
         });
     }
 };
+/** * @function
+ *   @name showSuccessMessage
+ *   @param successTitle
+ *   @param successMessage
+ *   @param root
+ *   @returns
+ */
+export const showSuccessMessage = (successTitle, successMessage, root) => {
+    const vm = getCurrentInstance();
+    const vmRoot = root || vm;
+    if (vmRoot) {
+        vmRoot.$notify({
+            group: 'noticeTopRight',
+            type: 'success',
+            title: successTitle,
+            text: successMessage,
+            duration: 2000,
+            speed: 1000,
+        });
+    }
+};
+
 
 /**
  * @class

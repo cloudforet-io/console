@@ -1,21 +1,23 @@
 <template>
     <general-page-layout class="collector-page">
         <div class="page-navigation">
-            <p-page-navigation :routes="route" />
+            <p-page-navigation :routes="routes" />
         </div>
         <p-page-title :title="$t('WORD.COLLECTOR')"
                       use-total-count
-                      :total-count="apiHandler.totalCount.value"
+                      :total-count="totalCount"
         />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <s-dynamic-layout v-bind="mainTableLayout" :toolset="apiHandler"
-                                  :vbind="{
-                                      showTitle: false,
-                                      resourceType: 'inventory.Collector',
-                                      width: '1020px'
-                                  }"
-                                  :style="{height: `${height}px`}"
+                <p-query-search-table
+                    :fields="fields"
+                    :items="items"
+                    :key-items="querySearchHandlers.keyItems"
+                    :value-handler-map="querySearchHandlers.valueHandlerMap"
+                    :total-count="totalCount"
+                    :query-tags="searchTags"
+                    @select="onSelect"
+                    @change="onChange"
                 >
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
@@ -41,49 +43,70 @@
                         />
                         {{ data.value }}
                     </template>
-                </s-dynamic-layout>
+                    <template #col-state-format="data">
+                        <p-status :text="data.value" :theme="data.value" />
+                    </template>
+                    <template #col-last_collected_at-format="{ value }">
+                        {{ value ? timestampFormatter(value) : '' }}
+                    </template>
+                    <template #col-created_at-format="{ value }">
+                        {{ timestampFormatter(value) }}
+                    </template>
+                </p-query-search-table>
             </template>
         </p-horizontal-layout>
 
-        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne"
+        <p-tab v-if="selectedItems.length === 1"
                :tabs="singleItemTab.state.tabs"
                :active-tab.sync="singleItemTab.syncState.activeTab"
         >
             <template #detail>
-                <collector-detail :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
+                <collector-detail :collector-id="selectedItems[0].collector_id" />
             </template>
             <template #tag>
                 <s-tags-panel :is-show="singleItemTab.syncState.activeTab==='tag'"
-                              :resource-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
+                              :resource-id="selectedItems[0].collector_id"
                               tag-page-name="collectorTags"
                 />
             </template>
             <template #credentials>
-                <collector-credentials :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
+                <collector-credentials :collector-id="selectedItems[0].collector_id" />
             </template>
             <template #schedules>
-                <collector-schedules :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id" />
+                <collector-schedules :collector-id="selectedItems[0].collector_id" />
             </template>
         </p-tab>
-        <p-tab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
+        <p-tab v-else-if="selectedItems.length > 1"
                :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab"
         >
             <template #data>
-                <s-dynamic-layout v-bind="multiDataLayout"
-                                  :data="apiHandler.tableTS.selectState.selectItems"
-                                  :vbind="{colCopy: true}"
-                />
+                <div>
+                    <p-panel-top :use-total-count="true" :total-count="selectedItems.length">
+                        <span>{{ $t('TAB.SELECTED_DATA') }}</span>
+                    </p-panel-top>
+                    <p-data-table
+                        :fields="selectedDataFields"
+                        :items="selectedItems"
+                        :sortable="false"
+                        :selectable="false"
+                        :col-copy="true"
+                    >
+                        <template #col-state-format="data">
+                            <p-status :text="data.value" :theme="data.value" />
+                        </template>
+                    </p-data-table>
+                </div>
             </template>
         </p-tab>
 
-        <collector-update-modal v-if="updateModalState.visible"
-                                :visible.sync="updateModalState.visible"
-                                :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
+        <collector-update-modal v-if="updateModalVisible"
+                                :visible.sync="updateModalVisible"
+                                :collector-id="selectedItems[0].collector_id"
         />
 
-        <collect-data-modal v-if="collectDataState.visible"
-                            :visible.sync="collectDataState.visible"
-                            :collector-id="apiHandler.tableTS.selectState.firstSelectItem.collector_id"
+        <collect-data-modal v-if="collectDataModalVisible"
+                            :visible.sync="collectDataModalVisible"
+                            :collector-id="selectedItems[0].collector_id"
         />
 
         <p-table-check-modal v-if="checkModalState.visible"
@@ -95,56 +118,46 @@
                              size="lg"
                              centered
                              :selectable="false"
-                             :items="apiHandler.tableTS.selectState.selectItems"
+                             :items="selectedItems"
                              @confirm="checkModalConfirm"
         />
     </general-page-layout>
 </template>
 
 <script lang="ts">
-/* eslint-disable class-methods-use-this */
-
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, watch, getCurrentInstance, Ref,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
-import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
-import _ from 'lodash';
+import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { get } from 'lodash';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-
-import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { dateTimeViewType } from '@/lib/data-source';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { Component } from 'vue/types/umd';
-import { showErrorMessage } from '@/lib/util';
-import {
-    TabBarState,
-} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import {
-    makeQueryStringComputed,
-    makeQueryStringComputeds, queryStringToNumberArray,
-    queryTagsToOriginal,
-    queryTagsToQueryString, selectIndexAutoReplacer,
-} from '@/lib/router-query-string';
-import {
-    getEnumValueHandler,
-    makeKeyItems,
-    makeQuerySearchHandlersWithSearchSchema, makeValueHandlerMapWithReference,
-} from '@/lib/component-utils/query-search';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import { QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
+import PStatus from '@/components/molecules/status/PStatus.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
-const PTab = (): Component => import('@/components/organisms/tabs/tab/PTab.vue') as Component;
-const PTableCheckModal = (): Component => import('@/components/organisms/modals/table-modal/PTableCheckModal.vue') as Component;
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { Component } from 'vue/types/umd';
+import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+
+import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { parseTag } from '@/lib/api/query-search';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
+import router from '@/routes';
+
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
@@ -152,101 +165,141 @@ const CollectorDetail = (): Component => import('@/views/plugin/collector/module
 const CollectorCredentials = (): Component => import('@/views/plugin/collector/modules/CollectorCredentials.vue') as Component;
 const CollectorSchedules = (): Component => import('@/views/plugin/collector/modules/CollectorSchedules.vue') as Component;
 
+export type UrlQueryString = string | (string | null)[] | null | undefined;
+
 export default {
     name: 'Collector',
     components: {
-        PQuerySearchTable,
         PPageTitle,
         GeneralPageLayout,
         PLazyImg,
         PHorizontalLayout,
         PIconTextButton,
         PDropdownMenuBtn,
+        PDataTable,
+        PPanelTop,
+        PQuerySearchTable,
+        PStatus,
         PTab,
-        CollectorUpdateModal,
         PTableCheckModal,
+        PPageNavigation,
+        CollectorUpdateModal,
         CollectDataModal,
         CollectorDetail,
         CollectorCredentials,
         CollectorSchedules,
         STagsPanel,
-        SDynamicLayout,
-        PPageNavigation,
     },
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
-        const collectorApi = fluentApi.inventory().collector();
-
-        const args = {
-            keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
-            suggestKeys: ['collector_id', 'name'],
-        };
-        const handlers = makeQuerySearchHandlersWithSearchSchema({
-            title: 'Properties',
-            items: [
-                { key: 'collector_id', name: 'Collector ID' },
-                { key: 'name', name: 'Name' },
-                { key: 'state', name: 'State', enums: ['ENABLED', 'DISABLED'] },
-                // { key: 'priority', name: 'Priority', data_type: 'integer' },
-                { key: 'plugin_info.options.supported_resource_type', name: 'Resource Type' },
-                { key: 'plugin_info.plugin_id', name: 'Plugin ID' },
-                { key: 'plugin_info.version', name: 'Plugin Version' },
-                { key: 'provider', name: 'Provider' },
-                // { key: 'created_at', name: 'Created', data_type: 'datetime' },
-                // { key: 'last_collected_at', name: 'Last Collected', data_type: 'datetime' },
+        const state = reactive({
+            fields: [
+                { name: 'name', label: 'Name', options: { width: '14rem' } },
+                {
+                    name: 'state',
+                    label: 'State',
+                    type: 'enum',
+                    options: {
+                        ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
+                        DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
+                        width: '7rem',
+                    },
+                },
+                { name: 'priority', label: 'Priority', options: { width: '5.5rem' } },
+                {
+                    name: 'last_collected_at',
+                    label: 'Last Collected',
+                    type: 'datetime',
+                    options: {
+                        // eslint-disable-next-line camelcase
+                        source_type: 'timestamp',
+                        // eslint-disable-next-line camelcase
+                        source_format: 'seconds',
+                        width: '9rem',
+                    },
+                },
+                {
+                    name: 'created_at',
+                    label: 'Created',
+                    width: '9rem',
+                    type: 'datetime',
+                    options: {
+                        // eslint-disable-next-line camelcase
+                        source_type: 'timestamp',
+                        // eslint-disable-next-line camelcase
+                        source_format: 'seconds',
+                        width: '9rem',
+                    },
+                },
             ],
-        }, 'inventory.Collector');
-
-        const apiHandler = new QuerySearchTableFluentAPI(
-            collectorApi.list(),
-            {
-                selectable: true,
-                sortable: true,
-                hover: true,
-                settingVisible: false,
-                useCursorLoading: true,
-                excelVisible: true,
-            },
-            undefined,
-            handlers,
-            // {
-            //     keyItems: makeKeyItems(args.keys),
-            //     valueHandlerMap: {
-            //         ...makeValueHandlerMapWithReference([
-            //             ['collector_id', 'ID'],
-            //             ['name', 'Name']],
-            //         'inventory.Collector'),
-            //         state: getEnumValueHandler(['ENABLED', 'DISABLED']),
-            //         'plugin_info.options.supported_resource_type': getEnumValueHandler(['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
-            //     },
-            // },
-        );
-
+            items: [] as CollectorModel[],
+            totalCount: 0,
+            // selected
+            selectedIndexes: [],
+            selectedItems: computed(() => {
+                const items = [] as CollectorModel[];
+                state.selectedIndexes.map(d => items.push(state.items[d]));
+                return items;
+            }),
+            selectedDataFields: [
+                { name: 'name', label: 'Name' },
+                {
+                    name: 'state',
+                    label: 'State',
+                    type: 'enum',
+                    options: {
+                        ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
+                        DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
+                    },
+                },
+                { name: 'priority', label: 'Priority' },
+            ],
+            // query search
+            querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
+                title: 'Properties',
+                items: [
+                    { key: 'collector_id', name: 'Collector ID' },
+                    { key: 'name', name: 'Name' },
+                    { key: 'state', name: 'State', enums: ['ENABLED', 'DISABLED'] },
+                    { key: 'plugin_info.options.supported_resource_type', name: 'Resource Type' },
+                    { key: 'plugin_info.plugin_id', name: 'Plugin ID' },
+                    { key: 'plugin_info.version', name: 'Plugin Version' },
+                    { key: 'provider', name: 'Provider' },
+                ],
+            }, 'inventory.Collector'),
+            searchTags: [],
+            // dropdown action
+            dropdown: computed(() => (makeTrItems([
+                ['update', 'BTN.UPDATE', { disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0 }],
+                [null, null, { type: 'divider' }],
+                ['enable', 'BTN.ENABLE', { disabled: state.selectedIndexes.length === 0 }],
+                ['disable', 'BTN.DISABLE', { disabled: state.selectedIndexes.length === 0 }],
+                ['delete', 'BTN.DELETE', { disabled: state.selectedIndexes.length === 0 }],
+                [null, null, { type: 'divider' }],
+                ['collectData', 'BTN.COLLECT_DATA', { disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0 }],
+            ], null, { type: 'item' }))),
+            updateModalVisible: false,
+            collectDataModalVisible: false,
+            //
+            routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
+        });
         const checkModalState: UnwrapRef<{
-            visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api: ActionAPIInterface;
-        }> = reactive({
-            visible: false,
-            mode: '',
-            title: '',
-            subTitle: '',
-            themeColor: '',
-            api: collectorApi.enable(),
-            tableCheckFields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
-                ['priority', 'COMMON.PRIORITY'],
-            ])),
-        });
+                visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api: ActionAPIInterface;
+            }> = reactive({
+                visible: false,
+                mode: '',
+                title: '',
+                subTitle: '',
+                themeColor: '',
+                api: fluentApi.inventory().collector().enable(),
+                tableCheckFields: computed(() => makeTrItems([
+                    ['name', 'COMMON.NAME'],
+                    ['state', 'COMMON.STATE'],
+                    ['priority', 'COMMON.PRIORITY'],
+                ])),
+            });
 
-        const updateModalState = reactive({
-            visible: false,
-        });
-
-        const collectDataState = reactive({
-            visible: false,
-        });
-
+        // Tab
         const singleItemTab = new TabBarState(
             {
                 tabs: computed(() => makeTrItems([
@@ -261,7 +314,6 @@ export default {
                 activeTab: 'detail',
             },
         );
-
         const multiItemTab = new TabBarState(
             {
                 tabs: makeTrItems([
@@ -273,128 +325,82 @@ export default {
             },
         );
 
-        const state = reactive({
-            dropdown: computed(() => (
-                makeTrItems([
-                    ['update', 'BTN.UPDATE', { disabled: apiHandler.tableTS.selectState.isSelectMulti || apiHandler.tableTS.selectState.isNotSelected }],
-                    [null, null, { type: 'divider' }],
-                    ['enable', 'BTN.ENABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
-                    ['disable', 'BTN.DISABLE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
-                    ['delete', 'BTN.DELETE', { disabled: apiHandler.tableTS.selectState.isNotSelected }],
-                    [null, null, { type: 'divider' }],
-                    ['collectData', 'BTN.COLLECT_DATA', { disabled: apiHandler.tableTS.selectState.isSelectMulti || apiHandler.tableTS.selectState.isNotSelected }],
-                ], null, { type: 'item' }))),
-            mainTableLayout: computed(() => ({
-                name: vm.$t('WORD.COLLECTOR'),
-                type: 'query-search-table',
-                options: {
-                    fields: [
-                        { key: 'name', name: vm.$t('COMMON.NAME'), options: { width: '14rem' } },
-                        {
-                            key: 'state',
-                            name: vm.$t('COMMON.STATE'),
-                            type: 'enum',
-                            options: {
-                                ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
-                                DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
-                                width: '7rem',
-                            },
-                        },
-                        { key: 'priority', name: vm.$t('COMMON.PRIORITY'), options: { width: '5.5rem' } },
-                        {
-                            key: 'last_collected_at.seconds',
-                            name: vm.$t('COMMON.LAST_COL'),
-                            type: 'datetime',
-                            options: {
-                                // eslint-disable-next-line camelcase
-                                source_type: 'timestamp',
-                                // eslint-disable-next-line camelcase
-                                source_format: 'seconds',
-                                width: '9rem',
-                            },
-                        },
-                        {
-                            key: 'created_at.seconds',
-                            name: vm.$t('COMMON.CREATED'),
-                            width: '9rem',
-                            type: 'datetime',
-                            options: {
-                                // eslint-disable-next-line camelcase
-                                source_type: 'timestamp',
-                                // eslint-disable-next-line camelcase
-                                source_format: 'seconds',
-                                width: '9rem',
-                            },
-                        },
-                    ],
-                },
-            })),
-            multiDataLayout: computed(() => ({
-                name: vm.$t('TAB.SELECTED_DATA'),
-                type: 'simple-table',
-                options: {
-                    fields: [
-                        { key: 'name', name: vm.$t('COMMON.NAME') },
-                        {
-                            key: 'state',
-                            name: vm.$t('COMMON.STATE'),
-                            type: 'enum',
-                            options: {
-                                ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
-                                DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
-                            },
-                        },
-                        { key: 'priority', name: vm.$t('COMMON.PRIORITY') },
-                    ],
-                },
-            })),
-        });
-
-        const mainTable: Partial<QuerySearchTableProps> = reactive({
-            fields: [
-                { name: 'name', label: 'Name', width: '14rem' },
-                { name: 'state', label: 'State', width: '7rem' },
-                { name: 'priority', label: 'Priority', width: '14rem' },
-                { name: 'last_collected_at.seconds', label: 'Last Collected', width: '9rem' },
-                { name: 'created_at.seconds', label: 'Created', width: '9rem' },
-            ],
-            items: [],
-            loading: true,
-
-        });
-
-        const routeState = reactive({
-            route: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
-        });
-
-        const onClickUpdate = (): void => {
-            updateModalState.visible = true;
+        // Url query
+        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
+            if (Array.isArray(tags)) {
+                return tags.map((tag) => {
+                    let item;
+                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
+                    else item = `${tag.value?.name}`;
+                    return item;
+                });
+            }
+            return null;
+        };
+        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
+            if (!urlQueryString) return [];
+            if (Array.isArray(urlQueryString)) {
+                return urlQueryString.reduce((res, qs) => {
+                    if (qs) res.push(parseTag(qs));
+                    return res;
+                }, [] as QueryTag[]);
+            }
+            return [parseTag(urlQueryString as string)];
+        };
+        const setSearchTags = () => {
+            state.searchTags = urlQueryStringToSearchTags(vm.$route.query.f);
         };
 
+        // Table
+        const listCollector = async () => {
+            try {
+                const res = await fluentApi.inventory().collector().list()
+                    .setFilter(...state.searchTags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })))
+                    .execute();
+                state.items = res.data.results;
+                state.totalCount = res.data.total_count || 0;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const onSelect = (index) => {
+            state.selectedIndexes = index;
+        };
+        const onChange = async (item) => {
+            state.selectedIndexes = [];
+            state.searchTags = item.queryTags;
+            const urlQueryString = searchTagsToUrlQueryString(item.queryTags);
+            // eslint-disable-next-line no-empty-function
+            await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
+            // TODO: thisPage, pageSize, sortBy, sortDesc 기능 필요
+            try {
+                await listCollector();
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        // Action events
         const checkModalConfirm = async (): Promise<void> => {
             try {
                 await checkModalState.api.execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: checkModalState.title,
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', checkModalState.title, context.root);
             } catch (e) {
                 console.error(e);
                 showErrorMessage(`Fail to ${checkModalState.title}`, e, context.root);
             } finally {
+                if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;
-                await apiHandler.getData();
+                await listCollector();
             }
         };
-
+        const onClickUpdate = (): void => {
+            state.updateModalVisible = true;
+        };
         const onClickEnable = (): void => {
             checkModalState.mode = 'enable';
-            checkModalState.api = collectorApi.enable()
-                .setIds(apiHandler.tableTS.selectState.selectItems.map(d => d.collector_id));
+            checkModalState.api = fluentApi.inventory().collector().enable()
+                .setIds(state.selectedItems.map(d => d.collector_id));
             checkModalState.title = 'Enable Collector';
             checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
             checkModalState.themeColor = 'primary';
@@ -402,8 +408,8 @@ export default {
         };
         const onClickDisable = (): void => {
             checkModalState.mode = 'disable';
-            checkModalState.api = collectorApi.disable()
-                .setIds(apiHandler.tableTS.selectState.selectItems.map(d => d.collector_id));
+            checkModalState.api = fluentApi.inventory().collector().disable()
+                .setIds(state.selectedItems.map(d => d.collector_id));
             checkModalState.title = 'Disable Collector';
             checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
             checkModalState.themeColor = 'primary';
@@ -411,62 +417,44 @@ export default {
         };
         const onClickDelete = (): void => {
             checkModalState.mode = 'delete';
-            checkModalState.api = collectorApi.delete()
-                .setIds(apiHandler.tableTS.selectState.selectItems.map(d => d.collector_id));
+            checkModalState.api = fluentApi.inventory().collector().delete()
+                .setIds(state.selectedItems.map(d => d.collector_id));
             checkModalState.title = 'Delete Collector';
             checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
-
         const onClickCollectData = (): void => {
-            collectDataState.visible = true;
+            state.collectDataModalVisible = true;
         };
 
-        const queryRefs = {
-            f: makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
-                {
-                    key: 'f',
-                    setter: queryTagsToOriginal,
-                    getter: queryTagsToQueryString,
-                }),
-            ...makeQueryStringComputeds(apiHandler.tableTS.syncState, {
-                pageSize: { key: 'ps', setter: Number },
-                thisPage: { key: 'p', setter: Number },
-                sortBy: { key: 'sb' },
-                sortDesc: { key: 'sd', setter: Boolean },
-                selectIndex: {
-                    key: 'sl',
-                    setter: queryStringToNumberArray,
-                    autoReplacer: selectIndexAutoReplacer,
-                },
-            }),
-            ...makeQueryStringComputeds(multiItemTab.syncState, {
-                activeTab: { key: 'mt' },
-            }),
-            ...makeQueryStringComputeds(singleItemTab.syncState, {
-                activeTab: { key: 'st' },
-            }),
+        const init = async () => {
+            await setSearchTags();
+            await listCollector();
         };
+        init();
+
+        watch(() => state.updateModalVisible, (val) => {
+            if (!val) {
+                listCollector();
+            }
+        });
 
         return {
             ...toRefs(state),
-            mainTable,
-            handlers,
-            ...toRefs(routeState),
             singleItemTab,
             multiItemTab,
-            updateModalState,
-            collectDataState,
             checkModalState,
-            apiHandler,
-            getIcon: (data): void => _.get(data, 'item.tags.icon', ''),
+            getIcon: (data): void => get(data, 'item.tags.icon', ''),
+            onSelect,
+            onChange,
             onClickUpdate,
             onClickEnable,
             onClickDisable,
             onClickDelete,
             onClickCollectData,
             checkModalConfirm,
+            timestampFormatter,
         };
     },
 };
