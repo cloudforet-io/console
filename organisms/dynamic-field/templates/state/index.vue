@@ -2,7 +2,7 @@
 import { get } from 'lodash';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import { getColor } from '@/components/organisms/dynamic-field/PDynamicField.toolset';
-import { StatusProps } from '@/components/molecules/status/PStatus.toolset';
+import { StatusProps } from '@/components/molecules/status/type';
 import { StateOptions } from '@/components/organisms/dynamic-field/type';
 
 export default {
