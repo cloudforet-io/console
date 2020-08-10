@@ -231,7 +231,7 @@ export default {
                     type: 'item',
                     label: 'User Guide',
                     name: 'user-guide',
-                    link: 'https://spaceone-dev.gitbook.io/user-guide/',
+                    link: 'https://spaceone-dev-1.gitbook.io/user-guide/',
                     target: '_blank',
                 },
                 {
