@@ -14,8 +14,13 @@
                     :items="items"
                     :key-items="querySearchHandlers.keyItems"
                     :value-handler-map="querySearchHandlers.valueHandlerMap"
+                    :loading="loading"
                     :total-count="totalCount"
                     :query-tags="searchTags"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    :this-page.sync="thisPage"
+                    :page-size.sync="pageSize"
                     @select="onSelect"
                     @change="onChange"
                 >
@@ -125,12 +130,8 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs, computed, watch, getCurrentInstance, Ref,
-} from '@vue/composition-api';
-import { makeTrItems } from '@/lib/view-helper';
-import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { get } from 'lodash';
+import router from '@/routes';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
@@ -146,17 +147,23 @@ import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { Component } from 'vue/types/umd';
-import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
-
-import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
-import { parseTag } from '@/lib/api/query-search';
+
+import { Component } from 'vue/types/umd';
+import {
+    reactive, toRefs, computed, watch, getCurrentInstance,
+} from '@vue/composition-api';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import router from '@/routes';
+
+import { makeTrItems } from '@/lib/view-helper';
+import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { makeQueryStringComputeds } from '@/lib/router-query-string';
+import { parseTag } from '@/lib/api/query-search';
 
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
@@ -254,7 +261,7 @@ export default {
                 },
                 { name: 'priority', label: 'Priority' },
             ],
-            // query search
+            // query
             querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
                 title: 'Properties',
                 items: [
@@ -267,7 +274,12 @@ export default {
                     { key: 'provider', name: 'Provider' },
                 ],
             }, 'inventory.Collector'),
+            loading: false,
             searchTags: [],
+            pageSize: 15,
+            thisPage: 1,
+            sortBy: null,
+            sortDesc: true,
             // dropdown action
             dropdown: computed(() => (makeTrItems([
                 ['update', 'BTN.UPDATE', { disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0 }],
@@ -353,14 +365,21 @@ export default {
 
         // Table
         const listCollector = async () => {
+            state.loading = true;
             try {
                 const res = await fluentApi.inventory().collector().list()
                     .setFilter(...state.searchTags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })))
+                    .setSortBy(state.sortBy)
+                    .setSortDesc(state.sortDesc)
+                    .setThisPage(state.thisPage)
+                    .setPageSize(state.pageSize)
                     .execute();
                 state.items = res.data.results;
                 state.totalCount = res.data.total_count || 0;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const onSelect = (index) => {
@@ -372,7 +391,6 @@ export default {
             const urlQueryString = searchTagsToUrlQueryString(item.queryTags);
             // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
-            // TODO: thisPage, pageSize, sortBy, sortDesc 기능 필요
             try {
                 await listCollector();
             } catch (e) {
@@ -439,6 +457,15 @@ export default {
                 listCollector();
             }
         });
+
+        const queryRefs = {
+            ...makeQueryStringComputeds(state, {
+                pageSize: { key: 'ps', setter: Number },
+                thisPage: { key: 'p', setter: Number },
+                sortBy: { key: 'sb' },
+                sortDesc: { key: 'sd', setter: Boolean },
+            }),
+        };
 
         return {
             ...toRefs(state),
