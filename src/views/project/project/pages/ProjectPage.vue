@@ -22,6 +22,7 @@
                     <project-group-tree ref="treeRef"
                                         @select="onSelectTreeItem"
                                         @create="openProjectGroupForm"
+                                        @list="onProjectGroupList"
                     />
                 </div>
             </div>
@@ -65,9 +66,11 @@
                     card-height="11.25rem"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
+                    :loading.sync="apiHandler.gridTS.syncState.loading"
                     @changePageNumber="apiHandler.getData()"
                     @changePageSize="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
+                    @card:click.self="goToProjectDetail"
                 >
                     <template #toolbox-left>
                         <div class="flex items-center">
@@ -81,97 +84,96 @@
                         </div>
                     </template>
                     <template #no-data>
-                        <div class="empty-project">
-                            <img class="w-48 mx-auto pt-12 mb-4" src="@/assets/images/illust_astronaut_standing.svg">
-                            <p class="text-primary2">
-                                Looks like you don't have any Project.
-                            </p>
+                        <div class="empty">
+                            <div v-if="noProjectGroup" class="empty-project-grp">
+                                <p class="title">
+                                    Let's begin your resource management!<br>
+                                </p>
+                                <p class="content">
+                                    Getting started with grouping your scattered resource <br>
+                                    and accounts with your own project.
+                                </p>
+                                <p class="content-order">
+                                    <b>1.</b> Name your project group first. <br>
+                                    <b>2.</b> Register your project.
+                                </p>
+                                <p-button style-type="primary-dark" class="mt-8"
+                                          @click="openProjectGroupForm(null)"
+                                >
+                                    <p-i name="ic_plus_bold" color="inherit"
+                                         width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
+                                    />
+                                    Create Project Group
+                                </p-button>
+                            </div>
+                            <div v-if="!noProjectGroup && noProject" class="empty-project">
+                                <p class="text-primary2">
+                                    Looks like you don't have any Project.
+                                </p>
+                            </div>
                         </div>
                     </template>
+                    <template #loading>
+                        <p-lottie name="spinner" :size="2"
+                                  :auto="true"
+                        />
+                    </template>
                     <template #card="{item}">
-                        <router-link :to="goToProjectDetail(item)">
-                            <div v-if="item">
-                                <div class="project-description">
-                                    <div class="project">
-                                        <div class="project-group-name">
-                                            <template v-if="parentGroups.length > 0">
-                                                {{ parentGroups[parentGroups.length - 1].name }} >
-                                            </template>
-                                            {{ item.project_group_info.name }}
+                        <div v-if="item">
+                            <div class="project-description">
+                                <div class="project">
+                                    <div class="project-group-name">
+                                        <template v-if="parentGroups.length > 0">
+                                            {{ parentGroups[parentGroups.length - 1].name }} >
+                                        </template>
+                                        {{ item.project_group_info.name }}
+                                    </div>
+                                    <p id="project-name">
+                                        {{ item.name }}
+                                    </p>
+                                    <div class="project-summary">
+                                        <div v-if="cardSummary[item.project_id]" class="summary-item">
+                                            <span class="summary-item-text">Server</span><span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span>
+                                            <span class="mx-2 text-gray-300 divider">|</span>
+                                            <span class="summary-item-text">Cloud Services<span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
                                         </div>
-                                        <p id="project-name">
-                                            {{ item.name }}
-                                        </p>
-
-                                        <div class="project-summary">
-                                            <div v-if="cardSummary[item.project_id]" class="summary-item">
-                                                <span class="summary-item-text">Server</span><span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span>
-                                                <span class="mx-2 text-gray-300 divider">|</span>
-                                                <span class="summary-item-text">Cloud Services<span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
-                                            </div>
-                                            <div v-else class="loading">
-                                                <div v-for="v in skeletons" :key="v" class="flex items-center pb-2">
-                                                    <p-skeleton class="flex-grow" />
-                                                    <p-skeleton width="1.5rem" height="1.5rem" class="ml-5 flex-shrink-0" />
-                                                </div>
+                                        <div v-else class="loading">
+                                            <div v-for="v in skeletons" :key="v" class="flex items-center pb-2">
+                                                <p-skeleton class="flex-grow" />
+                                                <p-skeleton width="1.5rem" height="1.5rem" class="ml-5 flex-shrink-0" />
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <hr class="solid">
-                                        <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
-                                             @click.stop="goToServiceAccount"
+                                    <hr class="solid">
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
+                                         @click.stop="goToServiceAccount"
+                                    >
+                                        <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
+                                            <p-i name="ic_plus"
+                                                 width=".75rem" height=".75rem"
+                                            />
+                                        </div>
+                                        <span class="ml-2"> Add Service Account</span>
+                                    </div>
+                                    <div v-else-if="item.force_console_data.providers" class="providers">
+                                        <span>Service Accounts</span>
+                                        <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
+                                             class="provider-icon"
                                         >
-                                            <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
-                                                <p-i name="ic_plus"
-                                                     width=".75rem" height=".75rem"
-                                                />
-                                            </div>
-                                            <span class="ml-2"> Add Service Account</span>
-                                        </div>
-                                        <div v-else-if="item.force_console_data.providers" class="providers">
-                                            <span>Service Accounts</span>
-                                            <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
-                                                 class="provider-icon"
-                                            >
-                                            <span class="w-6 h-6 bg-blue-100 rounded-full inline-block provider-add-btn" @click.stop="goToServiceAccount">
-                                                <p-i name="ic_plus"
-                                                     width=".75rem" height=".75rem"
-                                                />
-                                            </span>
-                                            <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
-                                        </div>
+                                        <span class="provider-add-btn" @click.stop="goToServiceAccount">
+                                            <p-i name="ic_plus"
+                                                 width=".75rem" height=".75rem"
+                                            />
+                                        </span>
+                                        <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </div>
                     </template>
                 </p-toolbox-grid-layout>
             </div>
-            <!--            <div v-else class="empty">-->
-            <!--                <img class="w-40 mx-auto mb-4 pt-8" src="@/assets/images/illust_astronaut_walking.svg">-->
-            <!--                <div class="empty-project-grp">-->
-            <!--                    <p class="title">-->
-            <!--                        Let's begin your <br>-->
-            <!--                        resource management!<br>-->
-            <!--                    </p>-->
-            <!--                    <p class="content">-->
-            <!--                        Getting started with grouping your scattered resource and <br>-->
-            <!--                        accounts with your own project.<br><br>-->
-            <!--                    </p>-->
-            <!--                    <p class="content-order">-->
-            <!--                        <b>1.</b> Name your project group first. <br>-->
-            <!--                        <b>2.</b> Register your project.-->
-            <!--                    </p>-->
-            <!--                    <p-button style-type="primary-dark"-->
-            <!--                              @click="openProjectGroupForm"-->
-            <!--                    >-->
-            <!--                        <p-i name="ic_plus_bold" color="inherit"-->
-            <!--                             width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"-->
-            <!--                        />-->
-            <!--                        Create Project Group-->
-            <!--                    </p-button>-->
-            <!--                </div>-->
-            <!--            </div>-->
             <s-project-group-create-form-modal v-if="projectGroupFormVisible"
                                                :id="updateMode && searchedProjectGroup ?
                                                    searchedProjectGroup.id : undefined"
@@ -226,7 +228,7 @@ import {
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -283,6 +285,8 @@ import { Location } from 'vue-router';
         parentGroups: Readonly<ProjectGroup[]>;
         projectGroupNavigation: any; // TODO: routeNavigation type
         treeRef: any;
+        noProjectGroup: boolean;
+        noProject: boolean;
     }
 
 const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): ProjectGroup[] => {
@@ -304,6 +308,7 @@ export default {
         ProjectSearch,
         PVerticalPageLayout,
         PI,
+        PLottie,
         PPageTitle,
         PCheckBox,
         PSkeleton,
@@ -351,6 +356,8 @@ export default {
                     ...result,
                 ];
             }),
+            noProjectGroup: false,
+            noProject: false,
         });
 
         const formState = reactive({
@@ -450,6 +457,7 @@ export default {
             {
                 cardClass: () => ['card-item', 'project-card-item'],
                 cardMinWidth: '18.75rem',
+                cardMaxHeight: '18.75rem',
                 cardHeight: '15rem',
             },
         );
@@ -468,13 +476,12 @@ export default {
              * Click Card Item
              */
         const goToProjectDetail = (item) => {
-            const res: Location = {
+            vm.$router.push({
                 name: 'projectDetail',
                 params: {
                     id: item.project_id,
                 },
-            };
-            return res;
+            } as Location);
         };
 
         const goToServiceAccount = () => {
@@ -511,6 +518,7 @@ export default {
                 showErrorMessage('Fail to Delete Project Group', e, context.root);
             } finally {
                 formState.projectGroupDeleteFormVisible = false;
+                await state.treeRef.listNodes();
             }
         };
 
@@ -539,6 +547,7 @@ export default {
 
             await state.treeRef.addNode(newItem, formState.createTargetNode);
             formState.projectGroupFormVisible = false;
+            state.noProjectGroup = false;
         };
 
         const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
@@ -591,6 +600,7 @@ export default {
             apiHandler.action = api;
             apiHandler.resetAll();
             await apiHandler.getData();
+            if (apiHandler.gridTS.state.items.length === 0) state.noProject = true;
         };
 
         /** Query String */
@@ -668,6 +678,17 @@ export default {
             await listProjects(state.searchText, projectGroup);
         };
 
+        const onProjectGroupList = async (items: ProjectTreeItem[]) => {
+            if (items.length === 0) {
+                apiHandler.gridTS.syncState.loading = true;
+                state.noProjectGroup = true;
+            } else {
+                state.noProjectGroup = false;
+            }
+            apiHandler.gridTS.syncState.loading = false;
+            await listProjects(state.searchText, state.searchedProjectGroup);
+        };
+
         onMounted(async () => {
             await init();
         });
@@ -692,6 +713,7 @@ export default {
             onProjectGroupUpdate,
             onProjectGroupCreate,
             onProjectGroupNavClick,
+            onProjectGroupList,
         };
     },
 };
@@ -813,7 +835,7 @@ export default {
                 min-height: 1.5rem;
                 width: fit-content;
                 .provider-add-btn {
-                    @apply text-gray-900;
+                    @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
                     &:hover {
                         @apply bg-blue-300;
                     }

@@ -13,8 +13,18 @@ interface IdParameter {
     [idField]: string;
 }
 
+export interface RegionModel extends Tags, IdParameter {
+    state: string;
+    name: string;
+    created_at: TimeStamp;
+    domain_id: string;
+    deleted_at: TimeStamp;
+    region_code: string;
+    region_type: string;
+    collection_info: object;
+}
 
-export type RegionListResp = ListType<any>
+export type RegionListResp = ListType<RegionModel>
 
 interface CreateParameter extends Tags {
     name: string;

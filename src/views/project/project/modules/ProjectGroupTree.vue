@@ -35,14 +35,14 @@
             </template>
             <template #right-extra="{data}">
                 <div v-if="hoveredNode && data.id === hoveredNode.node.data.id">
-                    <div v-tooltip.top="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"
-                         class="float-right text-base truncate leading-tight"
-                    >
-                        <p-icon-button :name="'ic_plus'" class="group-add-btn"
-                                       width="1rem" height="1rem"
-                                       @click.stop="$emit('create', hoveredNode)"
-                        />
-                    </div>
+                    <!--                    <div v-tooltip.top="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"-->
+                    <!--                         class="float-right text-base truncate leading-tight"-->
+                    <!--                    >-->
+                    <p-icon-button :name="'ic_plus'" class="group-add-btn"
+                                   width="1rem" height="1rem"
+                                   @click.stop="$emit('create', hoveredNode)"
+                    />
+                    <!--                    </div>-->
                 </div>
             </template>
         </p-tree-node>

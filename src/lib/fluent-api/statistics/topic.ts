@@ -11,6 +11,11 @@ export class CloudServiceType extends StatTopicAction<any, any> {
         this.apiState.extraParameter.show_all = show;
         return this.clone();
     }
+
+    setLabels(labels: any): this {
+        this.apiState.extraParameter.labels = labels;
+        return this.clone();
+    }
 }
 
 export default class Topic extends Resource implements ResourceActions<'cloudServiceType'> {

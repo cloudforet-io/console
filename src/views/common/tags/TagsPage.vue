@@ -13,7 +13,6 @@
                 </div>
                 <div class="right" />
             </div>
-
             <p-pane-layout class="tag-panel">
                 <div v-if="items.length == 0" class="comment">
                     <span class="highlight">{{ $t('ACTION.DICT.NO_TAG') }}</span><br>
@@ -51,6 +50,7 @@
                 </p-button>
             </div>
         </p-pane-layout>
+        <f-n-b class="fnb" />
     </div>
 </template>
 
@@ -75,10 +75,12 @@ import _ from 'lodash';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import FNB from '@/views/containers/fnb/FNB.vue';
 
 export default {
     name: 'CloudServicePage',
     components: {
+        FNB,
         GeneralPageLayout,
         PIconButton,
         PButton,
@@ -168,15 +170,15 @@ export default {
 
 <style lang="postcss" scoped>
     .page-mask {
-        @apply absolute flex left-0 w-full h-full;
+        @apply absolute flex flex-col left-0 w-full h-full;
         z-index: 99;
-        bottom: $fnb-height;
+        top: $gnb-height;
         /*transition: opacity 0.3s ease;*/
-        max-height: calc(100vh - ($gnb-height + $fnb-height));
-        min-height: calc(100vh - ($gnb-height + $fnb-height));
+        max-height: calc(100vh - ($gnb-height));
+        min-height: calc(100vh - ($gnb-height));
         max-width: 100vw;
         .page-wrapper {
-            @apply w-screen border-none;
+            @apply w-screen border-none flex-grow;
             .page-nav {
                 @apply my-6 ml-8;
                 .left {
@@ -204,6 +206,9 @@ export default {
                     @apply ml-4;
                 }
             }
+        }
+        .fnb {
+            @apply flex-grow-0 border-none bg-white;
         }
 
     }

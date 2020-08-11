@@ -1,113 +1,124 @@
 <template>
     <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <p-grid-layout
-                class="provider-list"
-                v-bind="providerListState.state"
-                @card:click="selectProvider=$event.provider"
+            <p class="sidebar-title">
+                Service Providers
+            </p>
+            <p-hr class="sidebar-divider" />
+            <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
+                <p-hr v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
+                <img v-if="provider.icon"
+                     :src="provider.icon"
+                     :alt="provider.provider"
+                     class="provider-icon"
+                >
+                <p-i v-else name="ic_provider_other"
+                     class="provider-icon"
+                />
+                <span class="provider-name">{{ provider.name }}</span>
+                <p-radio v-model="selectProvider" :value="provider.provider" class="provider-radio-btn" />
+            </div>
+            <p class="sidebar-title">
+                Region
+            </p>
+            <p-hr class="sidebar-divider" />
+            <div v-for="(region, idx) in filterState.regionList" :key="idx"
+                 class="region-list"
             >
-                <template #card="{item}">
-                    <div class="left">
-                        <template>
-                            <img v-if="item.icon"
-                                 width="32px" height="32px"
-                                 :src="item.icon"
-                                 :alt="item.provider"
-                            >
-                            <p-i v-else name="ic_provider_other"
-                                 width="32px"
-                                 height="32px"
-                            />
-                        </template>
-                        <div class="title">
-                            {{ item.name }}
-                        </div>
-                    </div>
-                    <div class="right">
-                        <div
-                            class="total-count"
-                            :style="{'background-color': item.color||'#3C2C84','border-color': item.color||'#3C2C84'}"
-                        >
-                            {{ providerTotalCount[item.provider]||0 }}
-                        </div>
-                    </div>
-                </template>
-            </p-grid-layout>
+                <p-check-box :selected="filterState.selectedRegionIdx" :value="idx"
+                             @change="onClickRegion(idx, region)"
+                />
+                <span class="region-type">[{{ region.region_type }}] {{ region.name }} <br> </span>
+                <span class="region-code">/ {{ region.region_code }} </span>
+            </div>
+            <div id="service-category-title">Service Categories</div>
+            <p-hr class="sidebar-divider" />
+            <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
+                 class="service-categories" :class="{selected: checked}"
+            >
+                <p-check-box :selected="filterState.serviceCategories[service]" :value="true"
+                             @change="onClickService(service)"
+                />
+                <span class="service">{{ service }}</span>
+            </div>
         </template>
         <template #default>
-            <div class="text-xs text-gray-500 mb-1">
-                Cloud Service Provider
+            <div class="page-navigation">
+                <p-page-navigation :routes="route" />
             </div>
-            <PPageTitle :title="selectProviderName" use-total-count :total-count="apiHandler.totalCount.value"
-                        class="pagetitle"
+            <p-page-title :title="selectProvider.toUpperCase()" use-total-count :total-count="totalCount"
+                          class="page-title"
             />
             <div class="cloud-services">
-                <PToolboxGridLayout
-                    v-bind="apiHandler.gridTS.state"
-                    :this-page.sync="apiHandler.gridTS.syncState.thisPage"
-                    :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                    @changePageNumber="apiHandler.getData()"
-                    @changePageSize="apiHandler.getData()"
-                    @clickRefresh="apiHandler.getData()"
-                    @card:click="clickCard"
-                    @clickExcel="exportToolSet.getData()"
+                <p-search-grid-layout
+                    :items="items"
+                    :card-class="cardClass"
+                    :loading="loading"
+                    :this-page.sync="thisPage"
+                    :page-size.sync="pageSize"
+                    :total-count="totalCount"
+                    :query-tags="tags"
+                    :key-items="keyItems"
+                    :value-handler-map="valueHandlerMap"
+                    @change="onChange"
                 >
-                    <template slot="toolbox-bottom">
-                        <div class="cst-toolbox-bottom">
-                            <p-search v-model="apiHandler.gridTS.searchText.value"
-                                      @search="onSearch" @delete="onSearch()"
-                            />
-                        </div>
-                    </template>
                     <template #no-data>
-                        <div class="text-center empty-project">
-                            <img class="w-48 mx-auto pt-19 mb-8" src="@/assets/images/illust_satellite.svg">
+                        <div v-if="!items || items.length === 0" class="text-center empty-cloud-service">
+                            <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
                             <p class="text-primary2 mb-12">
                                 We need your registration for monitoring cloud resources.
                             </p>
-                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                                class="mx-auto text-center"
-                                                @click="goToServiceAccount"
-                            >
-                                {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
-                            </p-icon-text-button>
+                            <router-link :to="`/identity/service-account/?provider=${selectProvider}`">
+                                <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                                    class="mx-auto text-center"
+                                >
+                                    {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                                </p-icon-text-button>
+                            </router-link>
                         </div>
+                    </template>
+                    <template #loading>
+                        <p-lottie name="spinner" :size="2"
+                                  :auto="true"
+                        />
                     </template>
                     <template #card="{item}">
-                        <div class="left">
-                            <div class="w-12 h-12">
-                                <img v-if="item.tags['spaceone:icon']"
-                                     width="48px" height="48px"
-                                     :src="item.tags['spaceone:icon']"
-                                     :alt="item.name"
-                                >
-                                <img v-else-if="providerStore.state.providers[item.provider]"
-                                     width="48px" height="48px"
-                                     :src="providerStore.state.providers[item.provider].icon"
-                                     :alt="item.provider"
-                                >
-                                <p-i v-else name="ic_provider_other" width="48px"
-                                     height="48px"
-                                />
-                            </div>
-                            <div class="text-content">
-                                <div class="title">
-                                    {{ item.group }}
+                        <router-link :to="getToCloudService(item)">
+                            <div class="left">
+                                <div class="w-12 h-12">
+                                    <img v-if="item.icon"
+                                         width="48px" height="48px"
+                                         :src="item.icon"
+                                         :alt="item.name"
+                                    >
+                                    <img v-else-if="providerStore.state.providers[item.provider]"
+                                         width="48px" height="48px"
+                                         :src="providerStore.state.providers[item.provider].icon"
+                                         :alt="item.provider"
+                                    >
+                                    <p-i v-else name="ic_provider_other" width="48px"
+                                         height="48px"
+                                    />
                                 </div>
-                                <div class="sub-title">
-                                    <span class="sub-title-provider"> {{ item.provider }} </span>
-                                    <span class="sub-title-divider">
-                                        |
-                                    </span>
-                                    <span class="sub-title-name">{{ item.name }}</span>
-                                    <span v-if="statData" class="sub-title-count">
-                                        {{ statData[item.cloud_service_type_id][totalResourceCountName]||0 }}
-                                    </span>
+                                <div class="text-content">
+                                    <div class="title">
+                                        {{ item.cloud_service_group }}
+                                    </div>
+                                    <div class="sub-title">
+                                        <span class="sub-title-provider"> {{ item.provider }} </span>
+                                        <span class="sub-title-divider">
+                                            |
+                                        </span>
+                                        <span class="sub-title-name">{{ item.cloud_service_type }}</span>
+                                        <span class="sub-title-count">
+                                            {{ item.cloud_service_count }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </router-link>
                     </template>
-                </PToolboxGridLayout>
+                </p-search-grid-layout>
             </div>
         </template>
     </p-vertical-page-layout>
@@ -117,43 +128,54 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, ref, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import { fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
-import {
-    SearchGridFluentAPI,
-} from '@/lib/api/grid';
-import { AxiosResponse } from 'axios';
-import { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
-    makeQueryStringComputed, makeQueryStringComputeds, replaceQuery,
+    makeQueryStringComputed,
+    makeQueryStringComputeds,
+    queryTagsToOriginal,
+    queryTagsToQueryString,
+    replaceQuery,
 } from '@/lib/router-query-string';
-import {
-    GridLayoutState,
-} from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
-import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PSearch from '@/components/molecules/search/PSearch.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+import { Location } from 'vue-router';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import {
+    makeQuerySearchHandlersWithSearchSchema,
+} from '@/lib/component-utils/query-search';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import Region, { RegionModel } from '@/lib/fluent-api/inventory/region';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
+
+import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
+import { parseTag } from '@/lib/api/query-search';
+import router from '@/routes';
+import PHr from '@/components/atoms/hr/PHr.vue';
+
+export type UrlQueryString = string | (string | null)[] | null | undefined;
 
 export default {
-    name: 'ServiceAccount',
+    name: 'CloudServiceType',
     components: {
+        PHr,
+        PSearchGridLayout,
+        PRadio,
         PIconTextButton,
         PVerticalPageLayout,
-        PSearch,
         PI,
-        PToolboxGridLayout,
-        PGridLayout,
+        PLottie,
         PPageTitle,
+        PPageNavigation,
+        PCheckBox,
     },
     setup(props, context) {
         const {
@@ -161,196 +183,254 @@ export default {
         } = useStore();
         const providerStore: ProviderStoreType = provider;
         providerStore.getProvider();
-        const providerTotalCount = ref<any>({ all: 0 });
-        const cstCountName = 'cloud_service_type_count';
-        const cstCountApi = fluentApi.statisticsTest().resource().stat()
-            .setResourceType('inventory.CloudServiceType')
-            .addGroupKey('provider', 'provider')
-            .setJoinKeys(['provider'], 0)
-            .setJoinResourceType('inventory.CloudServiceType', 0)
-            .addJoinGroupKey('provider', 'provider', 0)
-            .addJoinGroupField(cstCountName, STAT_OPERATORS.count, undefined, 0);
         const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
+
         const selectProvider = ref('all');
-        const providerListState = new GridLayoutState(
+        const providerState = reactive({
+            items: computed(() => {
+                const result = [{
+                    provider: 'all', icon: '', color: '', name: 'All',
+                }];
+                if (providerStore.state.providers) {
+                    result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
+                }
+                return result;
+            }),
+        });
+
+        const filterState = reactive({
+            serviceCategories: _.zipObject([
+                'Compute', 'Container', 'Database', 'Networking', 'Storage', 'Security', 'Analytics', 'Application Integration', 'Management',
+            ], new Array(9).fill(false)),
+            serviceFilter: [] as string[],
+            regionList: [] as RegionModel[],
+            selectedRegionIdx: [] as number[],
+            regionFilter: [] as string[],
+        });
+
+        const handlers = makeQuerySearchHandlersWithSearchSchema(
             {
-                items: computed(() => {
-                    const result = [{
-                        provider: 'all', icon: '', color: '', name: 'All',
-                    }];
-                    if (providerStore.state.providers) {
-                        result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
-                    }
-                    return result;
-                }),
-                cardClass: (item) => {
-                    const _class = ['provider-card-item', 'card-item'];
-                    if (item.provider === selectProvider.value) {
-                        _class.push('selected');
-                    }
-                    return _class;
-                },
-                cardMinWidth: '14.125rem',
-                cardHeight: '3.5rem',
-                columnGap: '0.5rem',
-                rowGap: '0.5rem',
-                fixColumn: 1,
+                title: 'Properties',
+                items: [
+                    { key: 'cloud_service_type', name: 'Cloud Service Type' },
+                    { key: 'cloud_service_group', name: 'Cloud Service Group' },
+                    { key: 'project_id', name: 'Project', reference: 'identity.Project' },
+                    { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
+                    { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
+                    { key: 'data.region_name', name: 'Region' },
+                ],
             },
+            'inventory.CloudService',
         );
-        const selectProviderName = computed(() => _.find(providerListState.state.items, { provider: selectProvider.value }).name);
-        const totalResourceCountName = 'cloud_service_count';
 
-        const newResourceCountName = 'yesterday_cloud_service_count';
-        const metricAPI = fluentApi.statisticsTest().resource().stat()
-            .setResourceType('inventory.CloudServiceType')
+        const state = reactive({
+            items: [] as any,
+            cardClass: () => ['card-item', 'cloud-service-type-list'],
+            loading: false,
+            keyItems: handlers.keyItems,
+            valueHandlerMap: handlers.valueHandlerMap,
+            tags: [] as any,
+            thisPage: 1,
+            pageSize: 24,
+            totalCount: 0,
+        });
 
-            .addGroupKey('name', 'cloud_service_type')
-            .addGroupKey('cloud_service_type_id', 'cloud_service_type_id')
-            .addGroupKey('group', 'cloud_service_group')
-            .addGroupKey('provider', 'provider')
-
-            .setJoinKeys(['cloud_service_type', 'cloud_service_group', 'provider'], 0)
-            .setJoinResourceType('inventory.CloudService', 0)
-            .addJoinGroupKey('cloud_service_type', 'cloud_service_type', 0)
-            .addJoinGroupKey('cloud_service_group', 'cloud_service_group', 0)
-            .addJoinGroupKey('provider', 'provider', 0)
-            .addJoinGroupField(totalResourceCountName, STAT_OPERATORS.count, undefined, 0);
-
-        const statData = ref<null|any>(null);
-
-        const getMetric = (resp: AxiosResponse<CloudServiceTypeListResp>) => {
-            const ids = resp.data.results.map(item => item.cloud_service_type_id);
-            statData.value = null;
-            metricAPI.setFilter(
-                { key: 'cloud_service_type_id', operator: '=', value: ids },
-            ).execute().then((rp) => {
-                const data = {};
-                rp.data.results.forEach((item) => {
-                    data[item.cloud_service_type_id] = item;
-                });
-                statData.value = data;
-            });
-            return resp;
+        const listRegionByProvider = async (selectedProvider) => {
+            try {
+                if (selectedProvider === 'all') {
+                    const res = await fluentApi.inventory().region().list()
+                        .execute();
+                    filterState.regionList = res.data.results.map(d => ({ ...d }));
+                } else if (selectedProvider) {
+                    const res = await fluentApi.inventory().region().list().setFixFilter({
+                        key: 'region_type',
+                        value: selectedProvider,
+                        operator: FILTER_OPERATOR.contain,
+                    })
+                        .execute();
+                    filterState.regionList = res.data.results.map(d => ({ ...d }));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const onClickService = async (val) => {
+            filterState.serviceCategories[val] = !filterState.serviceCategories[val];
+            if (filterState.serviceFilter.includes(val)) {
+                const idx = filterState.serviceFilter.indexOf(val);
+                if (idx > -1) {
+                    filterState.serviceFilter.splice(idx, 1);
+                }
+            } else if (!filterState.serviceFilter.includes(val)) filterState.serviceFilter.push(val);
+        };
+        const onClickRegion = async (val, region) => {
+            if (filterState.selectedRegionIdx.includes(val)) {
+                const idx = filterState.selectedRegionIdx.indexOf(val);
+                if (idx > -1) {
+                    filterState.selectedRegionIdx.splice(idx, 1);
+                    filterState.regionFilter.splice(idx, 1);
+                }
+            } else if (!filterState.selectedRegionIdx.includes(val)) {
+                filterState.selectedRegionIdx.push(val);
+                filterState.regionFilter.push(region.region_code);
+            }
         };
 
-        const listAction = fluentApi.inventory().cloudServiceType().list()
-            .setOnly('provider', 'group', 'name', 'tags.spaceone:icon', 'cloud_service_type_id')
-            .setTransformer(getMetric);
-
-        const apiHandler = new SearchGridFluentAPI(
-            listAction,
-            {
-                cardClass: () => ['card-item', 'cst-card-item'],
-                cardMinWidth: '28rem',
-                cardHeight: '6rem',
-                excelVisible: false,
-            },
-            undefined,
-        );
-
-        const clickCard = (item) => {
-            vm.$router.push({
+        /**
+         * Card click event
+         * */
+        const getToCloudService = (item) => {
+            const filters: QueryTag[] = [];
+            state.tags.forEach((tag) => {
+                if (tag.key) {
+                    if (tag.key.name === 'project_id') filters.push(tag);
+                }
+            });
+            filterState.regionFilter.forEach((d) => {
+                filters.push({ key: { name: 'data.region_name', label: 'region' }, value: { name: d, label: d }, operator: FILTER_OPERATOR.in });
+            });
+            const res: Location = {
                 name: 'cloudServicePage',
                 params: {
                     provider: item.provider,
-                    group: item.group,
-                    name: item.name,
+                    group: item.cloud_service_group,
+                    name: item.cloud_service_type,
                 },
-            });
+                query: {
+                    f: queryTagsToQueryString(filters),
+                },
+            };
+            return res;
         };
 
-        const goToServiceAccount = () => {
-            vm.$router.push({
-                name: 'serviceAccount',
-            });
+        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
+            if (Array.isArray(tags)) {
+                return tags.map((tag) => {
+                    let item;
+                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
+                    else item = `${tag.value?.name}`;
+                    return item;
+                });
+            }
+            return null;
         };
 
-        const dataSource = [
-            { name: 'provider', key: 'provider' },
-            { name: 'group', key: 'group' },
-            { name: 'name', key: 'name' },
-        ];
-        const exportAction = fluentApi.addons().excel().export().setDataSource(dataSource);
-        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
-
-
-        const requestProvider = async () => {
-            const resp = await cstCountApi.execute();
-            let total = 0;
-            const data: any = { };
-            resp.data.results.forEach((item) => {
-                const count = item[cstCountName];
-                total += count;
-                data[item.provider] = count;
-            });
-            data.all = total;
-            providerTotalCount.value = data;
+        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
+            if (!urlQueryString) return [];
+            if (Array.isArray(urlQueryString)) {
+                return urlQueryString.reduce((res, qs) => {
+                    if (qs) res.push(parseTag(qs));
+                    return res;
+                }, [] as QueryTag[]);
+            }
+            return [parseTag(urlQueryString as string)];
         };
-
-
-        /** Query String */
+        const setSearchTags = () => {
+            state.tags = urlQueryStringToSearchTags(vm.$route.query.f);
+        };
         const queryRefs = {
+            f: makeQueryStringComputed(state.tags,
+                {
+                    key: 'f',
+                    setter: queryTagsToOriginal,
+                    getter: queryTagsToQueryString,
+                }),
             provider: makeQueryStringComputed(selectProvider, { key: 'provider', disableAutoReplace: true }),
-            g_s: makeQueryStringComputed(ref(undefined), { key: 'g_s' }),
-            ...makeQueryStringComputeds(apiHandler.gridTS.syncState, {
+            ...makeQueryStringComputeds(state, {
                 pageSize: { key: 'g_ps', setter: Number },
                 thisPage: { key: 'g_p', setter: Number },
             }),
         };
 
-        const onSearch = async (e) => {
-            if (!e) apiHandler.gridTS.searchText.value = '';
-            await apiHandler.getData();
-            queryRefs.g_s.value = e || undefined;
+        const onChange = async (options) => {
+            state.tags = options.queryTags;
+            const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
+            // eslint-disable-next-line no-empty-function
+            await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
+            state.pageSize = options.pageSize;
+            state.thisPage = options.thisPage;
         };
 
-        /** Init */
+        const filters = computed(() => [
+            { key: 'provider', operator: '=', value: selectProvider.value },
+            { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
+            { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
+            state.thisPage,
+            state.pageSize,
+            state.tags,
+        ]);
+
+        const handleNullValuesForFilter = (value) => {
+            if (value[0].value === 'all') value[0].value = '';
+            if (value[1].value.length === 0) value[1].value = [''];
+            if (value[2].value.length === 0) value[2].value = '';
+            return value;
+        };
+
+        watch(() => filters.value, async (after, before) => {
+            if (after !== before) {
+                state.loading = true;
+                handleNullValuesForFilter(after);
+                const [providerFilter, region, label, pageStart, pageSize] = [after[0].value, after[1].value, after[2].value, after[3], after[4]];
+                try {
+                    const res = await fluentApi.statisticsTest().topic().cloudServiceType()
+                        .setStart(((pageStart - 1) * pageSize) + 1)
+                        .setLimit(pageSize)
+                        .setFilter(
+                            { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
+                            { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
+                            ...state.tags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })),
+                        )
+                        .setLabels(label)
+                        .showAll(true)
+                        .execute();
+                    state.items = res.data.results;
+                    state.totalCount = res.data.total_count || 0;
+                    state.loading = false;
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        });
+
+        const routeState = reactive({
+            route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' }],
+        });
+
         const init = async () => {
-            await requestProvider();
-
-            // init search text by query string
-            apiHandler.gridTS.searchText.value = queryRefs.g_s.value || '';
-
-            // init search text by query string
-            apiHandler.gridTS.searchText.value = vm.$route.query.g_s as string;
-
-            if (providerListState.state.items.length > 0) {
+            if (providerState.items.length > 0) {
                 // set selected provider
                 const res = queryRefs.provider.value;
-                selectProvider.value = res || providerListState.state.items[0].provider;
-
-
-                await apiHandler.getData();
+                selectProvider.value = res || providerState.items[0].provider;
+                await setSearchTags();
                 watch(selectProvider, _.debounce(async (after) => {
                     if (!after) return;
-                    if (after === 'all') listAction.setFixFilter();
-                    else {
-                        apiHandler.action = listAction.setFixFilter(
-                            { key: 'provider', operator: '=', value: after },
-                        );
+                    if (after === 'all') {
+                        await listRegionByProvider(after);
+                    } else {
+                        await listRegionByProvider(after);
                     }
-                    await apiHandler.getData();
                     await replaceQuery('provider', after);
-                }, 50), { lazy: true });
+                }, 50));
             }
         };
 
         init();
 
         return {
+            filterState,
+            // filters,
+            listRegionByProvider,
+            onClickService,
+            onClickRegion,
+            ...toRefs(routeState),
+            ...toRefs(state),
             selectProvider,
-            selectProviderName,
-            apiHandler,
-            clickCard,
-            goToServiceAccount,
             providerStore,
-            statData,
-            providerListState,
-            providerTotalCount,
-            exportToolSet,
-            newResourceCountName,
-            totalResourceCountName,
-            onSearch,
+            providerState,
+            getToCloudService,
+            skeletons: _.range(5),
+            onChange,
         };
     },
 
@@ -359,55 +439,78 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .cst-toolbox-bottom {
-        @apply flex flex-col-reverse items-start justify-between w-full mb-4;
-
-        @screen lg {
-            @apply flex-row items-center;
-        }
-        .search-bar {
-            @apply flex-1;
-
-            @screen lg {
-                @apply max-w-1/2;
-            }
-        }
-        .checkbox {
-            @apply whitespace-no-wrap;
-        }
+    .sidebar-title {
+        @apply text-gray-500 text-sm font-bold;
+        padding-top: 2.25rem;
+        padding-left: 1rem;
+    }
+    #service-category-title {
+        @apply text-gray-500 text-sm font-bold;
+        padding-top: 1.375rem;
+        padding-left: 1rem;
+    }
+    .sidebar-divider {
+        @apply w-full;
+        padding-left: 0;
+        margin-top: 0.5625rem;
+        margin-bottom: 1rem;
     }
     .provider-list {
-        @apply w-full px-4 pt-6;
-    }
-    >>> .provider-card-item {
-        @apply px-4 py-3 flex items-center justify-between bg-transparent;
-
-        .left {
-            @apply flex items-center;
-            .title {
-                @apply ml-4;
-            }
+        @apply justify-between text-sm;
+        padding-left: 1rem;
+        padding-right: 1.1875rem;
+        .provider-divider {
+            @apply bg-gray-100;
+            margin-top: 0.625rem;
+            margin-bottom: 0.5625rem;
         }
-        .right {
-            .total-count {
-                @apply w-10 flex h-6 ml-2 justify-center items-center text-white;
-                border-radius: 6.25rem;
-                border-width: 0.0625rem;
-            }
+        .provider-icon {
+            @apply inline justify-start;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5625rem;
         }
-        &.selected {
-            @apply border-secondary bg-blue-200 text-secondary;
-            .left {
-                .title {
-                    @apply text-secondary;
-                }
-            }
+        .provider-name {
+            /*&:hover {*/
+            /*    @apply text-secondary;*/
+            /*}*/
+        }
+        .provider-radio-btn {
+            @apply float-right;
         }
     }
+    .region-list {
+        @apply text-sm;
+        margin-left: 1rem;
+        margin-bottom: 0.875rem;
+        .region-type {
+            padding-left: 0.75rem;
+        }
+        .region-code {
+            @apply text-gray-400;
+            padding-left: 2rem;
+        }
+    }
 
-    >>> .cst-card-item {
-        @apply p-6 flex flex-row justify-between items-center;
+    .service-categories {
+        @apply text-sm;
+        margin-left: 1rem;
+        padding-bottom: 0.625rem;
+        .service {
+            padding-left: 0.75rem;
+        }
+    }
 
+    >>> .cloud-service-type-list {
+        @apply border border-gray-200 rounded overflow-visible;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        a {
+            @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center rounded overflow-hidden;
+            &:hover {
+                @apply bg-blue-100;
+                cursor: pointer;
+            }
+        }
         .left {
             @apply inline-flex items-center;
             img {
@@ -440,28 +543,17 @@ export default {
                 }
             }
         }
-        .right {
-            @apply inline-flex items-center;
-            .total-count {
-                @apply font-bold text-2xl;
-            }
-            .today-created {
-                @apply border-green-500 flex h-6 ml-2 justify-center items-center mr-2;
-                border-radius: 6.25rem;
-                border-width: 0.0625rem;
-                min-width: 2.5rem;
-                .number {
-                    @apply font-bold text-sm text-green-500 w-auto h-4 text-right;
-                    line-height: 1.0625rem;
-                }
-            }
-        }
         &:hover {
-             @apply border-gray-200 bg-blue-100;
-             cursor: pointer;
-         }
+            @apply border-gray-200 bg-blue-100;
+            cursor: pointer;
+        }
     }
-    .pagetitle {
+    .page-title {
         margin-bottom: 0;
+    }
+    .empty-cloud-service {
+        .empty-cloud-service-img {
+            @apply w-48 mx-auto pt-19 mb-8;
+        }
     }
 </style>
