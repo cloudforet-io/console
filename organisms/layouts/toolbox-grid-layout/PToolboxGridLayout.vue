@@ -73,34 +73,12 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.
 import PTextPagination from '@/components/organisms/pagination/PTextPagination.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/components/util/composition-helpers';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
 import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
-
-const setTools = (props, context) => {
-    const state = reactive({
-        proxyThisPage: makeProxy('thisPage', props, context.emit),
-        proxyPageSize: makeProxy('pageSize', props, context.emit),
-        pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
-    });
-    const changePageNumber = (page) => {
-        state.proxyThisPage = page;
-        context.emit('changePageNumber', page);
-    };
-    const changePageSize = (size) => {
-        const sizeNum = Number(size);
-        if (props.pageSize !== sizeNum) {
-            state.proxyPageSize = sizeNum;
-            state.proxyThisPage = 1;
-            context.emit('changePageSize', sizeNum);
-        }
-    };
-    return {
-        ...toRefs(state),
-        changePageNumber,
-        changePageSize,
-    };
-};
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {
     name: 'PToolboxGridLayout',
@@ -138,11 +116,11 @@ export default {
         },
         pageSize: {
             type: Number,
-            default: 12,
+            default: 24,
         },
         pageNationValues: {
             type: Array,
-            default: () => [12, 24, 36],
+            default: () => [24, 36, 48],
         },
         allPage: {
             type: Number,
@@ -153,10 +131,29 @@ export default {
         },
     },
     setup(props, context) {
-        const toolState = setTools(props, context);
+        const vm = getCurrentInstance() as ComponentInstance;
 
+        const state = reactive({
+            proxyThisPage: makeOptionalProxy('thisPage', vm),
+            proxyPageSize: makeOptionalProxy('pageSize', vm),
+            pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
+        });
+        const changePageNumber = (page) => {
+            state.proxyThisPage = page;
+            context.emit('changePageNumber', page);
+        };
+        const changePageSize = (size) => {
+            const sizeNum = Number(size);
+            if (props.pageSize !== sizeNum) {
+                state.proxyPageSize = sizeNum;
+                state.proxyThisPage = 1;
+                context.emit('changePageSize', sizeNum);
+            }
+        };
         return {
-            ...toolState,
+            ...toRefs(state),
+            changePageSize,
+            changePageNumber,
         };
     },
 
