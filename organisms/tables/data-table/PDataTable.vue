@@ -1,166 +1,148 @@
 <template>
     <div class="p-data-table">
-        <table ref="table"
-               :class="{
-                   striped: striped,
-                   bordered: bordered,
-                   'no-hover': !hover,
-                   [tableStyleType]: true,
-               }"
-               :style="{
-                   width: getTableWidth()
-               }"
-        >
-            <thead>
-                <slot name="head" :fields="fieldsData">
-                    <!--                    <tr v-if="loading || items.length === 0">-->
-                    <!--                        <th :colspan="selectable? fieldsData.length +1 :fieldsData.length">-->
-                    <!--                            <span class="th-contents">&zwnj;</span>-->
-                    <!--                        </th>-->
-                    <!--                    </tr>-->
-                    <tr>
-                        <th v-if="selectable" class="all-select">
-                            <p-check-box v-if="multiSelect"
-                                         v-model="allState"
-                                         @change="selectAllToggle"
-                            />
-                        </th>
-                        <th
-                            v-for="(field, index) in fieldsData"
-                            :key="index"
-                            :style="{
-                                minWidth: field.width || undefined,
-                                width: field.width || undefined,
-                            }"
-                            :class="{'fix-width': colCopy}"
-                            @click="theadClick(field, index, $event)"
-                            @mouseenter="thHoverIndex=index"
-                            @mouseleave="thHoverIndex=null"
-                        >
-                            <slot :name="`th-${field.name}`" :index="index" :field="field"
-                                  :sortable="sortable"
+        <div class="table-container">
+            <table ref="table"
+                   :class="{
+                       striped: striped,
+                       bordered: bordered,
+                       'no-hover': !hover,
+                       [tableStyleType]: true,
+                   }"
+                   :style="{ width: getTableWidth() }"
+            >
+                <thead>
+                    <slot name="head" :fields="fieldsData">
+                        <tr v-if="showHeader" class="fade-in">
+                            <th v-if="selectable" class="all-select">
+                                <p-check-box v-if="multiSelect"
+                                             v-model="allState"
+                                             @change="selectAllToggle"
+                                />
+                            </th>
+                            <th
+                                v-for="(field, index) in fieldsData"
+                                :key="index"
+                                :style="{
+                                    minWidth: field.width || undefined,
+                                    width: field.width || undefined,
+                                }"
+                                :class="{'fix-width': colCopy}"
+                                @click="theadClick(field, index, $event)"
+                                @mouseenter="thHoverIndex=index"
+                                @mouseleave="thHoverIndex=null"
                             >
-                                <span class="th-contents">
-                                    <span>
-                                        {{ field.label ? field.label : field.name }}
-                                        <p-copy-button v-if="colCopy"
-                                                       class="ml-2"
-                                                       @copy="clickColCopy(index)"
-                                        />
-                                    </span>
-
-                                    <template v-if="sortable&&field.sortable">
-                                        <p-i
-                                            v-if="sortable&&(field.sortKey|| field.name)===sortBy"
-                                            :name="sortIcon"
-                                            class="sort-icon"
-                                        />
-                                        <p-i v-else
-                                             name="ic_table_sort"
-                                             class="sort-icon"
-                                        />
-                                    </template>
-                                </span>
-                            </slot>
-                        </th>
-                    </tr>
-                </slot>
-            </thead>
-            <tbody>
-                <slot v-if="loading" name="loading">
-                    <!--                    <tr v-for="s in skeletons" :key="s">-->
-                    <!--                        <td v-if="selectable" class="!pr-0  min-w-4 w-4">-->
-                    <!--                            &lt;!&ndash;                                <p-skeleton width="1rem" height="1rem" />&ndash;&gt;-->
-                    <!--                        </td>-->
-                    <!--                        <td v-for="(field, index) in fieldsData" :key="index">-->
-                    <!--                            <slot :name="'skeleton-'+field.name" :index="index" :field="field">-->
-                    <!--                                &lt;!&ndash;                                    <p-skeleton />&ndash;&gt;-->
-                    <!--                            </slot>-->
-                    <!--                        </td>-->
-                    <!--                    </tr>-->
-                    <tr v-if="loading" key="loading" class="tr-no-data">
-                        <td :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                            <p-lottie name="spinner" :size="2"
-                                      :auto="true"
-                            />
-                        </td>
-                    </tr>
-                </slot>
-                <slot v-else-if="showNoData" name="no-data" :fields="fieldsData">
-                    <tr key="noData" class="tr-no-data">
-                        <td :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                            {{ $t('ORGANISMS.NO_DATA') }}
-                        </td>
-                    </tr>
-                </slot>
-                <slot v-else name="body" :items="items">
-                    <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
-                          :item="item" :index="index"
-                    >
-                        <slot :name="'row-'+index"
-                              :item="item"
-                              :index="index"
-                              :fields="fieldsName"
-                        >
-                            <tr :key="index" :data-index="index"
-                                :class="{
-                                    'tr-selected': isSelected(index),
-                                    'row-height-fixed': rowHeightFixed
-                                } "
-                                v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
-                                @click.left="rowLeftClick( item, index, $event )"
-                                @click.right="rowRightClick( item, index, $event )"
-                                @click.middle="rowMiddleClick( item, index, $event )"
-                                @mouseover="rowMouseOver(item,index, $event)"
-                                @mouseout="rowMouseOut(item,index, $event)"
-                            >
-                                <td v-if="selectable"
-                                    class="select-checkbox"
-                                    @click.stop.prevent="selectClick"
-                                    @mouseenter="hoverIndex=index"
-                                    @mouseleave="hoverIndex=null"
+                                <slot :name="`th-${field.name}`" :index="index" :field="field"
+                                      :sortable="sortable"
                                 >
-                                    <p-check-box v-if="multiSelect"
-                                                 v-model="proxySelectIndex"
+                                    <span class="th-contents">
+                                        <span>
+                                            {{ field.label ? field.label : field.name }}
+                                            <p-copy-button v-if="colCopy"
+                                                           class="ml-2"
+                                                           @copy="clickColCopy(index)"
+                                            />
+                                        </span>
+
+                                        <template v-if="sortable && field.sortable">
+                                            <p-i
+                                                v-if="sortable && (field.sortKey|| field.name) === sortBy"
+                                                :name="sortIcon"
+                                                class="sort-icon"
+                                            />
+                                            <p-i v-else
+                                                 name="ic_table_sort"
+                                                 class="sort-icon"
+                                            />
+                                        </template>
+                                    </span>
+                                </slot>
+                            </th>
+                        </tr>
+                    </slot>
+                </thead>
+                <tbody>
+                    <slot v-if="showNoData" name="no-data" :fields="fieldsData">
+                        <div class="no-data">
+                            No Items
+                        </div>
+                        <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
+                    </slot>
+                    <slot name="body" :items="items">
+                        <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
+                              :item="item" :index="index"
+                        >
+                            <slot :name="'row-'+index"
+                                  :item="item"
+                                  :index="index"
+                                  :fields="fieldsName"
+                            >
+                                <tr :key="index" :data-index="index"
+                                    class="fade-in"
+                                    :class="{
+                                        'tr-selected': isSelected(index),
+                                        'row-height-fixed': rowHeightFixed
+                                    } "
+                                    v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
+                                    @click.left="rowLeftClick( item, index, $event )"
+                                    @click.right="rowRightClick( item, index, $event )"
+                                    @click.middle="rowMiddleClick( item, index, $event )"
+                                    @mouseover="rowMouseOver(item,index, $event)"
+                                    @mouseout="rowMouseOut(item,index, $event)"
+                                >
+                                    <td v-if="selectable"
+                                        class="select-checkbox"
+                                        @click.stop.prevent="selectClick"
+                                        @mouseenter="hoverIndex=index"
+                                        @mouseleave="hoverIndex=null"
+                                    >
+                                        <p-check-box v-if="multiSelect"
+                                                     v-model="proxySelectIndex"
+                                                     :value="index"
+                                                     :hovered="hoverIndex===index"
+                                        />
+                                        <p-radio v-else
+                                                 v-model="proxySelectIndex[0]"
                                                  :value="index"
                                                  :hovered="hoverIndex===index"
-                                    />
-                                    <p-radio v-else
-                                             v-model="proxySelectIndex[0]"
-                                             :value="index"
-                                             :hovered="hoverIndex===index"
-                                    />
-                                </td>
-                                <slot v-for="(field, i) in fieldsName"
-                                      :name="'col-'+field"
-                                      :item="item"
-                                      :value=" item? item[field] :''"
-                                      :index="index"
-                                      :field="field"
-                                >
-                                    <td :key="i"
-                                        v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
-                                    >
-                                        <slot
-                                            :name="'col-'+field+'-format'"
-                                            :item="item"
-                                            :value="getValueFunc(item,field)"
-                                            :index="index"
-                                            :field="field"
-                                        >
-                                            {{ getValueFunc(item,field) }}
-                                        </slot>
+                                        />
                                     </td>
-                                </slot>
-                            </tr>
+                                    <slot v-for="(field, i) in fieldsName"
+                                          :name="'col-'+field"
+                                          :item="item"
+                                          :value=" item? item[field] :''"
+                                          :index="index"
+                                          :field="field"
+                                    >
+                                        <td :key="i"
+                                            v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
+                                        >
+                                            <slot
+                                                :name="'col-'+field+'-format'"
+                                                :item="item"
+                                                :value="getValueFunc(item,field)"
+                                                :index="index"
+                                                :field="field"
+                                            >
+                                                {{ getValueFunc(item,field) }}
+                                            </slot>
+                                        </td>
+                                    </slot>
+                                </tr>
+                            </slot>
                         </slot>
                     </slot>
-                </slot>
-            </tbody>
-            <tfoot>
-                <slot name="foot" />
-            </tfoot>
-        </table>
+                </tbody>
+                <tfoot>
+                    <slot name="foot" />
+                </tfoot>
+            </table>
+        </div>
+        <slot v-if="showLoading" name="loading">
+            <div class="loading-backdrop fade-in" />
+            <p-lottie name="thin-spinner" :size="2.5"
+                      :auto="true" class="loading"
+            />
+        </slot>
     </div>
 </template>
 
@@ -181,24 +163,6 @@ import { DataTableField, DataTableSetupProps } from './PDataTable.toolset';
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/PCheckBox.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
 const PCopyButton = () => import('@/components/molecules/buttons/copy-button/PCopyButton.vue');
-
-
-const loadingHandler = (props) => {
-    onMounted(() => {
-        if (props.useCursorLoading && props.loading) {
-            document.body.style.cursor = 'progress';
-        }
-    });
-    watch(() => props.loading, (value) => {
-        if (props.useCursorLoading) {
-            if (value) {
-                document.body.style.cursor = 'progress';
-            } else {
-                document.body.style.cursor = 'default';
-            }
-        }
-    });
-};
 
 
 export default {
@@ -241,7 +205,7 @@ export default {
         },
         loading: {
             type: Boolean,
-            default: false,
+            default: undefined,
         },
         useCursorLoading: {
             type: Boolean,
@@ -286,12 +250,13 @@ export default {
         const sortIcon = computed(() => (props.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
         // @ts-ignore
         const copyTargetElement = computed(() => state.table.children[1].children);
+
+        const showLoading = ref(true);
+        const showHeader = ref(false);
         const showNoData = computed(() => {
-            // eslint-disable-next-line no-prototype-builtins
-            if (!props.items || !props.items.hasOwnProperty('length') || props.items.length === 0) {
-                if (props.loading) {
-                    return false;
-                }
+            if (showHeader.value && (
+                !props.items || !Array.isArray(props.items) || props.items.length === 0
+            )) {
                 return true;
             }
             return false;
@@ -445,7 +410,33 @@ export default {
             }
         });
 
-        loadingHandler(props);
+        onMounted(() => {
+            if (props.useCursorLoading && props.loading) {
+                document.body.style.cursor = 'progress';
+            }
+        });
+        watch(() => props.loading, (value) => {
+            if (typeof value !== 'boolean') {
+                showHeader.value = true;
+                showLoading.value = false;
+                return;
+            }
+
+            if (props.useCursorLoading) {
+                if (value) {
+                    document.body.style.cursor = 'progress';
+                } else {
+                    document.body.style.cursor = 'default';
+                }
+            }
+
+            if (value) {
+                showLoading.value = true;
+            } else {
+                if (!showHeader.value) showHeader.value = true;
+                showLoading.value = false;
+            }
+        });
 
 
         const getValueFunc = computed(() => {
@@ -457,10 +448,10 @@ export default {
 
         const getTableWidth = () => {
             if (props.width) return props.width;
-            if (!props.colWidth) return undefined;
-            const num = props.colWidth.match(/\d+/g);
-            const unit = props.colWidth.match(/[a-zA-Z]+/g);
-            if (num && unit) return `${Number(num[0]) * props.fields.length}${unit[0]}`;
+            // if (!props.colWidth) return undefined;
+            // const num = props.colWidth.match(/\d+/g);
+            // const unit = props.colWidth.match(/[a-zA-Z]+/g);
+            // if (num && unit) return `${Number(num[0]) * props.fields.length}${unit[0]}`;
             return undefined;
         };
 
@@ -504,6 +495,8 @@ export default {
             fieldsName,
             sortIcon,
             showNoData,
+            showLoading,
+            showHeader,
             isSelected,
             rowLeftClick,
             rowRightClick,
@@ -533,19 +526,17 @@ export default {
             background-color: $th-bg-color;
             height: 2rem;
         }
+        &.bordered {
+            td {
+                border-bottom: 1px solid $border-color;
+            }
+        }
         tr {
             &.tr-selected {
                 @apply text-secondary bg-blue-200;
             }
             &:not(.no-hover):hover {
                 background-color: $hover-color;
-            }
-        }
-        &.bordered {
-            tr:not(.tr-no-data) {
-                td {
-                    border-bottom: 1px solid $border-color;
-                }
             }
         }
         &.striped {
@@ -562,7 +553,10 @@ export default {
     }
 
     .p-data-table {
-        @apply overflow-auto h-full w-full relative;
+        @apply h-full w-full relative;
+        .table-container {
+            @apply overflow-auto h-full w-full;
+        }
         table {
             @apply min-w-full;
             border-collapse: separate;
@@ -612,25 +606,51 @@ export default {
                     @apply truncate;
                 }
             }
-            &.tr-no-data {
-                @apply border-transparent;
-                td {
-                    @apply border-transparent text-primary2 border-0 text-center py-12 text-2xl;
-                    &:hover {
-                        @apply bg-white;
-                    }
-                    line-height: 120%;
-                }
-            }
         }
 
         .select-checkbox {
             @apply cursor-pointer min-w-4 w-4;
         }
 
-        /*.loading-spinner {*/
-        /*    @apply absolute w-full h-full justify-center items-center;*/
-        /*}*/
+        .no-data {
+            @apply absolute justify-center items-center flex w-full h-full text-gray-300 text-center;
+            line-height: 120%;
+            font-size: 1.125rem;
+            max-height: 16.875rem;
+            top: 0;
+        }
+
+        .loading-backdrop {
+            @apply absolute w-full h-full overflow-hidden;
+            background-color: white;
+            opacity: 0.5;
+            top: 0;
+            z-index: 1;
+        }
+
+        .loading {
+            @apply absolute flex w-full h-full justify-center items-center;
+            top: 0;
+            max-height: 16.875rem;
+        }
+
+        .fake-row {
+            @apply opacity-0;
+        }
+
+        /* transitions */
+        .fade-in-enter-active {
+            transition: opacity 0.2s;
+        }
+        .fade-in-leave-active {
+            transition: opacity 0.2s;
+        }
+        .fade-in-enter, .fade-in-leave-to {
+            opacity: 0;
+        }
+        .fade-in-leave, .fade-in-enter-to {
+            opacity: 0.5;
+        }
 
         /* themes */
         .default {

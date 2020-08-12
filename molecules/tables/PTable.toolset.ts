@@ -29,10 +29,6 @@ export const tableProps = {
         type: String,
         default: undefined,
     },
-    colWidth: {
-        type: String,
-        default: undefined,
-    },
     rowHeightFixed: {
         type: Boolean,
         default: true,

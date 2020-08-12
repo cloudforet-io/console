@@ -73,7 +73,7 @@ export interface DataTableSyncType {
     sortBy: string;
     sortDesc: boolean;
     selectIndex: any[]|number;
-    loading: boolean;
+    loading?: boolean;
 }
 export interface DataTableFieldType {
     name: string;
@@ -92,15 +92,14 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     selectable: boolean;
     selectIndex: any[]|number;
     colCopy: boolean;
-    loading: boolean;
+    loading?: boolean;
     useCursorLoading: boolean;
     skeletonRows: number;
     multiSelect: boolean;
     sortBy: string;
     sortDesc: boolean;
-    width?: string;
-    colWidth?: string;
     rowHeightFixed: boolean;
+    width?: string;
 }
 
 export type DataTableProps = DataTableSetupProps;

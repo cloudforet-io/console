@@ -12,7 +12,6 @@
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
         :width="width"
-        :col-width="colWidth"
         :row-height-fixed="rowHeightFixed"
         :setting-visible="false"
         :use-cursor-loading="true"
@@ -157,10 +156,6 @@ export default {
         rowHeightFixed: {
             type: Boolean,
             default: true,
-        },
-        colWidth: {
-            type: String,
-            default: undefined,
         },
     },
     setup(props: DynamicLayoutProps) {

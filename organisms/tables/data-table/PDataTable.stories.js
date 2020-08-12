@@ -1,24 +1,33 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
-import { boolean } from '@storybook/addon-knobs';
+import {
+    text, number, select, object, boolean,
+} from '@storybook/addon-knobs/vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { DataTableToolSet } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import md from '@/components/organisms/tables/data-table/PDataTable.md';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import casual, { arrayOf } from '@/components/util/casual';
+import { orderBy } from 'lodash';
 
 export default {
-    title: 'organisms/tables/datatable',
+    title: 'organisms/tables/DataTable',
     component: PDataTable,
     parameters: {
         notes: md,
     },
 };
 const actions = {
+    select: action('select'),
     rowLeftClick: action('rowLeftClick'),
     rowRightClick: action('rowRightClick'),
     rowMiddleClick: action('rowMiddleClick'),
     rowMouseOver: action('rowMouseOver'),
     rowMouseOut: action('rowMouseOut'),
+    theadClick: action('theadClick'),
+    changeSort: action('changeSort'),
 };
 const data = {
     fields: ['name', 'phone', 'email'],
@@ -26,7 +35,6 @@ const data = {
     sortBy: null,
     sortDesc: true,
 };
-
 
 const mockupMixin = {
     methods: {
@@ -40,82 +48,139 @@ const mockupMixin = {
     },
     computed: {
         items() {
-            const data = [];
+            const dataset = [];
             for (let step = 0; step < 5; step++) {
-                data.push(this.getUser());
+                dataset.push(this.getUser());
             }
-            return data;
+            return dataset;
         },
     },
 };
-export const datatable = () => ({
+
+export const defaultCase = () => ({
     components: { PDataTable },
-    mixins: [mockupMixin],
-    template: `
-        <div style="background-color: white;">
-<PDataTable 
-    :items="items" 
-    :fields="fields"
-    :hover="true"
-    @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
->
-</PDataTable>
-        </div>
-`,
-    data() {
-        return {
-            ...data,
-        };
+    props: {
+        fields: {
+            default: object('fields', ['name', 'phone', 'email']),
+        },
+        itemCount: {
+            default: number('itemCount', 10),
+        },
+        loading: {
+            default: boolean('loading', false),
+        },
+        selectable: {
+            default: boolean('selectable', false),
+        },
+        colCopy: {
+            default: boolean('colCopy', false),
+        },
+        useCursorLoading: {
+            default: boolean('useCursorLoading', false),
+        },
+        skeletonRows: {
+            default: number('skeletonRows', 5),
+        },
+        multiSelect: {
+            default: boolean('multiSelect', false),
+        },
+        rowClickMultiSelectMode: {
+            default: boolean('rowClickMultiSelectMode', false),
+        },
+        rowHeightFixed: {
+            default: boolean('rowHeightFixed', true),
+        },
+        width: {
+            default: text('width', undefined),
+        },
     },
-    methods: {
-        ...actions,
+    template: `
+        <div style="display: flex; 
+                    justify-content: center; 
+                    align-items: center; 
+                    height: 100vh; 
+                    width: 100vw; 
+                    background-color: beige;">
+            <div style="background-color: white; 
+                        height: 80%; 
+                        width: 80%;">
+                <PDataTable v-bind="$props"
+                            :items="items"
+                            v-on="actions"
+                >
+                </PDataTable>
+            </div>
+        </div>
+    `,
+    setup(props) {
+        const state = reactive({
+            items: [],
+        });
+
+        const getUsers = () => {
+            state.items = arrayOf(props.itemCount, () => {
+                const res = {};
+                props.fields.forEach((d) => {
+                    res[d] = casual.word;
+                });
+                return res;
+            });
+        };
+
+        watch([() => props.fields, () => props.itemCount], () => {
+            getUsers();
+        });
+
+
+        return {
+            ...toRefs(state),
+            actions,
+        };
     },
 });
 
-export const usingToolSet = () => ({
+export const sortCase = () => ({
     components: { PDataTable },
-    mixins: [mockupMixin],
+    props: {
+        sortable: {
+            default: boolean('sortable', true),
+        },
+    },
     template: `
-        <div style="background-color: white;">
-<PDataTable 
-    v-bind="ts.state"
-    @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
->
-</PDataTable>
-        </div>
-`,
+            <div>
+                <PDataTable :sortable="sortable"
+                            :sort-by.sync="sortBy"
+                            :sort-desc.sync="sortDesc"
+                            :fields="fields"
+                            :items="items"
+                            @changeSort="onChangeSort"
+                >
+                </PDataTable>
+                <p>sort by : {{sortBy}}, sort desc : {{sortDesc}}</p>
+            </div>
+    `,
     setup() {
-        const ts = new DataTableToolSet(data);
-        return {
-            ts,
-            ...actions,
-        };
-    },
-});
+        const state = reactive({
+            fields: ['name', 'phone', 'email'],
+            items: arrayOf(10, () => ({
+                name: casual.full_name,
+                phone: casual.phone,
+                email: casual.email,
+            })),
+            sortBy: 'name',
+            sortDesc: true,
+        });
 
-export const dataTableWithSortFunctionality = () => ({
-    components: { PDataTable },
-    mixins: [mockupMixin],
-    template: `
-<div>
-<p>sort by : {{sortBy}}, sort desc : {{sortDesc}}</p>
-</div>
-`,
-    data() {
+
         return {
-            ...data,
+            ...toRefs(state),
+            onChangeSort(sortBy, sortDesc) {
+                if (sortBy) {
+                    state.items = orderBy(state.items, [sortBy], [sortDesc ? 'desc' : 'asc']);
+                }
+                action('changeSort')(sortBy, sortDesc);
+            },
         };
-    },
-    methods: {
-        ...actions,
     },
 });
 
@@ -227,11 +292,11 @@ export const rowVBind = () => ({
     },
     computed: {
         items() {
-            const data = [];
+            const dataset = [];
             for (let step = 0; step < 20; step++) {
-                data.push(this.getUser(step));
+                dataset.push(this.getUser(step));
             }
-            return data;
+            return dataset;
         },
     },
 });

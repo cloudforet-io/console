@@ -72,7 +72,6 @@
             :use-cursor-loading="useCursorLoading"
             :skeleton-rows="pageSize"
             :width="width"
-            :col-width="colWidth"
             :row-height-fixed="rowHeightFixed"
             v-on="$listeners"
             @changeSort="changeSort"
@@ -164,7 +163,7 @@ export default {
             pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
             proxyPageSize: makeOptionalProxy('pageSize', vm),
             proxyThisPage: makeOptionalProxy('thisPage', vm),
-            proxySelectIndex: makeOptionalProxy('SelectIndex', vm),
+            proxySelectIndex: makeOptionalProxy('selectIndex', vm),
             proxySortBy: makeOptionalProxy('sortBy', vm),
             proxySortDesc: makeOptionalProxy('sortDesc', vm),
         });

@@ -14,7 +14,6 @@
         :setting-visible="false"
         :use-cursor-loading="true"
         :width="width"
-        :col-width="colWidth" l
         :row-height-fixed="rowHeightFixed"
         v-on="$listeners"
         @changePageSize="getData"
@@ -138,10 +137,6 @@ export default {
         rowHeightFixed: {
             type: Boolean,
             default: true,
-        },
-        colWidth: {
-            type: String,
-            default: undefined,
         },
     },
     setup(props: DynamicLayoutProps, { emit }) {
