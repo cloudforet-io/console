@@ -5,8 +5,7 @@
                                :placeholder="selectedProjectGroup ? 'project' : 'e.g. project/project group'"
                                :disable-icon="!!selectedProjectGroup"
                                :menu="menu"
-                               :loading="loading"
-                               :visible-menu="visibleMenu"
+                               :visible-menu.sync="visibleMenu"
                                :is-focused.sync="isFocused"
                                @delete="onDeleteAll"
                                @input="onInput"
@@ -22,12 +21,6 @@
                 >
                     <span class="text">{{ selectedProjectGroup.name }}</span>
                 </div>
-            </template>
-            <template #menu-loading>
-                <span />
-                <!--                <p-lottie class="mt-6" name="spinner" auto-->
-                <!--                          :size="1.5"-->
-                <!--                />-->
             </template>
             <template #menu-no-data>
                 <div class="text-center">
@@ -52,9 +45,9 @@
                     <template v-else>
                         <span>{{ item.label }}</span>
                     </template>
-<!--                    <template v-if="item.dataType === 'PROJECT'">-->
-<!--                        <span class="link-icon"><p-i name="ic_external-link" height="0.875rem" width="0.875rem" /></span>-->
-<!--                    </template>-->
+                    <!--                    <template v-if="item.dataType === 'PROJECT'">-->
+                    <!--                        <span class="link-icon"><p-i name="ic_external-link" height="0.875rem" width="0.875rem" /></span>-->
+                    <!--                    </template>-->
                 </div>
             </template>
             <template #menu-header-more="{item}">
@@ -147,8 +140,6 @@ interface State {
     projectGroupStart: number;
     projectStart: number;
     menu: Readonly<MenuItem[]>;
-    noMenuData: boolean;
-    loading: boolean;
     visibleMenu: boolean;
     isFocused: boolean;
 }
@@ -194,8 +185,7 @@ export default {
             projectStart: 1,
             menu: computed<MenuItem[]>(() => {
                 const menuOptions: MenuOption[] = [];
-                if (state.selectedProjectGroup === null
-                    && state.projectGroupItems.length > 0) {
+                if (state.selectedProjectGroup === null) {
                     menuOptions.push({
                         title: 'Project group',
                         items: state.projectGroupItems,
@@ -205,20 +195,16 @@ export default {
                         icon: 'ic_tree_project-group',
                     });
                 }
-                if (state.projectItems.length > 0) {
-                    menuOptions.push({
-                        title: 'Project',
-                        items: state.projectItems,
-                        type: 'PROJECT',
-                        count: state.projectTotalCount,
-                        showMore: state.projectTotalCount > state.projectStart * LIMIT,
-                        icon: 'ic_tree_project',
-                    });
-                }
+                menuOptions.push({
+                    title: 'Project',
+                    items: state.projectItems,
+                    type: 'PROJECT',
+                    count: state.projectTotalCount,
+                    showMore: state.projectTotalCount > state.projectStart * LIMIT,
+                    icon: 'ic_tree_project',
+                });
                 return makeMenuItems(...menuOptions);
             }),
-            noMenuData: computed<boolean>(() => state.projectGroupItems.length === 0 && state.projectItems.length === 0),
-            loading: false,
             visibleMenu: false,
             isFocused: true,
         });
@@ -255,7 +241,8 @@ export default {
                 });
             }
             const res = await api.setThisPage(state.projectGroupStart).execute();
-            state.projectGroupItems = [...state.projectGroupItems, ...res.data.results];
+            if (state.projectGroupStart === 1) state.projectGroupItems = res.data.results;
+            else state.projectGroupItems = [...state.projectGroupItems, ...res.data.results];
             state.projectGroupTotalCount = res.data.total_count;
         };
 
@@ -271,22 +258,20 @@ export default {
                 });
             }
             const res = await api.setThisPage(state.projectStart).execute();
-            state.projectItems = [...state.projectItems, ...res.data.results];
+            if (state.projectStart === 1) state.projectItems = res.data.results;
+            else state.projectItems = [...state.projectItems, ...res.data.results];
             state.projectTotalCount = res.data.total_count;
         };
 
         const listItems = async () => {
-            state.loading = true;
-            state.projectItems = [];
-            state.projectGroupItems = [];
             state.projectStart = 1;
             state.projectGroupStart = 1;
             try {
                 await Promise.all([listProjectGroups(), listProjects()]);
             } catch (e) {
                 console.error(e);
-            } finally {
-                state.loading = false;
+                state.projectItems = [];
+                state.projectGroupItems = [];
             }
         };
 
@@ -296,7 +281,6 @@ export default {
         const onInput = debounce(async (e?) => {
             if (!state.visibleMenu) showMenu();
             await listItems();
-            if (state.projectGroupItems.length === 0 && state.projectItems.length === 0) hideMenu();
         }, 300);
 
         watch(() => props.projectGroup, async (pg) => {
@@ -307,7 +291,7 @@ export default {
         });
 
 
-        const emitSearch = (value?: string, projectGroup: ProjectGroup|null = null) => {
+        const emitSearch = (value?: string, projectGroup: ProjectGroup|null = null, hide = true) => {
             let val = value;
             if (typeof value === 'string') val = value.trim();
             if (!val) val = '';
@@ -316,7 +300,7 @@ export default {
                 value: val,
             };
             emit('search', res);
-            hideMenu();
+            if (hide) hideMenu();
             state.isFocused = false;
         };
 
@@ -332,7 +316,9 @@ export default {
                     name: item.label as string,
                 };
                 state.proxySearchText = '';
-                emitSearch(value, projectGroup);
+                emitSearch(value, projectGroup, false);
+                state.projectGroupStart = 1;
+                listProjectGroups();
                 state.isFocused = true;
             } else {
                 state.proxySearchText = '';
