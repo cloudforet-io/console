@@ -16,39 +16,49 @@
                      class="provider-icon"
                 />
                 <span class="provider-name">{{ provider.name }}</span>
-                <p-radio v-model="selectProvider" :value="provider.provider" class="provider-radio-btn" />
+                <p-radio v-model="selectedProvider" :value="provider.provider" class="provider-radio-btn" />
             </div>
-            <p class="sidebar-title">
-                Region
-            </p>
-            <p-hr class="sidebar-divider" />
-            <div v-for="(region, idx) in filterState.regionList" :key="idx"
-                 class="region-list"
-            >
-                <p-check-box :selected="filterState.selectedRegionIdx" :value="idx"
-                             @change="onClickRegion(idx, region)"
-                />
-                <span class="region-type">[{{ region.region_type }}] {{ region.name }} <br> </span>
-                <span class="region-code">/ {{ region.region_code }} </span>
+            <div id="service-category-title">
+                Service Categories
             </div>
-            <div id="service-category-title">Service Categories</div>
             <p-hr class="sidebar-divider" />
             <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
-                 class="service-categories" :class="{selected: checked}"
+                 :class="{selected: checked}"
+                 class="service-categories" @click.stop="onClickService(service)"
             >
                 <p-check-box :selected="filterState.serviceCategories[service]" :value="true"
                              @change="onClickService(service)"
                 />
                 <span class="service">{{ service }}</span>
             </div>
+            <p class="sidebar-title">
+                Regions
+            </p>
+            <p-hr class="sidebar-divider" />
+            <div v-if="filterState.regionList.length === 0">
+                <p class="no-region">
+                    No Region
+                </p>
+            </div>
+            <div v-for="(region, idx) in filterState.regionList" :key="idx"
+                 :class="{selected: region}"
+                 class="region-list" @click.stop="onClickRegion(idx, region)"
+            >
+                <p-check-box :selected="filterState.selectedRegionIdx" :value="idx"
+                             @change="onClickRegion(idx, region)"
+                />
+                <span class="region-type">[{{ region.region_type }}] {{ region.name }} <br> </span>
+                <span class="region-code">{{ region.region_code }} </span>
+            </div>
         </template>
         <template #default>
             <div class="page-navigation">
                 <p-page-navigation :routes="route" />
             </div>
-            <p-page-title :title="selectProvider.toUpperCase()" use-total-count :total-count="totalCount"
+            <p-page-title :title="selectedProviderName" use-total-count :total-count="totalCount"
                           class="page-title"
             />
+            <p-hr class="cloud-service-divider" />
             <div class="cloud-services">
                 <p-search-grid-layout
                     :items="items"
@@ -61,6 +71,7 @@
                     :key-items="keyItems"
                     :value-handler-map="valueHandlerMap"
                     @change="onChange"
+                    @refresh="onChange"
                 >
                     <template #no-data>
                         <div v-if="!items || items.length === 0" class="text-center empty-cloud-service">
@@ -68,7 +79,7 @@
                             <p class="text-primary2 mb-12">
                                 We need your registration for monitoring cloud resources.
                             </p>
-                            <router-link :to="`/identity/service-account/?provider=${selectProvider}`">
+                            <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
                                 <p-icon-text-button style-type="primary" name="ic_plus_bold"
                                                     class="mx-auto text-center"
                                 >
@@ -162,6 +173,12 @@ import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
+const PROVIDER_NAME_MAP = Object.freeze({
+    all: 'All',
+    aws: 'AWS',
+    google_cloud: 'Google Cloud',
+    azure: 'Microsoft Azure',
+});
 
 export default {
     name: 'CloudServiceType',
@@ -185,7 +202,8 @@ export default {
         providerStore.getProvider();
         const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
 
-        const selectProvider = ref('all');
+        const selectedProvider = ref('all');
+
         const providerState = reactive({
             items: computed(() => {
                 const result = [{
@@ -197,7 +215,15 @@ export default {
                 return result;
             }),
         });
-
+        const selectedProviderName = computed(() => {
+            let name = '';
+            providerState.items.forEach((d) => {
+                if (d.provider === selectedProvider.value) {
+                    name = d.name;
+                }
+            });
+            return name;
+        });
         const filterState = reactive({
             serviceCategories: _.zipObject([
                 'Compute', 'Container', 'Database', 'Networking', 'Storage', 'Security', 'Analytics', 'Application Integration', 'Management',
@@ -207,7 +233,6 @@ export default {
             selectedRegionIdx: [] as number[],
             regionFilter: [] as string[],
         });
-
         const handlers = makeQuerySearchHandlersWithSearchSchema(
             {
                 title: 'Properties',
@@ -217,7 +242,6 @@ export default {
                     { key: 'project_id', name: 'Project', reference: 'identity.Project' },
                     { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
                     { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
-                    { key: 'data.region_name', name: 'Region' },
                 ],
             },
             'inventory.CloudService',
@@ -225,6 +249,7 @@ export default {
 
         const state = reactive({
             items: [] as any,
+            providerName: 'All',
             cardClass: () => ['card-item', 'cloud-service-type-list'],
             loading: false,
             keyItems: handlers.keyItems,
@@ -235,16 +260,16 @@ export default {
             totalCount: 0,
         });
 
-        const listRegionByProvider = async (selectedProvider) => {
+        const listRegionByProvider = async (selectedProviderValue) => {
             try {
-                if (selectedProvider === 'all') {
+                if (selectedProviderValue === 'all') {
                     const res = await fluentApi.inventory().region().list()
                         .execute();
                     filterState.regionList = res.data.results.map(d => ({ ...d }));
-                } else if (selectedProvider) {
+                } else if (selectedProviderValue) {
                     const res = await fluentApi.inventory().region().list().setFixFilter({
                         key: 'region_type',
-                        value: selectedProvider,
+                        value: selectedProviderValue,
                         operator: FILTER_OPERATOR.contain,
                     })
                         .execute();
@@ -277,8 +302,8 @@ export default {
         };
 
         /**
-         * Card click event
-         * */
+             * Card click event
+             * */
         const getToCloudService = (item) => {
             const filters: QueryTag[] = [];
             state.tags.forEach((tag) => {
@@ -335,30 +360,12 @@ export default {
                     setter: queryTagsToOriginal,
                     getter: queryTagsToQueryString,
                 }),
-            provider: makeQueryStringComputed(selectProvider, { key: 'provider', disableAutoReplace: true }),
+            provider: makeQueryStringComputed(selectedProvider, { key: 'provider', disableAutoReplace: true }),
             ...makeQueryStringComputeds(state, {
                 pageSize: { key: 'g_ps', setter: Number },
                 thisPage: { key: 'g_p', setter: Number },
             }),
         };
-
-        const onChange = async (options) => {
-            state.tags = options.queryTags;
-            const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
-            // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
-            state.pageSize = options.pageSize;
-            state.thisPage = options.thisPage;
-        };
-
-        const filters = computed(() => [
-            { key: 'provider', operator: '=', value: selectProvider.value },
-            { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
-            { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
-            state.thisPage,
-            state.pageSize,
-            state.tags,
-        ]);
 
         const handleNullValuesForFilter = (value) => {
             if (value[0].value === 'all') value[0].value = '';
@@ -367,29 +374,61 @@ export default {
             return value;
         };
 
-        watch(() => filters.value, async (after, before) => {
+        const listCloudServiceType = async (after) => {
+            state.loading = true;
+            handleNullValuesForFilter(after);
+            const [providerFilter, region, label] = [after[0].value, after[1].value, after[2].value];
+            try {
+                const res = await fluentApi.statisticsTest().topic().cloudServiceType()
+                    .setStart(((state.thisPage - 1) * state.pageSize) + 1)
+                    .setLimit(state.pageSize)
+                    .setFilter(
+                        { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
+                        { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
+                        ...state.tags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })),
+                    )
+                    .setLabels(label)
+                    .showAll(true)
+                    .execute();
+                state.items = res.data.results;
+                state.totalCount = res.data.total_count || 0;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const leftFilters = computed(() => [
+            { key: 'provider', operator: '=', value: selectedProvider.value },
+            { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
+            { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
+        ]);
+
+        const changeQueryString = async (options) => {
+            const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
+            const newQuery = {
+                g_ps: Number(options.pageSize),
+                g_p: Number(options.thisPage),
+                f: urlQueryString,
+            };
+                // eslint-disable-next-line no-empty-function
+            await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {
+            });
+        };
+
+        const onChange = async (options?: any) => {
+            if (options) {
+                state.tags = options.queryTags;
+                state.pageSize = options.pageSize;
+                state.thisPage = options.thisPage;
+                await changeQueryString(options);
+            }
+            await listCloudServiceType(leftFilters.value);
+        };
+
+        watch(() => leftFilters.value, async (after, before) => {
             if (after !== before) {
-                state.loading = true;
-                handleNullValuesForFilter(after);
-                const [providerFilter, region, label, pageStart, pageSize] = [after[0].value, after[1].value, after[2].value, after[3], after[4]];
-                try {
-                    const res = await fluentApi.statisticsTest().topic().cloudServiceType()
-                        .setStart(((pageStart - 1) * pageSize) + 1)
-                        .setLimit(pageSize)
-                        .setFilter(
-                            { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
-                            { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
-                            ...state.tags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })),
-                        )
-                        .setLabels(label)
-                        .showAll(true)
-                        .execute();
-                    state.items = res.data.results;
-                    state.totalCount = res.data.total_count || 0;
-                    state.loading = false;
-                } catch (e) {
-                    console.error(e);
-                }
+                await listCloudServiceType(after);
             }
         });
 
@@ -401,9 +440,9 @@ export default {
             if (providerState.items.length > 0) {
                 // set selected provider
                 const res = queryRefs.provider.value;
-                selectProvider.value = res || providerState.items[0].provider;
+                selectedProvider.value = res || providerState.items[0].provider;
                 await setSearchTags();
-                watch(selectProvider, _.debounce(async (after) => {
+                watch(selectedProvider, _.debounce(async (after) => {
                     if (!after) return;
                     if (after === 'all') {
                         await listRegionByProvider(after);
@@ -419,13 +458,13 @@ export default {
 
         return {
             filterState,
-            // filters,
+            selectedProviderName,
             listRegionByProvider,
             onClickService,
             onClickRegion,
             ...toRefs(routeState),
             ...toRefs(state),
-            selectProvider,
+            selectedProvider,
             providerStore,
             providerState,
             getToCloudService,
@@ -455,6 +494,7 @@ export default {
         margin-top: 0.5625rem;
         margin-bottom: 1rem;
     }
+
     .provider-list {
         @apply justify-between text-sm;
         padding-left: 1rem;
@@ -470,19 +510,21 @@ export default {
             height: 1.5rem;
             margin-right: 0.5625rem;
         }
-        .provider-name {
-            /*&:hover {*/
-            /*    @apply text-secondary;*/
-            /*}*/
-        }
         .provider-radio-btn {
             @apply float-right;
         }
+    }
+    .no-region {
+        @apply text-gray-400 text-sm;
+        padding-left: 1rem;
     }
     .region-list {
         @apply text-sm;
         margin-left: 1rem;
         margin-bottom: 0.875rem;
+        &:hover {
+            @apply text-secondary cursor-pointer;
+        }
         .region-type {
             padding-left: 0.75rem;
         }
@@ -491,16 +533,22 @@ export default {
             padding-left: 2rem;
         }
     }
-
     .service-categories {
         @apply text-sm;
         margin-left: 1rem;
         padding-bottom: 0.625rem;
         .service {
             padding-left: 0.75rem;
+            &:hover {
+                @apply text-secondary cursor-pointer;
+            }
         }
     }
-
+    .cloud-service-divider {
+        @apply w-full;
+        margin-top: 1.6875rem;
+        margin-bottom: 1.5rem;
+    }
     >>> .cloud-service-type-list {
         @apply border border-gray-200 rounded overflow-visible;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);

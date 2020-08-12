@@ -14,7 +14,7 @@
 
                 <div class="side-item">
                     <header>
-                        <span class="title">Project Group</span>
+                        <span class="title">Project Groups</span>
                         <p-button class="action-btn" @click="openProjectGroupForm(null)">
                             Create
                         </p-button>
