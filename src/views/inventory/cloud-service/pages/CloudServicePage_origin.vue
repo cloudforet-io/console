@@ -42,7 +42,6 @@
                         </p-dropdown-menu-btn>
                     </template>
                 </s-dynamic-layout>
-                <!--                <p-dynamic-layout :options="tableSchema.options" />-->
             </template>
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
@@ -213,7 +212,7 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentInstance;
 
-        const fieldMap = {
+        const filedMap = {
             project_id: {
                 key: 'console_force_data.project',
                 type: 'text',
@@ -227,11 +226,10 @@ export default {
                 ...state.originFields,
                 ...baseTable.options.fields,
             ]),
-            fields: computed(() => state.mergeFields.map(field => fieldMap[field.key] || field)),
+            fields: computed(() => state.mergeFields.map(field => filedMap[field.key] || field)),
             options: computed(() => ({
                 fields: state.fields,
             })),
-            tableSchema: {},
         });
 
         const routeState = reactive({
@@ -240,6 +238,7 @@ export default {
         });
 
         const { project } = useStore();
+        project.getProject();
         const csListAction = fluentApi.inventory().cloudService().list()
             .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
                 const result = resp;
@@ -313,6 +312,7 @@ export default {
             apiHandler.tableTS.querySearch.valueHandlerMap = makeValueHandlerMapWithReference(keys, 'inventory.CloudService');
         };
 
+        getFields(props.provider, props.group, props.name);
 
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
@@ -479,6 +479,10 @@ export default {
             thisPage: { key: 'p', setter: Number },
             sortBy: { key: 'sb' },
             sortDesc: { key: 'sd', setter: Boolean },
+            selectIndex: {
+                key: 'sl',
+                setter: queryStringToNumberArray,
+            },
         });
         makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
             {
@@ -486,12 +490,31 @@ export default {
                 setter: queryTagsToOriginal,
                 getter: queryTagsToQueryString,
             });
+        makeQueryStringComputeds(multiItemTab.syncState, {
+            activeTab: { key: 'mt' },
+        });
+        makeQueryStringComputeds(singleItemTab.syncState, {
+            activeTab: { key: 'st' },
+        });
+
+        // const listCloudServiceData = async () => {
+        //     try {
+        //         const res = await apiHandler.getAction().execute();
+        //         apiHandler.tableTS.state.items = res.data.results;
+        //         apiHandler.totalCount.value = res.data.total_count;
+        //         apiHandler.tableTS.setAllPage(res.data.total_count);
+        //     } catch (e) {
+        //         apiHandler.tableTS.state.items = [];
+        //         apiHandler.tableTS.state.allPage = 1;
+        //         apiHandler.totalCount.value = 0;
+        //     } finally {
+        //         apiHandler.tableTS.syncState.loading = false;
+        //     }
+        // };
 
         /** Init */
         const init = async () => {
             // await listCloudServiceData();
-            await getFields(props.provider, props.group, props.name);
-            await project.getProject();
             await apiHandler.getData();
         };
 
