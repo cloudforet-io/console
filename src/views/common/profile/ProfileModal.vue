@@ -120,6 +120,7 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'ProfileModalTemplate',
@@ -137,6 +138,8 @@ export default {
     },
     setup(props, context) {
         const vm: any = getCurrentInstance();
+
+        const { user, domain } = useStore();
 
         const userState = reactive({
             password: '',
@@ -175,8 +178,8 @@ export default {
             // timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
             showValidation: false,
             ...formValidation(userState, updateUserValidations),
-            isLocalType: computed(() => vm.$ls.domain.state.isLocalType),
-            isDomainOwner: computed(() => vm.$ls.user.state.isDomainOwner),
+            isLocalType: computed(() => domain.state.isLocalType),
+            isDomainOwner: computed(() => user.state.isDomainOwner),
         });
 
         const params: any = {};
@@ -211,42 +214,49 @@ export default {
             }
         };
 
+        const syncStore = () => {
+            user.state.language = state.userState.language || 'en';
+            user.state.timezone = state.userState.timezone || 'UTC';
+            localStorage.setItem('user/language', user.state.language as string);
+            localStorage.setItem('user/timezone', user.state.timezone as string);
+        };
+
         const updateOwner = async (parameters) => {
-            await fluentApi.identity().domainOwner().update().setParameter(parameters)
-                .execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'success',
-                        text: 'Update Profile',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                    state.proxyVisible = false;
-                })
-                .catch((e) => {
-                    showErrorMessage('Fail to Update Owner', e, context.root);
+            try {
+                await fluentApi.identity().domainOwner().update().setParameter(parameters)
+                    .execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Profile',
+                    duration: 2000,
+                    speed: 1000,
                 });
+                state.proxyVisible = false;
+                syncStore();
+            } catch (e) {
+                showErrorMessage('Fail to Update Owner', e, context.root);
+            }
         };
 
         const updateUser = async (parameters) => {
-            await fluentApi.identity().user().update().setParameter(parameters)
-                .execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'success',
-                        text: 'Update Profile',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                    state.proxyVisible = false;
-                })
-                .catch((e) => {
-                    showErrorMessage('Fail to Update User', e, context.root);
+            try {
+                await fluentApi.identity().user().update().setParameter(parameters)
+                    .execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Profile',
+                    duration: 2000,
+                    speed: 1000,
                 });
+                state.proxyVisible = false;
+                syncStore();
+            } catch (e) {
+                showErrorMessage('Fail to Update User', e, context.root);
+            }
         };
 
         if (state.isDomainOwner) {

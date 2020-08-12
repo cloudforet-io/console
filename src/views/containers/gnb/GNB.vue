@@ -97,11 +97,11 @@
                         </div>
                         <div class="context-info">
                             <span class="label">Time zone</span>
-                            <span class="value">{{ timezone }}</span>
+                            <span class="value">{{ storeTimezone }}</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Language</span>
-                            <span class="value">{{ language }}</span>
+                            <span class="value">{{ storeLanguage }}</span>
                         </div>
                     </template>
                     <template #divider>
@@ -341,6 +341,8 @@ export default {
             toggleMenu,
             openProfile,
             logOutAction,
+            storeTimezone: computed(() => user.state.timezone),
+            storeLanguage: computed(() => user.state.language),
         };
     },
 };

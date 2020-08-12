@@ -100,9 +100,11 @@ export const platformBadgeColor = Object.freeze({
     LINUX: { backgroundColor: styles.coral.default },
     WINDOWS: { backgroundColor: styles.secondary },
 });
+
+
 export const getTimezone = () => {
     const timezone = localStorage.getItem('user/timezone');
-    return timezone ? JSON.parse(timezone).data || 'UTC' : 'UTC';
+    return timezone || 'UTC';
 };
 export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' for display Timezone
 export const getTimestamp = (momentTime: Moment) => ({

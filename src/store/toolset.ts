@@ -62,7 +62,6 @@ interface UserState {
     timezone: string|null;
     userId: string|null;
     userType: 'USER'|'DOMAIN_OWNER'|null;
-    isLocalType: Readonly<boolean>;
     isDomainOwner: Readonly<boolean>;
     isSignedIn: Readonly<boolean>;
     userUrl: Readonly<string>;
@@ -106,6 +105,8 @@ class UserStore extends Store<UserState> {
         const data = _.get(resp, 'data', {});
         this.state.language = data.language || 'en';
         this.state.timezone = data.timezone || 'UTC';
+        localStorage.setItem('user/language', this.state.language as string);
+        localStorage.setItem('user/timezone', this.state.timezone as string);
     }
 
     async setLanguage(lang: string) {
@@ -133,6 +134,7 @@ interface DomainState {
     domainName: string;
     authType: string;
     pluginOption: any;
+    isLocalType: Readonly<boolean>;
 }
 class DomainStore extends Store<DomainState> {
     constructor(prefix: string) {
