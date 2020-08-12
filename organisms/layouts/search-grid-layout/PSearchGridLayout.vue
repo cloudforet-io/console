@@ -24,18 +24,17 @@
         </template>
         <template #toolbox-bottom>
             <div class="flex flex-col flex-1">
-                <p-query-search class="block lg:hidden mt-4"
+                <p-query-search class="block lg:hidden mb-6"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
                                 :key-items="keyItems"
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
-                <div v-if="tags.length > 0" class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
-                    <p-hr style="width: 100%;" />
-                    <p-query-search-tags style="margin-top: 0.5rem;"
-                                         :tags="tags"
-                                         @delete:tag="deleteTag"
-                                         @delete:all="deleteAllTags"
+                <div v-if="tags.length > 0" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
+                    <p-query-search-tags
+                        :tags="tags"
+                        @delete:tag="deleteTag"
+                        @delete:all="deleteAllTags"
                     />
                 </div>
                 <slot name="toolbox-bottom" />
@@ -52,7 +51,7 @@ import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearc
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { forEach } from 'lodash';
 import { QueryItem } from '@/components/organisms/search/query-search/type';
@@ -81,7 +80,7 @@ export default {
         },
         cardMinWidth: {
             type: String,
-            default: '28rem',
+            default: '20rem',
         },
         cardHeight: {
             type: String,
@@ -140,6 +139,7 @@ export default {
             }),
         });
 
+
         /** Event emitter */
         const emitChange = (options?: Partial<Options>) => {
             emit('change', Object.freeze({
@@ -149,7 +149,10 @@ export default {
         };
 
         const onChangePageSize = (pageSize: number) => {
-            emitChange({ pageSize });
+            if (props.thisPage > (Math.ceil(props.totalCount / pageSize) || 1)) {
+                state.proxyThisPage = 1;
+                emitChange({ pageSize, thisPage: 1 });
+            } else emitChange({ pageSize });
         };
 
         const onChangePageNumber = (thisPage: number) => {

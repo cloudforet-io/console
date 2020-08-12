@@ -185,7 +185,7 @@ export default {
 
     /*    margin-top: 0.5rem; */
         .toolbox-middle {
-            @apply flex flex-no-wrap justify-between items-center mb-4;
+            @apply flex flex-no-wrap justify-between items-center mb-6;
             .left {
                 @apply inline-flex flex-wrap w-auto justify-start;
             }
