@@ -23,7 +23,9 @@
                                    @clickRefresh="listPlugins"
             >
                 <template #toolbox-left>
-                    <p-page-title title="Plugins" use-total-count :total-count="apiHandler.totalCount.value" />
+                    <p-page-title title="Plugins" use-total-count :total-count="apiHandler.totalCount.value"
+                                  child @goBack="$router.go(-1)"
+                    />
                 </template>
                 <template #page-size>
                     <p-select-dropdown v-model="sortBy" :items="sortMenu" @onSelected="listPlugins" />
