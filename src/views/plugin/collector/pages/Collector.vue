@@ -21,6 +21,7 @@
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
                     :page-size.sync="pageSize"
+                    :style="{height: `${height}px`}"
                     @select="onSelect"
                     @change="onChange"
                 >

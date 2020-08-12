@@ -76,7 +76,6 @@ export abstract class BaseTableFluentAPI<
             this.tableTS.syncState.thisPage = 1;
         }
         this.tableTS.syncState.loading = true;
-        this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
         try {
             const res = await this.getAction().execute();
@@ -325,7 +324,6 @@ export abstract class BaseTableAPI<
             this.tableTS.syncState.thisPage = 1;
         }
         this.tableTS.syncState.loading = true;
-        this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
         try {
             const res = await this.requestData();

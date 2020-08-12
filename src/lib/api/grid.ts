@@ -46,7 +46,6 @@ export abstract class BaseGridFluentAPI<
             this.gridTS.syncState.thisPage = 1;
         }
         this.gridTS.syncState.loading = true;
-        this.gridTS.state.items = [];
         // let res: PromiseLike<AxiosResponse<any>>|any = null;
         try {
             const res = await this.getAction().execute();

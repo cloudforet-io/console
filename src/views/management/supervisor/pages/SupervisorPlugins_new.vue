@@ -114,12 +114,12 @@ export default {
         });
 
         const listPlugins = async () => {
-            state.items = [];
             try {
                 const resp = await fluentApi.plugin().supervisorPlugin().list().execute();
                 state.totalCount = resp.data.total_count || 0;
                 state.items = resp.data.results;
             } catch (e) {
+                state.items = [];
                 console.error(e);
             }
         };

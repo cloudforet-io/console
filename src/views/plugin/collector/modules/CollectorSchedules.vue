@@ -147,7 +147,6 @@ export default {
 
         const listSchedules = _.debounce(async (): Promise<void> => {
             state.loading = true;
-            state.items = [];
             state.selectIndex = [];
             state.totalCount = 0;
             try {
@@ -157,6 +156,7 @@ export default {
                 state.items = res.data.results;
                 state.totalCount = res.data.total_count;
             } catch (e) {
+                state.items = [];
                 console.error(e);
             } finally {
                 state.loading = false;

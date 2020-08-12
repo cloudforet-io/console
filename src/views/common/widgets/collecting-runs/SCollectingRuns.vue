@@ -86,7 +86,6 @@ export default {
 
         const getData = async () => {
             ts.syncState.loading = true;
-            ts.state.items = [];
             try {
                 const res = await api.execute();
                 ts.state.items = res.data.results.map(d => ({
@@ -94,6 +93,7 @@ export default {
                     start: d.created_at,
                 }));
             } catch (e) {
+                ts.state.items = [];
                 console.error(e);
             } finally {
                 ts.syncState.loading = false;

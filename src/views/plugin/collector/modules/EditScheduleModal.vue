@@ -235,6 +235,8 @@ export default {
                     .setCollectorId(props.collectorId)
                     .execute();
                 state.schedule = res.data;
+                state.name = state.schedule.name;
+                initSelectedHours();
             } catch (e) {
                 console.error(e);
             } finally {

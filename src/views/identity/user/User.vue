@@ -84,7 +84,6 @@ export default {
         const requestUserList = async () => {
             // console.debug('before', state.loading);
             state.loading = true;
-            state.items = [];
             try {
                 // console.debug('start', state.loading);
                 const res = await context.parent.$http.post('/identity/user/list', {
@@ -97,6 +96,7 @@ export default {
                 state.loading = false;
             } catch (e) {
                 console.error(e);
+                state.items = [];
                 state.loading = false;
             }
         };
