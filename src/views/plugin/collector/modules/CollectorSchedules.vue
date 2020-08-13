@@ -4,8 +4,6 @@
                          :fields="fields"
                          sortable
                          hover
-                         :border="false"
-                         :shadow="false"
                          :sort-by.sync="sortBy"
                          :sort-desc.sync="sortDesc"
                          :all-page="allPage"

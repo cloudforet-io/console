@@ -161,6 +161,9 @@ import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import Chart, { ChartDataSets } from 'chart.js';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
+const DATA_COUNT = 5;
+const DEFAULT_MAX = 1000;
+
 export default {
     name: 'TopProjects',
     components: {
@@ -214,31 +217,31 @@ export default {
         });
 
         const drawChart = (canvas) => {
+            let data;
+
+            if (state.data.length > 0) {
+                data = state.data;
+            } else {
+                data = new Array(DATA_COUNT).fill({ cloud_services: 0, servers: 0 });
+            }
+
             const datasets: ChartDataSets[] = [{
                 label: 'Server',
-                data: state.data.map(d => d.servers) as number[],
+                data: data.map(d => d.servers) as number[],
                 backgroundColor: state.colors.servers,
                 borderColor: state.colors.servers,
             }, {
                 label: 'Cloud Service',
-                data: state.data.map(d => d.cloud_services) as number[],
+                data: data.map(d => d.cloud_services) as number[],
                 backgroundColor: state.colors.cloud_services,
                 borderColor: state.colors.cloud_services,
             }];
-
-            // const max: number = _.max(_.reduceRight(datasets, (res: number[], ds) => {
-            //     ds.data.forEach((d, i) => {
-            //         res[i] = res[i] + d || d;
-            //     });
-            //     return res;
-            // }, [])) as number;
-            // const stepSize = max / (ticksCount || 1);
 
             state.chart = new NSChart(canvas,
                 {
                     type: 'horizontalBar',
                     data: {
-                        labels: state.data.map((d, i) => `Top ${i + 1}`),
+                        labels: data.map((d, i) => `Top ${i + 1}`),
                         datasets,
                     },
                     options: {
@@ -274,6 +277,7 @@ export default {
                                 ticks: {
                                     padding: 10,
                                     fontColor: black,
+                                    max: state.data.length === 0 ? DEFAULT_MAX : undefined,
                                 },
                                 afterTickToLabelConversion(scaleInstance): void {
                                     scaleInstance.ticks[0] = null;
@@ -346,6 +350,7 @@ export default {
                 state.data = res.data.results;
             } catch (e) {
                 console.error(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

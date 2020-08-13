@@ -1,6 +1,8 @@
 <template>
     <p-widget-layout title="History">
-        <div class="text-gray text-xs mb-2">Job Count</div>
+        <div class="text-gray text-xs mb-2">
+            Job Count
+        </div>
         <p-chart-loader :loading="loading" class="chart">
             <template #loader>
                 <p-skeleton width="100%" height="100%" />
@@ -47,6 +49,11 @@ interface Props {
     getAction: (api: HistoryStat<Data>) => HistoryStat<Data>;
 }
 
+const TICKS_COUNT = 5;
+const DAY_COUNT = 7;
+const DEFAULT_MAX = 600;
+const DEFAULT_STEP_SIZE = 100;
+
 export default {
     name: 'SCollectionHistory',
     components: {
@@ -84,29 +91,43 @@ export default {
             loading: true,
         });
 
-        const ticksCount = 5;
-
         const drawChart = (canvas) => {
+            let data;
+            if (state.data.length > 0) {
+                data = state.data;
+            } else {
+                data = _.chain(_.range(0, DAY_COUNT))
+                    .map(i => ({
+                        failure: 0,
+                        success: 0,
+                        date: moment().subtract(i, 'days').toISOString(),
+                    }))
+                    .orderBy(['date'], ['asc'])
+                    .value();
+            }
+
             const datasets = [{
                 label: 'Success',
-                data: state.data.map(d => d.success) as number[],
+                data: data.map(d => d.success) as number[],
                 backgroundColor: LEGEND_COLORS.success,
                 borderColor: LEGEND_COLORS.success,
             }, {
                 label: 'Failure',
-                data: state.data.map(d => d.failure) as number[],
+                data: data.map(d => d.failure) as number[],
                 backgroundColor: LEGEND_COLORS.failure,
                 borderColor: LEGEND_COLORS.failure,
             }];
 
-            const max: number = _.max(datasets.map(ds => _.max(ds.data as number[]))) as number;
-            const stepSize = max / (ticksCount || 1);
+            const max: number = state.data.length === 0 ? DEFAULT_MAX
+                : _.max(datasets.map(ds => _.max(ds.data as number[]))) as number;
+            const stepSize = state.data.length === 0 ? DEFAULT_STEP_SIZE
+                : max / (TICKS_COUNT || 1);
 
 
             state.chart = new NSChart(canvas, {
                 type: 'bar',
                 data: {
-                    labels: state.data.map(d => moment(d.date).format('MM/DD')),
+                    labels: data.map(d => moment(d.date).format('MM/DD')),
                     datasets,
                 },
                 options: {
@@ -134,14 +155,14 @@ export default {
                                 max,
                                 padding: 10,
                                 fontColor: black,
-                                callback(value) {
+                                callback: (value) => {
                                     if (typeof value === 'number') {
                                         return value < 10000 ? numeral(value).format('0,0') : numeral(value).format('0.0a');
                                     }
                                     return value;
                                 },
                             },
-                            afterTickToLabelConversion(scaleInstance): void {
+                            afterTickToLabelConversion: (scaleInstance) => {
                                 scaleInstance.ticks[0] = null;
                                 scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
                             },
@@ -203,14 +224,15 @@ export default {
             .addGroupKey('created_at', 'date')
             .addGroupField('success', STAT_OPERATORS.sum, 'values.success_count')
             .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
-            .setFilter({ key: 'created_at', value: 'now/d-6d', operator: FILTER_OPERATOR.gtTime });
+            .setFilter({ key: 'created_at', value: `now/d-${DAY_COUNT - 1}d`, operator: FILTER_OPERATOR.gtTime });
+
 
         const getData = async (): Promise<void> => {
             state.loading = true;
             state.data = [];
             try {
                 const res = await props.getAction(api).execute();
-                state.data = _.sortBy(res.data.results, 'date');
+                state.data = _.orderBy(res.data.results, ['date'], ['asc']);
             } catch (e) {
                 console.error(e);
             } finally {
