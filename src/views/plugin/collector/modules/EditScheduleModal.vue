@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="scheduleId ?$t('INVENTORY.UPT_SCHEDULE') :$t('INVENTORY.ADD_SCHEDULE')"
+    <p-button-modal :header-title="addMode ? $t('INVENTORY.ADD_SCHEDULE') : $t('INVENTORY.UPT_SCHEDULE')"
                     centered
                     fade
                     backdrop
@@ -85,9 +85,7 @@ export default {
         PButtonModal,
     },
     props: {
-        /**
-             * sync prop
-             */
+        /* sync */
         visible: Boolean,
         collectorId: {
             type: String,
@@ -96,6 +94,10 @@ export default {
         scheduleId: {
             type: String,
             default: '',
+        },
+        addMode: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props, { emit, root }) {
@@ -221,8 +223,8 @@ export default {
             if (!state.isValid) return;
 
             state.loading = true;
-            if (props.scheduleId) await updateSchedule();
-            else await addSchedule();
+            if (props.addMode) await addSchedule();
+            else await updateSchedule();
             state.loading = false;
             state.proxyVisible = false;
         };
@@ -246,7 +248,7 @@ export default {
 
         watch([() => props.collectorId, () => props.scheduleId],
             async ([collectorId, scheduleId]) => {
-                if (collectorId && scheduleId) await getSchedule();
+                if (!props.addMode && collectorId && scheduleId) await getSchedule();
             });
 
 

@@ -17,23 +17,23 @@
                          :multi-select="false"
                          :select-index.sync="selectIndex"
                          use-cursor-loading
-                         :responsive-style="{overflow: 'auto'}"
+                         :rowHeightFixed="false"
                          @changePageSize="listSchedules"
                          @changePageNumber="listSchedules"
                          @clickRefresh="listSchedules"
                          @changeSort="listSchedules"
         >
             <template slot="toolbox-left">
-                <PIconTextButton style-type="primary-dark"
-                                 name="ic_plus_bold"
-                                 @click="openEditModal(null)"
+                <p-icon-text-button style-type="primary-dark"
+                                    name="ic_plus_bold"
+                                    @click="openEditModal(true)"
                 >
                     {{ $t('BTN.ADD') }}
-                </PIconTextButton>
+                </p-icon-text-button>
 
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="ml-4"
-                                     @click-update="openEditModal(items[selectIndex[0]])"
+                                     @click-update="openEditModal(false)"
                                      @click-delete="deleteVisible = true"
                 >
                     {{ $t('BTN.ACTION') }}
@@ -58,6 +58,7 @@
                              :visible.sync="editVisible"
                              :collector-id="collectorId"
                              :schedule-id="items[selectIndex[0]] ? items[selectIndex[0]].schedule_id : null"
+                             :add-mode="isAddMode"
                              @success="listSchedules"
         />
 
@@ -117,8 +118,7 @@ export default {
             fields: makeTrItems([
                 ['schedule_id', 'COMMON.ID'],
                 ['name', 'COMMON.NAME'],
-                ['schedule', 'COMMON.SCHEDULE', { sortable: false }],
-                ['last_schedule_at', 'COMMON.LAST_SCHEDULED'],
+                ['schedule', 'COMMON.SCHEDULE', { sortable: false, width: '25rem' }],
                 ['created_at', 'COMMON.CREATED'],
             ], parent),
             dropdown: computed(() => makeTrItems([
@@ -136,12 +136,14 @@ export default {
                 ['schedule_id', 'COMMON.ID'],
                 ['name', 'COMMON.NAME'],
             ], parent),
+            isAddMode: true,
         });
 
         const timezone = vm.$ls.user.state.timezone || 'UTC';
         const getUtcHour = hour => moment.tz(moment.utc({ hour }), timezone).hour();
 
-        const openEditModal = (item) => {
+        const openEditModal = (addMode: boolean) => {
+            state.isAddMode = addMode;
             state.editVisible = true;
         };
 
@@ -203,3 +205,8 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+    .p-toolbox-table {
+        border-width: 0;
+    }
+</style>

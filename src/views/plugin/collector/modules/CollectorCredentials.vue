@@ -147,6 +147,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.p-toolbox-table {
+    border-width: 0;
+}
 .credential-btn {
     float: right;
 }
