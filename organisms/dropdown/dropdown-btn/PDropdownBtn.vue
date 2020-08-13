@@ -70,7 +70,7 @@ export default defineComponent({
 }
 
 .menu-btn.p-button {
-    @apply border-gray-300 text-gray-900 px-4 justify-start text-left flex-grow font-normal;
+    @apply border-gray-300 text-gray-900 px-2 justify-start text-left flex-grow font-normal;
     width: auto;
     min-width: unset;
     margin-right: -1px;

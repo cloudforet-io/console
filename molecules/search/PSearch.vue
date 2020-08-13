@@ -98,7 +98,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-search {
-        @apply flex items-center border border-gray-300 bg-white text-gray-900 px-3 w-full;
+        @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full;
         border-radius: 2px;
         height: 2rem;
         line-height: 2rem;
