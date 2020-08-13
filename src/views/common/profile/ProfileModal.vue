@@ -120,7 +120,7 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { useStore } from '@/store/toolset';
+import {useStore} from "@/store/toolset";
 
 export default {
     name: 'ProfileModalTemplate',

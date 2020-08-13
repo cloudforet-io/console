@@ -109,22 +109,14 @@ class UserStore extends Store<UserState> {
         localStorage.setItem('user/timezone', this.state.timezone as string);
     }
 
-    async setLanguage(lang: string) {
-        try {
-            if (this.state.isDomainOwner) {
-                await fluentApi.identity().domainOwner().update()
-                    .setOnwerId(this.state.userId as string)
-                    .setLanguage(lang)
-                    .execute();
-            } else {
-                await fluentApi.identity().user().update()
-                    .setId(this.state.userId as string)
-                    .setLanguage(lang)
-                    .execute();
-            }
-            localStorage.setItem('user/language', lang);
-        } catch (e) {
-            console.error(e);
+    sync(data: Partial<UserState>) {
+        if (data) {
+            _.forEach(data, (d, k) => {
+                if (this.state[k] !== d) {
+                    this.state[k] = d;
+                    localStorage.setItem(`user/${k}`, typeof d === 'string' ? d : JSON.stringify(d));
+                }
+            });
         }
     }
 }

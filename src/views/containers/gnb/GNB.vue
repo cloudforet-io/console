@@ -308,6 +308,7 @@ export default {
                 userState.language = res.data.language;
                 userState.timezone = res.data.timezone;
                 vm.$i18n.locale = res.data.language;
+                user.sync(userState);
             } catch (e) {
                 console.error(e);
             }
