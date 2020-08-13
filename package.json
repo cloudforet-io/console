@@ -37,6 +37,7 @@
     "fuse.js": "^3.4.6",
     "hashids": "^2.2.1",
     "highlight.js": "^10.0.2",
+    "jsonschema": "^1.2.6",
     "jsonwebtoken": "^8.5.1",
     "liquor-tree": "^0.2.70",
     "lockr": "^0.8.5",

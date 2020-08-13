@@ -23,37 +23,34 @@
                 <div class="flex-grow">
                     <p-field-group :label="$t('COMMON.NAME')"
                                    :invalid-text="nameInvalidText"
-                                   :invalid="!isNameValid"
+                                   :invalid="!nameValidator.valid"
                                    :required="true"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="newName" block
+                            <p-text-input v-model="name" block
                                           class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
-                                          @keyup="onNameInputChange"
                             />
                         </template>
                     </p-field-group>
 
                     <p-field-group :label="$t('COMMON.PRIORITY')"
                                    :invalid-text="priorityInvalidText"
-                                   :invalid="!isPriorityValid"
+                                   :invalid="!priorityValidator.valid"
                                    :required="true"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="newPriority" block
+                            <p-text-input v-model.number="priority" block
                                           type="number"
                                           class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
-                                          @change="onPriorityInputChange"
-                                          @keyup="onPriorityInputChange"
                             />
                         </template>
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.VERSION')"
                                    :required="true"
                     >
-                        <p-select-dropdown v-model="newVersion" :items="versions" />
+                        <p-select-dropdown v-model="version" :items="versions" />
                     </p-field-group>
                 </div>
             </div>
@@ -74,17 +71,20 @@
 </template>
 
 <script lang="ts">
-import { toRefs, reactive, computed } from '@vue/composition-api';
 import { get, cloneDeep } from 'lodash';
-import { makeProxy } from '@/lib/compostion-util';
+import { Validator } from 'jsonschema';
+
+import { toRefs, reactive, computed } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+
 import { fluentApi } from '@/lib/fluent-api';
+import { makeProxy } from '@/lib/compostion-util';
 import { CollectorPluginModel, CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
@@ -106,12 +106,12 @@ export default {
         },
     },
     setup(props, { root, emit }) {
+        const validator = new Validator();
         const state = reactive({
             loading: true,
+            collector: null,
             imageUrl: computed(() => get(state.collector, 'tags.icon', '')),
             proxyVisible: makeProxy<boolean>('visible', props, emit),
-            isValid: true,
-            collector: null,
             pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info')),
             confirmBtnBind: computed(() => {
                 const defaultStyle: any = { style: { padding: 0 }, disabled: !state.isValid };
@@ -119,15 +119,34 @@ export default {
                 return defaultStyle;
             }),
             //
-            newCollectorParam: {} as CollectorUpdateParameter,
-            newName: '',
-            newPriority: null,
-            newVersion: null,
-            isNameValid: true,
-            isPriorityValid: true,
-            nameInvalidText: '',
-            priorityInvalidText: '',
+            collectorUpdateParam: {} as CollectorUpdateParameter,
             versions: [],
+            names: [],
+            name: '',
+            priority: 10,
+            version: null,
+            //
+            errorText: {
+                format: 'name is duplicated',
+                minLength: 'should NOT be shorter than 2 characters',
+                minimum: 'should be >= 1',
+                maximum: 'should be <= 10',
+            },
+            nameValidator: computed(() => validator.validate(state.name, {
+                type: 'string',
+                required: true,
+                minLength: 2,
+                format: 'nameFormat',
+            })),
+            priorityValidator: computed(() => validator.validate(state.priority, {
+                type: 'number',
+                required: true,
+                minimum: 1,
+                maximum: 10,
+            })),
+            nameInvalidText: computed(() => state.errorText[state.nameValidator.errors[0]?.name]),
+            priorityInvalidText: computed(() => state.errorText[state.priorityValidator.errors[0]?.name]),
+            isValid: computed(() => state.nameValidator.valid && state.priorityValidator.valid),
         });
 
         const getCollector = async (): Promise<void> => {
@@ -135,13 +154,19 @@ export default {
                 const res = await fluentApi.inventory().collector().get().setId(props.collectorId)
                     .execute();
                 state.collector = res.data;
-                state.newName = res.data.name;
-                state.newPriority = res.data.priority;
-                state.newVersion = res.data.plugin_info.version;
+                state.name = res.data.name;
+                state.priority = Number(res.data.priority);
+                state.version = res.data.plugin_info.version;
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Get Collector', e, root);
             }
+        };
+        const getNames = async () => {
+            const res = await fluentApi.inventory().collector().list()
+                .setFilter({ key: 'name', operator: '!=', value: state.name })
+                .execute();
+            state.names = res.data.results.map(v => v.name);
         };
         const getVersions = async () => {
             try {
@@ -161,58 +186,28 @@ export default {
             }
         };
 
-        const onNameInputChange = (e) => {
-            if (e.target.value.length < 2) {
-                state.isNameValid = false;
-                state.nameInvalidText = 'should NOT be shorter than 2 characters';
-                state.isValid = false;
-            } else {
-                state.isNameValid = true;
-                state.nameInvalidText = '';
-                state.isValid = true;
-            }
-        };
-        const onPriorityInputChange = (e) => {
-            if (e.target.value > 11) {
-                state.isPriorityValid = false;
-                state.priorityInvalidText = 'should be <= 10';
-                state.isValid = false;
-            } else if (e.target.value < 1) {
-                state.isPriorityValid = false;
-                state.priorityInvalidText = 'should be >= 1';
-                state.isValid = false;
-            } else {
-                state.isPriorityValid = true;
-                state.priorityInvalidText = '';
-                state.isValid = true;
-            }
-        };
-
         const onClickReset = (): void => {
             if (state.loading) return;
-            state.newName = get(state.collector, 'name', '');
-            state.newPriority = get(state.collector, 'priority', null);
-            state.newVersion = get(state.collector, 'plugin_info.version', null);
-            state.isValid = true;
+            state.name = get(state.collector, 'name', '');
+            state.priority = get(state.collector, 'priority', null);
+            state.version = get(state.collector, 'plugin_info.version', null);
         };
         const onClickConfirm = async (): Promise<void> => {
             if (state.isValid) {
                 state.loading = true;
 
                 const newPluginInfo = cloneDeep(state.pluginInfo);
-                newPluginInfo.version = state.newVersion;
-                state.newCollectorParam = {
-                    // eslint-disable-next-line camelcase
+                newPluginInfo.version = state.version;
+                state.collectorUpdateParam = {
                     collector_id: props.collectorId,
-                    name: state.newName,
-                    // eslint-disable-next-line camelcase
+                    name: state.name,
                     plugin_info: newPluginInfo,
-                    priority: state.newPriority,
+                    priority: state.priority,
                 };
 
                 try {
                     await fluentApi.inventory().collector().update()
-                        .setParameter(state.newCollectorParam)
+                        .setParameter(state.collectorUpdateParam)
                         .setId(props.collectorId)
                         .execute();
                     showSuccessMessage('success', 'Update Collector', root);
@@ -229,6 +224,10 @@ export default {
         const init = async () => {
             state.loading = true;
             await getCollector();
+            //
+            await getNames();
+            validator.customFormats.nameFormat = input => !(state.names.includes(input)); // set name custom format
+            //
             await getVersions();
             state.loading = false;
         };
@@ -238,8 +237,6 @@ export default {
             ...toRefs(state),
             onClickReset,
             onClickConfirm,
-            onNameInputChange,
-            onPriorityInputChange,
         };
     },
 };

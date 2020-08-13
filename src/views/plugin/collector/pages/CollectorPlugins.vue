@@ -2,51 +2,56 @@
     <p-vertical-page-layout :min-width="200" :init-width="260">
         <template #sidebar="{width}">
             <div :style="{width: width}">
-                <plugin-filter :query-tag-tool="apiHandler.gridTS.querySearch"
-                               :repositories="repoState.repositories"
-                               :selected-repo-id.sync="repoState.selectedRepoId"
-                               @search="search"
+                <plugin-filter :repositories="repositories"
+                               :selected-repo-id.sync="selectedRepositoryId"
+                               :resource-type-search-tags.sync="resourceTypeSearchTags"
+                               @search="onSearch"
                 />
             </div>
         </template>
         <template #default>
             <div class="page-navigation">
-                <p-page-navigation :routes="route" />
+                <p-page-navigation :routes="routes" />
             </div>
-            <p-toolbox-grid-layout v-bind="apiHandler.gridTS.state"
-                                   :this-page.sync="apiHandler.gridTS.syncState.thisPage"
-                                   :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                                   :loading.sync="apiHandler.gridTS.syncState.loading"
-                                   class="plugin-list"
-                                   @changePageNumber="listPlugins"
-                                   @changePageSize="listPlugins"
-                                   @clickRefresh="listPlugins"
+            <p-toolbox-grid-layout class="plugin-list"
+                                   :items="plugins"
+                                   :this-page.sync="thisPage"
+                                   :page-size.sync="pageSize"
+                                   :loading.sync="loading"
+                                   :card-class="cardClass"
+                                   :card-height="cardHeight"
+                                   :card-min-width="cardMinWidth"
+                                   :fix-column="fixColumn"
+                                   :column-gap="columnGap"
+                                   @changePageNumber="getPlugins"
+                                   @changePageSize="getPlugins"
+                                   @clickRefresh="getPlugins"
             >
                 <template #toolbox-left>
-                    <p-page-title title="Plugins" use-total-count :total-count="apiHandler.totalCount.value"
+                    <p-page-title title="Plugins" use-total-count :total-count="totalCount"
                                   child @goBack="$router.go(-1)"
                     />
                 </template>
                 <template #page-size>
-                    <p-select-dropdown v-model="sortBy" :items="sortMenu" @onSelected="listPlugins" />
+                    <p-select-dropdown v-model="sortBy" :items="sortMenu" @onSelected="getPlugins" />
                 </template>
                 <template #toolbox-bottom>
-                    <p v-if="apiHandler.gridTS.querySearch.tags.value.length > 0" class="mb-4">
-                        <p-badge v-for="(tag, idx) in apiHandler.gridTS.querySearch.tags.value" :key="idx"
+                    <p v-if="resourceTypeSearchTags.length > 0" class="mb-4">
+                        <p-badge v-for="(tag, idx) in resourceTypeSearchTags" :key="idx"
                                  style-type="primary"
                                  :outline="true"
                                  class="filter-tag"
                         >
-                            <span>{{ tag.value }}</span>
+                            <span>{{ tag }}</span>
                             <p-i name="ic_delete" width="1rem"
                                  height="1rem" color="transparent inherit"
                                  class="cursor-pointer"
-                                 @click="onDeleteTag(idx)"
+                                 @click="onDeleteResourceSearchTag(idx)"
                             />
                         </p-badge>
                     </p>
                     <p v-if="keyword" class="mb-2 text-sm">
-                        {{ apiHandler.totalCount.value }} plugins for <strong>[{{ keyword }}]</strong>
+                        {{ totalCount }} plugins for <strong>[{{ keyword }}]</strong>
                     </p>
                 </template>
                 <template #loading>
@@ -99,126 +104,26 @@
 </template>
 
 <script lang="ts">
-import {
-    toRefs, reactive, watch, onMounted, ref,
-} from '@vue/composition-api';
-import _ from 'lodash';
+import { get, range } from 'lodash';
 
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+import { toRefs, reactive, watch } from '@vue/composition-api';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { fluentApi } from '@/lib/fluent-api';
-import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
-import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PCardItem from '@/components/molecules/cards/PCardItem.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { makeKeyItems } from '@/lib/component-utils/query-search';
-import { getStatApiValueHandler } from '@/lib/api/query-search';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
-const repoState = reactive({
-    repositories: [] as unknown as RepositoryModel[],
-    selectedRepoId: undefined as unknown as string,
-});
-
-
-export const setup = (props, { root }) => {
-    const state = reactive({
-        keyword: '',
-        sortMenu: [
-            { type: 'item', label: 'Name', name: 'name' },
-            { type: 'item', label: 'Recent', name: 'created_at' },
-        ],
-        sortBy: 'name',
-    });
-
-    const routeState = reactive({
-        route: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }, { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
-    });
-
-    const listApi = fluentApi.repository().plugin().list().setServiceType('inventory.Collector');
-
-    const apiHandler = new QuerySearchGridFluentAPI(
-        listApi,
-        {
-            cardClass: () => [],
-            fixColumn: 1,
-            cardMinWidth: '23.75rem',
-            cardHeight: 'auto',
-        },
-        undefined,
-        {
-            keyItems: makeKeyItems(['labels']),
-            valueHandlerMap: {
-                label: getStatApiValueHandler('repository.Plugin'),
-            },
-        },
-    );
-
-    const listPlugins = _.debounce(async () => {
-        apiHandler.action = apiHandler.action
-            .setRepositoryId(repoState.selectedRepoId)
-            .setSortBy(state.sortBy)
-            .setSortDesc(state.sortBy !== 'name');
-        await apiHandler.getData();
-    }, 100);
-
-    const listRepositories = async () => {
-        try {
-            const res = await fluentApi.repository().repository().list()
-                .setSortBy('repository_type')
-                .execute();
-            repoState.repositories = res.data.results;
-            repoState.selectedRepoId = res.data.results[0].repository_id;
-            await listPlugins();
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    const onPluginCreate = (item) => {
-        root.$router.push({ path: `./collector-creator/${item.plugin_id}` });
-    };
-
-    listRepositories();
-
-    watch(() => repoState.selectedRepoId, (repoId, _repoId) => {
-        if (repoId && repoId !== _repoId) {
-            listPlugins();
-        }
-    });
-
-
-    return {
-        apiHandler,
-        ...toRefs(state),
-        ...toRefs(routeState),
-        repoState,
-        listPlugins,
-        onPluginCreate,
-        goBack: () => {
-            root.$router.push('/plugin/collector');
-        },
-        search: (val) => {
-            state.keyword = val;
-            apiHandler.action = apiHandler.action.setKeyword(val);
-            listPlugins();
-        },
-        onDeleteTag: (idx) => {
-            apiHandler.gridTS.querySearch.deleteTag(idx);
-            listPlugins();
-        },
-        isBeta: item => _.get(item, 'tags.beta', ''),
-        skeletons: _.range(5),
-    };
-};
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
+import { PluginModel } from '@/lib/fluent-api/repository/plugin';
 
 export default {
     name: 'CollectorPlugins',
@@ -236,8 +141,106 @@ export default {
         PluginFilter,
         PIconTextButton,
     },
-    setup(props, context) {
-        return setup(props, context);
+    setup(props, { root }) {
+        const state = reactive({
+            loading: false,
+            totalCount: 0,
+            keyword: '',
+            thisPage: 1,
+            pageSize: 24,
+            sortMenu: [
+                { type: 'item', label: 'Name', name: 'name' },
+                { type: 'item', label: 'Recent', name: 'created_at' },
+            ],
+            sortBy: 'name',
+            resourceTypeSearchTags: [],
+            //
+            plugins: [] as PluginModel[],
+            cardClass: () => ['card-item'],
+            cardHeight: 'auto',
+            cardMinWidth: '23.75rem',
+            fixColumn: 1,
+            columnGap: '1rem',
+            //
+            repositories: [] as unknown as RepositoryModel[],
+            selectedRepositoryId: undefined as unknown as string,
+        });
+        const routeState = reactive({
+            routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }, { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
+        });
+
+        const getPlugins = async () => {
+            state.loading = true;
+            try {
+                let api = fluentApi.repository().plugin().list().setServiceType('inventory.Collector')
+                    .setRepositoryId(state.selectedRepositoryId)
+                    .setSortBy(state.sortBy)
+                    .setSortDesc(state.sortBy !== 'name')
+                    .setKeyword(state.keyword);
+                if (state.resourceTypeSearchTags.length) {
+                    api = api.setFilter({ key: 'labels', value: state.resourceTypeSearchTags, operator: FILTER_OPERATOR.in });
+                }
+                const res = await api.execute();
+                state.plugins = res.data.results;
+                state.totalCount = res.data.total_count;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+        const getRepositories = async () => {
+            try {
+                const res = await fluentApi.repository().repository().list()
+                    .setSortBy('repository_type')
+                    .execute();
+                state.repositories = res.data.results;
+                state.selectedRepositoryId = res.data.results[0].repository_id;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const onPluginCreate = (item) => {
+            root.$router.push({ path: `./collector-creator/${item.plugin_id}` });
+        };
+        const onSearch = (val) => {
+            state.keyword = val;
+            getPlugins();
+        };
+        const onDeleteResourceSearchTag = (idx) => {
+            state.resourceTypeSearchTags.splice(idx, 1);
+        };
+
+        const init = async () => {
+            state.loading = true;
+            await getRepositories();
+            await getPlugins();
+            state.loading = false;
+        };
+        init();
+
+        watch(() => state.selectedRepositoryId, (before, after) => {
+            if (before && before !== after) {
+                getPlugins();
+            }
+        });
+        watch(() => state.resourceTypeSearchTags, () => {
+            if (state.selectedRepositoryId) {
+                getPlugins();
+            }
+        });
+
+        return {
+            ...toRefs(state),
+            ...toRefs(routeState),
+            skeletons: range(5),
+            getPlugins,
+            onPluginCreate,
+            onSearch,
+            onDeleteResourceSearchTag,
+            isBeta: item => get(item, 'tags.beta', ''),
+        };
     },
 };
 </script>

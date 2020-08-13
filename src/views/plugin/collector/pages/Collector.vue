@@ -132,24 +132,6 @@
 
 <script lang="ts">
 import { get } from 'lodash';
-import router from '@/routes';
-
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PStatus from '@/components/molecules/status/PStatus.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
 import { Component } from 'vue/types/umd';
 import {
@@ -158,6 +140,23 @@ import {
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PStatus from '@/components/molecules/status/PStatus.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+
+import router from '@/routes';
 import { makeTrItems } from '@/lib/view-helper';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
@@ -166,6 +165,7 @@ import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
 import { parseTag } from '@/lib/api/query-search';
 
+const GeneralPageLayout = (): Component => import('@/views/containers/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
@@ -179,7 +179,6 @@ export default {
     name: 'Collector',
     components: {
         PPageTitle,
-        GeneralPageLayout,
         PLazyImg,
         PHorizontalLayout,
         PIconTextButton,
@@ -191,6 +190,7 @@ export default {
         PTab,
         PTableCheckModal,
         PPageNavigation,
+        GeneralPageLayout,
         CollectorUpdateModal,
         CollectDataModal,
         CollectorDetail,

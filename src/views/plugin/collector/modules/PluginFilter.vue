@@ -1,19 +1,12 @@
 <template>
     <div class="plugin-filter-container">
         <div class="rows">
-            <p-search class="p-search" v-model="search" placeholder="Enter keyword"
+            <p-search v-model="search" class="p-search" placeholder="Enter keyword"
                       @search="$emit('search', $event)"
             />
         </div>
         <div class="rows">
             <header>Repository</header>
-            <!--            <div v-for="(repo, idx) in repositories" :key="idx"-->
-            <!--                 class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"-->
-            <!--                 @click.stop="onClickRepoText(repo.repository_id)"-->
-            <!--            >-->
-            <!--                <p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" />-->
-            <!--                {{ repo.name }}-->
-            <!--            </div>-->
             <div v-for="(repo, idx) in repositories" :key="idx"
                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
                  @click.stop="onClickRepoText(repo.repository_id)"
@@ -36,13 +29,13 @@
 </template>
 
 <script lang="ts">
-import { toRefs, reactive } from '@vue/composition-api';
+import { toRefs, reactive, computed } from '@vue/composition-api';
 
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
+
 import { makeProxy } from '@/lib/compostion-util';
-import _ from 'lodash';
 
 export default {
     name: 'PluginFilter',
@@ -52,42 +45,45 @@ export default {
         PCheckBox,
     },
     props: {
-        queryTagTool: {
-            type: Object,
-        },
         repositories: {
             type: Array,
             default: () => [],
+        },
+        searchKeyword: {
+            type: String,
+            default: '',
         },
         /** sync */
         selectedRepoId: {
             type: String,
             default: undefined,
         },
+        resourceTypeSearchTags: {
+            type: Array,
+            default: () => [],
+        },
     },
-    setup(props, context) {
+    setup(props, { emit }) {
         const state = reactive({
             search: '',
-            proxySelectedRepoId: makeProxy('selectedRepoId', props, context.emit),
-            resourceOptions: _.zipObject([
-                'Server', 'Network', 'Subnet', 'IP Address', 'Cloud Service',
-            ], new Array(5).fill(false)),
-            // selectedResources: computed(() => _.keyBy(state.resourceOptions, (v, k) => )),
+            proxySelectedRepoId: makeProxy('selectedRepoId', props, emit),
+            resourceOptions: computed(() => ({
+                Server: props.resourceTypeSearchTags.includes('Server'),
+                'Cloud Service': props.resourceTypeSearchTags.includes('Cloud Service'),
+            })),
         });
-
 
         const onClickRepoText = (val) => {
             state.proxySelectedRepoId = val;
         };
-
         const onClickResourceText = (val) => {
-            state.resourceOptions[val] = !state.resourceOptions[val];
-            const itemIdx = _.findIndex(props.queryTagTool.tags.value, { value: val });
-            if (itemIdx > -1) {
-                props.queryTagTool.deleteTag(itemIdx);
-            } else props.queryTagTool.addTag({ key: 'labels', value: val, operator: '=' });
+            const idx = props.resourceTypeSearchTags.indexOf(val);
+            if (idx > -1) {
+                props.resourceTypeSearchTags.splice(idx, 1);
+            } else {
+                props.resourceTypeSearchTags.push(val);
+            }
         };
-
 
         return {
             ...toRefs(state),
