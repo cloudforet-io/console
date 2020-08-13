@@ -134,7 +134,7 @@ import vClickOutside from 'v-click-outside';
 import PI from '@/components/atoms/icons/PI.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
-import SiteMap from '@/views/containers/gnb/modules/SiteMap_new.vue';
+import SiteMap from '@/views/containers/gnb/modules/SiteMap.vue';
 import {
     reactive, toRefs, getCurrentInstance, computed,
 } from '@vue/composition-api';

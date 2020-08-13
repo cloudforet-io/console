@@ -1,156 +1,106 @@
 <template>
     <div class="sitemap-container">
-        <p-tooltip-button tooltip="Services"
-                          :tooltip-options="{offset: '20px'}"
-                          :active="visible"
-                          :theme="'primary'"
-                          @click="toggle"
+        <div class="sitemap-button"
+             :active="visible"
+             @click="toggle"
         >
-            <template #buttonContents>
-                <p-i class="service-icon" name="ic_gnb_services"
-                     width="2rem" height="2rem"
-                     color="transparent inherit"
-                />
-            </template>
-        </p-tooltip-button>
-
-        <div v-if="visible" class="sitemap" :style="{left: margin}">
-            <div class="contents">
-                <div class="title">
-                    <p-button class="back-btn" @click="hide">
-                        <template>
-                            <p-i name="ic_back" width="2rem" height="2rem" />
-                        </template>
-                    </p-button>
-                    <span class="name">Services</span>
-                </div>
-
-                <ul @click="hide">
-                    <li>
-                        <router-link class="group" to="/dashboard">
-                            <span class="icon">
-                                <p-i name="ic_dashboard"
-                                     color="transparent inherit"
-                                />
-                            </span>
-                            <span class="name">Dashboard</span>
-                        </router-link>
-                    </li>
-
-                    <li>
-                        <router-link class="group" to="/project">
-                            <span class="icon">
-                                <p-i name="ic_project" />
-                            </span>
-                            <span class="name">Project</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="group" to="/inventory">
-                            <span class="icon">
-                                <p-i name="ic_inventory" />
-                            </span>
-                            <span class="name">Inventory</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service" to="/inventory/server">
-                            Server
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service last" to="/inventory/cloud-service">
-                            Cloud Service
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="group" to="/identity">
-                            <span class="icon">
-                                <p-i name="ic_identity" />
-                            </span>
-                            <span class="name">Identity</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service" to="/identity/service-account">
-                            Service Account
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service last" to="/identity/user">
-                            User
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="group" to="/plugin">
-                            <span class="icon">
-                                <p-i name="ic_plugin" />
-                            </span>
-                            <span class="name">Plugin</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service last" to="/plugin/collector">
-                            Collector
-                        </router-link>
-                    </li>
-
-                    <template v-if="$ls.user.state.isDomainOwner">
-                        <li class="admin_menu">
-                            <router-link class="group" to="/management">
-                                <span class="icon">
-                                    <p-i name="ic_admin"
-                                         color="#58309C inherit"
-                                    />
-                                </span>
-                                <span class="name">Management</span>
-                            </router-link>
-                        </li>
-
-                        <li class="admin_menu">
-                            <router-link class="service" to="/management/supervisor/plugins">
-                                Plugin
-                            </router-link>
-                        </li>
-                        <li class="admin_menu">
-                            <router-link class="service" to="/secret/credentials">
-                                Credentials
-                            </router-link>
-                        </li>
-                    </template>
-                </ul>
-            </div>
-            <div
-                v-if="visible"
-                class="backdrop"
-                @click.stop="hide"
+            <p-i class="sitemap-icon"
+                 name="ic_gnb_service_2"
+                 color="inherit transparent"
+                 width="2rem" height="2rem"
             />
+        </div>
+        <div v-if="visible" v-click-outside="hide" class="sitemap">
+            <ul v-for="(aItem, aIdx) in allMenu"
+                :key="aIdx"
+            >
+                <div v-if="!aItem.isAdminMenu || isDomainOwner">
+                    <router-link :to="aItem.link">
+                        <li class="menu" @click="hide">
+                            {{ aItem.label }}
+                        </li>
+                    </router-link>
+                    <div v-if="aItem.subMenus.length > 0">
+                        <div v-for="(sItem, sIdx) in aItem.subMenus"
+                             :key="sIdx"
+                        >
+                            <router-link :to="sItem.link">
+                                <li class="submenu" @click="hide">
+                                    {{ sItem.label }}
+                                </li>
+                            </router-link>
+                        </div>
+                    </div>
+                </div>
+            </ul>
         </div>
     </div>
 </template>
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
+import vClickOutside from 'v-click-outside';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'SiteMap',
     components: {
-        PButton,
         PI,
-        PTooltipButton,
+    },
+    directives: {
+        clickOutside: vClickOutside.directive,
     },
     props: {
-        margin: {
-            type: String,
-            default: '',
+        isDomainOwner: {
+            type: Boolean,
+            default: false,
         },
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             visible: false,
+            allMenu: [
+                {
+                    label: 'Dashboard', link: '/dashboard', isAdminMenu: false, subMenus: [],
+                },
+                {
+                    label: 'Project', link: '/project', isAdminMenu: false, subMenus: [],
+                },
+                {
+                    label: 'Inventory',
+                    link: '/inventory',
+                    isAdminMenu: false,
+                    subMenus: [
+                        { label: 'Server', link: '/inventory/server' },
+                        { label: 'Cloud Service', link: '/inventory/cloud-service' },
+                    ],
+                },
+                {
+                    label: 'Identity',
+                    link: '/identity',
+                    isAdminMenu: false,
+                    subMenus: [
+                        { label: 'Service Account', link: '/identity/service-account' },
+                        { label: 'User', link: '/identity/user' },
+                    ],
+                },
+                {
+                    label: 'Plugin',
+                    link: '/plugin',
+                    isAdminMenu: false,
+                    subMenus: [
+                        { label: 'Collector', link: '/plugin/collector' },
+                    ],
+                },
+                {
+                    label: 'Management',
+                    link: '/management',
+                    isAdminMenu: true,
+                    subMenus: [
+                        { label: 'Plugin', link: '/management/supervisor/plugins' },
+                    ],
+                },
+            ],
         });
 
         return {
@@ -164,110 +114,49 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    $sitemap-width: 260px;
 .sitemap-container {
-    .service-icon {
-        @apply text-primary4;
-        &:hover {
-            @apply bg-primary-dark;
+    .sitemap-button {
+        @apply relative cursor-pointer;
+        text-decoration: none;
+        opacity: 0.5;
+        &.opened, &:hover {
+            @apply text-primary opacity-100;
+            .sitemap-icon {
+                @apply bg-primary4
+            }
         }
-    }
-    .activator {
-        @apply text-primary4;
-        display: inline-block;
-        padding: 0;
-        border-radius: 2px;
-        min-width: 2rem;
-        height: 2rem;
+        .sitemap-icon {
+            @apply rounded-full;
+            width: 2rem;
+            height: 2rem;
+        }
     }
 
     .sitemap {
-        position: fixed;
-        width: 100%;
-        top: 0;
-        height: 100vh;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        .contents {
-            @apply bg-primary4 text-gray-900;
-            box-shadow: 4px 0 8px rgba(theme('colors.gray.900'), 0.32);
-            text-align: left;
-            height: 100%;
-            min-width: $sitemap-width;
-            width: $sitemap-width;
-        }
-        .title {
-            @apply text-gray-500;
-            display: flex;
-            align-items: center;
-            font-size: 1rem;
-            padding: 1rem 1.1rem;
-            font-weight: normal;
-            line-height: 1.5rem;
-            .name {
-                padding-left: 0.5rem;
-            }
-            .back-btn {
-                padding: 0;
-                vertical-align: unset;
-                min-width: 2rem;
-                height: 2rem;
-                border-radius: 2px;
-                border: 0;
-                &:hover {
-                    @apply bg-primary3;
-                }
-            }
-        }
+        @apply bg-white text-gray-900 text-sm;
+        position: absolute;
+        top: 2.5rem;
+        left: 0;
+        width: 14rem;
+        border: 1px solid theme('colors.gray.200');
+        box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
+        padding: 0.5rem;
+        z-index: 10;
         li {
+            @apply cursor-pointer;
             display: block;
-            cursor: pointer;
+            line-height: 1.5rem;
+            padding: 0.5rem;
             &:hover {
-                @apply bg-primary3;
-                /* .icon {
-                    @apply text-primary;
-                } */
+                @apply text-primary bg-primary4
             }
-            a {
-                display: block;
+            &.menu {
+                @apply font-bold;
             }
-        }
-
-        .admin_menu{
-            @apply text-violet-600 ;
-        }
-
-        .group {
-            @apply border-t border-gray-200;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            font-weight: bold;
-            vertical-align: middle;
-            .name {
-                padding-left: 0.5rem;
-            }
-            .icon {
-                display: inline-block;
-                /* margin-left: 0.5rem; */
-                text-align: center;
-                color: inherit;
-                width: 1.5rem;
-                max-height: 241.5rem;
+            &.submenu {
+                padding-left: 1rem;
             }
         }
-        .service {
-            padding: 0.5rem  0 0.5rem 3.5rem;
-            &.last {
-                margin-bottom: .5rem;
-            }
-        }
-    }
-    .backdrop {
-        background-color: rgba(theme('colors.gray.900'), 0.32);
-        width: 100%;
-        height: 100%;
     }
 }
 </style>
