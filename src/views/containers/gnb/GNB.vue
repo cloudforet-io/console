@@ -131,15 +131,18 @@
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
-import PI from '@/components/atoms/icons/PI.vue';
-import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
-import ProfileModal from '@/views/common/profile/ProfileModal.vue';
-import SiteMap from '@/views/containers/gnb/modules/SiteMap.vue';
+
 import {
     reactive, toRefs, getCurrentInstance, computed,
 } from '@vue/composition-api';
-import { fluentApi } from '@/lib/fluent-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
+
+import ProfileModal from '@/views/common/profile/ProfileModal.vue';
+import SiteMap from '@/views/containers/gnb/modules/SiteMap.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
+
+import { fluentApi } from '@/lib/fluent-api';
 import { useStore } from '@/store/toolset';
 
 export default {
@@ -291,47 +294,35 @@ export default {
         };
 
         // account
-        const params: any = {};
-        const getUser = async (id) => {
-            const res = await fluentApi.identity().user().get().setId(id)
-                .execute();
+        const getUser = async () => {
+            let api;
+            if (state.userId && state.isDomainOwner) {
+                api = fluentApi.identity().domainOwner().get().setId(state.userId);
+            } else if (state.userId) {
+                api = fluentApi.identity().user().get().setId(state.userId);
+            }
             try {
+                const res = await api.execute();
                 userState.name = res.data.name;
                 userState.email = res.data.email;
                 userState.language = res.data.language;
                 userState.timezone = res.data.timezone;
+                vm.$i18n.locale = res.data.language;
             } catch (e) {
                 console.error(e);
             }
         };
-        const getOwner = async (id) => {
-            const res = await fluentApi.identity().domainOwner().get().setId(id)
-                .execute();
-            try {
-                userState.name = res.data.name;
-                userState.email = res.data.email;
-                userState.language = res.data.language;
-                userState.timezone = res.data.timezone;
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        if (state.isDomainOwner) {
-            // eslint-disable-next-line camelcase
-            params.owner_id = state.userId;
-            getOwner(params.owner_id);
-        } else {
-            // eslint-disable-next-line camelcase
-            params.user_id = state.userId;
-            getUser(params.user_id);
-        }
-
         const openProfile = () => {
             state.profileVisible = true;
         };
         const logOutAction = async () => {
             logout(vm);
         };
+
+        const init = async () => {
+            await getUser();
+        };
+        init();
 
         return {
             ...toRefs(state),

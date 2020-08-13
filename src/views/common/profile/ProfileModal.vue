@@ -287,6 +287,8 @@ export default {
                 userParam.user_id = props.userId;
                 await updateUser(userParam);
             }
+
+            vm.$i18n.locale = state.userState.language;
             state.proxyVisible = false;
         };
 
