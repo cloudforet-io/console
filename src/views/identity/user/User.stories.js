@@ -1,7 +1,7 @@
 import { action } from '@storybook/addon-actions';
-import User from './User.template.vue';
 import casual from '@/views/identity/user/models/user-model';
 import { arrayOf } from '@/lib/casual';
+import User from './User.vue';
 
 
 export default {
