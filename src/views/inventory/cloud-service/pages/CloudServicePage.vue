@@ -66,12 +66,14 @@
                 <s-dynamic-layout :api="adminApi"
                                   :is-show="adminIsShow" :name="$t('TAB.MEMBER')"
                                   v-bind="defaultAdminLayout"
+                                  :style="{borderWidth: 0}"
                 />
             </template>
             <template #history>
                 <s-dynamic-layout :api="historyApi"
                                   :is-show="historyIsShow" :name="$t('TAB.HISTORY')"
                                   v-bind="defaultHistoryLayout"
+                                  :style="{borderWidth: 0}"
                 />
             </template>
             <template #monitoring>

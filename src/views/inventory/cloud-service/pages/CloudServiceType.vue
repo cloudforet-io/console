@@ -18,9 +18,9 @@
                 <span class="provider-name">{{ provider.name }}</span>
                 <p-radio v-model="selectedProvider" :value="provider.provider" class="provider-radio-btn" />
             </div>
-            <div id="service-category-title">
+            <p class="sidebar-title">
                 Service Categories
-            </div>
+            </p>
             <p-hr class="sidebar-divider" />
             <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
                  :class="{selected: checked}"
@@ -31,7 +31,7 @@
                 />
                 <span class="service">{{ service }}</span>
             </div>
-            <p class="sidebar-title">
+            <p id="region-title">
                 Regions
             </p>
             <p-hr class="sidebar-divider" />
@@ -89,8 +89,8 @@
                         </div>
                     </template>
                     <template #loading>
-                        <p-lottie name="spinner" :size="2"
-                                  :auto="true"
+                        <p-lottie name="thin-spinner" :size="2"
+                                  :auto="true" style="margin-right: 2rem;"
                         />
                     </template>
                     <template #card="{item}">
@@ -480,10 +480,10 @@ export default {
 <style lang="postcss" scoped>
     .sidebar-title {
         @apply text-gray-500 text-sm font-bold;
-        padding-top: 2.25rem;
+        padding-top: 2rem;
         padding-left: 1rem;
     }
-    #service-category-title {
+    #region-title {
         @apply text-gray-500 text-sm font-bold;
         padding-top: 1.375rem;
         padding-left: 1rem;
@@ -546,7 +546,7 @@ export default {
     }
     .cloud-service-divider {
         @apply w-full;
-        margin-top: 1.6875rem;
+        margin-top: 1.5rem;
         margin-bottom: 1.5rem;
     }
     >>> .cloud-service-type-list {
@@ -579,13 +579,13 @@ export default {
                         @apply text-gray-300;
                     }
                     .sub-title-divider {
-                        @apply px-2 text-gray-200;
+                        @apply text-gray-200;
                     }
                     .sub-title-name {
                         @apply text-gray-500;
                     }
                     .sub-title-count {
-                        @apply ml-2 font-bold text-base;
+                        @apply font-bold text-base;
                         line-height: 150%;
                     }
                 }

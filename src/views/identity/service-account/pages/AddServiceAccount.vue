@@ -112,7 +112,7 @@
             <p-button class="item" style-type="primary" @click="confirm">
                 {{ $t('BTN.SAVE') }}
             </p-button>
-            <p-button class="item" outline style-type="primary-dark"
+            <p-button class="item" style-type="outline gray900"
                       @click="goBack"
             >
                 {{ $t('BTN.CANCEL') }}

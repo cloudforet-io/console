@@ -114,7 +114,8 @@
                         </div>
                     </template>
                     <template #loading>
-                        <p-lottie name="spinner" :size="2"
+                        <p-lottie name="thin-spinner" class="loading"
+                                  :size="2"
                                   :auto="true"
                         />
                     </template>
@@ -137,10 +138,9 @@
                                             <span class="mx-2 text-gray-300 divider">|</span>
                                             <span class="summary-item-text">Cloud Services<span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
                                         </div>
-                                        <div v-else class="loading">
-                                            <div v-for="v in skeletons" :key="v" class="flex items-center pb-2">
-                                                <p-skeleton class="flex-grow" />
-                                                <p-skeleton width="1.5rem" height="1.5rem" class="ml-5 flex-shrink-0" />
+                                        <div v-else class="skeleton-loading">
+                                            <div v-for="v in skeletons" :key="v" class="flex items-center pb-2 pr-15">
+                                                <p-skeleton  />
                                             </div>
                                         </div>
                                     </div>
@@ -696,7 +696,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            skeletons: range(3),
+            skeletons: range(1),
             goToProjectDetail,
             goToServiceAccount,
             cardSummary,
@@ -805,12 +805,12 @@ export default {
         }
     }
 
-    .project-group-icon {
-            @apply mx-1;
-    }
-
     .empty {
         @apply flex-col text-center justify-start;
+    }
+
+    .loading {
+        padding-top: 3rem;
     }
 
     .project-description {
