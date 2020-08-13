@@ -220,15 +220,15 @@ export default {
         };
         init();
 
-        watch(() => state.selectedRepositoryId, (before, after) => {
-            if (before && before !== after) {
-                getPlugins();
-            }
+        watch(() => state.selectedRepositoryId, () => {
+            getPlugins();
+        }, {
+            lazy: true,
         });
         watch(() => state.resourceTypeSearchTags, () => {
-            if (state.selectedRepositoryId) {
-                getPlugins();
-            }
+            getPlugins();
+        }, {
+            lazy: true,
         });
 
         return {

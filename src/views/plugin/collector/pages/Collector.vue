@@ -457,6 +457,8 @@ export default {
             if (!val) {
                 listCollector();
             }
+        }, {
+            lazy: true,
         });
 
         const queryRefs = {

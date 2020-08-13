@@ -56,14 +56,15 @@
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
-import { makeTrItems } from '@/lib/view-helper';
-import { timestampFormatter } from '@/lib/util';
 
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+
 import { fluentApi } from '@/lib/fluent-api';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
+import { makeTrItems } from '@/lib/view-helper';
+import { timestampFormatter } from '@/lib/util';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 const CredentialVerifyModal = () => import('@/views/plugin/collector/modules/CredentialVerifyModal.vue');
@@ -78,7 +79,10 @@ export default {
         CredentialVerifyModal,
     },
     props: {
-        collectorId: String,
+        collectorId: {
+            type: String,
+            required: true,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -110,7 +114,6 @@ export default {
             .setSortBy(state.sortBy)
             .setSortDesc(state.sortDesc));
 
-        // TODO: list credentials by provider & plugin
         const listCredentials = async (): Promise<void> => {
             state.loading = true;
             try {
@@ -124,8 +127,10 @@ export default {
             }
         };
 
-
-        listCredentials();
+        const init = async () => {
+            await listCredentials();
+        };
+        init();
 
         watch(() => props.collectorId, () => {
             listCredentials();
