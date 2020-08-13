@@ -499,10 +499,14 @@ export default {
         @apply justify-between text-sm;
         padding-left: 1rem;
         padding-right: 1.1875rem;
+        line-height: 1.5rem;
         .provider-divider {
             @apply bg-gray-100;
             margin-top: 0.625rem;
             margin-bottom: 0.5625rem;
+        }
+        .provider-name {
+            display: inline-block;
         }
         .provider-icon {
             @apply inline justify-start;
@@ -526,11 +530,11 @@ export default {
             @apply text-secondary cursor-pointer;
         }
         .region-type {
-            padding-left: 0.75rem;
+            padding-left: 0.25rem;
         }
         .region-code {
             @apply text-gray-400;
-            padding-left: 2rem;
+            padding-left: 1.5rem;
         }
     }
     .service-categories {
@@ -538,7 +542,7 @@ export default {
         margin-left: 1rem;
         padding-bottom: 0.625rem;
         .service {
-            padding-left: 0.75rem;
+            padding-left: 0.25rem;
             &:hover {
                 @apply text-secondary cursor-pointer;
             }

@@ -62,7 +62,7 @@ export default {
                     },
                 },
                 { label: 'Last Collected', name: 'last_collected_at.seconds', ...dateTimeViewType },
-                { label: 'Create', name: 'created_at.seconds', ...dateTimeViewType },
+                { label: 'Created', name: 'created_at.seconds', ...dateTimeViewType },
             ]),
             data: {},
         });
