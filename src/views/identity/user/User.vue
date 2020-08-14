@@ -123,7 +123,10 @@
 <script lang="ts">
 import { map } from 'lodash';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';
@@ -146,6 +149,7 @@ import { showErrorMessage, showSuccessMessage, userStateFormatter } from '@/lib/
 import { makeAutocompleteHandlerWithReference } from '@/lib/component-utils/query-search';
 import { makeTrItems } from '@/lib/view-helper';
 import { fluentApi, Tags, TimeStamp } from '@/lib/fluent-api';
+import { useStore } from '@/store/toolset';
 
 interface UserModel {
     // eslint-disable-next-line camelcase
@@ -185,6 +189,8 @@ export default {
         PPageTitle,
     },
     setup(props, { root, parent }) {
+        const vm = getCurrentInstance() as ComponentInstance;
+        const { user } = useStore();
         const state = reactive({
             loading: false,
             users: [] as UserModel[],
@@ -334,6 +340,10 @@ export default {
             try {
                 await fluentApi.identity().user().update().setParameter({ ...item })
                     .execute();
+                if (user.state.userId === item.user_id) {
+                    await user.setUser('USER', item.user_id, vm);
+                    vm.$i18n.locale = item.language;
+                }
                 showSuccessMessage('Success', 'User has been successfully updated.', root);
             } catch (e) {
                 showErrorMessage('Fail to Update User', e, root);
@@ -346,6 +356,7 @@ export default {
             } else {
                 await addUser(item);
             }
+            await getUsers();
         };
 
         const getUsersParam = items => ({ users: map(items, 'user_id') });
