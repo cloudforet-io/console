@@ -33,7 +33,6 @@ jobs:
         env:
           # 이 곳에서 환경변수를 통해 설정 관리
           IMAGE_PREFIX: spaceone
-          DOCKER_UPLOAD: true
           # LOCATION points the parent directory
           LOCATION_DOCKERFILE: .
 
@@ -43,9 +42,9 @@ jobs:
           echo "::set-env name=SERVICE::$(cut -d'/' -f2 <<<${{github.repository}})"
           echo "::set-env name=IMAGE_PREFIX::$IMAGE_PREFIX"
 
-          echo "::set-env name=DOCKER_UPLOAD::$DOCKER_UPLOAD"
           echo "::set-env name=LOCATION_DOCKERFILE::$LOCATION_DOCKERFILE"
 
+          echo "::set-env name=VERSION::$VERSION"
           # LATEST_TAG true or false
           if [[ $VERSION =~ ^[0-9]\.[0-9]\.[0-9]$ ]];
           then
@@ -85,9 +84,7 @@ jobs:
           bash set_env.sh
 
       - name: "Upload docker - Option a. :latest, :${{ env.VERSION }}"
-        if: env.DOCKER_UPLOAD == 'true' && env.LATEST_TAG == 'true'
-        run: |
-          echo latest
+        if: env.LATEST_TAG == 'true'
         uses: docker/build-push-action@v1
         with:
           repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
@@ -96,9 +93,7 @@ jobs:
           tags: latest,${{ env.VERSION }}
 
       - name: "Upload docker - Option b. only :${{ env.VERSION }}"
-        if: env.DOCKER_UPLOAD == 'true' && env.LATEST_TAG == 'false'
-        run: |
-          echo no latest
+        if: env.LATEST_TAG == 'false'
         uses: docker/build-push-action@v1
         with:
           repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}

@@ -64,7 +64,6 @@ jobs:
           bash set_env.sh
 
       - name: Upload the docker image on ECR
-        if: env.DOCKER_UPLOAD == 'true'
         uses: kciter/aws-ecr-action@v1
         with:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
