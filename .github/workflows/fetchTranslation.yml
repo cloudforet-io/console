@@ -1,7 +1,5 @@
 name: FetchTranslation
 on:
-  watch:
-    types: [started]
   workflow_dispatch:
 jobs:
   authorize:

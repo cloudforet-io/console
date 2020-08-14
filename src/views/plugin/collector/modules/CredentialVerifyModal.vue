@@ -34,7 +34,7 @@
         <template #confirm-button>
             <div class="confirm-btn">
                 <p-lottie v-if="loading" class="spinner"
-                          name="spinner"
+                          name="thin-spinner"
                           auto
                           :size="1.5"
                 />

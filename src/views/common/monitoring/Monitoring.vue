@@ -47,7 +47,7 @@
                 </template>
             </i18n>
             <div v-if="metricsLoading">
-                <p-lottie name="spinner" auto />
+                <p-lottie name="thin-spinner" auto />
             </div>
             <div v-else-if="metrics.length === 0" class="text-center text-gray">
                 No Metrics

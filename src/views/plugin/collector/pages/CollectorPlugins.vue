@@ -156,7 +156,7 @@ export default {
             resourceTypeSearchTags: [],
             //
             plugins: [] as PluginModel[],
-            cardClass: () => ['card-item'],
+            cardClass: () => [],
             cardHeight: 'auto',
             cardMinWidth: '23.75rem',
             fixColumn: 1,

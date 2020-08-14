@@ -6,9 +6,6 @@
         <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <router-view />
     </div>
-    <div v-else class="app-spinner">
-        <p-lottie ref="pageLoading" :auto="true" :size="45" />
-    </div>
 </template>
 
 <script lang="ts">
