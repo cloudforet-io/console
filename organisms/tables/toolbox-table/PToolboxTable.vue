@@ -243,9 +243,6 @@ export default {
                     }
                 }
             }
-            .toolbox-bottom {
-                @apply mt-4;
-            }
         }
         .tool {
             @apply inline;

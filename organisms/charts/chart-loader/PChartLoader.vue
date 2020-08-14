@@ -3,7 +3,7 @@
         <transition name="fade-in">
             <div v-if="loading" class="loader w-full h-full">
                 <slot name="loader" :loading="loading">
-                    <p-lottie name="spinner" class="h-full"
+                    <p-lottie name="thin-spinner"
                               auto
                               :size="1.5"
                     />

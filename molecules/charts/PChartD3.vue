@@ -15,7 +15,7 @@
         <transition name="fade-in">
             <div v-if="!startDraw" class="spinner-container">
                 <p-lottie class="spinner"
-                          :size="1.5" :auto="true" name="spinner"
+                          :size="1.5" :auto="true" name="thin-spinner"
                 />
             </div>
         </transition>

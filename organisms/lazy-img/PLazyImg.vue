@@ -6,7 +6,7 @@
                       :imgLoading="imgLoading"
                 >
 
-                    <p-lottie name="spinner"
+                    <p-lottie name="thin-spinner"
                               auto
                               :height="height"
                               :width="width"

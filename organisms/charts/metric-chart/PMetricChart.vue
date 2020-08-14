@@ -3,7 +3,7 @@
         <div class="flex justify-between">
             <span class="text-sm font-bold capitalize">{{ title }}</span>
             <span class="text-sm text-gray flex-grow">&nbsp; {{ unit.y | yUnit }}</span>
-            <p-lottie v-if="loading && chart" name="spinner" auto />
+            <p-lottie v-if="loading && chart" name="thin-spinner" auto />
         </div>
         <p-chart-loader :loading="loading && !chart" class="chart">
             <template #loader>

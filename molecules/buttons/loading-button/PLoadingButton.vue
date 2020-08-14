@@ -4,7 +4,7 @@
     >
         <div class="loading-btn">
             <p-lottie v-if="loading" class="spinner"
-                      name="spinner" auto
+                      name="thin-spinner" auto
                       :size="1.5"
             />
             <slot />

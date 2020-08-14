@@ -6,7 +6,7 @@
         <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
             <div key="loading" class="context-content context-item no-drag">
                 <slot name="loading-format" v-bind="{...$props, uuid}">
-                    <p-lottie name="spinner" auto :size="1" />
+                    <p-lottie name="thin-spinner" auto :size="1" />
                 </slot>
             </div>
         </slot>
