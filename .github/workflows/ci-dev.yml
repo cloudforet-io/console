@@ -6,6 +6,10 @@ on:
     tags:
       - "**"
   workflow_dispatch:
+    inputs:
+      tag:
+      # can replace github.event.inputs.tag <=> steps.getTag.outputs.tag
+        default: 1.2.3
 
 jobs:
   initialize:
@@ -16,13 +20,21 @@ jobs:
       - uses: olegtarasov/get-tag@v2
         id: getTag
 
-      - name: Set environment virables
+      - name: Set version
+        run: |
+          if [ ${{ steps.getTag.outputs.tag }} ]
+          then
+            echo "::set-env name=VERSION::${{ steps.getTag.outputs.tag }}"
+          else
+            echo "::set-env name=VERSION::${{ github.event.inputs.tag }}"
+          fi
+
+      - name: Set environment variables
         env:
           # 이 곳에서 환경변수를 통해 설정 관리
           IMAGE_PREFIX: spaceone
           DOCKER_UPLOAD: true
           # LOCATION points the parent directory
-          LOCATION_VERSION: src # the location for VERSION file (ex- . means the location of VERSION is ./VERSION)
           LOCATION_DOCKERFILE: .
 
         run: |
@@ -32,11 +44,15 @@ jobs:
           echo "::set-env name=IMAGE_PREFIX::$IMAGE_PREFIX"
 
           echo "::set-env name=DOCKER_UPLOAD::$DOCKER_UPLOAD"
-          echo "::set-env name=LOCATION_VERSION::$LOCATION_VERSION"
           echo "::set-env name=LOCATION_DOCKERFILE::$LOCATION_DOCKERFILE"
 
-          echo "::set-env name=VERSION::${{ steps.getTag.outputs.tag }}"
-          echo "$(cat $LOCATION_VERSION/VERSION).${{ github.run_id }}">$LOCATION_VERSION/VERSION
+          # LATEST_TAG true or false
+          if [[ $VERSION =~ ^[0-9]\.[0-9]\.[0-9]$ ]];
+          then
+            echo "::set-env name=LATEST_TAG::true"
+          else
+            echo "::set-env name=LATEST_TAG::false"
+          fi
           EOF
 
           bash set_env.sh
@@ -48,26 +64,6 @@ jobs:
           path: set_env.sh
       - run: |
           cat set_env.sh
-
-      - name: Clone master branch
-        uses: actions/checkout@v2
-        with:
-          ref: master
-          path: master_branch
-
-      - name: Compare version
-        run: |
-          echo "MASTER BRANCH VERSION"
-          cat master_branch/$LOCATION_VERSION/VERSION
-          echo -e "\n\n"
-
-          echo "PR VERSION"
-          cat $LOCATION_VERSION/VERSION
-          echo -e "\n\n"
-
-          echo "::set-env name=IS_NEW_VERSION::false"
-          cmp --silent master_branch/$LOCATION_VERSION/VERSION $LOCATION_VERSION/VERSION || \
-          echo "::set-env name=IS_NEW_VERSION::true"
 
   docker:
     needs: initialize
@@ -88,12 +84,34 @@ jobs:
         run: |
           bash set_env.sh
 
-      - name: Upload docker
-        if: env.DOCKER_UPLOAD == 'true'
+      - name: "Upload docker - Option a. :latest, :${{ env.VERSION }}"
+        if: env.DOCKER_UPLOAD == 'true' && env.LATEST_TAG == 'true'
+        run: |
+          echo latest
         uses: docker/build-push-action@v1
         with:
           repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          workdir: ${{ env.LOCATION_DOCKERFILE }}
           tags: latest,${{ env.VERSION }}
+
+      - name: "Upload docker - Option b. only :${{ env.VERSION }}"
+        if: env.DOCKER_UPLOAD == 'true' && env.LATEST_TAG == 'false'
+        run: |
+          echo no latest
+        uses: docker/build-push-action@v1
+        with:
+          repository: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: ${{ env.VERSION }}
+
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.2.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          author_name: Github Action Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+      - github-action
+
   workflow_dispatch:
 jobs:
   initialize:
@@ -11,11 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set environment virables
+      - name: Set environment variables
         env:
           # 이 곳에서 환경변수를 통해 설정 관리
           IMAGE_PREFIX: spaceone
-          DOCKER_UPLOAD: true
           # LOCATION points the parent directory
           LOCATION_VERSION: src # the location for VERSION file (ex- . means the location of VERSION is ./VERSION)
           LOCATION_DOCKERFILE: .
@@ -26,7 +27,6 @@ jobs:
           echo "::set-env name=SERVICE::$(cut -d'/' -f2 <<<${{github.repository}})"
           echo "::set-env name=IMAGE_PREFIX::$IMAGE_PREFIX"
 
-          echo "::set-env name=DOCKER_UPLOAD::$DOCKER_UPLOAD"
           echo "::set-env name=LOCATION_VERSION::$LOCATION_VERSION"
           echo "::set-env name=LOCATION_DOCKERFILE::$LOCATION_DOCKERFILE"
 
@@ -43,26 +43,6 @@ jobs:
           path: set_env.sh
       - run: |
           cat set_env.sh
-
-      - name: Clone master branch
-        uses: actions/checkout@v2
-        with:
-          ref: master
-          path: master_branch
-
-      - name: Compare version
-        run: |
-          echo "MASTER BRANCH VERSION"
-          cat master_branch/$LOCATION_VERSION/VERSION
-          echo -e "\n\n"
-
-          echo "PR VERSION"
-          cat $LOCATION_VERSION/VERSION
-          echo -e "\n\n"
-
-          echo "::set-env name=IS_NEW_VERSION::false"
-          cmp --silent master_branch/$LOCATION_VERSION/VERSION $LOCATION_VERSION/VERSION || \
-          echo "::set-env name=IS_NEW_VERSION::true"
 
   docker:
     needs: initialize
@@ -94,3 +74,13 @@ jobs:
           region: ap-northeast-2
           tags: latest,${{ env.VERSION }}
           create_repo: false
+
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.2.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          author_name: Github Action Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
