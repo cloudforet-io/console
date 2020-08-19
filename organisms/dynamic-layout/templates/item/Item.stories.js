@@ -4,7 +4,7 @@ import {
 } from '@storybook/addon-knobs';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { action } from '@storybook/addon-actions';
-import md from './item.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
     title: 'organisms/dynamic-layout/item',
@@ -69,7 +69,11 @@ const defaultLayout = {
 export const defaultCase = () => ({
     components: { PDynamicLayout },
     template: `<div class="w-full bg-white">
-        <PDynamicLayout v-bind="$props" type="item"
+        <PDynamicLayout type="item"
+                        :name="name"
+                        :options="options"
+                        :data="data"
+                        :extra="{timezone}"
                         @init="onInit"
         />
     </div>`,
@@ -209,7 +213,11 @@ const rootPathLayout = {
 export const rootPathCase = () => ({
     components: { PDynamicLayout },
     template: `<div class="w-full bg-white">
-        <PDynamicLayout v-bind="$props" type="item"
+        <PDynamicLayout type="item"
+                        :name="name"
+                        :options="options"
+                        :data="data"
+                        :extra="{timezone}"
                         @init="onInit"
         />
     </div>`,

@@ -8,7 +8,7 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import md from './table.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
     title: 'organisms/dynamic-layout/table',
@@ -82,12 +82,12 @@ export const defaultCase = () => ({
     },
     template: `
         <div style="width: 95vw;" class="flex">
-            <PDynamicLayout v-bind="$props"
-                             style="width: 65%;"
+            <PDynamicLayout style="width: 65%;"
                             type="table"
+                            :name="name"
+                            :options="options"
                              :data="data"
-                             :loading="loading"
-                             :total-count="totalCount"
+                             :extra="extra"
                              @init="onInit"
                              @fetch="onFetch"
                              @select="onSelect"
@@ -100,15 +100,17 @@ export const defaultCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: [],
-            loading: true,
-            totalCount: 0,
+            extra: {
+                loading: true,
+                totalCount: 0,
+            },
         });
 
         const onFetch = async (options, changed) => {
-            state.loading = true;
+            state.extra.loading = true;
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
-                    state.totalCount = casual.integer(0);
+                    state.extra.totalCount = casual.integer(0);
                     const res = {
                         data: {
                             security_group_rules: arrayOf(options.pageLimit,
@@ -124,7 +126,7 @@ export const defaultCase = () => ({
                     resolve(res);
                 }, 1000);
             });
-            state.loading = false;
+            state.extra.loading = false;
         };
 
         return {

@@ -4,7 +4,7 @@ import {
 } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { ref } from '@vue/composition-api';
-import md from './raw.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
@@ -124,7 +124,11 @@ export const rootPathCase = () => ({
     components: { PDynamicLayout },
     template: `
         <div class="w-screen bg-white">
-            <PDynamicLayout v-bind="$props" type="raw" @init="onInit" />
+            <PDynamicLayout type="raw"
+                            :name="name"
+                            :options="options"
+                            :data="data"
+                            @init="onInit" />
         </div>
     `,
     props: {
@@ -135,9 +139,6 @@ export const rootPathCase = () => ({
             default: object('options', {
                 root_path: 'data.compute',
             }),
-        },
-        timezone: {
-            default: text('timezone', 'UTC'),
         },
         data: {
             default: object('data', data),

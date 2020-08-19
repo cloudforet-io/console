@@ -1,11 +1,24 @@
-import { DynamicLayoutTemplateProps, TableOptions } from '@/components/organisms/dynamic-layout/type';
-import { ToolboxTableProps } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
+import {
+    DynamicLayoutEventListeners, DynamicLayoutExtra,
+    DynamicLayoutFetchOptions,
+    DynamicLayoutProps,
+} from '@/components/organisms/dynamic-layout/type';
+import { TableOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
-export interface SearchTableProps extends ToolboxTableProps {
-    searchText: string;
-}
 
-export type TableDynamicLayoutProps = DynamicLayoutTemplateProps<
-    SearchTableProps,
-    TableOptions
+export type TableFetchOptions = Pick<DynamicLayoutFetchOptions,
+    'sortBy'|'sortDesc'|'pageStart'|'pageLimit'|'searchText'
     >
+
+export type TableExtra = Pick<DynamicLayoutExtra,
+    'loading'|'totalCount'|'timezone'|'selectIndex'
+    >
+
+export type TableDynamicLayoutProps = DynamicLayoutProps <
+    TableOptions,
+    TableFetchOptions,
+    TableExtra
+    >
+
+export type TableDynamicLayoutEventListeners
+    = DynamicLayoutEventListeners<TableFetchOptions>;

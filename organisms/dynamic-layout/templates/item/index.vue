@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top v-if="name">{{ name }}</p-panel-top>
+        <p-panel-top v-if="name">
+            {{ name }}
+        </p-panel-top>
         <p-definition-table :fields="fields" :data="rootData" :loading="loading"
                             v-on="$listeners"
         >
@@ -19,8 +21,9 @@ import { get } from 'lodash';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import { DefinitionData, DefinitionField } from '@/components/organisms/tables/definition-table/type';
-import { ItemDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/item/type';
-import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
+import {
+    ItemDynamicLayoutProps, ItemFetchOptions,
+} from '@/components/organisms/dynamic-layout/templates/item/type';
 
 export default {
     name: 'PDynamicLayoutItem',
@@ -41,19 +44,11 @@ export default {
             type: Object,
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
@@ -72,10 +67,11 @@ export default {
                 }
                 return props.data;
             }),
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
+            loading: computed(() => (props.extra === undefined ? undefined : props.extra.loading)),
+            fetchOptionsParam: computed<ItemFetchOptions>(() => ({})),
         });
 
-        emit('init', state.fetchOptions);
+        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

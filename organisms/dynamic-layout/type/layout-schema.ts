@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 import { DynamicField } from '@/components/organisms/dynamic-field/type';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
 /** Metadata schema types for Dynamic layout */
 export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'
@@ -50,38 +49,3 @@ export interface DynamicLayout {
     type: DynamicLayoutType;
     options?: DynamicLayoutOptions;
 }
-
-/** Props for Dynamic layout component */
-export interface DynamicLayoutProps<InitProps, Options> {
-    name: string;
-    type: DynamicLayoutType;
-    options: Options;
-    data?: any;
-    loading?: boolean;
-    totalCount?: number;
-    timezone?: string;
-    beforeCreate?: (props: any) => void|Promise<void>;
-    initProps?: InitProps;
-}
-
-export interface DynamicLayoutFetchOptions {
-    sortBy?: string;
-    sortDesc?: boolean;
-    pageStart?: number;
-    pageLimit?: number;
-    queryTags?: QueryTag[];
-    selectIndex?: number[];
-    searchText?: string;
-}
-
-/** Dynamic Layout Event Listeners */
-export interface DynamicLayoutEventListeners {
-    init: (options: DynamicLayoutFetchOptions) => void|Promise<void>;
-    fetch: (options: DynamicLayoutFetchOptions,
-             changedOptions: DynamicLayoutFetchOptions) => void|Promise<void>;
-    select: (selectIndex: number[]) => void|Promise<void>;
-}
-
-/** Props for each template component that matches to dynamic layout types */
-export type DynamicLayoutTemplateProps<InitProps, Options> =
-    Omit<DynamicLayoutProps<InitProps, Options>, 'type' | 'beforeCreate'>;

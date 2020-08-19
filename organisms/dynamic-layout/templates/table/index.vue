@@ -64,7 +64,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, reactive, Ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
@@ -73,7 +73,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
-import { TableDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/table/type';
+import { TableDynamicLayoutProps, TableFetchOptions } from '@/components/organisms/dynamic-layout/templates/table/type';
 import { get } from 'lodash';
 
 interface Field {
@@ -103,19 +103,11 @@ export default {
             type: [Array, Object],
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
@@ -137,16 +129,19 @@ export default {
                     width: ds.options?.width,
                 }));
             }),
-            allPage: computed(() => (props.totalCount ? Math.ceil(props.totalCount / state.pageSize) : 1)),
-            sortBy: props.initProps?.sortBy || '',
-            sortDesc: props.initProps?.sortDesc || true,
-            selectIndex: props.initProps?.selectIndex || [],
-            thisPage: props.initProps?.thisPage || 1,
-            pageSize: props.initProps?.pageSize || 15,
-            /** search */
-            searchText: props.initProps?.searchText || '',
+            /** get data from extra prop */
+            loading: computed(() => (props.extra?.loading || false)),
+            totalCount: computed(() => (props.extra?.totalCount || 0)),
+            allPage: computed(() => (state.totalCount ? Math.ceil(state.totalCount / state.pageSize) : 1)),
+            selectIndex: props.extra?.selectIndex || [],
+            /** get data from fetch options */
+            sortBy: props.fetchOptions?.sortBy || '',
+            sortDesc: props.fetchOptions?.sortDesc || true,
+            thisPage: props.fetchOptions?.pageStart || 1,
+            pageSize: props.fetchOptions?.pageLimit || 15,
+            searchText: props.fetchOptions?.searchText || '',
             /** dynamic layout fetch options */
-            fetchOptions: computed(() => ({
+            fetchOptionsParam: computed<TableFetchOptions>(() => ({
                 sortBy: state.sortBy,
                 sortDesc: state.sortDesc,
                 pageStart: state.thisPage,
@@ -160,10 +155,10 @@ export default {
                 if (!props.options.fields) return res;
 
                 props.options.fields.forEach((ds: DynamicField, i) => {
-                    const item = { ...ds, initProps: {} as any };
+                    const item: Pick<DynamicFieldProps, 'extra'|'options'> = { ...ds, extra: {} as any };
 
                     if (ds.type === 'datetime') {
-                        if (!item.initProps.timezone) item.initProps.timezone = props.timezone || 'UTC';
+                        if (!item.extra.timezone) item.extra.timezone = props.extra?.timezone || 'UTC';
                     }
 
                     res[`col-${ds.key}-format`] = item;
@@ -183,7 +178,7 @@ export default {
         const emitFetch = (options?: Partial<DynamicLayoutFetchOptions>) => {
             emit('fetch', Object.freeze({
                 ...state.options,
-                ...state.fetchOptions,
+                ...state.fetchOptionsParam,
             }), Object.freeze({ ...options }));
         };
 
@@ -212,7 +207,7 @@ export default {
             if (val) emitFetch({ searchText: val });
         };
 
-        emit('init', state.fetchOptions);
+        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

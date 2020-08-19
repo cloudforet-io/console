@@ -8,7 +8,8 @@
                           :loading="loading"
                           :total-count="totalCount"
                           :timezone="timezone"
-                          :init-props="initPropsMap[layout.name]"
+                          :fetch-options="fetchOptionsMap[layout.name]"
+                          :extra="extraMap[layout.name]"
                           v-on="getListeners(layout.name, idx)"
         >
             <template v-for="(slot) of slotNames" v-slot:[slot]="scope">
@@ -24,10 +25,12 @@ import {
 } from '@vue/composition-api';
 import { map, replace, get } from 'lodash';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { ListDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/list/type';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type';
+import {
+    ListDynamicLayoutProps,
+} from '@/components/organisms/dynamic-layout/templates/list/type';
 import { makeByPassListeners } from '@/components/util/composition-helpers';
-import { list } from 'postcss';
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayoutExtra, DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
 
 export default {
     name: 'PDynamicLayoutList',
@@ -45,19 +48,11 @@ export default {
             type: [Array, Object],
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
@@ -70,7 +65,8 @@ export default {
                 return get(props.data, props.options.root_path, undefined);
             }),
             slotNames: computed(() => (map(slots, (slot: string, name) => replace(name, `${props.name}-`, '')))),
-            initPropsMap: computed(() => props.initProps || {}),
+            fetchOptionsMap: computed<Record<string, Partial<DynamicLayoutFetchOptions>>>(() => props.fetchOptions?.listMap || {}),
+            extraMap: computed<Record<string, Partial<DynamicLayoutExtra>>>(() => props.extra?.listMap || {}),
         });
 
         return {

@@ -7,7 +7,7 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import md from './list.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
     title: 'organisms/dynamic-layout/list',
@@ -371,7 +371,7 @@ export const defaultCase = () => ({
     <div style="width: 80vw;">
         <PDynamicLayout :name="name"
                         :options="options"
-                        :timezone="timezone"
+                        :extra="{timezone}"
                         type="list"
                         @init="onInit" 
                         @fetch="onFetch" 

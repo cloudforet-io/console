@@ -1,6 +1,6 @@
 <template>
     <div class="p-dynamic-layout-query-search-table">
-        <p-panel-top class="panel-top" v-if="name"
+        <p-panel-top v-if="name" class="panel-top"
                      :use-total-count="true"
                      :total-count="totalCount"
         >
@@ -37,20 +37,16 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import {
-    DynamicLayoutEventListeners,
-    DynamicLayoutFetchOptions,
-} from '@/components/organisms/dynamic-layout/type';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import {
-    Options as QuerySearchTableFetchOptions,
-} from '@/components/organisms/tables/query-search-table/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import {forEach, get} from 'lodash';
-import { QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
+import { forEach, get } from 'lodash';
+import {
+    QuerySearchTableDynamicLayoutEventListeners,
+    QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
+} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
@@ -72,24 +68,16 @@ export default {
             type: Array,
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
     },
-    setup(props: QuerySearchDynamicLayoutProps, { emit }) {
+    setup(props: QuerySearchTableDynamicLayoutProps, { emit }) {
         const state = reactive({
             fields: computed(() => {
                 if (!props.options.fields) return [];
@@ -103,21 +91,25 @@ export default {
                     width: ds.options?.width,
                 }));
             }),
-            sortBy: props.initProps?.sortBy || '',
-            sortDesc: props.initProps?.sortDesc || true,
-            selectIndex: props.initProps?.selectIndex || [],
-            thisPage: props.initProps?.thisPage || 1,
-            pageSize: props.initProps?.pageSize || 15,
+            /** get data from fetch options */
+            sortBy: props.fetchOptions?.sortBy || '',
+            sortDesc: props.fetchOptions?.sortDesc || true,
+            thisPage: props.fetchOptions?.pageStart || 1,
+            pageSize: props.fetchOptions?.pageLimit || 15,
+            queryTags: props.fetchOptions?.queryTags || [],
+            /** get data from extra prop */
+            loading: computed(() => (props.extra?.loading || false)),
+            totalCount: computed(() => (props.extra?.totalCount || 0)),
             keyItems: computed<KeyItem[]>(() => {
-                if (props.initProps?.keyItems) return props.initProps?.keyItems;
+                if (props.extra?.keyItems) return props.extra?.keyItems;
                 if (!props.options.fields) return [];
 
                 return props.options.fields.map(d => ({ label: d.name, name: d.key }));
             }),
-            valueHandlerMap: props.initProps?.valueHandlerMap || {},
-            queryTags: props.initProps?.queryTags || [],
+            valueHandlerMap: props.extra?.valueHandlerMap || {},
+            selectIndex: props.extra?.selectIndex || [],
             /** dynamic layout fetch options */
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({
+            fetchOptionsParam: computed<QuerySearchTableFetchOptions>(() => ({
                 sortBy: state.sortBy,
                 sortDesc: state.sortDesc,
                 pageStart: state.thisPage,
@@ -138,10 +130,10 @@ export default {
             if (!props.options.fields) return res;
 
             props.options.fields.forEach((ds: DynamicField, i) => {
-                const item = { ...ds, initProps: {} as any };
+                const item: Pick<DynamicFieldProps, 'extra'|'options'> = { ...ds, extra: {} };
 
                 if (ds.type === 'datetime') {
-                    if (!item.initProps.timezone) item.initProps.timezone = props.timezone || 'UTC';
+                    if (!item.extra.timezone) item.extra.timezone = props.extra?.timezone || 'UTC';
                 }
 
                 res[`col-${ds.key}-format`] = item;
@@ -156,20 +148,20 @@ export default {
         };
 
         const onChange = (options: QuerySearchTableFetchOptions, changedOptions: Partial<QuerySearchTableFetchOptions>) => {
-            const changedFetchOptions: Partial<DynamicLayoutFetchOptions> = {};
+            const changedFetchOptions: Partial<QuerySearchTableFetchOptions> = {};
             forEach(changedOptions, (d, k) => {
                 state[k] = d;
                 if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
                 else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
             });
 
-            const args: Parameters<DynamicLayoutEventListeners['fetch']> = [
-                state.fetchOptions, changedFetchOptions,
+            const args: Parameters<QuerySearchTableDynamicLayoutEventListeners['fetch']> = [
+                state.fetchOptionsParam, changedFetchOptions,
             ];
             emit('fetch', ...args);
         };
 
-        emit('init', state.fetchOptions);
+        emit('init', state.fetchOptionsParam);
 
 
         return {

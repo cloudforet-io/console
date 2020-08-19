@@ -18,8 +18,10 @@ import {
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
 import { get } from 'lodash';
-import { MarkdownDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/markdown/type';
-import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
+import {
+    MarkdownDynamicLayoutProps,
+    MarkdownFetchOptions,
+} from '@/components/organisms/dynamic-layout/templates/markdown/type';
 
 
 export default {
@@ -40,19 +42,11 @@ export default {
             type: [Array, Object],
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
@@ -65,11 +59,11 @@ export default {
                 }
                 return props.data;
             }),
-            language: computed(() => props.initProps?.language || 'en'),
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
+            language: computed(() => props.extra?.language || 'en'),
+            fetchOptionsParam: computed<MarkdownFetchOptions>(() => ({})),
         });
 
-        emit('init', state.fetchOptions);
+        emit('init', state.fetchOptionsParam);
 
 
         return {

@@ -75,11 +75,14 @@ export default {
         .fort-awesome {
             color: $icon-color;
         }
-        p-i {
+        .p-i {
             color: $icon-color;
         }
         .circle {
-            background-color: $circle-color;
+            background-color: $icon-color;
+        }
+        .label {
+            color: $circle-color;
         }
     }
     .p-status {
@@ -93,15 +96,21 @@ export default {
         }
         .label {
             margin: 0;
-            padding-left: .5rem;
+            padding-left: 0.5rem;
         }
 
-        /*theme*/
-        &.ENABLED {
-            @mixin status-theme theme('colors.green.500'), theme('colors.green.500');
+        /* theme */
+        &.yellow {
+            @mixin status-theme theme('colors.yellow.500'), theme('colors.black');
         }
-        &.DISABLED {
+        &.green {
+            @mixin status-theme theme('colors.green.500'), theme('colors.black');
+        }
+        &.red {
             @mixin status-theme theme('colors.red.500'), theme('colors.red.500');
+        }
+        &.gray {
+            @mixin status-theme theme('colors.gray.500'), theme('colors.gray.500');
         }
     }
 </style>

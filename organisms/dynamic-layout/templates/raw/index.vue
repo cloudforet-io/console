@@ -14,8 +14,7 @@ import {
 import { get } from 'lodash';
 import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import { RawDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/raw/type';
-import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
+import { RawDynamicLayoutProps, RawFetchOptions } from '@/components/organisms/dynamic-layout/templates/raw/type';
 
 export default {
     name: 'PDynamicLayoutRaw',
@@ -33,19 +32,11 @@ export default {
             type: [Array, Object],
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
@@ -58,10 +49,10 @@ export default {
                 }
                 return props.data;
             }),
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
+            fetchOptionsParam: computed<RawFetchOptions>(() => ({})),
         });
 
-        emit('init', state.fetchOptions);
+        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

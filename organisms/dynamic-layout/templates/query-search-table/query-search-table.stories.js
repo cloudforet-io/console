@@ -8,7 +8,7 @@ import {
 } from '@storybook/addon-knobs/vue';
 import casual, { arrayOf } from '@/components/util/casual';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import md from './query-search-table.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
     title: 'organisms/dynamic-layout/query-search-table',
@@ -74,11 +74,9 @@ export const defaultCase = () => ({
         <PDynamicLayout style="width: 65%;"
                         :name="name"
                         :options="options"
-                        :timezone="timezone"
                         type="query-search-table"
                         :data="data"
-                        :loading="loading"
-                        :total-count="totalCount"
+                        :extra="extra"
                         @init="onInit"
                         @fetch="onFetch"
                         @select="onSelect"
@@ -91,15 +89,19 @@ export const defaultCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: [],
-            loading: true,
-            totalCount: 0,
+            extra: {
+                loading: true,
+                totalCount: 0,
+                timezone: computed(() => props.timezone),
+            },
+
         });
 
         const onFetch = async (options, changed) => {
-            state.loading = true;
+            state.extra.loading = true;
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
-                    state.totalCount = casual.integer(0);
+                    state.extra.totalCount = casual.integer(0);
                     resolve(arrayOf(options.pageLimit, () => ({
                         // eslint-disable-next-line camelcase
                         server_id: casual.uuid,
@@ -113,7 +115,7 @@ export const defaultCase = () => ({
                     })));
                 }, 1000);
             });
-            state.loading = false;
+            state.extra.loading = false;
         };
 
         return {

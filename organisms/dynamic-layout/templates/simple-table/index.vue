@@ -6,8 +6,7 @@
         >
             {{ name }}
         </p-panel-top>
-        <p-data-table v-bind="initProps"
-                      :items="rootData"
+        <p-data-table :items="rootData"
                       :fields="fields"
                       :loading="loading"
                       v-on="$listeners"
@@ -33,8 +32,10 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { SimpleTableDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/simple-table/type';
-import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
+import {
+    SimpleTableDynamicLayoutProps,
+    SimpleTableFetchOptions
+} from '@/components/organisms/dynamic-layout/templates/simple-table/type';
 
 
 export default {
@@ -58,19 +59,11 @@ export default {
             type: [Array, Object],
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        initProps: {
+        extra: {
             type: Object,
             default: undefined,
         },
@@ -95,16 +88,18 @@ export default {
                 }
                 return props.data;
             }),
+            loading: computed(() => (props.extra?.loading || false)),
+            totalCount: computed(() => (props.extra?.totalCount || 0)),
             /** others */
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
                 if (!props.options.fields) return res;
 
                 props.options.fields.forEach((ds: DynamicField, i) => {
-                    const item = { ...ds, initProps: {} as any };
+                    const item: Pick<DynamicFieldProps, 'extra'|'options'> = { ...ds, extra: {} as any };
 
                     if (ds.type === 'datetime') {
-                        if (!item.initProps.timezone) item.initProps.timezone = props.timezone || 'UTC';
+                        if (!item.extra.timezone) item.extra.timezone = props.extra?.timezone || 'UTC';
                     }
 
                     res[`col-${ds.key}-format`] = item;
@@ -112,10 +107,10 @@ export default {
 
                 return res;
             }),
-            fetchOptions: computed<DynamicLayoutFetchOptions>(() => ({})),
+            fetchOptionsParam: computed<SimpleTableFetchOptions>(() => ({})),
         });
 
-        emit('init', state.fetchOptions);
+        emit('init', state.fetchOptionsParam);
         return {
             ...toRefs(state),
         };

@@ -1,22 +1,16 @@
 import {
-    ListOptions,
-    DynamicLayoutTemplateProps,
+    DynamicLayoutProps, DynamicLayoutFetchOptions, DynamicLayoutExtra, DynamicLayoutEventListeners,
 } from '@/components/organisms/dynamic-layout/type';
-import { MarkdownDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/markdown/type';
-import { RawDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/raw/type';
-import { ItemDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/item/type';
-import { QuerySearchDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { TableDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/table/type';
-import { SimpleTableDynamicLayoutProps } from '@/components/organisms/dynamic-layout/templates/simple-table/type';
+import { ListOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
-type AllTypeInitProps = Partial<MarkdownDynamicLayoutProps>
-| Partial<RawDynamicLayoutProps>
-| Partial<ItemDynamicLayoutProps>
-| Partial<QuerySearchDynamicLayoutProps>
-| Partial<TableDynamicLayoutProps>
-| Partial<SimpleTableDynamicLayoutProps>
+type ListFetchOptions = Pick<DynamicLayoutFetchOptions, 'listMap'>
 
-export type ListDynamicLayoutProps = DynamicLayoutTemplateProps<
-    Record<string, AllTypeInitProps>,
-    ListOptions
->
+type ListExtra = Pick<DynamicLayoutExtra, 'listMap'>
+
+export type ListDynamicLayoutProps = DynamicLayoutProps<
+    ListOptions,
+    ListFetchOptions,
+    ListExtra
+    >
+
+export type ListDynamicLayoutEventListeners = Partial<DynamicLayoutEventListeners>;

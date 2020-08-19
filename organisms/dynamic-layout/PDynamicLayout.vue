@@ -4,10 +4,8 @@
         :name="name"
         :options="options"
         :data="data"
-        :loading="loading"
-        :total-count="totalCount"
-        :timezone="timezone"
-        :init-props="initProps"
+        :fetch-options="fetchOptions"
+        :extra="extra"
         v-on="$listeners"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -37,7 +35,7 @@ export default {
         },
         type: {
             type: String,
-            default: '',
+            default: 'item',
         },
         options: {
             type: Object,
@@ -47,28 +45,20 @@ export default {
             type: [Object, Array],
             default: undefined,
         },
-        loading: {
-            type: Boolean,
+        fetchOptions: {
+            type: Object,
             default: undefined,
         },
-        totalCount: {
-            type: Number,
-            default: undefined,
-        },
-        timezone: {
-            type: String,
+        extra: {
+            type: Object,
             default: undefined,
         },
         beforeCreate: {
             type: Function,
             default: undefined,
         },
-        initProps: {
-            type: Object,
-            default: undefined,
-        },
     },
-    setup(props: DynamicLayoutProps<any, any>, { emit }) {
+    setup(props: DynamicLayoutProps, { emit }) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,

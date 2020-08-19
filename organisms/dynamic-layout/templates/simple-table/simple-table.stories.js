@@ -3,9 +3,9 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import casual, { arrayOf } from '@/components/util/casual';
-import md from './simple-table.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
@@ -174,27 +174,36 @@ export const defaultCase = () => ({
         },
     },
     template: `
-        <div class="w-screen bg-white">
-            <PDynamicLayout v-bind="$props"
+        <div style="width: 95vw;" class="flex">
+            <PDynamicLayout style="width: 65%;"
                             type="simple-table"
-                           :data="data"
-                           :totalCount="totalCount"
+                            :name="name"
+                            :options="options"
+                            :extra="extra"
+                            :data="data"
+                            
                            @init="onInit"/>
+            <pre style="width: 30%; font-size: 0.75rem; overflow: scroll; height: 100%; border: 1px solid gray; margin-left: 1rem;">
+                {{data}}
+            </pre>
         </div>
         `,
     setup() {
         const state = reactive({
             data: [],
-            totalCount: 0,
+            extra: {
+                totalCount: 0,
+                timezone: computed(() => props.timezone),
+            },
         });
 
         const onFetch = async (options, changed) => {
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
-                    state.totalCount = casual.integer(0, 25);
+                    state.extra.totalCount = casual.integer(0, 25);
                     const res = {
                         data: {
-                            security_group_rules: arrayOf(state.totalCount,
+                            security_group_rules: arrayOf(state.extra.totalCount,
                                 () => ({
                                     security_group_name: casual.name,
                                     port_range_max: casual.integer(0),

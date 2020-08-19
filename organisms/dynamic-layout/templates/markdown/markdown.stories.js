@@ -5,7 +5,7 @@ import {
 import { reactive, toRefs } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import md from './markdown.md';
+import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
     title: 'organisms/dynamic-layout/markdown',
@@ -186,7 +186,7 @@ export const templateMode = () => ({
             <PDynamicLayout :name="name" 
                             type="markdown"
                             :options="options" 
-                            :timezone="timezone"
+                            :extra="{ timezone }"
                             :data="data"
                             @init="onInit"
             />
@@ -294,7 +294,7 @@ export const i18nMode = () => ({
             <PDynamicLayout :name="name" 
                             type="markdown"
                             :options="options"
-                            :init-props="{ language }"
+                            :extra="{ language, timezone }"
                             @init="onInit"
             />
         </div>

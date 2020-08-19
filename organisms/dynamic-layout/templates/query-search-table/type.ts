@@ -1,7 +1,22 @@
-import { QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
-import { DynamicLayoutTemplateProps, QuerySearchTableOptions } from '@/components/organisms/dynamic-layout/type';
+import {
+    DynamicLayoutEventListeners, DynamicLayoutExtra, DynamicLayoutFetchOptions,
+    DynamicLayoutProps,
+} from '@/components/organisms/dynamic-layout/type';
+import { QuerySearchTableOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
-export type QuerySearchDynamicLayoutProps = DynamicLayoutTemplateProps<
-    Partial<QuerySearchTableProps>,
-    QuerySearchTableOptions
+export type QuerySearchTableFetchOptions = Pick<DynamicLayoutFetchOptions,
+'sortBy'|'sortDesc'|'pageStart'|'pageLimit'|'queryTags'
     >
+
+export type QuerySearchTableExtra = Pick<DynamicLayoutExtra,
+    'loading'|'totalCount'|'timezone'|'selectIndex'|'keyItems'|'valueHandlerMap'
+    >
+
+export type QuerySearchTableDynamicLayoutProps = DynamicLayoutProps<
+    QuerySearchTableOptions,
+    QuerySearchTableFetchOptions,
+    QuerySearchTableExtra
+    >
+
+export type QuerySearchTableDynamicLayoutEventListeners
+    = DynamicLayoutEventListeners<QuerySearchTableFetchOptions>
