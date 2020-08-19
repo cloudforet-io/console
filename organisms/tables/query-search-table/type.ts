@@ -15,6 +15,7 @@ export interface QuerySearchTableProps {
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     queryTags: QueryTag[]; // sync
+    selectable: boolean;
 }
 
 export interface Options {
