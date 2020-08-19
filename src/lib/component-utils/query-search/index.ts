@@ -20,14 +20,14 @@ import {
     SearchKeyGroup,
 } from '@/lib/component-utils/query-search/type';
 import { fluentApi } from '@/lib/fluent-api';
-import { getStatApiValueHandler } from '@/lib/api/query-search';
 import { AutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
 
 
-type KeyParam = Array<string[]|string>
+type KeyParam = Array<string[]|string|KeyItem>
 export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
     if (Array.isArray(d)) return { name: d[0], label: d[1] || d[0] };
-    return { name: d, label: d };
+    if (typeof d === 'string') return { name: d, label: d };
+    return d;
 });
 
 export function getEnumValueHandler(keys: KeyParam): ValueHandler {
@@ -96,7 +96,8 @@ export function makeValueHandlerMapWithReference(keys: KeyParam, resourceType: s
     const res = {};
     keys.forEach((k) => {
         if (Array.isArray(k)) res[k[0]] = makeValueHandlerWithReference(resourceType, k[0]);
-        else res[k] = makeValueHandlerWithReference(resourceType, k);
+        else if (typeof k === 'string') res[k] = makeValueHandlerWithReference(resourceType, k);
+        else res[k.name] = makeValueHandlerWithReference(resourceType, k.name);
     });
     return res;
 }

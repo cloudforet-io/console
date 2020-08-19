@@ -158,7 +158,7 @@ export const queryTagsToQueryString: Getter = (tags: QueryTag[]): RouteQueryStri
     return null;
 };
 
-export const queryTagsToOriginal: Setter = (queryString: RouteQueryString): QueryTag[] => {
+export const queryStringToQueryTags: Setter = (queryString: RouteQueryString): QueryTag[] => {
     if (!queryString) return [];
     if (Array.isArray(queryString)) {
         return queryString.reduce((res, qs) => {

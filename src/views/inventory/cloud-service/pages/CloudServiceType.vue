@@ -150,7 +150,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds,
-    queryTagsToOriginal,
+    queryStringToQueryTags,
     queryTagsToQueryString,
     replaceQuery,
 } from '@/lib/router-query-string';
@@ -351,7 +351,7 @@ export default {
             f: makeQueryStringComputed(state.tags,
                 {
                     key: 'f',
-                    setter: queryTagsToOriginal,
+                    setter: queryStringToQueryTags,
                     getter: queryTagsToQueryString,
                 }),
             provider: makeQueryStringComputed(selectedProvider, { key: 'provider', disableAutoReplace: true }),

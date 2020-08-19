@@ -128,8 +128,8 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSe
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import { fluentApi, Resource } from '@/lib/fluent-api';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
+import SDynamicSubData from '@/views/common/dynamic-subdata/SDynamicSubData.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';

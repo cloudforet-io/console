@@ -148,17 +148,18 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
 
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
-import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
+import SDynamicSubData from '@/views/common/dynamic-subdata/SDynamicSubData.vue';
 import baseTable from '@/data-schema/inventory/cloud_service/table/layout/base_table.json';
-import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import baseInfoSchema from '@/data-schema/inventory/cloud_service/sub_data/layouts/base_info.json';
 import { get, debounce } from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray,
-    queryTagsToOriginal,
+    queryStringToQueryTags,
     queryTagsToQueryString,
 } from '@/lib/router-query-string';
 import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
@@ -482,7 +483,7 @@ export default {
         makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
             {
                 key: 'f',
-                setter: queryTagsToOriginal,
+                setter: queryStringToQueryTags,
                 getter: queryTagsToQueryString,
             });
         makeQueryStringComputeds(multiItemTab.syncState, {

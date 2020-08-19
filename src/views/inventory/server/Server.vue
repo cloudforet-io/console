@@ -171,13 +171,12 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import baseTable from '@/data-schema/inventory/server/table/layout/base_table.json';
-import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     makeQueryStringComputed,
-    makeQueryStringComputeds, queryStringToNumberArray,
-    queryTagsToOriginal, queryTagsToQueryString, replaceQuery, selectIndexAutoReplacer,
+    makeQueryStringComputeds, queryStringToNumberArray, queryStringToQueryTags, queryTagsToQueryString, replaceQuery, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
 import {
     TabBarState,
@@ -185,7 +184,7 @@ import {
 import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { get } from 'lodash';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import {
     makeQuerySearchHandlersWithSearchSchema,
 } from '@/lib/component-utils/query-search';
@@ -694,7 +693,7 @@ export default {
             f: makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
                 {
                     key: 'f',
-                    setter: queryTagsToOriginal,
+                    setter: queryStringToQueryTags,
                     getter: queryTagsToQueryString,
                 }),
             ...makeQueryStringComputeds(apiHandler.tableTS.syncState, {

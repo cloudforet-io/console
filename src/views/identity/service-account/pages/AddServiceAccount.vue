@@ -149,7 +149,7 @@ import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectT
 import { useStore } from '@/store/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import { get } from 'lodash';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import { showErrorMessage } from '@/lib/util';
 
 const accountFormSetup = (props) => {

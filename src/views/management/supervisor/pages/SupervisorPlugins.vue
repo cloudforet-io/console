@@ -87,7 +87,7 @@ import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearc
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray,
-    queryTagsToOriginal,
+    queryStringToQueryTags,
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
 import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
@@ -212,7 +212,7 @@ export default {
             f: makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
                 {
                     key: 'f',
-                    setter: queryTagsToOriginal,
+                    setter: queryStringToQueryTags,
                     getter: queryTagsToQueryString,
                 }),
             ...makeQueryStringComputeds(apiHandler.tableTS.syncState, {

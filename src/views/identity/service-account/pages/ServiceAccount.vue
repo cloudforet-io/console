@@ -164,7 +164,7 @@ import {
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
@@ -204,7 +204,7 @@ import {
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
-import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';

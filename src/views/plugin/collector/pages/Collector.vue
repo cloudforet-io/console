@@ -50,7 +50,7 @@
                         {{ data.value }}
                     </template>
                     <template #col-state-format="data">
-                        <p-status :text="data.value" :theme="data.value" />
+                        <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
                     </template>
                     <template #col-last_collected_at-format="{ value }">
                         {{ value ? timestampFormatter(value) : '' }}

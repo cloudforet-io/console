@@ -113,7 +113,7 @@ import _ from 'lodash';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -130,7 +130,7 @@ import {
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray,
-    queryTagsToOriginal,
+    queryStringToQueryTags,
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
 import {
@@ -418,7 +418,7 @@ export default {
             f: makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
                 {
                     key: 'f',
-                    setter: queryTagsToOriginal,
+                    setter: queryStringToQueryTags,
                     getter: queryTagsToQueryString,
                 }),
             ...makeQueryStringComputeds(apiHandler.tableTS.syncState, {

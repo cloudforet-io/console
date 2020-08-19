@@ -9,7 +9,7 @@
 
 <script lang="ts">
 
-import SDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/SDynamicSubData.vue';
+import SDynamicSubData from '@/views/common/dynamic-subdata/SDynamicSubData.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import {
     computed, reactive, toRefs, watch,
