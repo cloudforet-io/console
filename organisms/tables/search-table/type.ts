@@ -11,6 +11,7 @@ export interface SearchTableProps {
     pageSize: number; // sync
     totalCount: number;
     searchText: string; // sync
+    selectable: boolean;
 }
 
 export interface Options {

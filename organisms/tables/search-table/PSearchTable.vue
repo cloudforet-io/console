@@ -12,13 +12,18 @@
                      use-cursor-loading
                      :setting-visible="false"
                      sortable
-                     selectable
+                     :selectable="selectable"
                      @changePageSize="onChangePageSize"
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
                      @select="onSelect"
                      @clickRefresh="emitChange()"
                      @clickExcel="emitExport()"
+                     @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
+                     @rowRightClick="byPassEvent('rowRightClick', ...arguments)"
+                     @rowMiddleClick="byPassEvent('rowMiddleClick', ...arguments)"
+                     @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
+                     @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
         <template #toolbox-left>
             <slot name="toolbox-left" />
@@ -101,6 +106,10 @@ export default {
             type: String,
             default: '',
         },
+        selectable: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, { emit, slots }) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -138,6 +147,10 @@ export default {
                 ...state.options,
                 ...options,
             }), Object.freeze({ ...options }));
+        };
+
+        const byPassEvent = (name, item, index, mouseEvent) => {
+            emit(name, item, index, mouseEvent);
         };
 
         const emitExport = () => {
@@ -180,6 +193,7 @@ export default {
             onChangeSort,
             onSelect,
             onSearch,
+            byPassEvent,
         };
     },
 };
