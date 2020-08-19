@@ -28,7 +28,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="name" block
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
+                                          class="block"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -42,7 +42,7 @@
                         <template #default="{invalid}">
                             <p-text-input v-model.number="priority" block
                                           type="number"
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
+                                          class="block"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -248,6 +248,17 @@ export default {
         @apply flex border-r border-gray-200;
         width: 50%;
         padding: 2.5rem;
+        .p-text-input {
+            @apply text-gray-900;
+            width: 100%;
+            max-width: 19rem;
+            appearance: none;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.125rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
     }
 
     .reset-btn {
