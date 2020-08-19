@@ -2,7 +2,7 @@
 import { makeArrayResults, MockData } from '@/lib/mock/toolset';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/lib/mock/casual';
-import _ from 'lodash';
+import { get, find } from 'lodash';
 
 const schemas = [
     {
@@ -244,8 +244,8 @@ export default [
     new MockData('/repository/repository/list', () => makeArrayResults(arrayOf(10, casual._repository), 80)),
     new MockData('/repository/schema/get', (req) => {
         const params: any = JSON.parse(req.data);
-        const name: string = _.get(params, 'name');
-        return _.find(schemas, { name });
+        const name: string = get(params, 'name');
+        return find(schemas, { name });
     }),
     new MockData('/repository/plugin/list', () => makeArrayResults(arrayOf(10, casual._plugin), 80)),
     new MockData('/repository/plugin/get-versions', () => casual._pluginVersion),

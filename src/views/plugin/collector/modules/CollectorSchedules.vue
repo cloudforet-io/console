@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
@@ -145,7 +145,7 @@ export default {
             state.editVisible = true;
         };
 
-        const listSchedules = _.debounce(async (): Promise<void> => {
+        const listSchedules = debounce(async (): Promise<void> => {
             state.loading = true;
             state.selectIndex = [];
             state.totalCount = 0;

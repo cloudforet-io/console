@@ -3,7 +3,7 @@ import {
 } from '@/lib/chart/s-chart';
 import { Chart } from 'chart.js';
 import { black, white, gray } from '@/styles/colors';
-import _ from 'lodash';
+import { sumBy, sum, range } from 'lodash';
 
 interface SPieChartInterface {
     showTotalCount: boolean;
@@ -65,7 +65,7 @@ const pieChartSettings: SettingsInterface = {
             if (!ctx) return;
 
             if (chart.showTotalCount) {
-                const totalCount: number = chart.isNoData ? 0 : _.sumBy(chart.data?.datasets, ds => _.sum(ds.data) || 0);
+                const totalCount: number = chart.isNoData ? 0 : sumBy(chart.data?.datasets, ds => sum(ds.data) || 0);
                 const txt = `${totalCount}`;
 
                 ctx.font = '2rem Roboto';
@@ -132,7 +132,7 @@ export class SPieChart extends SChart implements SPieChartInterface {
         if (this.isNoData) {
             // eslint-disable-next-line no-unused-expressions
             this.data.datasets?.forEach((ds, i, origin) => {
-                origin[i].data = _.range(this.defaultCount).fill(1);
+                origin[i].data = range(this.defaultCount).fill(1);
             });
         }
 

@@ -103,8 +103,7 @@
                                 :name="$t('TAB.CREDENTIALS')"
                                 :toolset="secretApiHandler"
                                 :options="{fields: secretDataSource}"
-                            >
-                            </s-dynamic-layout>
+                            />
                         </template>
                         <template #member>
                             <s-dynamic-layout :api="adminApi"
@@ -167,7 +166,6 @@ import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayo
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
@@ -195,7 +193,6 @@ import { DoubleCheckModalState } from '@/components/organisms/modals/double-chec
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
-import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
@@ -210,13 +207,7 @@ import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { projectFormatter } from '@/lib/display-formatter';
-import PPageNavigation from "@/components/molecules/page-navigation/PPageNavigation.vue";
-
-enum providerQsName{
-    select = 'provider'
-}
-
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -224,7 +215,6 @@ export default {
         PVerticalPageLayout,
         PHorizontalLayout,
         PTab,
-        PButton,
         PDropdownMenuBtn,
         PEmpty,
         SProjectTreeModal,

@@ -140,7 +140,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import _ from 'lodash';
 import {
     computed, getCurrentInstance, reactive, Ref, toRefs, watch,
 } from '@vue/composition-api';

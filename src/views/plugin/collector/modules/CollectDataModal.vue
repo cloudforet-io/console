@@ -84,7 +84,7 @@
 import {
     toRefs, reactive, computed, SetupContext, watch,
 } from '@vue/composition-api';
-import _ from 'lodash';
+import { get } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -160,11 +160,11 @@ export default {
                 [COLLECT_MODE.create, 'INVENTORY.ACTION.COLLECT_CREATE'],
             ], null, { type: 'item' })),
             selectedCollectMode: COLLECT_MODE.all,
-            image: computed<string>(() => _.get(state.collector, 'tags.icon', '')),
-            version: computed<string>(() => _.get(state.collector, 'plugin_info.version', '')),
-            description: computed<string>(() => _.get(state.collector, 'tags.description', '')),
+            image: computed<string>(() => get(state.collector, 'tags.icon', '')),
+            version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
+            description: computed<string>(() => get(state.collector, 'tags.description', '')),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            filterFormats: computed<any[]>(() => _.get(state.collector, 'plugin_info.options.filter_format', [])),
+            filterFormats: computed<any[]>(() => get(state.collector, 'plugin_info.options.filter_format', [])),
             filters: {},
             confirmBtnStyle: computed(() => ({
                 styleType: state.loading ? 'gray200' : 'primary-dark',
@@ -194,7 +194,6 @@ export default {
             const api = collectorApi.collect()
                 .setId(props.collectorId)
                 .setCollectMode(state.selectedCollectMode as COLLECT_MODE);
-            // if (!_.isEmpty(state.filters)) api.setFilters(state.filters);
             if (props.credentialId) api.setSecretId(props.credentialId);
             return api;
         });
@@ -202,7 +201,6 @@ export default {
         const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
             state.showValidation = true;
-            // if (await vdApi.allValidation()) {
             try {
                 await collectApi.value.execute();
                 context.root.$notify({

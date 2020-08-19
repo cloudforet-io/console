@@ -148,7 +148,7 @@ import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import { useStore } from '@/store/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
-import _ from 'lodash';
+import { get } from 'lodash';
 import SDynamicLayout from '@/components/organisms/dynamic-view/dynamic-layout/SDynamicLayout.vue';
 import { showErrorMessage } from '@/lib/util';
 
@@ -227,7 +227,7 @@ const credentialsFormSetup = (props) => {
         crdState.formSchema = resp.data.template.service_account.schema;
         schemaNames.value = resp.data.capability.supported_schema;
         // eslint-disable-next-line camelcase
-        description.value = _.get(resp.data, descriptionPath);
+        description.value = get(resp.data, descriptionPath);
     });
     return {
         crdFormTS,

@@ -5,7 +5,7 @@
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { fluentApi } from '@/lib/fluent-api';
 import {
-    getCurrentInstance, reactive, ref, toRefs,
+    getCurrentInstance, ref,
 } from '@vue/composition-api';
 
 export default {

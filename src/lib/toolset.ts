@@ -1,5 +1,5 @@
 import { reactive, computed, Ref } from '@vue/composition-api';
-import _ from 'lodash';
+import { assign } from 'lodash';
 import { ClassTypeOf } from '@/lib/type';
 
 export type optionalType<T1, T2> = T1 | T1 & T2
@@ -53,7 +53,7 @@ export function initReactive<T>(lazy: boolean, ...args: any[]): T {
     if (lazy) {
         return null as unknown as T;
     }
-    return reactive(_.assign({}, ...args));
+    return reactive(assign({}, ...args));
 }
 // EXAMPLE
 // @StateToolSet<string>() // fail

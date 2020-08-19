@@ -321,11 +321,10 @@
 </template>
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch, ref, Ref, onMounted,
+    ref, Ref, onMounted,
 } from '@vue/composition-api';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { parser } from '@/lib/api/code-generater';
 import VueHtml2pdf from 'vue-html2pdf';
 import html2pdf from 'html2pdf.js';
 
@@ -338,7 +337,6 @@ export default {
         VueHtml2pdf,
     },
     setup() {
-        const vm = getCurrentInstance();
         const html2Pdf: Ref<VueHtml2pdf> = ref(null);
         const exportPdf = () => {
             html2Pdf.value.generatePdf();

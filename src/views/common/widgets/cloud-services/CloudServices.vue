@@ -67,7 +67,7 @@ import {
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
-import _ from 'lodash';
+import { range } from 'lodash';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
@@ -97,8 +97,6 @@ export default {
         },
     },
     setup(props) {
-        const vm: any = getCurrentInstance();
-
         const {
             provider,
         } = useStore();
@@ -181,7 +179,7 @@ export default {
 
         return {
             ...toRefs(state),
-            skeletons: _.range(12),
+            skeletons: range(12),
             iconUrl: (item: Value): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
             // onSelected(item): void {
             //     if (props.projectFilter) {

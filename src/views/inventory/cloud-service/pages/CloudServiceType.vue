@@ -144,7 +144,7 @@ import {
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
-import _ from 'lodash';
+import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
@@ -164,7 +164,7 @@ import {
     makeQuerySearchHandlersWithSearchSchema,
 } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import Region, { RegionModel } from '@/lib/fluent-api/inventory/region';
+import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
@@ -173,12 +173,6 @@ import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
-const PROVIDER_NAME_MAP = Object.freeze({
-    all: 'All',
-    aws: 'AWS',
-    google_cloud: 'Google Cloud',
-    azure: 'Microsoft Azure',
-});
 
 export default {
     name: 'CloudServiceType',
@@ -225,7 +219,7 @@ export default {
             return name;
         });
         const filterState = reactive({
-            serviceCategories: _.zipObject([
+            serviceCategories: zipObject([
                 'Compute', 'Container', 'Database', 'Networking', 'Storage', 'Security', 'Analytics', 'Application Integration', 'Management',
             ], new Array(9).fill(false)),
             serviceFilter: [] as string[],
@@ -441,12 +435,10 @@ export default {
                 // set selected provider
                 const res = queryRefs.provider.value;
                 selectedProvider.value = res || providerState.items[0].provider;
-                await setSearchTags();
-                watch(selectedProvider, _.debounce(async (after) => {
+                setSearchTags();
+                watch(selectedProvider, debounce(async (after) => {
                     if (!after) return;
-                    if (after === 'all') {
-                        await listRegionByProvider(after);
-                    } else {
+                    if (after) {
                         await listRegionByProvider(after);
                     }
                     await replaceQuery('provider', after);
@@ -468,7 +460,7 @@ export default {
             providerStore,
             providerState,
             getToCloudService,
-            skeletons: _.range(5),
+            skeletons: range(5),
             onChange,
         };
     },

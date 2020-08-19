@@ -1,6 +1,3 @@
-import { Location } from 'vue-router';
-import router from '@/routes';
-
 
 export const projectLinkFormatter = async (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}/${referenceKey}`;

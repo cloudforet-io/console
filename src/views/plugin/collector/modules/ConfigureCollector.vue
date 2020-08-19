@@ -28,7 +28,9 @@
 import {
     reactive, toRefs, computed, watch, Ref,
 } from '@vue/composition-api';
-import _ from 'lodash';
+import {
+    get, forEach, set, every, debounce,
+} from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';
 
 import { fluentApi } from '@/lib/fluent-api';
@@ -129,14 +131,14 @@ export default {
 
         const init = (initForm: Form): void => {
             const newForm: Form = {
-                name: _.get(initForm, 'name', ''),
-                priority: _.get(initForm, 'priority', DEFAULT_PRIORITY),
+                name: get(initForm, 'name', ''),
+                priority: get(initForm, 'priority', DEFAULT_PRIORITY),
                 // eslint-disable-next-line camelcase
                 plugin_info: {
                     // eslint-disable-next-line camelcase
-                    plugin_id: _.get(initForm, 'plugin_info.plugin_id', ''),
-                    options: _.get(initForm, 'plugin_info.options', {}),
-                    version: _.get(initForm, 'plugin_info.version', ''),
+                    plugin_id: get(initForm, 'plugin_info.plugin_id', ''),
+                    options: get(initForm, 'plugin_info.options', {}),
+                    version: get(initForm, 'plugin_info.version', ''),
                 },
             };
 
@@ -144,13 +146,13 @@ export default {
             fixedFormTS.syncState.item.name = newForm.name;
             fixedFormTS.syncState.item.priority = newForm.priority;
             fixedFormTS.syncState.item['plugin_info.version'] = newForm.plugin_info.version;
-            _.forEach(fixedFormTS.state.invalidState, (v, k, origin) => {
+            forEach(fixedFormTS.state.invalidState, (v, k, origin) => {
                 origin[k] = false;
             });
 
             // init optionsFormTS
             optionsFormTS.syncState.item = newForm.plugin_info.options;
-            _.forEach(optionsFormTS.state.invalidState, (v, k, origin) => {
+            forEach(optionsFormTS.state.invalidState, (v, k, origin) => {
                 origin[k] = false;
             });
             state.proxyForm = newForm;
@@ -158,8 +160,8 @@ export default {
         init(state.proxyForm);
 
         const allValid: Readonly<Ref<boolean>> = computed(
-            () => _.every(fixedFormTS.state.invalidState, v => !v)
-                && _.every(optionsFormTS.state.invalidState, v => !v),
+            () => every(fixedFormTS.state.invalidState, v => !v)
+                && every(optionsFormTS.state.invalidState, v => !v),
         );
 
 
@@ -172,7 +174,7 @@ export default {
                 // eslint-disable-next-line no-param-reassign
                 val = `${parseFloat(val)}`;
             }
-            _.set(props.form, valueKey, val);
+            set(props.form, valueKey, val);
             state.proxyForm = { ...state.proxyForm };
             if (props.enableValidation) {
                 await ts.formState.fieldValidator(key);
@@ -185,10 +187,10 @@ export default {
                 await optionsFormTS.formState.validator();
                 emit('update:isValid', allValid.value);
             },
-            onChangeFixedForm: _.debounce(async (key, val) => {
+            onChangeFixedForm: debounce(async (key, val) => {
                 await updateFormAndValidateField(key, val);
             }, 300),
-            onChangeOptionsForm: _.debounce(async (key, val) => {
+            onChangeOptionsForm: debounce(async (key, val) => {
                 await updateFormAndValidateField(key, val, true);
             }, 300),
         };

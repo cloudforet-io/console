@@ -8,6 +8,7 @@
                     :items="items"
                     :key-items="keyItems"
                     :total-count="totalCount"
+                    :style="{height: `${height}px`}"
                     @select="onSelect"
                     @change="onChange"
                 >
@@ -50,7 +51,7 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper/index';
 import { fluentApi } from '@/lib/fluent-api';
@@ -63,7 +64,6 @@ import PDefinitionTable from '@/components/organisms/tables/definition-table/PDe
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { SupervisorPluginModel } from '@/lib/fluent-api/plugin/supervisorPlugin';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -89,7 +89,6 @@ export default {
         },
     },
     setup(props, context) {
-        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
 
         const state = reactive({
             fields: [

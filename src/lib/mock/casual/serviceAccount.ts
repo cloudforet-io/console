@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import { arrayOf } from '@/lib/casual';
 import { ModelType } from '@/lib/mock/casual/type';
 
 const serviceAccount = (casual) => {

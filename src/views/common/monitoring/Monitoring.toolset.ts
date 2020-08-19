@@ -1,7 +1,7 @@
 import {
     HelperToolSet, initReactive, StateToolSet,
 } from '@/components/util/toolset-helpers';
-import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { DataSourceResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
 import { get, chain } from 'lodash';
 import { computed } from '@vue/composition-api';

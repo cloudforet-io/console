@@ -2,9 +2,7 @@
 import { makeArrayResults, makeTreeResults, MockData } from '@/lib/mock/toolset';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/lib/mock/casual';
-import _ from 'lodash';
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { TreeParameter } from '@/lib/fluent-api/type';
+import { get, find } from 'lodash';
 
 export const DOMAIN_INFO = {
     domain_id: 'domain_test_id',
@@ -180,8 +178,8 @@ export default [
     new MockData('/identity/provider/get', (req) => {
         console.debug(req);
         const params: any = JSON.parse(req.data);
-        const provider: any = _.get(params, 'provider');
-        return _.find(providerList, { provider });
+        const provider: any = get(params, 'provider');
+        return find(providerList, { provider });
     }),
     new MockData('/identity/user/get', () => USER_INFO),
     new MockData('/identity/domain-owner/get', () => USER_INFO),

@@ -11,27 +11,15 @@
     >
         <template #body>
             <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
-<!--            <PFieldGroup-->
-<!--                label="Tags"-->
-<!--            >-->
-<!--                <p-dict-input-group-->
-<!--                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"-->
-<!--                    v-bind="tagsTS.state"-->
-<!--                    :items.sync="tagsTS.syncState.items"-->
-<!--                    v-on="tagsTS.events"-->
-<!--                />-->
-<!--            </PFieldGroup>-->
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import {
     makeProxy,
 } from '@/lib/compostion-util';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 import {
     CustomKeywords,
@@ -46,8 +34,6 @@ export default {
     name: 'ProjectCreateFormModal',
     components: {
         PButtonModal,
-        PFieldGroup,
-        PDictInputGroup,
         PJsonSchemaForm,
     },
     directives: {

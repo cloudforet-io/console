@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, onMounted, reactive,
+    defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import { CombinedVueInstance } from 'vue/types/vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';

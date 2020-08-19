@@ -110,8 +110,7 @@ import {
 import {
     makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
 } from '@/lib/compostion-util';
-import { LANGUAGES } from '@/lib/global-enums';
-import { MenuItem, showErrorMessage } from '@/lib/util';
+import { showErrorMessage } from '@/lib/util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
@@ -120,7 +119,7 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import {useStore} from "@/store/toolset";
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'ProfileModalTemplate',

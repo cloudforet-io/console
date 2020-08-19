@@ -140,7 +140,7 @@
                                         </div>
                                         <div v-else class="skeleton-loading">
                                             <div v-for="v in skeletons" :key="v" class="flex items-center pb-2 pr-15">
-                                                <p-skeleton  />
+                                                <p-skeleton />
                                             </div>
                                         </div>
                                     </div>
@@ -229,14 +229,13 @@ import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layo
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import {
-    FILTER_OPERATOR, fluentApi, QueryAPI,
+    FILTER_OPERATOR, fluentApi,
 } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectItemResp, ProjectListResp } from '@/lib/fluent-api/identity/project';
@@ -251,8 +250,7 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
-    makeQueryStringComputed,
-    makeQueryStringComputeds, queryTagsToQueryString,
+    makeQueryStringComputeds,
 } from '@/lib/router-query-string';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import {
@@ -261,7 +259,6 @@ import {
 } from '@/views/project/project/modules/ProjectSearch.toolset';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { Location } from 'vue-router';
@@ -417,18 +414,21 @@ export default {
             return temp;
         };
 
+        const setCard = (items) => {
+            if (items) {
+                items.forEach((item) => {
+                    const project_id = item.project_id;
+                    item.cloud_services = item.cloud_services || 0;
+                    item.servers_count = item.servers_count || 0;
+                    cardSummary.value[project_id] = item;
+                });
+            }
+        };
+
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
             if (resp.data.results.length !== 0) {
                 const ids = resp.data.results.map(item => item.project_id);
                 cardSummary.value = reactive(zipObject(ids));
-                const setCard = (items) => {
-                    items.forEach((item) => {
-                        const project_id = item.project_id;
-                        item.cloud_services = item?.cloud_services || 0;
-                        item.servers_count = item?.servers_count || 0;
-                        cardSummary.value[project_id] = item;
-                    });
-                };
                 statisticsAPI.setFilter({
                     key: 'project_id',
                     value: ids,

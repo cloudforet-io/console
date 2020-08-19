@@ -48,7 +48,7 @@
 import {
     reactive, toRefs, computed, getCurrentInstance, watch,
 } from '@vue/composition-api';
-import _ from 'lodash';
+import { range, flatMap, get, forEach } from 'lodash';
 import moment from 'moment';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -108,9 +108,9 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             name: '',
             timezone: vm.$ls.user.state.timezone || 'UTC',
-            hoursMatrix: _.range(24),
+            hoursMatrix: range(24),
             selectedHours: {},
-            selectedUTCHoursList: computed(() => _.flatMap(state.selectedHours, time => moment.utc(time).hour())),
+            selectedUTCHoursList: computed(() => flatMap(state.selectedHours, time => moment.utc(time).hour())),
             isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
             showValidation: false,
             isValid: computed(() => state.selectedUTCHoursList.length !== 0),
@@ -124,7 +124,7 @@ export default {
 
         const initSelectedHours = () => {
             const res = {};
-            _.get(state, 'schedule.schedule.hours', []).forEach((hour) => {
+            get(state, 'schedule.schedule.hours', []).forEach((hour) => {
                 const time = moment.tz(moment.utc({ hour }), state.timezone);
                 res[time.hour()] = time;
             });
@@ -134,7 +134,7 @@ export default {
 
         const changeTimezone = () => {
             const res = {};
-            _.forEach(state.selectedHours, (time) => {
+            forEach(state.selectedHours, (time) => {
                 const newTime = moment.tz(time, state.timezone);
                 res[newTime.hour()] = newTime;
             });

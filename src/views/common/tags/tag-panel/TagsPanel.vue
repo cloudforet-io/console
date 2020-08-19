@@ -63,7 +63,7 @@ export default {
         const vm: any = getCurrentInstance();
 
         const state = reactive({
-            parentRouter: computed(() => vm?.$route.matched[vm?.$route.matched.length - 2]),
+            parentRouter: computed(() => vm?.$route.matched[vm.$route.matched.length - 2]),
             resource: computed(() => state.parentRouter?.meta),
             api: computed(() => props.action || state.resource?.api),
             fields: makeTrItems([

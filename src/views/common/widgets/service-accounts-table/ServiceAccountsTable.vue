@@ -72,7 +72,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
@@ -170,9 +170,9 @@ export default {
                         provider_color: providers[item.provider].color,
                         service_account_name: item.service_account_name,
                         service_account_id: item.service_account_id,
-                        cloud_service_count: item?.cloud_service_count || 0,
-                        server_count: item?.server_count || 0,
-                        secret_count: item?.secret_count || 0,
+                        cloud_service_count: item.cloud_service_count || 0,
+                        server_count: item.server_count || 0,
+                        secret_count: item.secret_count || 0,
                         project_id: projectId.value,
                     }));
                 } catch (e) {

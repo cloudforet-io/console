@@ -53,7 +53,7 @@
 
 import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { getBaseNodeState, getDefaultNode, TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
+import { getBaseNodeState, getDefaultNode } from '@/components/molecules/tree/PTreeNode.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
 import {
@@ -62,7 +62,6 @@ import {
 import { fluentApi } from '@/lib/fluent-api';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { ProjectGroup, ProjectTreeItem } from '@/views/project/project/modules/ProjectSearch.toolset';
-import { debounce } from 'lodash';
 
 
 export default {

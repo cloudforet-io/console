@@ -105,7 +105,6 @@ import { fluentApi, TimeStamp } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SelectBtnType } from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.toolset';
 import {
-    DataSourceResp,
     MetricListResp, MetricResp, MONITORING_TYPE, STATISTICS_TYPE,
 } from '@/lib/fluent-api/monitoring/type';
 import { GetMetricData, MetricList } from '@/lib/fluent-api/monitoring/metric';

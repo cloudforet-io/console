@@ -53,7 +53,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import { SPieChart } from '@/lib/chart/pie-chart';
 import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import { violet, yellow } from '@/styles/colors';
-import _ from 'lodash';
+import { map, forEach, range } from 'lodash';
 import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
 import { SChartToolSet } from '@/lib/chart/toolset';
@@ -107,9 +107,9 @@ export default {
         }
 
         const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
-            chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
-                .setLabels(_.map(ts.state.data, d => d.name))
-                .setColors(_.map(ts.state.data, d => d.color))
+            chart => chart.addData(map(ts.state.data, d => d.count), 'Account')
+                .setLabels(map(ts.state.data, d => d.name))
+                .setColors(map(ts.state.data, d => d.color))
                 .setDefaultCount(4)
                 .apply(), {
                 loaderRef: null,
@@ -145,7 +145,7 @@ export default {
                 const providers: ProviderInfo = providerStore.state.providers;
 
                 if (res.data.results.length > 0) {
-                    _.forEach(res.data.results, (d: Value, i) => {
+                    forEach(res.data.results, (d: Value, i) => {
                         if (providers[d.provider]) {
                             ts.state.data.push({
                                 ...providers[d.provider],
@@ -155,7 +155,7 @@ export default {
                         } else others.count += d.count;
                     });
                 } else {
-                    ts.state.data = _.map(providers, p => ({ ...p, count: 0 }));
+                    ts.state.data = map(providers, p => ({ ...p, count: 0 }));
                 }
                 ts.state.data.push(others);
             } catch (e) {
@@ -169,7 +169,7 @@ export default {
 
         return {
             ...toRefs(ts.state),
-            skeletons: _.range(4),
+            skeletons: range(4),
             onSelected(item): void {
                 vm.$router.push('/identity/service-account');
             },

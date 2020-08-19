@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { defaultsDeep, join } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper/index';
 
 export default {
@@ -13,11 +13,11 @@ export default {
 const makeMockItem = (parent, commonOption, name, trLabel, extra) => {
     let item = extra ? { ...extra, name } : { name };
     if (commonOption) {
-        item = _.defaultsDeep(item, commonOption);
+        item = defaultsDeep(item, commonOption);
     }
     if (trLabel) {
         const label = (typeof trLabel === 'string') ? [trLabel, 'null'] : trLabel;
-        item.label = `parent.$t(${_.join(label)}, parent)`;
+        item.label = `parent.$t(${join(label)}, parent)`;
     }
     return item;
 };

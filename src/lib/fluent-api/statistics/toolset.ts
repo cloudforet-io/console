@@ -14,7 +14,6 @@ import {
     UnwindItem,
 } from '@/lib/fluent-api/statistics/type';
 import { ApiType, Page } from '@/lib/fluent-api/type';
-import _ from 'lodash';
 
 
 export const getInitStatQueryState = <parameter=undefined>(): StatQueryState<parameter> => ({

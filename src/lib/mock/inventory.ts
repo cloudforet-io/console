@@ -2,7 +2,7 @@
 import { makeArrayResults, MockData } from '@/lib/mock/toolset';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/lib/mock/casual';
-import _ from 'lodash';
+import { get, map } from 'lodash';
 
 export const DOMAIN_INFO = {
     domain_id: 'domain_test_id',
@@ -195,7 +195,7 @@ export default [
     new MockData('/inventory/server/get-data', (req) => {
         // console.log(req);
         const data = JSON.parse(req.data);
-        return makeArrayResults(_.get(dynamicLayoutData, data.key_path), 20);
+        return makeArrayResults(get(dynamicLayoutData, data.key_path), 20);
     }),
     new MockData('/inventory/cloud-service-type/list', () => makeArrayResults(arrayOf(15, casual._cloudServiceType), 1)),
     new MockData('/inventory/cloud-service-type/get', () => casual.cloudServiceType),
@@ -204,14 +204,14 @@ export default [
     new MockData(RegExp('.*?/.*?/member/list'), () => makeArrayResults(arrayOf(5, casual._member), 35)),
     new MockData('/inventory/collector/list', (req) => {
         const params: any = JSON.parse(req.data);
-        const filter: any = _.get(params, 'query.filter');
+        const filter: any = get(params, 'query.filter');
         if (filter) {
             const res: any[] = [];
-            _.map(filter, (f) => {
+            map(filter, (f) => {
                 const key = f.k || f.key;
                 let values: any = f.v || f.value;
                 if (typeof values === 'string') values = [values];
-                _.map(values, (v) => {
+                map(values, (v) => {
                     res.push(casual._collector({ [key]: v }));
                 });
             });

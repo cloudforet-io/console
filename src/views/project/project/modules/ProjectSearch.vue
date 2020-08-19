@@ -79,7 +79,7 @@ import {
     ProjectGroup, Props, DataType, SearchResult,
 } from './ProjectSearch.toolset';
 
-const LIMIT = Object.freeze(5);
+const LIMIT = 5;
 
 
 interface MenuOption {
@@ -147,7 +147,6 @@ interface State {
 export default {
     name: 'ProjectSearch',
     components: {
-        PLottie,
         PI,
         PAutocompleteSearch,
     },

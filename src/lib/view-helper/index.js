@@ -1,10 +1,10 @@
-import _ from 'lodash';
+import { defaultsDeep } from 'lodash';
 import { i18n } from '@/translations';
 
 export const makeItem = (parent, commonOption, name, trLabel, extra) => {
     let item = extra ? { ...extra, name } : { name };
     if (commonOption) {
-        item = _.defaultsDeep(item, commonOption);
+        item = defaultsDeep(item, commonOption);
     }
     if (trLabel) {
         const label = (typeof trLabel === 'string') ? [trLabel, null] : trLabel;

@@ -121,7 +121,6 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { dateTimeViewType } from '@/lib/data-source';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Component } from 'vue/types/umd';
 import { showErrorMessage } from '@/lib/util';
@@ -135,12 +134,9 @@ import {
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
 import {
-    getEnumValueHandler,
-    makeKeyItems,
-    makeQuerySearchHandlersWithSearchSchema, makeValueHandlerMapWithReference,
+    makeQuerySearchHandlersWithSearchSchema,
 } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import { QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 
 const PTab = (): Component => import('@/components/organisms/tabs/tab/PTab.vue') as Component;
@@ -155,7 +151,6 @@ const CollectorSchedules = (): Component => import('@/views/plugin/collector/mod
 export default {
     name: 'Collector',
     components: {
-        PQuerySearchTable,
         PPageTitle,
         GeneralPageLayout,
         PLazyImg,
@@ -178,10 +173,6 @@ export default {
         const vm = getCurrentInstance() as ComponentInstance;
         const collectorApi = fluentApi.inventory().collector();
 
-        const args = {
-            keys: ['collector_id', 'name', 'state', 'priority', 'plugin_info.options.supported_resource_type'],
-            suggestKeys: ['collector_id', 'name'],
-        };
         const handlers = makeQuerySearchHandlersWithSearchSchema({
             title: 'Properties',
             items: [

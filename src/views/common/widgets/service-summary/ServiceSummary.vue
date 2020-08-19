@@ -36,7 +36,7 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetL
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import { gray, blue } from '@/styles/colors';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import _ from 'lodash';
+import { maxBy, minBy, chain } from 'lodash';
 import moment from 'moment';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import Chart, { ChartColor } from 'chart.js';
@@ -77,8 +77,8 @@ export default {
         const ticksCount = 2;
 
         const drawChart = (canvas) => {
-            const maxItem = _.maxBy(state.data, 'count');
-            const minItem = _.minBy(state.data, 'count');
+            const maxItem = maxBy(state.data, 'count');
+            const minItem = minBy(state.data, 'count');
             const max = maxItem ? maxItem.count : 80;
             const min = minItem ? minItem.count : 0;
             const diff = Math.abs(max - min);
@@ -260,7 +260,7 @@ export default {
                     state.data = [padItem, item, { ...padItem, count: item.count }];
                     // more than one data case
                 } else {
-                    state.data = _.chain(res.data.results)
+                    state.data = chain(res.data.results)
                         .sortBy('date')
                         .forEach((d) => {
                             d.date = moment(d.date).format('M/D');

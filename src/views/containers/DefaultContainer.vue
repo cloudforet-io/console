@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import { get } from 'lodash';
 import { reactive, toRefs } from '@vue/composition-api';
 
 import GNB from '@/views/containers/gnb/GNB.vue';
@@ -23,7 +23,7 @@ export default {
     components: { GNB },
     setup(props, { root }) {
         const state = reactive({
-            disableFNB: _.get(root, '$route.meta.disableFNB', false),
+            disableFNB: get(root, '$route.meta.disableFNB', false),
         });
         return {
             ...toRefs(state),

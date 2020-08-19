@@ -315,7 +315,6 @@ export default {
         PButton,
     },
     setup() {
-        const vm = getCurrentInstance();
         const modeTab = new TabBarState({
             tabs: ['api', 'raw'],
         },

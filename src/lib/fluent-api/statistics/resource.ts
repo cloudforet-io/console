@@ -15,7 +15,6 @@ import {
 } from '@/lib/fluent-api/statistics/type';
 import { isNotEmpty } from '@/lib/util';
 import { ApiType, FilterItem } from '@/lib/fluent-api/type';
-import _ from 'lodash';
 
 
 export class Stat<value=any> extends StatAction<ResourceStatState, StatResponse<value>> {

@@ -117,7 +117,7 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
-import { defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
+import { getQueryItemsToFilterItems } from '@/lib/api/query-search';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
 import { QuerySearchToolSet } from '@/lib/component-utils/query-search';
 

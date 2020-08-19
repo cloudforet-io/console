@@ -139,8 +139,6 @@ export default {
         },
     },
     setup(props) {
-        const vm: any = getCurrentInstance();
-
         const {
             provider,
         } = useStore();

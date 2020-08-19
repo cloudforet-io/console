@@ -61,7 +61,6 @@ import {
     reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { DictPanelAPI } from '@/lib/api/dict';
@@ -71,7 +70,7 @@ import {
     getNewDict,
     toDictItems,
 } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -81,7 +80,6 @@ export default {
     name: 'CloudServicePage',
     components: {
         FNB,
-        GeneralPageLayout,
         PIconButton,
         PButton,
         PPaneLayout,
@@ -110,19 +108,11 @@ export default {
             showValidation: true,
             loading: false,
             items: [] as unknown as DictItem[],
-            parentRouter: computed(() => vm?.$route.matched[vm?.$route.matched.length - 2]),
+            parentRouter: computed(() => vm?.$route.matched[vm.$route.matched.length - 2]),
             resource: computed(() => state.parentRouter?.meta),
         });
 
-        //
-        // if (!state.resource) {
-        //     console.error(`please add resource fluentAPI to ${state.parentRouter?.name || state.parentRouter?.path} router.meta.api`);
-        // }
         const goBack = () => {
-            // if (!vm?.$route.query.nextPath) {
-            //     vm?.$router.push(state.parentRouter?.path as string);
-            // }
-            // vm?.$router.push(vm?.$route.query.nextPath as string);
             context.emit('close');
         };
 
@@ -134,8 +124,8 @@ export default {
         const newDict = computed(() => getNewDict(state.items as unknown as DictItem[], invalidMessages.value));
 
         const dictIGListeners = {
-            'change:value': _.debounce((idx) => { itemValidation(idx, 'value'); }, 100),
-            'change:key': _.debounce(() => { allValidation('key', false); }, 100),
+            'change:value': debounce((idx) => { itemValidation(idx, 'value'); }, 100),
+            'change:key': debounce(() => { allValidation('key', false); }, 100),
             'change:add': (idx) => { itemValidation(idx); },
             'change:delete': () => { allValidation(); },
         };

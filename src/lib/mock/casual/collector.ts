@@ -56,25 +56,6 @@ const pluginInfo = (casual) => {
     return casual;
 };
 
-const credentialGroup = (casual) => {
-    casual.define('credentialGroup', () => ({
-        credential_group_id: casual.make_id('credential_group'),
-        name: casual.word,
-    }));
-    return casual;
-};
-
-const credential = (casual) => {
-    casual.define('credential', () => ({
-        credential_id: casual.make_id('credential'),
-        name: casual.word,
-        issue_type: casual.random_element(['token', 'credential']),
-        credential_groups: arrayOf(casual.integer(1, 5), casual._credentialGroup),
-    }));
-    return casual;
-};
-
-
 const collector = (casual) => {
     casual.define('collector', (params: any = {}) => {
         const crd = casual.random_element(['credential', 'credential_group']);

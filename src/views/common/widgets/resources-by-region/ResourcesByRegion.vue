@@ -61,7 +61,7 @@ import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import {
     blue, coral, green, peacock, violet, yellow,
 } from '@/styles/colors';
-import _ from 'lodash';
+import { map, forEach, range } from 'lodash';
 import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
 import { SChartToolSet } from '@/lib/chart/toolset';
@@ -118,8 +118,8 @@ export default {
                 coral[300], peacock[700], coral[300], peacock[300], green[300],
             ];
             const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
-                chart => chart.addData(_.map(ts.state.data, d => d.count), 'Account')
-                    .setLabels(_.map(ts.state.data, d => d.name))
+                chart => chart.addData(map(ts.state.data, d => d.count), 'Account')
+                    .setLabels(map(ts.state.data, d => d.name))
                     .setDefaultCount(4)
                     .setColors(colors)
                     .apply(), {
@@ -140,7 +140,7 @@ export default {
                     .apply();
             });
 
-            const defaultItems = _.range(4).map((d, index) => ({
+            const defaultItems = range(4).map((d, index) => ({
                 name: 'region',
                 color: colors[index],
                 count: 0,
@@ -174,7 +174,7 @@ export default {
 
             return {
                 ...toRefs(ts.state),
-                skeletons: _.range(4),
+                skeletons: range(4),
                 defaultItems,
                 onSelected(item) {
                     if (props.projectFilter && props.isServer) {
@@ -189,8 +189,6 @@ export default {
                     }
                 },
             };
-            ///inventory/cloud-service?f=project_id%3A&f=project_id%3A%3Dproject-22ba4e072a5f&f=data.region_name%3Aap-northeast-2
-            ///inventory/cloud-service?f=project_id%3A%3Dproject-22ba4e072a5f&f=data.region_name%3Aap-northeast-2
     },
 };
 </script>
