@@ -9,26 +9,21 @@
         @confirm="confirm($event)"
     >
         <template #body>
-            <p-toolbox-table v-bind="apiHandler.tableTS.state"
-                             :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
-                             :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
-                             :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
-                             :loading.sync="apiHandler.tableTS.syncState.loading"
-                             :this-page.sync="apiHandler.tableTS.syncState.thisPage"
-                             :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-                             :style="{
-                                 height: '19rem', padding: '-1rem'
-                             }"
-                             @changePageSize="apiHandler.getData"
-                             @changePageNumber="apiHandler.getData"
-                             @clickRefresh="apiHandler.getData"
-                             @changeSort="apiHandler.getData"
-                             @rowLeftClick="onSelect"
-            >
-                <template #toolbox-left>
-                    <p-search v-model="apiHandler.tableTS.searchText.value" @search="onSearch" @delete="onSearch()" />
-                </template>
-            </p-toolbox-table>
+            <p-search-table :fields="fields"
+                            :items="items"
+                            :total-count="totalCount"
+                            :sort-by.sync="sortBy"
+                            :sort-desc.sync="sortDesc"
+                            :loading.sync="loading"
+                            :this-page.sync="thisPage"
+                            :page-size.sync="pageSize"
+                            :style="{
+                                height: '19rem', padding: '-1rem'
+                            }"
+                            :selectable="false"
+                            @change="onChange"
+                            @rowLeftClick="onSelect"
+            />
             <p class="tag-title">
                 Added Members
             </p>
@@ -52,18 +47,17 @@ import {
 import PTag from '@/components/molecules/tags/PTag.vue';
 import { tagList } from '@/components/molecules/tags/PTag.toolset';
 import { fluentApi } from '@/lib/fluent-api';
-import { SearchTableFluentAPI } from '@/lib/api/table';
 import { reactive, toRefs } from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
 import { showErrorMessage } from '@/lib/util';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 
 export default {
     name: 'ProjectMemberAddModal',
     components: {
-        PSearch,
-        PToolboxTable,
+        PSearchTable,
         PButtonModal,
         PBoxLayout,
         PTag,
@@ -92,29 +86,58 @@ export default {
         },
     },
     setup(props, context) {
+        const state = reactive({
+            fields: [
+                { label: 'Name', name: 'name', type: 'item' },
+                { label: 'ID', name: 'user_id', type: 'item' },
+                { label: 'Email', name: 'email', type: 'item' },
+            ],
+            items: [] as any,
+            loading: false,
+            pageSize: 15,
+            thisPage: 1,
+            sortBy: 'user_id',
+            sortDesc: true,
+            totalCount: 0,
+            searchText: '',
+            keyword: '',
+        });
         const formState = reactive({
             tagTools: tagList(null),
         });
         const proxyVisible = makeProxy('visible', props, context.emit);
         const projectId = context.root.$route.params.id;
 
-
         // List api Handler for query search table
-        const MemberListAction = fluentApi.identity().user().list();
-        const apiHandler = new SearchTableFluentAPI(MemberListAction, {
-            shadow: false,
-            border: false,
-            selectable: false,
-            fields: [
-                { label: 'Name', name: 'name', type: 'item' },
-                { label: 'ID', name: 'user_id', type: 'item' },
-                { label: 'Email', name: 'email', type: 'item' },
-            ],
-        });
+        const listUser = async () => {
+            try {
+                const resp = await fluentApi.identity().user().list()
+                    .setPageSize(state.pageSize)
+                    .setThisPage(state.thisPage)
+                    .setSortBy(state.sortBy)
+                    .setSortDesc(state.sortDesc)
+                    .setKeyword(state.keyword)
+                    .execute();
+                state.items = resp.data.results;
+                state.totalCount = resp.data.total_count || 0;
+            } catch (e) {
+                state.items = [];
+                console.error(e);
+            }
+        };
 
         const onSelect = (item) => {
             formState.tagTools.addTag(item.user_id);
         };
+
+        const onChange = async (item) => {
+            try {
+                state.keyword = item.searchText;
+                await listUser();
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
         const confirm = async () => {
             const users = formState.tagTools.tags;
@@ -138,24 +161,16 @@ export default {
             }
         };
 
-        const onSearch = async (val?: string) => {
-            if (!val) apiHandler.tableTS.searchText.value = '';
-            await apiHandler.getData();
-        };
-
-        const init = () => {
-            apiHandler.getData();
-        };
-
-        init();
+        listUser();
 
         return {
+            ...toRefs(state),
             ...toRefs(formState),
-            apiHandler,
+            listUser,
             confirm,
             onSelect,
+            onChange,
             proxyVisible,
-            onSearch,
         };
     },
 };
