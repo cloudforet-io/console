@@ -168,7 +168,7 @@ import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import {getQueryItemsToFilterItems, parseTag} from '@/lib/api/query-search';
+import { getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
 import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
@@ -360,12 +360,32 @@ export default {
                 thisPage: { key: 'g_p', setter: Number },
             }),
         };
-
         const handleNullValuesForFilter = (value) => {
             if (value[0].value === 'all') value[0].value = '';
             if (value[1].value.length === 0) value[1].value = [''];
             if (value[2].value.length === 0) value[2].value = '';
             return value;
+        };
+
+        const initListCloudService = async () => {
+            state.loading = true;
+            try {
+                const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
+                const res = await fluentApi.statisticsTest().topic().cloudServiceType()
+                    .setStart(((state.thisPage - 1) * state.pageSize) + 1)
+                    .setLimit(state.pageSize)
+                    .setFilter(...searchItems.and)
+                    .setFilterOr(...searchItems.or)
+                    .showAll(true)
+                    .execute();
+                state.items = res.data.results;
+                state.totalCount = res.data.total_count || 0;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         const listCloudServiceType = async (after) => {
@@ -404,10 +424,7 @@ export default {
             if (after !== before) {
                 await listCloudServiceType(after);
             }
-        });
-
-        const searchTagFilter = computed(() => state.tags);
-
+        }, { lazy: true });
 
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
@@ -448,6 +465,7 @@ export default {
                     }
                     await replaceQuery('provider', after);
                 }, 50));
+                await initListCloudService();
             }
         };
 
