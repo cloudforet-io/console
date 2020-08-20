@@ -168,7 +168,7 @@ import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import { parseTag } from '@/lib/api/query-search';
+import {getQueryItemsToFilterItems, parseTag} from '@/lib/api/query-search';
 import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
@@ -296,8 +296,8 @@ export default {
         };
 
         /**
-             * Card click event
-             * */
+         * Card click event
+         * */
         const getToCloudService = (item) => {
             const filters: QueryTag[] = [];
             state.tags.forEach((tag) => {
@@ -372,6 +372,7 @@ export default {
             state.loading = true;
             handleNullValuesForFilter(after);
             const [providerFilter, region, label] = [after[0].value, after[1].value, after[2].value];
+            const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
             try {
                 const res = await fluentApi.statisticsTest().topic().cloudServiceType()
                     .setStart(((state.thisPage - 1) * state.pageSize) + 1)
@@ -379,8 +380,9 @@ export default {
                     .setFilter(
                         { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
                         { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
-                        ...state.tags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })),
+                        ...searchItems.and,
                     )
+                    .setFilterOr(...searchItems.or)
                     .setLabels(label)
                     .showAll(true)
                     .execute();
@@ -392,11 +394,20 @@ export default {
             }
         };
 
-        const leftFilters = computed(() => [
+        const sidebarFilters = computed(() => [
             { key: 'provider', operator: '=', value: selectedProvider.value },
             { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
             { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
         ]);
+
+        watch(() => sidebarFilters.value, async (after, before) => {
+            if (after !== before) {
+                await listCloudServiceType(after);
+            }
+        });
+
+        const searchTagFilter = computed(() => state.tags);
+
 
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
@@ -417,14 +428,8 @@ export default {
                 state.thisPage = options.thisPage;
                 await changeQueryString(options);
             }
-            await listCloudServiceType(leftFilters.value);
+            await listCloudServiceType(sidebarFilters.value);
         };
-
-        watch(() => leftFilters.value, async (after, before) => {
-            if (after !== before) {
-                await listCloudServiceType(after);
-            }
-        });
 
         const routeState = reactive({
             route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' }],

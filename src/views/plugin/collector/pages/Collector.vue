@@ -163,7 +163,7 @@ import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/q
 import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
-import { parseTag } from '@/lib/api/query-search';
+import {getQueryItemsToFilterItems, parseTag} from '@/lib/api/query-search';
 
 const GeneralPageLayout = (): Component => import('@/views/containers/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
@@ -368,8 +368,10 @@ export default {
         const listCollector = async () => {
             state.loading = true;
             try {
+                const items = getQueryItemsToFilterItems(state.searchTags, state.querySearchHandlers.keyItems);
                 const res = await fluentApi.inventory().collector().list()
-                    .setFilter(...state.searchTags.map(v => ({ key: v.key.name, value: v.value.name, operator: FILTER_OPERATOR.in })))
+                    .setFilter(...items.and)
+                    .setFilterOr(...items.or)
                     .setSortBy(state.sortBy)
                     .setSortDesc(state.sortDesc)
                     .setThisPage(state.thisPage)

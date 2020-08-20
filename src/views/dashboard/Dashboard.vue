@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
-import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
+import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates_new.vue';
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';

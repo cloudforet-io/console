@@ -18,8 +18,30 @@ export class CloudServiceType extends StatTopicAction<any, any> {
     }
 }
 
-export default class Topic extends Resource implements ResourceActions<'cloudServiceType'> {
+export class DailyUpdateServer extends StatTopicAction<any, any> {
+    path = 'daily-update-server'
+
+    setId(projectId: string): this {
+        this.apiState.extraParameter.project_id = projectId;
+        return this.clone();
+    }
+}
+
+export class DailyUpdateCloudService extends StatTopicAction<any, any> {
+    path = 'daily-update-cloud-service'
+
+    setId(projectId: string): this {
+        this.apiState.extraParameter.project_id = projectId;
+        return this.clone();
+    }
+}
+
+export default class Topic extends Resource implements ResourceActions<'cloudServiceType'|'dailyUpdateServer'|'dailyUpdateCloudService'> {
     name = 'topic'
 
     cloudServiceType() { return new CloudServiceType(this.api, this.baseUrl); }
+
+    dailyUpdateServer() { return new DailyUpdateServer(this.api, this.baseUrl); }
+
+    dailyUpdateCloudService() { return new DailyUpdateCloudService(this.api, this.baseUrl); }
 }
