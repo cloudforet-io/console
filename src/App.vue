@@ -14,6 +14,7 @@ import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { api } from '@/lib/api/axios';
+import { SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
@@ -38,6 +39,10 @@ export default defineComponent({
         });
         const configInit = async () => {
             await config.init();
+            await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
+                vm.$ls.logout(vm);
+            }, vm.$ls.user);
+
             Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'), vm);
         };
         const preparationTo = async () => {
@@ -67,12 +72,10 @@ export default defineComponent({
 <style lang="postcss">
     #loading {
         background-color: transparent;
-        /*lottie image size*/
         width: 100%;
         height: auto;
         max-width: 600px;
         max-height: 600px;
-        /*lottie image size end*/
         display: block;
         overflow: hidden;
         margin: auto;

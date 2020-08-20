@@ -1,4 +1,7 @@
 {
+  "CONSOLE_API": {
+    "ENDPOINT": "https://console-api.dev.spaceone.dev"
+  },
   "VUE_APP_API": {
     "ENDPOINT": "https://console-api.dev.spaceone.dev"
   },

@@ -68,7 +68,7 @@ interface UserState {
     paramIdName: Readonly<string>;
 }
 
-class UserStore extends Store<UserState> {
+export class UserStore extends Store<UserState> {
     constructor(prefix: string) {
         super(prefix, [
             'refreshToken',
