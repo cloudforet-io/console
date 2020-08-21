@@ -18,5 +18,5 @@ export type QuerySearchTableDynamicLayoutProps = DynamicLayoutProps<
     QuerySearchTableExtra
     >
 
-export type QuerySearchTableDynamicLayoutEventListeners
+export type QuerySearchTableListeners
     = DynamicLayoutEventListeners<QuerySearchTableFetchOptions>

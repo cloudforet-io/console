@@ -29,6 +29,9 @@
                     />
                 </slot>
             </template>
+            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <slot v-if="!slot.startsWith('col-')" :name="slot" v-bind="scope" />
+            </template>
         </p-query-search-table>
     </div>
 </template>
@@ -44,7 +47,7 @@ import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { forEach, get } from 'lodash';
 import {
-    QuerySearchTableDynamicLayoutEventListeners,
+    QuerySearchTableListeners,
     QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 
@@ -93,8 +96,13 @@ export default {
             }),
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
-            sortDesc: props.fetchOptions?.sortDesc || true,
-            thisPage: props.fetchOptions?.pageStart || 1,
+            sortDesc: (props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true,
+            thisPage: computed(() => {
+                if (props.fetchOptions?.pageStart && props.fetchOptions?.pageLimit) {
+                    return Math.floor((props.fetchOptions.pageStart || 1) / state.pageSize) || 1;
+                }
+                return 1;
+            }),
             pageSize: props.fetchOptions?.pageLimit || 15,
             queryTags: props.fetchOptions?.queryTags || [],
             /** get data from extra prop */
@@ -112,7 +120,7 @@ export default {
             fetchOptionsParam: computed<QuerySearchTableFetchOptions>(() => ({
                 sortBy: state.sortBy,
                 sortDesc: state.sortDesc,
-                pageStart: state.thisPage,
+                pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
                 pageLimit: state.pageSize,
                 queryTags: state.queryTags,
                 selectIndex: state.selectIndex,
@@ -153,9 +161,10 @@ export default {
                 state[k] = d;
                 if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
                 else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
+                else changedFetchOptions[k] = d;
             });
 
-            const args: Parameters<QuerySearchTableDynamicLayoutEventListeners['fetch']> = [
+            const args: Parameters<QuerySearchTableListeners['fetch']> = [
                 state.fetchOptionsParam, changedFetchOptions,
             ];
             emit('fetch', ...args);
@@ -178,6 +187,9 @@ export default {
     .p-dynamic-layout-query-search-table {
         .panel-top {
             margin: 0.5rem 0 0;
+        }
+        .p-query-search-table {
+            height: 100%;
         }
     }
 </style>
