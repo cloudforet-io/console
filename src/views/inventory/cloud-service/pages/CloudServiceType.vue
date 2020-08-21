@@ -142,7 +142,7 @@ import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, FilterItem, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -168,11 +168,22 @@ import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import { getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
+import {
+    getFiltersFromQueryTags,
+    getQueryItemsToFilterItems,
+    parseTag,
+    setFilterOrWithSuggestKeys,
+} from '@/lib/api/query-search';
 import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { Filter } from '@/lib/space-connector/type';
+import { KeyItem } from '@/components/organisms/search/query-search/type';
+import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios';
+import { APIError } from '@/lib/space-connector/api';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
+
 
 export default {
     name: 'CloudServiceType',
@@ -246,9 +257,9 @@ export default {
             providerName: 'All',
             cardClass: () => ['card-item', 'cloud-service-type-list'],
             loading: false,
-            keyItems: handlers.keyItems,
+            keyItems: handlers.keyItems as KeyItem[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: [] as any,
+            tags: [],
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
@@ -300,7 +311,7 @@ export default {
          * */
         const getToCloudService = (item) => {
             const filters: QueryTag[] = [];
-            state.tags.forEach((tag) => {
+            state.tags.forEach((tag: QueryTag) => {
                 if (tag.key) {
                     if (tag.key.name === 'project_id') filters.push(tag);
                 }
@@ -345,9 +356,11 @@ export default {
             return [parseTag(urlQueryString as string)];
         };
         const setSearchTags = () => {
+            // @ts-ignore
             state.tags = urlQueryStringToSearchTags(vm.$route.query.f);
         };
         const queryRefs = {
+            // @ts-ignore
             f: makeQueryStringComputed(state.tags,
                 {
                     key: 'f',
@@ -360,69 +373,148 @@ export default {
                 thisPage: { key: 'g_p', setter: Number },
             }),
         };
-        const handleNullValuesForFilter = (value) => {
-            if (value[0].value === 'all') value[0].value = '';
-            if (value[1].value.length === 0) value[1].value = [''];
-            if (value[2].value.length === 0) value[2].value = '';
-            return value;
+        // const handleNullValuesForFilter = (value) => {
+        //     if (value[0].value === 'all') value[0].value = '';
+        //     if (value[1].value.length === 0) value[1].value = [''];
+        //     if (value[2].value.length === 0) value[2].value = '';
+        //     return value;
+        // };
+        //
+        // const initListCloudService = async () => {
+        //     state.loading = true;
+        //     try {
+        //         const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
+        //         const res = await fluentApi.statisticsTest().topic().cloudServiceType()
+        //             .setStart(((state.thisPage - 1) * state.pageSize) + 1)
+        //             .setLimit(state.pageSize)
+        //             .setFilter(...searchItems.and)
+        //             .setFilterOr(...searchItems.or)
+        //             .showAll(true)
+        //             .execute();
+        //         state.items = res.data.results;
+        //         state.totalCount = res.data.total_count || 0;
+        //         state.loading = false;
+        //     } catch (e) {
+        //         console.error(e);
+        //     } finally {
+        //         state.loading = false;
+        //     }
+        // };
+
+        /** TODO: Code Review */
+
+        const getFilters = () => {
+            // const or: Filter[] = [];
+            // state.orTags.forEach((q) => {
+            //     state.keyItems.forEach((k) => {
+            //         or.push({
+            //             k: k.name,
+            //             v: q.value?.name || '',
+            //             o: 'contain',
+            //         });
+            //     });
+            // });
         };
 
-        const initListCloudService = async () => {
+        const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
+            const res = {
+                filters: [] as Filter[],
+                labels: [] as string[],
+            };
+            if (selectedProvider.value !== 'all') {
+                res.filters.push({ k: 'provider', v: selectedProvider.value, o: 'eq' });
+            }
+            if (filterState.regionFilter.length > 0) {
+                res.filters.push({ k: 'data.region_name', v: filterState.regionFilter, o: 'in' });
+            }
+            if (filterState.serviceFilter.length > 0) {
+                res.labels = filterState.serviceFilter;
+            }
+            return res;
+        });
+
+        const getParams = () => {
+            const { and, or } = getFiltersFromQueryTags(state.tags);
+
+            const { filters, labels } = sidebarFilters.value;
+
+            const query = new QueryHelper();
+            query.setPageStart(((state.thisPage - 1) * state.pageSize) + 1)
+                .setPageLimit(state.pageSize)
+                .setKeyword(...or)
+                // .setFilterOr(...or)
+                .setFilter(...and, ...filters);
+
+            return {
+                show_all: true,
+                labels,
+                query: query.data,
+            };
+        };
+
+        // ajax request
+        let listCloudServiceRequest: CancelTokenSource | undefined;
+        const listCloudServiceType = async () => {
+            // if request is already exist, cancel the request
+            if (listCloudServiceRequest) {
+                listCloudServiceRequest.cancel('Next request has been called.');
+                listCloudServiceRequest = undefined;
+            }
+
+            // create a new token for upcoming request (overwrite the previous one)
+            listCloudServiceRequest = axios.CancelToken.source();
+
             state.loading = true;
             try {
-                const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
-                const res = await fluentApi.statisticsTest().topic().cloudServiceType()
-                    .setStart(((state.thisPage - 1) * state.pageSize) + 1)
-                    .setLimit(state.pageSize)
-                    .setFilter(...searchItems.and)
-                    .setFilterOr(...searchItems.or)
-                    .showAll(true)
-                    .execute();
-                state.items = res.data.results;
-                state.totalCount = res.data.total_count || 0;
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage(
+                    getParams(),
+                    { cancelToken: listCloudServiceRequest.token },
+                );
+                state.items = res.results;
+                state.totalCount = res.total_count || 0;
                 state.loading = false;
+                listCloudServiceRequest = undefined;
             } catch (e) {
-                console.error(e);
-            } finally {
-                state.loading = false;
+                if (!axios.isCancel(e.axiosError)) state.loading = false;
+                else console.error(e);
             }
+
+
+            // state.loading = true;
+            // handleNullValuesForFilter(after);
+            // const [providerFilter, region, label] = [after[0].value, after[1].value, after[2].value];
+            // const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
+            // try {
+            //     const res = await fluentApi.statisticsTest().topic().cloudServiceType()
+            //         .setStart(((state.thisPage - 1) * state.pageSize) + 1)
+            //         .setLimit(state.pageSize)
+            //         .setFilter(
+            //             { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
+            //             { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
+            //             ...searchItems.and,
+            //         )
+            //         .setFilterOr(...searchItems.or)
+            //         .setLabels(label)
+            //         .showAll(true)
+            //         .execute();
+            //     state.items = res.data.results;
+            //     state.totalCount = res.data.total_count || 0;
+            //     state.loading = false;
+            // } catch (e) {
+            //     console.error(e);
+            // }
         };
 
-        const listCloudServiceType = async (after) => {
-            state.loading = true;
-            handleNullValuesForFilter(after);
-            const [providerFilter, region, label] = [after[0].value, after[1].value, after[2].value];
-            const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
-            try {
-                const res = await fluentApi.statisticsTest().topic().cloudServiceType()
-                    .setStart(((state.thisPage - 1) * state.pageSize) + 1)
-                    .setLimit(state.pageSize)
-                    .setFilter(
-                        { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
-                        { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
-                        ...searchItems.and,
-                    )
-                    .setFilterOr(...searchItems.or)
-                    .setLabels(label)
-                    .showAll(true)
-                    .execute();
-                state.items = res.data.results;
-                state.totalCount = res.data.total_count || 0;
-                state.loading = false;
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        const sidebarFilters = computed(() => [
-            { key: 'provider', operator: '=', value: selectedProvider.value },
-            { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
-            { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
-        ]);
+        // const sidebarFilters = computed(() => [
+        //     { key: 'provider', operator: '=', value: selectedProvider.value },
+        //     { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
+        //     { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
+        // ]);
 
         watch(() => sidebarFilters.value, async (after, before) => {
             if (after !== before) {
-                await listCloudServiceType(after);
+                // await listCloudServiceType(after);
+                await listCloudServiceType();
             }
         }, { lazy: true });
 
@@ -445,7 +537,8 @@ export default {
                 state.thisPage = options.thisPage;
                 await changeQueryString(options);
             }
-            await listCloudServiceType(sidebarFilters.value);
+            // await listCloudServiceType(sidebarFilters.value);
+            await listCloudServiceType();
         };
 
         const routeState = reactive({
@@ -465,7 +558,8 @@ export default {
                     }
                     await replaceQuery('provider', after);
                 }, 50));
-                await initListCloudService();
+                await listCloudServiceType();
+                // await initListCloudService();
             }
         };
 

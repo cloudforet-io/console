@@ -6,7 +6,7 @@ import { SessionTimeoutCallback } from './type';
 
 const REFRESH_URL = '/identity/token/refresh';
 
-class APIError extends Error {
+export class APIError extends Error {
     status: number;
 
     code: string;

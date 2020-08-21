@@ -1,11 +1,12 @@
 import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
 import { FILTER_OPERATOR, FilterItem } from '@/lib/fluent-api/type';
-import { fluentApi } from '@/lib/fluent-api';
+import { fluentApi, OPERATOR_MAP } from '@/lib/fluent-api';
 import { get } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import {
-    KeyItem, QueryItem, ValueHandler, ValueHandlerMap, ValueItem,
+    KeyItem, ValueHandler, ValueHandlerMap, ValueItem,
 } from '@/components/organisms/search/query-search/type';
+import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
 
 export interface ACHandlerMeta {
@@ -117,6 +118,28 @@ export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[
     });
 
     return { and, or };
+};
+
+export const getFiltersFromQueryTags = (tags: QueryTag[]): {and: Filter[]; or: string[]} => {
+    const or: string[] = [];
+    const andMap: Record<string, Filter> = {};
+    tags.forEach((q) => {
+        if (q.key !== null && q.key !== undefined && !q.invalid) {
+            const operator = OPERATOR_MAP[q.operator] as FilterOperator
+            const filter = andMap[`${q.key.name}/${operator}`];
+            if (filter && filter.o === operator) {
+                filter.v.push(q.value?.name || '');
+            } else {
+                andMap[`${q.key.name}/${operator}`] = {
+                    k: q.key.name,
+                    v: [q.value?.name || ''],
+                    o: operator,
+                };
+            }
+        } else if (q.value.name) or.push(q.value.name);
+    });
+
+    return { and: Object.values(andMap), or };
 };
 
 

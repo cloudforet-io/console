@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { QueryHelper } from '@/lib/space-connector/helper';
+import { AxiosRequestConfig } from 'axios';
 import API from './api';
 import { SessionTimeoutCallback, APIInfo } from './type';
 
@@ -61,9 +62,9 @@ class SpaceConnector {
     }
 
     protected APIHandler(path: string) {
-        return async (params: object = {}): Promise<any> => {
+        return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
             try {
-                const response = await this.api.instance.post(path, params);
+                const response = await this.api.instance.post(path, params, config);
                 return response.data;
             } catch (e) {
                 throw e;
