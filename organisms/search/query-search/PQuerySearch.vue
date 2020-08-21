@@ -237,7 +237,7 @@ export default {
 
 
         const onInput = async (rawVal: string, e) => {
-            const val = rawVal.trim();
+            const val = rawVal || ''; // rawVal.trim()
             state.searchText = val;
 
             if (state.selectedKey) {

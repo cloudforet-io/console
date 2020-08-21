@@ -33,9 +33,6 @@ export interface DynamicLayoutProps<
     type: DynamicLayoutType;
     options: SchemaOptions;
     data?: any;
-    // loading?: boolean;
-    // totalCount?: number;
-    // timezone?: string;
     beforeCreate?: (props: any) => void|Promise<void>;
     fetchOptions?: FetchOptions;
     extra?: Extra;
