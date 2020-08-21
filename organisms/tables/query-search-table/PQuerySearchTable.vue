@@ -24,6 +24,9 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
+        <template #toolbox-top>
+            <slot name="toolbox-top" />
+        </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item hidden lg:block">
@@ -156,7 +159,7 @@ export default {
             slotNames: computed(() => {
                 const res: string[] = [];
                 forEach(slots, (func, name) => {
-                    if (!['toolbox-left', 'toolbox-bottom'].includes(name)) res.push(name);
+                    if (!['toolbox-left', 'toolbox-bottom', 'toolbox-top'].includes(name)) res.push(name);
                 });
                 return res;
             }),
