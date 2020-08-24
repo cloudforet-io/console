@@ -29,6 +29,7 @@ import {
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { getTimezone } from '@/lib/util';
+import { Moment } from 'moment-timezone/moment-timezone';
 
 const TICKS_COUNT = 5;
 const DAY_COUNT = 30;
@@ -43,24 +44,24 @@ interface DataType {
     success: number;
     failure: number;
 }
-// interface State {
-//     chartRef: HTMLCanvasElement|null;
-//     chart: Chart|null;
-//     data: DataType[];
-//     loading: boolean;
-//     selectedDate: string;
-// }
+interface State {
+    loading: boolean;
+    chartRef: HTMLCanvasElement|null;
+    chart: Chart|null;
+    data: DataType[];
+    currentDate: Moment;
+    selectedDate: string;
+}
 
 export default {
     name: 'PCollectorHistoryChart',
     components: { PSkeleton, PChartLoader },
     setup() {
-        const state = reactive({
+        const state: UnwrapRef<State> = reactive({
             loading: true,
             chartRef: null,
             chart: null,
             data: [],
-            //
             currentDate: moment().tz(getTimezone()),
             selectedDate: '',
         });
@@ -74,14 +75,18 @@ export default {
                 // const sample = await SpaceConnector.client.statistics.topic.dailyJobSummary({
                 //     start: ''
                 // })
-                const res = await fluentApi.statisticsTest().history().stat()
+                const res = await fluentApi.statisticsTest().history().stat<DataType>()
                     .setTopic('daily_job_summary')
                     .addGroupKey('created_at', 'date')
                     .addGroupField('success', STAT_OPERATORS.sum, 'values.success_count')
                     .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
                     .setFilter({ key: 'created_at', value: `now/d-${DAY_COUNT - 1}d`, operator: FILTER_OPERATOR.gtTime })
                     .execute();
-                state.data = res.data.results;
+                state.data = res.data.results.map((d) => ({
+                    date: d.date,
+                    success: d.success,
+                    failure: d.failure,
+                }));
             } catch (e) {
                 console.error(e);
             } finally {

@@ -163,7 +163,7 @@ import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/q
 import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
-import {getQueryItemsToFilterItems, parseTag} from '@/lib/api/query-search';
+import { getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
 
 const GeneralPageLayout = (): Component => import('@/views/containers/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
@@ -369,6 +369,7 @@ export default {
             state.loading = true;
             try {
                 const items = getQueryItemsToFilterItems(state.searchTags, state.querySearchHandlers.keyItems);
+                // // const fieldsArray = state.fields.map(d => d.name);
                 const res = await fluentApi.inventory().collector().list()
                     .setFilter(...items.and)
                     .setFilterOr(...items.or)
@@ -376,6 +377,10 @@ export default {
                     .setSortDesc(state.sortDesc)
                     .setThisPage(state.thisPage)
                     .setPageSize(state.pageSize)
+                    .setOnly(
+                        'collector_id', 'name', 'state', 'priority', 'last_collected_at',
+                        'created_at', 'provider', 'tags',
+                    )
                     .execute();
                 state.items = res.data.results;
                 state.totalCount = res.data.total_count || 0;

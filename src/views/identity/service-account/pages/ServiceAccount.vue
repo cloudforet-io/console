@@ -416,7 +416,9 @@ export default {
 
         const secretIsShow = computed(() => apiHandler.tableTS.selectState.isSelectOne && singleItemTab.syncState.activeTab === 'credentials');
 
-        const secretListAction = fluentApi.secret().secret().list();
+        const secretListAction = fluentApi.secret().secret().list().setOnly(
+            'secret_id', 'name', 'schema', 'created_at',
+        );
         const secretApiHandler = new TabSearchTableFluentAPI(
             secretListAction,
             secretIsShow,

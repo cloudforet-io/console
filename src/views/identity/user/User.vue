@@ -74,11 +74,6 @@
                                :item="selectedUsers[0]"
                 />
             </template>
-            <template #summary>
-                <p-user-detail ref="userDetail"
-                               :item="selectedUsers[0]"
-                />
-            </template>
         </p-tab>
         <p-tab v-else-if="selectedIndexes.length > 1" :tabs="multiItemTab.state.tabs"
                :active-tab.sync="multiItemTab.syncState.activeTab"
@@ -285,6 +280,8 @@ export default {
                 .setSortBy(state.sortBy)
                 .setSortDesc(state.sortDesc)
                 .setKeyword(state.searchText)
+                .setOnly('user_id', 'name', 'email',
+                    'state', 'mobile', 'group', 'timezone', 'language')
                 .execute();
             state.users = res.data.results;
             state.totalCount = res.data.total_count;
