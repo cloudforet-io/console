@@ -1,6 +1,7 @@
 const Management = () => import('@/views/management/management');
 const ManagementNavBar = () => import('@/views/management/managementNavBar');
 const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins_new.vue');
+const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 
 export default {
     path: 'management',
@@ -30,6 +31,12 @@ export default {
                     component: SupervisorPlugins,
                 },
             ],
+        },
+        {
+            path: 'collector-history',
+            name: 'collectorHistory',
+            meta: { label: 'Collector History', breadcrumb: true },
+            component: CollectorHistory,
         },
     ],
 };

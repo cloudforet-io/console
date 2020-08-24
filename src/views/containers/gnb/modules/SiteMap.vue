@@ -98,6 +98,7 @@ export default {
                     isAdminMenu: true,
                     subMenus: [
                         { label: 'Plugin', link: '/management/supervisor/plugins' },
+                        { label: 'Collector History', link: '/management/collector-history' },
                     ],
                 },
             ],
