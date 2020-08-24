@@ -1,9 +1,12 @@
 import axios, {
     AxiosError, AxiosInstance, AxiosRequestConfig,
 } from 'axios';
+import jwt from 'jsonwebtoken';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import { SessionTimeoutCallback } from './type';
 
+const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
+const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 
 class APIError extends Error {
@@ -41,7 +44,9 @@ class API {
 
     private refreshInstance: AxiosInstance;
 
-    private readonly userStore: any
+    private accessToken?: string;
+
+    private refreshToken?: string;
 
     private readonly sessionTimeoutCallback: SessionTimeoutCallback;
 
@@ -51,15 +56,66 @@ class API {
         },
     }
 
-    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback, userStore: any) {
-        this.userStore = userStore;
+    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
         this.sessionTimeoutCallback = sessionTimeoutCallback;
 
         const axiosConfig = this.getAxiosConfig(baseURL);
         this.instance = axios.create(axiosConfig);
         this.refreshInstance = axios.create(axiosConfig);
 
+        this.loadToken();
         this.setAxiosInterceptors();
+    }
+
+    private loadToken(): void {
+        const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+        const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
+
+        if (storedAccessToken) this.accessToken = storedAccessToken;
+        if (storedRefreshToken) this.refreshToken = storedRefreshToken;
+    }
+
+    checkToken(): boolean {
+        return (API.getTokenExpirationTime(this.refreshToken) - API.getCurrentTime()) > 10;
+    }
+
+    getExpirationTime(): number {
+        const expiryTime = API.getTokenExpirationTime(this.refreshToken) - API.getCurrentTime();
+        if (expiryTime < 0) return 0;
+
+        return expiryTime;
+    }
+
+    flushToken(): void {
+        window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+        window.localStorage.removeItem(REFRESH_TOKEN_KEY);
+        this.accessToken = undefined;
+        this.refreshToken = undefined;
+    }
+
+    setToken(accessToken: string, refreshToken: string): void {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+        window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    }
+
+    static getTokenExpirationTime(token?: string): number {
+        if (token) {
+            try {
+                const refreshToken = JSON.parse(token).data;
+                const decodedToken = jwt.decode(refreshToken);
+                return decodedToken.exp;
+            } catch (e) {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+    }
+
+    static getCurrentTime(): number {
+        return Math.floor(Date.now() / 1000);
     }
 
     private getAxiosConfig(baseURL: string): AxiosRequestConfig {
@@ -73,10 +129,11 @@ class API {
     private async refreshAuthLogic(failedRequest: any): Promise<any> {
         try {
             const response = await this.refreshInstance.post(REFRESH_URL);
-            this.userStore.setToken(response.data.refresh_token, response.data.access_token);
-            failedRequest.response.config.headers.Authorization = `Bearer ${this.userStore.state.accessToken}`;
+            this.setToken(response.data.access_token, response.data.refresh_token);
+            failedRequest.response.config.headers.Authorization = `Bearer ${this.accessToken}`;
             return response;
         } catch (err) {
+            this.flushToken();
             this.sessionTimeoutCallback();
             throw err;
         }
@@ -85,9 +142,7 @@ class API {
     private setAxiosInterceptors(): void {
         // Axios request interceptor to set the access token
         this.instance.interceptors.request.use((request) => {
-            if (this.userStore.state.isSignedIn) {
-                request.headers.Authorization = `Bearer ${this.userStore.state.accessToken}`;
-            }
+            request.headers.Authorization = `Bearer ${this.accessToken}`;
             return request;
         });
 
@@ -99,9 +154,7 @@ class API {
 
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
-            if (this.userStore.state.isSignedIn) {
-                request.headers.Authorization = `Bearer ${this.userStore.state.refreshToken}`;
-            }
+            request.headers.Authorization = `Bearer ${this.refreshToken}`;
             return request;
         });
 

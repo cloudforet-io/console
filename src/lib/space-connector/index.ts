@@ -12,13 +12,13 @@ class SpaceConnector {
 
     private _client: any = {};
 
-    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, userStore?: any) {
-        this.api = new API(endpoint, sessionTimeoutCallback, userStore);
+    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined) {
+        this.api = new API(endpoint, sessionTimeoutCallback);
     }
 
-    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, userStore?: any): Promise<void> {
+    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback): Promise<void> {
         if (!SpaceConnector.instance) {
-            SpaceConnector.instance = new SpaceConnector(endpoint, sessionTimeoutCallback, userStore);
+            SpaceConnector.instance = new SpaceConnector(endpoint, sessionTimeoutCallback);
             await SpaceConnector.instance.loadAPI();
         }
     }
@@ -28,6 +28,22 @@ class SpaceConnector {
             return SpaceConnector.instance._client;
         }
         throw new Error('Not initialized SpaceONE client!');
+    }
+
+    static setToken(accessToken: string, refreshToken: string): void {
+        SpaceConnector.instance.api.setToken(accessToken, refreshToken);
+    }
+
+    static flushToken(): void {
+        SpaceConnector.instance.api.flushToken();
+    }
+
+    static get isTokenExpired(): boolean {
+        return SpaceConnector.instance.api.checkToken();
+    }
+
+    static getExpirationTime(): number {
+        return SpaceConnector.instance.api.getExpirationTime();
     }
 
     protected async loadAPI(): Promise<void> {
