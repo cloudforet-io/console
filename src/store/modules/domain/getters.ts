@@ -1,0 +1,1 @@
+import { DomainState } from './type';

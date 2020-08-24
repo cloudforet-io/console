@@ -42,6 +42,11 @@ export default defineComponent({
     setup(props, context) {
         const vm = getCurrentInstance()as CombinedVueInstance<any, any, any, any, any>;
         const login = async (userId, param) => {
+            await vm.$store.dispatch('user/signIn', {
+                domain_id: vm.$store.state.domain.domainId,
+                credentials: param,
+            });
+
             // console.debug('start oauth login');
             const response = await vm.$http.post('/identity/token/issue', {
                 credentials: param,

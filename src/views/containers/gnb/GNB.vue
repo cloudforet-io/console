@@ -320,6 +320,7 @@ export default {
             state.profileVisible = true;
         };
         const logOutAction = async () => {
+            await vm.$store.dispatch('user/signOut');
             logout(vm);
         };
 
