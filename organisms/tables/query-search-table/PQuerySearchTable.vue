@@ -12,6 +12,7 @@
                      use-cursor-loading
                      sortable
                      :selectable="selectable"
+                     :multi-select="multiSelect"
                      @changePageSize="onChangePageSize"
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
@@ -131,6 +132,10 @@ export default {
             default: () => [],
         },
         selectable: {
+            type: Boolean,
+            default: true,
+        },
+        multiSelect: {
             type: Boolean,
             default: true,
         },
