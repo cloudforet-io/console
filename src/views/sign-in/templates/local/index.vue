@@ -122,6 +122,17 @@ export default defineComponent({
             const data = {};
             const result = await validateAPI.allValidation();
             if (result) {
+                await vm.$store.dispatch('user/signIn', {
+                    domain_id: vm.$store.state.domain.domainId,
+                    credentials: {
+                        // eslint-disable-next-line camelcase
+                        user_type: 'DOMAIN_OWNER',
+                        // eslint-disable-next-line camelcase
+                        user_id: state.userId,
+                        password: state.password,
+                    },
+                });
+
                 const response = await vm.$http.post('/identity/token/issue', {
                     credentials: {
                         // eslint-disable-next-line camelcase
