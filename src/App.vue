@@ -41,13 +41,23 @@ export default defineComponent({
             await config.init();
             await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
                 vm.$ls.logout(vm);
-            }, vm.$ls.user);
-
+            });
             Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'), vm);
+        };
+        const domainInit = async () => {
+            let domainName;
+            if (config.get('DOMAIN_NAME_REF') === 'hostname') {
+                const { hostname } = window.location;
+                domainName = hostname.split('.')[0];
+            } else {
+                domainName = config.get('DOMAIN_NAME');
+            }
+            await vm.$store.dispatch('domain/load', domainName);
         };
         const preparationTo = async () => {
             try {
                 await configInit();
+                await domainInit();
                 if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), vm);
                 setGtagUserID(vm);
             } catch (e) {
