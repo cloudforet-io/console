@@ -89,8 +89,6 @@ import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-// @ts-ignore
-import { setValidation } from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
@@ -101,6 +99,7 @@ import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { showErrorMessage } from '@/lib/util';
+import { formValidation, requiredValidation } from '@/components/util/composition-helpers';
 
 interface State {
     loading: boolean;
@@ -126,6 +125,42 @@ interface Props {
     credentialId: string | null;
     collectorId: string;
 }
+
+const map = {
+    key: 'key',
+    label: 'name',
+    required: 'is_required',
+    placeholder: 'example',
+    type: 'type',
+    default: 'default',
+    menu: 'enums',
+};
+
+const setValidation = (forms, values) => {
+    const formKey = map.key;
+    const vd = {};
+
+    forms.forEach((form) => {
+        vd[form[formKey]] = form[map.required] ? [requiredValidation()] : [];
+    });
+
+    const {
+        allValidation,
+        fieldValidation,
+        invalidMsg,
+        invalidState,
+        isAllValid,
+    } = formValidation(values, vd);
+
+    return {
+        formKey,
+        allValidation,
+        fieldValidation,
+        invalidMsg,
+        invalidState,
+        isAllValid,
+    };
+};
 
 export default {
     name: 'CollectDataModal',
