@@ -226,6 +226,9 @@ export default {
                         {
                             type: 'item', label: 'Plugin', name: 'plugin', link: '/management/supervisor/plugins',
                         },
+                        {
+                            type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history',
+                        },
                     ],
                 },
             ],

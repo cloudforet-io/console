@@ -9,7 +9,7 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 
-class APIError extends Error {
+export class APIError extends Error {
     status: number;
 
     code: string;
