@@ -24,15 +24,15 @@ import { setGtagUserID } from '@/lib/gtag';
 
 
 interface State {
-        component: any;
-        loader: () => Promise<any>;
+    component: any;
+    loader: () => Promise<any>;
 }
 
 interface Credentials {
     // eslint-disable-next-line camelcase
-        access_token: string;
+    access_token: string;
     // eslint-disable-next-line camelcase
-        refresh_token: string;
+    refresh_token: string;
 }
 export default defineComponent({
     name: 'Login',
