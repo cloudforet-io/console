@@ -1,9 +1,9 @@
-import PAnchor from '@/components/atoms/anchors/PAnchor.vue';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { text } from '@storybook/addon-knobs';
 
 
 export default {
-    title: 'atoms/anchor',
+    title: 'molecules/anchor',
     component: PAnchor,
     parameters: {
         info: {
