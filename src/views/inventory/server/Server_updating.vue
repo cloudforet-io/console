@@ -403,10 +403,6 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-            // exportApi.setUrl('inventory/server/list')
-            //     .setDataSource(tableSchema.options.fields)
-            //     .setParam({
-            //     })
         };
 
 

@@ -203,8 +203,6 @@ export default {
             if (ctx && !loading) {
                 drawChart(ctx);
             }
-        }, {
-            lazy: true,
         });
 
         return {
