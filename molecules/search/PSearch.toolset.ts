@@ -10,7 +10,7 @@ export const searchProps = {
     },
     focused: {
         type: Boolean,
-        default: true,
+        default: false,
     },
     disabled: {
         type: Boolean,
