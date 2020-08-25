@@ -35,9 +35,8 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, getCurrentInstance, Ref,
+    toRefs, reactive, getCurrentInstance, Ref, UnwrapRef,
 } from '@vue/composition-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
     dictIGProps, DictIGPropsType,
     DictItem,

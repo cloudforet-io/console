@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, watch,
+    reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import { MetricChartProps, metricChartProps } from '@/components/organisms/charts/metric-chart/PMetricChart.toolset';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
@@ -31,7 +31,6 @@ import { map, forEach } from 'lodash';
 import { gray } from '@/styles/colors';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ChartColor, ChartDataSets } from 'chart.js';
 import { PChart, tooltips } from '@/components/organisms/charts/PChart.toolset';
 import moment from 'moment';

@@ -1,10 +1,10 @@
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, onMounted, onUnmounted, reactive, ref, Ref,
 } from '@vue/composition-api';
 import { every } from 'lodash';
 import VueI18n from 'vue-i18n';
 import { isNotEmpty } from '@/components/util/helpers';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 /**
  * Event listeners by pass
@@ -51,7 +51,7 @@ export const makeProxy = <T extends any>(name: string, props: any, emit: any): R
  * @param emit
  * @return {Ref<*>}
  */
-export function makeOptionalProxy<T extends any>(name: string, vm: ComponentInstance): Ref<T>|T {
+export function makeOptionalProxy<T extends any>(name: string, vm: ComponentRenderProxy): Ref<T>|T {
     if (vm.$listeners[`update:${name}`]) {
         return computed({
             get: () => vm.$props[name],
@@ -65,7 +65,7 @@ export function makeOptionalProxy<T extends any>(name: string, vm: ComponentInst
 
 
 export function makeVModelProxy<T extends any>(name = 'value', event = 'input', transform: ((val: any) => any)|null = null): Ref<T> {
-    const vm = getCurrentInstance() as ComponentInstance;
+    const vm = getCurrentInstance() as ComponentRenderProxy;
     let setter: (val: any) => void;
     if (transform) {
         setter = (val) => { vm.$emit(event, transform(val)); };

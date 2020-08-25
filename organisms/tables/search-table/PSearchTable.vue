@@ -55,9 +55,9 @@
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { forEach } from 'lodash';
 import { Options } from '@/components/organisms/tables/search-table/type';
@@ -112,7 +112,7 @@ export default {
         },
     },
     setup(props, { emit, slots }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             /** table */

@@ -36,10 +36,10 @@
 import { focus } from 'vue-focus';
 import { searchProps } from '@/components/molecules/search/PSearch.toolset';
 import {
+    ComponentRenderProxy,
     computed,
     getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PI from '@/components/atoms/icons/PI.vue';
 import { makeByPassListeners, makeProxy } from '@/components/util/composition-helpers';
 
@@ -53,7 +53,7 @@ export default {
     },
     props: searchProps,
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state: any = reactive({
             proxyIsFocused: props.isFocused === undefined
                 ? props.focused

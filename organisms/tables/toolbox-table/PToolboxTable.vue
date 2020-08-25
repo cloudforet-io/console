@@ -86,6 +86,7 @@
 <script lang="ts">
 import { flatMap } from 'lodash';
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
@@ -95,8 +96,6 @@ import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
-
 
 export default {
     name: 'PToolboxTable',
@@ -157,7 +156,7 @@ export default {
         },
     },
     setup(props: ToolBoxTableSetupProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),

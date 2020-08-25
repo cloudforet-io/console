@@ -3,9 +3,8 @@ import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/components/util/toolset-helpers';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
-    computed, reactive,
+    computed, reactive, UnwrapRef,
 } from '@vue/composition-api';
 
 export interface TreeNodeStateType<T=any, S extends BaseNodeStateType = BaseNodeStateType> {

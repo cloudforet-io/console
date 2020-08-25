@@ -74,11 +74,11 @@ import PTextPagination from '@/components/organisms/pagination/PTextPagination.v
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
 import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {
     name: 'PToolboxGridLayout',
@@ -131,7 +131,7 @@ export default {
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             proxyThisPage: makeOptionalProxy('thisPage', vm),

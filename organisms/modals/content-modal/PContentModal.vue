@@ -24,13 +24,12 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs, computed,
-} from '@vue/composition-api';
+    import {
+        reactive, toRefs, computed, UnwrapRef,
+    } from '@vue/composition-api';
 // @ts-ignore
 import PModal, { propsMixin } from '@/components/molecules/modals/PModal.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export const setup = (props, context) => {
     interface StateType {

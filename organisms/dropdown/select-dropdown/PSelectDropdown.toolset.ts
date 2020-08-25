@@ -3,7 +3,7 @@ import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/components/util/toolset-helpers';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { UnwrapRef } from '@vue/composition-api';
 
 export const selectDropdownProps = {
     items: {

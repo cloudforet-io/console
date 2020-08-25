@@ -64,15 +64,14 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
 import { TableDynamicLayoutProps, TableFetchOptions } from '@/components/organisms/dynamic-layout/templates/table/type';
 import { get } from 'lodash';
 
@@ -113,7 +112,7 @@ export default {
         },
     },
     setup(props: TableDynamicLayoutProps, { emit, slots }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             /** table */

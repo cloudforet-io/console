@@ -1,6 +1,5 @@
-import { reactive } from '@vue/composition-api';
+import { reactive, UnwrapRef } from '@vue/composition-api';
 import { optionalType, StateToolSet } from '@/lib/toolset';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 const color = ['default', 'light', 'primary4'];

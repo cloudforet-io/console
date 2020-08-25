@@ -22,10 +22,9 @@
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 
 import {
-    computed, defineComponent, onMounted, reactive, toRefs,
+    computed, defineComponent, onMounted, reactive, toRefs, UnwrapRef,
 } from '@vue/composition-api';
 import { Computed } from '@/components/util/type';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 interface State {
