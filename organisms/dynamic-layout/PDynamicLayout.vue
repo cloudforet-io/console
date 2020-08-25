@@ -80,7 +80,7 @@ export default {
             if (!isEqual(aft, bef)) {
                 getComponent();
             }
-        }, { lazy: true });
+        }, { immediate: false });
 
         onMounted(async () => {
             await getComponent();

@@ -256,7 +256,7 @@ export default {
         const copyTargetElement = computed(() => state.table.children[1].children);
 
         const showLoading = ref(true);
-        const showHeader = ref(false);
+        const showHeader = ref(props.items && props.items.length > 0 && props.fields.length > 0);
         const showNoData = computed(() => {
             if (showHeader.value && (
                 !props.items || !Array.isArray(props.items) || props.items.length === 0
@@ -440,7 +440,7 @@ export default {
                 if (!showHeader.value) showHeader.value = true;
                 showLoading.value = false;
             }
-        });
+        }, { immediate: true });
 
 
         const getValueFunc = computed(() => {

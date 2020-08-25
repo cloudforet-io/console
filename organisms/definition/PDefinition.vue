@@ -1,5 +1,5 @@
 <template>
-    <tr>
+    <tr class="p-definition">
         <td class="key">
             {{ label || name }}
         </td>
@@ -12,8 +12,9 @@
                                  :data="data"
                 />
             </slot>
-            <p-copy-button v-if="typeof data !== 'undefined' && data !== ''"
-                           class="ml-2" @copy="copy"
+            <p-copy-button v-if="typeof data !== 'undefined' && data !== '' && data !== null"
+                           class="ml-2" width="0.8rem" height="0.8rem"
+                           @copy="copy"
                            @mouseover="onMouseOver()" @mouseout="onMouseOut()"
             />
         </td>
@@ -57,7 +58,7 @@ export default {
         },
     },
     setup(props: DefinitionProps, { emit }) {
-        const field = ref<HTMLFormElement>(null);
+        const field = ref<HTMLFormElement|null>(null);
 
         const copy = (): void => {
             copyAnyData(field.value?.$el.innerText);
@@ -72,21 +73,25 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-.key {
-    @apply font-bold;
-    width: 18rem;
-}
-.value {
-    @apply cursor-text;
-    &.hover {
-        @apply text-blue-500;
+<style lang="postcss">
+.p-definition {
+    @apply flex;
+    .key {
+        @apply font-bold;
+        width: 18rem;
+    }
+    .value {
+        @apply inline-flex items-center flex-grow cursor-text;
+        flex-wrap: wrap;
+        max-width: calc(100% - 18rem);
+        &.hover {
+            @apply text-blue-500;
+        }
+    }
+    .key, .value {
+        @apply py-2 px-4 text-sm;
+        line-height: 1.45;
+        cursor: unset;
     }
 }
-.key, .value {
-    @apply py-2 px-4 text-sm;
-    line-height: 1.45;
-    cursor: unset;
-}
-
 </style>

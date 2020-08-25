@@ -4,7 +4,7 @@
           @mouseenter="onMouseOver()"
           @mouseup="copyText()"
           v-on="$listeners"
-    ><p-i width="1rem" height="1rem" :name="icon"
+    ><p-i :width="width" :height="height" :name="icon"
           :color="color"
           @click="copyText"
     /></span>
@@ -25,6 +25,14 @@ export default {
         value: {
             type: [String, Array, Number, Object, Boolean, null],
             default: null,
+        },
+        width: {
+            type: String,
+            default: '1rem',
+        },
+        height: {
+            type: String,
+            default: '1rem',
         },
     },
     setup(props, context) {

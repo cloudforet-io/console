@@ -5,11 +5,8 @@
                           :type="layout.type"
                           :options="layout.options"
                           :data="rootData"
-                          :loading="loading"
-                          :total-count="totalCount"
-                          :timezone="timezone"
-                          :fetch-options="fetchOptionsMap[layout.name]"
-                          :extra="extraMap[layout.name]"
+                          :fetch-options="fetchOptionsMap[layout.name] || fetchOptions"
+                          :extra="extraMap[layout.name] || extra"
                           v-on="getListeners(layout.name, idx)"
         >
             <template v-for="(slot) of slotNames" v-slot:[slot]="scope">

@@ -41,7 +41,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: Object,
+            type: [Object, Array],
             default: undefined,
         },
         fetchOptions: {
@@ -63,8 +63,9 @@ export default {
             }),
             rootData: computed<DefinitionData>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                    return get(props.data, props.options.root_path, {});
                 }
+                if (Array.isArray(props.data)) return {};
                 return props.data;
             }),
             loading: computed(() => (props.extra === undefined ? undefined : props.extra.loading)),

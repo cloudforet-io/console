@@ -59,7 +59,7 @@ export interface StateOptions extends CommonOptions {
 }
 
 export interface EnumOptions {
-    [data: string]: DynamicField;
+    [data: string]: Omit<DynamicField, 'key'|'name'>;
 }
 
 export type DictOptions = CommonOptions

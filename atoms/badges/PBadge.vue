@@ -1,10 +1,13 @@
 <script lang="ts">
 import { getBindClass } from '@/components/util/functional-helpers';
 import { BADGE_STYLE, BADGE_SHAPE } from '@/components/atoms/badges/PBadge.toolset';
+import { getColor } from '@/components/util/helpers';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 
 export default {
     name: 'PBadge',
     functional: true,
+    components: { PAnchor },
     props: {
         /** @type {string} */
         styleType: {
@@ -50,18 +53,14 @@ export default {
         newData.class[`badge-${props.shape}`] = true;
         if (props.backgroundColor || props.textColor) {
             newData.staticStyle = data.staticStyle || {};
-            if (!props.outline) {
-                if (props.backgroundColor) {
-                    newData.staticStyle['background-color'] = props.backgroundColor;
-                }
-                if (props.textColor) {
-                    newData.staticStyle.color = props.textColor;
-                }
+            if (props.outline) {
+                newData.staticStyle.backgroundColor = 'transparent';
+                newData.staticStyle.borderColor = getColor(props.backgroundColor);
+                newData.staticStyle.borderWidth = '1px';
+                newData.staticStyle.color = getColor(props.backgroundColor);
             } else {
-                newData.staticStyle['background-color'] = 'transparent';
-                newData.staticStyle['border-color'] = props.backgroundColor;
-                newData.staticStyle['border-width'] = '1px';
-                newData.staticStyle.color = props.backgroundColor;
+                newData.staticStyle.color = getColor(props.textColor);
+                newData.staticStyle.backgroundColor = getColor(props.backgroundColor);
             }
         } else {
             newData.class[`badge-${props.styleType}`] = true;
@@ -70,7 +69,7 @@ export default {
 
         let tag = 'span';
         if (props.link) {
-            tag = 'a';
+            tag = 'p-anchor';
             newData.attrs = { href: props.link, target: props.target };
         }
         return h(tag, newData, children);
@@ -80,13 +79,17 @@ export default {
 
 <style lang="postcss">
 .p-badge {
-    display: inline-block;
-    background-clip: padding-box;
-    text-align: center;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
     font-size: 0.75rem;
-    line-height: 0.875rem;
+    line-height: 1;
+    height: 1.25rem;
+    overflow: hidden;
     letter-spacing: 0.02rem;
-    padding: 0.1875rem 0.5rem 0.1875rem 0.5rem;
+    padding: 0 0.5rem;
 
     @apply text-white bg-gray;
     &.badge-round {
@@ -97,7 +100,7 @@ export default {
     }
 }
 
-@define-mixin badge-color $theme, $color, $opposite-color {
+@define-mixin badge-color $theme, $color, $opposite-color, $hover-color {
     .badge-$(theme) {
         background-color: $color;
         color: $opposite-color;
@@ -109,22 +112,22 @@ export default {
     }
 }
 
-@mixin badge-color primary, theme('colors.primary'), theme('colors.white');
-@mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
-@mixin badge-color primary1, theme('colors.primary1'), theme('colors.white');
-@mixin badge-color primary2, theme('colors.primary2'), theme('colors.white');
-@mixin badge-color primary3, theme('colors.primary3'), theme('colors.white');
-@mixin badge-color primary4, theme('colors.primary4'), theme('colors.white');
-@mixin badge-color secondary, theme('colors.secondary'), theme('colors.white');
-@mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white');
-@mixin badge-color secondary2, theme('colors.secondary2'), theme('colors.white');
-@mixin badge-color alert, theme('colors.alert'), theme('colors.white');
-@mixin badge-color safe, theme('colors.safe'), theme('colors.white');
-@mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white');
-@mixin badge-color gray, theme('colors.gray.default'), theme('colors.white');
-@mixin badge-color gray200, theme('colors.gray.200'), theme('colors.gray.900');
-@mixin badge-color gray100, theme('colors.gray.100'), theme('colors.gray.default');
-@mixin badge-color coral, theme('colors.coral.default'), theme('colors.white');
-@mixin badge-color yellow, theme('colors.yellow.default'), theme('colors.white');
+@mixin badge-color primary, theme('colors.primary'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color primary1, theme('colors.primary1'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color primary2, theme('colors.primary2'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color primary3, theme('colors.primary3'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color primary4, theme('colors.primary4'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color secondary, theme('colors.secondary'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color secondary2, theme('colors.secondary2'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color alert, theme('colors.alert'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color safe, theme('colors.safe'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color gray, theme('colors.gray.default'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color gray200, theme('colors.gray.200'), theme('colors.gray.900'), theme('colors.secondary');
+@mixin badge-color gray100, theme('colors.gray.100'), theme('colors.gray.default'), theme('colors.secondary');
+@mixin badge-color coral, theme('colors.coral.default'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color yellow, theme('colors.yellow.default'), theme('colors.white'), theme('colors.secondary');
 
 </style>

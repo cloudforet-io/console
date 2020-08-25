@@ -1,6 +1,7 @@
 import { DynamicLayoutOptions, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import {DynamicField} from "@/components/organisms/dynamic-field/type";
 
 
 export interface DynamicLayoutFetchOptions {
@@ -10,7 +11,7 @@ export interface DynamicLayoutFetchOptions {
     pageLimit: number;
     queryTags: QueryTag[];
     searchText: string;
-    listMap: Record<string, Partial<DynamicLayoutFetchOptions>>;
+    listMap?: Record<string, Partial<DynamicLayoutFetchOptions>>;
 }
 
 export interface DynamicLayoutExtra {
@@ -21,7 +22,7 @@ export interface DynamicLayoutExtra {
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     language: string;
-    listMap: Record<string, Partial<DynamicLayoutExtra>>;
+    listMap?: Record<string, Partial<DynamicLayoutExtra>>;
 }
 
 export interface DynamicLayoutProps<
@@ -45,4 +46,5 @@ export interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOp
              changedOptions: Partial<FetchOptions>,
              layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    export: (options: FetchOptions, fields: DynamicField[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
 }

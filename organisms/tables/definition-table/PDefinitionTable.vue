@@ -1,31 +1,25 @@
 <template>
     <div class="p-definition-table">
-        <slot v-if="isNoData" name="empty">
-            <p-empty v-if="isNoData" class="py-8">
+        <slot v-if="!loading && isNoData" name="empty">
+            <p-empty class="py-8">
                 No Data
             </p-empty>
         </slot>
-        <table v-else>
+        <table v-else-if="!isNoData">
             <tbody>
-                <template v-if="loading">
-                    <tr v-for="s in skeletons" :key="s">
-                        <td class="w-1/4 py-2 px-4 h-8">
-                            <p-skeleton />
-                        </td>
-                        <td class="py-2 pr-4 h-8">
-                            <p-skeleton />
-                        </td>
-                    </tr>
-                </template>
-                <template v-else>
-                    <p-definition v-for="(bind, idx) in items" :key="idx"
-                                  class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
-                    >
-                        <slot :name="`data-${bind.name}`" v-bind="{...bind, index: idx, items}" />
-                    </p-definition>
-                </template>
+                <p-definition v-for="(bind, idx) in items" :key="idx"
+                              class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
+                >
+                    <slot :name="`data-${bind.name}`" v-bind="{...bind, index: idx, items}" />
+                </p-definition>
             </tbody>
         </table>
+        <slot v-if="loading" name="loading">
+            <div class="loading-backdrop fade-in" />
+            <p-lottie name="thin-spinner" :size="2.5"
+                      :auto="true" class="loading"
+            />
+        </slot>
     </div>
 </template>
 
@@ -41,6 +35,7 @@ import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { every, range, get } from 'lodash';
 import { DefinitionProps } from '@/components/organisms/definition/type';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): DefinitionProps[] => fields.map(item => ({
     ...item,
@@ -49,7 +44,9 @@ const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): Definit
 
 export default {
     name: 'PDefinitionTable',
-    components: { PSkeleton, PEmpty, PDefinition },
+    components: {
+        PLottie, PEmpty, PDefinition,
+    },
     props: {
         fields: {
             type: Array,
@@ -92,6 +89,8 @@ export default {
 
 <style lang="postcss">
 .p-definition-table {
+    @apply relative;
+    min-height: 2.5rem;
     table {
         @apply w-full;
         td {
@@ -107,6 +106,31 @@ export default {
 
             @apply bg-violet-100;
         }
+    }
+    .loading-backdrop {
+        @apply absolute w-full h-full overflow-hidden;
+        background-color: white;
+        opacity: 0.5;
+        top: 0;
+        z-index: 1;
+    }
+    .loading {
+        @apply absolute flex w-full h-full justify-center items-center;
+        top: 0;
+        max-height: 16.875rem;
+    }
+    /* transitions */
+    .fade-in-enter-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-enter, .fade-in-leave-to {
+        opacity: 0;
+    }
+    .fade-in-leave, .fade-in-enter-to {
+        opacity: 0.5;
     }
 }
 </style>

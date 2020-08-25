@@ -38,10 +38,10 @@ export interface ListOptions extends CommonOptions {
     layouts: DynamicLayout[];
 }
 
-export type DynamicLayoutOptions =
-    ItemOptions | SimpleTableOptions | TableOptions |
-    QuerySearchTableOptions | RawOptions | MarkdownOptions |
-    ListOptions
+export interface DynamicLayoutOptions extends
+    ItemOptions, SimpleTableOptions, TableOptions,
+    QuerySearchTableOptions, RawOptions, MarkdownOptions,
+    ListOptions {}
 
 
 export interface DynamicLayout {

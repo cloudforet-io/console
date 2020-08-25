@@ -1,4 +1,5 @@
-import _, { toString } from 'lodash';
+import _, { get, toString } from 'lodash';
+import colors from '@/components/styles/colors';
 
 /** @function
  * @name selectToCopyToClipboard
@@ -31,4 +32,10 @@ export const isNotEmpty = (value): boolean => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
+};
+
+export const getColor = (col?: string|null) => {
+    if (!col) return col;
+    if (col.startsWith('#')) return col;
+    return get(colors, col);
 };
