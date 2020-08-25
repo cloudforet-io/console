@@ -8,10 +8,19 @@
         </p-label>
     </span>
     <span v-else class="p-status">
-        <span v-if="isFortAwesome" :style="{color:iconColor||null}"><i :class="icon.split(' ')" /></span>
-        <p-i v-else-if="icon" :name="icon" :color="iconStyle" />
-        <span v-else class="circle" :style="circleStyle" />
-        <p-label class="label" :style="labelStyle">
+        <span v-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
+        <p-i v-else-if="icon" :name="icon"
+             :color="realIconColor ? `transparent ${realIconColor}` : undefined"
+             width="1rem" height="1rem"
+        />
+        <span v-else class="circle" :style="{
+            backgroundColor: circleColor
+        }"
+        />
+        <p-label class="label" :style="{
+            color: labelColor
+        }"
+        >
             {{ text }}
         </p-label>
     </span>
@@ -22,8 +31,10 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PLabel from '@/components/atoms/labels/PLabel.vue';
 import { computed } from '@vue/composition-api';
 import { StatusProps } from '@/components/molecules/status/type';
+import { getColor } from '@/components/util/helpers';
 
 const fontAwesomePrefix = RegExp('fa-');
+
 export default {
     name: 'PStatus',
     components: { PI, PLabel },
@@ -50,9 +61,9 @@ export default {
         },
     },
     setup(props: StatusProps) {
-        const labelStyle = computed(() => (props.textColor ? { color: props.textColor } : null));
-        const circleStyle = computed(() => (props.iconColor ? { backgroundColor: props.iconColor } : null));
-        const iconStyle = computed(() => (props.iconColor ? `transparent ${props.iconColor}` : null));
+        const labelColor = computed(() => getColor(props.textColor));
+        const circleColor = computed(() => getColor(props.iconColor));
+        const realIconColor = computed(() => getColor(props.iconColor));
         const isFortAwesome = computed(() => {
             if (props.icon && fontAwesomePrefix.test(props.icon)) {
                 return true;
@@ -61,9 +72,9 @@ export default {
         });
 
         return {
-            labelStyle,
-            circleStyle,
-            iconStyle,
+            labelColor,
+            circleColor,
+            realIconColor,
             isFortAwesome,
         };
     },
@@ -93,10 +104,11 @@ export default {
             border-radius: 50%;
             height: 0.5rem;
             width: 0.5rem;
+            margin-right: 0.1rem;
         }
         .label {
             margin: 0;
-            padding-left: 0.5rem;
+            margin-left: 0.3rem;
         }
 
         /* theme */
