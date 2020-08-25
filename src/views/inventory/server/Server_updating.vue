@@ -50,15 +50,12 @@
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <p-server-detail
-                    :server-id="tableState.selectedItems[0].server_id"
-                />
+                <p-server-detail :server-id="tableState.selectedItems[0].server_id" />
             </template>
             <template #tag>
-                <s-tags-panel
-                    :is-show="singleItemTabState.activeTab==='tag'"
-                    :resource-id="tableState.selectedItems[0].server_id"
-                    tag-page-name="serverTags"
+                <s-tags-panel :is-show="singleItemTabState.activeTab==='tag'"
+                              :resource-id="tableState.selectedItems[0].server_id"
+                              tag-page-name="serverTags"
                 />
             </template>
             <!--                <template #admin>-->
@@ -113,22 +110,21 @@
             </template>
         </p-tab>
 
-        <div v-else id="empty-space">
+        <div v-else class="empty-space">
             Select a Server above for details.
         </div>
-        <p-table-check-modal
-            v-if="!!checkTableModalState.mode"
-            :visible.sync="checkTableModalState.visible"
-            :header-title="checkTableModalState.title"
-            :sub-title="checkTableModalState.subTitle"
-            :theme-color="checkTableModalState.themeColor"
-            :fields="tableState.multiFields"
-            size="lg"
-            :centered="true"
-            :selectable="false"
-            :items="tableState.selectedItems"
+        <p-table-check-modal v-if="!!checkTableModalState.mode"
+                             :visible.sync="checkTableModalState.visible"
+                             :header-title="checkTableModalState.title"
+                             :sub-title="checkTableModalState.subTitle"
+                             :theme-color="checkTableModalState.themeColor"
+                             :fields="tableState.multiFields"
+                             size="lg"
+                             :centered="true"
+                             :selectable="false"
+                             :items="tableState.selectedItems"
 
-            @confirm="checkModalConfirm"
+                             @confirm="checkModalConfirm"
         />
         <s-project-tree-modal :visible.sync="changeProjectState.visible"
                               :project-id="changeProjectState.projectId"
@@ -292,6 +288,7 @@ export default {
             totalCount: 0,
             timezone: computed(() => user.state.timezone || 'UTC'),
             selectIndex: [],
+            selectable: true,
             keyItems: tableAutocompleteProps.keyItems,
             valueHandlerMap: tableAutocompleteProps.valueHandlerMap,
         });
@@ -389,8 +386,10 @@ export default {
         const exportServerData = async () => {
             try {
                 const res = await exportApi({
-                    source: '/inventory/server/list',
-                    param: { query: getQuery() },
+                    source: {
+                        url: '/inventory/server/list',
+                        param: { query: getQuery() },
+                    },
                     template: {
                         options: {
                             fileType: 'xlsx',
@@ -672,7 +671,7 @@ export default {
         }
     }
 
-    #empty-space {
+    .empty-space {
         @apply text-primary2 mt-6;
         text-align: center;
         margin-bottom: 0.5rem;

@@ -27,7 +27,7 @@
                 <p-panel-top v-if="showTitle"
                              style="margin: 0; margin-top: 0.5rem;"
                              :use-total-count="true"
-                             :total-count="apiHandler.totalCount.value"
+                             :total-count="apiHandler.totalCount"
                 >
                     {{ name }}
                 </p-panel-top>
@@ -36,12 +36,12 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                <p-search v-model="apiHandler.tableTS.searchText.value" @search="searchGetData(false)" @delete="searchGetData(true)" />
+                <p-search v-model="apiHandler.tableTS.searchText" @search="searchGetData(false)" @delete="searchGetData(true)" />
             </div>
         </template>
         <template #toolbox-bottom>
             <div class="flex-1 2xs:block lg:hidden mt-4" :class="{'mb-4':$scopedSlots['toolbox-bottom']}">
-                <p-search v-model="apiHandler.tableTS.searchText.value" @search="searchGetData(false)" @delete="searchGetData(true)" />
+                <p-search v-model="apiHandler.tableTS.searchText" @search="searchGetData(false)" @delete="searchGetData(true)" />
             </div>
             <slot name="toolbox-bottom" />
         </template>
@@ -246,14 +246,14 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
     &:last-child {
          flex-grow: 1;
      }
     }
-.s-dynamic-layout-table{
-    >>> .toolbox{
-        .toolbox-bottom{
+.s-dynamic-layout-table {
+    >>> .toolbox {
+        .toolbox-bottom {
             @apply mt-0;
         }
     }

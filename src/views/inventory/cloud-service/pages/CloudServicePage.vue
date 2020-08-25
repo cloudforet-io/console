@@ -8,7 +8,7 @@
                 <p-page-title :title="$route.params.name"
                               child
                               use-total-count
-                              use-selected-count :total-count="apiHandler.totalCount.value"
+                              use-selected-count :total-count="apiHandler.totalCount"
                               :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                               @goBack="$router.go(-1)"
                 />

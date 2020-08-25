@@ -5,7 +5,7 @@
         </div>
         <p-page-title :title="$t('WORD.COLLECTOR')"
                       use-total-count
-                      :total-count="apiHandler.totalCount.value"
+                      :total-count="apiHandler.totalCount"
         />
         <p-horizontal-layout>
             <template #container="{ height }">

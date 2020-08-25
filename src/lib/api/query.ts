@@ -1,9 +1,7 @@
 import _ from 'lodash';
 import { readonlyArgs } from '@/lib/type';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
-import { OPERATOR_MAP, QueryAPI } from '@/lib/fluent-api/toolset';
-import { FilterItem } from '@/lib/fluent-api/type';
-import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
+import { OPERATOR_MAP } from '@/lib/fluent-api/toolset';
 
 const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
@@ -34,9 +32,6 @@ export interface ApiQuery {
     only?: readonlyArgs<string[]>;
 }
 
-export interface APIParameter{
-    query?: ApiQuery;
-}
 type ValueFormatter = (string, any) => string | number | Array<string | number>;
 /**
  * @name defaultQuery
@@ -108,60 +103,3 @@ export const defaultQuery = (
     }
     return query;
 };
-/**
- * make value autocomplete query
- * @param key
- * @param value
- * @param itemLimit
- * @param sortBy
- * @param sortDesc
- * @return {{page: {start: number, limit: *}}}
- */
-export const autoCompleteQuery = (searchQuery, itemLimit?: number, sortBy?: string, sortDesc?: boolean, distinct?: boolean) => {
-    const query: ApiQuery = {
-        page: { start: 1, limit: itemLimit },
-        only: [searchQuery.key],
-    };
-    if (sortBy) {
-        query.sort = { key: sortBy, desc: sortDesc };
-    }
-
-    if (searchQuery.value) {
-        query.filter = [{
-            k: searchQuery.key,
-            v: searchQuery.value,
-            o: 'contain',
-        }];
-    }
-    return query;
-};
-
-/**
- * set autocomplete query to given action
- */
-export function setActionByQuery
-<api extends StatQueryAPI<any, any>|QueryAPI<any, any> = StatQueryAPI<any, any>>(
-    action: api,
-    searchQuery: FilterItem,
-    itemLimit?: number,
-    sortBy?: string,
-    sortDesc?: boolean,
-): api {
-    let api;
-    if (action instanceof StatQueryAPI) {
-        api = action.setDistinct(searchQuery.key);
-        api = api.setSort(sortBy || searchQuery.key, sortDesc === undefined ? false : sortDesc);
-        if (itemLimit) api = api.setLimit(itemLimit);
-    } else if (action instanceof QueryAPI) {
-        api = action;
-        if (sortBy) {
-            api.setSortBy(sortBy);
-            if (sortDesc !== undefined) api.setSortDesc(sortDesc);
-        }
-        if (itemLimit) api = api.setPageSize(itemLimit);
-    }
-
-
-    if (searchQuery.value) api = api.setFilter(searchQuery);
-    return api;
-}

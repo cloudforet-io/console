@@ -44,7 +44,7 @@
                             </div>
                             <p-page-title
                                 :use-selected-count="true" :use-total-count="true" :title="`${selectProviderItem ? selectProviderItem.name : ''} Account`"
-                                :total-count="apiHandler.totalCount.value"
+                                :total-count="apiHandler.totalCount"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                             />
                             <s-dynamic-layout type="table"
@@ -208,6 +208,7 @@ import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'ServiceAccount',
@@ -232,7 +233,7 @@ export default {
         const projectState = reactive({
             project: {},
         });
-        const { project } = (vm as any).$ls;
+        const { project } = useStore();
 
         const resourceCountAPI = fluentApi.identity().serviceAccount().list().setCountOnly();
         const providerListAPI = fluentApi.identity().provider().list().setOnly(

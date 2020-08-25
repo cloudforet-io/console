@@ -22,7 +22,7 @@ export const setGtagUserID = (vm: any) => {
             console.error('init gtag userid fail', e);
         }
     } else if (config.get('GTAG_ID') !== 'DISABLED') {
-        console.error('not set $ls or $gtag');
+        console.error('not set $gtag');
     }
 };
 

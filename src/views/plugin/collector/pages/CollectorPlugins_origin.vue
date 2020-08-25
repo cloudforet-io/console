@@ -23,7 +23,7 @@
                                    @clickRefresh="listPlugins"
             >
                 <template #toolbox-left>
-                    <p-page-title title="Plugins" use-total-count :total-count="apiHandler.totalCount.value"
+                    <p-page-title title="Plugins" use-total-count :total-count="apiHandler.totalCount"
                                   child @goBack="$router.go(-1)"
                     />
                 </template>
@@ -46,7 +46,7 @@
                         </p-badge>
                     </p>
                     <p v-if="keyword" class="mb-2 text-sm">
-                        {{ apiHandler.totalCount.value }} plugins for <strong>[{{ keyword }}]</strong>
+                        {{ apiHandler.totalCount }} plugins for <strong>[{{ keyword }}]</strong>
                     </p>
                 </template>
                 <template #loading>

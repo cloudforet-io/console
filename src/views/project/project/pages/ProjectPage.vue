@@ -37,7 +37,7 @@
                 <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
                                   : 'All Project'"
                               use-total-count
-                              :total-count="apiHandler.totalCount.value"
+                              :total-count="apiHandler.totalCount"
                 >
                     <template #extra-area>
                         <div class="btns">

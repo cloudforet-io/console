@@ -131,6 +131,7 @@ import {
     lengthMinValidation,
     checkTimeZoneValidation, noEmptySpaceValidation,
 } from '@/lib/compostion-util';
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'PUserForm',
@@ -182,6 +183,7 @@ export default {
     },
     setup(props, context) {
         const state = contentModalSetup(props, context);
+        const { domain } = useStore();
         const formState = reactive({
             // eslint-disable-next-line camelcase
             user_id: '',
@@ -196,7 +198,7 @@ export default {
             tags: {},
             isLastCheck: false,
             // eslint-disable-next-line camelcase
-            is_local_auth: computed(() => context.parent.$ls.domain.state.isLocalType),
+            is_local_auth: computed(() => domain.state.isLocalType),
             ...props.item,
         });
         const languageSelectItems = [
@@ -222,7 +224,7 @@ export default {
         const pluginAuthIDValidation = () => new Validation(async (value) => {
             let result = false;
             // eslint-disable-next-line camelcase
-            await context.parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: context.parent.$ls.domain.state.domainId }).then((res) => {
+            await context.parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: domain.state.domainId }).then((res) => {
                 if (res.data.total_count >= 1) {
                     result = true;
                     if (!formState.isLastCheck && res.data.total_count === 1) {

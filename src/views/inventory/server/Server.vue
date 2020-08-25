@@ -5,7 +5,7 @@
         </div>
         <p-page-title title="Server"
                       use-total-count use-selected-count
-                      :total-count="apiHandler.totalCount.value"
+                      :total-count="apiHandler.totalCount"
                       :selected-count="apiHandler.tableTS.selectState.selectItems.length"
         />
         <p-horizontal-layout>
@@ -216,7 +216,7 @@ export default {
             project: {},
             isReady: false,
         });
-        const { project } = (vm as any).$ls;
+        const { project } = useStore();
 
         const filedMap = {
             project_id: {

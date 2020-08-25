@@ -53,6 +53,8 @@ import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuery
 import { SearchSchema } from '@/lib/component-utils/query-search/type';
 import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
+import config from '@/lib/config';
 
 const rawLayout = {
     name: 'Raw Data',
@@ -184,26 +186,23 @@ export default {
             return query.data;
         };
 
-        const getApi = () => {
-            let api;
-            const params: any = {
-                // eslint-disable-next-line camelcase
-                server_id: props.serverId,
-            };
-
+        const getParams = () => {
+            // eslint-disable-next-line camelcase
+            const params: any = { server_id: props.serverId };
             if (state.currentLayout) params.query = getQuery(state.currentLayout);
-
             // eslint-disable-next-line camelcase
             const keyPath = state.currentLayout?.options?.root_path;
-            if (keyPath) {
-                // eslint-disable-next-line camelcase
-                params.key_path = keyPath;
-                api = SpaceConnector.client.inventory.server.getData(params);
-            } else {
-                api = SpaceConnector.client.inventory.server.get(params);
-            }
+            // eslint-disable-next-line camelcase
+            if (keyPath) params.key_path = keyPath;
+            return params;
+        };
 
-            return api;
+        const getApi = () => {
+            // eslint-disable-next-line camelcase
+            if (state.currentLayout?.options?.root_path) {
+                return SpaceConnector.client.inventory.server.getData(getParams());
+            }
+            return SpaceConnector.client.inventory.server.get(getParams());
         };
 
         const getData = debounce(async () => {
@@ -243,6 +242,7 @@ export default {
             }
         });
 
+        const exportApi = SpaceConnector.client.addOns.excel.export;
         const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
             init(options) {
                 if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
@@ -262,7 +262,29 @@ export default {
             select(selectIndex) {
                 state.selectIndex = selectIndex;
             },
+            async export(options, fields) {
+                try {
+                    const res = await exportApi({
+                        source: {
+                            url: '/inventory/server/get-data',
+                            param: getParams(),
+                        },
+                        template: {
+                            options: {
+                                fileType: 'xlsx',
+                                timezone: state.timezone,
+                            },
+                            // eslint-disable-next-line camelcase
+                            data_source: fields,
+                        },
+                    });
+                    window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
         });
+
         project.getProject();
         provider.getProvider();
         serviceAccount.getServiceAccounts();

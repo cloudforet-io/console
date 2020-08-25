@@ -2,7 +2,7 @@
     <general-page-layout>
         <p-page-title title="Plugins"
                       use-total-count
-                      :total-count="apiHandler.totalCount.value"
+                      :total-count="apiHandler.totalCount"
         />
         <p-horizontal-layout>
             <template #container="{ height }">
