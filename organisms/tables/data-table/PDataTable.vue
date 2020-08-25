@@ -36,7 +36,11 @@
                                 >
                                     <span class="th-contents">
                                         <span>
-                                            {{ field.label ? field.label : field.name }}
+                                            <slot :name="`th-${field.name}-format`"
+                                                  :value="field.label"
+                                            >
+                                                {{ field.label ? field.label : field.name }}
+                                            </slot>
                                             <p-copy-button v-if="colCopy"
                                                            class="ml-2"
                                                            @copy="clickColCopy(index)"
