@@ -4,9 +4,9 @@ const palette = {
     black: '#000000',
     white: '#FFFFFF',
     gray: {
-        100: '#F2F2F2',
-        200: '#DCDDE2',
-        300: '#BBBCC4',
+        100: '#F7F7F7',
+        200: '#E5E5E8',
+        300: '#CED0D6',
         400: '#A7A9B2',
         500: '#858895',
         600: '#6B6E7B',

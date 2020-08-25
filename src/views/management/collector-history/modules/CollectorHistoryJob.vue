@@ -11,12 +11,12 @@
             </div>
             <!--            <span class="toggle-button">hide</span>-->
         </div>
-        <p-horizontal-layout>
+        <p-horizontal-layout class="job-tasks-lap">
             <template #container="{ height }">
                 <p-query-search-table
                     :loading="loading"
                     :fields="fields"
-                    :items="jobTasks"
+                    :items="items"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
@@ -41,25 +41,14 @@
                             </div>
                         </div>
                     </template>
-                    <template #col-service_account_id-format="{ value }">
-                        {{ convertServiceAccountName(value) }}
-                    </template>
-                    <template #col-project_id-format="{ value }">
-                        {{ convertProjectName(value) }}
-                    </template>
+
                     <template #col-status-format="{ value }">
-                        <span :class="value.toLowerCase()">{{ convertStatus(value) }}</span>
-                    </template>
-                    <template #col-created_at-format="{ value }">
-                        {{ timestampFormatter(value) }}
-                    </template>
-                    <template #col-finished_at-format="{ value }">
-                        아직 안함
+                        <span :class="value.toLowerCase()">{{ value }}</span>
                     </template>
                 </p-query-search-table>
             </template>
         </p-horizontal-layout>
-        <div v-if="selectedItem && selectedItem.errors.length > 0">
+        <div v-if="selectedItem && selectedItem.errors.length > 0" class="error-list-lap">
             <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
                 Error List
             </p-panel-top>
@@ -67,11 +56,11 @@
                           :items="selectedItem.errors"
                           :sortable="false"
                           :selectable="false"
-                          :loading="loading"
+                          :row-height-fixed="false"
                           table-style-type="light"
                           bordered
             >
-                <template #col-message-format="{ value }">
+                <template #col-message-format="{ value }" style="width: 20rem">
                     <div class="error-message">
                         {{ value }}
                     </div>
@@ -83,6 +72,7 @@
 
 <script lang="ts">
 import { capitalize, find } from 'lodash';
+import moment from 'moment';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
@@ -107,16 +97,14 @@ export default {
             type: Object,
             required: true,
         },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props) {
         const state = reactive({
+            loading: false,
             jobTasks: [],
             serviceAccounts: [],
             projects: [],
+            items: [],
             //
             disabledIndex: [0, 3],
             selectedIndexes: [],
@@ -129,6 +117,7 @@ export default {
             totalCount: 0,
             //
             fields: [
+                { label: 'No.', name: 'sequence' },
                 { label: 'Service Account', name: 'service_account_id' },
                 { label: 'Project', name: 'project_id' },
                 { label: 'Status', name: 'status' },
@@ -136,7 +125,7 @@ export default {
                 { label: 'Updated', name: 'updated_count' },
                 { label: 'Error', name: 'errors.length' },
                 { label: 'Start Time', name: 'created_at' },
-                { label: 'Duration', name: 'finished_at' },
+                { label: 'Duration', name: 'duration' },
             ],
             errorFields: [
                 { label: 'No.', name: 'sequence' },
@@ -154,7 +143,54 @@ export default {
             activatedStatus: 'all',
         });
 
+        const convertStatus = (status) => {
+            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
+            return capitalize(status);
+        };
+        const convertServiceAccountName = (serviceAccountId) => {
+            // eslint-disable-next-line camelcase
+            const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
+            return serviceAccount?.name;
+        };
+        const convertProjectName = (projectId) => {
+            // eslint-disable-next-line camelcase
+            const project = find(state.projects, { project_id: projectId });
+            return project?.name;
+        };
+        const convertFinishedAtToDuration = (createdAt, finishedAt) => {
+            if (createdAt && finishedAt) {
+                const createdAtMoment = moment(timestampFormatter(createdAt));
+                const finishedAtMoment = moment(timestampFormatter(finishedAt));
+                const duration = finishedAtMoment.diff(createdAtMoment, 'minutes');
+                return `${duration.toString()} min`;
+            }
+            return null;
+        };
+        const convertJobTasksToFieldItem = (jobTasks) => {
+            state.items = [];
+            jobTasks.forEach((task, index) => {
+                const newTask = {
+                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    // eslint-disable-next-line camelcase
+                    service_account_id: convertServiceAccountName(task.service_account_id),
+                    // eslint-disable-next-line camelcase
+                    project_id: convertProjectName(task.project_id),
+                    status: convertStatus(task.status),
+                    // eslint-disable-next-line camelcase
+                    created_count: task.created_count,
+                    // eslint-disable-next-line camelcase
+                    updated_count: task.updated_count,
+                    'errors.length': task.errors.length,
+                    // eslint-disable-next-line camelcase
+                    created_at: timestampFormatter(task.created_at),
+                    duration: convertFinishedAtToDuration(task.created_at, task.finished_at),
+                };
+                state.items.push(newTask);
+            });
+        };
+
         const getJobTasks = async () => {
+            state.loading = true;
             try {
                 const query = new QueryHelper();
                 query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
@@ -166,9 +202,12 @@ export default {
                 });
                 state.jobTasks = res.results;
                 state.totalCount = res.total_count;
+
+                convertJobTasksToFieldItem(res.results);
             } catch (e) {
                 console.error(e);
             }
+            state.loading = false;
         };
         const getServiceAccounts = async () => {
             try {
@@ -185,21 +224,6 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-        };
-
-        const convertStatus = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
-            return capitalize(status);
-        };
-        const convertServiceAccountName = (serviceAccountId) => {
-            // eslint-disable-next-line camelcase
-            const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
-            return serviceAccount?.name;
-        };
-        const convertProjectName = (projectId) => {
-            // eslint-disable-next-line camelcase
-            const project = find(state.projects, { project_id: projectId });
-            return project?.name;
         };
 
         const onSelect = (item, index) => {
@@ -258,21 +282,38 @@ export default {
         }
     }
 
-    .p-query-search-table {
-        .p-data-table {
-            .failure {
-                @apply text-red-500;
+    .job-tasks-lap {
+        .p-query-search-table {
+            .p-data-table {
+                .failure {
+                    @apply text-red-500;
+                }
             }
         }
     }
 
-    .p-data-table {
-        .error-message {
-            display: block;
-            max-width: 20rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+    .error-list-lap {
+        @apply border border-gray-200;
+        border-radius: 0.125rem;
+        padding-bottom: 2.375rem;
+        .p-data-table {
+            th {
+                border-top: none;
+            }
+            tr:hover {
+                @apply bg-gray-100;
+            }
+            td {
+                @apply border-gray-200;
+            }
+            .th-contents {
+                @apply text-gray-500;
+            }
+            .error-message {
+                /*white-space: nowrap;*/
+                /*overflow: hidden;*/
+                /*text-overflow: ellipsis;*/
+            }
         }
     }
 }

@@ -5,7 +5,7 @@
             <p-collector-history-chart :loading="loading" />
             <p-query-search-table
                 :fields="fields"
-                :items="jobs"
+                :items="items"
                 :loading="loading"
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
@@ -30,27 +30,27 @@
                         </div>
                     </div>
                 </template>
-                <template #col-status-format="{ value }">
-                    <span :class="value.toLowerCase()">{{ convertStatus(value) }}</span>
+                <template #th-total_tasks-format="{ value }">
+                    <span>{{ value }}</span>
+                    <span class="th-additional-info-text">(completed / total)</span>
                 </template>
-                <template #col-created_at-format="{ value }">
-                    {{ timestampFormatter(value) }}
+                <template #col-status-format="{ value }">
+                    <span :class="value.toLowerCase()">{{ value }}</span>
                 </template>
             </p-query-search-table>
         </div>
         <div v-else>
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
-            <p-collector-history-job :job="selectedItem" :loading="loading" />
+            <p-collector-history-job :job="selectedItem" />
         </div>
     </general-page-layout>
 </template>
 
 <script lang="ts">
 import { capitalize } from 'lodash';
+import moment from 'moment';
 
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
@@ -76,6 +76,7 @@ export default {
             loading: false,
             pageTitle: computed(() => (state.selectedItem ? state.selectedItem.job_id : 'Collector History')),
             fields: computed(() => [
+                { label: 'No.', name: 'sequence' },
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info.name' },
                 { label: 'Status', name: 'status' },
@@ -91,6 +92,7 @@ export default {
             ],
             activatedStatus: 'all',
             jobs: [] as JobModel[],
+            items: [],
             //
             pageSize: 15,
             thisPage: 1,
@@ -101,21 +103,6 @@ export default {
             selectedIndex: [],
             selectedItem: computed(() => state.jobs[state.selectedIndex]),
         });
-        const getJobs = async () => {
-            state.loading = true;
-            try {
-                const query = new QueryHelper();
-                query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
-
-                const res = await SpaceConnector.client.inventory.job.list({ query: query.data });
-                state.jobs = res.results;
-                state.totalCount = res.total_count;
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
 
         const onSelect = (item, index) => {
             state.selectedIndex = index;
@@ -128,8 +115,53 @@ export default {
         };
 
         const convertStatus = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
+            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-progress';
             return capitalize(status);
+        };
+        const convertFinishedAtToDuration = (createdAt, finishedAt) => {
+            if (createdAt && finishedAt) {
+                const createdAtMoment = moment(timestampFormatter(createdAt));
+                const finishedAtMoment = moment(timestampFormatter(finishedAt));
+                const duration = finishedAtMoment.diff(createdAtMoment, 'minutes');
+                return `${duration.toString()} min`;
+            }
+            return null;
+        };
+        const convertJobsToFieldItem = (jobs) => {
+            state.items = [];
+            jobs.forEach((job, index) => {
+                const newJob = {
+                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    // eslint-disable-next-line camelcase
+                    job_id: job.job_id,
+                    'collector_info.name': job.collector_info.name,
+                    status: convertStatus(job.status),
+                    // eslint-disable-next-line camelcase
+                    total_tasks: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
+                    // eslint-disable-next-line camelcase
+                    created_at: timestampFormatter(job.created_at),
+                    duration: convertFinishedAtToDuration(job.created_at, job.finished_at),
+                };
+                state.items.push(newJob);
+            });
+        };
+
+        const getJobs = async () => {
+            state.loading = true;
+            try {
+                const query = new QueryHelper();
+                query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
+
+                const res = await SpaceConnector.client.inventory.job.list({ query: query.data });
+                state.jobs = res.results;
+                state.totalCount = res.total_count;
+
+                convertJobsToFieldItem(res.results);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         const init = async () => {
@@ -143,8 +175,6 @@ export default {
             onClickGoBack,
             onClickStatus,
             getJobs,
-            convertStatus,
-            timestampFormatter,
         };
     },
 };
@@ -179,9 +209,16 @@ export default {
             }
         }
     }
+
     .p-query-search-table {
-        .error, .timeout, .canceled {
-            @apply text-red-500;
+        .p-data-table {
+            .error, .timeout, .canceled {
+                @apply text-red-500;
+            }
+            .th-additional-info-text {
+                font-weight: normal;
+                font-size: 0.75rem;
+            }
         }
     }
 }

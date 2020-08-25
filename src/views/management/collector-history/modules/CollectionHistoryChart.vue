@@ -13,9 +13,8 @@ import {
 } from 'lodash';
 import moment from 'moment';
 import numeral from 'numeral';
-import Chart from 'chart.js';
+import { Moment } from 'moment-timezone/moment-timezone';
 
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { reactive, watch, toRefs } from '@vue/composition-api';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
@@ -23,13 +22,12 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { NSChart } from '@/lib/chart/s-chart';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import {
-    black, coral, gray, primary,
-} from '@/styles/colors';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { getTimezone } from '@/lib/util';
-import { Moment } from 'moment-timezone/moment-timezone';
+import {
+    black, coral, gray, primary,
+} from '@/styles/colors';
 
 const TICKS_COUNT = 5;
 const DAY_COUNT = 30;
@@ -44,37 +42,35 @@ interface DataType {
     success: number;
     failure: number;
 }
-interface State {
-    loading: boolean;
-    chartRef: HTMLCanvasElement|null;
-    chart: Chart|null;
-    data: DataType[];
-    currentDate: Moment;
-    selectedDate: string;
-}
+// interface State {
+//     loading: boolean;
+//     chartRef: HTMLCanvasElement|null;
+//     chart: Chart|null;
+//     data: DataType[];
+//     currentDate: Moment;
+//     selectedDate: string;
+// }
 
 export default {
     name: 'PCollectorHistoryChart',
     components: { PSkeleton, PChartLoader },
     setup() {
-        const state: UnwrapRef<State> = reactive({
+        const state = reactive({
             loading: true,
-            chartRef: null,
-            chart: null,
-            data: [],
+            chartRef: null as HTMLCanvasElement|null,
+            chart: null as null|NSChart,
+            data: [] as any,
             currentDate: moment().tz(getTimezone()),
             selectedDate: '',
         });
 
         const getJobStat = async () => {
-            // const query = new QueryHelper();
-            // query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
-            // const res = await SpaceConnector.client;
             state.loading = true;
             try {
-                // const sample = await SpaceConnector.client.statistics.topic.dailyJobSummary({
-                //     start: ''
-                // })
+                // const query = new QueryHelper();
+                // query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
+                // const res = await SpaceConnector.client.statistics.topic.dailyJobSummary();
+
                 const res = await fluentApi.statisticsTest().history().stat<DataType>()
                     .setTopic('daily_job_summary')
                     .addGroupKey('created_at', 'date')
@@ -82,7 +78,7 @@ export default {
                     .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
                     .setFilter({ key: 'created_at', value: `now/d-${DAY_COUNT - 1}d`, operator: FILTER_OPERATOR.gtTime })
                     .execute();
-                state.data = res.data.results.map((d) => ({
+                state.data = res.data.results.map(d => ({
                     date: d.date,
                     success: d.success,
                     failure: d.failure,
