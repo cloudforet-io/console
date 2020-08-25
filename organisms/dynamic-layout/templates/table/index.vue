@@ -12,16 +12,16 @@
                      use-cursor-loading
                      :setting-visible="false"
                      sortable
-                     selectable
+                     :selectable="false"
                      @changePageSize="onChangePageSize"
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
                      @select="onSelect"
-                     @clickRefresh="emitFetch()"
+                     @clickRefresh="emitFetch({})"
                      @clickExcel="emitExport()"
     >
         <template #toolbox-top>
-            <slot v-if="$scopedSlots['toolbox-top']" name="toolbox-top">
+            <slot v-if="name" name="toolbox-top">
                 <p-panel-top v-if="name" style="margin: 0; margin-top: 0.5rem;"
                              :use-total-count="true"
                              :total-count="totalCount"
@@ -81,7 +81,7 @@ interface Field {
     label: string;
 }
 
-
+const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 export default {
     name: 'PDynamicLayoutTable',
     components: {
@@ -133,22 +133,13 @@ export default {
             loading: computed(() => (props.extra?.loading || false)),
             totalCount: computed(() => (props.extra?.totalCount || 0)),
             allPage: computed(() => (state.totalCount ? Math.ceil(state.totalCount / state.pageSize) : 1)),
-            selectIndex: props.extra?.selectIndex || [],
+            selectIndex: computed(() => props.extra?.selectIndex || []),
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
             sortDesc: props.fetchOptions?.sortDesc || true,
-            thisPage: props.fetchOptions?.pageStart || 1,
+            thisPage: getThisPage(props.fetchOptions?.pageStart, props.fetchOptions?.pageLimit),
             pageSize: props.fetchOptions?.pageLimit || 15,
             searchText: props.fetchOptions?.searchText || '',
-            /** dynamic layout fetch options */
-            fetchOptionsParam: computed<TableFetchOptions>(() => ({
-                sortBy: state.sortBy,
-                sortDesc: state.sortDesc,
-                pageStart: state.thisPage,
-                pageLimit: state.pageSize,
-                selectIndex: state.selectIndex,
-                searchText: state.searchText,
-            })) as unknown as DynamicLayoutFetchOptions,
             /** others */
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
@@ -168,18 +159,21 @@ export default {
             }),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                    return get(props.data, props.options.root_path, []);
                 }
                 return props.data;
             }),
         });
 
 
-        const emitFetch = (options?: Partial<DynamicLayoutFetchOptions>) => {
-            emit('fetch', Object.freeze({
-                ...state.options,
-                ...state.fetchOptionsParam,
-            }), Object.freeze({ ...options }));
+        const emitFetch = (options: Partial<TableFetchOptions>) => {
+            emit('fetch', {
+                sortBy: options.sortBy === undefined ? state.sortBy : options.sortBy,
+                sortDesc: options.sortDesc === undefined ? state.sortDesc : options.sortDesc,
+                pageStart: options.pageStart === undefined ? state.thisPage : options.pageStart,
+                pageLimit: options.pageLimit === undefined ? state.pageSize : options.pageLimit,
+                searchText: options.searchText === undefined ? state.searchText : options.searchText,
+            } as TableFetchOptions, { ...options });
         };
 
         const emitExport = () => {
@@ -204,10 +198,16 @@ export default {
         };
 
         const onSearch = (val?: string) => {
-            if (val) emitFetch({ searchText: val });
+            emitFetch({ searchText: val || '' });
         };
 
-        emit('init', state.fetchOptionsParam);
+        emit('init', {
+            sortBy: state.sortBy,
+            sortDesc: state.sortDesc,
+            pageStart: state.thisPage,
+            pageLimit: state.pageSize,
+            searchText: state.searchText,
+        } as TableFetchOptions);
 
         return {
             ...toRefs(state),
@@ -224,6 +224,7 @@ export default {
 </script>
 <style lang="postcss">
 .p-dynamic-layout-table {
+    border-width: 0;
     .left-toolbox-item {
         &:last-child {
             flex-grow: 1;
