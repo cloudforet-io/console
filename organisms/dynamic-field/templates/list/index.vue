@@ -6,7 +6,6 @@ import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vu
 import { getBindClass } from '@/components/util/functional-helpers';
 import { DynamicFieldOptions, DynamicFieldProps, ListOptions } from '@/components/organisms/dynamic-field/type';
 
-
 export default {
     name: 'PDynamicFieldList',
     functional: true,
