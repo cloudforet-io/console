@@ -1,11 +1,10 @@
-import { computed, reactive, Ref } from '@vue/composition-api';
+import {computed, reactive, Ref, UnwrapRef} from '@vue/composition-api';
 import { TableState, tableProps, TablePropsType } from '@/components/molecules/tables/PTable.toolset';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/components/util/toolset-helpers';
 import { get } from 'lodash';
 import { Computed } from '@/components/util/type';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 export const dataTableProps = {

@@ -27,12 +27,13 @@
 <script lang="ts">
 
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, UnwrapRef,
+} from '@vue/composition-api';
 import {
     find, debounce,
 } from 'lodash';
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
     KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
 } from '@/components/organisms/search/query-search/type';

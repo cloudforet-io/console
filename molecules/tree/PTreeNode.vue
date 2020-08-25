@@ -89,6 +89,7 @@
 <script lang="ts">
 import { TreeNodeProps, treeNodeProps } from '@/components/molecules/tree/PTreeNode.toolset';
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, onMounted, reactive, ref,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -96,7 +97,6 @@ import { makeProxy } from '@/components/util/composition-helpers';
 import {
     forEach,
 } from 'lodash';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 const PTreeNode = import('@/components/molecules/tree/PTreeNode.vue');
 export default {
@@ -104,7 +104,7 @@ export default {
     components: { PI, PTreeNode },
     props: treeNodeProps,
     setup(props: TreeNodeProps, { emit }) {
-        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const depth = computed(() => {
             if (!props.padSize) return `${props.level}rem`;
             const size = props.padSize.match(/\d+/g);

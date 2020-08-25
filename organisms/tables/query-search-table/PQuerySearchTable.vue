@@ -69,6 +69,7 @@ import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearc
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { forEach } from 'lodash';
@@ -76,7 +77,6 @@ import { QueryItem } from '@/components/organisms/search/query-search/type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export default {
     name: 'PQuerySearchTable',
@@ -142,7 +142,7 @@ export default {
         },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             /** table */
