@@ -140,6 +140,14 @@ export default {
             pageSize: props.fetchOptions?.pageLimit || 15,
             searchText: props.fetchOptions?.searchText || '',
             /** others */
+            pageStart: computed(() => ((state.thisPage - 1) * state.pageSize) + 1),
+            fetchOptionsParam: computed(() => ({
+                sortBy: state.sortBy,
+                sortDesc: state.sortDesc,
+                pageStart: state.pageStart,
+                pageLimit: state.pageSize,
+                searchText: state.searchText,
+            } as TableFetchOptions)),
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
                 if (!props.options.fields) return res;
@@ -166,17 +174,21 @@ export default {
 
 
         const emitFetch = (options: Partial<TableFetchOptions>) => {
+            /*
+                check if each option value is 'undefined' to escape auto type casting
+                DO NOT use 'state.fetchOptionsParam'. it does not warranty the latest value.
+            */
             emit('fetch', {
                 sortBy: options.sortBy === undefined ? state.sortBy : options.sortBy,
                 sortDesc: options.sortDesc === undefined ? state.sortDesc : options.sortDesc,
-                pageStart: options.pageStart === undefined ? state.thisPage : options.pageStart,
+                pageStart: options.pageStart === undefined ? state.pageStart : options.pageStart,
                 pageLimit: options.pageLimit === undefined ? state.pageSize : options.pageLimit,
                 searchText: options.searchText === undefined ? state.searchText : options.searchText,
             } as TableFetchOptions, { ...options });
         };
 
         const emitExport = () => {
-            // emit('export');
+            emit('export', state.fetchOptionsParam, props.options.fields || []);
         };
 
         const onChangePageSize = (pageLimit: number) => {
@@ -192,21 +204,15 @@ export default {
         };
 
         const onSelect = (selectIndex: number[]) => {
-            state.selectIndex = [...selectIndex];
-            emit('select', [...state.selectIndex]);
+            state.selectIndex = selectIndex;
+            emit('select', selectIndex);
         };
 
         const onSearch = (val?: string) => {
             emitFetch({ searchText: val || '' });
         };
 
-        emit('init', {
-            sortBy: state.sortBy,
-            sortDesc: state.sortDesc,
-            pageStart: state.thisPage,
-            pageLimit: state.pageSize,
-            searchText: state.searchText,
-        } as TableFetchOptions);
+        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

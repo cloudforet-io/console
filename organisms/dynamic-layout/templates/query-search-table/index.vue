@@ -122,6 +122,14 @@ export default {
             valueHandlerMap: bindExtra(props, 'valueHandlerMap', {}),
             selectIndex: bindExtra(props, 'selectIndex', []),
 
+            pageStart: computed(() => ((state.thisPage - 1) * state.pageSize) + 1),
+            fetchOptionsParam: computed(() => ({
+                sortBy: state.sortBy,
+                sortDesc: state.sortDesc,
+                pageStart: state.pageStart,
+                pageLimit: state.pageSize,
+                queryTags: state.queryTags,
+            } as QuerySearchTableFetchOptions)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
                     return get(props.data, props.options.root_path);
@@ -153,20 +161,13 @@ export default {
         };
 
         const onExport = () => {
-            emit('export', {
-                sortBy: state.sortBy,
-                sortDesc: state.sortDesc,
-                pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
-                pageLimit: state.pageSize,
-                queryTags: state.queryTags,
-            } as QuerySearchTableFetchOptions,
-            props.options.fields || []);
+            emit('export', state.fetchOptionsParam, props.options.fields || []);
         };
 
         const onChange = (options: QuerySearchTableFetchOptions, changedOptions: Partial<QuerySearchTableFetchOptions>) => {
             const changedFetchOptions: Partial<QuerySearchTableFetchOptions> = {};
 
-            // change state
+            // apply changed options to state and rename for dynamic fetch options
             forEach(changedOptions, (d, k) => {
                 state[k] = d;
                 if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
@@ -176,24 +177,12 @@ export default {
 
             // emit
             const args: Parameters<QuerySearchTableListeners['fetch']> = [
-                {
-                    sortBy: state.sortBy,
-                    sortDesc: state.sortDesc,
-                    pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
-                    pageLimit: state.pageSize,
-                    queryTags: state.queryTags,
-                }, changedFetchOptions,
+                state.fetchOptionsParam, changedFetchOptions,
             ];
             emit('fetch', ...args);
         };
 
-        emit('init', {
-            sortBy: state.sortBy,
-            sortDesc: state.sortDesc,
-            pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
-            pageLimit: state.pageSize,
-            queryTags: state.queryTags,
-        } as QuerySearchTableFetchOptions);
+        emit('init', state.fetchOptionsParam);
 
 
         return {

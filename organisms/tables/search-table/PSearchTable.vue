@@ -125,13 +125,6 @@ export default {
             /** search */
             proxySearchText: makeOptionalProxy('searchText', vm),
             /** others */
-            options: computed<Options>(() => ({
-                sortBy: state.proxySortBy,
-                sortDesc: state.proxySortDesc,
-                thisPage: state.proxyThisPage,
-                pageSize: state.proxyPageSize,
-                searchText: state.proxySearchText,
-            })),
             slotNames: computed(() => {
                 const res: string[] = [];
                 forEach(slots, (func, name) => {
@@ -142,11 +135,22 @@ export default {
         });
 
         /** Event emitter */
-        const emitChange = (options?: Partial<Options>) => {
-            emit('change', Object.freeze({
-                ...state.options,
-                ...options,
-            }), Object.freeze({ ...options }));
+        const emitSelect = () => {
+            emit('select', [...state.proxySelectIndex]);
+        };
+
+        const emitChange = (options: Partial<Options> = {}) => {
+            state.proxySelectIndex = [];
+            emitSelect();
+
+            // check if each option value is 'undefined' to escape auto type casting
+            emit('change', {
+                sortBy: options.sortBy === undefined ? state.proxySortBy : options.sortBy,
+                sortDesc: options.sortDesc === undefined ? state.proxySortDesc : options.sortDesc,
+                thisPage: options.thisPage === undefined ? state.proxyThisPage : options.thisPage,
+                pageSize: options.pageSize === undefined ? state.proxyPageSize : options.pageSize,
+                searchText: options.searchText === undefined ? state.proxySearchText : options.searchText,
+            } as Options, options);
         };
 
         const byPassEvent = (name, item, index, mouseEvent) => {
@@ -155,10 +159,6 @@ export default {
 
         const emitExport = () => {
             emit('export');
-        };
-
-        const emitSelect = () => {
-            emit('select', [...state.proxySelectIndex]);
         };
 
         /** Table event listeners */
@@ -175,7 +175,7 @@ export default {
         };
 
         const onSelect = (selectIndex: number[]) => {
-            state.selectIndex = [...selectIndex];
+            state.proxySelectIndex = [...selectIndex];
             emitSelect();
         };
 

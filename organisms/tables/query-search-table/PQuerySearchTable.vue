@@ -155,13 +155,6 @@ export default {
             /** search */
             tags: makeOptionalProxy('queryTags', vm),
             /** others */
-            options: computed<Options>(() => ({
-                sortBy: state.proxySortBy,
-                sortDesc: state.proxySortDesc,
-                thisPage: state.proxyThisPage,
-                pageSize: state.proxyPageSize,
-                queryTags: state.tags,
-            })),
             slotNames: computed(() => {
                 const res: string[] = [];
                 forEach(slots, (func, name) => {
@@ -176,14 +169,18 @@ export default {
             emit('select', [...state.proxySelectIndex]);
         };
 
-        const emitChange = (options?: Partial<Options>) => {
+        const emitChange = (options: Partial<Options> = {}) => {
             state.proxySelectIndex = [];
             emitSelect();
 
-            emit('change', Object.freeze({
-                ...state.options,
-                ...options,
-            }), Object.freeze({ ...options }));
+            // check if each option value is 'undefined' to escape auto type casting
+            emit('change', {
+                sortBy: options.sortBy === undefined ? state.proxySortBy : options.sortBy,
+                sortDesc: options.sortDesc === undefined ? state.proxySortDesc : options.sortDesc,
+                thisPage: options.thisPage === undefined ? state.proxyThisPage : options.thisPage,
+                pageSize: options.pageSize === undefined ? state.proxyPageSize : options.pageSize,
+                queryTags: options.queryTags === undefined ? state.tags : options.queryTags,
+            } as Options, options);
         };
 
         const byPassEvent = (name, item, index, mouseEvent) => {
