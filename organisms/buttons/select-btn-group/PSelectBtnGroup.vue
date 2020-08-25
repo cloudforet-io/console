@@ -60,7 +60,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
     .p-select-btn-group {
         @apply flex flex-wrap;
         .btns {
@@ -70,6 +70,11 @@ export default {
         .p-button {
             @apply mr-2 mb-2;
             min-width: auto;
+            &.outline {
+                &:not(.disabled):hover {
+                    @apply border-secondary bg-blue-200 text-secondary;
+                }
+            }
         }
     }
 </style>

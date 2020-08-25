@@ -83,7 +83,7 @@ import {
 } from '@/components/organisms/context-menu/PContextMenu.toolset';
 
 const setAutoHeight = (props) => {
-    const contextMenu = ref(null) as Ref<HTMLElement>;
+    const contextMenu = ref(null) as Ref<HTMLElement|null>;
     const contextMenuHeight = ref(0);
     const autoHeightStyle = computed(() => {
         if (props.autoHeight && contextMenuHeight.value) {
@@ -96,7 +96,7 @@ const setAutoHeight = (props) => {
     onMounted(() => {
         if (!props.autoHeight) return;
         const winHeight = window.innerHeight;
-        const rects = contextMenu.value.getBoundingClientRect();
+        const rects: any = contextMenu.value?.getBoundingClientRect();
         if (rects.bottom > winHeight) contextMenuHeight.value = winHeight - rects.top;
     });
 
@@ -252,14 +252,15 @@ export default {
                 padding: 0 0.5rem;
                 border-radius: 0.25rem;
                 &:hover, &:focus {
-                    /*@apply bg-primary4 text-primary;*/
+                    /* @apply bg-primary4 text-primary; */
                     @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
                     theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
                 }
             }
             .context-divider {
                 @mixin context-menu-color theme('colors.white'), theme('colors.gray.200');
-                /*border-top-style: solid;*/
+
+                /* border-top-style: solid; */
             }
         }
         &.right-align {
@@ -271,7 +272,6 @@ export default {
             padding-left: 0.5rem;
             padding-right: 0.5rem;
         }
-
 
         .context-header {
             margin-top: 0.875rem;
