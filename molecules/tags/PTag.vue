@@ -33,7 +33,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
     .p-tag {
         margin-right: 0.5rem;
         vertical-align: middle;
