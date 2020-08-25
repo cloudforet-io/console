@@ -139,7 +139,8 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, reactive, ref, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, Ref, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import { FILTER_OPERATOR, FilterItem, fluentApi } from '@/lib/fluent-api';
@@ -205,9 +206,9 @@ export default {
         } = useStore();
         const providerStore: ProviderStoreType = provider;
         providerStore.getProvider();
-        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const selectedProvider = ref('all');
+        const selectedProvider: Ref<string> = ref('all');
 
         const providerState = reactive({
             items: computed(() => {
@@ -516,7 +517,7 @@ export default {
                 // await listCloudServiceType(after);
                 await listCloudServiceType();
             }
-        }, { lazy: true });
+        }, { immediate: false });
 
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
@@ -551,7 +552,7 @@ export default {
                 const res = queryRefs.provider.value;
                 selectedProvider.value = res || providerState.items[0].provider;
                 setSearchTags();
-                watch(selectedProvider, debounce(async (after) => {
+                watch<string>(selectedProvider, debounce(async (after) => {
                     if (!after) return;
                     if (after) {
                         await listRegionByProvider(after);

@@ -119,6 +119,7 @@
 import { map } from 'lodash';
 
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
@@ -184,7 +185,7 @@ export default {
         PPageTitle,
     },
     setup(props, { root, parent }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const { user } = useStore();
         const state = reactive({
             loading: false,

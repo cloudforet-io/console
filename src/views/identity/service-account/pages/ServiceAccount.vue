@@ -160,6 +160,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
@@ -228,7 +229,7 @@ export default {
         PPageNavigation,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectState = reactive({
             project: {},
         });
@@ -651,7 +652,7 @@ export default {
                         );
                         await apiHandler.getData();
                     }
-                });
+                }, { immediate: true });
             }
         };
 

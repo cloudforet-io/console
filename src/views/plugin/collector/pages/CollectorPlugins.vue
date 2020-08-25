@@ -223,12 +223,12 @@ export default {
         watch(() => state.selectedRepositoryId, () => {
             getPlugins();
         }, {
-            lazy: true,
+            immediate: false,
         });
         watch(() => state.resourceTypeSearchTags, () => {
             getPlugins();
         }, {
-            lazy: true,
+            immediate: false,
         });
 
         return {

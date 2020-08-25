@@ -49,7 +49,7 @@ export class SChartToolSet<C extends SChart, D=object> {
                 this.draw(this.state.chart as any);
             }
         }, {
-            lazy: true,
+            immediate: false,
         });
     }
 }

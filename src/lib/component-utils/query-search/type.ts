@@ -26,3 +26,5 @@ export interface SearchKeyGroup {
     items: SearchKeyOptions[];
     options?: object;
 }
+
+export type SearchSchema = SearchKeyGroup;

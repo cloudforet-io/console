@@ -5,6 +5,7 @@ import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
 import { dataTableProps } from '@/components/organisms/tables/data-table/PDataTable.toolset';
+import {useStore} from "@/store/toolset";
 
 const MockAdapter = require('axios-mock-adapter');
 
@@ -55,7 +56,7 @@ export class API {
 
     protected axiosOptions: any;
 
-    private vm: any;
+    private store: any;
 
     newInstance() {
         const instance = axios.create(this.axiosOptions);
@@ -69,7 +70,7 @@ export class API {
     constructor() {
         this.instance = axios.create();
         this.refreshInstance = axios.create();
-        this.vm = null;
+        this.store = useStore();
     }
 
 
@@ -80,30 +81,30 @@ export class API {
                 'Content-Type': 'application/json',
             },
         };
-        this.vm = vm;
+        this.store = useStore();
         this.instance = this.newInstance();
         this.refreshInstance = this.newInstance();
 
         this.setRefreshRequestInterceptor((request) => {
-            if (this.vm.$ls.user.state.isSignedIn) {
-                request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.refreshToken}`;
+            if (this.store.user.state.isSignedIn) {
+                request.headers.Authorization = `Bearer ${this.store.user.state.refreshToken}`;
             }
             return request;
         });
         this.setRequestInterceptor((request) => {
-            if (this.vm.$ls.user.state.isSignedIn) {
-                request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+            if (this.store.user.state.isSignedIn) {
+                request.headers.Authorization = `Bearer ${this.store.user.state.accessToken}`;
                 if (request.method?.toUpperCase() === 'POST' && !!request.data) {
                     if (typeof request.data === 'string') {
                         try {
                             const data = JSON.parse(request.data);
-                            data.domain_id = this.vm.$ls.domain.state.domainId;
+                            data.domain_id = this.store.domain.state.domainId;
                             request.data = JSON.stringify(data);
                         } catch (e) {
                             console.error(e);
                         }
                     } else {
-                        request.data.domain_id = this.vm.$ls.domain.state.domainId;
+                        request.data.domain_id = this.store.domain.state.domainId;
                     }
                 }
             }
@@ -111,11 +112,11 @@ export class API {
         });
         const refreshAuthLogic = failedRequest => this.refreshInstance.post(refreshUrl).then((resp) => {
             // console.debug('request refresh token');
-            this.vm.$ls.user.setToken(resp.data.refresh_token, resp.data.access_token);
-            failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+            this.store.user.setToken(resp.data.refresh_token, resp.data.access_token);
+            failedRequest.response.config.headers.Authorization = `Bearer ${this.store.user.state.accessToken}`;
             return Promise.resolve();
         }, (error) => {
-            this.vm.$ls.logout(vm);
+            this.store.logout(vm);
             return Promise.reject(error);
         });
 

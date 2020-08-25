@@ -215,7 +215,7 @@ export default {
                 drawChart(ctx);
             }
         }, {
-            lazy: true,
+            immediate: false,
         });
 
 

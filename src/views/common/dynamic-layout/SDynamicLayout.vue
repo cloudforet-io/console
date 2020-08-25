@@ -114,7 +114,7 @@ export default defineComponent({
                 state.isLoading = true;
                 getComponent();
             }
-        }, { lazy: true });
+        }, { immediate: false });
 
         onMounted(async () => {
             await getComponent();

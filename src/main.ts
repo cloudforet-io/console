@@ -9,7 +9,7 @@ import store from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Util } from '@/lib/global-util';
-import LocalStorageStore from '@/store/toolset';
+import setStore from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
@@ -49,7 +49,8 @@ webFontLoader.load({
  **************************************************************** */
 
 Vue.prototype.$bus = new Vue({});
-Vue.prototype.$ls = new Vue(LocalStorageStore);
+Vue.prototype.$ls = setStore();
+
 directive(Vue);
 
 new Vue({

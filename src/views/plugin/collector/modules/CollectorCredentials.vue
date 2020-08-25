@@ -133,7 +133,7 @@ export default {
         watch(() => props.collectorId, () => {
             listCredentials();
         }, {
-            lazy: true,
+            immediate: false,
         });
 
         return {

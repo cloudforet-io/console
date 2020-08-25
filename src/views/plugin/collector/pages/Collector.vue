@@ -135,7 +135,7 @@ import { get } from 'lodash';
 
 import { Component } from 'vue/types/umd';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
@@ -199,7 +199,7 @@ export default {
         STagsPanel,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             fields: [
                 { name: 'name', label: 'Name', options: { width: '14rem' } },
@@ -465,7 +465,7 @@ export default {
                 listCollector();
             }
         }, {
-            lazy: true,
+            immediate: false,
         });
 
         const queryRefs = {

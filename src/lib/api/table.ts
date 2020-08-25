@@ -168,7 +168,7 @@ export class TabSearchTableFluentAPI<
                 if (show && show !== preShow) {
                     await this.getData();
                 }
-            });
+            }, { immediate: true });
         });
     }
 }
@@ -231,7 +231,7 @@ export class QuerySearchTableFluentAPI<
             if (tags !== preTags && this.action) {
                 await this.getData(true);
             }
-        }, { lazy: true });
+        }, { immediate: false });
     }
 
     constructor(

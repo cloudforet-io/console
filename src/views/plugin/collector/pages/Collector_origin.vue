@@ -105,7 +105,7 @@
 /* eslint-disable class-methods-use-this */
 
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
@@ -170,7 +170,7 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const collectorApi = fluentApi.inventory().collector();
 
         const handlers = makeQuerySearchHandlersWithSearchSchema({

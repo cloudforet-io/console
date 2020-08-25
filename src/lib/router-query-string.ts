@@ -58,7 +58,7 @@ export const getQueryStringComputed = (
 export const setQueryStringRefWatchable = (queryRef: Ref<any>, key: string) => {
     const stop = watch(() => queryRef.value, debounce(async (val: string) => {
         await replaceQuery(key, val);
-    }, 100), { lazy: true });
+    }, 100), { immediate: false });
 
     onUnmounted(() => stop());
 };
@@ -179,7 +179,7 @@ export const selectIndexAutoReplacer: AutoReplacer = (slRef: Ref<any>, key: stri
         } else {
             await replaceQuery(key, val);
         }
-    }, 100), { lazy: true });
+    }, 100), { immediate: false });
 
     onUnmounted(() => stop());
 };

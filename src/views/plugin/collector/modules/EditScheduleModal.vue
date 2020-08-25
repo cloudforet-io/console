@@ -48,7 +48,9 @@
 import {
     reactive, toRefs, computed, getCurrentInstance, watch,
 } from '@vue/composition-api';
-import { range, flatMap, get, forEach } from 'lodash';
+import {
+    range, flatMap, get, forEach,
+} from 'lodash';
 import moment from 'moment';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -60,6 +62,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 import { showErrorMessage } from '@/lib/util';
+import { useStore } from '@/store/toolset';
 
 class MenuItem {
     name: string;
@@ -102,12 +105,13 @@ export default {
     },
     setup(props, { emit, root }) {
         const vm: any = getCurrentInstance();
+        const store = useStore();
         const state: any = reactive({
             loading: false,
             schedule: null,
             proxyVisible: makeProxy('visible', props, emit),
             name: '',
-            timezone: vm.$ls.user.state.timezone || 'UTC',
+            timezone: store.user.state.timezone || 'UTC',
             hoursMatrix: range(24),
             selectedHours: {},
             selectedUTCHoursList: computed(() => flatMap(state.selectedHours, time => moment.utc(time).hour())),
@@ -249,7 +253,7 @@ export default {
         watch([() => props.collectorId, () => props.scheduleId],
             async ([collectorId, scheduleId]) => {
                 if (!props.addMode && collectorId && scheduleId) await getSchedule();
-            });
+            }, { immediate: true });
 
 
         return {

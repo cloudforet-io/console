@@ -182,8 +182,11 @@ export default {
     }
     .tag-container {
         height: 7.5rem;
-        .tag {
+        >>> .p-tag.deletable {
             @apply bg-white border border-primary;
+            .p-i-icon {
+                @apply text-primary;
+            }
         }
     }
 </style>

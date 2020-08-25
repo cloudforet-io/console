@@ -133,7 +133,7 @@
 import vClickOutside from 'v-click-outside';
 
 import {
-    reactive, toRefs, getCurrentInstance, computed,
+    reactive, toRefs, getCurrentInstance, computed, ComponentRenderProxy,
 } from '@vue/composition-api';
 import { ComponentInstance } from '@vue/composition-api/dist/component';
 
@@ -157,7 +157,7 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const { user, logout } = useStore();
         const userState = reactive({
             name: '',

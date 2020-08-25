@@ -134,6 +134,7 @@ import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJson
 import { JsonSchemaObjectType } from '@/lib/type';
 import { fluentApi } from '@/lib/fluent-api';
 import {
+    ComponentRenderProxy,
     computed,
     getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
@@ -176,7 +177,7 @@ const credentialsFormSetup = (props) => {
     const crdFixFormTS = new JsonSchemaFormToolSet();
     const schemaNames = ref<string[]>([]);
     const selectSchema = ref<string>('');
-    const description = ref<string|undefined>(null);
+    const description = ref<string|undefined>(undefined);
     const crdState = reactive({
         formSchema: {},
     });
@@ -202,7 +203,7 @@ const credentialsFormSetup = (props) => {
             crdFixFormTS.setProperty(sch, ['name'], validation);
             selectSchema.value = schemaNames.value[0];
         }
-    });
+    }, { immediate: true });
 
 
     const crdFormTS = new JsonSchemaFormToolSet();
@@ -218,7 +219,7 @@ const credentialsFormSetup = (props) => {
         if (after && after !== before) {
             await getSchema(after);
         }
-    });
+    }, { immediate: true });
     onMounted(async () => {
         const descriptionPath = 'metadata.view.layouts.help:service_account:create';
         const resp = await fluentApi.identity().provider().get().setId(props.provider)
@@ -275,7 +276,7 @@ export default {
             showValidation: true,
         });
         const providerIcon = computed(() => provider.state.providers[props.provider]?.icon);
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const {
             actFixFormTS,
             actJscTS,
@@ -296,9 +297,9 @@ export default {
         const goBack = () => {
             const nextPath = vm?.$route.query.nextPath as string|undefined;
             if (nextPath) {
-                vm?.$router.push(nextPath);
+                vm.$router.push(nextPath);
             } else {
-                vm?.$router.back();
+                vm.$router.back();
             }
         };
 
@@ -385,31 +386,30 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .panel{
+    .panel {
         @apply w-full px-4 py-8 mb-4;
-        &:nth-last-child(1){
+        &:nth-last-child(1) {
             @apply mb-0;
-
         }
     }
-    .bottom{
+    .bottom {
         @apply flex flex-row-reverse mt-8;
-        .item{
+        .item {
             @apply mr-8;
         }
     }
-    .title{
+    .title {
         @apply text-2xl mb-8;
         line-height: 120%;
     }
-    .form-box{
-        @apply  w-full;
-        @screen lg{
+    .form-box {
+        @apply w-full;
+
+        @screen lg {
             @apply max-w-1/2;
         }
     }
-    .custom-schema-box{
+    .custom-schema-box {
         @apply border rounded-sm border-gray-200 border-l-4 px-8 py-5;
-
     }
 </style>

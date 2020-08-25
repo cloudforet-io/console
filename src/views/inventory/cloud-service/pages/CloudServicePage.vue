@@ -464,7 +464,7 @@ export default {
                     watchStop = null;
                 }
             }
-        });
+        }, { immediate: true });
 
 
         const monitoringTS = new MonitoringToolSet(
