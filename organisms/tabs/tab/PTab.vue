@@ -50,18 +50,17 @@ export default defineComponent({
 });
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
     .p-tab {
         @apply rounded-sm border  border-gray-200 bg-white;
-    }
-    .p-tab-bar {
-        @apply border-b-4 border-gray-100;
-        &.is-one {
-            @apply border-b-2;
+        .p-tab-bar {
+            @apply border-b-4 border-gray-100;
+            &.is-one {
+                @apply border-b-2;
+            }
+        }
+        .tab-pane {
+            @apply w-full pb-8;
         }
     }
-    .tab-pane {
-        @apply w-full pb-8;
-    }
-
 </style>
