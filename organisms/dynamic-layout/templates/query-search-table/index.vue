@@ -10,16 +10,17 @@
                               :items="rootData"
                               :loading="loading"
                               :total-count="totalCount"
-                              :sort-by="sortBy"
-                              :sort-desc="sortDesc"
+                              :sort-by.sync="sortBy"
+                              :sort-desc.sync="sortDesc"
                               :select-index="selectIndex"
-                              :this-page="thisPage"
-                              :page-size="pageSize"
+                              :this-page.sync="thisPage"
+                              :page-size.sync="pageSize"
                               :key-items="keyItems"
                               :value-handler-map="valueHandlerMap"
                               :query-tags="queryTags"
                               @select="onSelect"
                               @change="onChange"
+                              @export="onExport"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
@@ -38,7 +39,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, isReactive, isRef, reactive, toRefs,
 } from '@vue/composition-api';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
@@ -51,6 +52,14 @@ import {
     QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 
+const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
+
+const bindExtra = (props: QuerySearchTableDynamicLayoutProps, name: string, init: any) => {
+    if (props.extra && props.extra[name]) {
+        return computed(() => (props.extra ? props.extra[name] : init));
+    }
+    return init;
+};
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
     components: {
@@ -97,34 +106,22 @@ export default {
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
             sortDesc: (props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true,
-            thisPage: computed(() => {
-                if (props.fetchOptions?.pageStart && props.fetchOptions?.pageLimit) {
-                    return Math.floor((props.fetchOptions.pageStart || 1) / state.pageSize) || 1;
-                }
-                return 1;
-            }),
+            thisPage: getThisPage(props.fetchOptions?.pageStart, props.fetchOptions?.pageLimit),
             pageSize: props.fetchOptions?.pageLimit || 15,
             queryTags: props.fetchOptions?.queryTags || [],
+
             /** get data from extra prop */
-            loading: computed(() => (props.extra?.loading || false)),
-            totalCount: computed(() => (props.extra?.totalCount || 0)),
+            loading: bindExtra(props, 'loading', false),
+            totalCount: bindExtra(props, 'totalCount', 0),
             keyItems: computed<KeyItem[]>(() => {
                 if (props.extra?.keyItems) return props.extra?.keyItems;
                 if (!props.options.fields) return [];
 
                 return props.options.fields.map(d => ({ label: d.name, name: d.key }));
             }),
-            valueHandlerMap: props.extra?.valueHandlerMap || {},
-            selectIndex: props.extra?.selectIndex || [],
-            /** dynamic layout fetch options */
-            fetchOptionsParam: computed<QuerySearchTableFetchOptions>(() => ({
-                sortBy: state.sortBy,
-                sortDesc: state.sortDesc,
-                pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
-                pageLimit: state.pageSize,
-                queryTags: state.queryTags,
-                selectIndex: state.selectIndex,
-            })),
+            valueHandlerMap: bindExtra(props, 'valueHandlerMap', {}),
+            selectIndex: bindExtra(props, 'selectIndex', []),
+
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
                     return get(props.data, props.options.root_path);
@@ -151,12 +148,25 @@ export default {
         });
 
         const onSelect = (selectIndex: number[]) => {
-            state.selectIndex = selectIndex;
+            if (!props.extra?.selectIndex) state.selectIndex = selectIndex;
             emit('select', selectIndex);
+        };
+
+        const onExport = () => {
+            emit('export', {
+                sortBy: state.sortBy,
+                sortDesc: state.sortDesc,
+                pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
+                pageLimit: state.pageSize,
+                queryTags: state.queryTags,
+            } as QuerySearchTableFetchOptions,
+            props.options.fields || []);
         };
 
         const onChange = (options: QuerySearchTableFetchOptions, changedOptions: Partial<QuerySearchTableFetchOptions>) => {
             const changedFetchOptions: Partial<QuerySearchTableFetchOptions> = {};
+
+            // change state
             forEach(changedOptions, (d, k) => {
                 state[k] = d;
                 if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
@@ -164,19 +174,33 @@ export default {
                 else changedFetchOptions[k] = d;
             });
 
+            // emit
             const args: Parameters<QuerySearchTableListeners['fetch']> = [
-                state.fetchOptionsParam, changedFetchOptions,
+                {
+                    sortBy: state.sortBy,
+                    sortDesc: state.sortDesc,
+                    pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
+                    pageLimit: state.pageSize,
+                    queryTags: state.queryTags,
+                }, changedFetchOptions,
             ];
             emit('fetch', ...args);
         };
 
-        emit('init', state.fetchOptionsParam);
+        emit('init', {
+            sortBy: state.sortBy,
+            sortDesc: state.sortDesc,
+            pageStart: ((state.thisPage - 1) * state.pageSize) + 1,
+            pageLimit: state.pageSize,
+            queryTags: state.queryTags,
+        } as QuerySearchTableFetchOptions);
 
 
         return {
             ...toRefs(state),
             onChange,
             onSelect,
+            onExport,
             dynamicFieldSlots,
         };
     },
@@ -190,6 +214,7 @@ export default {
         }
         .p-query-search-table {
             height: 100%;
+            border-width: 0;
         }
     }
 </style>
