@@ -18,6 +18,7 @@
                               :key-items="keyItems"
                               :value-handler-map="valueHandlerMap"
                               :query-tags="queryTags"
+                              :selectable="selectable"
                               @select="onSelect"
                               @change="onChange"
                               @export="onExport"
@@ -103,6 +104,20 @@ export default {
                     width: ds.options?.width,
                 }));
             }),
+
+            /** get data from extra prop */
+            loading: computed(() => (props.extra?.loading || false)),
+            totalCount: computed(() => (props.extra?.totalCount || 0)),
+            keyItems: computed<KeyItem[]>(() => {
+                if (props.extra?.keyItems) return props.extra?.keyItems;
+                if (!props.options.fields) return [];
+
+                return props.options.fields.map(d => ({ label: d.name, name: d.key }));
+            }),
+            valueHandlerMap: computed(() => (props.extra?.valueHandlerMap || {})),
+            selectIndex: bindExtra(props, 'selectIndex', []),
+            selectable: computed(() => (props.extra?.selectable || false)),
+
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
             sortDesc: (props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true,
@@ -110,18 +125,7 @@ export default {
             pageSize: props.fetchOptions?.pageLimit || 15,
             queryTags: props.fetchOptions?.queryTags || [],
 
-            /** get data from extra prop */
-            loading: bindExtra(props, 'loading', false),
-            totalCount: bindExtra(props, 'totalCount', 0),
-            keyItems: computed<KeyItem[]>(() => {
-                if (props.extra?.keyItems) return props.extra?.keyItems;
-                if (!props.options.fields) return [];
-
-                return props.options.fields.map(d => ({ label: d.name, name: d.key }));
-            }),
-            valueHandlerMap: bindExtra(props, 'valueHandlerMap', {}),
-            selectIndex: bindExtra(props, 'selectIndex', []),
-
+            /** others */
             pageStart: computed(() => ((state.thisPage - 1) * state.pageSize) + 1),
             fetchOptionsParam: computed(() => ({
                 sortBy: state.sortBy,

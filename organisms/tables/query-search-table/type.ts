@@ -17,6 +17,7 @@ export interface QuerySearchTableProps {
     queryTags: QueryTag[]; // sync
     selectable: boolean;
     multiSelect: boolean;
+    excelVisible: boolean;
 }
 
 export interface Options {

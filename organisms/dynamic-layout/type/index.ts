@@ -1,7 +1,7 @@
 import { DynamicLayoutOptions, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import {DynamicField} from "@/components/organisms/dynamic-field/type";
+import { DynamicField } from '@/components/organisms/dynamic-field/type';
 
 
 export interface DynamicLayoutFetchOptions {
@@ -19,6 +19,7 @@ export interface DynamicLayoutExtra {
     totalCount: number;
     timezone: string;
     selectIndex: number[];
+    selectable: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     language: string;

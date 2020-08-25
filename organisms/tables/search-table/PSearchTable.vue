@@ -9,10 +9,12 @@
                      :select-index.sync="proxySelectIndex"
                      :this-page.sync="proxyThisPage"
                      :page-size.sync="proxyPageSize"
+                     :excel-visible="excelVisible"
                      use-cursor-loading
                      :setting-visible="false"
                      sortable
                      :selectable="selectable"
+                     :multi-select="multiSelect"
                      @changePageSize="onChangePageSize"
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
@@ -60,7 +62,7 @@ import {
 } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { forEach } from 'lodash';
-import { Options } from '@/components/organisms/tables/search-table/type';
+import { Options, SearchTableProps } from '@/components/organisms/tables/search-table/type';
 
 export default {
     name: 'PSearchTable',
@@ -110,8 +112,16 @@ export default {
             type: Boolean,
             default: true,
         },
+        multiSelect: {
+            type: Boolean,
+            default: true,
+        },
+        excelVisible: {
+            type: Boolean,
+            default: true,
+        },
     },
-    setup(props, { emit, slots }) {
+    setup(props: SearchTableProps, { emit, slots }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -180,8 +190,8 @@ export default {
         };
 
         const onSearch = async (val?: string) => {
-            state.proxySearchText = val;
-            emitChange({ searchText: val });
+            state.proxySearchText = val || '';
+            emitChange({ searchText: val || '' });
         };
 
         return {

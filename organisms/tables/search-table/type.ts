@@ -12,6 +12,8 @@ export interface SearchTableProps {
     totalCount: number;
     searchText: string; // sync
     selectable: boolean;
+    multiSelect: boolean;
+    excelVisible: boolean;
 }
 
 export interface Options {

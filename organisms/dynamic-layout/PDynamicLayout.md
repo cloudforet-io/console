@@ -6,6 +6,7 @@
 # Dynamic Layout Props
 <br>
 <hr>
+
 | Name | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | name | ``` String ``` | ``` '' ``` | The name of layout |
@@ -18,9 +19,11 @@
 
 <br>
 <br>
+
 # Supported Types
 <br>
 <hr>
+
 | Type | Description |
 | ---- | ----------- |
 | item | key / value |
@@ -33,9 +36,11 @@
 
 <br>
 <br>
+
 # Schema Options
 <br>
 <hr>
+
 | Type | Options Properties |
 | ---- | ----------- |
 | item | ```root_path?: string, fields: DynamicField[]``` |
@@ -48,10 +53,12 @@
 
 <br>
 <br>
+
 # Fetch Options
 <br>
 <hr>
 <br>
+
 ```typescript
 interface DynamicLayoutFetchOptions {
     sortBy: string;
@@ -67,6 +74,7 @@ interface DynamicLayoutFetchOptions {
 
 <br>
 <br>
+
 ## Fetch Options by Layout Types
 | Type | Fetch Options Properties |
 | ---- | ----------- |
@@ -80,16 +88,19 @@ interface DynamicLayoutFetchOptions {
 
 <br>
 <br>
+
 # Extra Options
 <br>
 <hr>
 <br>
+
 ```typescript
 interface DynamicLayoutExtra {
     loading: boolean;
     totalCount: number;
     timezone: string;
     selectIndex: number[];
+    selectable: boolean;
     keyItems: KeyItem[]; // See QuerySearchTable
     valueHandlerMap: ValueHandlerMap; // See QuerySearchTable
     language: string;
@@ -99,23 +110,43 @@ interface DynamicLayoutExtra {
 
 <br>
 <br>
+
+## Extra Options Description
+| Name | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| loading | boolean | ```false``` | Used to display loading spinner. |
+| totalCount | number | ```0``` | Used to calculate pagination, displaying count next to the title. |
+| timezone | string |```'UTC'``` | Used to display datetime. |
+| selectIndex | number[] |```[]``` | Used to initiate selectIndex of tables. Works only 'selectable' is ```true``` |
+| selectable | boolean | ```false``` | Used to make tables selectable. |
+| keyItems | KeyItem[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
+| valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
+| language | string | ```'en'``` | NOT supported yet except markdown type. |
+| listMap | Record<string, Partial<DynamicLayoutExtra>> | ```{}``` | Only for list type. Give layout's name as key, and extra options as value. If value is ```undefined```, other extra options will be automatically bound to each component. |
+
+<br>
+<br>
+
 ## Extra Options by Layout Types
 | Type | Extra Options Properties |
 | ---- | ----------- |
 | item | ```loading``` |
 | simple-table | ```loading```, ```totalCount```, ```timezone``` |
-| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex``` |
-| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```keyItems```, ```valueHandlerMap``` |
+| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable``` |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```keyItems```, ```valueHandlerMap``` |
 | raw | - |
 | markdown | ```language``` |
 | list | ```listMap``` |
 
 <br>
 <br>
+
 # Events
+
 <br>
 <hr>
 <br>
+
 ```typescript
 interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> {
     init: (options: FetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
@@ -123,17 +154,20 @@ interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> 
              changedOptions: Partial<FetchOptions>,
              layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    export: (options: FetchOptions, fields: DynamicField[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
 }
 ```
 
 <br>
 <br>
+
 ## Event Description
 | Event Name | Description |
 | ---------- | ----------- | 
 | init | Emitted when the component has been created. |
 | fetch | Emitted when the new 'data' must be fetched.<br> ex) when user clicked refresh button. |
 | select | Emitted when row(item) has been selected. |
+| export | Emitted when clicked export button. |
 
 ## Event Parameter Description
 | Parameter Name | Description |
@@ -143,14 +177,15 @@ interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> 
 | selectIndex | Selected row(item) indexes. |
 | layoutName | Name props. Only provided when layout type is 'list'. |
 | layoutIndex | Layout index. Only provided when layout type is 'list'. |
+| fields (export) | Fields for exported csv/excel columns.  |
 
 ## Supported Events by Layout Types
 | Type | Extra Options Properties |
 | ---- | ----------- |
 | item | init |
 | simple-table | init |
-| table | init, fetch, select |
-| query-search-table | init, fetch, select |
+| table | init, fetch, select, export |
+| query-search-table | init, fetch, select, export |
 | raw | init |
 | markdown | init |
 | list | init, fetch, select |

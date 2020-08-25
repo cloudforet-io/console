@@ -11,7 +11,7 @@ export type TableFetchOptions = Pick<DynamicLayoutFetchOptions,
     >
 
 export type TableExtra = Pick<DynamicLayoutExtra,
-    'loading'|'totalCount'|'timezone'|'selectIndex'
+    'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'
     >
 
 export type TableDynamicLayoutProps = DynamicLayoutProps <
@@ -20,5 +20,5 @@ export type TableDynamicLayoutProps = DynamicLayoutProps <
     TableExtra
     >
 
-export type TableDynamicLayoutEventListeners
+export type TableEventListeners
     = DynamicLayoutEventListeners<TableFetchOptions>;

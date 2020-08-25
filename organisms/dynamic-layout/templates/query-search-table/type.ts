@@ -9,7 +9,7 @@ export type QuerySearchTableFetchOptions = Pick<DynamicLayoutFetchOptions,
     >
 
 export type QuerySearchTableExtra = Pick<DynamicLayoutExtra,
-    'loading'|'totalCount'|'timezone'|'selectIndex'|'keyItems'|'valueHandlerMap'
+    'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'|'keyItems'|'valueHandlerMap'
     >
 
 export type QuerySearchTableDynamicLayoutProps = DynamicLayoutProps<

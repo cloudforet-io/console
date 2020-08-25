@@ -9,7 +9,7 @@
                      :select-index.sync="proxySelectIndex"
                      :this-page.sync="proxyThisPage"
                      :page-size.sync="proxyPageSize"
-                     excel-visible
+                     :excel-visible="excelVisible"
                      use-cursor-loading
                      sortable
                      :selectable="selectable"
@@ -137,6 +137,10 @@ export default {
             default: true,
         },
         multiSelect: {
+            type: Boolean,
+            default: true,
+        },
+        excelVisible: {
             type: Boolean,
             default: true,
         },

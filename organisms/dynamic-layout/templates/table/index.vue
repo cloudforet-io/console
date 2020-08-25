@@ -1,64 +1,39 @@
 <template>
-    <p-toolbox-table class="p-dynamic-layout-table"
-                     :fields="fields"
-                     :items="rootData"
-                     :loading="loading"
-                     :all-page="allPage"
-                     :sort-by.sync="sortBy"
-                     :sort-desc.sync="sortDesc"
-                     :select-index.sync="selectIndex"
-                     :this-page.sync="thisPage"
-                     :page-size.sync="pageSize"
-                     use-cursor-loading
-                     :setting-visible="false"
-                     sortable
-                     :selectable="false"
-                     @changePageSize="onChangePageSize"
-                     @changePageNumber="onChangePageNumber"
-                     @changeSort="onChangeSort"
-                     @select="onSelect"
-                     @clickRefresh="emitFetch({})"
-                     @clickExcel="emitExport()"
-    >
-        <template #toolbox-top>
-            <slot v-if="name" name="toolbox-top">
-                <p-panel-top v-if="name" style="margin: 0; margin-top: 0.5rem;"
-                             :use-total-count="true"
-                             :total-count="totalCount"
-                >
-                    {{ name }}
-                </p-panel-top>
-            </slot>
-        </template>
-        <template #toolbox-left>
-            <slot name="toolbox-left" />
-            <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                <p-search v-model="searchText"
-                          @search="onSearch"
-                          @delete="onSearch()"
-                />
-            </div>
-        </template>
-        <template #toolbox-bottom>
-            <div class="flex-1 2xs:block lg:hidden mt-4"
-                 :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
-            >
-                <p-search v-model="searchText"
-                          @search="onSearch"
-                          @delete="onSearch()"
-                />
-            </div>
-            <slot name="toolbox-bottom" />
-        </template>
-        <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
-            <slot :name="slotName" v-bind="data">
-                <p-dynamic-field :key="item.name"
-                                 v-bind="item"
-                                 :data="data.value"
-                />
-            </slot>
-        </template>
-    </p-toolbox-table>
+    <div class="p-dynamic-layout-table">
+        <p-panel-top v-if="name" class="panel-top"
+                     :use-total-count="true"
+                     :total-count="totalCount"
+        >
+            {{ name }}
+        </p-panel-top>
+        <p-search-table :fields="fields"
+                        :items="rootData"
+                        :loading="loading"
+                        :total-count="totalCount"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :select-index="selectIndex"
+                        :this-page.sync="thisPage"
+                        :page-size.sync="pageSize"
+                        :search-text="searchText"
+                        :selectable="selectable"
+                        @select="onSelect"
+                        @change="onChange"
+                        @export="onExport"
+        >
+            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
+                <slot :name="slotName" v-bind="data">
+                    <p-dynamic-field :key="item.name"
+                                     v-bind="item"
+                                     :data="data.value"
+                    />
+                </slot>
+            </template>
+            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <slot v-if="!slot.startsWith('col-')" :name="slot" v-bind="scope" />
+            </template>
+        </p-search-table>
+    </div>
 </template>
 
 <script lang="ts">
@@ -67,26 +42,30 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
-import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
-import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { TableDynamicLayoutProps, TableFetchOptions } from '@/components/organisms/dynamic-layout/templates/table/type';
-import { get } from 'lodash';
+import {
+    TableDynamicLayoutProps,
+    TableEventListeners,
+    TableFetchOptions,
+} from '@/components/organisms/dynamic-layout/templates/table/type';
+import { forEach, get } from 'lodash';
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 
-interface Field {
-    name: string;
-    label: string;
-}
+const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
+    if (props.extra && props.extra[name]) {
+        return computed(() => (props.extra ? props.extra[name] : init));
+    }
+    return init;
+};
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 export default {
     name: 'PDynamicLayoutTable',
     components: {
         PDynamicField,
-        PToolboxTable,
-        PSearch,
+        PSearchTable,
         PPanelTop,
     },
     props: {
@@ -128,17 +107,21 @@ export default {
                     width: ds.options?.width,
                 }));
             }),
+
             /** get data from extra prop */
             loading: computed(() => (props.extra?.loading || false)),
             totalCount: computed(() => (props.extra?.totalCount || 0)),
             allPage: computed(() => (state.totalCount ? Math.ceil(state.totalCount / state.pageSize) : 1)),
-            selectIndex: computed(() => props.extra?.selectIndex || []),
+            selectIndex: bindExtra(props, 'selectIndex', []),
+            selectable: computed(() => (props.extra?.selectable || false)),
+
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
             sortDesc: props.fetchOptions?.sortDesc || true,
             thisPage: getThisPage(props.fetchOptions?.pageStart, props.fetchOptions?.pageLimit),
             pageSize: props.fetchOptions?.pageLimit || 15,
             searchText: props.fetchOptions?.searchText || '',
+
             /** others */
             pageStart: computed(() => ((state.thisPage - 1) * state.pageSize) + 1),
             fetchOptionsParam: computed(() => ({
@@ -172,73 +155,69 @@ export default {
             }),
         });
 
+        const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
+            const res = {};
+            if (!props.options.fields) return res;
 
-        const emitFetch = (options: Partial<TableFetchOptions>) => {
-            /*
-                check if each option value is 'undefined' to escape auto type casting
-                DO NOT use 'state.fetchOptionsParam'. it does not warranty the latest value.
-            */
-            emit('fetch', {
-                sortBy: options.sortBy === undefined ? state.sortBy : options.sortBy,
-                sortDesc: options.sortDesc === undefined ? state.sortDesc : options.sortDesc,
-                pageStart: options.pageStart === undefined ? state.pageStart : options.pageStart,
-                pageLimit: options.pageLimit === undefined ? state.pageSize : options.pageLimit,
-                searchText: options.searchText === undefined ? state.searchText : options.searchText,
-            } as TableFetchOptions, { ...options });
-        };
+            props.options.fields.forEach((ds: DynamicField, i) => {
+                const item: Pick<DynamicFieldProps, 'extra'|'options'> = { ...ds, extra: {} };
 
-        const emitExport = () => {
-            emit('export', state.fetchOptionsParam, props.options.fields || []);
-        };
+                if (ds.type === 'datetime') {
+                    if (!item.extra.timezone) item.extra.timezone = props.extra?.timezone || 'UTC';
+                }
 
-        const onChangePageSize = (pageLimit: number) => {
-            emitFetch({ pageLimit });
-        };
+                res[`col-${ds.key}-format`] = item;
+            });
 
-        const onChangePageNumber = (pageStart: number) => {
-            emitFetch({ pageStart });
-        };
+            return res;
+        });
 
-        const onChangeSort = (sortBy: string, sortDesc: boolean) => {
-            emitFetch({ sortBy, sortDesc });
-        };
 
         const onSelect = (selectIndex: number[]) => {
-            state.selectIndex = selectIndex;
+            if (!props.extra?.selectIndex) state.selectIndex = selectIndex;
             emit('select', selectIndex);
         };
 
-        const onSearch = (val?: string) => {
-            emitFetch({ searchText: val || '' });
+        const onChange = (options: TableFetchOptions, changedOptions: Partial<TableFetchOptions>) => {
+            const changedFetchOptions: Partial<TableFetchOptions> = {};
+
+            // apply changed options to state and rename for dynamic fetch options
+            forEach(changedOptions, (d, k) => {
+                state[k] = d;
+                if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
+                else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
+                else changedFetchOptions[k] = d;
+            });
+
+            // emit
+            const args: Parameters<TableEventListeners['fetch']> = [
+                state.fetchOptionsParam, changedFetchOptions,
+            ];
+            emit('fetch', ...args);
         };
+
+        const onExport = () => {
+            emit('export', state.fetchOptionsParam, props.options.fields || []);
+        };
+
 
         emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),
-            emitFetch,
-            emitExport,
-            onChangePageSize,
-            onChangePageNumber,
-            onChangeSort,
+            dynamicFieldSlots,
             onSelect,
-            onSearch,
+            onChange,
+            onExport,
         };
     },
 };
 </script>
 <style lang="postcss">
-.p-dynamic-layout-table {
-    border-width: 0;
-    .left-toolbox-item {
-        &:last-child {
-            flex-grow: 1;
+    .p-dynamic-layout-table {
+        .p-search-table {
+            height: 100%;
+            border-width: 0;
         }
     }
-    >>> .toolbox {
-        .toolbox-bottom {
-            @apply mt-0;
-        }
-    }
-}
 </style>
