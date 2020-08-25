@@ -13,6 +13,7 @@
                      use-cursor-loading
                      sortable
                      :selectable="selectable"
+                     :multi-select="multiSelect"
                      @changePageSize="onChangePageSize"
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
@@ -25,6 +26,9 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
+        <template #toolbox-top>
+            <slot name="toolbox-top" />
+        </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item hidden lg:block">
@@ -132,6 +136,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        multiSelect: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentInstance;
@@ -157,7 +165,7 @@ export default {
             slotNames: computed(() => {
                 const res: string[] = [];
                 forEach(slots, (func, name) => {
-                    if (!['toolbox-left', 'toolbox-bottom'].includes(name)) res.push(name);
+                    if (!['toolbox-left', 'toolbox-bottom', 'toolbox-top'].includes(name)) res.push(name);
                 });
                 return res;
             }),

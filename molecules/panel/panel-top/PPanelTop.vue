@@ -34,7 +34,7 @@ export default {
         height: 2rem;
         align-items: center;
         .title {
-            @apply font-bold text-2xl;
+            @apply text-2xl;
         }
         .total-count {
             @apply text-gray-500 text-lg;
