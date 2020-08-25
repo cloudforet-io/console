@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 import {
@@ -97,7 +97,6 @@ import {
 } from 'lodash';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SelectBtnType } from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.toolset';
 import {
     MetricListResp, MetricResp, MONITORING_TYPE, STATISTICS_TYPE,

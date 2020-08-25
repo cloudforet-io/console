@@ -2,9 +2,8 @@ import {
     forEach, get, set, debounce,
 } from 'lodash';
 import router from '@/routes';
-import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity/ref';
 import {
-    computed, onUnmounted, watch, ref,
+    computed, onUnmounted, watch, ref, Ref, UnwrapRef,
 } from '@vue/composition-api';
 import { Dictionary } from 'vue-router/types/router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';

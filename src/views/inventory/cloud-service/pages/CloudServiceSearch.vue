@@ -2,7 +2,6 @@
 
 <script lang="ts">
 
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { fluentApi } from '@/lib/fluent-api';
 import {
     ComponentRenderProxy,

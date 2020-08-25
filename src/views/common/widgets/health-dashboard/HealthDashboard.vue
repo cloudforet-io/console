@@ -74,16 +74,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
+    import {
+        computed, reactive, toRefs, UnwrapRef,
+    } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export default {
     name: 'HealthDashboard',

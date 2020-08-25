@@ -135,7 +135,6 @@ import vClickOutside from 'v-click-outside';
 import {
     reactive, toRefs, getCurrentInstance, computed, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
 import SiteMap from '@/views/containers/gnb/modules/SiteMap.vue';

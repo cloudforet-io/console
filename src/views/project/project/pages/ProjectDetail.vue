@@ -145,7 +145,6 @@ import {
     queryStringToNumberArray,
     selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';

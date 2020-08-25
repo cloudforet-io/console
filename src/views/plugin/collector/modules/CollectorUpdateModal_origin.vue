@@ -39,9 +39,9 @@
 </template>
 
 <script lang="ts">
-import {
-    toRefs, reactive, computed, onMounted,
-} from '@vue/composition-api';
+    import {
+        toRefs, reactive, computed, onMounted, UnwrapRef,
+    } from '@vue/composition-api';
 import _ from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -49,7 +49,6 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import ConfigureCollector from '@/views/plugin/collector/modules/ConfigureCollector.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { JsonSchemaObjectType } from '@/lib/type';
 import { CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 import { showErrorMessage } from '@/lib/util';

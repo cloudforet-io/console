@@ -105,7 +105,7 @@
 /* eslint-disable class-methods-use-this */
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, UnwrapRef,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
@@ -120,8 +120,6 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 
 import { QuerySearchTableFluentAPI } from '@/lib/api/table';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Component } from 'vue/types/umd';
 import { showErrorMessage } from '@/lib/util';
 import {

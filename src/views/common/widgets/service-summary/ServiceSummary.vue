@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import numeral from 'numeral';
 import {
@@ -38,7 +38,6 @@ import { gray, blue } from '@/styles/colors';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { maxBy, minBy, chain } from 'lodash';
 import moment from 'moment';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import Chart, { ChartColor } from 'chart.js';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import Color from 'color';

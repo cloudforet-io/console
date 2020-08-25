@@ -19,9 +19,9 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
+    import {
+        computed, reactive, toRefs, UnwrapRef, watch,
+    } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import {
     coral, gray, primary, black,
@@ -34,7 +34,6 @@ import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import moment from 'moment';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { HistoryStat } from '@/lib/fluent-api/statistics/history';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import Chart from 'chart.js';
 import numeral from 'numeral';

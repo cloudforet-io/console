@@ -207,7 +207,6 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 export default {

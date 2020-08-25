@@ -1,9 +1,8 @@
 /* eslint-disable camelcase,@typescript-eslint/camelcase */
 import Vue from 'vue';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
     ref,
-    computed, getCurrentInstance, isRef, onMounted, reactive, Ref, watch,
+    computed, getCurrentInstance, isRef, onMounted, reactive, Ref, watch, UnwrapRef,
 } from '@vue/composition-api';
 
 import {
@@ -21,7 +20,6 @@ import {
 } from '@/lib/fluent-api';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
 import { ACHandlerMeta, defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export abstract class BaseTableFluentAPI<
     parameter = any,

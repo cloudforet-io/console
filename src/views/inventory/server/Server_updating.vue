@@ -149,7 +149,6 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 /* Components */
 import PStatus from '@/components/molecules/status/PStatus.vue';

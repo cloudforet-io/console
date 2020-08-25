@@ -158,7 +158,6 @@ import {
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import {

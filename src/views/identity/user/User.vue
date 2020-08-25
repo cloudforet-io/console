@@ -122,7 +122,6 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';

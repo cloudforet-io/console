@@ -40,7 +40,7 @@ export default {
         });
     },
     // setup(props) {
-    //     const vm = getCurrentInstance() as ComponentInstance;
+    //     const vm = getCurrentInstance() as ComponentRenderProxy;
     //     const url = ref('');
     //     const getDynamicLink = async () => {
     //         const result = await fluentApi.addons().pageDiscovery().get().setId('sa-50889b1079bc')

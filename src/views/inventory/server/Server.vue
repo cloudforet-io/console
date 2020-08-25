@@ -142,6 +142,7 @@
 /* eslint-disable camelcase */
 
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/PStatus.vue';
@@ -173,7 +174,6 @@ import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import baseTable from '@/data-schema/inventory/server/table/layout/base_table.json';
 import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray, queryStringToQueryTags, queryTagsToQueryString, replaceQuery, selectIndexAutoReplacer,
@@ -211,7 +211,7 @@ export default {
         PPageNavigation,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectState = reactive({
             project: {},
             isReady: false,

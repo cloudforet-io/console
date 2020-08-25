@@ -53,7 +53,6 @@ import VueFormGenerator from 'vue-form-generator/dist/vfg';
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';

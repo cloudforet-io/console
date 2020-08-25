@@ -135,10 +135,8 @@ import { get } from 'lodash';
 
 import { Component } from 'vue/types/umd';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy, UnwrapRef,
 } from '@vue/composition-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';

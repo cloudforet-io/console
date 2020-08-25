@@ -81,9 +81,9 @@
 </template>
 
 <script lang="ts">
-import {
-    toRefs, reactive, computed, SetupContext, watch,
-} from '@vue/composition-api';
+    import {
+        toRefs, reactive, computed, SetupContext, watch, UnwrapRef,
+    } from '@vue/composition-api';
 import { get } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
@@ -95,7 +95,6 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSe
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import { showErrorMessage } from '@/lib/util';

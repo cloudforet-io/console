@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, watch, Ref,
+    reactive, toRefs, computed, watch, Ref, UnwrapRef,
 } from '@vue/composition-api';
 import {
     get, forEach, set, every, debounce,
@@ -38,7 +38,6 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
 import { JsonSchemaObjectType } from '@/lib/type';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { showErrorMessage } from '@/lib/util';
 
 const DEFAULT_PRIORITY = 10;
