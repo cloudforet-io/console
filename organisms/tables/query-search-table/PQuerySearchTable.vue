@@ -9,6 +9,7 @@
                      :select-index.sync="proxySelectIndex"
                      :this-page.sync="proxyThisPage"
                      :page-size.sync="proxyPageSize"
+                     excel-visible
                      use-cursor-loading
                      sortable
                      :selectable="selectable"
@@ -16,7 +17,7 @@
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
                      @select="onSelect"
-                     @clickRefresh="emitChange()"
+                     @clickRefresh="onRefresh"
                      @clickExcel="emitExport()"
                      @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
                      @rowRightClick="byPassEvent('rowRightClick', ...arguments)"
@@ -163,7 +164,14 @@ export default {
         });
 
         /** Event emitter */
+        const emitSelect = () => {
+            emit('select', [...state.proxySelectIndex]);
+        };
+
         const emitChange = (options?: Partial<Options>) => {
+            state.proxySelectIndex = [];
+            emitSelect();
+
             emit('change', Object.freeze({
                 ...state.options,
                 ...options,
@@ -176,10 +184,6 @@ export default {
 
         const emitExport = () => {
             emit('export');
-        };
-
-        const emitSelect = () => {
-            emit('select', [...state.proxySelectIndex]);
         };
 
         /** Table event listeners */
@@ -196,7 +200,7 @@ export default {
         };
 
         const onSelect = (selectIndex: number[]) => {
-            state.selectIndex = [...selectIndex];
+            state.proxySelectIndex = [...selectIndex];
             emitSelect();
         };
 
@@ -231,6 +235,10 @@ export default {
             emitChange({ queryTags: state.tags });
         };
 
+        const onRefresh = () => {
+            emitChange();
+        };
+
         return {
             ...toRefs(state),
             deleteTag,
@@ -242,6 +250,7 @@ export default {
             onChangeSort,
             onSelect,
             onSearch,
+            onRefresh,
             byPassEvent,
         };
     },
