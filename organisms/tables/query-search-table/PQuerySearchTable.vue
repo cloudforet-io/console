@@ -10,6 +10,7 @@
                      :this-page.sync="proxyThisPage"
                      :page-size.sync="proxyPageSize"
                      :excel-visible="excelVisible"
+                     :row-cursor-pointer="rowCursorPointer"
                      use-cursor-loading
                      sortable
                      :selectable="selectable"
@@ -143,6 +144,10 @@ export default {
         excelVisible: {
             type: Boolean,
             default: true,
+        },
+        rowCursorPointer: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {

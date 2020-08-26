@@ -73,6 +73,7 @@
             :skeleton-rows="pageSize"
             :width="width"
             :row-height-fixed="rowHeightFixed"
+            :row-cursor-pointer="rowCursorPointer"
             v-on="$listeners"
             @changeSort="changeSort"
         >
@@ -153,6 +154,10 @@ export default {
         pageNationValues: {
             type: Array,
             default: () => [15, 30, 45],
+        },
+        rowCursorPointer: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: ToolBoxTableSetupProps, { emit }) {

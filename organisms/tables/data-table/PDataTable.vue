@@ -79,12 +79,14 @@
                                   :item="item"
                                   :index="index"
                                   :fields="fieldsName"
+                                  :row-cursor-pointer="rowCursorPointer"
                             >
                                 <tr :key="index" :data-index="index"
                                     class="fade-in"
                                     :class="{
                                         'tr-selected': isSelected(index),
-                                        'row-height-fixed': rowHeightFixed
+                                        'row-height-fixed': rowHeightFixed,
+                                        'row-cursor-pointer': rowCursorPointer,
                                     } "
                                     v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
                                     @click.left="rowLeftClick( item, index, $event )"
@@ -226,6 +228,10 @@ export default {
         multiSelect: {
             type: Boolean,
             default: true,
+        },
+        rowCursorPointer: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DataTableSetupProps, context) {
@@ -609,6 +615,9 @@ export default {
                 td {
                     @apply truncate;
                 }
+            }
+            &.row-cursor-pointer {
+                cursor: pointer;
             }
         }
 
