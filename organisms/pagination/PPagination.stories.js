@@ -1,6 +1,6 @@
 import { number } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PBottomPagination from '@/components/organisms/pagination/PBottomPagination.vue';
+import PBottomPagination from '@/components/organisms/pagination/PPagination.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {

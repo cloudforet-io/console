@@ -30,7 +30,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
     details {
         position: relative;
         width: 100%;
