@@ -20,7 +20,7 @@
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build"
   },
   "dependencies": {
-    "@vue/composition-api": "^0.5.0",
+    "@vue/composition-api": "^0.6.7",
     "ajv": "^6.12.0",
     "animated-number-vue": "^1.0.0",
     "axios": "^0.19.1",

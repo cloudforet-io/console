@@ -1,21 +1,21 @@
 
-export const projectLinkFormatter = async (baseUrl, referenceKey) => {
+export const projectLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}/${referenceKey}`;
     return queryString;
 };
 
-export const serverLinkFormatter = async (baseUrl, referenceKey) => {
+export const serverLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}?f=server_id%3A${referenceKey}`;
     return queryString;
 };
 
-export const collectorLinkFormatter = async (baseUrl, referenceKey) => {
+export const collectorLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}?f=collector_id%3A${referenceKey}`;
     return queryString;
 };
 
-export const serviceAccountLinkFormatter = async (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}/search`;
+export const serviceAccountLinkFormatter = (baseUrl, referenceKey) => {
+    const queryString = `${baseUrl}/search/${referenceKey}`;
     return queryString;
 };
 
@@ -43,9 +43,9 @@ export const RouterMap = {
         },
 };
 
-export const referenceRouter = async (referenceType, referenceKey): Promise<string> => {
+export const referenceRouter = (referenceType, referenceKey): string => {
     const { baseUrl, formatter } = RouterMap[referenceType];
-    const link = await formatter(baseUrl, referenceKey);
+    const link = formatter(baseUrl, referenceKey);
     return link;
 };
 

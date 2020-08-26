@@ -1,9 +1,7 @@
 /* eslint-disable camelcase,@typescript-eslint/camelcase */
-import Vue from 'vue';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
     ref,
-    computed, getCurrentInstance, isRef, onMounted, reactive, Ref, watch,
+    onMounted, Ref, watch,
 } from '@vue/composition-api';
 
 import {
@@ -12,16 +10,13 @@ import {
     ToolboxTableToolSet,
 } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
 import {
-    BaseApiState, transformHandlerType, getDataAPI, DynamicFluentAPIToolSet,
+    DynamicFluentAPIToolSet,
 } from '@/lib/api/toolset';
-import { forceRefArg, readonlyRefArg } from '@/lib/type';
-import { ApiQuery, defaultQuery } from '@/lib/api/query';
+import { forceRefArg } from '@/lib/type';
 import {
-    GetDataAction, ListType, MemberListAction, QueryAPI,
+    ListType, QueryAPI,
 } from '@/lib/fluent-api';
-import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
 import { ACHandlerMeta, defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 export abstract class BaseTableFluentAPI<
     parameter = any,
@@ -168,7 +163,7 @@ export class TabSearchTableFluentAPI<
                 if (show && show !== preShow) {
                     await this.getData();
                 }
-            });
+            }, { immediate: true });
         });
     }
 }
@@ -231,7 +226,7 @@ export class QuerySearchTableFluentAPI<
             if (tags !== preTags && this.action) {
                 await this.getData(true);
             }
-        }, { lazy: true });
+        }, { immediate: false });
     }
 
     constructor(
@@ -261,145 +256,4 @@ export class QuerySearchTableFluentAPI<
         this.defaultReset();
         this.tableTS.querySearch.syncState.value = '';
     };
-}
-
-
-export abstract class BaseTableAPI<
-        initData = any,
-        initSyncData = any,
-        T extends ToolboxTableToolSet<initData, initSyncData> = ToolboxTableToolSet<initData, initSyncData>
-    > extends getDataAPI {
-    tableTS: T;
-
-    vm: Vue;
-
-    apiState: UnwrapRef<BaseApiState>
-
-
-    protected constructor(
-        url: readonlyRefArg<string>,
-        only: readonlyRefArg<string[]> = [],
-        extraParams: readonlyRefArg<any> = {},
-        fixSearchQuery: SearchQueryType[] = [],
-        transformHandler: transformHandlerType|null = null,
-    ) {
-        super();
-        // @ts-ignore
-        this.vm = getCurrentInstance();
-        this.apiState = reactive({
-            url,
-            only,
-            fixSearchQuery, // default fix query
-            extraParams, // for api extra parameters
-            transformHandler,
-        });
-        this.tableTS = new ToolboxTableToolSet<initData, initSyncData>() as T;
-    }
-
-    protected abstract paramQuery: Ref<ApiQuery>;
-
-    // @ts-ignore
-    protected requestData = async () => {
-        const params = {
-            query: this.paramQuery.value,
-            ...this.apiState.extraParams,
-        };
-        const resp = await this.$http.post(this.apiState.url, params).then((response) => {
-            let result = response;
-            if (this.apiState.transformHandler) {
-                try {
-                    result = this.apiState.transformHandler(response);
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            return result;
-        });
-        return resp;
-    };
-
-
-    getData = async (resetThisPage = false) => {
-        if (resetThisPage) {
-            this.tableTS.syncState.thisPage = 1;
-        }
-        this.tableTS.syncState.loading = true;
-        this.tableTS.syncState.selectIndex = [];
-        try {
-            const res = await this.requestData();
-            this.tableTS.state.items = res.data.results;
-            this.tableTS.setAllPage(res.data.total_count);
-        } catch (e) {
-            this.tableTS.state.items = [];
-            this.tableTS.state.allPage = 1;
-        }
-        this.tableTS.syncState.loading = false;
-    };
-
-    protected defaultReset = () => {
-        this.tableTS.state.allPage = 1;
-        this.tableTS.state.items = [];
-        this.tableTS.syncState.thisPage = 1;
-        this.tableTS.syncState.selectIndex = [];
-        this.tableTS.syncState.sortBy = '';
-        this.tableTS.syncState.sortDesc = true;
-    };
-
-    resetAll = () => {
-        this.defaultReset();
-    }
-}
-
-export class SearchTableAPI<initData = any, initSyncData = any,
-    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>> extends BaseTableAPI<initData, initSyncData, T> {
-    constructor(
-        url: readonlyRefArg<string>,
-        only: readonlyRefArg<string[]> = [],
-        extraParams: readonlyRefArg<any> = {},
-        fixSearchQuery: SearchQueryType[] = [],
-        initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData,
-    ) {
-        super(url, only, extraParams, fixSearchQuery);
-        this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
-    }
-
-    protected paramQuery = computed(() => defaultQuery(
-        (this.tableTS.syncState.thisPage as number), (this.tableTS.syncState.pageSize as number),
-        this.tableTS.syncState.sortBy, this.tableTS.syncState.sortDesc, this.tableTS.searchText.value,
-        // @ts-ignore
-        this.apiState.fixSearchQuery, undefined, this.apiState.only,
-    ));
-
-    resetAll = () => {
-        this.defaultReset();
-        this.tableTS.searchText.value = '';
-    }
-}
-
-interface DataSource {
-    name: string;
-    key: string;
-    view_type?: string;
-    view_option?: any;
-
-}
-
-
-export class SubDataAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
-    // @ts-ignore
-    constructor(
-        url: readonlyRefArg<string>,
-        idKey: string,
-        // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-        private keyPath: readonlyRefArg<string>,
-        // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-        private id: readonlyRefArg<string>,
-        initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData,
-    ) {
-        super(url, undefined, undefined, undefined, initData, initSyncData);
-        this.apiState.extraParams = computed(() => ({
-            key_path: isRef(this.keyPath) ? this.keyPath.value : this.keyPath,
-            [idKey]: isRef(this.id) ? this.id.value : this.id,
-        }));
-    }
 }

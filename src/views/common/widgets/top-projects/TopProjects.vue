@@ -141,7 +141,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, reactive, Ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, Ref, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
@@ -158,7 +158,6 @@ import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import Chart, { ChartDataSets } from 'chart.js';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 const DATA_COUNT = 5;
 const DEFAULT_MAX = 1000;
@@ -319,7 +318,7 @@ export default {
                 drawChart(ctx);
             }
         }, {
-            lazy: true,
+            immediate: false,
         });
 
 

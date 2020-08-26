@@ -1,12 +1,11 @@
 import {
-    onUnmounted, ref, Ref, watch,
+    onUnmounted, ref, Ref, UnwrapRef, watch,
 } from '@vue/composition-api';
 import {
     HelperToolSet, initReactive, optionalType,
 } from '@/lib/toolset';
 import { SChart } from '@/lib/chart/s-chart';
 import { ChartConfiguration } from 'chart.js';
-import {UnwrapRef} from "@vue/composition-api/dist/reactivity";
 
 interface ChartStateType<C> {
     chartRef: null | HTMLCanvasElement;
@@ -49,7 +48,7 @@ export class SChartToolSet<C extends SChart, D=object> {
                 this.draw(this.state.chart as any);
             }
         }, {
-            lazy: true,
+            immediate: false,
         });
     }
 }

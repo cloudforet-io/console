@@ -26,9 +26,6 @@ import {
 import { Computed } from '@/lib/type';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import _ from 'lodash';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { makeProxy } from '@/lib/compostion-util';
-import referenceRouter from '@/lib/reference/referenceRouter';
 import { DynamicLayoutProps } from './toolset';
 
 
@@ -114,7 +111,7 @@ export default defineComponent({
                 state.isLoading = true;
                 getComponent();
             }
-        }, { lazy: true });
+        }, { immediate: false });
 
         onMounted(async () => {
             await getComponent();

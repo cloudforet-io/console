@@ -161,7 +161,7 @@ export class StatQuerySearchGridFluentAPI<
             if (tags !== preTags && this.action) {
                 await this.getData(true);
             }
-        }, { lazy: true });
+        }, { immediate: false });
     }
 
     constructor(
@@ -210,7 +210,7 @@ export class QuerySearchGridFluentAPI<
             if (tags !== preTags) {
                 await this.getData(true);
             }
-        });
+        }, { immediate: true });
     }
 
     constructor(

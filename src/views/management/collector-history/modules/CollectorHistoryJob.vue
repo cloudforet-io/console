@@ -1,22 +1,28 @@
 <template>
     <div class="collector-history-job">
-        <div class="more-information-lap">
-            <div>
-                <span class="info-title">Collector Name: </span>
-                <span class="info-text">{{ job.collector_info.name }}</span>
-            </div>
-            <div>
-                <span class="info-title">Provider: </span>
-                <span class="info-text">{{ job.collector_info.provider }}</span>
-            </div>
-            <!--            <span class="toggle-button">hide</span>-->
-        </div>
-        <p-horizontal-layout>
+        <p-collapsible-panel>
+            <template #content>
+                <div class="more-information-lap">
+                    <div>
+                        <span class="info-title">Collector Name: </span>
+                        <span class="info-text">{{ collectorName }}</span>
+                    </div>
+                    <div>
+                        <span class="info-title">Provider: </span>
+                        <span class="info-text">{{ provider }}</span>
+                    </div>
+                </div>
+            </template>
+        </p-collapsible-panel>
+        <p-horizontal-layout class="job-tasks-lap">
             <template #container="{ height }">
                 <p-query-search-table
                     :loading="loading"
                     :fields="fields"
-                    :items="jobTasks"
+                    :items="items"
+                    :query-tags="searchTags"
+                    :key-items="querySearchHandlers.keyItems"
+                    :value-handler-map="querySearchHandlers.valueHandlerMap"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
@@ -25,7 +31,7 @@
                     :multi-select="false"
                     :select-index.sync="selectedIndexes"
                     :disabled-index="disabledIndex"
-                    @change="getJobTasks"
+                    @change="onChange"
                     @rowLeftClick="onSelect"
                 >
                     <template #toolbox-top>
@@ -41,37 +47,32 @@
                             </div>
                         </div>
                     </template>
-                    <template #col-service_account_id-format="{ value }">
-                        {{ convertServiceAccountName(value) }}
-                    </template>
-                    <template #col-project_id-format="{ value }">
-                        {{ convertProjectName(value) }}
-                    </template>
+
                     <template #col-status-format="{ value }">
-                        <span :class="value.toLowerCase()">{{ convertStatus(value) }}</span>
-                    </template>
-                    <template #col-created_at-format="{ value }">
-                        {{ timestampFormatter(value) }}
-                    </template>
-                    <template #col-finished_at-format="{ value }">
-                        아직 안함
+                        <span :class="value.toLowerCase()">{{ value }}</span>
                     </template>
                 </p-query-search-table>
             </template>
         </p-horizontal-layout>
-        <div v-if="selectedItem && selectedItem.errors.length > 0">
+        <div v-if="selectedItem" class="error-list-lap">
             <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
                 Error List
             </p-panel-top>
-            <p-data-table :fields="errorFields"
+            <div v-if="selectedItem.errors.length === 0">
+                <p-empty class="w-full h-full">
+                    No Data
+                </p-empty>
+            </div>
+            <p-data-table v-else
+                          :fields="errorFields"
                           :items="selectedItem.errors"
                           :sortable="false"
                           :selectable="false"
-                          :loading="loading"
+                          :row-height-fixed="false"
                           table-style-type="light"
                           bordered
             >
-                <template #col-message-format="{ value }">
+                <template #col-message-format="{ value }" style="width: 20rem">
                     <div class="error-message">
                         {{ value }}
                     </div>
@@ -83,40 +84,84 @@
 
 <script lang="ts">
 import { capitalize, find } from 'lodash';
+import moment from 'moment';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
+import {
+    makeQuerySearchHandlersWithSearchSchema,
+    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums
+} from '@/lib/component-utils/query-search';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { JobModel } from '@/lib/fluent-api/inventory/job';
+import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
+
+enum JOB_TASK_STATUS {
+    pending = 'PENDING',
+    progress = 'IN_PROGRESS',
+    success = 'SUCCESS',
+    failure = 'FAILURE',
+}
 
 export default {
-    name: 'PCollectorHistoryDetail',
+    name: 'PCollectorHistoryJob',
     components: {
+        PCollapsiblePanel,
+        PEmpty,
         PDataTable,
         PPanelTop,
         PHorizontalLayout,
         PQuerySearchTable,
     },
     props: {
-        job: {
-            type: Object,
+        jobId: {
+            type: String,
             required: true,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props) {
         const state = reactive({
+            loading: false,
+            job: {} as JobModel,
+            collectorName: computed(() => state.job.collector_info?.name),
+            provider: computed(() => state.job.collector_info?.provider),
             jobTasks: [],
             serviceAccounts: [],
             projects: [],
+            items: [],
+            fields: [
+                { label: 'No.', name: 'sequence' },
+                { label: 'Service Account', name: 'service_account_id' },
+                { label: 'Project', name: 'project_id' },
+                { label: 'Status', name: 'status' },
+                { label: 'Created', name: 'created_count' },
+                { label: 'Updated', name: 'updated_count' },
+                { label: 'Error', name: 'errors.length' },
+                { label: 'Start Time', name: 'created_at' },
+                { label: 'Duration', name: 'duration' },
+            ],
+            errorFields: [
+                { label: 'No.', name: 'sequence' },
+                { label: 'Error Code', name: 'error_code' },
+                { label: 'Error Message', name: 'message' },
+                { label: 'Resource Type', name: 'additional.resource_type' },
+                { label: 'Resource ID', name: 'additional.resource_id' },
+            ],
+            statusList: [
+                { key: 'all', label: 'All', class: 'all' },
+                { key: 'inProgress', label: 'In-progress', class: 'in-progress' },
+                { key: 'success', label: 'Success', class: 'success' },
+                { key: 'failure', label: 'Failure', class: 'failure' },
+            ],
+            activatedStatus: 'all',
             //
             disabledIndex: [0, 3],
             selectedIndexes: [],
@@ -128,46 +173,134 @@ export default {
             sortDesc: true,
             totalCount: 0,
             //
-            fields: [
-                { label: 'Service Account', name: 'service_account_id' },
-                { label: 'Project', name: 'project_id' },
-                { label: 'Status', name: 'status' },
-                { label: 'Created', name: 'created_count' },
-                { label: 'Updated', name: 'updated_count' },
-                { label: 'Error', name: 'errors.length' },
-                { label: 'Start Time', name: 'created_at' },
-                { label: 'Duration', name: 'finished_at' },
-            ],
-            errorFields: [
-                { label: 'No.', name: 'sequence' },
-                { label: 'Error Code', name: 'error_code' },
-                { label: 'Error Message', name: 'message' },
-                { label: 'Resource Type', name: 'resource_type' },
-                { label: 'Resource ID', name: 'resource_id' },
-            ],
-            statusList: [
-                { key: 'all', label: 'All', class: 'all' },
-                { key: 'inProgress', label: 'In-progress', class: 'in-progress' },
-                { key: 'success', label: 'Success', class: 'success' },
-                { key: 'failure', label: 'Failure', class: 'failure' },
-            ],
-            activatedStatus: 'all',
+            searchTags: [],
+            querySearchHandlers: {
+                keyItems: [
+                    {
+                        name: 'service_account_id',
+                        label: 'Service Account',
+                    },
+                    {
+                        name: 'project_id',
+                        label: 'Project',
+                    },
+                    {
+                        name: 'status',
+                        label: 'Status',
+                    },
+                ],
+                valueHandlerMap: {
+                    // eslint-disable-next-line camelcase
+                    service_account_id: makeValueHandlerWithReference('identity.ServiceAccount'),
+                    // eslint-disable-next-line camelcase
+                    project_id: makeValueHandlerWithReference('identity.Project'),
+                    status: makeValueHandlerWithSearchEnums(JOB_TASK_STATUS),
+                },
+            },
         });
 
-        const getJobTasks = async () => {
-            try {
-                const query = new QueryHelper();
-                query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
+        const convertStatus = (status) => {
+            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
+            return capitalize(status);
+        };
+        const convertServiceAccountName = (serviceAccountId) => {
+            // eslint-disable-next-line camelcase
+            const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
+            return serviceAccount?.name;
+        };
+        const convertProjectName = (projectId) => {
+            // eslint-disable-next-line camelcase
+            const project = find(state.projects, { project_id: projectId });
+            return project?.name;
+        };
+        const convertFinishedAtToDuration = (createdAt, finishedAt) => {
+            if (createdAt && finishedAt) {
+                const createdAtMoment = moment(timestampFormatter(createdAt));
+                const finishedAtMoment = moment(timestampFormatter(finishedAt));
+                const duration = finishedAtMoment.diff(createdAtMoment, 'minutes');
+                return `${duration.toString()} min`;
+            }
+            return null;
+        };
+        const convertJobTasksToFieldItem = (jobTasks) => {
+            state.items = [];
+            jobTasks.forEach((task, index) => {
+                const newTask = {
+                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    // eslint-disable-next-line camelcase
+                    service_account_id: convertServiceAccountName(task.service_account_id),
+                    // eslint-disable-next-line camelcase
+                    project_id: convertProjectName(task.project_id),
+                    status: convertStatus(task.status),
+                    // eslint-disable-next-line camelcase
+                    created_count: task.created_count,
+                    // eslint-disable-next-line camelcase
+                    updated_count: task.updated_count,
+                    'errors.length': task.errors.length,
+                    // eslint-disable-next-line camelcase
+                    created_at: timestampFormatter(task.created_at),
+                    duration: convertFinishedAtToDuration(task.created_at, task.finished_at),
+                };
+                state.items.push(newTask);
+            });
+        };
 
+        const getQuery = () => {
+            let statusValues: JOB_TASK_STATUS[] = [];
+            if (state.activatedStatus === 'inProgress') {
+                statusValues = [JOB_TASK_STATUS.progress, JOB_TASK_STATUS.pending];
+            } else if (state.activatedStatus === 'success') {
+                statusValues = [JOB_TASK_STATUS.success];
+            } else if (state.activatedStatus === 'failure') {
+                statusValues = [JOB_TASK_STATUS.failure];
+            }
+
+            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+
+            const query = new QueryHelper();
+            query
+                .setSort(state.sortBy, state.sortDesc)
+                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setKeyword(...or);
+            if (statusValues.length > 0) {
+                query.setFilter({
+                    k: 'status',
+                    v: statusValues,
+                    o: 'in',
+                }, ...and);
+            } else {
+                query.setFilter(...and);
+            }
+            return query;
+        };
+        const getJobTasks = async () => {
+            state.loading = true;
+            try {
+                const query = getQuery();
                 const res = await SpaceConnector.client.inventory.jobTask.list({
                     query: query.data,
                     // eslint-disable-next-line camelcase
-                    job_id: props.job.job_id,
+                    job_id: props.jobId,
                 });
                 state.jobTasks = res.results;
                 state.totalCount = res.total_count;
+
+                convertJobTasksToFieldItem(res.results);
             } catch (e) {
                 console.error(e);
+            }
+            state.loading = false;
+        };
+        const getJob = async () => {
+            state.loading = true;
+            try {
+                // eslint-disable-next-line camelcase
+                const res = await SpaceConnector.client.inventory.job.list({ job_id: props.jobId });
+                state.job = res.results[0];
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const getServiceAccounts = async () => {
@@ -187,29 +320,20 @@ export default {
             }
         };
 
-        const convertStatus = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
-            return capitalize(status);
-        };
-        const convertServiceAccountName = (serviceAccountId) => {
-            // eslint-disable-next-line camelcase
-            const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
-            return serviceAccount?.name;
-        };
-        const convertProjectName = (projectId) => {
-            // eslint-disable-next-line camelcase
-            const project = find(state.projects, { project_id: projectId });
-            return project?.name;
-        };
-
         const onSelect = (item, index) => {
             state.selectedIndexes = index;
         };
+        const onChange = async (item) => {
+            state.searchTags = item.queryTags;
+            await getJobTasks();
+        };
         const onClickStatus = (status) => {
             state.activatedStatus = status;
+            getJobTasks();
         };
 
         const init = async () => {
+            await getJob();
             await getServiceAccounts();
             await getProject();
             await getJobTasks();
@@ -219,11 +343,11 @@ export default {
         return {
             ...toRefs(state),
             timestampFormatter,
-            getJobTasks,
             convertStatus,
             convertServiceAccountName,
             convertProjectName,
             onSelect,
+            onChange,
             onClickStatus,
         };
     },
@@ -233,9 +357,7 @@ export default {
 <style lang="postcss">
 .collector-history-job {
     .more-information-lap {
-        @apply bg-primary4 border border-gray-200;
         position: relative;
-        border-left-width: 0.25rem;
         font-size: 0.75rem;
         line-height: 150%;
         border-radius: 0.125rem;
@@ -249,30 +371,40 @@ export default {
         .info-text {
             @apply text-gray-900;
         }
-        .toggle-button {
-            @apply text-secondary;
-            position: absolute;
-            right: 1rem;
-            bottom: 0.5rem;
-            cursor: pointer;
-        }
     }
 
-    .p-query-search-table {
-        .p-data-table {
-            .failure {
-                @apply text-red-500;
+    .job-tasks-lap {
+        .p-query-search-table {
+            .p-data-table {
+                .failure {
+                    @apply text-red-500;
+                }
             }
         }
     }
 
-    .p-data-table {
-        .error-message {
-            display: block;
-            max-width: 20rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+    .error-list-lap {
+        @apply border border-gray-200;
+        border-radius: 0.125rem;
+        padding-bottom: 2.375rem;
+        .p-data-table {
+            th {
+                border-top: none;
+            }
+            tr:hover {
+                @apply bg-gray-100;
+            }
+            td {
+                @apply border-gray-200;
+            }
+            .th-contents {
+                @apply text-gray-500;
+            }
+            .error-message {
+                /*white-space: nowrap;*/
+                /*overflow: hidden;*/
+                /*text-overflow: ellipsis;*/
+            }
         }
     }
 }

@@ -89,6 +89,7 @@ import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModa
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { fluentApi } from '@/lib/fluent-api';
+import {useStore} from "@/store/toolset";
 
 export default {
     name: 'CollectorSchedules',
@@ -137,7 +138,7 @@ export default {
             isAddMode: true,
         });
 
-        const timezone = vm.$ls.user.state.timezone || 'UTC';
+        const timezone = useStore().user.state.timezone || 'UTC';
         const getUtcHour = hour => moment.tz(moment.utc({ hour }), timezone).hour();
 
         const openEditModal = (addMode: boolean) => {

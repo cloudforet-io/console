@@ -211,17 +211,6 @@ export const lengthMinValidation = (min: number, invalidMessage?: message) => ne
 export const lengthMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
 export const checkTimeZoneValidation = (invalidMessage: message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
 
-export const credentialsNameValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
-    let result = false;
-    await parent.$http.post('/secret/secret/list', { name: value, domain_id: parent.$ls.domain.state.domainId }).then((res) => {
-        if (res.data.total_count === 0) {
-            result = true;
-        }
-    }).catch((error) => {
-        console.error(error);
-    });
-    return result;
-}, invalidMessage || 'same name exists!');
 
 export const userIDValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
     let result = false;

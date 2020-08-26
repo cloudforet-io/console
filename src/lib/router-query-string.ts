@@ -2,9 +2,8 @@ import {
     forEach, get, set, debounce,
 } from 'lodash';
 import router from '@/routes';
-import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity/ref';
 import {
-    computed, onUnmounted, watch, ref,
+    computed, onUnmounted, watch, ref, Ref, UnwrapRef,
 } from '@vue/composition-api';
 import { Dictionary } from 'vue-router/types/router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
@@ -58,7 +57,7 @@ export const getQueryStringComputed = (
 export const setQueryStringRefWatchable = (queryRef: Ref<any>, key: string) => {
     const stop = watch(() => queryRef.value, debounce(async (val: string) => {
         await replaceQuery(key, val);
-    }, 100), { lazy: true });
+    }, 100), { immediate: false });
 
     onUnmounted(() => stop());
 };
@@ -179,7 +178,7 @@ export const selectIndexAutoReplacer: AutoReplacer = (slRef: Ref<any>, key: stri
         } else {
             await replaceQuery(key, val);
         }
-    }, 100), { lazy: true });
+    }, 100), { immediate: false });
 
     onUnmounted(() => stop());
 };

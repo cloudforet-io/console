@@ -43,11 +43,12 @@ export default {
                 //     component: TagsPage,
                 // },
                 {
-                    path: 'search',
+                    path: 'search/:id',
                     name: 'serviceAccountSearch',
                     meta: {
                         label: 'search',
                     },
+                    props: true,
                     component: ServiceAccountSearch,
                 },
                 {

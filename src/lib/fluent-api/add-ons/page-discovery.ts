@@ -17,8 +17,21 @@ class Get extends GetAction<any, PageDiscoveryTypeModel> {
     idField = idField;
 
     setResourceType(resource: string) {
-        this.apiState.parameter.resource_type = resource;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.resource_type = resource;
+        return api;
+    }
+
+    setSearch(search: string) {
+        const api = this.clone();
+        api.apiState.parameter.search = search;
+        return api;
+    }
+
+    setSearchKey(searchKey: string) {
+        const api = this.clone();
+        api.apiState.parameter.search_key = searchKey;
+        return api;
     }
 }
 

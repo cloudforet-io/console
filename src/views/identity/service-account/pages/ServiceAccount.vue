@@ -44,7 +44,7 @@
                             </div>
                             <p-page-title
                                 :use-selected-count="true" :use-total-count="true" :title="`${selectProviderItem ? selectProviderItem.name : ''} Account`"
-                                :total-count="apiHandler.totalCount.value"
+                                :total-count="apiHandler.totalCount"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                             />
                             <s-dynamic-layout type="table"
@@ -160,6 +160,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
+    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
@@ -206,8 +207,8 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import { showErrorMessage } from '@/lib/util';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'ServiceAccount',
@@ -228,11 +229,11 @@ export default {
         PPageNavigation,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectState = reactive({
             project: {},
         });
-        const { project } = (vm as any).$ls;
+        const { project } = useStore();
 
         const resourceCountAPI = fluentApi.identity().serviceAccount().list().setCountOnly();
         const providerListAPI = fluentApi.identity().provider().list().setOnly(
@@ -416,7 +417,9 @@ export default {
 
         const secretIsShow = computed(() => apiHandler.tableTS.selectState.isSelectOne && singleItemTab.syncState.activeTab === 'credentials');
 
-        const secretListAction = fluentApi.secret().secret().list();
+        const secretListAction = fluentApi.secret().secret().list().setOnly(
+            'secret_id', 'name', 'schema', 'created_at',
+        );
         const secretApiHandler = new TabSearchTableFluentAPI(
             secretListAction,
             secretIsShow,
@@ -649,7 +652,7 @@ export default {
                         );
                         await apiHandler.getData();
                     }
-                });
+                }, { immediate: true });
             }
         };
 

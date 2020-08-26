@@ -47,10 +47,6 @@ export { default as PGridLayout } from './components/molecules/layouts/grid-layo
 export { default as PBoxLayout } from './components/molecules/layouts/box-layout/PBoxLayout.vue';
 export { default as PPaneLayout } from './components/molecules/layouts/pane-layout/PPaneLayout.vue';
 
-// molecule tables components
-export { default as PTable } from './components/molecules/tables/PTable.vue';
-import * as PTableToolset from './components/molecules/tables/PTable.toolset';
-
 // organisms buttons
 export { default as PSelectBtnGroup } from './components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 

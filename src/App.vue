@@ -19,6 +19,7 @@ import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 import { GTag, setGtagUserID } from '@/lib/gtag';
+import { useStore } from '@/store/toolset';
 
 export default defineComponent({
     name: 'App',
@@ -34,13 +35,14 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as any;
+        const { user, logout } = useStore();
         const state = reactive({
             loading: true,
         });
         const configInit = async () => {
             await config.init();
             await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
-                vm.$ls.logout(vm);
+                logout(vm);
             });
             Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'), vm);
         };

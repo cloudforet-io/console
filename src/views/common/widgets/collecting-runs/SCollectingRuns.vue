@@ -79,7 +79,7 @@ export default {
 
         const api = fluentApi.inventory().jobs().list()
             .setOnly('job_id', 'collector', 'created_at')
-            .setFilter({ key: 'state', value: [JOB_STATE.created, JOB_STATE.progress], operator: FILTER_OPERATOR.contain })
+            .setFilter({ key: 'status', value: [JOB_STATE.created, JOB_STATE.progress], operator: FILTER_OPERATOR.contain })
             .setSortBy('created_at')
             .setPageSize(5)
             .setThisPage(1);

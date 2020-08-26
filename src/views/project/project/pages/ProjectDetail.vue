@@ -108,9 +108,10 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
-} from '@vue/composition-api';
+    import {
+        ComponentRenderProxy,
+        computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    } from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
@@ -144,7 +145,6 @@ import {
     queryStringToNumberArray,
     selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -170,7 +170,7 @@ export default {
         PPageNavigation,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const item = ref({} as ProjectModel);
         const state = reactive({
@@ -199,7 +199,7 @@ export default {
             if (after && after !== before) {
                 getProject(after);
             }
-        });
+        }, { immediate: true });
 
         const singleItemTab = new TabBarState(
             {

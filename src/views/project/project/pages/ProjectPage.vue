@@ -37,7 +37,7 @@
                 <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
                                   : 'All Project'"
                               use-total-count
-                              :total-count="apiHandler.totalCount.value"
+                              :total-count="apiHandler.totalCount"
                 >
                     <template #extra-area>
                         <div class="btns">
@@ -217,8 +217,8 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed,
-    getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 
@@ -237,7 +237,6 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import {
     FILTER_OPERATOR, fluentApi,
 } from '@/lib/fluent-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectItemResp, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
@@ -248,7 +247,6 @@ import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCrea
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage } from '@/lib/util';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     makeQueryStringComputeds,
 } from '@/lib/router-query-string';
@@ -316,7 +314,7 @@ export default {
         PIconTextButton,
     },
     setup(props, context) {
-        const vm: ComponentInstance = getCurrentInstance() as ComponentInstance;
+        const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
         const state: UnwrapRef<State> = reactive({
             searchText: '',
@@ -462,14 +460,14 @@ export default {
             },
         );
 
-        watch(() => state.showAllProjects, async (after: boolean, before: boolean) => {
+        watch<boolean, boolean>(() => state.showAllProjects, async (after, before) => {
             if (after !== before) {
                 // @ts-ignore
                 apiHandler.action = apiHandler.action.setRecursive(after);
                 apiHandler.resetAll();
                 await apiHandler.getData();
             }
-        }, { lazy: true });
+        }, { immediate: false });
 
 
         /**

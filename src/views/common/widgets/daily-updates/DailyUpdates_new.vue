@@ -64,16 +64,14 @@
 </template>
 
 <script lang="ts">
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+    import {reactive, toRefs, UnwrapRef} from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 
     interface CloudService {
         // eslint-disable-next-line camelcase

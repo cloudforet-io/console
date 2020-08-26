@@ -1,5 +1,5 @@
 import {
-    computed, getCurrentInstance, reactive,
+    computed, reactive,
 } from '@vue/composition-api';
 import Lockr from 'lockr';
 import _ from 'lodash';
@@ -7,6 +7,10 @@ import { DateTime } from 'luxon';
 import { api } from '@/lib/api/axios';
 import { fluentApi } from '@/lib/fluent-api';
 import config from '@/lib/config';
+import router from '@/routes';
+import Vue from 'vue';
+
+let ls: any;
 
 const bindLocalStorage = (prefix: string, name: string, state: any) => computed({
     get: () => state[name],
@@ -87,17 +91,17 @@ export class UserStore extends Store<UserState> {
         });
     }
 
-    setToken(refresh: string, access: string) {
+    setToken = (refresh: string, access: string) => {
         this.state.refreshToken = refresh;
         this.state.accessToken = access;
     }
 
-    async setUser(userType: 'USER'|'DOMAIN_OWNER', userId: string, vm: any) {
+    setUser = async (userType: 'USER'|'DOMAIN_OWNER', userId: string, vm: any) => {
         this.state.userId = userId;
         this.state.userType = userType;
 
         const resp = await vm.$http.post(this.state.userUrl, {
-            domain_id: vm.$ls.domain.state.domainId,
+            domain_id: ls.domain.state.domainId,
             [this.state.paramIdName]: this.state.userId,
             // eslint-disable-next-line camelcase
             user_type: this.state.userType,
@@ -109,7 +113,7 @@ export class UserStore extends Store<UserState> {
         localStorage.setItem('user/timezone', this.state.timezone as string);
     }
 
-    sync(data: Partial<UserState>) {
+    sync = (data: Partial<UserState>) => {
         if (data) {
             _.forEach(data, (d, k) => {
                 if (this.state[k] !== d) {
@@ -182,7 +186,7 @@ class ProjectStore extends Store<ProjectState> {
         });
     }
 
-    isExpiration(): boolean {
+    isExpiration = (): boolean => {
         let result = true;
         if (this.state.ttl) {
             result = this.state.ttl < DateTime.local();
@@ -222,7 +226,7 @@ class ProjectStore extends Store<ProjectState> {
         this.state.projects = result;
     }
 }
-export interface ProviderInfo{
+export interface ProviderInfo {
     [provider: string]: {
         name: string;
         icon: string;
@@ -246,7 +250,7 @@ class ProviderStore extends Store<ProviderState> {
         });
     }
 
-    isExpiration(): boolean {
+    isExpiration = (): boolean => {
         let result = true;
         if (this.state.ttl) {
             result = this.state.ttl < DateTime.local();
@@ -254,10 +258,10 @@ class ProviderStore extends Store<ProviderState> {
         return result;
     }
 
-    getProvider = async () => {
+    getProvider = async (force = false) => {
         // console.debug('isEXP?', this.isExpiration());
         const providerAPI = fluentApi.identity().provider();
-        if (this.isExpiration()) {
+        if (this.isExpiration() || force) {
             const result = {};
             try {
                 // console.debug('request provider');
@@ -280,51 +284,185 @@ class ProviderStore extends Store<ProviderState> {
 }
 export type ProviderStoreType = ProviderStore;
 
-export default {
-    name: 'LocalStorage',
-    setup() {
-        const state = {
-            user: new UserStore('user/'),
-            domain: new DomainStore('domain/'),
-            project: new ProjectStore('project/'),
-            provider: new ProviderStore('provider/'),
-        };
-        return {
-            ...state,
-            logout(vm?: any) {
-                let routerMeta: any = null;
-                if (vm) {
-                    routerMeta = {
-                        name: vm.$ls.user.state.isDomainOwner ? 'AdminLogin' : 'Login',
+interface ServiceAccountState {
+    serviceAccounts: any;
+    ttl: DateTime;
+}
+
+class ServiceAccountStore extends Store<ServiceAccountState> {
+    constructor(prefix: string) {
+        super(prefix, [
+            'serviceAccounts',
+            'ttl',
+        ]);
+        this.state = reactive({
+            ...initState(this.prefix, this.names, this.data),
+        });
+    }
+
+    isExpiration = (): boolean => {
+        let result = true;
+        if (this.state.ttl) {
+            result = this.state.ttl < DateTime.local();
+        }
+        return result;
+    }
+
+    getServiceAccounts = async (force = false) => {
+        if (this.isExpiration() || force) {
+            const result = {};
+            try {
+                const res = await fluentApi.addons().autocomplete().get()
+                    .setResourceType('identity.ServiceAccount')
+                    .execute();
+                res.data.results.forEach((d) => {
+                    result[d.key] = d.name;
+                });
+                this.state.ttl = DateTime.local().plus({ hours: 1 });
+            } catch (e) {
+                console.error(e);
+            }
+            this.state.serviceAccounts = result;
+        }
+    }
+}
+
+interface SecretState {
+    secrets: any;
+    ttl: DateTime;
+}
+
+class SecretStore extends Store<SecretState> {
+    constructor(prefix: string) {
+        super(prefix, [
+            'secrets',
+            'ttl',
+        ]);
+        this.state = reactive({
+            ...initState(this.prefix, this.names, this.data),
+        });
+    }
+
+    isExpiration= (): boolean => {
+        let result = true;
+        if (this.state.ttl) {
+            result = this.state.ttl < DateTime.local();
+        }
+        return result;
+    }
+
+    getSecrets = async (force = false) => {
+        if (this.isExpiration() || force) {
+            const result = {};
+            try {
+                const res = await fluentApi.addons().autocomplete().get()
+                    .setResourceType('secret.Secret')
+                    .execute();
+                res.data.results.forEach((d) => {
+                    result[d.key] = d.name;
+                });
+                this.state.ttl = DateTime.local().plus({ hours: 1 });
+            } catch (e) {
+                console.error(e);
+            }
+            this.state.secrets = result;
+        }
+    }
+}
+
+interface CollectorState {
+    collectors: any;
+    ttl: DateTime;
+}
+
+class CollectorStore extends Store<CollectorState> {
+    constructor(prefix: string) {
+        super(prefix, [
+            'collectors',
+            'ttl',
+        ]);
+        this.state = reactive({
+            ...initState(this.prefix, this.names, this.data),
+        });
+    }
+
+    isExpiration = (): boolean => {
+        let result = true;
+        if (this.state.ttl) {
+            result = this.state.ttl < DateTime.local();
+        }
+        return result;
+    }
+
+    getCollectors = async (force = false) => {
+        if (this.isExpiration() || force) {
+            const result = {};
+            try {
+                const res = await fluentApi.addons().autocomplete().get()
+                    .setResourceType('inventory.Collector')
+                    .execute();
+                res.data.results.forEach((d) => {
+                    result[d.key] = d.name;
+                });
+                this.state.ttl = DateTime.local().plus({ hours: 1 });
+            } catch (e) {
+                console.error(e);
+            }
+            this.state.collectors = result;
+        }
+    }
+}
+
+const setStore = () => {
+    ls = new Vue({
+        name: 'LocalStorage',
+        setup() {
+            const state = {
+                user: new UserStore('user/'),
+                domain: new DomainStore('domain/'),
+                project: new ProjectStore('project/'),
+                provider: new ProviderStore('provider/'),
+                serviceAccount: new ServiceAccountStore('serviceAccount/'),
+                secret: new SecretStore('secret/'),
+                collector: new CollectorStore('collector/'),
+            };
+            return {
+                ...state,
+                logout() {
+                    const routerMeta: any = {
+                        name: state.user.state.isDomainOwner ? 'AdminLogin' : 'Login',
                     };
-                    if (vm.$route && vm.$route.path) {
-                        routerMeta.query = { nextPath: vm.$route.path };
+                    if (router && router.currentRoute.path) {
+                        routerMeta.query = { nextPath: router.currentRoute.path };
                     }
-                }
-                state.user.reset();
-                state.domain.reset();
-                state.project.reset();
-                state.provider.reset();
-                if (vm) {
-                    // console.debug(routerMeta);
-                    vm.$router.push(routerMeta);
-                }
-            },
-            resetAll() {
-                Object.values(state).forEach(store => store.reset());
-            },
-        };
-    },
-
+                    state.user.reset();
+                    state.domain.reset();
+                    state.project.reset();
+                    state.provider.reset();
+                    state.serviceAccount.reset();
+                    state.secret.reset();
+                    state.collector.reset();
+                    if (router) {
+                        // console.debug(routerMeta);
+                        router.push(routerMeta);
+                    }
+                },
+                resetAll() {
+                    Object.values(state).forEach(store => store.reset());
+                },
+            };
+        },
+    });
 };
+export default setStore;
 
-export const useStore = () => {
-    const vm = getCurrentInstance() as any;
-    return vm.$ls as {
+export const useStore = () => ls as {
         user: UserStore;
         domain: DomainStore;
         project: ProjectStore;
         provider: ProviderStore;
+        serviceAccount: ServiceAccountStore;
+        secret: SecretStore;
+        collector: CollectorStore;
         logout: Function;
     };
-};

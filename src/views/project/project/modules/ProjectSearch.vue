@@ -65,7 +65,7 @@
 <script lang="ts">
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import { makeProxy } from '@/components/util/composition-helpers';
 import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
@@ -73,8 +73,6 @@ import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { fluentApi, ProjectGroupInfo } from '@/lib/fluent-api';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
     ProjectGroup, Props, DataType, SearchResult,
 } from './ProjectSearch.toolset';

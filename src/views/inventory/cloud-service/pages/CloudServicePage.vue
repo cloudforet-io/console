@@ -8,7 +8,7 @@
                 <p-page-title :title="$route.params.name"
                               child
                               use-total-count
-                              use-selected-count :total-count="apiHandler.totalCount.value"
+                              use-selected-count :total-count="apiHandler.totalCount"
                               :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                               @goBack="$router.go(-1)"
                 />
@@ -124,7 +124,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -159,7 +159,6 @@ import { DynamicLayoutApiProp } from '@/views/common/dynamic-layout/toolset';
 import baseInfoSchema from '@/data-schema/inventory/cloud_service/sub_data/layouts/base_info.json';
 import { get, debounce } from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds, queryStringToNumberArray,
@@ -212,7 +211,7 @@ export default {
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const fieldMap = {
             project_id: {
@@ -464,7 +463,7 @@ export default {
                     watchStop = null;
                 }
             }
-        });
+        }, { immediate: true });
 
 
         const monitoringTS = new MonitoringToolSet(

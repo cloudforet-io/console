@@ -27,7 +27,7 @@
                 <p-panel-top v-if="showTitle"
                              style="margin: 0; margin-top: 0.5rem;"
                              :use-total-count="true"
-                             :total-count="apiHandler.totalCount.value"
+                             :total-count="apiHandler.totalCount"
                 >
                     {{ name }}
                 </p-panel-top>

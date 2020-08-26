@@ -9,7 +9,7 @@ export interface SearchEnumItem {
     };
 }
 export type SearchDataType = 'string'|'integer'|'float'|'boolean'|'datetime'|'timestamp'
-export type SearchEnums = Record<string, SearchEnumItem>|string[]
+export type SearchEnums = Record<string, SearchEnumItem|string>|string[]
 
 export interface SearchKeyOptions {
     key: string; // Key to retrieve actual data
@@ -26,3 +26,5 @@ export interface SearchKeyGroup {
     items: SearchKeyOptions[];
     options?: object;
 }
+
+export type SearchSchema = SearchKeyGroup;

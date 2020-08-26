@@ -21,6 +21,7 @@ import {
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
+import { useStore } from '@/store/toolset';
 
 
 interface State {
@@ -34,7 +35,7 @@ interface Credentials {
     // eslint-disable-next-line camelcase
     refresh_token: string;
 }
-export default defineComponent({
+export default {
     name: 'Login',
     components: {
         PButton,
@@ -53,7 +54,8 @@ export default defineComponent({
     setup(props: any, context: any) {
         // console.debug('login!!');
         const vm = (getCurrentInstance() as any);
-        vm.$ls.domain.getDomain(vm);
+        const store = useStore();
+        store.domain.getDomain(vm);
 
         const state = reactive<any>({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
@@ -62,7 +64,7 @@ export default defineComponent({
                 if (props.admin) {
                     authType = 'admin';
                 } else {
-                    authType = vm.$ls.domain.state.authType;
+                    authType = store.domain.state.authType;
                 }
                 let component;
                 try {
@@ -74,8 +76,9 @@ export default defineComponent({
             }),
         });
         const login = async (userId: string, credentials: Credentials) => {
-            vm.$ls.user.setToken(credentials.refresh_token, credentials.access_token);
-            await vm.$ls.user.setUser(state.userType, userId, vm);
+            console.debug('store', store)
+            store.user.setToken(credentials.refresh_token, credentials.access_token);
+            await store.user.setUser(state.userType, userId, vm);
             setGtagUserID(vm);
             await vm.$router.push(props.nextPath);
         };
@@ -84,7 +87,7 @@ export default defineComponent({
             login,
         };
     },
-});
+};
 
 </script>
 
@@ -93,7 +96,8 @@ export default defineComponent({
         &.$(theme) {
             background: $background;
             background-size: cover;
-            /*background-position: center center;*/
+
+            /* background-position: center center; */
         }
     }
 
@@ -106,7 +110,8 @@ export default defineComponent({
         overflow: hidden;
         background: url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg') no-repeat center center fixed;
         background-size: cover;
-        /*background-color: theme('colors.white');*/
+
+        /* background-color: theme('colors.white'); */
         @mixin background-theme 'default-theme', theme('colors.white');
         @mixin background-theme 'color-theme', theme('colors.gray.default');
         @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
@@ -115,14 +120,18 @@ export default defineComponent({
 
     #login-container {
         /* background-color: white; */
+
         /* max-width: 24.5rem; */
-        /*width: 100%;*/
-        /*margin: 1rem;*/
+
+        /* width: 100%; */
+
+        /* margin: 1rem; */
+
         /* padding: 1.5rem 1rem 0.62rem; */
     }
 
     #logo {
-        display:inline-block;
+        display: inline-block;
         text-align: center;
         vertical-align: middle;
         margin: 0 auto;
@@ -137,7 +146,7 @@ export default defineComponent({
         height: auto;
     }
 
-    .header{
+    .header {
         padding-top: 1.5rem;
         text-align: center;
         #title {
@@ -150,7 +159,9 @@ export default defineComponent({
     .input-title {
         font-size: 0.875rem;
         font-weight: bold;
-        /*padding-top: 16px;*/
-        /*padding-bottom: 4px;*/
+
+        /* padding-top: 16px; */
+
+        /* padding-bottom: 4px; */
     }
 </style>

@@ -85,13 +85,8 @@
 
 <script lang="ts">
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import {
-    monitoringProps,
-    MonitoringProps,
-    MonitoringResourceType,
-} from '@/views/common/monitoring/Monitoring.toolset';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 import {
     blue, coral, green, peacock, violet, yellow,
@@ -102,7 +97,6 @@ import {
 } from 'lodash';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { SelectBtnType } from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.toolset';
 import {
     MetricListResp, MetricResp, MONITORING_TYPE, STATISTICS_TYPE,
@@ -114,6 +108,43 @@ import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChar
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
+
+interface ChartMetric {
+    loading: boolean;
+    labels: string[];
+    dataset: {[resourceKey: string]: number[]};
+    metric: MetricResp;
+    error?: boolean;
+}
+
+interface DataToolType {
+    id: string;
+    name: string;
+    statisticsTypes: STATISTICS_TYPE[];
+}
+
+interface State {
+    timezone: string;
+    dataTools: DataToolType[];
+    tools: readonly SelectBtnType[];
+    selectedToolId: string;
+    selectedTimeRange: string;
+    statisticsTypes: readonly STATISTICS_TYPE[];
+    statItems: readonly {type: string; label: string; name: string}[];
+    selectedStat: STATISTICS_TYPE;
+    metricsLoading: boolean;
+    metrics: MetricResp[];
+    chartMetrics: ChartMetric[];
+    availableResources: MonitoringResourceType[];
+    noData: boolean;
+    metricListApi: MetricList;
+    chartMetricApi: GetMetricData;
+}
+
+const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
+const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
+const LOAD_LIMIT = 12;
 
 export default {
     name: 'SMonitoring',
@@ -126,44 +157,20 @@ export default {
         PIconButton,
         PMetricChart,
     },
-    props: monitoringProps,
+    props: {
+        resourceType: {
+            type: String,
+            default: null,
+        },
+        resources: {
+            type: Array,
+            default: () => [],
+            validator(resources) {
+                return resources.every(resource => resource.id);
+            },
+        },
+    },
     setup(props: MonitoringProps) {
-        const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
-        const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
-        const LOAD_LIMIT = 12;
-
-        interface ChartMetric {
-            loading: boolean;
-            labels: string[];
-            dataset: {[resourceKey: string]: number[]};
-            metric: MetricResp;
-            error?: boolean;
-        }
-
-        interface DataToolType {
-            id: string;
-            name: string;
-            statisticsTypes: STATISTICS_TYPE[];
-        }
-
-        interface State {
-            timezone: string;
-            dataTools: DataToolType[];
-            tools: readonly SelectBtnType[];
-            selectedToolId: string;
-            selectedTimeRange: string;
-            statisticsTypes: readonly STATISTICS_TYPE[];
-            statItems: readonly {type: string; label: string; name: string}[];
-            selectedStat: STATISTICS_TYPE;
-            metricsLoading: boolean;
-            metrics: MetricResp[];
-            chartMetrics: ChartMetric[];
-            availableResources: MonitoringResourceType[];
-            noData: boolean;
-            metricListApi: MetricList;
-            chartMetricApi: GetMetricData;
-        }
-
         const state: UnwrapRef<State> = reactive({
             timezone: getTimezone(),
             dataTools: [],
@@ -351,13 +358,13 @@ export default {
             watch([() => props.resources, () => state.selectedToolId], (resources, toolId) => {
                 if (resources.length > 0 && toolId) listAll();
             }, {
-                lazy: true,
+                immediate: false,
             });
 
             watch([() => state.selectedTimeRange, () => state.selectedStat], (timeRange, stat) => {
                 if (timeRange && stat) listChartMetrics();
             }, {
-                lazy: true,
+                immediate: false,
             });
 
             listAll();

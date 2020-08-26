@@ -14,12 +14,7 @@ import managementRoute from '@/routes/management/management-route';
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
-import { ref } from '@vue/composition-api';
 
-const DynamicLayoutHelper = () => import('@/views/common/helper/DynamicLayoutHelper.vue');
-const QueryHelper = () => import('@/views/common/helper/QueryHelper.vue');
-const ApiMaker = () => import('@/views/common/helper/ApiMaker.vue');
-const ExportPdf = () => import('@/views/common/helper/ExportPdf.vue');
 Vue.use(VueRouter);
 
 
@@ -85,30 +80,6 @@ const router = new VueRouter({
                 projectRoute,
                 managementRoute,
             ],
-        },
-        {
-            path: '/helper',
-            name: 'Helper',
-            component: DynamicLayoutHelper,
-
-        },
-        {
-            path: '/helper/query',
-            name: 'QueryHelper',
-            component: QueryHelper,
-
-        },
-        {
-            path: '/helper/api',
-            name: 'ApiMaker',
-            component: ApiMaker,
-
-        },
-        {
-            path: '/helper/pdf',
-            name: 'ExportPdf',
-            component: ExportPdf,
-
         },
         { path: '*', component: ErrorPage },
     ],

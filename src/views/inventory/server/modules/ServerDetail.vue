@@ -1,256 +1,298 @@
 <template>
-    <s-dynamic-sub-data
-        :layouts="mergeLayouts"
-        :resource-api="resourceApi"
-        :select-id="selectId"
-        :is-show="isShow"
-    />
+    <div>
+        <p-button-tab :tabs="tabs" :active-tab.sync="activeTab" keep-alive-all>
+            <template slot="Base Information">
+                <server-base-info :data="data" :loading="loading" />
+            </template>
+            <template v-for="(layout, idx) in layouts" :slot="layout.name">
+                <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
+                                  :fetch-options="fetchOptionsMap[layout.name]"
+                                  :type-options="{
+                                      loading,
+                                      totalCount,
+                                      timezone,
+                                      selectIndex,
+                                      keyItems,
+                                      valueHandlerMap,
+                                      language,
+                                  }"
+                                  :field-handler="fieldHandler"
+                                  v-on="getLayoutListeners(layout)"
+                />
+            </template>
+            <template slot="Raw Data">
+                <p-raw-data :item="data" />
+            </template>
+        </p-button-tab>
+    </div>
 </template>
 
 <script lang="ts">
 
-import SDynamicSubData from '@/views/common/dynamic-subdata/SDynamicSubData.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { get, debounce } from 'lodash';
+import { get, debounce, set } from 'lodash';
 import baseInfoSchema from '@/data-schema/inventory/server/sub_data/layouts/base_info.json';
-
-const rawLayout = {
-    name: 'Raw Data',
-    type: 'raw',
-
-};
-// const defaultLayouts = [
-//     listLayout,
-//     {
-//         name: 'Disk',
-//         options: {
-//             fields: [{
-//                 key: 'device_index',
-//                 name: 'Index',
-//             },
-//             {
-//                 key: 'device',
-//                 name: 'Name',
-//             },
-//             {
-//                 key: 'disk_type',
-//                 name: 'Type',
-//             },
-//             {
-//                 key: 'size',
-//                 name: 'Size(GB)',
-//             },
-//             {
-//                 key: 'tags.encrypted',
-//                 name: 'Encrypted',
-//                 options: {
-//                     false: {
-//                         options: { background_color: 'red.500' },
-//                         type: 'badge',
-//                     },
-//                     true: {
-//                         options: { background_color: 'green.500' },
-//                         type: 'badge',
-//                     },
-//                 },
-//                 type: 'enums',
-//             },
-//             {
-//                 key: 'tags.iops',
-//                 name: 'iops',
-//             }],
-//             root_path: 'disks',
-//         },
-//         type: 'table',
-//     },
-//     {
-//         name: 'NIC',
-//         options: {
-//             fields: [{
-//                 key: 'device_index',
-//                 name: 'Index',
-//             },
-//             {
-//                 key: 'mac_address',
-//                 name: 'MAC Address',
-//             },
-//             {
-//                 key: 'tags.ip_list',
-//                 name: 'IP Addresses',
-//                 options: { item: { type: 'text' } },
-//                 type: 'list',
-//             },
-//             {
-//                 key: 'tags.eip',
-//                 name: 'Elastic IP',
-//             },
-//             {
-//                 key: 'tags.public_dns',
-//                 name: 'Public DNS',
-//             }],
-//             root_path: 'nics',
-//         },
-//         type: 'table',
-//     },
-//     {
-//         name: 'Security Group',
-//         options: {
-//             fields: [{
-//                 key: 'direction',
-//                 name: 'Direction',
-//                 options: {
-//                     inbound: {
-//                         options: { background_color: 'green.500' },
-//                         type: 'badge',
-//                     },
-//                     outbound: {
-//                         options: { background_color: 'blue.500' },
-//                         type: 'badge',
-//                     },
-//                 },
-//                 type: 'enum',
-//             },
-//             {
-//                 key: 'security_group_name',
-//                 name: 'Name',
-//             },
-//             {
-//                 key: 'remote',
-//                 name: 'Remote',
-//             },
-//             {
-//                 key: 'port',
-//                 name: 'Port',
-//             },
-//             {
-//                 key: 'protocol',
-//                 name: 'Protocol',
-//             },
-//             {
-//                 key: 'description',
-//                 name: 'Description',
-//             }],
-//             root_path: 'data.security_group_rules',
-//         },
-//         type: 'table',
-//     },
-//     {
-//         name: 'ELB',
-//         options: {
-//             fields: [{
-//                 key: 'name',
-//                 name: 'Name',
-//             },
-//             {
-//                 key: 'dns',
-//                 name: 'DNS',
-//             },
-//             {
-//                 key: 'port',
-//                 name: 'Port',
-//                 options: { item: { type: 'text' } },
-//                 type: 'list',
-//             },
-//             {
-//                 key: 'type',
-//                 name: 'Type',
-//                 options: {
-//                     application: {
-//                         options: { background_color: 'green.500' },
-//                         type: 'badge',
-//                     },
-//                     network: {
-//                         options: { background_color: 'blue.500' },
-//                         type: 'badge',
-//                     },
-//                 },
-//                 type: 'enum',
-//             },
-//             {
-//                 key: 'tags.scheme',
-//                 name: 'Scheme',
-//                 options: {
-//                     internal: {
-//                         options: { background_color: 'coral.500' },
-//                         type: 'badge',
-//                     },
-//                     'internet-facing': {
-//                         options: { background_color: 'green.500' },
-//                         type: 'badge',
-//                     },
-//                 },
-//                 type: 'enum',
-//             }],
-//             root_path: 'data.load_balancers',
-//         },
-//         type: 'table',
-//     }];
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ProviderInfo, useStore } from '@/store/toolset';
+import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
+import ServerBaseInfo from '@/views/inventory/server/modules/ServerBaseInfo.vue';
+import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
+import {
+    DynamicLayoutEventListeners,
+    DynamicLayoutTypeOptions,
+    DynamicLayoutFetchOptions,
+} from '@/components/organisms/dynamic-layout/type';
+import { getTimezone } from '@/lib/util';
+import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import {
+    DynamicFieldHandler,
+} from '@/components/organisms/dynamic-field/type';
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { SearchSchema } from '@/lib/component-utils/query-search/type';
+import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import config from '@/lib/config';
+import referenceRouter from '@/lib/reference/referenceRouter';
 
 export default {
     name: 'PServerDetail',
     components: {
-        SDynamicSubData,
+        PRawData,
+        PButtonTab,
+        ServerBaseInfo,
+        PDynamicLayout,
     },
     props: {
-        selectId: {
+        serverId: {
             type: String,
             default: '',
         },
-        isShow: {
-            type: Boolean,
-            default: false,
-        },
     },
-    setup(props, context) {
-        const cache = {};
+    setup(props) {
+        const {
+            project, provider, serviceAccount, secret, collector, user,
+        } = useStore();
+        const layoutSchemaCacheMap = {};
+        const searchSchemaCacheMap = {};
+        const fetchOptionsMap = {};
+
+
         const state = reactive({
-            layouts: null,
-            resourceApi: fluentApi.inventory().server(),
-            mergeLayouts: computed(() => (state.layouts ? [baseInfoSchema, ...state.layouts, rawLayout] : [baseInfoSchema, rawLayout])),
+            data: {} as any,
+            loading: true,
+            totalCount: 0,
+            timezone: computed(() => getTimezone()),
+            selectIndex: [] as number[],
+            keyItems: [] as KeyItem[],
+            valueHandlerMap: {} as ValueHandlerMap,
+            language: computed(() => user.state.language),
+
+            // button tab
+            tabs: computed<string[]>(() => {
+                const res: string[] = [];
+                res.push('Base Information');
+                if (state.layouts) res.push(...state.layouts.map(d => d.name));
+                res.push('Raw Data');
+                return res;
+            }),
+            activeTab: 'Base Information',
+
+            // schema
+            layouts: [] as DynamicLayout[],
+            currentLayout: computed<null|DynamicLayout>(() => {
+                let res: null|DynamicLayout = null;
+                state.layouts.some((d) => {
+                    if (d.name === state.activeTab) {
+                        res = d;
+                    }
+                    return d.name === state.activeTab;
+                });
+                return res;
+            }),
+            searches: [] as SearchSchema[],
+
+            // formatters
+            projects: computed(() => project.state.projects || {}),
+            providers: computed<ProviderInfo>(() => provider.state.providers || {}),
+            serviceAccounts: computed(() => serviceAccount.state.serviceAccounts || {}),
+            secrets: computed(() => secret.state.secrets || {}),
+            collectors: computed(() => collector.state.collectors || {}),
         });
 
+        const schemaQuery = new QueryHelper().setOnly('metadata.view.sub_data.layouts', 'metadata.view.search');
+        const getSchema = debounce(async () => {
+            let layouts = layoutSchemaCacheMap[props.serverId];
+            let searches = searchSchemaCacheMap[props.serverId];
 
-        const getLayoutFunc = async () => {
-            state.layouts = null;
-            let layouts;
-            if (cache[props.selectId]) {
-                // console.debug(props.selectId, ' hit cache layout');
-                layouts = cache[props.selectId];
-            } else {
-                const resp = await fluentApi.inventory().server().get().setId(props.selectId)
-                    .setOnly('metadata.view.sub_data.layouts')
-                    .execute();
-                layouts = get(resp.data, 'metadata.view.sub_data.layouts', []);
-                // layouts = defaultLayouts;
-                cache[props.selectId] = layouts;
-            }
-            state.layouts = layouts;
-        };
-        const getLayout = debounce(getLayoutFunc, 50);
-
-        let watchStop = null as unknown as any;
-        watch(() => props.isShow, (aft, bef) => {
-            if (aft !== bef) {
-                if (aft) {
-                    watchStop = watch(() => props.selectId, (af, be) => {
-                        if (af && af !== be) {
-                            getLayout();
-                        }
+            if (!layouts || !searches) {
+                try {
+                    const res = await SpaceConnector.client.inventory.server.get({
+                        // eslint-disable-next-line camelcase
+                        server_id: props.serverId,
+                        query: schemaQuery.data,
                     });
-                } else if (watchStop) {
-                    watchStop();
-                    state.layouts = null;
-                    watchStop = null;
+                    layouts = get(res, 'metadata.view.sub_data.layouts', null);
+                    searches = get(res, 'metadata.view.search', null);
+                } catch (e) {
+                    console.error(e);
                 }
             }
+
+            layoutSchemaCacheMap[props.serverId] = layouts;
+            searchSchemaCacheMap[props.serverId] = searches;
+
+            state.layouts = layouts || [];
+            state.searches = searches || [];
+        }, 50);
+
+        const getQuery = (layout: DynamicLayout) => {
+            const query = new QueryHelper();
+
+            if (fetchOptionsMap[layout.name]) {
+                const options = fetchOptionsMap[layout.name];
+                if (options.sortBy) query.setSort(options.sortBy, options.sortDesc);
+                if (options.pageLimit) query.setPageLimit(options.pageLimit);
+                if (options.pageStart) query.setPageStart(options.pageStart);
+                if (options.searchText) query.setKeyword(options.searchText);
+                if (options.queryTags) {
+                    const { and, or } = getFiltersFromQueryTags(options.queryTags);
+                    query.setFilter(...and)
+                        .setKeyword(...or);
+                }
+            }
+
+            if (layout.options?.fields) {
+                query.setOnly(...layout.options.fields.map(d => d.name));
+            }
+
+            return query.data;
+        };
+
+        const getParams = () => {
+            // eslint-disable-next-line camelcase
+            const params: any = { server_id: props.serverId };
+            if (state.currentLayout) params.query = getQuery(state.currentLayout);
+            // eslint-disable-next-line camelcase
+            const keyPath = state.currentLayout?.options?.root_path;
+            // eslint-disable-next-line camelcase
+            if (keyPath) params.key_path = keyPath;
+            return params;
+        };
+
+        const getApi = () => {
+            // eslint-disable-next-line camelcase
+            if (state.currentLayout?.options?.root_path) {
+                return SpaceConnector.client.inventory.server.getData(getParams());
+            }
+            return SpaceConnector.client.inventory.server.get(getParams());
+        };
+
+        const getData = debounce(async () => {
+            state.loading = true;
+            try {
+                const res = await getApi();
+
+                if (res.total_count !== undefined) state.totalCount = res.total_count;
+
+                const data = res.results || res;
+                // eslint-disable-next-line camelcase
+                const keyPath = state.currentLayout?.options?.root_path;
+                if (keyPath) {
+                    set(state.data, keyPath, data);
+                    if (Array.isArray(state.data)) state.data = [...state.data];
+                    else state.data = { ...state.data };
+                } else state.data = data;
+            } catch (e) {
+                state.data = {};
+                state.totalCount = 0;
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        }, 50);
+
+        watch(() => props.serverId, async (after, before) => {
+            if (after && after !== before) {
+                await getSchema();
+                await getData();
+            }
+        }, { immediate: true });
+
+        watch(() => state.activeTab, async (after, before) => {
+            if (after && after !== before) {
+                await getData();
+            }
         });
-        getLayout();
+
+        const exportApi = SpaceConnector.client.addOns.excel.export;
+        const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
+            init(options) {
+                if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
+                if (searchSchemaCacheMap[props.serverId]) {
+                    const { keyItems, valueHandlerMap } = makeQuerySearchHandlersWithSearchSchema(
+                        searchSchemaCacheMap[props.serverId],
+                        'inventory.Server',
+                    );
+                    state.keyItems = keyItems;
+                    state.valueHandlerMap = valueHandlerMap;
+                }
+            },
+            fetch(options) {
+                fetchOptionsMap[layout.name] = options;
+                getData();
+            },
+            select(selectIndex) {
+                state.selectIndex = selectIndex;
+            },
+            async export(options, fields) {
+                try {
+                    const res = await exportApi({
+                        source: {
+                            url: '/inventory/server/get-data',
+                            param: getParams(),
+                        },
+                        template: {
+                            options: {
+                                fileType: 'xlsx',
+                                timezone: state.timezone,
+                            },
+                            // eslint-disable-next-line camelcase
+                            data_source: fields,
+                        },
+                    });
+                    window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+        });
+
+        const fieldHandler: DynamicFieldHandler = (item) => {
+            if (item.extraData?.reference) {
+                item.options.link = referenceRouter(
+                    item.extraData.reference.resource_type,
+                    item.extraData.reference.reference_key,
+                );
+            }
+            return item;
+        };
+
+        project.getProject();
+        provider.getProvider();
+        serviceAccount.getServiceAccounts();
+        secret.getSecrets();
+        collector.getCollectors();
 
         return {
             ...toRefs(state),
+            baseInfoSchema,
+            getLayoutListeners,
+            fetchOptionsMap,
+            fieldHandler,
         };
     },
 };

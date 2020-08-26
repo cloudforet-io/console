@@ -51,9 +51,8 @@ import { get, some } from 'lodash';
 import VueFormGenerator from 'vue-form-generator/dist/vfg';
 
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
@@ -80,7 +79,7 @@ export default {
         PLazyImg,
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             plugin: {},
             imageUrl: computed(() => get(state.plugin, 'tags.icon', '')),

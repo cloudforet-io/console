@@ -2,16 +2,16 @@
 
 <script lang="ts">
 
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { fluentApi } from '@/lib/fluent-api';
 import {
+    ComponentRenderProxy,
     getCurrentInstance, ref,
 } from '@vue/composition-api';
 
 export default {
     name: 'CloudServiceSearch',
     setup() {
-        const vm = getCurrentInstance() as ComponentInstance;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const url = ref('');
         const getDynamicLink = async () => {
             const result = await fluentApi.addons().pageDiscovery().get().setId('vpc-0494b1f302cb92153')

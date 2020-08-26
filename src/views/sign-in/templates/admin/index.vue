@@ -71,6 +71,7 @@ import {
     formValidation,
     requiredValidation,
 } from '@/lib/compostion-util';
+import {useStore} from "@/store/toolset";
 
 export default defineComponent({
     name: 'Admin',
@@ -81,6 +82,7 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as any;
+        const store = useStore()
         const state = reactive({
             userId: '',
             password: '',
@@ -123,7 +125,7 @@ export default defineComponent({
                         user_id: state.userId,
                         password: state.password,
                     },
-                    domain_id: vm.$ls.domain.state.domainId,
+                    domain_id: store.domain.state.domainId,
                 }, { skipAuthRefresh: true }).catch(() => {
                     state.loginFail = true;
                     state.password = '';

@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
-import { reactive } from '@vue/composition-api';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { reactive, UnwrapRef } from '@vue/composition-api';
 import { AxiosError } from 'axios';
 import { fetchDataAPI } from '@/lib/api/toolset';
 import { readonlyRefArg } from '@/lib/type';

@@ -1,12 +1,15 @@
 <template>
     <general-page-layout class="collector-history">
-        <div v-if="!selectedItem">
+        <div v-if="!selectedJobId">
             <p-page-title :title="pageTitle" />
-            <p-collector-history-chart :loading="loading" />
+            <!--            <p-collector-history-chart :loading="loading" />-->
             <p-query-search-table
                 :fields="fields"
-                :items="jobs"
+                :items="items"
                 :loading="loading"
+                :query-tags="searchTags"
+                :key-items="querySearchHandlers.keyItems"
+                :value-handler-map="querySearchHandlers.valueHandlerMap"
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
                 :this-page.sync="thisPage"
@@ -14,7 +17,8 @@
                 :total-count="totalCount"
                 :style="{height: '100%'}"
                 :selectable="false"
-                @change="getJobs"
+                :row-cursor-pointer="rowCursorPointer"
+                @change="onChange"
                 @rowLeftClick="onSelect"
             >
                 <template #toolbox-top>
@@ -30,52 +34,72 @@
                         </div>
                     </div>
                 </template>
-                <template #col-status-format="{ value }">
-                    <span :class="value.toLowerCase()">{{ convertStatus(value) }}</span>
+                <template #th-total_tasks-format="{ value }">
+                    <span>{{ value }}</span>
+                    <span class="th-additional-info-text">(completed / total)</span>
                 </template>
-                <template #col-created_at-format="{ value }">
-                    {{ timestampFormatter(value) }}
+                <template #col-status-format="{ value }">
+                    <span :class="value.toLowerCase()">{{ value }}</span>
                 </template>
             </p-query-search-table>
         </div>
         <div v-else>
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
-            <p-collector-history-job :job="selectedItem" :loading="loading" />
+            <p-collector-history-job :job-id="selectedJobId" />
         </div>
     </general-page-layout>
 </template>
 
 <script lang="ts">
 import { capitalize } from 'lodash';
+import moment from 'moment';
 
 import {
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
-import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
+// import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { timestampFormatter } from '@/lib/util';
+import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
+import {
+    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
+} from '@/lib/component-utils/query-search';
+import router from '@/routes';
+
+enum JOB_STATUS {
+    created = 'CREATED',
+    canceled = 'CANCELED',
+    progress = 'IN_PROGRESS',
+    success = 'SUCCESS',
+    error = 'ERROR',
+    timeout = 'TIMEOUT',
+}
+type UrlQueryString = string | (string | null)[] | null | undefined;
 
 export default {
     name: 'PCollectorHistory',
     components: {
-        PCollectorHistoryChart,
+        // PCollectorHistoryChart,
         PCollectorHistoryJob,
         PQuerySearchTable,
         PPageTitle,
         GeneralPageLayout,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
-            pageTitle: computed(() => (state.selectedItem ? state.selectedItem.job_id : 'Collector History')),
+            pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
+                { label: 'No.', name: 'sequence' },
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info.name' },
                 { label: 'Status', name: 'status' },
@@ -91,25 +115,106 @@ export default {
             ],
             activatedStatus: 'all',
             jobs: [] as JobModel[],
+            items: [],
             //
             pageSize: 15,
             thisPage: 1,
             sortBy: '',
             sortDesc: true,
             totalCount: 0,
+            rowCursorPointer: true,
             //
-            selectedIndex: [],
-            selectedItem: computed(() => state.jobs[state.selectedIndex]),
+            selectedJobId: '',
+            searchTags: [],
+            querySearchHandlers: {
+                keyItems: [
+                    {
+                        name: 'job_id',
+                        label: 'Job ID',
+                    },
+                    {
+                        name: 'status',
+                        label: 'Status',
+                    },
+                ],
+                valueHandlerMap: {
+                    // eslint-disable-next-line camelcase
+                    job_id: makeValueHandlerWithReference('inventory.Job', 'job_id'),
+                    status: makeValueHandlerWithSearchEnums(JOB_STATUS),
+                },
+            },
         });
+
+        const convertStatus = (status) => {
+            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-progress';
+            return capitalize(status);
+        };
+        const convertFinishedAtToDuration = (createdAt, finishedAt) => {
+            if (createdAt && finishedAt) {
+                const createdAtMoment = moment(timestampFormatter(createdAt));
+                const finishedAtMoment = moment(timestampFormatter(finishedAt));
+                const duration = finishedAtMoment.diff(createdAtMoment, 'minutes');
+                return `${duration.toString()} min`;
+            }
+            return null;
+        };
+        const convertJobsToFieldItem = (jobs) => {
+            state.items = [];
+            jobs.forEach((job, index) => {
+                const newJob = {
+                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    // eslint-disable-next-line camelcase
+                    job_id: job.job_id,
+                    'collector_info.name': job.collector_info.name,
+                    status: convertStatus(job.status),
+                    // eslint-disable-next-line camelcase
+                    total_tasks: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
+                    // eslint-disable-next-line camelcase
+                    created_at: timestampFormatter(job.created_at),
+                    duration: convertFinishedAtToDuration(job.created_at, job.finished_at),
+                };
+                state.items.push(newJob);
+            });
+        };
+
+        const getQuery = () => {
+            let statusValues: JOB_STATUS[] = [];
+            if (state.activatedStatus === 'inProgress') {
+                statusValues = [JOB_STATUS.progress];
+            } else if (state.activatedStatus === 'success') {
+                statusValues = [JOB_STATUS.created, JOB_STATUS.success];
+            } else if (state.activatedStatus === 'failure') {
+                statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
+            }
+
+            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+
+            const query = new QueryHelper();
+            query
+                .setSort(state.sortBy, state.sortDesc)
+                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setKeyword(...or);
+            if (statusValues.length > 0) {
+                query.setFilter({
+                    k: 'status',
+                    v: statusValues,
+                    o: 'in',
+                }, ...and);
+            } else {
+                query.setFilter(...and);
+            }
+
+            return query.data;
+        };
         const getJobs = async () => {
             state.loading = true;
             try {
-                const query = new QueryHelper();
-                query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
-
-                const res = await SpaceConnector.client.inventory.job.list({ query: query.data });
+                const query = getQuery();
+                const res = await SpaceConnector.client.inventory.job.list({ query });
                 state.jobs = res.results;
                 state.totalCount = res.total_count;
+
+                convertJobsToFieldItem(res.results);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -117,22 +222,60 @@ export default {
             }
         };
 
-        const onSelect = (item, index) => {
-            state.selectedIndex = index;
+        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
+            if (Array.isArray(tags)) {
+                return tags.map((tag) => {
+                    let item;
+                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
+                    else item = `${tag.value?.name}`;
+                    return item;
+                });
+            }
+            return null;
+        };
+        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
+            if (!urlQueryString) return [];
+            if (Array.isArray(urlQueryString)) {
+                return urlQueryString.reduce((res, qs) => {
+                    if (qs) res.push(parseTag(qs));
+                    return res;
+                }, [] as QueryTag[]);
+            }
+            return [parseTag(urlQueryString as string)];
+        };
+
+        const onSelect = (item) => {
+            state.selectedJobId = item.job_id;
+            // eslint-disable-next-line no-empty-function
+            vm.$router.replace({ query: { ...router.currentRoute.query }, hash: item.job_id }).catch(() => {});
+        };
+        const onChange = async (item) => {
+            state.searchTags = item.queryTags;
+            const urlQueryString = searchTagsToUrlQueryString(item.queryTags);
+            // eslint-disable-next-line no-empty-function
+            await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
+            try {
+                await getJobs();
+            } catch (e) {
+                console.error(e);
+            }
         };
         const onClickGoBack = () => {
-            state.selectedIndex = [];
+            state.selectedJobId = '';
+            // eslint-disable-next-line no-empty-function
+            vm.$router.replace({ query: { ...router.currentRoute.query }, hash: '' }).catch(() => {});
         };
         const onClickStatus = (status) => {
             state.activatedStatus = status;
-        };
-
-        const convertStatus = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
-            return capitalize(status);
+            getJobs();
         };
 
         const init = async () => {
+            const hash = router.currentRoute.hash;
+            if (hash) {
+                state.selectedJobId = hash.replace('#', '');
+            }
+            state.searchTags = urlQueryStringToSearchTags(vm.$route.query.f);
             await getJobs();
         };
         init();
@@ -140,11 +283,9 @@ export default {
         return {
             ...toRefs(state),
             onSelect,
+            onChange,
             onClickGoBack,
             onClickStatus,
-            getJobs,
-            convertStatus,
-            timestampFormatter,
         };
     },
 };
@@ -179,9 +320,16 @@ export default {
             }
         }
     }
+
     .p-query-search-table {
-        .error, .timeout, .canceled {
-            @apply text-red-500;
+        .p-data-table {
+            .error, .timeout, .canceled {
+                @apply text-red-500;
+            }
+            .th-additional-info-text {
+                font-weight: normal;
+                font-size: 0.75rem;
+            }
         }
     }
 }
