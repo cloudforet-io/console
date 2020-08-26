@@ -72,6 +72,7 @@ export default {
         items: {
             type: Array,
             default: () => ([]),
+            required: true,
         },
         cardClass: {
             type: Function,
@@ -100,6 +101,7 @@ export default {
         totalCount: {
             type: Number,
             default: 0,
+            required: true,
         },
         keyItems: {
             type: Array,
@@ -138,7 +140,6 @@ export default {
             }),
         });
 
-
         /** Event emitter */
         const emitChange = (options?: Partial<Options>) => {
             emit('change', Object.freeze({
@@ -146,6 +147,13 @@ export default {
                 ...options,
             }), Object.freeze({ ...options }));
         };
+
+        watch(() => props.totalCount, async (after, before) => {
+            if (before !== after) {
+                state.proxyThisPage = 1;
+                // emitChange({ thisPage: 1 });
+            }
+        });
 
         const onChangePageSize = (pageSize: number) => {
             if (props.thisPage > (Math.ceil(props.totalCount / pageSize) || 1)) {
