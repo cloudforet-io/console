@@ -24,6 +24,7 @@
                     :style="{height: `${height}px`}"
                     @select="onSelect"
                     @change="onChange"
+                    @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
@@ -156,12 +157,17 @@ import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset
 
 import router from '@/routes';
 import { makeTrItems } from '@/lib/view-helper';
-import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import {
+    getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
+} from '@/lib/util';
 import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
 import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
-import { getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags, getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
+import config from '@/lib/config';
 
 const GeneralPageLayout = (): Component => import('@/views/containers/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
@@ -235,6 +241,33 @@ export default {
                         // eslint-disable-next-line camelcase
                         source_format: 'seconds',
                         width: '9rem',
+                    },
+                },
+            ],
+            excelFields: [
+                { key: 'name', name: 'Name' },
+                { key: 'state', name: 'State' },
+                { key: 'priority', name: 'Priority' },
+                {
+                    key: 'last_collected_at',
+                    name: 'Last Collected',
+                    type: 'datetime',
+                    options: {
+                        // eslint-disable-next-line camelcase
+                        source_type: 'timestamp',
+                        // eslint-disable-next-line camelcase
+                        source_format: 'seconds',
+                    },
+                },
+                {
+                    key: 'created_at',
+                    name: 'Created',
+                    type: 'datetime',
+                    options: {
+                        // eslint-disable-next-line camelcase
+                        source_type: 'timestamp',
+                        // eslint-disable-next-line camelcase
+                        source_format: 'seconds',
                     },
                 },
             ],
@@ -363,31 +396,35 @@ export default {
         };
 
         // Table
-        const listCollector = async () => {
+        const getQuery = () => {
+            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+            const query = new QueryHelper();
+            query
+                .setSort(state.sortBy, state.sortDesc)
+                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setKeyword(...or)
+                .setFilter(...and)
+                .setOnly(
+                    'collector_id', 'name', 'state', 'priority', 'last_collected_at',
+                    'created_at', 'provider', 'tags',
+                );
+            return query.data;
+        };
+        const getCollectors = async () => {
             state.loading = true;
             try {
-                const items = getQueryItemsToFilterItems(state.searchTags, state.querySearchHandlers.keyItems);
-                // // const fieldsArray = state.fields.map(d => d.name);
-                const res = await fluentApi.inventory().collector().list()
-                    .setFilter(...items.and)
-                    .setFilterOr(...items.or)
-                    .setSortBy(state.sortBy)
-                    .setSortDesc(state.sortDesc)
-                    .setThisPage(state.thisPage)
-                    .setPageSize(state.pageSize)
-                    .setOnly(
-                        'collector_id', 'name', 'state', 'priority', 'last_collected_at',
-                        'created_at', 'provider', 'tags',
-                    )
-                    .execute();
-                state.items = res.data.results;
-                state.totalCount = res.data.total_count || 0;
+                const query = getQuery();
+                const res = await SpaceConnector.client.inventory.collector.list({ query });
+                state.items = res.results;
+                state.totalCount = res.total_count || 0;
             } catch (e) {
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
+
+        // Action events
         const onSelect = (index) => {
             state.selectedIndexes = index;
         };
@@ -398,13 +435,11 @@ export default {
             // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
             try {
-                await listCollector();
+                await getCollectors();
             } catch (e) {
                 console.error(e);
             }
         };
-
-        // Action events
         const checkModalConfirm = async (): Promise<void> => {
             try {
                 await checkModalState.api.execute();
@@ -415,7 +450,7 @@ export default {
             } finally {
                 if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;
-                await listCollector();
+                await getCollectors();
             }
         };
         const onClickUpdate = (): void => {
@@ -452,15 +487,37 @@ export default {
             state.collectDataModalVisible = true;
         };
 
+        const exportCollectorDataToExcel = async () => {
+            try {
+                const res = await SpaceConnector.client.addOns.excel.export({
+                    source: {
+                        url: '/inventory/collector/list',
+                        param: { query: getQuery() },
+                    },
+                    template: {
+                        options: {
+                            fileType: 'xlsx',
+                            timezone: getTimezone(),
+                        },
+                        // eslint-disable-next-line camelcase
+                        data_source: state.excelFields,
+                    },
+                });
+                window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const init = async () => {
             await setSearchTags();
-            await listCollector();
+            await getCollectors();
         };
         init();
 
         watch(() => state.updateModalVisible, (val) => {
             if (!val) {
-                listCollector();
+                getCollectors();
             }
         }, {
             immediate: false,
@@ -489,6 +546,7 @@ export default {
             onClickDelete,
             onClickCollectData,
             checkModalConfirm,
+            exportCollectorDataToExcel,
             timestampFormatter,
         };
     },
