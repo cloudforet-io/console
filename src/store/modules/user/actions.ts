@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 
+import jwt from 'jsonwebtoken';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     UserState, SignInRequest, UpdateUserRequest,
@@ -50,15 +51,22 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     }
 };
 
+const getUserInfoFromToken = (token: string): [string, string] => {
+    const decodedToken = jwt.decode(token);
+    return [decodedToken.user_type, decodedToken.aud];
+};
+
 export const signIn = async ({ commit, state }, signInRequest: SignInRequest): Promise<void> => {
     const response = await SpaceConnector.client.identity.token.issue(signInRequest);
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 
-    if (signInRequest.credentials.user_type === 'DOMAIN_OWNER') {
-        const userInfo = await getDomainOwner(signInRequest.credentials.user_id);
+    const [userType, userId] = getUserInfoFromToken(response.access_token);
+
+    if (userType === 'DOMAIN_OWNER') {
+        const userInfo = await getDomainOwner(userId);
         commit('setUser', userInfo);
     } else {
-        const userInfo = await getUser(signInRequest.credentials.user_id);
+        const userInfo = await getUser(userId);
         commit('setUser', userInfo);
     }
 };
