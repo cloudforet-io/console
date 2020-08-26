@@ -4,7 +4,9 @@ import {
 } from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { getBindClass } from '@/components/util/functional-helpers';
-import { DynamicFieldOptions, DynamicFieldProps, ListOptions } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldOptions, ListOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import { ListDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/list/type';
 
 export default {
     name: 'PDynamicFieldList',
@@ -19,12 +21,20 @@ export default {
             type: [String, Object, Array, Boolean, Number, null],
             default: null,
         },
-        extra: {
+        typeOptions: {
             type: Object,
             default: () => ({}),
         },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
     },
-    render(h, { props, data: compData }) {
+    render(h, { props, data: compData, listeners }: {props: ListDynamicFieldProps; data: any; listeners: any}) {
         const listOptions: ListOptions = props.options || {};
 
         const options: DynamicFieldOptions = {
@@ -35,7 +45,9 @@ export default {
         const childOptions: Omit<DynamicFieldProps, 'data'> = {
             type: listOptions.item ? listOptions.item.type : 'text',
             options,
-            extra: props.extra,
+            typeOptions: props.typeOptions,
+            beforeCreate: props.beforeCreate,
+            handler: props.handler,
         };
 
 
@@ -61,7 +73,7 @@ export default {
         }
         let children: any[] = [];
         if (Array.isArray(childrenData)) {
-            children = childrenData.map(data => h(PDynamicField, { props: { ...childOptions, data } }));
+            children = childrenData.map(data => h(PDynamicField, { props: { ...childOptions, data }, on: listeners }));
         }
 
 

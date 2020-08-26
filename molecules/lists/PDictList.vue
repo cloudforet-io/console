@@ -1,5 +1,5 @@
 <template>
-    <ul>
+    <ul class="p-dict-list">
         <li v-for="(value, key) in dict" :key="key">
             {{ key }} : {{ value }}
         </li>
@@ -13,17 +13,19 @@ export default {
     props: {
         dict: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
     },
 
 };
 </script>
-<style lang="postcss" scoped>
-    ul {
-        list-style-type: disc;
-    }
-    li {
-        display: list-item;
+<style lang="postcss">
+    .p-dict-list {
+        ul {
+            list-style-type: disc;
+        }
+        li {
+            display: list-item;
+        }
     }
 </style>

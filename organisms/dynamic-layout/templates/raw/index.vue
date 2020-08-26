@@ -36,7 +36,7 @@ export default {
             type: Object,
             default: undefined,
         },
-        extra: {
+        typeOptions: {
             type: Object,
             default: undefined,
         },

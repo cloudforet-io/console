@@ -1,5 +1,5 @@
 import {
-    DynamicLayoutEventListeners, DynamicLayoutExtra,
+    DynamicLayoutEventListeners, DynamicLayoutTypeOptions,
     DynamicLayoutFetchOptions,
     DynamicLayoutProps,
 } from '@/components/organisms/dynamic-layout/type';
@@ -10,14 +10,14 @@ export type TableFetchOptions = Pick<DynamicLayoutFetchOptions,
     'sortBy'|'sortDesc'|'pageStart'|'pageLimit'|'searchText'
     >
 
-export type TableExtra = Pick<DynamicLayoutExtra,
+export type TableTypeOptions = Pick<DynamicLayoutTypeOptions,
     'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'
     >
 
 export type TableDynamicLayoutProps = DynamicLayoutProps <
     TableOptions,
     TableFetchOptions,
-    TableExtra
+    TableTypeOptions
     >
 
 export type TableEventListeners

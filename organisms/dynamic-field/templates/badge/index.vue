@@ -3,7 +3,8 @@ import { get } from 'lodash';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { getColor } from '@/components/organisms/dynamic-field/PDynamicField.toolset';
 import { BADGE_SHAPE, BadgeProps } from '@/components/atoms/badges/PBadge.toolset';
-import { BadgeOptions } from '@/components/organisms/dynamic-field/type';
+import { BadgeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import { BadgeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/badge/type';
 
 export default {
     name: 'PDynamicFieldBadge',
@@ -19,8 +20,12 @@ export default {
             type: [String, Object, Array, Boolean, Number],
             required: true,
         },
+        typeOptions: {
+            type: Object,
+            default: () => ({}),
+        },
     },
-    render(h, { props }) {
+    render(h, { props }: {props: BadgeDynamicFieldProps}) {
         const options: BadgeOptions = props.options;
         const outline = get(options, ['outline_color'], null);
         const shape = get(options, ['shape'], null);

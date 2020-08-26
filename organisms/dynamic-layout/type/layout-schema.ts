@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
-import { DynamicField } from '@/components/organisms/dynamic-field/type';
+
+import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 
 /** Metadata schema types for Dynamic layout */
 export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'

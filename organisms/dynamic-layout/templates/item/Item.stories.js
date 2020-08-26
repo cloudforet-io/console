@@ -73,7 +73,7 @@ export const defaultCase = () => ({
                         :name="name"
                         :options="options"
                         :data="data"
-                        :extra="{timezone}"
+                        :typeOptions="{timezone}"
                         @init="onInit"
         />
     </div>`,
@@ -217,7 +217,7 @@ export const rootPathCase = () => ({
                         :name="name"
                         :options="options"
                         :data="data"
-                        :extra="{timezone}"
+                        :typeOptions="{timezone}"
                         @init="onInit"
         />
     </div>`,

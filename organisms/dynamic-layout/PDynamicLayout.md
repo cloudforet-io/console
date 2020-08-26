@@ -14,8 +14,10 @@
 | options | ``` Object ``` | ``` {} ``` | Meta schema options. Different by layout type.<br> See schema options below. |
 | data | ``` Object, Array ``` | ``` undefined ``` | Data to show by layout |
 | fetchOptions | ``` Object ``` | ``` undefined ``` | Options for fetching data.<br> Use it only for initiating fetch options.<br> Different by layout type.<br> See fetch options by type below. |
-| extra | ``` Object ``` | ``` undefined ``` | Extra props for each layout component.<br> Different by layout type.<br> See extra options by type below.|
+| typeOptions | ``` Object ``` | ``` undefined ``` | props for each layout component.<br> Different by layout type.<br> See type options by type below.|
 | beforeCreate | ``` Function ``` | ``` undefined ``` | Hook that executed before create type matched component.<br> NOT supported yet. |
+| beforeCreateField | ``` Function ``` | ``` undefined ``` | Hook that executed before create each dynamic field component. |
+| fieldHandler | ``` Function ``` | ``` undefined ``` | handler that executed for handling dynamic field props that bound to dynamic field component. |
 
 <br>
 <br>
@@ -95,7 +97,7 @@ interface DynamicLayoutFetchOptions {
 <br>
 
 ```typescript
-interface DynamicLayoutExtra {
+interface DynamicLayoutTypeOptions {
     loading: boolean;
     totalCount: number;
     timezone: string;
@@ -104,7 +106,7 @@ interface DynamicLayoutExtra {
     keyItems: KeyItem[]; // See QuerySearchTable
     valueHandlerMap: ValueHandlerMap; // See QuerySearchTable
     language: string;
-    listMap: Record<string, Partial<DynamicLayoutExtra>>;
+    listMap: Record<string, Partial<DynamicLayoutTypeOptions>>;
 }
 ```
 
@@ -122,13 +124,13 @@ interface DynamicLayoutExtra {
 | keyItems | KeyItem[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
 | valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
 | language | string | ```'en'``` | NOT supported yet except markdown type. |
-| listMap | Record<string, Partial<DynamicLayoutExtra>> | ```{}``` | Only for list type. Give layout's name as key, and extra options as value. If value is ```undefined```, other extra options will be automatically bound to each component. |
+| listMap | Record<string, Partial<DynamicLayoutTypeOptions>> | ```{}``` | Only for list type. Give layout's name as key, and type options as value. If value is ```undefined```, other type options will be automatically bound to each component. |
 
 <br>
 <br>
 
-## Extra Options by Layout Types
-| Type | Extra Options Properties |
+## Type Options by Layout Types
+| Type | Type Options Properties |
 | ---- | ----------- |
 | item | ```loading``` |
 | simple-table | ```loading```, ```totalCount```, ```timezone``` |
@@ -180,7 +182,7 @@ interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> 
 | fields (export) | Fields for exported csv/excel columns.  |
 
 ## Supported Events by Layout Types
-| Type | Extra Options Properties |
+| Type | Type Options Properties |
 | ---- | ----------- |
 | item | init |
 | simple-table | init |

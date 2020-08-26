@@ -87,7 +87,7 @@ export const defaultCase = () => ({
                             :name="name"
                             :options="options"
                              :data="data"
-                             :extra="extra"
+                             :typeOptions="typeOptions"
                              @init="onInit"
                              @fetch="onFetch"
                              @select="onSelect"
@@ -100,17 +100,17 @@ export const defaultCase = () => ({
     setup(props, context) {
         const state = reactive({
             data: [],
-            extra: {
+            typeOptions: {
                 loading: true,
                 totalCount: 0,
             },
         });
 
         const onFetch = async (options, changed) => {
-            state.extra.loading = true;
+            state.typeOptions.loading = true;
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
-                    state.extra.totalCount = casual.integer(0);
+                    state.typeOptions.totalCount = casual.integer(0);
                     const res = {
                         data: {
                             security_group_rules: arrayOf(options.pageLimit,
@@ -126,7 +126,7 @@ export const defaultCase = () => ({
                     resolve(res);
                 }, 1000);
             });
-            state.extra.loading = false;
+            state.typeOptions.loading = false;
         };
 
         return {

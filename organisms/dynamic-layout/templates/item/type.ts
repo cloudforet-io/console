@@ -2,17 +2,17 @@ import { ItemOptions } from '@/components/organisms/dynamic-layout/type/layout-s
 import {
     DynamicLayoutProps,
     DynamicLayoutEventListeners,
-    DynamicLayoutFetchOptions, DynamicLayoutExtra
-} from "@/components/organisms/dynamic-layout/type";
+    DynamicLayoutFetchOptions, DynamicLayoutTypeOptions,
+} from '@/components/organisms/dynamic-layout/type';
 
 export type ItemFetchOptions = Pick<DynamicLayoutFetchOptions, never>;
 
-export type ItemExtra = Pick<DynamicLayoutExtra, 'loading'|'timezone'>;
+export type ItemTypeOptions = Pick<DynamicLayoutTypeOptions, 'loading'|'timezone'>;
 
 export type ItemDynamicLayoutProps = DynamicLayoutProps<
     ItemOptions,
     ItemFetchOptions,
-    ItemExtra
+    ItemTypeOptions
     >
 
 export type ItemDynamicLayoutEventListeners

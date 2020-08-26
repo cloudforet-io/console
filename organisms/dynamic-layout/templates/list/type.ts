@@ -1,16 +1,16 @@
 import {
-    DynamicLayoutProps, DynamicLayoutFetchOptions, DynamicLayoutExtra, DynamicLayoutEventListeners,
+    DynamicLayoutProps, DynamicLayoutFetchOptions, DynamicLayoutTypeOptions, DynamicLayoutEventListeners,
 } from '@/components/organisms/dynamic-layout/type';
 import { ListOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 type ListFetchOptions = Pick<DynamicLayoutFetchOptions, 'listMap'>
 
-type ListExtra = Pick<DynamicLayoutExtra, 'listMap'>
+type ListTypeOptions = Pick<DynamicLayoutTypeOptions, 'listMap'>
 
 export type ListDynamicLayoutProps = DynamicLayoutProps<
     ListOptions,
     ListFetchOptions,
-    ListExtra
+    ListTypeOptions
     >
 
 export type ListDynamicLayoutEventListeners = Partial<DynamicLayoutEventListeners>;

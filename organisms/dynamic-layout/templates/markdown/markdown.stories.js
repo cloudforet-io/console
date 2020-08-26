@@ -186,7 +186,7 @@ export const templateMode = () => ({
             <PDynamicLayout :name="name" 
                             type="markdown"
                             :options="options" 
-                            :extra="{ timezone }"
+                            :typeOptions="{ timezone }"
                             :data="data"
                             @init="onInit"
             />
@@ -294,7 +294,7 @@ export const i18nMode = () => ({
             <PDynamicLayout :name="name" 
                             type="markdown"
                             :options="options"
-                            :extra="{ language, timezone }"
+                            :typeOptions="{ language, timezone }"
                             @init="onInit"
             />
         </div>

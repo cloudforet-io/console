@@ -6,7 +6,10 @@
                           :options="layout.options"
                           :data="rootData"
                           :fetch-options="fetchOptionsMap[layout.name] || fetchOptions"
-                          :extra="extraMap[layout.name] || extra"
+                          :typeOptions="extraMap[layout.name] || typeOptions"
+                          :before-create="beforeCreate"
+                          :before-create-field="beforeCreateField"
+                          :field-handler="fieldHandler"
                           v-on="getListeners(layout.name, idx)"
         >
             <template v-for="(slot) of slotNames" v-slot:[slot]="scope">
@@ -27,7 +30,7 @@ import {
 } from '@/components/organisms/dynamic-layout/templates/list/type';
 import { makeByPassListeners } from '@/components/util/composition-helpers';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { DynamicLayoutExtra, DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
+import { DynamicLayoutTypeOptions, DynamicLayoutFetchOptions } from '@/components/organisms/dynamic-layout/type';
 
 export default {
     name: 'PDynamicLayoutList',
@@ -49,8 +52,20 @@ export default {
             type: Object,
             default: undefined,
         },
-        extra: {
+        typeOptions: {
             type: Object,
+            default: undefined,
+        },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
+        beforeCreateField: {
+            type: Function,
+            default: undefined,
+        },
+        fieldHandler: {
+            type: Function,
             default: undefined,
         },
     },
@@ -63,7 +78,7 @@ export default {
             }),
             slotNames: computed(() => (map(slots, (slot: string, name) => replace(name, `${props.name}-`, '')))),
             fetchOptionsMap: computed<Record<string, Partial<DynamicLayoutFetchOptions>>>(() => props.fetchOptions?.listMap || {}),
-            extraMap: computed<Record<string, Partial<DynamicLayoutExtra>>>(() => props.extra?.listMap || {}),
+            extraMap: computed<Record<string, Partial<DynamicLayoutTypeOptions>>>(() => props.typeOptions?.listMap || {}),
         });
 
         return {

@@ -119,7 +119,9 @@ export default {
         top: 0;
         max-height: 16.875rem;
     }
+
     /* transitions */
+
     .fade-in-enter-active {
         transition: opacity 0.2s;
     }

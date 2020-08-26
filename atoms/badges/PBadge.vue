@@ -67,9 +67,9 @@ export default {
         }
         if (props.outline) newData.class.outline = true;
 
-        let tag = 'span';
+        let tag: any = 'span';
         if (props.link) {
-            tag = 'p-anchor';
+            tag = PAnchor;
             newData.attrs = { href: props.link, target: props.target };
         }
         return h(tag, newData, children);

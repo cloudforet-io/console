@@ -1,7 +1,8 @@
 import { DynamicLayoutOptions, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import { DynamicField } from '@/components/organisms/dynamic-field/type';
+import { BeforeCreateDynamicField, DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
+import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
 export interface DynamicLayoutFetchOptions {
@@ -14,7 +15,7 @@ export interface DynamicLayoutFetchOptions {
     listMap?: Record<string, Partial<DynamicLayoutFetchOptions>>;
 }
 
-export interface DynamicLayoutExtra {
+export interface DynamicLayoutTypeOptions {
     loading: boolean;
     totalCount: number;
     timezone: string;
@@ -23,21 +24,23 @@ export interface DynamicLayoutExtra {
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     language: string;
-    listMap?: Record<string, Partial<DynamicLayoutExtra>>;
+    listMap?: Record<string, Partial<DynamicLayoutTypeOptions>>;
 }
 
 export interface DynamicLayoutProps<
     SchemaOptions = DynamicLayoutOptions,
         FetchOptions = DynamicLayoutFetchOptions,
-    Extra = DynamicLayoutExtra
+    TypeOptions = DynamicLayoutTypeOptions
     > {
     name: string;
     type: DynamicLayoutType;
     options: SchemaOptions;
     data?: any;
-    beforeCreate?: (props: any) => void|Promise<void>;
     fetchOptions?: FetchOptions;
-    extra?: Extra;
+    typeOptions?: TypeOptions;
+    beforeCreate?: (props: any) => void|Promise<void>;
+    beforeCreateField?: BeforeCreateDynamicField;
+    fieldHandler?: DynamicFieldHandler;
 }
 
 

@@ -1,11 +1,13 @@
 <script lang="ts">
-import { DateTime as dt } from 'luxon';
-import { DatetimeOptions } from '@/components/organisms/dynamic-field/type';
 import moment, { Moment } from 'moment';
+import { DatetimeOptions, TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import { DatetimeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/datetime/type';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 
 export default {
     name: 'PDynamicFieldDatetime',
     functional: true,
+    components: { PAnchor },
     props: {
         options: {
             type: Object,
@@ -18,12 +20,12 @@ export default {
             type: [String, Object, Array, Boolean, Number],
             required: true,
         },
-        extra: {
+        typeOptions: {
             type: Object,
             default: () => ({}),
         },
     },
-    render(h, { props, data }) {
+    render(h, { props, data }: {props: DatetimeDynamicFieldProps; data: any}) {
         let result = '';
         const options: DatetimeOptions = props.options;
         if (props.data) {
@@ -36,12 +38,18 @@ export default {
                 time = moment(props.data);
             }
 
-            time = moment.tz(time, props.extra.timezone || 'UTC');
+            time = moment.tz(time, props.typeOptions?.timezone || 'UTC');
             if (options.display_format) {
                 result = time.format(options.display_format);
             } else {
                 result = time.format('YYYY-MM-DD HH:mm:ss');
             }
+        }
+        if (props.options.link) {
+            return h(PAnchor, {
+                ...data,
+                attrs: { href: (props.options as TextOptions).link, target: '_blank' },
+            }, result);
         }
         return h('span', data, result);
     },

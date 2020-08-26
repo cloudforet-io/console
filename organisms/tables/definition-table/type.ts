@@ -1,4 +1,4 @@
-import { DynamicFieldOptions, DynamicFieldType } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldOptions, DynamicFieldType } from '@/components/organisms/dynamic-field/type/field-schema';
 
 export interface DefinitionData {
     [key: string]: any;

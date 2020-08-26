@@ -6,8 +6,13 @@
         <p-definition-table :fields="fields" :data="rootData" :loading="loading"
                             v-on="$listeners"
         >
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="{...scope, rootData}" />
+            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="slotProps">
+                <slot :name="slotName" v-bind="slotProps">
+                    <p-dynamic-field :key="slotName" v-bind="item" :data="slotProps.data"
+                                     :before-create="beforeCreateField"
+                                     :handler="fieldHandler"
+                    />
+                </slot>
             </template>
         </p-definition-table>
     </div>
@@ -24,10 +29,14 @@ import { DefinitionData, DefinitionField } from '@/components/organisms/tables/d
 import {
     ItemDynamicLayoutProps, ItemFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/item/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
+import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 
 export default {
     name: 'PDynamicLayoutItem',
     components: {
+        PDynamicField,
         PPanelTop,
         PDefinitionTable,
     },
@@ -48,8 +57,16 @@ export default {
             type: Object,
             default: undefined,
         },
-        extra: {
+        typeOptions: {
             type: Object,
+            default: undefined,
+        },
+        beforeCreateField: {
+            type: Function,
+            default: undefined,
+        },
+        fieldHandler: {
+            type: Function,
             default: undefined,
         },
     },
@@ -68,14 +85,38 @@ export default {
                 if (Array.isArray(props.data)) return {};
                 return props.data;
             }),
-            loading: computed(() => (props.extra === undefined ? undefined : props.extra.loading)),
+            loading: computed(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
             fetchOptionsParam: computed<ItemFetchOptions>(() => ({})),
+        });
+
+        const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
+            const res = {};
+            if (!props.options.fields) return res;
+
+            // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
+            const timezone = props.typeOptions?.timezone || 'UTC';
+
+            props.options.fields.forEach((ds: DynamicField, i) => {
+                const item: Omit<DynamicFieldProps, 'data'> = {
+                    type: ds.type || 'text',
+                    options: ds.options || {},
+                    extraData: ds,
+                };
+
+                if (ds.type === 'datetime') {
+                    item.typeOptions = { timezone };
+                }
+                res[`data-${ds.key}`] = item;
+            });
+
+            return res;
         });
 
         emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),
+            dynamicFieldSlots,
         };
     },
 };

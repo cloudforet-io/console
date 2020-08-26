@@ -3,12 +3,14 @@ import { get } from 'lodash';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import { getColor } from '@/components/organisms/dynamic-field/PDynamicField.toolset';
 import { StatusProps } from '@/components/molecules/status/type';
-import { StateOptions } from '@/components/organisms/dynamic-field/type';
+import { StateOptions, TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import { StateDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/state/type';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 
 export default {
     name: 'PDynamicFieldState',
     functional: true,
-    components: { PStatus },
+    components: { PStatus, PAnchor },
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
         options: {
@@ -20,7 +22,7 @@ export default {
             default: '',
         },
     },
-    render(h, { props }) {
+    render(h, { props }: {props: StateDynamicFieldProps}) {
         const options: StateOptions = props.options;
         const statusProps: StatusProps = {
             icon: get(options, ['icon', 'image'], null),
@@ -28,9 +30,18 @@ export default {
             textColor: getColor(get(options, ['text_color'], null)),
             text: props.data,
         };
-        return h(PStatus, {
+
+        const statusEl = h(PStatus, {
             props: statusProps,
         });
+
+        if (props.options.link) {
+            return h(PAnchor, {
+                attrs: { href: (props.options as TextOptions).link, target: '_blank' },
+            }, statusEl);
+        }
+
+        return statusEl;
     },
 };
 </script>

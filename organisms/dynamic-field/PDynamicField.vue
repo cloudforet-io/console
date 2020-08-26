@@ -1,7 +1,11 @@
 <template>
     <component :is="component"
-               :options="options" :data="data"
-               :extra="extra"
+               :options="proxy.options"
+               :data="proxy.data"
+               :typeOptions="proxy.typeOptions"
+               :before-create="beforeCreate"
+               :handler="handler"
+               v-on="$listeners"
     />
 </template>
 
@@ -9,7 +13,8 @@
 import {
     computed, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldMutableProps, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { makeProxy } from '@/components/util/composition-helpers';
 
 
 interface State {
@@ -32,7 +37,7 @@ export default {
             type: [String, Object, Array, Boolean, Number, null],
             default: '',
         },
-        extra: {
+        typeOptions: {
             type: Object,
             default: () => ({}),
         },
@@ -40,18 +45,33 @@ export default {
             type: Function,
             default: undefined,
         },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
     },
-    setup(props: DynamicFieldProps) {
+    setup(props: DynamicFieldProps, { emit }) {
         // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
-            components: [],
             loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
+            proxy: computed<DynamicFieldMutableProps>(() => {
+                const res: DynamicFieldMutableProps = {
+                    options: props.options,
+                    data: props.data,
+                    typeOptions: props.typeOptions,
+                };
+                if (props.handler) return props.handler(res);
+
+                return res;
+            }),
         });
         onMounted(async () => {
             try {
-                // TODO: data array -> list
-                if (props.beforeCreate) await props.beforeCreate(props);
+                if (props.beforeCreate) {
+                    const res = props.beforeCreate(props);
+                    if (res instanceof Promise) await res;
+                }
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/text/index.vue');

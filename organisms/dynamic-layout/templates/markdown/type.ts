@@ -1,18 +1,18 @@
 import { MarkdownOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import {
     DynamicLayoutEventListeners,
-    DynamicLayoutExtra, DynamicLayoutFetchOptions,
+    DynamicLayoutTypeOptions, DynamicLayoutFetchOptions,
     DynamicLayoutProps,
 } from '@/components/organisms/dynamic-layout/type';
 
 export type MarkdownFetchOptions = Pick<DynamicLayoutFetchOptions, never>
 
-export type MarkdownExtra = Pick<DynamicLayoutExtra, 'language'>
+export type MarkdownTypeOptions = Pick<DynamicLayoutTypeOptions, 'language'>
 
 export type MarkdownDynamicLayoutProps = DynamicLayoutProps<
     MarkdownOptions,
     MarkdownFetchOptions,
-    MarkdownExtra
+    MarkdownTypeOptions
     >
 
 export type MarkdownDynamicLayoutEventListeners

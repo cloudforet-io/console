@@ -28,6 +28,8 @@
                     <p-dynamic-field :key="item.name"
                                      v-bind="item"
                                      :data="data.value"
+                                     :before-create="beforeCreateField"
+                                     :handler="fieldHandler"
                     />
                 </slot>
             </template>
@@ -45,19 +47,20 @@ import {
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
-import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { forEach, get } from 'lodash';
 import {
     QuerySearchTableListeners,
     QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
 const bindExtra = (props: QuerySearchTableDynamicLayoutProps, name: string, init: any) => {
-    if (props.extra && props.extra[name]) {
-        return computed(() => (props.extra ? props.extra[name] : init));
+    if (props.typeOptions && props.typeOptions[name]) {
+        return computed(() => (props.typeOptions ? props.typeOptions[name] : init));
     }
     return init;
 };
@@ -85,8 +88,16 @@ export default {
             type: Object,
             default: undefined,
         },
-        extra: {
+        typeOptions: {
             type: Object,
+            default: undefined,
+        },
+        beforeCreateField: {
+            type: Function,
+            default: undefined,
+        },
+        fieldHandler: {
+            type: Function,
             default: undefined,
         },
     },
@@ -105,18 +116,18 @@ export default {
                 }));
             }),
 
-            /** get data from extra prop */
-            loading: computed(() => (props.extra?.loading || false)),
-            totalCount: computed(() => (props.extra?.totalCount || 0)),
+            /** get data from typeOptions prop */
+            loading: computed(() => (props.typeOptions?.loading || false)),
+            totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
             keyItems: computed<KeyItem[]>(() => {
-                if (props.extra?.keyItems) return props.extra?.keyItems;
+                if (props.typeOptions?.keyItems) return props.typeOptions?.keyItems;
                 if (!props.options.fields) return [];
 
                 return props.options.fields.map(d => ({ label: d.name, name: d.key }));
             }),
-            valueHandlerMap: computed(() => (props.extra?.valueHandlerMap || {})),
+            valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
             selectIndex: bindExtra(props, 'selectIndex', []),
-            selectable: computed(() => (props.extra?.selectable || false)),
+            selectable: computed(() => (props.typeOptions?.selectable || false)),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
@@ -146,11 +157,18 @@ export default {
             const res = {};
             if (!props.options.fields) return res;
 
+            // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
+            const timezone = props.typeOptions?.timezone || 'UTC';
+
             props.options.fields.forEach((ds: DynamicField, i) => {
-                const item: Pick<DynamicFieldProps, 'extra'|'options'> = { ...ds, extra: {} };
+                const item: Omit<DynamicFieldProps, 'data'> = {
+                    type: ds.type || 'text',
+                    options: ds.options || {},
+                    extraData: ds,
+                };
 
                 if (ds.type === 'datetime') {
-                    if (!item.extra.timezone) item.extra.timezone = props.extra?.timezone || 'UTC';
+                    item.typeOptions = { timezone };
                 }
 
                 res[`col-${ds.key}-format`] = item;
@@ -160,7 +178,7 @@ export default {
         });
 
         const onSelect = (selectIndex: number[]) => {
-            if (!props.extra?.selectIndex) state.selectIndex = selectIndex;
+            if (!props.typeOptions?.selectIndex) state.selectIndex = selectIndex;
             emit('select', selectIndex);
         };
 

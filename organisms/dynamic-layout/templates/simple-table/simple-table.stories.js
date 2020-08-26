@@ -179,7 +179,7 @@ export const defaultCase = () => ({
                             type="simple-table"
                             :name="name"
                             :options="options"
-                            :extra="extra"
+                            :typeOptions="typeOptions"
                             :data="data"
                             
                            @init="onInit"/>
@@ -191,7 +191,7 @@ export const defaultCase = () => ({
     setup() {
         const state = reactive({
             data: [],
-            extra: {
+            typeOptions: {
                 totalCount: 0,
                 timezone: computed(() => props.timezone),
             },
@@ -200,10 +200,10 @@ export const defaultCase = () => ({
         const onFetch = async (options, changed) => {
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
-                    state.extra.totalCount = casual.integer(0, 25);
+                    state.typeOptions.totalCount = casual.integer(0, 25);
                     const res = {
                         data: {
-                            security_group_rules: arrayOf(state.extra.totalCount,
+                            security_group_rules: arrayOf(state.typeOptions.totalCount,
                                 () => ({
                                     security_group_name: casual.name,
                                     port_range_max: casual.integer(0),

@@ -1,5 +1,5 @@
 import {
-    DynamicLayoutEventListeners, DynamicLayoutExtra,
+    DynamicLayoutEventListeners, DynamicLayoutTypeOptions,
     DynamicLayoutFetchOptions,
     DynamicLayoutProps,
 } from '@/components/organisms/dynamic-layout/type';
@@ -7,13 +7,13 @@ import { SimpleTableOptions } from '@/components/organisms/dynamic-layout/type/l
 
 export type SimpleTableFetchOptions = Pick<DynamicLayoutFetchOptions, never>
 
-export type SimpleTableExtra = Pick<DynamicLayoutExtra,
+export type SimpleTableTypeOptions = Pick<DynamicLayoutTypeOptions,
     'loading'|'totalCount'|'timezone'
     >
 export type SimpleTableDynamicLayoutProps = DynamicLayoutProps<
     SimpleTableOptions,
     SimpleTableFetchOptions,
-    SimpleTableExtra
+    SimpleTableTypeOptions
     >
 
 export type SimpleTableDynamicLayoutEventListeners

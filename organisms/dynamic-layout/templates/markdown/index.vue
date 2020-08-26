@@ -46,7 +46,7 @@ export default {
             type: Object,
             default: undefined,
         },
-        extra: {
+        typeOptions: {
             type: Object,
             default: undefined,
         },
@@ -59,7 +59,7 @@ export default {
                 }
                 return props.data;
             }),
-            language: computed(() => props.extra?.language || 'en'),
+            language: computed(() => props.typeOptions?.language || 'en'),
             fetchOptionsParam: computed<MarkdownFetchOptions>(() => ({})),
         });
 

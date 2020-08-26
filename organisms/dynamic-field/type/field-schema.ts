@@ -80,12 +80,3 @@ export interface DynamicField {
     options?: DynamicFieldOptions;
     reference?: Reference;
 }
-
-/** Props type for Dynamic field component */
-export interface DynamicFieldProps {
-    type: DynamicFieldType;
-    options?: DynamicFieldOptions;
-    data: any;
-    extra: any; // a set of extra props for each component
-    beforeCreate?: any;
-}

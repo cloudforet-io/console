@@ -371,7 +371,7 @@ export const defaultCase = () => ({
     <div style="width: 80vw;">
         <PDynamicLayout :name="name"
                         :options="options"
-                        :extra="{timezone}"
+                        :typeOptions="{timezone}"
                         type="list"
                         @init="onInit" 
                         @fetch="onFetch" 

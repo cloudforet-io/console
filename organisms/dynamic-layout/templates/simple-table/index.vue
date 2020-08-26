@@ -16,6 +16,8 @@
                     <p-dynamic-field :key="item.name"
                                      v-bind="item"
                                      :data="data.value"
+                                     :before-create="beforeCreateField"
+                                     :handler="fieldHandler"
                     />
                 </slot>
             </template>
@@ -31,11 +33,12 @@ import { get } from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import { DynamicField, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import {
     SimpleTableDynamicLayoutProps,
-    SimpleTableFetchOptions
+    SimpleTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/simple-table/type';
+import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
 export default {
@@ -63,8 +66,16 @@ export default {
             type: Object,
             default: undefined,
         },
-        extra: {
+        typeOptions: {
             type: Object,
+            default: undefined,
+        },
+        beforeCreateField: {
+            type: Function,
+            default: undefined,
+        },
+        fieldHandler: {
+            type: Function,
             default: undefined,
         },
     },
@@ -88,18 +99,25 @@ export default {
                 }
                 return props.data;
             }),
-            loading: computed(() => (props.extra?.loading || false)),
-            totalCount: computed(() => (props.extra?.totalCount || 0)),
+            loading: computed(() => (props.typeOptions?.loading || false)),
+            totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
             /** others */
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
                 if (!props.options.fields) return res;
 
+                // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
+                const timezone = props.typeOptions?.timezone || 'UTC';
+
                 props.options.fields.forEach((ds: DynamicField, i) => {
-                    const item: Pick<DynamicFieldProps, 'extra'|'options'> = { ...ds, extra: {} as any };
+                    const item: Omit<DynamicFieldProps, 'data'> = {
+                        type: ds.type || 'text',
+                        options: ds.options || {},
+                        extraData: ds,
+                    };
 
                     if (ds.type === 'datetime') {
-                        if (!item.extra.timezone) item.extra.timezone = props.extra?.timezone || 'UTC';
+                        item.typeOptions = { timezone };
                     }
 
                     res[`col-${ds.key}-format`] = item;

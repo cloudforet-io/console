@@ -18,10 +18,10 @@ import {
     fill, flatten, zip, get,
 } from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
-import { getBindClass } from '@/components/util/functional-helpers';
-import { DynamicFieldOptions, DynamicFieldProps, ListOptions } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+import {ListOptions} from "@/components/organisms/dynamic-field/type/field-schema";
 
 export default {
     name: 'PDynamicFieldList',
@@ -35,7 +35,7 @@ export default {
             type: [String, Object, Array, Boolean, Number, null],
             default: null,
         },
-        extra: {
+        typeOptions: {
             type: Object,
             default: () => ({}),
         },
