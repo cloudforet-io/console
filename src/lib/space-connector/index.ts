@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import jwt from 'jsonwebtoken';
 import { QueryHelper } from '@/lib/space-connector/helper';
 import { AxiosRequestConfig } from 'axios';
 import API from './api';
@@ -39,12 +40,16 @@ class SpaceConnector {
         SpaceConnector.instance.api.flushToken();
     }
 
-    static get isTokenExpired(): boolean {
-        return SpaceConnector.instance.api.checkToken();
+    static get refreshToken(): string|undefined {
+        return SpaceConnector.instance.api.getRefreshToken();
+    }
+
+    static get isTokenAlive(): boolean {
+        return API.checkToken();
     }
 
     static getExpirationTime(): number {
-        return SpaceConnector.instance.api.getExpirationTime();
+        return API.getExpirationTime();
     }
 
     protected async loadAPI(): Promise<void> {

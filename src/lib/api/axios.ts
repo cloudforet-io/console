@@ -4,6 +4,7 @@ import axios, {
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
+import { SpaceConnector } from '@/lib/space-connector';
 import { useStore } from '@/store/toolset';
 
 const MockAdapter = require('axios-mock-adapter');
@@ -85,9 +86,11 @@ export class API {
         this.refreshInstance = this.newInstance();
 
         this.setRefreshRequestInterceptor((request) => {
-            if (this.store.user.state.isSignedIn) {
-                request.headers.Authorization = `Bearer ${this.store.user.state.refreshToken}`;
-            }
+            request.headers.Authorization = `Bearer ${SpaceConnector.refreshToken}`;
+            console.log(SpaceConnector.refreshToken);
+            // if (this.store.user.state.isSignedIn) {
+            //     request.headers.Authorization = `Bearer ${this.store.user.state.refreshToken}`;
+            // }
             return request;
         });
         this.setRequestInterceptor((request) => {
@@ -110,8 +113,9 @@ export class API {
             return request;
         });
         const refreshAuthLogic = failedRequest => this.refreshInstance.post(refreshUrl).then((resp) => {
-            // console.debug('request refresh token');
             this.store.user.setToken(resp.data.refresh_token, resp.data.access_token);
+            // set token for space-connector
+            SpaceConnector.setToken(resp.data.access_token, resp.data.refresh_token);
             failedRequest.response.config.headers.Authorization = `Bearer ${this.store.user.state.accessToken}`;
             return Promise.resolve();
         }, (error) => {

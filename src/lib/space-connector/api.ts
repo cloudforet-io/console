@@ -68,22 +68,8 @@ class API {
     }
 
     private loadToken(): void {
-        const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
-        const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
-
-        if (storedAccessToken) this.accessToken = storedAccessToken;
-        if (storedRefreshToken) this.refreshToken = storedRefreshToken;
-    }
-
-    checkToken(): boolean {
-        return (API.getTokenExpirationTime(this.refreshToken) - API.getCurrentTime()) > 10;
-    }
-
-    getExpirationTime(): number {
-        const expiryTime = API.getTokenExpirationTime(this.refreshToken) - API.getCurrentTime();
-        if (expiryTime < 0) return 0;
-
-        return expiryTime;
+        this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
+        this.refreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
     }
 
     flushToken(): void {
@@ -100,13 +86,30 @@ class API {
         window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     }
 
+    getRefreshToken(): string|undefined {
+        return this.refreshToken;
+    }
+
+    static checkToken(): boolean {
+        const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
+        return (API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime()) > 10;
+    }
+
+    static getExpirationTime(): number {
+        const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
+        const expirationTime = API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime();
+        if (expirationTime < 0) return 0;
+
+        return expirationTime;
+    }
+
     static getTokenExpirationTime(token?: string): number {
         if (token) {
             try {
-                const refreshToken = JSON.parse(token).data;
-                const decodedToken = jwt.decode(refreshToken);
+                const decodedToken = jwt.decode(token);
                 return decodedToken.exp;
             } catch (e) {
+                console.log(`Decode token error: ${e}`);
                 return -1;
             }
         } else {
@@ -126,31 +129,12 @@ class API {
         return this.defaultAxiosConfig;
     }
 
-    private async refreshAuthLogic(failedRequest: any): Promise<any> {
-        try {
-            const response = await this.refreshInstance.post(REFRESH_URL);
-            this.setToken(response.data.access_token, response.data.refresh_token);
-            failedRequest.response.config.headers.Authorization = `Bearer ${this.accessToken}`;
-            return response;
-        } catch (err) {
-            this.flushToken();
-            this.sessionTimeoutCallback();
-            throw err;
-        }
-    }
-
     private setAxiosInterceptors(): void {
         // Axios request interceptor to set the access token
         this.instance.interceptors.request.use((request) => {
             request.headers.Authorization = `Bearer ${this.accessToken}`;
             return request;
         });
-
-        // Axios response interceptor with error handling
-        this.instance.interceptors.response.use(
-            response => response,
-            error => Promise.reject(new APIError(error)),
-        );
 
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
@@ -159,7 +143,26 @@ class API {
         });
 
         // Interceptor for auth refresh
-        createAuthRefreshInterceptor(this.instance, this.refreshAuthLogic, { skipWhileRefreshing: false });
+        const refreshAuthLogic = async (failedRequest: any): Promise<any> => {
+            try {
+                const response = await this.refreshInstance.post(REFRESH_URL);
+                this.setToken(response.data.access_token, response.data.refresh_token);
+                failedRequest.response.config.headers.Authorization = `Bearer ${this.accessToken}`;
+                return response;
+            } catch (err) {
+                this.flushToken();
+                this.sessionTimeoutCallback();
+                throw err;
+            }
+        };
+
+        createAuthRefreshInterceptor(this.instance, refreshAuthLogic, { skipWhileRefreshing: false });
+
+        // Axios response interceptor with error handling
+        this.instance.interceptors.response.use(
+            response => response,
+            error => Promise.reject(new APIError(error)),
+        );
     }
 }
 

@@ -2,6 +2,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import jwt from 'jsonwebtoken';
 
+import { SpaceConnector } from '@/lib/space-connector';
+
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
@@ -85,28 +87,12 @@ const router = new VueRouter({
     ],
 });
 
-const hasLogIn = () => {
-    const refreshTokenData = localStorage.getItem('user/refreshToken');
-    if (refreshTokenData) {
-        try {
-            const refreshToken = JSON.parse(refreshTokenData).data;
-            const decodedToken = jwt.decode(refreshToken);
-            const expireTime = decodedToken.exp;
-            const currentTime = Math.floor(Date.now() / 1000);
-            return (expireTime - currentTime) > 10;
-        } catch (e) {
-            return false;
-        }
-    }
-    return false;
-};
 const isDomainOwner = () => JSON.parse(localStorage.getItem('user/userType')).data === 'DOMAIN_OWNER';
-
 
 router.beforeEach(async (to, from, next) => {
     if (to.meta && to.meta.excludeAuth) {
         if (to.meta.isSignInPage) {
-            if (hasLogIn()) {
+            if (SpaceConnector.isTokenAlive) {
                 try {
                     next({ path: to.meta.query.nextPath });
                 } catch (e) {
@@ -115,7 +101,7 @@ router.beforeEach(async (to, from, next) => {
             }
         }
         next();
-    } else if (hasLogIn()) {
+    } else if (SpaceConnector.isTokenAlive) {
         if (to.meta && to.meta.isDomainOwnerOnly && !isDomainOwner()) {
             next({ name: 'error' });
         }
