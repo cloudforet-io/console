@@ -86,17 +86,19 @@
 
 <script lang="ts">
 import { flatMap } from 'lodash';
+
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, ref, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, ref, toRefs,
 } from '@vue/composition-api';
+
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { dataTableProps } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import PTextPagination from '@/components/organisms/pagination/PTextPagination.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import { PToolboxTableProps } from '@/components/organisms/tables/toolbox-table/type';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
-import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
+
+const color = ['default', 'light', 'primary4'];
 
 export default {
     name: 'PToolboxTable',
@@ -104,20 +106,92 @@ export default {
         PDataTable, PTextPagination, PIconButton, PDropdownMenuBtn,
     },
     props: {
-        ...dataTableProps,
+        // PDataTableProps
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        fields: {
+            type: Array,
+            required: true,
+        },
+        items: {
+            type: Array,
+            required: true,
+        },
+        sortable: {
+            type: Boolean,
+            default: false,
+        },
+        sortBy: {
+            type: String,
+            default: null,
+        },
+        sortDesc: {
+            type: Boolean,
+            default: true,
+        },
+        colCopy: {
+            type: Boolean,
+            default: false,
+        },
+        selectable: {
+            type: Boolean,
+            default: false,
+        },
+        selectIndex: {
+            type: [Array, Number],
+            default: () => [],
+        },
+        multiSelect: {
+            type: Boolean,
+            default: true,
+        },
+        useCursorLoading: {
+            type: Boolean,
+            default: false,
+        },
+        skeletonRows: {
+            type: Number,
+            default: 5,
+        },
+        tableStyleType: {
+            type: String,
+            default: 'default',
+            validator(value) {
+                return [null, ...color].indexOf(value) !== -1;
+            },
+        },
+        striped: {
+            type: Boolean,
+            default: false,
+        },
+        bordered: {
+            type: Boolean,
+            default: true,
+        },
+        hover: {
+            type: Boolean,
+            default: false,
+        },
+        width: {
+            type: String,
+            default: undefined,
+        },
+        rowHeightFixed: {
+            type: Boolean,
+            default: true,
+        },
+        rowCursorPointer: {
+            type: Boolean,
+            default: false,
+        },
+        // PToolboxTableProps
         paginationVisible: {
             type: Boolean,
             default: true,
         },
         pageSizeVisible: {
-            type: Boolean,
-            default: true,
-        },
-        shadow: {
-            type: Boolean,
-            default: true,
-        },
-        border: {
             type: Boolean,
             default: true,
         },
@@ -155,12 +229,8 @@ export default {
             type: Array,
             default: () => [15, 30, 45],
         },
-        rowCursorPointer: {
-            type: Boolean,
-            default: false,
-        },
     },
-    setup(props: ToolBoxTableSetupProps, { emit }) {
+    setup(props: PToolboxTableProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -191,21 +261,12 @@ export default {
             state.proxyThisPage = 1;
         };
 
-        // const testLoading = ref(true);
-        // const clickRefreshTest = () => {
-        //     testLoading.value = true;
-        //     setTimeout(() => {
-        //         testLoading.value = false;
-        //     }, 1000);
-        // };
         return {
             ...toRefs(state),
             changePageSize,
             changePageNumber,
             getSelectItem,
             changeSort,
-            // testLoading,
-            // clickRefreshTest,
         };
     },
 };

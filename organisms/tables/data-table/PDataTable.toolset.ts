@@ -1,63 +1,13 @@
-import {computed, reactive, Ref, UnwrapRef} from '@vue/composition-api';
-import { TableState, tableProps, TablePropsType } from '@/components/molecules/tables/PTable.toolset';
+import {
+    computed, reactive, Ref, UnwrapRef,
+} from '@vue/composition-api';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/components/util/toolset-helpers';
 import { get } from 'lodash';
 import { Computed } from '@/components/util/type';
 
-
-export const dataTableProps = {
-    ...tableProps,
-    fields: Array,
-    items: Array,
-    sortable: {
-        type: Boolean,
-        default: false,
-    },
-    rowClickMultiSelectMode: {
-        type: Boolean,
-        default: false,
-    },
-    selectable: {
-        type: Boolean,
-        default: false,
-    },
-    selectIndex: {
-        type: [Array, Number],
-        default: () => [],
-    },
-    sortBy: {
-        type: String,
-        default: null,
-    },
-    sortDesc: {
-        type: Boolean,
-        default: true,
-    },
-    colCopy: {
-        type: Boolean,
-        default: false,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    useCursorLoading: {
-        type: Boolean,
-        default: false,
-    },
-    skeletonRows: {
-        type: Number,
-        default: 5,
-    },
-    multiSelect: {
-        type: Boolean,
-        default: true,
-    },
-};
-
-export interface DataTablePropsType extends TablePropsType {
+export interface DataTablePropsType {
     fields?: any[] | Readonly<any[]>;
     items?: any[];
     sortable?: boolean;
@@ -67,6 +17,11 @@ export interface DataTablePropsType extends TablePropsType {
     useCursorLoading?: boolean;
     skeletonRows?: number;
     multiSelect?: boolean;
+    // TablePropsType
+    striped?: boolean;
+    bordered?: boolean|null|unknown;
+    hover?: boolean;
+    tableStyleType?: string;
 }
 export interface DataTableSyncType {
     sortBy: string;
@@ -82,26 +37,36 @@ export interface DataTableFieldType {
     width?: string;
 }
 
-export type DataTableField = string|DataTableFieldType
-export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncType{
-    fields: DataTableField[];
-    items: any[];
-    sortable: boolean;
-    rowClickMultiSelectMode: boolean;
-    selectable: boolean;
-    selectIndex: any[]|number;
-    colCopy: boolean;
-    loading?: boolean;
-    useCursorLoading: boolean;
-    skeletonRows: number;
-    multiSelect: boolean;
-    sortBy: string;
-    sortDesc: boolean;
-    rowHeightFixed: boolean;
-    width?: string;
+export interface TablePropsType {
+    striped?: boolean;
+    bordered?: boolean|null|unknown;
+    hover?: boolean;
+    tableStyleType?: string;
+}
+@StateToolSet<TablePropsType>()
+export class TableState<initData, initState extends TablePropsType = TablePropsType> {
+    state: UnwrapRef<optionalType<initState, initData>>;
+
+    static initState() {
+        return {
+            striped: false,
+            bordered: true,
+            hover: true,
+        };
+    }
+
+    constructor(initData: initData = {} as initData, lazy = false) {
+        if (lazy) {
+            this.state = null as unknown as UnwrapRef<initState>;
+        } else {
+            this.state = reactive({
+                ...TableState.initState(),
+                ...initData,
+            }) as UnwrapRef<optionalType<initState, initData>>;
+        }
+    }
 }
 
-export type DataTableProps = DataTableSetupProps;
 
 @StateToolSet<DataTablePropsType>()
 @SyncStateToolSet<DataTableSyncType>()

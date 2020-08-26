@@ -1,6 +1,5 @@
 import { Ref, ref } from '@vue/composition-api';
 import {
-    DataTablePropsType,
     DataTableSelectState,
     DataTableState,
     DataTableSyncType,
@@ -16,7 +15,7 @@ import { getAllPage } from '@/components/organisms/pagination/PTextPagination.to
 import { QuerySearchToolSet } from '@/lib/component-utils/query-search';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 
-export interface ToolBoxTablePropsType extends DataTablePropsType{
+export interface ToolBoxTablePropsType {
     paginationVisible?: boolean;
     pageSizeVisible?: boolean;
     shadow?: boolean;
@@ -24,25 +23,26 @@ export interface ToolBoxTablePropsType extends DataTablePropsType{
     refreshVisible?: boolean;
     allPage?: number;
     pageNationValues?: number[];
+    //
+    fields?: any[] | Readonly<any[]>;
+    items?: any[];
+    sortable?: boolean;
+    rowClickMultiSelectMode?: boolean;
+    selectable?: boolean;
+    colCopy?: boolean;
+    useCursorLoading?: boolean;
+    skeletonRows?: number;
+    multiSelect?: boolean;
+    // TablePropsType
+    striped?: boolean;
+    bordered?: boolean|null|unknown;
+    hover?: boolean;
+    tableStyleType?: string;
 }
 export interface ToolBoxTableSyncType extends DataTableSyncType {
     pageSize?: number;
     thisPage?: number;
 }
-
-export interface ToolBoxTableSetupProps extends ToolBoxTablePropsType, ToolBoxTableSyncType{
-    paginationVisible: boolean;
-    pageSizeVisible: boolean;
-    shadow: boolean;
-    settingVisible: boolean;
-    refreshVisible: boolean;
-    allPage: number;
-    pageNationValues: number[];
-    pageSize: number;
-    thisPage: number;
-}
-
-export type ToolboxTableProps = ToolBoxTableSetupProps
 
 @StateToolSet<ToolBoxTablePropsType>()
 @SyncStateToolSet<ToolBoxTableSyncType>()

@@ -154,27 +154,27 @@
 
 <script lang="ts">
 import {
-    toRefs, computed, reactive, watch, onMounted, Ref, ref,
-} from '@vue/composition-api';
-import {
     flatMap, range, get, every,
 } from 'lodash';
-import PI from '@/components/atoms/icons/PI.vue';
+
+import {
+    toRefs, computed, reactive, watch, onMounted, Ref, ref,
+} from '@vue/composition-api';
+
+import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import { PDataTableProps, DataTableField } from '@/components/organisms/tables/data-table/type';
 import { copyAnyData, selectToCopyToClipboard } from '@/components/util/helpers';
 import { windowEventMount } from '@/components/util/composition-helpers';
-import { tableProps } from '@/components/molecules/tables/PTable.toolset';
-import { DataTableField, DataTableSetupProps } from './PDataTable.toolset';
 
-const PCheckBox = () => import('@/components/molecules/forms/checkbox/PCheckBox.vue');
-const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
-const PCopyButton = () => import('@/components/molecules/buttons/copy-button/PCopyButton.vue');
-
+const color = ['default', 'light', 'primary4'];
 
 export default {
     name: 'PDataTable',
     components: {
-        // PSkeleton,
         PI,
         PCheckBox,
         PCopyButton,
@@ -182,20 +182,21 @@ export default {
         PRadio,
     },
     props: {
-        ...tableProps,
-        fields: Array,
-        items: Array,
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        fields: {
+            type: Array,
+            required: true,
+        },
+        items: {
+            type: Array,
+            required: true,
+        },
         sortable: {
             type: Boolean,
             default: false,
-        },
-        selectable: {
-            type: Boolean,
-            default: false,
-        },
-        selectIndex: {
-            type: [Array, Number],
-            default: () => [],
         },
         sortBy: {
             type: String,
@@ -209,9 +210,21 @@ export default {
             type: Boolean,
             default: false,
         },
-        loading: {
+        selectable: {
             type: Boolean,
-            default: undefined,
+            default: false,
+        },
+        selectIndex: {
+            type: [Array, Number],
+            default: () => [],
+        },
+        multiSelect: {
+            type: Boolean,
+            default: true,
+        },
+        rowClickMultiSelectMode: {
+            type: Boolean,
+            default: false,
         },
         useCursorLoading: {
             type: Boolean,
@@ -221,11 +234,30 @@ export default {
             type: Number,
             default: 5,
         },
-        rowClickMultiSelectMode: {
+        tableStyleType: {
+            type: String,
+            default: 'default',
+            validator(value) {
+                return [null, ...color].indexOf(value) !== -1;
+            },
+        },
+        striped: {
             type: Boolean,
             default: false,
         },
-        multiSelect: {
+        bordered: {
+            type: Boolean,
+            default: true,
+        },
+        hover: {
+            type: Boolean,
+            default: false,
+        },
+        width: {
+            type: String,
+            default: undefined,
+        },
+        rowHeightFixed: {
             type: Boolean,
             default: true,
         },
@@ -234,7 +266,7 @@ export default {
             default: false,
         },
     },
-    setup(props: DataTableSetupProps, context) {
+    setup(props: PDataTableProps, context) {
         const state = reactive({
             table: null,
             allState: false,
@@ -271,6 +303,7 @@ export default {
             }
             return false;
         });
+        // @ts-ignore
         const skeletons = computed(() => range(props.skeletonRows));
 
         const makeTableText = (el) => {
@@ -673,7 +706,8 @@ export default {
         .light {
             @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
             th {
-                border-bottom: 1px solid theme('colors.gray.200');
+                @apply border-gray-200;
+                border-bottom: 1px solid;
             }
         }
 
