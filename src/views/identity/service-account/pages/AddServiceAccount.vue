@@ -23,13 +23,13 @@
                 </div>
             </template>
         </p-page-title>
-        <p-pane-layout v-if="description" class="panel">
-            <div class="title">
-                Help
-            </div>
-            <s-dynamic-layout v-bind="description" :vbind="{showTitle:false}" />
-        </p-pane-layout>
-
+        <p-collapsible-panel>
+            <template #content>
+                <div class="p-4">
+                    <s-dynamic-layout v-bind="description" :vbind="{showTitle:false}" />
+                </div>
+            </template>
+        </p-collapsible-panel>
         <p-pane-layout class="panel">
             <div class="title">
                 Base Information
@@ -152,6 +152,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { get } from 'lodash';
 import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import { showErrorMessage } from '@/lib/util';
+import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 
 const accountFormSetup = (props) => {
     const actFixFormTS = new JsonSchemaFormToolSet();
@@ -242,6 +243,7 @@ const credentialsFormSetup = (props) => {
 export default {
     name: 'SSecretCreateFormModal',
     components: {
+        PCollapsiblePanel,
         PPageTitle,
         PPageNavigation,
         PFieldGroup,

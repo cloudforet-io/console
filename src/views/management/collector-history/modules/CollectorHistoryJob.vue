@@ -1,16 +1,19 @@
 <template>
     <div class="collector-history-job">
-        <div class="more-information-lap">
-            <div>
-                <span class="info-title">Collector Name: </span>
-                <span class="info-text">{{ collectorName }}</span>
-            </div>
-            <div>
-                <span class="info-title">Provider: </span>
-                <span class="info-text">{{ provider }}</span>
-            </div>
-            <!--            <span class="toggle-button">hide</span>-->
-        </div>
+        <p-collapsible-panel>
+            <template #content>
+                <div class="more-information-lap">
+                    <div>
+                        <span class="info-title">Collector Name: </span>
+                        <span class="info-text">{{ collectorName }}</span>
+                    </div>
+                    <div>
+                        <span class="info-title">Provider: </span>
+                        <span class="info-text">{{ provider }}</span>
+                    </div>
+                </div>
+            </template>
+        </p-collapsible-panel>
         <p-horizontal-layout class="job-tasks-lap">
             <template #container="{ height }">
                 <p-query-search-table
@@ -96,6 +99,7 @@ import { timestampFormatter } from '@/lib/util';
 import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
+import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -107,6 +111,7 @@ enum JOB_TASK_STATUS {
 export default {
     name: 'PCollectorHistoryJob',
     components: {
+        PCollapsiblePanel,
         PEmpty,
         PDataTable,
         PPanelTop,
@@ -332,9 +337,7 @@ export default {
 <style lang="postcss">
 .collector-history-job {
     .more-information-lap {
-        @apply bg-primary4 border border-gray-200;
         position: relative;
-        border-left-width: 0.25rem;
         font-size: 0.75rem;
         line-height: 150%;
         border-radius: 0.125rem;
@@ -347,13 +350,6 @@ export default {
         }
         .info-text {
             @apply text-gray-900;
-        }
-        .toggle-button {
-            @apply text-secondary;
-            position: absolute;
-            right: 1rem;
-            bottom: 0.5rem;
-            cursor: pointer;
         }
     }
 

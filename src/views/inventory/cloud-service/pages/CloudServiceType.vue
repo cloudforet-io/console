@@ -130,6 +130,13 @@
                         </router-link>
                     </template>
                 </p-search-grid-layout>
+                <p-pagination :total-count="totalCount"
+                              :this-page.sync="thisPage"
+                              :page-size.sync="pageSize"
+                              @prevPage="prevPage"
+                              @nextPage="nextPage"
+                              @clickPage="clickPage"
+                />
             </div>
         </template>
     </p-vertical-page-layout>
@@ -181,6 +188,7 @@ import { Filter } from '@/lib/space-connector/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios';
 import { APIError } from '@/lib/space-connector/api';
+import PPagination from '@/components/organisms/pagination/PPagination.vue';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
 
@@ -188,6 +196,7 @@ export type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'CloudServiceType',
     components: {
+        PPagination,
         PHr,
         PSearchGridLayout,
         PRadio,
@@ -368,52 +377,10 @@ export default {
                     getter: queryTagsToQueryString,
                 }),
             provider: makeQueryStringComputed(selectedProvider, { key: 'provider', disableAutoReplace: true }),
-            ...makeQueryStringComputeds(state, {
-                pageSize: { key: 'g_ps', setter: Number },
-                thisPage: { key: 'g_p', setter: Number },
-            }),
-        };
-        // const handleNullValuesForFilter = (value) => {
-        //     if (value[0].value === 'all') value[0].value = '';
-        //     if (value[1].value.length === 0) value[1].value = [''];
-        //     if (value[2].value.length === 0) value[2].value = '';
-        //     return value;
-        // };
-        //
-        // const initListCloudService = async () => {
-        //     state.loading = true;
-        //     try {
-        //         const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
-        //         const res = await fluentApi.statisticsTest().topic().cloudServiceType()
-        //             .setStart(((state.thisPage - 1) * state.pageSize) + 1)
-        //             .setLimit(state.pageSize)
-        //             .setFilter(...searchItems.and)
-        //             .setFilterOr(...searchItems.or)
-        //             .showAll(true)
-        //             .execute();
-        //         state.items = res.data.results;
-        //         state.totalCount = res.data.total_count || 0;
-        //         state.loading = false;
-        //     } catch (e) {
-        //         console.error(e);
-        //     } finally {
-        //         state.loading = false;
-        //     }
-        // };
-
-        /** TODO: Code Review */
-
-        const getFilters = () => {
-            // const or: Filter[] = [];
-            // state.orTags.forEach((q) => {
-            //     state.keyItems.forEach((k) => {
-            //         or.push({
-            //             k: k.name,
-            //             v: q.value?.name || '',
-            //             o: 'contain',
-            //         });
-            //     });
-            // });
+            // ...makeQueryStringComputeds(state, {
+            //     pageSize: { key: 'g_ps', setter: Number },
+            //     thisPage: { key: 'g_p', setter: Number },
+            // }),
         };
 
         const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
@@ -433,17 +400,19 @@ export default {
             return res;
         });
 
-        const getParams = () => {
+        const getParams = (isTriggeredBySideFilter = false) => {
             const { and, or } = getFiltersFromQueryTags(state.tags);
 
             const { filters, labels } = sidebarFilters.value;
 
             const query = new QueryHelper();
-            query.setPageStart(((state.thisPage - 1) * state.pageSize) + 1)
+            query
                 .setPageLimit(state.pageSize)
                 .setKeyword(...or)
-                // .setFilterOr(...or)
                 .setFilter(...and, ...filters);
+            if (!isTriggeredBySideFilter) {
+                query.setPageStart(((state.thisPage - 1) * state.pageSize) + 1);
+            }
 
             return {
                 show_all: true,
@@ -454,7 +423,7 @@ export default {
 
         // ajax request
         let listCloudServiceRequest: CancelTokenSource | undefined;
-        const listCloudServiceType = async () => {
+        const listCloudServiceType = async (isTriggeredBySideFilter = false) => {
             // if request is already exist, cancel the request
             if (listCloudServiceRequest) {
                 listCloudServiceRequest.cancel('Next request has been called.');
@@ -467,7 +436,7 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage(
-                    getParams(),
+                    getParams(isTriggeredBySideFilter),
                     { cancelToken: listCloudServiceRequest.token },
                 );
                 state.items = res.results;
@@ -478,56 +447,41 @@ export default {
                 if (!axios.isCancel(e.axiosError)) state.loading = false;
                 else console.error(e);
             }
-
-
-            // state.loading = true;
-            // handleNullValuesForFilter(after);
-            // const [providerFilter, region, label] = [after[0].value, after[1].value, after[2].value];
-            // const searchItems = getQueryItemsToFilterItems(state.tags, state.keyItems);
-            // try {
-            //     const res = await fluentApi.statisticsTest().topic().cloudServiceType()
-            //         .setStart(((state.thisPage - 1) * state.pageSize) + 1)
-            //         .setLimit(state.pageSize)
-            //         .setFilter(
-            //             { key: 'provider', operator: FILTER_OPERATOR.contain, value: providerFilter },
-            //             { key: 'data.region_name', operator: FILTER_OPERATOR.contain, value: region },
-            //             ...searchItems.and,
-            //         )
-            //         .setFilterOr(...searchItems.or)
-            //         .setLabels(label)
-            //         .showAll(true)
-            //         .execute();
-            //     state.items = res.data.results;
-            //     state.totalCount = res.data.total_count || 0;
-            //     state.loading = false;
-            // } catch (e) {
-            //     console.error(e);
-            // }
         };
-
-        // const sidebarFilters = computed(() => [
-        //     { key: 'provider', operator: '=', value: selectedProvider.value },
-        //     { key: 'data.region_name', operator: '=', value: filterState.regionFilter },
-        //     { key: 'labels', operator: FILTER_OPERATOR.in, value: filterState.serviceFilter },
-        // ]);
 
         watch(() => sidebarFilters.value, async (after, before) => {
             if (after !== before) {
                 // await listCloudServiceType(after);
-                await listCloudServiceType();
+                await listCloudServiceType(true);
             }
         }, { immediate: false });
 
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
             const newQuery = {
-                g_ps: Number(options.pageSize),
-                g_p: Number(options.thisPage),
+                // g_ps: Number(options.pageSize),
+                // g_p: Number(options.thisPage),
                 f: urlQueryString,
             };
                 // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {
             });
+        };
+
+        const clickPage = async (page) => {
+            state.thisPage = page;
+            await listCloudServiceType();
+        };
+
+        const prevPage = async (page) => {
+            state.thisPage = page - 1;
+            if (state.thisPage <= 0) state.thisPage = 1;
+            await listCloudServiceType();
+        };
+
+        const nextPage = async (page) => {
+            state.thisPage = page + 1;
+            await listCloudServiceType();
         };
 
         const onChange = async (options?: any) => {
@@ -537,7 +491,6 @@ export default {
                 state.thisPage = options.thisPage;
                 await changeQueryString(options);
             }
-            // await listCloudServiceType(sidebarFilters.value);
             await listCloudServiceType();
         };
 
@@ -559,7 +512,6 @@ export default {
                     await replaceQuery('provider', after);
                 }, 50));
                 await listCloudServiceType();
-                // await initListCloudService();
             }
         };
 
@@ -578,6 +530,9 @@ export default {
             providerState,
             getToCloudService,
             skeletons: range(5),
+            clickPage,
+            prevPage,
+            nextPage,
             onChange,
         };
     },
