@@ -3,11 +3,11 @@
         <div class="more-information-lap">
             <div>
                 <span class="info-title">Collector Name: </span>
-                <span class="info-text">{{ job.collector_info.name }}</span>
+                <span class="info-text">{{ collectorName }}</span>
             </div>
             <div>
                 <span class="info-title">Provider: </span>
-                <span class="info-text">{{ job.collector_info.provider }}</span>
+                <span class="info-text">{{ provider }}</span>
             </div>
             <!--            <span class="toggle-button">hide</span>-->
         </div>
@@ -17,6 +17,9 @@
                     :loading="loading"
                     :fields="fields"
                     :items="items"
+                    :query-tags="searchTags"
+                    :key-items="querySearchHandlers.keyItems"
+                    :value-handler-map="querySearchHandlers.valueHandlerMap"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
@@ -25,7 +28,7 @@
                     :multi-select="false"
                     :select-index.sync="selectedIndexes"
                     :disabled-index="disabledIndex"
-                    @change="getJobTasks"
+                    @change="onChange"
                     @rowLeftClick="onSelect"
                 >
                     <template #toolbox-top>
@@ -48,11 +51,17 @@
                 </p-query-search-table>
             </template>
         </p-horizontal-layout>
-        <div v-if="selectedItem && selectedItem.errors.length > 0" class="error-list-lap">
+        <div v-if="selectedItem" class="error-list-lap">
             <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
                 Error List
             </p-panel-top>
-            <p-data-table :fields="errorFields"
+            <div v-if="selectedItem.errors.length === 0">
+                <p-empty class="w-full h-full">
+                    No Data
+                </p-empty>
+            </div>
+            <p-data-table v-else
+                          :fields="errorFields"
                           :items="selectedItem.errors"
                           :sortable="false"
                           :selectable="false"
@@ -76,46 +85,50 @@ import moment from 'moment';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
+import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { JobModel } from '@/lib/fluent-api/inventory/job';
+
+enum JOB_TASK_STATUS {
+    pending = 'PENDING',
+    progress = 'IN_PROGRESS',
+    success = 'SUCCESS',
+    failure = 'FAILURE',
+}
 
 export default {
-    name: 'PCollectorHistoryDetail',
+    name: 'PCollectorHistoryJob',
     components: {
+        PEmpty,
         PDataTable,
         PPanelTop,
         PHorizontalLayout,
         PQuerySearchTable,
     },
     props: {
-        job: {
-            type: Object,
+        jobId: {
+            type: String,
             required: true,
         },
     },
     setup(props) {
         const state = reactive({
             loading: false,
+            job: {} as JobModel,
+            collectorName: computed(() => state.job.collector_info?.name),
+            provider: computed(() => state.job.collector_info?.provider),
             jobTasks: [],
             serviceAccounts: [],
             projects: [],
             items: [],
-            //
-            disabledIndex: [0, 3],
-            selectedIndexes: [],
-            selectedItem: computed(() => state.jobTasks[state.selectedIndexes[0]]),
-            //
-            pageSize: 15,
-            thisPage: 1,
-            sortBy: '',
-            sortDesc: true,
-            totalCount: 0,
-            //
             fields: [
                 { label: 'No.', name: 'sequence' },
                 { label: 'Service Account', name: 'service_account_id' },
@@ -141,6 +154,24 @@ export default {
                 { key: 'failure', label: 'Failure', class: 'failure' },
             ],
             activatedStatus: 'all',
+            //
+            disabledIndex: [0, 3],
+            selectedIndexes: [],
+            selectedItem: computed(() => state.jobTasks[state.selectedIndexes[0]]),
+            //
+            pageSize: 15,
+            thisPage: 1,
+            sortBy: '',
+            sortDesc: true,
+            totalCount: 0,
+            //
+            searchTags: [],
+            querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
+                title: 'Properties',
+                items: [
+                    { key: 'status', name: 'Status', enums: Object.values(JOB_TASK_STATUS) },
+                ],
+            }, 'inventory.CollectorHistory'),
         });
 
         const convertStatus = (status) => {
@@ -189,16 +220,42 @@ export default {
             });
         };
 
+        const getQuery = () => {
+            let statusValues: JOB_TASK_STATUS[] = [];
+            if (state.activatedStatus === 'inProgress') {
+                statusValues = [JOB_TASK_STATUS.progress, JOB_TASK_STATUS.pending];
+            } else if (state.activatedStatus === 'success') {
+                statusValues = [JOB_TASK_STATUS.success];
+            } else if (state.activatedStatus === 'failure') {
+                statusValues = [JOB_TASK_STATUS.failure];
+            }
+
+            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+
+            const query = new QueryHelper();
+            query
+                .setSort(state.sortBy, state.sortDesc)
+                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setKeyword(...or);
+            if (statusValues.length > 0) {
+                query.setFilter({
+                    k: 'status',
+                    v: statusValues,
+                    o: 'in',
+                }, ...and);
+            } else {
+                query.setFilter(...and);
+            }
+            return query;
+        };
         const getJobTasks = async () => {
             state.loading = true;
             try {
-                const query = new QueryHelper();
-                query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
-
+                const query = getQuery();
                 const res = await SpaceConnector.client.inventory.jobTask.list({
                     query: query.data,
                     // eslint-disable-next-line camelcase
-                    job_id: props.job.job_id,
+                    job_id: props.jobId,
                 });
                 state.jobTasks = res.results;
                 state.totalCount = res.total_count;
@@ -208,6 +265,18 @@ export default {
                 console.error(e);
             }
             state.loading = false;
+        };
+        const getJob = async () => {
+            state.loading = true;
+            try {
+                // eslint-disable-next-line camelcase
+                const res = await SpaceConnector.client.inventory.job.list({ job_id: props.jobId });
+                state.job = res.results[0];
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
         const getServiceAccounts = async () => {
             try {
@@ -229,11 +298,17 @@ export default {
         const onSelect = (item, index) => {
             state.selectedIndexes = index;
         };
+        const onChange = async (item) => {
+            state.searchTags = item.queryTags;
+            await getJobTasks();
+        };
         const onClickStatus = (status) => {
             state.activatedStatus = status;
+            getJobTasks();
         };
 
         const init = async () => {
+            await getJob();
             await getServiceAccounts();
             await getProject();
             await getJobTasks();
@@ -243,11 +318,11 @@ export default {
         return {
             ...toRefs(state),
             timestampFormatter,
-            getJobTasks,
             convertStatus,
             convertServiceAccountName,
             convertProjectName,
             onSelect,
+            onChange,
             onClickStatus,
         };
     },
