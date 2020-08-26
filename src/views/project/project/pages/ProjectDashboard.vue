@@ -193,7 +193,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
     .cloud-service {
         height: 26rem;
     &::v-deep .widget-contents {

@@ -1,5 +1,3 @@
-import { fluentApi } from '@/lib/fluent-api';
-
 const Plugin = () => import('@/views/plugin/plugin');
 const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
 
@@ -12,7 +10,7 @@ export default {
     path: 'plugin',
     name: 'plugin',
     redirect: '/plugin/collector',
-    meta: { label: 'Plugin', breadcrumb: true },
+    meta: { label: 'Plugin' },
     components: {
         lnb: PluginNavBar,
         main: Plugin,
@@ -24,8 +22,6 @@ export default {
             redirect: '/plugin/collector',
             meta: {
                 label: 'Collector',
-                breadcrumb: true,
-                api: fluentApi.inventory().collector(),
             },
             component: { template: '<router-view />' },
             children: [
@@ -38,7 +34,7 @@ export default {
                 {
                     path: 'create',
                     name: 'createCollector',
-                    meta: { label: 'Create Collector', breadcrumb: true },
+                    meta: { label: 'Create Collector' },
                     redirect: './create/plugins',
                     component: { template: '<router-view />' },
                     children: [

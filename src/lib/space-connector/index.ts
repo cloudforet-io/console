@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import jwt from 'jsonwebtoken';
 import { QueryHelper } from '@/lib/space-connector/helper';
 import { AxiosRequestConfig } from 'axios';
 import API from './api';

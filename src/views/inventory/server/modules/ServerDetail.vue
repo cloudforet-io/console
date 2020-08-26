@@ -33,17 +33,14 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { get, debounce, set } from 'lodash';
-import baseInfoSchema from '@/data-schema/inventory/server/sub_data/layouts/base_info.json';
+import baseInfoSchema from '@/views/inventory/server/default-schema/base-info.json';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { ProviderInfo, useStore } from '@/store/toolset';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 import ServerBaseInfo from '@/views/inventory/server/modules/ServerBaseInfo.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import {
     DynamicLayoutEventListeners,
-    DynamicLayoutTypeOptions,
-    DynamicLayoutFetchOptions,
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
 import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
@@ -56,7 +53,7 @@ import { SearchSchema } from '@/lib/component-utils/query-search/type';
 import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
-import referenceRouter from '@/lib/reference/referenceRouter';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 export default {
     name: 'PServerDetail',

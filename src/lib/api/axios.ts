@@ -7,9 +7,6 @@ import { setMockData } from '@/lib/mock';
 import { SpaceConnector } from '@/lib/space-connector';
 import { useStore } from '@/store/toolset';
 
-const MockAdapter = require('axios-mock-adapter');
-
-
 class APIError extends Error {
     status: number;
 
