@@ -4,7 +4,6 @@ import {
 import Lockr from 'lockr';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
-import { api } from '@/lib/api/axios';
 import { fluentApi } from '@/lib/fluent-api';
 import config from '@/lib/config';
 import router from '@/routes';
@@ -146,7 +145,7 @@ class DomainStore extends Store<DomainState> {
         });
     }
 
-    getDomain= async (vm: any) => {
+    getDomain= async (api: any) => {
         const { hostname } = window.location;
         this.state.domainName = hostname.split('.')[0];
         const param = {
@@ -164,7 +163,7 @@ class DomainStore extends Store<DomainState> {
             }
         } else {
             // console.debug('no domain');
-            vm.$router.push({ name: 'error' });
+            await router.push({ name: 'error' })
         }
     }
 }

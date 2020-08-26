@@ -22,6 +22,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
 import { useStore } from '@/store/toolset';
+import { api } from '@/lib/api/axios';
 
 
 interface State {
@@ -55,7 +56,7 @@ export default {
         // console.debug('login!!');
         const vm = (getCurrentInstance() as any);
         const store = useStore();
-        store.domain.getDomain(vm);
+        store.domain.getDomain(api);
 
         const state = reactive<any>({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
@@ -76,7 +77,7 @@ export default {
             }),
         });
         const login = async (userId: string, credentials: Credentials) => {
-            console.debug('store', store)
+            console.debug('store', store);
             store.user.setToken(credentials.refresh_token, credentials.access_token);
             await store.user.setUser(state.userType, userId, vm);
             setGtagUserID(vm);

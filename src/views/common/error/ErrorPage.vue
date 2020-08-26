@@ -34,12 +34,12 @@ export default {
 </script>
 
 
-<style lang="css" scoped>
+<style lang="postcss" scoped>
     .wrap {
         @apply flex min-h-screen flex-col;
     }
 
-    .error{
+    .error {
         @apply m-auto flex-1 text-center;
         .error-contents {
             padding-top: calc(70% - 2.5rem);
@@ -59,7 +59,6 @@ export default {
             }
         }
     }
-
 
     .footer-img {
         @apply mx-auto w-24 align-middle pb-8;

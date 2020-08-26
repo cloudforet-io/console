@@ -1,5 +1,3 @@
-import { fluentApi } from '@/lib/fluent-api';
-
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 
@@ -13,7 +11,7 @@ export default {
     path: 'inventory',
     name: 'inventory',
     redirect: 'inventory/server',
-    meta: { label: 'Inventory', breadcrumb: true },
+    meta: { label: 'Inventory' },
     components: {
         lnb: InventoryNavBar,
         main: Inventory,
@@ -23,8 +21,6 @@ export default {
             path: 'server',
             meta: {
                 label: 'Server',
-                breadcrumb: true,
-                api: fluentApi.inventory().server(),
             },
             component: { template: '<router-view />' },
             children: [
@@ -46,7 +42,7 @@ export default {
             path: 'cloud-service',
             name: 'cloudService',
             redirect: '/inventory/cloud-service',
-            meta: { label: 'Cloud Service', breadcrumb: true },
+            meta: { label: 'Cloud Service' },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -67,7 +63,6 @@ export default {
                     props: true,
                     meta: {
                         label: 'Cloud Service',
-                        api: fluentApi.inventory().cloudService(),
                     },
                     component: { template: '<router-view />' },
                     children: [

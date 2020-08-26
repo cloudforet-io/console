@@ -1,5 +1,3 @@
-import { fluentApi } from '@/lib/fluent-api';
-
 const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount.vue');
 
 const Identity = () => import('@/views/identity/Identity');
@@ -14,7 +12,7 @@ export default {
     path: 'identity',
     name: 'identity',
     redirect: '/identity/service-account',
-    meta: { label: 'Identity', breadcrumb: true },
+    meta: { label: 'Identity' },
     components: {
         lnb: IdentityNavBar,
         main: Identity,
@@ -24,8 +22,6 @@ export default {
             path: 'service-account',
             meta: {
                 label: 'Service Account',
-                breadcrumb: true,
-                api: fluentApi.identity().serviceAccount(),
             },
             component: { template: '<router-view />' },
             children: [
@@ -65,8 +61,6 @@ export default {
             name: 'user',
             meta: {
                 label: 'User',
-                breadcrumb: true,
-                api: fluentApi.identity().user(),
             },
             redirect: '/identity/user',
             component: { template: '<router-view />' },
