@@ -80,24 +80,12 @@ export const makeTableSlots = (props: DynamicLayoutProps|any) => computed((): Dy
             name: `col-${ds.key}-format`,
         };
         if (res.type === 'datetime') {
-            if (!res.extra) res.extra = {};
-            if (!res.extra.timezone) res.extra.timezone = getTimezone();
+            if (!res.typeOptions) res.typeOptions = {};
+            if (!res.typeOptions.timezone) res.typeOptions.timezone = getTimezone();
         }
         return res;
     }) : []));
 
-export const makeDefs = (
-    fields: ComputedOrRef<DynamicFieldType[]>,
-    data: ComputedOrRef<any>,
-) => computed<DefinitionProps[]>(() => (
-    fields.value
-        ? (fields.value as DynamicFieldType[]).map(item => ({
-            name: item.key,
-            label: item.name,
-            type: item.type,
-            options: item.options,
-            data: _.get(data.value, item.key, ''),
-        })) : []));
 
 const matchMap = {
     'created_at.seconds': 'created_at',

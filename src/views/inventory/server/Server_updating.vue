@@ -14,7 +14,7 @@
                                   :options="tableSchema.options"
                                   :data="tableState.items"
                                   :fetch-options="fetchOptionState"
-                                  :extra="extraOptionState"
+                                  :type-options="extraOptionState"
                                   :style="{height: `${height}px`}"
                                   @init="fetchTableData"
                                   @fetch="fetchTableData"
@@ -184,7 +184,7 @@ import {
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { SearchKeyGroup } from '@/lib/component-utils/query-search/type';
 import {
-    QuerySearchTableExtra,
+    QuerySearchTableTypeOptions,
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -283,7 +283,7 @@ export default {
             queryTags: queryStringToQueryTags(vm.$route.query.filters),
         });
 
-        const extraOptionState: QuerySearchTableExtra = reactive({
+        const extraOptionState: QuerySearchTableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => user.state.timezone || 'UTC'),

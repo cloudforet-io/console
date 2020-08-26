@@ -7,7 +7,7 @@
             <template v-for="(layout, idx) in layouts" :slot="layout.name">
                 <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
                                   :fetch-options="fetchOptionsMap[layout.name]"
-                                  :extra="{
+                                  :type-options="{
                                       loading,
                                       totalCount,
                                       timezone,
@@ -16,6 +16,7 @@
                                       valueHandlerMap,
                                       language,
                                   }"
+                                  :field-handler="fieldHandler"
                                   v-on="getLayoutListeners(layout)"
                 />
             </template>
@@ -41,36 +42,21 @@ import ServerBaseInfo from '@/views/inventory/server/modules/ServerBaseInfo.vue'
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import {
     DynamicLayoutEventListeners,
-    DynamicLayoutExtra,
+    DynamicLayoutTypeOptions,
     DynamicLayoutFetchOptions,
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
 import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
-import { DynamicFieldOptions } from '@/components/organisms/dynamic-field/type';
+import {
+    DynamicFieldHandler,
+} from '@/components/organisms/dynamic-field/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import { SearchSchema } from '@/lib/component-utils/query-search/type';
 import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
-
-const rawLayout = {
-    name: 'Raw Data',
-    type: 'raw',
-
-};
-
-const defaultFetchOptions: DynamicLayoutFetchOptions = {
-    sortBy: '',
-    sortDesc: true,
-    pageStart: 1,
-    pageLimit: 15,
-    queryTags: [],
-    searchText: '',
-    listMap: {},
-};
+import referenceRouter from '@/lib/reference/referenceRouter';
 
 export default {
     name: 'PServerDetail',
@@ -285,6 +271,16 @@ export default {
             },
         });
 
+        const fieldHandler: DynamicFieldHandler = (item) => {
+            if (item.extraData?.reference) {
+                item.options.link = referenceRouter(
+                    item.extraData.reference.resource_type,
+                    item.extraData.reference.reference_key,
+                );
+            }
+            return item;
+        };
+
         project.getProject();
         provider.getProvider();
         serviceAccount.getServiceAccounts();
@@ -296,6 +292,7 @@ export default {
             baseInfoSchema,
             getLayoutListeners,
             fetchOptionsMap,
+            fieldHandler,
         };
     },
 };

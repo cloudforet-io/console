@@ -1,10 +1,9 @@
-import { StatQueryAPI } from '@/lib/fluent-api/statistics/toolset';
-import { FILTER_OPERATOR, FilterItem } from '@/lib/fluent-api/type';
-import { fluentApi, OPERATOR_MAP } from '@/lib/fluent-api';
+import { FilterItem } from '@/lib/fluent-api/type';
+import { OPERATOR_MAP } from '@/lib/fluent-api';
 import { get } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 import {
-    KeyItem, ValueHandler, ValueHandlerMap, ValueItem,
+    KeyItem, ValueHandlerMap, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
@@ -18,79 +17,6 @@ export const defaultACHandler: ACHandlerMeta = {
     keyItems: [],
     valueHandlerMap: {},
 };
-
-type getValueHandlerActionType<T> = (
-    api: T,
-    val: string,
-    keyItem: KeyItem,
-    itemLimit?: number,
-    sortBy?: string,
-    sortDesc?: boolean,
-) => T
-
-
-export const getStatAction: getValueHandlerActionType<StatQueryAPI<any, any>> = (
-    action: StatQueryAPI<any, any>,
-    val: string,
-    keyItem: KeyItem,
-    itemLimit = 10,
-    sortBy?: string,
-    sortDesc?: boolean,
-): StatQueryAPI<any, any> => {
-    let api = action.setDistinct(keyItem.name as string)
-        .setSort(sortBy || keyItem.name, sortDesc === undefined ? false : sortDesc);
-    api = api.setLimit(itemLimit);
-    if (val) {
-        api = api.setFilter({
-            key: keyItem.name,
-            operator: FILTER_OPERATOR.contain,
-            value: val,
-        });
-    }
-    return api;
-};
-
-
-export function getStatApiValueHandler(
-    resourceType: string,
-    getAction: getValueHandlerActionType<StatQueryAPI<any, any>> = getStatAction,
-    formatter: (res: any) => {
-        results: ValueItem[];
-        totalCount: number;
-    } = res => ({
-        results: res.data.results.map(d => ({ label: d, name: d })),
-        totalCount: res.data.total_count,
-    }),
-): ValueHandler {
-    return async (val: string, keyItem: KeyItem) => {
-        const res = await getAction(
-            fluentApi.statisticsTest().resource().stat().setResourceType(resourceType),
-            val, keyItem,
-        ).execute();
-        return formatter(res);
-    };
-}
-
-
-export function getStatApiValueHandlerMap(
-    keys: Array<string[]|string>,
-    resourceType: string,
-    getAction: getValueHandlerActionType<StatQueryAPI<any, any>> = getStatAction,
-    formatter: (res: any) => {
-        results: ValueItem[];
-        totalCount: number;
-    } = res => ({
-        results: res.data.results.map(d => ({ label: d, name: d })),
-        totalCount: res.data.total_count,
-    }),
-): ValueHandlerMap {
-    const map = {};
-    keys.forEach((key) => {
-        if (Array.isArray(key)) map[key[0]] = getStatApiValueHandler(resourceType, getAction, formatter);
-        else map[key] = getStatApiValueHandler(resourceType, getAction, formatter);
-    });
-    return map;
-}
 
 export const setFilterOrWithSuggestKeys = (query: FilterItem, keyItems: KeyItem[], filterOr: FilterItem[]): void => {
     keyItems.forEach((keyItem) => {
@@ -125,7 +51,7 @@ export const getFiltersFromQueryTags = (tags: QueryTag[]): {and: Filter[]; or: s
     const andMap: Record<string, Filter> = {};
     tags.forEach((q) => {
         if (q.key !== null && q.key !== undefined && !q.invalid) {
-            const operator = OPERATOR_MAP[q.operator] as FilterOperator
+            const operator = OPERATOR_MAP[q.operator] as FilterOperator;
             const filter = andMap[`${q.key.name}/${operator}`];
             if (filter && filter.o === operator) {
                 filter.v.push(q.value?.name || '');
