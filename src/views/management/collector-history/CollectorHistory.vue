@@ -69,7 +69,9 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import {
+    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
+} from '@/lib/component-utils/query-search';
 import router from '@/routes';
 
 enum JOB_STATUS {
@@ -124,14 +126,23 @@ export default {
             //
             selectedJobId: '',
             searchTags: [],
-            querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
-                title: 'Properties',
-                items: [
-                    // { key: 'job_id', name: 'Job ID' },
-                    // { key: 'collector_name', name: 'Collector Name' },
-                    { key: 'status', name: 'Status', enums: Object.values(JOB_STATUS) },
+            querySearchHandlers: {
+                keyItems: [
+                    {
+                        name: 'job_id',
+                        label: 'Job ID',
+                    },
+                    {
+                        name: 'status',
+                        label: 'Status',
+                    },
                 ],
-            }, 'inventory.CollectorHistory'),
+                valueHandlerMap: {
+                    // eslint-disable-next-line camelcase
+                    job_id: makeValueHandlerWithReference('inventory.Job', 'job_id'),
+                    status: makeValueHandlerWithSearchEnums(JOB_STATUS),
+                },
+            },
         });
 
         const convertStatus = (status) => {
@@ -193,13 +204,13 @@ export default {
                 query.setFilter(...and);
             }
 
-            return query;
+            return query.data;
         };
         const getJobs = async () => {
             state.loading = true;
             try {
                 const query = getQuery();
-                const res = await SpaceConnector.client.inventory.job.list({ query: query.data });
+                const res = await SpaceConnector.client.inventory.job.list({ query });
                 state.jobs = res.results;
                 state.totalCount = res.total_count;
 

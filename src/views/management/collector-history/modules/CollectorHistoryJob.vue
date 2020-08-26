@@ -96,7 +96,10 @@ import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import {
+    makeQuerySearchHandlersWithSearchSchema,
+    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums
+} from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
@@ -149,8 +152,8 @@ export default {
                 { label: 'No.', name: 'sequence' },
                 { label: 'Error Code', name: 'error_code' },
                 { label: 'Error Message', name: 'message' },
-                { label: 'Resource Type', name: 'resource_type' },
-                { label: 'Resource ID', name: 'resource_id' },
+                { label: 'Resource Type', name: 'additional.resource_type' },
+                { label: 'Resource ID', name: 'additional.resource_id' },
             ],
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },
@@ -171,12 +174,29 @@ export default {
             totalCount: 0,
             //
             searchTags: [],
-            querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
-                title: 'Properties',
-                items: [
-                    { key: 'status', name: 'Status', enums: Object.values(JOB_TASK_STATUS) },
+            querySearchHandlers: {
+                keyItems: [
+                    {
+                        name: 'service_account_id',
+                        label: 'Service Account',
+                    },
+                    {
+                        name: 'project_id',
+                        label: 'Project',
+                    },
+                    {
+                        name: 'status',
+                        label: 'Status',
+                    },
                 ],
-            }, 'inventory.CollectorHistory'),
+                valueHandlerMap: {
+                    // eslint-disable-next-line camelcase
+                    service_account_id: makeValueHandlerWithReference('identity.ServiceAccount'),
+                    // eslint-disable-next-line camelcase
+                    project_id: makeValueHandlerWithReference('identity.Project'),
+                    status: makeValueHandlerWithSearchEnums(JOB_TASK_STATUS),
+                },
+            },
         });
 
         const convertStatus = (status) => {

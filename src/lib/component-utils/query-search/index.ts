@@ -50,6 +50,7 @@ export function getEnumValueHandler(keys: KeyParam): ValueHandler {
     };
 }
 
+// Do not use except in case of using PAutoCompleteSearch component
 export function makeAutocompleteHandlerWithReference(resourceType: string, distinct?: string, limit?: number): AutocompleteHandler {
     let api = fluentApi.addons().autocomplete().get()
         .setResourceType(resourceType)
