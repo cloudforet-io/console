@@ -5,7 +5,6 @@ import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import md from '@/components/organisms/context-menu/PContextMenu.md';
-import style from '@/components/organisms/context-menu/PContextMenu.stories.scss';
 
 export default {
     title: 'organisms/context-menu/context-menu',
