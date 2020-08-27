@@ -4,7 +4,7 @@ import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vu
 import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { VNodeData } from 'vue';
 import { EnumOptions } from '@/components/organisms/dynamic-field/type/field-schema';
-import {EnumDynamicFieldProps} from "@/components/organisms/dynamic-field/templates/enum/type";
+import { EnumDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/enum/type';
 
 export default {
     name: 'PDynamicFieldEnum',
@@ -20,6 +20,10 @@ export default {
             default: null,
         },
         typeOptions: {
+            type: Object,
+            default: () => ({}),
+        },
+        extraData: {
             type: Object,
             default: () => ({}),
         },
@@ -41,7 +45,12 @@ export default {
         );
         return h(PDynamicField, {
             props: {
-                ...option, data: props.data, typeOptions: props.typeOptions, beforeCreate: props.beforeCreate, handler: props.handler,
+                ...option,
+                data: props.data,
+                typeOptions: props.typeOptions,
+                beforeCreate: props.beforeCreate,
+                handler: props.handler,
+                extraData: props.extraData,
             },
             on: listeners,
         } as VNodeData);

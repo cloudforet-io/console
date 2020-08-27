@@ -16,6 +16,22 @@ export default {
             type: [String, Object, Array, Boolean, Number, null],
             default: null,
         },
+        typeOptions: {
+            type: Object,
+            default: () => ({}),
+        },
+        extraData: {
+            type: Object,
+            default: () => ({}),
+        },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
     },
     render(h, { props, data }: {props: TextDynamicFieldProps; data: any}) {
         let text = (typeof props.data === 'string') ? props.data : JSON.stringify(props.data);

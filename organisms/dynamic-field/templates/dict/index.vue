@@ -21,6 +21,18 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        extraData: {
+            type: Object,
+            default: () => ({}),
+        },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
     },
     render(h, { props }: {props: DictDynamicFieldProps}) {
         const dictEl = h(PDictList, {

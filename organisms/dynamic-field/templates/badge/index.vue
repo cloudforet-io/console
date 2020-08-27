@@ -24,6 +24,18 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        extraData: {
+            type: Object,
+            default: () => ({}),
+        },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
     },
     render(h, { props }: {props: BadgeDynamicFieldProps}) {
         const options: BadgeOptions = props.options;

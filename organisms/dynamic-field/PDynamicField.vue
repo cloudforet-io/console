@@ -2,7 +2,7 @@
     <component :is="component"
                :options="proxy.options"
                :data="proxy.data"
-               :typeOptions="proxy.typeOptions"
+               :type-options="proxy.typeOptions"
                :before-create="beforeCreate"
                :handler="handler"
                v-on="$listeners"
@@ -37,6 +37,10 @@ export default {
             type: [String, Object, Array, Boolean, Number, null],
             default: '',
         },
+        extraData: {
+            type: Object,
+            default: () => ({}),
+        },
         typeOptions: {
             type: Object,
             default: () => ({}),
@@ -60,6 +64,7 @@ export default {
                     options: props.options,
                     data: props.data,
                     typeOptions: props.typeOptions,
+                    extraData: props.extraData,
                 };
                 if (props.handler) return props.handler(res);
 

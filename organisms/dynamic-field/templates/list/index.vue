@@ -25,6 +25,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        extraData: {
+            type: Object,
+            default: () => ({}),
+        },
         beforeCreate: {
             type: Function,
             default: undefined,
@@ -46,6 +50,7 @@ export default {
             type: listOptions.item ? listOptions.item.type : 'text',
             options,
             typeOptions: props.typeOptions,
+            extraData: props.extraData,
             beforeCreate: props.beforeCreate,
             handler: props.handler,
         };

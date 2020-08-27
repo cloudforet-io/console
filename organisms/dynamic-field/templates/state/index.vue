@@ -21,6 +21,22 @@ export default {
             type: [String, Object, Array, Boolean, Number],
             default: '',
         },
+        typeOptions: {
+            type: Object,
+            default: () => ({}),
+        },
+        extraData: {
+            type: Object,
+            default: () => ({}),
+        },
+        beforeCreate: {
+            type: Function,
+            default: undefined,
+        },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
     },
     render(h, { props }: {props: StateDynamicFieldProps}) {
         const options: StateOptions = props.options;
