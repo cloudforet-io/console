@@ -123,15 +123,15 @@
                         </p-icon-text-button>
                     </router-link>
                 </div>
-            </div>
-            <div v-if="!loading && items.length > 0" class="pagination">
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
-                              @prevPage="prevPage"
-                              @nextPage="nextPage"
-                              @clickPage="clickPage"
-                />
+                <div v-if="!loading && items.length > 0" class="pagination">
+                    <p-pagination :total-count="totalCount"
+                                  :this-page.sync="thisPage"
+                                  :page-size.sync="pageSize"
+                                  @prevPage="prevPage"
+                                  @nextPage="nextPage"
+                                  @clickPage="clickPage"
+                    />
+                </div>
             </div>
         </template>
     </p-vertical-page-layout>
