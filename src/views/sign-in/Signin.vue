@@ -77,7 +77,6 @@ export default {
             }),
         });
         const login = async (userId: string, credentials: Credentials) => {
-            console.debug('store', store);
             store.user.setToken(credentials.refresh_token, credentials.access_token);
             await store.user.setUser(state.userType, userId, vm);
             setGtagUserID(vm);

@@ -84,7 +84,6 @@ export class API {
 
         this.setRefreshRequestInterceptor((request) => {
             request.headers.Authorization = `Bearer ${SpaceConnector.refreshToken}`;
-            console.log(SpaceConnector.refreshToken);
             // if (this.store.user.state.isSignedIn) {
             //     request.headers.Authorization = `Bearer ${this.store.user.state.refreshToken}`;
             // }
