@@ -2,7 +2,7 @@
     <general-page-layout class="collector-history">
         <div v-if="!selectedJobId">
             <p-page-title :title="pageTitle" />
-            <!--            <p-collector-history-chart :loading="loading" />-->
+            <p-collector-history-chart :loading="loading" />
             <p-query-search-table
                 :fields="fields"
                 :items="items"
@@ -18,6 +18,7 @@
                 :style="{height: '100%'}"
                 :selectable="false"
                 :row-cursor-pointer="rowCursorPointer"
+                :excel-visible="false"
                 @change="onChange"
                 @rowLeftClick="onSelect"
             >
@@ -46,9 +47,9 @@
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
-                              @prevPage="prevPage"
-                              @nextPage="nextPage"
-                              @clickPage="clickPage"
+                              @prevPage="onClickPrevPageButton"
+                              @nextPage="onClickNextPageButton"
+                              @clickPage="onClickPageNumber"
                 />
             </div>
         </div>
@@ -69,10 +70,11 @@ import {
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
-// import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
+import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -82,7 +84,6 @@ import {
     makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
 } from '@/lib/component-utils/query-search';
 import router from '@/routes';
-import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
 enum JOB_STATUS {
@@ -98,8 +99,8 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'PCollectorHistory',
     components: {
+        PCollectorHistoryChart,
         PPagination,
-        // PCollectorHistoryChart,
         PCollectorHistoryJob,
         PQuerySearchTable,
         PPageTitle,
@@ -272,22 +273,19 @@ export default {
                 console.error(e);
             }
         };
-        const clickPage = async (page) => {
+        const onClickPageNumber = async (page) => {
             state.thisPage = page;
             await getJobs();
         };
-
-        const prevPage = async (page) => {
+        const onClickPrevPageButton = async (page) => {
             state.thisPage = page - 1;
             if (state.thisPage <= 0) state.thisPage = 1;
             await getJobs();
         };
-
-        const nextPage = async (page) => {
+        const onClickNextPageButton = async (page) => {
             state.thisPage = page + 1;
             await getJobs();
         };
-
         const onClickGoBack = () => {
             state.selectedJobId = '';
             // eslint-disable-next-line no-empty-function
@@ -312,9 +310,9 @@ export default {
             ...toRefs(state),
             onSelect,
             onChange,
-            clickPage,
-            prevPage,
-            nextPage,
+            onClickPageNumber,
+            onClickPrevPageButton,
+            onClickNextPageButton,
             onClickGoBack,
             onClickStatus,
         };
@@ -324,7 +322,7 @@ export default {
 
 <style lang="postcss">
 .collector-history {
-    .toolbox {
+    .toolbox-top {
         .filter-button-lap {
             @apply border-r border-gray-200;
             display: inline-block;
@@ -353,6 +351,7 @@ export default {
     }
 
     .p-query-search-table {
+        margin-top: 2rem;
         .p-data-table {
             .error, .timeout, .canceled {
                 @apply text-red-500;

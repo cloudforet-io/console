@@ -31,6 +31,7 @@
                     :multi-select="false"
                     :select-index.sync="selectedIndexes"
                     :disabled-index="disabledIndex"
+                    :excel-visible="false"
                     @change="onChange"
                     @rowLeftClick="onSelect"
                 >
@@ -74,7 +75,7 @@
             >
                 <template #col-message-format="{ value }" style="width: 20rem;">
                     <div class="error-message">
-                        {{ value }}
+                        {{ value.replace(/\'/g, '') }}
                     </div>
                 </template>
             </p-data-table>
@@ -92,6 +93,7 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -101,7 +103,6 @@ import {
 } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
-import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
 enum JOB_TASK_STATUS {
