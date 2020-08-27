@@ -137,7 +137,7 @@ import { get } from 'lodash';
 
 import { Component } from 'vue/types/umd';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy, UnwrapRef,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy, UnwrapRef, onMounted,
 } from '@vue/composition-api';
 
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
@@ -206,6 +206,15 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        // onMounted(async () => {
+        //     await vm.$store.dispatch('resource/loadAll');
+        //     console.log(vm.$store.state.resource.project.items['project-18655561c535']?.label);
+        //     console.log(vm.$store.state.resource.serviceAccount);
+        //     console.log(vm.$store.state.resource.secret.items);
+        //     console.log(vm.$store.state.resource.collector.items);
+        //     console.log(vm.$store.state.resource.provider.items);
+        // });
         const state = reactive({
             fields: [
                 { name: 'name', label: 'Name', options: { width: '14rem' } },

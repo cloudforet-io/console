@@ -228,7 +228,7 @@ export default {
             if (after && after !== before) {
                 await getData();
             }
-        });
+        }, { immediate: false });
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
         const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({

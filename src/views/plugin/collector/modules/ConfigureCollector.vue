@@ -216,14 +216,14 @@ export default {
 
         watch(() => props.pluginId, (val) => {
             if (val) getVersions();
-        });
+        }, { immediate: true });
 
         watch(() => props.optionsSchema, (val) => {
             if (val) {
                 optionsFormTS.setProperty(val);
                 init(state.proxyForm);
             }
-        });
+        }, { immediate: true });
 
 
         return {

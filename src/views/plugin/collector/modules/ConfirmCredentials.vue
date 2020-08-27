@@ -111,7 +111,7 @@ export default {
                 await Promise.all([listSecretCount(), getProviderSchemaList()]);
                 state.loading = false;
             }
-        });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -119,7 +119,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-
-</style>

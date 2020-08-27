@@ -42,6 +42,7 @@ export default defineComponent({
         const configInit = async () => {
             await config.init();
             await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
+                // TODO: open session expire modal
                 logout(vm);
             });
             Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'), vm);

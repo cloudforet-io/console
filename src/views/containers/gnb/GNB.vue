@@ -16,8 +16,7 @@
                  :key="idx"
                  class="menu-lap"
             >
-                <div v-if="!dItem.isAdminMenu || isDomainOwner"
-                     class="menu-button opacity mr-4 lg:mr-8"
+                <div class="menu-button opacity mr-4 lg:mr-8"
                      :class="[{
                          opened: dItem.menu.length > 0 && openedMenu === dItem.key,
                          selected: dItem.parentRoutes.includes(selectedMenu)
@@ -41,6 +40,9 @@
                     class="white"
                     :menu="dItem.menu"
                 >
+                    <template #item-plugin>
+                        <div v-if="!isDomainOwner" class="empty" />
+                    </template>
                     <template #item--format="{item}">
                         <router-link :to="item.link" @click.native="hideMenu">
                             <div>{{ item.label }}</div>
@@ -170,14 +172,12 @@ export default {
                 {
                     key: 'project',
                     link: '/project',
-                    isAdminMenu: false,
                     parentRoutes: ['project'],
                     menu: [],
                 },
                 {
                     key: 'inventory',
                     link: '/inventory',
-                    isAdminMenu: false,
                     parentRoutes: ['inventory'],
                     menu: [
                         {
@@ -191,7 +191,6 @@ export default {
                 {
                     key: 'identity',
                     link: '/identity',
-                    isAdminMenu: false,
                     parentRoutes: ['identity'],
                     menu: [
                         {
@@ -208,7 +207,6 @@ export default {
                 {
                     key: 'plugin',
                     link: '/plugin',
-                    isAdminMenu: false,
                     parentRoutes: ['plugin'],
                     menu: [
                         {
@@ -219,7 +217,6 @@ export default {
                 {
                     key: 'management',
                     link: '/management',
-                    isAdminMenu: true,
                     parentRoutes: ['management'],
                     menu: [
                         {
@@ -253,9 +250,6 @@ export default {
                     link: 'https://github.com/spaceone-dev',
                     target: '_blank',
                 },
-                // {
-                //     type: 'item', label: 'Send Feedback', name: 'send-feedback', disabled: true,
-                // },
             ],
             accountMenu: [
                 {

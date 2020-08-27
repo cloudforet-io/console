@@ -327,7 +327,7 @@ export default {
                 await getFields(after[0], after[1], after[2]);
                 // exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
-        });
+        }, { immediate: true });
         // apiHandler.getData();
 
 
@@ -455,7 +455,7 @@ export default {
                         if (af && af !== be) {
                             getLayouts();
                         }
-                    });
+                    }, { immediate: true });
                 } else if (watchStop) {
                     watchStop();
                     dynamicLayoutState.layouts = null;

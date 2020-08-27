@@ -106,10 +106,15 @@ export default {
                         model: 'name',
                         min: 2,
                         required: true,
-                        validator: VueFormGenerator.validators.string.locale({
+                        validator: [VueFormGenerator.validators.string.locale({
                             fieldIsRequired: 'should NOT be shorter than 2 characters',
                             textTooSmall: 'should NOT be shorter than 2 characters',
-                        }),
+                        }), (value) => {
+                            if (state.names.includes(value)) {
+                                return ['Name is duplicated'];
+                            }
+                            return [];
+                        }],
                     },
                     {
                         type: 'input',
@@ -171,7 +176,7 @@ export default {
             disabled: computed(() => some(tabState.invalidState, v => v === true)),
         });
 
-        const getPlugin = async (): Promise<void> => {
+        const getPlugin = async () => {
             try {
                 const res = await fluentApi.repository().plugin().get().setId(state.pluginId)
                     .execute();

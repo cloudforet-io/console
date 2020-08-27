@@ -112,12 +112,12 @@ export default {
                         if ((isShow && isShow !== beforeIsShow) || (afterApi.resource !== beforeApi?.resource || afterApi.getAction !== beforeApi?.getAction)) {
                             getData();
                         }
-                    });
+                    }, { immediate: true });
                 } else if (apiWatchStop) {
                     apiWatchStop();
                 }
             }
-        });
+        }, { immediate: true });
 
 
         const readonlyData = computed(() => (state.isApiMode ? state.data : props.data));

@@ -16,6 +16,7 @@
                                   :fetch-options="fetchOptionState"
                                   :type-options="extraOptionState"
                                   :style="{height: `${height}px`}"
+                                  :field-handler="fieldHandler"
                                   @init="fetchTableData"
                                   @fetch="fetchTableData"
                                   @select="onSelect"
@@ -188,6 +189,8 @@ import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitori
 import config from '@/lib/config';
 import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
+import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 import searchSchema from './default-schema/search.json';
 import tableSchema from './default-schema/base-table.json';
 
@@ -404,6 +407,20 @@ export default {
             }
         };
 
+        const fieldHandler: DynamicFieldHandler = (item) => {
+            if (item.extraData?.reference) {
+                item.options.link = referenceRouter(
+                    item.extraData.reference.resource_type,
+                    item.data,
+                );
+
+                if (item.extraData.reference.resource_type === 'identity.Project') {
+                    item.data = project.state.projects[item.data];
+                }
+            }
+            return item;
+        };
+
 
         /** Change Project */
         const changeProjectState = reactive({
@@ -598,6 +615,7 @@ export default {
             exportServerData,
             listServerData,
             fetchTableData,
+            fieldHandler,
 
             /* Change Project */
             changeProjectState,

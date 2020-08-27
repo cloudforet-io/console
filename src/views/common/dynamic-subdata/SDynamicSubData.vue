@@ -94,11 +94,11 @@ export default {
         const buttons = computed(() => state.names.map(name => ({
             name, label: name, styleType: 'gray900', outline: selected.value !== name,
         })));
-        watch<string[]>(() => state.names, _.debounce((aft, bef) => {
+        watch<string[], boolean>(() => state.names, _.debounce((aft, bef) => {
             if (aft && aft[0] && aft.indexOf(selected.value) === -1) {
                 selected.value = aft[0];
             }
-        }, 400));
+        }, 400), { immediate: true });
 
 
         return {

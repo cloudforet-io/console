@@ -14,17 +14,17 @@
             <ul v-for="(aItem, aIdx) in allMenu"
                 :key="aIdx"
             >
-                <div v-if="!aItem.isAdminMenu || isDomainOwner">
-                    <router-link :to="aItem.link">
-                        <li class="menu" @click="hide">
-                            {{ aItem.label }}
-                        </li>
-                    </router-link>
-                    <div v-if="aItem.subMenus.length > 0">
-                        <div v-for="(sItem, sIdx) in aItem.subMenus"
-                             :key="sIdx"
-                        >
-                            <router-link :to="sItem.link">
+                <router-link :to="aItem.link">
+                    <li class="menu" @click="hide">
+                        {{ aItem.label }}
+                    </li>
+                </router-link>
+                <div v-if="aItem.subMenus.length > 0">
+                    <div v-for="(sItem, sIdx) in aItem.subMenus"
+                         :key="sIdx"
+                    >
+                        <div v-if="!sItem.isAdminMenu || isDomainOwner">
+                            <router-link v-if="sItem" :to="sItem.link">
                                 <li class="submenu" @click="hide">
                                     {{ sItem.label }}
                                 </li>
@@ -38,8 +38,8 @@
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
 import vClickOutside from 'v-click-outside';
+import { reactive, toRefs } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
@@ -61,15 +61,14 @@ export default {
             visible: false,
             allMenu: [
                 {
-                    label: 'Dashboard', link: '/dashboard', isAdminMenu: false, subMenus: [],
+                    label: 'Dashboard', link: '/dashboard', subMenus: [],
                 },
                 {
-                    label: 'Project', link: '/project', isAdminMenu: false, subMenus: [],
+                    label: 'Project', link: '/project', subMenus: [],
                 },
                 {
                     label: 'Inventory',
                     link: '/inventory',
-                    isAdminMenu: false,
                     subMenus: [
                         { label: 'Server', link: '/inventory/server' },
                         { label: 'Cloud Service', link: '/inventory/cloud-service' },
@@ -78,7 +77,6 @@ export default {
                 {
                     label: 'Identity',
                     link: '/identity',
-                    isAdminMenu: false,
                     subMenus: [
                         { label: 'Service Account', link: '/identity/service-account' },
                         { label: 'User', link: '/identity/user' },
@@ -87,7 +85,6 @@ export default {
                 {
                     label: 'Plugin',
                     link: '/plugin',
-                    isAdminMenu: false,
                     subMenus: [
                         { label: 'Collector', link: '/plugin/collector' },
                     ],
@@ -95,9 +92,8 @@ export default {
                 {
                     label: 'Management',
                     link: '/management',
-                    isAdminMenu: true,
                     subMenus: [
-                        { label: 'Plugin', link: '/management/supervisor/plugins' },
+                        { label: 'Plugin', link: '/management/supervisor/plugins', isAdminMenu: true },
                         { label: 'Collector History', link: '/management/collector-history' },
                     ],
                 },
@@ -134,12 +130,11 @@ export default {
     }
 
     .sitemap {
-        @apply bg-white text-gray-900 text-sm;
+        @apply bg-white border border-gray-200 text-gray-900 text-sm;
         position: absolute;
         top: 2.5rem;
         left: 0;
         width: 14rem;
-        border: 1px solid theme('colors.gray.200');
         box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
         padding: 0.5rem;
         z-index: 10;

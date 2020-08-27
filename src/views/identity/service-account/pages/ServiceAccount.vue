@@ -443,7 +443,7 @@ export default {
                     secretApiHandler.getData();
                 }
             }
-        });
+        }, { immediate: true });
         const adminIsShow = computed(() => {
             let result = false;
             if (selectProvider.value) {

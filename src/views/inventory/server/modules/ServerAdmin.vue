@@ -124,7 +124,7 @@ export default {
 
         watch(() => props.serverIds, (after, before) => {
             if (after !== before) listAdmin();
-        });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

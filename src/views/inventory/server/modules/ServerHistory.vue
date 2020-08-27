@@ -136,7 +136,7 @@ export default {
 
         watch(() => props.serverId, (after, before) => {
             if (after !== before) listHistory();
-        });
+        }, { immediate: false });
 
         return {
             ...toRefs(state),

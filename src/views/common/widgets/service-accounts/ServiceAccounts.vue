@@ -126,7 +126,7 @@ export default {
                 .setShowTotalCount(false)
                 .setAnimationDuration(0)
                 .apply();
-        });
+        }, { immediate: true });
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;

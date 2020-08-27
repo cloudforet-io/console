@@ -353,19 +353,15 @@ export default {
         onMounted(() => {
             watch(() => state.statisticsTypes, (types) => {
                 if (types) state.selectedStat = types[0] || STATISTICS_TYPE.average;
-            });
+            }, { immediate: true });
 
             watch([() => props.resources, () => state.selectedToolId], (resources, toolId) => {
                 if (resources.length > 0 && toolId) listAll();
-            }, {
-                immediate: false,
-            });
+            }, { immediate: false });
 
             watch([() => state.selectedTimeRange, () => state.selectedStat], (timeRange, stat) => {
                 if (timeRange && stat) listChartMetrics();
-            }, {
-                immediate: false,
-            });
+            }, { immediate: false });
 
             listAll();
         });

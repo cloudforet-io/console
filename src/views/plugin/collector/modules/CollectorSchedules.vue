@@ -190,7 +190,7 @@ export default {
 
         watch(() => props.collectorId, async () => {
             await listSchedules();
-        });
+        }, { immediate: true });
 
 
         return {
