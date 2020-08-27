@@ -21,7 +21,7 @@ jobs:
         run: npm install
 
       - name: build
-        run: npm run build:storybook:github
+        run: npm run build-storybook
 
       - name: clean s3 bucket
         env:
@@ -39,7 +39,7 @@ jobs:
           --region ap-northeast-2 \
           --acl public-read \
           .out s3://storybook-developer
-          
+
       - name: Invalidate cache
         env:
           AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}'

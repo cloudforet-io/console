@@ -56,10 +56,9 @@
             </template>
 
             <template #tag>
-                <s-tags-panel
-                    :is-show="singleItemTab.syncState.activeTab==='tag'"
-                    :resource-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
-                    tag-page-name="cloudServicePageTags"
+                <s-tags-panel :resource-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
+                              resource-type="inventory.CloudService"
+                              resource-key="cloud_service_id"
                 />
             </template>
             <template #member>

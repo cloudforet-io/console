@@ -31,6 +31,7 @@
                     :multi-select="false"
                     :select-index.sync="selectedIndexes"
                     :disabled-index="disabledIndex"
+                    :excel-visible="false"
                     @change="onChange"
                     @rowLeftClick="onSelect"
                 >
@@ -72,9 +73,9 @@
                           table-style-type="light"
                           bordered
             >
-                <template #col-message-format="{ value }" style="width: 20rem">
+                <template #col-message-format="{ value }" style="width: 20rem;">
                     <div class="error-message">
-                        {{ value }}
+                        {{ value.replace(/\'/g, '') }}
                     </div>
                 </template>
             </p-data-table>
@@ -92,17 +93,17 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import {
-    makeQuerySearchHandlersWithSearchSchema,
-    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums
+    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
 } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
-import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -226,7 +227,7 @@ export default {
             state.items = [];
             jobTasks.forEach((task, index) => {
                 const newTask = {
-                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    sequence: getPageStart(state.thisPage, state.pageSize) + index,
                     // eslint-disable-next-line camelcase
                     service_account_id: convertServiceAccountName(task.service_account_id),
                     // eslint-disable-next-line camelcase
@@ -260,7 +261,7 @@ export default {
             const query = new QueryHelper();
             query
                 .setSort(state.sortBy, state.sortDesc)
-                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setKeyword(...or);
             if (statusValues.length > 0) {
                 query.setFilter({
@@ -401,9 +402,11 @@ export default {
                 @apply text-gray-500;
             }
             .error-message {
-                /*white-space: nowrap;*/
-                /*overflow: hidden;*/
-                /*text-overflow: ellipsis;*/
+                /* white-space: nowrap; */
+
+                /* overflow: hidden; */
+
+                /* text-overflow: ellipsis; */
             }
         }
     }

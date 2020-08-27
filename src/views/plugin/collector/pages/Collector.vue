@@ -71,8 +71,9 @@
                 <collector-detail :collector-id="selectedItems[0].collector_id" />
             </template>
             <template #tag>
-                <s-tags-panel :is-show="singleItemTab.syncState.activeTab==='tag'"
-                              :resource-id="selectedItems[0].collector_id"
+                <s-tags-panel :resource-id="selectedItems[0].collector_id"
+                              resource-type="inventory.Collector"
+                              resource-key="collector_id"
                               tag-page-name="collectorTags"
                 />
             </template>
@@ -168,6 +169,7 @@ import { getFiltersFromQueryTags, getQueryItemsToFilterItems, parseTag } from '@
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 const GeneralPageLayout = (): Component => import('@/views/containers/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
@@ -401,7 +403,7 @@ export default {
             const query = new QueryHelper();
             query
                 .setSort(state.sortBy, state.sortDesc)
-                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setKeyword(...or)
                 .setFilter(...and)
                 .setOnly(

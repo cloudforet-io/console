@@ -73,26 +73,6 @@
                     @change="onChange"
                     @refresh="onChange"
                 >
-                    <template #no-data>
-                        <div v-if="!items || items.length === 0" class="text-center empty-cloud-service">
-                            <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
-                            <p class="text-primary2 mb-12">
-                                We need your registration for monitoring cloud resources.
-                            </p>
-                            <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
-                                <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                                    class="mx-auto text-center"
-                                >
-                                    {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
-                                </p-icon-text-button>
-                            </router-link>
-                        </div>
-                    </template>
-                    <template #loading>
-                        <p-lottie name="thin-spinner" :size="2"
-                                  :auto="true" style="margin-right: 2rem;"
-                        />
-                    </template>
                     <template #card="{item}">
                         <router-link :to="getToCloudService(item)">
                             <div class="left">
@@ -130,13 +110,28 @@
                         </router-link>
                     </template>
                 </p-search-grid-layout>
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
-                              @prevPage="prevPage"
-                              @nextPage="nextPage"
-                              @clickPage="clickPage"
-                />
+                <div v-if="!loading && items.length === 0" class="text-center empty-cloud-service">
+                    <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
+                    <p class="text-primary2 mb-12">
+                        We need your registration for monitoring cloud resources.
+                    </p>
+                    <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
+                        <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                            class="mx-auto text-center"
+                        >
+                            {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                        </p-icon-text-button>
+                    </router-link>
+                </div>
+                <div v-if="!loading && items.length > 0" class="pagination">
+                    <p-pagination :total-count="totalCount"
+                                  :this-page.sync="thisPage"
+                                  :page-size.sync="pageSize"
+                                  @prevPage="prevPage"
+                                  @nextPage="nextPage"
+                                  @clickPage="clickPage"
+                    />
+                </div>
             </div>
         </template>
     </p-vertical-page-layout>
@@ -189,6 +184,7 @@ import { KeyItem } from '@/components/organisms/search/query-search/type';
 import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios';
 import { APIError } from '@/lib/space-connector/api';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
 
@@ -411,7 +407,7 @@ export default {
                 .setKeyword(...or)
                 .setFilter(...and, ...filters);
             if (!isTriggeredBySideFilter) {
-                query.setPageStart(((state.thisPage - 1) * state.pageSize) + 1);
+                query.setPageStart(getPageStart(state.thisPage, state.pageSize));
             }
 
             return {
@@ -504,13 +500,13 @@ export default {
                 const res = queryRefs.provider.value;
                 selectedProvider.value = res || providerState.items[0].provider;
                 setSearchTags();
-                watch<string>(selectedProvider, debounce(async (after) => {
+                watch<string, boolean>(selectedProvider, debounce(async (after) => {
                     if (!after) return;
                     if (after) {
                         await listRegionByProvider(after);
                     }
                     await replaceQuery('provider', after);
-                }, 50));
+                }, 50), { immediate: true });
                 await listCloudServiceType();
             }
         };
@@ -671,5 +667,10 @@ export default {
         .empty-cloud-service-img {
             @apply w-48 mx-auto pt-19 mb-8;
         }
+    }
+    .pagination {
+        text-align: center;
+        padding-top: 1.5rem;
+        bottom: 0;
     }
 </style>

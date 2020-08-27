@@ -3,115 +3,127 @@
         <template #loader>
             <p-skeleton width="100%" height="16rem" />
         </template>
+        <p-date-pagination :date.sync="currentDate" />
         <canvas ref="chartRef" />
     </p-chart-loader>
 </template>
 
 <script lang="ts">
 import {
-    chain, orderBy, range, max,
+    orderBy, range, max, find,
 } from 'lodash';
 import moment from 'moment';
 import numeral from 'numeral';
-import { Moment } from 'moment-timezone/moment-timezone';
 
-import { reactive, watch, toRefs } from '@vue/composition-api';
+import {
+    reactive, watch, toRefs, computed,
+} from '@vue/composition-api';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PDatePagination from '@/components/organisms/date-pagination/pDatePagination.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { NSChart } from '@/lib/chart/s-chart';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
 import {
     black, coral, gray, primary,
 } from '@/styles/colors';
 
 const TICKS_COUNT = 5;
-const DAY_COUNT = 30;
 const DEFAULT_MAX = 600;
 const DEFAULT_STEP_SIZE = 100;
 const LEGEND_COLORS: {[k: string]: string} = {
     success: primary,
     failure: coral.default,
 };
-interface DataType {
+
+interface ChartDataType {
     date: string;
-    success: number;
-    failure: number;
+    success: number | null;
+    failure: number | null;
 }
-// interface State {
-//     loading: boolean;
-//     chartRef: HTMLCanvasElement|null;
-//     chart: Chart|null;
-//     data: DataType[];
-//     currentDate: Moment;
-//     selectedDate: string;
-// }
 
 export default {
     name: 'PCollectorHistoryChart',
-    components: { PSkeleton, PChartLoader },
+    components: {
+        PDatePagination,
+        PSkeleton,
+        PChartLoader,
+    },
     setup() {
         const state = reactive({
             loading: true,
             chartRef: null as HTMLCanvasElement|null,
             chart: null as null|NSChart,
-            data: [] as any,
+            chartData: [] as ChartDataType[],
+            successData: [] as number[],
+            failureData: [] as number[],
+            noData: false,
+            //
             currentDate: moment().tz(getTimezone()),
+            currentDateText: computed(() => state.currentDate.format('YYYY-MM-DD')),
+            currentMonthStart: computed(() => moment(state.currentDateText).startOf('month')),
+            currentMonthEnd: computed(() => moment(state.currentDateText).endOf('month')),
+            dayCount: computed(() => state.currentDate.daysInMonth()),
             selectedDate: '',
         });
 
-        const getJobStat = async () => {
+        const initChartData = (rawData) => {
+            state.noData = rawData.length === 0;
+
+            const orderedData = orderBy(rawData, ['date'], ['asc']);
+            const dateFormattedData = orderedData.map(d => ({
+                date: moment(d.date).tz(getTimezone()).format('YYYY-MM-DD'),
+                success: d.success,
+                failure: d.failure,
+            }));
+            const chartData = [] as ChartDataType[];
+            const today = moment().tz(getTimezone());
+            const now = moment(state.currentMonthStart.format());
+
+            while (now.isSameOrBefore(state.currentMonthEnd)) {
+                const nowText = now.format('YYYY-MM-DD');
+                const existData = find(dateFormattedData, { date: nowText });
+                let success: number | null = 0;
+                let failure: number | null = 0;
+
+                if (existData) {
+                    success = existData.success;
+                    failure = existData.failure;
+                } else if (now.isAfter(today, 'days')) {
+                    success = null;
+                    failure = null;
+                }
+                chartData.push({
+                    date: now.format('YYYY-MM-DD'),
+                    success,
+                    failure,
+                });
+
+                now.add(1, 'days');
+            }
+            return chartData;
+        };
+        const getDailyJobSummary = async () => {
             state.loading = true;
             try {
-                // const query = new QueryHelper();
-                // query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
-                // const res = await SpaceConnector.client.statistics.topic.dailyJobSummary();
-
-                const res = await fluentApi.statisticsTest().history().stat<DataType>()
-                    .setTopic('daily_job_summary')
-                    .addGroupKey('created_at', 'date')
-                    .addGroupField('success', STAT_OPERATORS.sum, 'values.success_count')
-                    .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
-                    .setFilter({ key: 'created_at', value: `now/d-${DAY_COUNT - 1}d`, operator: FILTER_OPERATOR.gtTime })
-                    .execute();
-                state.data = res.data.results.map(d => ({
-                    date: d.date,
-                    success: d.success,
-                    failure: d.failure,
-                }));
+                const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
+                    start: state.currentMonthStart.format(),
+                    end: state.currentMonthEnd.format(),
+                });
+                state.chartData = initChartData(res.results);
             } catch (e) {
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
-
-        const initChartData = () => {
-            let data;
-            if (state.data.length > 0) {
-                data = orderBy(state.data, ['date'], ['asc']);
-            } else {
-                data = chain(range(0, DAY_COUNT))
-                    .map(i => ({
-                        failure: null,
-                        success: null,
-                        date: moment().subtract(i, 'days').toISOString(),
-                    }))
-                    .orderBy(['date'], ['asc'])
-                    .value();
-            }
-            return data;
-        };
         const drawChart = (canvas) => {
-            const chartData = initChartData();
             const datasets = [
                 {
                     label: 'Success',
-                    data: chartData.map(d => d.success) as number[],
+                    data: state.chartData.map(d => d.success),
                     backgroundColor: 'transparent',
                     borderColor: LEGEND_COLORS.success,
                     borderWidth: 1,
@@ -119,7 +131,7 @@ export default {
                     pointRadius: 2,
                 }, {
                     label: 'Failure',
-                    data: chartData.map(d => d.failure) as number[],
+                    data: state.chartData.map(d => d.failure),
                     backgroundColor: 'transparent',
                     borderColor: LEGEND_COLORS.failure,
                     borderWidth: 1,
@@ -127,9 +139,8 @@ export default {
                     pointRadius: 2,
                 },
             ];
-            const labels = chartData.map(d => moment(d.date).format('D'));
-            const maxNumber: number = state.data.length === 0 ? DEFAULT_MAX : max(datasets.map(ds => max(ds.data as number[]))) as number;
-            const stepSize = state.data.length === 0 ? DEFAULT_STEP_SIZE : maxNumber / (TICKS_COUNT || 1);
+            const maxNumber = state.noData ? DEFAULT_MAX : max(datasets.map(ds => max(ds.data as number[]))) as number;
+            const stepSize = state.noData ? DEFAULT_STEP_SIZE : maxNumber / (TICKS_COUNT || 1);
             const tooltips = {
                 cornerRadius: 2,
                 caretSize: 6,
@@ -143,9 +154,8 @@ export default {
             const pointClickEvent = (point, event) => {
                 const item = event[0];
                 if (item) {
-                    const date = chartData[item._index].date;
-                    state.selectedDate = date;
-                    console.log(date);
+                    const clickedData = state.chartData[item._index];
+                    state.selectedDate = clickedData.date;
                 }
             };
 
@@ -187,7 +197,7 @@ export default {
             state.chart = new NSChart(canvas, {
                 type: 'line',
                 data: {
-                    labels,
+                    labels: range(1, state.dayCount + 1),
                     datasets,
                 },
                 options,
@@ -195,12 +205,16 @@ export default {
         };
 
         const init = async () => {
-            await getJobStat();
+            await getDailyJobSummary();
         };
         init();
 
-        watch([() => state.chartRef, () => state.loading], ([ctx, loading]) => {
-            if (ctx && !loading) {
+        watch(() => state.currentDate, () => {
+            getDailyJobSummary();
+        }, { immediate: false });
+
+        watch([() => state.chartRef, () => state.chartData], ([ctx, chartData]) => {
+            if (ctx && chartData.length > 0) {
                 drawChart(ctx);
             }
         });

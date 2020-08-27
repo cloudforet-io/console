@@ -2,7 +2,7 @@
     <general-page-layout class="collector-history">
         <div v-if="!selectedJobId">
             <p-page-title :title="pageTitle" />
-            <!--            <p-collector-history-chart :loading="loading" />-->
+            <p-collector-history-chart :loading="loading" />
             <p-query-search-table
                 :fields="fields"
                 :items="items"
@@ -18,6 +18,7 @@
                 :style="{height: '100%'}"
                 :selectable="false"
                 :row-cursor-pointer="rowCursorPointer"
+                :excel-visible="false"
                 @change="onChange"
                 @rowLeftClick="onSelect"
             >
@@ -42,6 +43,15 @@
                     <span :class="value.toLowerCase()">{{ value }}</span>
                 </template>
             </p-query-search-table>
+            <div v-if="!loading && items.length > 0" class="pagination">
+                <p-pagination :total-count="totalCount"
+                              :this-page.sync="thisPage"
+                              :page-size.sync="pageSize"
+                              @prevPage="onClickPrevPageButton"
+                              @nextPage="onClickNextPageButton"
+                              @clickPage="onClickPageNumber"
+                />
+            </div>
         </div>
         <div v-else>
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
@@ -60,10 +70,11 @@ import {
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
-// import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
+import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -73,6 +84,7 @@ import {
     makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
 } from '@/lib/component-utils/query-search';
 import router from '@/routes';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -87,7 +99,8 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'PCollectorHistory',
     components: {
-        // PCollectorHistoryChart,
+        PCollectorHistoryChart,
+        PPagination,
         PCollectorHistoryJob,
         PQuerySearchTable,
         PPageTitle,
@@ -162,7 +175,7 @@ export default {
             state.items = [];
             jobs.forEach((job, index) => {
                 const newJob = {
-                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    sequence: getPageStart(state.thisPage, state.pageSize) + index,
                     // eslint-disable-next-line camelcase
                     job_id: job.job_id,
                     'collector_info.name': job.collector_info.name,
@@ -192,7 +205,7 @@ export default {
             const query = new QueryHelper();
             query
                 .setSort(state.sortBy, state.sortDesc)
-                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setKeyword(...or);
             if (statusValues.length > 0) {
                 query.setFilter({
@@ -260,6 +273,19 @@ export default {
                 console.error(e);
             }
         };
+        const onClickPageNumber = async (page) => {
+            state.thisPage = page;
+            await getJobs();
+        };
+        const onClickPrevPageButton = async (page) => {
+            state.thisPage = page - 1;
+            if (state.thisPage <= 0) state.thisPage = 1;
+            await getJobs();
+        };
+        const onClickNextPageButton = async (page) => {
+            state.thisPage = page + 1;
+            await getJobs();
+        };
         const onClickGoBack = () => {
             state.selectedJobId = '';
             // eslint-disable-next-line no-empty-function
@@ -284,6 +310,9 @@ export default {
             ...toRefs(state),
             onSelect,
             onChange,
+            onClickPageNumber,
+            onClickPrevPageButton,
+            onClickNextPageButton,
             onClickGoBack,
             onClickStatus,
         };
@@ -293,7 +322,7 @@ export default {
 
 <style lang="postcss">
 .collector-history {
-    .toolbox {
+    .toolbox-top {
         .filter-button-lap {
             @apply border-r border-gray-200;
             display: inline-block;
@@ -322,6 +351,7 @@ export default {
     }
 
     .p-query-search-table {
+        margin-top: 2rem;
         .p-data-table {
             .error, .timeout, .canceled {
                 @apply text-red-500;
@@ -331,6 +361,12 @@ export default {
                 font-size: 0.75rem;
             }
         }
+    }
+
+    .pagination {
+        text-align: center;
+        padding-top: 1.5rem;
+        bottom: 0;
     }
 }
 </style>

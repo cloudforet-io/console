@@ -64,11 +64,8 @@
                 </p-toolbox-table>
             </template>
             <template #tag>
-                <s-tags-panel
-                    :is-show="singleItemTab.syncState.activeTab==='tag'"
-                    :resource-id="projectId"
-                    tag-page-name="projectTags"
-                    class="tab-bg"
+                <s-tags-panel :resource-id="projectId" resource-key="project_id" resource-type="identity.Project"
+                              class="tab-bg"
                 />
             </template>
         </p-tab>
@@ -108,10 +105,10 @@
 </template>
 
 <script lang="ts">
-    import {
-        ComponentRenderProxy,
-        computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
-    } from '@vue/composition-api';
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+} from '@vue/composition-api';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';

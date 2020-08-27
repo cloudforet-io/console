@@ -14,27 +14,33 @@
         <p-data-table
             :fields="fields"
             :items="items"
+            :loading="loading"
             :col-copy="true"
         />
-        <s-tags-page
-            v-if="tagEditPageVisible"
-            :resource-id="resourceIdValue"
-            @close="closeTag"
-            @update="updateTag"
+        <s-tags-page v-if="tagEditPageVisible"
+                     :resource-id="resourceId"
+                     :resource-key="resourceKey"
+                     :resource-type="resourceType"
+                     @close="closeTag"
+                     @update="updateTag"
         />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import { map, debounce } from 'lodash';
+import {
+    map, get, camelCase, replace,
+} from 'lodash';
 import { makeTrItems } from '@/lib/view-helper/index';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import STagsPage from '@/views/common/tags/TagsPage.vue';
+import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'STagsPanel',
@@ -42,68 +48,80 @@ export default {
         PDataTable, PPanelTop, PButton, STagsPage,
     },
     props: {
-        action: {
-            type: Object,
-            default: null,
-        },
-        resourceId: {
-            type: [String, Object],
-            default: '',
-        },
-        tagPageName: {
+        resourceKey: {
             type: String,
+            default: '',
             required: true,
         },
-        isShow: {
-            type: Boolean,
+        resourceId: {
+            type: String,
+            default: '',
+            required: true,
+        },
+        resourceType: {
+            type: String,
+            default: '',
             required: true,
         },
     },
-    setup(props, context) {
-        const vm: any = getCurrentInstance();
+    setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const tags = ref({});
+        const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
+        const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
-            parentRouter: computed(() => vm?.$route.matched[vm.$route.matched.length - 2]),
-            resource: computed(() => state.parentRouter?.meta),
-            api: computed(() => props.action || state.resource?.api),
             fields: makeTrItems([
                 ['name', 'WORD.KEY'],
                 ['value', 'WORD.VALUE'],
             ], vm),
-            tags: {},
-            items: computed(() => map(state.tags, (v, k) => ({ name: k, value: v })) || []),
-            resourceIdValue: props.resourceId,
+            loading: true,
+            items: computed(() => map(tags.value, (v, k) => ({ name: k, value: v })) || []),
         });
+
         const tagState = reactive({
             tagEditPageVisible: false,
         });
-        const getTagData = debounce(async () => {
-            state.tags = {};
-            const resp = await state.api.get().setId(props.resourceId).setOnly('tags').execute();
-            state.tags = resp.data.tags;
-        }, 200);
+
+        const getTags = async () => {
+            if (!api.value) {
+                tags.value = {};
+                state.loading = false;
+            }
+
+            try {
+                const res = await api.value.get({
+                    [props.resourceKey]: props.resourceId,
+                    query: { only: ['tags'] },
+                });
+                tags.value = res.tags;
+            } catch (e) {
+                tags.value = {};
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
 
         const editTag = async () => {
             tagState.tagEditPageVisible = true;
         };
         const closeTag = async () => {
-            console.debug('close');
             tagState.tagEditPageVisible = false;
         };
         const updateTag = async () => {
-            await getTagData();
+            await getTags();
             tagState.tagEditPageVisible = false;
         };
-        onMounted(async () => {
-            if (props.isShow && props.resourceId) {
-                await getTagData();
-            }
-        });
-        watch(() => props.resourceId, async (after, before) => {
-            if (props.isShow && after && after !== before) {
-                await getTagData();
-            }
-        });
+
+        watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
+            async ([resourceKey, resourceId, resourceType]) => {
+                if (resourceKey && resourceId && resourceType) {
+                    await getTags();
+                }
+            }, { immediate: true });
+
         return {
             ...toRefs(state),
             ...toRefs(tagState),

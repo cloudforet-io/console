@@ -1,7 +1,4 @@
-import {configure, addParameters, addDecorator} from '@storybook/vue';
-import {withA11y} from '@storybook/addon-a11y';
-import centered from '@storybook/addon-centered/vue';
-import '@storybook/addon-console';
+import { addParameters, addDecorator } from '@storybook/vue';
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
@@ -23,7 +20,6 @@ import { fontUrls, webFonts } from '@/styles/web-fonts';
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
-import {axiosInstance} from '@sb/mockApi'
 import "@/styles/style.scss";
 
 Vue.use(VueRouter);
@@ -39,19 +35,12 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
 
 Vue.prototype.$velocity = velocity;
-Vue.prototype.$http = axiosInstance;
 webFontLoader.load({
     google: {
         families: webFonts,
         urls: fontUrls,
     },
 });
-/*****************************************************************
- * This is a Global Bus Event;
- * Please, name your '$emit' event name as action + Event such as
- * nodeSelectedEvent, closeModalEvent
- *****************************************************************/
-Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
 addParameters({
@@ -82,9 +71,7 @@ addParameters({
         }
     },
 });
-addDecorator(withA11y);
 addDecorator(withKnobs);
-addDecorator(centered);
 addDecorator(() => ({
     i18n,
     store,

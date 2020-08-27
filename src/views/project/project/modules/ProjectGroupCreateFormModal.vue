@@ -10,7 +10,7 @@
         @confirm="confirm"
     >
         <template #body>
-            <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
+            <p-json-schema-form v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
             <!--            <PFieldGroup-->
             <!--                label="Tags"-->
             <!--            >-->
@@ -138,7 +138,7 @@ export default {
 
         watch(() => props.id, async (id) => {
             await initForm();
-        });
+        }, { immediate: true });
 
         const createProjectGroup = async (item) => {
             try {
