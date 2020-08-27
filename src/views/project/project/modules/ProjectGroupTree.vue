@@ -79,7 +79,7 @@ export default {
         });
 
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after, before) => {
-            if ((after && !before) || (after && after.node.data.id !== before.node.data.id)) {
+            if ((after && !before) || (after && after.node.data.id !== before?.node.data.id)) {
                 emit('select', after);
             } else if (!after && before) {
                 emit('select', null);

@@ -165,7 +165,11 @@
       "name": "Account ID"
     },{
       "key": "project_id",
-      "name": "Project"
+      "name": "Project",
+      "reference": {
+        "resource_type": "identity.Project",
+        "reference_key": "project_id"
+      }
     },{
       "key": "updated_at.seconds",
       "name": "Updated",

@@ -120,7 +120,7 @@ export default {
         getSchema(props.schemaNames[0]);
 
         watch(() => fixFormTS.syncState.item, async (after, before) => {
-            if (after.schemaName && after.schemaName !== before.schemaName) {
+            if (after.schemaName && after.schemaName !== before?.schemaName) {
                 await getSchema(after.schemaName);
             }
         }, { immediate: true });
