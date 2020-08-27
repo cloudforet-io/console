@@ -13,11 +13,12 @@ export default {
             summary: '',
             components: { PModal },
         },
-        knobs: { escapeHTML: false },
+        // knobs: { escapeHTML: false },
         centered: { disable: true },
     },
 };
 
+const sizes = Object.keys(sizeMapping);
 const data = {
     visible: false,
 };
@@ -61,7 +62,7 @@ export const modal = () => ({
             default: boolean('scrollable', false),
         },
         size: {
-            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
+            default: select('size', ['', ...sizes], 'sm'),
         },
         centered: {
             default: boolean('centered', false),

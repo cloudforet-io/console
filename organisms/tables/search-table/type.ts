@@ -25,6 +25,7 @@ export interface Options {
 }
 
 export interface SearchTableListeners {
+    init?: (options: Readonly<Options>) => void|Promise<void>;
     change?: (options: Readonly<Options>, changedOptions: Readonly<Options>) => void|Promise<void>;
     export?: () => void|Promise<void>;
     select?: (selectIndex: number[]) => void|Promise<void>;

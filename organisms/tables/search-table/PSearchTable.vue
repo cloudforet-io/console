@@ -194,6 +194,14 @@ export default {
             emitChange({ searchText: val || '' });
         };
 
+        emit('init', {
+            sortBy: state.proxySortBy,
+            sortDesc: state.proxySortDesc,
+            thisPage: state.proxyThisPage,
+            pageSize: state.proxyPageSize,
+            searchText: state.proxySearchText,
+        });
+
         return {
             ...toRefs(state),
             emitChange,

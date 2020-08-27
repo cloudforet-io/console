@@ -55,6 +55,7 @@ import { forEach, get } from 'lodash';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
+import {getPageStart} from "@/lib/component-utils/pagination";
 
 const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
     if (props.typeOptions && props.typeOptions[name]) {
@@ -134,7 +135,7 @@ export default {
             searchText: props.fetchOptions?.searchText || '',
 
             /** others */
-            pageStart: computed(() => ((state.thisPage - 1) * state.pageSize) + 1),
+            pageStart: computed(() => getPageStart(state.thisPage, state.pageSize)),
             fetchOptionsParam: computed(() => ({
                 sortBy: state.sortBy,
                 sortDesc: state.sortDesc,

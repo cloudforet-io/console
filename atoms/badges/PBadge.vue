@@ -27,7 +27,7 @@ export default {
         },
         shape: {
             type: String,
-            default: BADGE_SHAPE.ROUND,
+            default: 'round',
         },
         outline: {
             type: Boolean,

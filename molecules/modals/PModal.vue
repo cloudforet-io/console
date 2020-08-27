@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { computed } from '@vue/composition-api';
-import { modalSizeValidator } from '@/components/molecules/modals/PModal.toolset';
+import { sizeMapping } from '@/components/molecules/modals/PModal.toolset';
 
 
 const setup = (props, { emit }) => {
@@ -48,7 +48,7 @@ export const propsMixin = {
         size: {
             type: String,
             default: 'md',
-            validator: modalSizeValidator,
+            validator: value => Object.keys(sizeMapping).includes(value),
         },
         centered: {
             type: Boolean,
@@ -68,10 +68,53 @@ export const propsMixin = {
 
 export default {
     name: 'PModal',
-    // events: ['hidden', 'shown'],
-    mixins: [propsMixin],
-    setup(props, context) {
-        return setup(props, context);
+    props: {
+        fade: {
+            type: Boolean,
+            default: false,
+        },
+        scrollable: {
+            type: Boolean,
+            default: false,
+        },
+        size: {
+            type: String,
+            default: 'md',
+            validator: value => Object.keys(sizeMapping).includes(value),
+        },
+        centered: {
+            type: Boolean,
+            default: false,
+        },
+        backdrop: {
+            type: Boolean,
+            default: true,
+        },
+        visible: { // sync
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
+        const dialogClassObject = computed(() => [
+            { scrollable: props.scrollable },
+            { centered: props.centered },
+            props.size,
+        ]);
+        const hide = () => {
+            if (props.visible) { emit('update:visible', false); }
+        };
+
+        return {
+            dialogClassObject,
+            show() {
+                if (!props.visible) { emit('update:visible', true); }
+            },
+            hide,
+            toggle() {
+                emit('update:visible', !props.visible);
+            },
+        };
     },
 };
 </script>
@@ -87,15 +130,14 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(theme('colors.gray.900'), .5);
-    transition: opacity .3s ease;
+    background-color: rgba(theme('colors.gray.900'), 0.5);
+    transition: opacity 0.3s ease;
 
     &.no-backdrop {
         background-color: transparent;
     }
 }
 .modal-wrapper {
-    width: auto;
     overflow: hidden;
     margin: 2rem;
     min-height: 30rem;

@@ -1,7 +1,9 @@
 <template>
     <div class="p-panel-top">
         <span class="title">
-            <slot />
+            <slot>
+                {{ title }}
+            </slot>
         </span>
         <span v-if="useTotalCount" class="total-count">
             &nbsp;({{ totalCount }})
@@ -23,11 +25,15 @@ export default {
             type: Number,
             default: 0,
         },
+        title: {
+            type: String,
+            default: '',
+        },
     },
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
     .p-panel-top {
         @apply mb-4 mx-4 mt-8;
         display: flex;

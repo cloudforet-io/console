@@ -55,6 +55,7 @@ import {
     QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
@@ -137,7 +138,7 @@ export default {
             queryTags: props.fetchOptions?.queryTags || [],
 
             /** others */
-            pageStart: computed(() => ((state.thisPage - 1) * state.pageSize) + 1),
+            pageStart: computed(() => getPageStart(state.thisPage, state.pageSize)),
             fetchOptionsParam: computed(() => ({
                 sortBy: state.sortBy,
                 sortDesc: state.sortDesc,
