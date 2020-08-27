@@ -1,11 +1,7 @@
 <template>
     <p-pane-layout class="panel">
-        <slot name="top">
-            <div class="title">
-                Project
-            </div>
-        </slot>
-        <div class="flex my-4">
+        <div class="tree-panel-header">
+            <span class="title">Project </span><span class="title-optional">(optional)</span>
             <p-icon-text-button style-type="primary" name="ic_plus_bold" outline
                                 @click="goToProject"
             >
@@ -251,6 +247,10 @@ export default {
     .title {
         @apply text-2xl mb-8;
         line-height: 120%;
+    }
+    .title-optional {
+        @apply text-lg text-gray-400;
+        margin-right: 1rem;
     }
     .alert {
         @apply text-alert align-middle;

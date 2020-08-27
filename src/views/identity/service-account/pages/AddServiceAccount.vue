@@ -38,20 +38,19 @@
                 <p-json-schema-form v-bind="actFixFormTS.state" :item.sync="actFixFormTS.syncState.item" />
                 <p-json-schema-form v-bind="actJscTS.state" :item.sync="actJscTS.syncState.item" />
             </div>
-            <div class="text-lg font-bold mb-2 mt-8" style="line-height: 120%;">
+            <div class="tag-title">
                 {{ $t('PANEL.TAG') }}
             </div>
-            <div class="text-sm mb-6" style="line-height: 150%;">
+            <div class="tag-help-msg">
                 <i18n path="ACTION.DICT.ADD_TAG_BY">
                     <template #name>
                         <span v-if="actFixFormTS.syncState.item.name" class="font-bold">[{{ actFixFormTS.syncState.item.name }}]</span>
-                        <span v-else class="font-bold"> Account</span>
+                        <span v-else> Account</span>
                     </template>
                 </i18n>
                 <br>
                 {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
-
             <p-dict-input-group
                 v-bind="tagsTS.state"
                 :items.sync="tagsTS.syncState.items"
@@ -82,13 +81,13 @@
                 required
             >
                 <div class="flex">
-                    <div v-for="(name, idx) in schemaNames" :key="idx" class="mr-12">
+                    <span v-for="(name, idx) in schemaNames" :key="idx" class="secret-type-name">
                         <p-radio
                             v-model="selectSchema"
                             :value="name"
                         />
                         {{ name }}
-                    </div>
+                    </span>
                 </div>
             </p-field-group>
             <div class="custom-schema-box">
@@ -100,14 +99,7 @@
         <s-project-tree-panel ref="projectRef" class="panel"
                               :resource-name="$t('WORD.SERVICE_ACCOUNT')"
                               :target-name="actFixFormTS.syncState.item.name"
-        >
-            <template #top>
-                <div class="mb-6">
-                    <span class="title">Project</span><span>  (optional)</span>
-                </div>
-            </template>
-        </s-project-tree-panel>
-
+        />
         <div class="bottom">
             <p-button class="item" style-type="primary" @click="confirm">
                 {{ $t('BTN.SAVE') }}
@@ -157,7 +149,7 @@ import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-pa
 const accountFormSetup = (props) => {
     const actFixFormTS = new JsonSchemaFormToolSet();
     const schema = new JsonSchemaObjectType();
-    schema.addStringProperty('name', 'Name', true);
+    schema.addStringProperty('name', 'Name', true, 'Cloud Account Name');
 
     actFixFormTS.setProperty(schema, ['name']);
 
@@ -195,7 +187,7 @@ const credentialsFormSetup = (props) => {
 
     const makeFixSchema = () => {
         const sch = new JsonSchemaObjectType(undefined, undefined, true);
-        sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true });
+        sch.addStringProperty('name', 'Name', true, 'Credentials Name', { uniqueName: true });
         return sch;
     };
     watch(schemaNames, (after, before) => {
@@ -293,7 +285,7 @@ export default {
 
         const routeState = reactive({
             route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
-                { name: 'Add Service Account', path: `/identity/service-account/add/${props.provider}` }],
+                { name: 'Add Account', path: `/identity/service-account/add/${props.provider}` }],
         });
 
         const goBack = () => {
@@ -397,12 +389,20 @@ export default {
     .bottom {
         @apply flex flex-row-reverse mt-8;
         .item {
-            @apply mr-8;
+            margin-left: 1rem;
         }
     }
     .title {
         @apply text-2xl mb-8;
         line-height: 120%;
+    }
+    .tag-title {
+        @apply text-sm font-bold mb-2 mt-8;
+        line-height: 120%;
+    }
+    .tag-help-msg {
+        @apply text-sm mb-6;
+        line-height: 150%;
     }
     .form-box {
         @apply w-full;
@@ -410,6 +410,9 @@ export default {
         @screen lg {
             @apply max-w-1/2;
         }
+    }
+    .secret-type-name {
+        margin-right: 4.375rem;
     }
     .custom-schema-box {
         @apply border rounded-sm border-gray-200 border-l-4 px-8 py-5;
