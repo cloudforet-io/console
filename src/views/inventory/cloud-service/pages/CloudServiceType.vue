@@ -145,14 +145,13 @@ import {
     computed, getCurrentInstance, reactive, Ref, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import { FILTER_OPERATOR, FilterItem, fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
     makeQueryStringComputed,
-    makeQueryStringComputeds,
     queryStringToQueryTags,
     queryTagsToQueryString,
     replaceQuery,
@@ -172,9 +171,7 @@ import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
 import {
     getFiltersFromQueryTags,
-    getQueryItemsToFilterItems,
     parseTag,
-    setFilterOrWithSuggestKeys,
 } from '@/lib/api/query-search';
 import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
@@ -199,7 +196,6 @@ export default {
         PIconTextButton,
         PVerticalPageLayout,
         PI,
-        PLottie,
         PPageTitle,
         PPageNavigation,
         PCheckBox,

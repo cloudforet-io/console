@@ -2,6 +2,7 @@ const Management = () => import('@/views/management/management');
 const ManagementNavBar = () => import('@/views/management/managementNavBar');
 const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins_new.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
+const PowerScheduler = () => import('@/views/management/power-scheduler/pages/PowerScheduler.vue');
 
 export default {
     path: 'management',
@@ -37,6 +38,12 @@ export default {
             name: 'collectorHistory',
             meta: { label: 'Collector History', breadcrumb: true },
             component: CollectorHistory,
+        },
+        {
+            path: 'power-scheduler',
+            name: 'powerScheduler',
+            meta: { label: 'Power Scheduler', breadcrumb: true },
+            component: PowerScheduler,
         },
     ],
 };
