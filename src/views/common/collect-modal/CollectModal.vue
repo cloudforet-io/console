@@ -212,7 +212,7 @@ export default {
 
         watch(() => props.visible, async (val) => {
             if (val) await initiate();
-        });
+        }, { immediate: true });
 
 
         return {

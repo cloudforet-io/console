@@ -287,12 +287,12 @@ export default {
 
         watch(() => props.collectorId, (id) => {
             if (id) getCollector();
-        });
+        }, { immediate: true });
 
         watch(() => props.credentialId, (id) => {
             if (id) getCredential();
             else state.credential = null;
-        });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

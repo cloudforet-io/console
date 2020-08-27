@@ -203,13 +203,13 @@ export default {
                         if (aft && (aft.resource !== bef?.resource || aft.getAction !== bef?.getAction)) {
                             await resetAction();
                         }
-                    });
+                    }, { immediate: true });
                     optionsWatchStop = watch(() => props.options, async (aft, bef) => {
                         if (aft && aft !== bef) {
                             exportToolSet.action = exportAction.setDataSource(aft.fields || []);
                             await resetAction();
                         }
-                    });
+                    }, { immediate: true });
                 } else {
                     if (apiWatchStop) {
                         apiWatchStop();
@@ -221,12 +221,12 @@ export default {
                     }
                 }
             }
-        });
+        }, { immediate: true });
         watch(() => props.isShow, async (aft, bef) => {
             if (aft && aft !== bef && props.isShowGetData) {
                 await getData();
             }
-        });
+        }, { immediate: true });
 
 
         const fields = makeFields(props);

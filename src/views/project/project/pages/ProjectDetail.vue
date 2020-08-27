@@ -367,7 +367,7 @@ export default {
 
         watch(() => singleItemTab.syncState.activeTab, (tab) => {
             if (tab === 'member') memberApiHandler.getData();
-        });
+        }, { immediate: true });
 
         /** Query String */
         const queryRefs = {

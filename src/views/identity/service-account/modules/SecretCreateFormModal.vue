@@ -106,7 +106,7 @@ export default {
                 const sch = makeFixSchema();
                 fixFormTS.setProperty(sch, ['name', 'schemaName'], validation);
             }
-        });
+        }, { immediate: true });
 
 
         const jscTS = new JsonSchemaFormToolSet();
@@ -123,7 +123,7 @@ export default {
             if (after.schemaName && after.schemaName !== before.schemaName) {
                 await getSchema(after.schemaName);
             }
-        });
+        }, { immediate: true });
 
 
         const confirm = async () => {

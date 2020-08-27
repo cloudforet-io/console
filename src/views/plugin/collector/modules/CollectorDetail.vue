@@ -74,7 +74,7 @@ export default {
         };
         watch(() => props.collectorId, () => {
             getCollectorDetailData();
-        });
+        }, { immediate: true });
 
         // Filter Format
         const filterState = reactive({

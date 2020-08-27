@@ -217,7 +217,7 @@ export default {
             if (ctx && chartData.length > 0) {
                 drawChart(ctx);
             }
-        });
+        }, { immediate: false });
 
         return {
             ...toRefs(state),

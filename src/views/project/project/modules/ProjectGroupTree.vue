@@ -84,7 +84,7 @@ export default {
             } else if (!after && before) {
                 emit('select', null);
             }
-        });
+        }, { immediate: true });
 
         const onNodeClick = (item: ProjectTreeItem) => {
             if (treeApiHandler.ts.metaState.firstSelectedNode) {

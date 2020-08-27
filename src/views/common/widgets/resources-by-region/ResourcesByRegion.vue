@@ -138,7 +138,7 @@ export default {
                     .setShowTotalCount(false)
                     .setAnimationDuration(0)
                     .apply();
-            });
+            }, { immediate: true });
 
             const defaultItems = range(4).map((d, index) => ({
                 name: 'region',

@@ -285,7 +285,7 @@ export default {
                 state.selectedProjectGroup = pg;
             } else state.selectedProjectGroup = null;
             if (state.visibleMenu) await listItems();
-        });
+        }, { immediate: true });
 
 
         const emitSearch = (value?: string, projectGroup: ProjectGroup|null = null, hide = true) => {

@@ -119,7 +119,7 @@ export default {
                 treeApiHandler.ts.metaState.nodes = [];
                 treeApiHandler.ts.metaState.selectedNodes = [];
             }
-        });
+        }, { immediate: true });
 
         // watch(() => treeApiHandler.ts.metaState.firstSelectedNode, (item) => {
         //     isRelease.value = !!item;
