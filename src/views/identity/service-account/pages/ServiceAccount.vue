@@ -167,6 +167,7 @@ import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayo
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
@@ -213,6 +214,7 @@ import { useStore } from '@/store/toolset';
 export default {
     name: 'ServiceAccount',
     components: {
+        PI,
         PVerticalPageLayout,
         PHorizontalLayout,
         PTab,

@@ -10,7 +10,7 @@
         @confirm="confirm"
     >
         <template #body>
-            <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
+            <p-json-schema-form v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
         </template>
     </p-button-modal>
 </template>
@@ -69,7 +69,7 @@ export default {
         currentProject: {
             type: String,
             default: '',
-        }
+        },
     },
     setup(props, context) {
         const tagsTS = new DictIGToolSet({

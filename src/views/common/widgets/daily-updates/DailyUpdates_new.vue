@@ -11,6 +11,9 @@
                     <p-skeleton width="100%" height="0.625rem" />
                 </div>
             </div>
+            <div v-if="!loading && data.length === 0" class="h-full flex flex-col justify-center">
+                <img :src="'./images/illust_no-update.svg'" class="no-data-img">
+            </div>
             <p-grid-layout :items="data"
                            row-gap="0" column-gap="0"
                            :fix-column="1" card-height="auto"
@@ -53,18 +56,13 @@
                         </div>
                     </router-link>
                 </template>
-                <template #no-data>
-                    <div v-if="!data || data.length === 0" class="h-full flex flex-col justify-center">
-                        <img :src="'./images/illust_no-update.svg'" class="no-data-img">
-                    </div>
-                </template>
             </p-grid-layout>
         </template>
     </p-widget-layout>
 </template>
 
 <script lang="ts">
-    import {reactive, toRefs, UnwrapRef} from '@vue/composition-api';
+import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
