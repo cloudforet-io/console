@@ -1,6 +1,7 @@
 <template>
     <general-page-layout class="collector-history">
         <div v-if="!selectedJobId">
+            <p-page-navigation :routes="route" />
             <p-page-title :title="pageTitle" />
             <p-collector-history-chart :loading="loading" />
             <p-query-search-table
@@ -75,6 +76,7 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -99,6 +101,7 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'PCollectorHistory',
     components: {
+        PPageNavigation,
         PCollectorHistoryChart,
         PPagination,
         PCollectorHistoryJob,
@@ -156,6 +159,10 @@ export default {
                     status: makeValueHandlerWithSearchEnums(JOB_STATUS),
                 },
             },
+        });
+
+        const routeState = reactive({
+            route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' }],
         });
 
         const convertStatus = (status) => {
@@ -308,6 +315,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(routeState),
             onSelect,
             onChange,
             onClickPageNumber,

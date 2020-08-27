@@ -1,5 +1,6 @@
 <template>
     <div class="collector-history-job">
+        <p-page-navigation :routes="route" />
         <p-collapsible-panel>
             <template #content>
                 <div class="more-information-lap">
@@ -93,6 +94,7 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
@@ -115,6 +117,7 @@ enum JOB_TASK_STATUS {
 export default {
     name: 'PCollectorHistoryJob',
     components: {
+        PPageNavigation,
         PCollapsiblePanel,
         PEmpty,
         PDataTable,
@@ -198,6 +201,11 @@ export default {
                     status: makeValueHandlerWithSearchEnums(JOB_TASK_STATUS),
                 },
             },
+        });
+
+        const routeState = reactive({
+            route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
+                { name: props.jobId, path: `/management/collector-history#${props.jobId}` }],
         });
 
         const convertStatus = (status) => {
@@ -343,6 +351,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(routeState),
             timestampFormatter,
             convertStatus,
             convertServiceAccountName,
