@@ -451,7 +451,7 @@ export default {
             } else {
                 state.allState = false;
             }
-        });
+        }, { immediate: true });
 
         onMounted(() => {
             if (props.useCursorLoading && props.loading) {

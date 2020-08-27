@@ -58,7 +58,7 @@ export default {
                 if (value !== state.buffer) {
                     state.editor.setValue(value);
                 }
-            });
+            }, { immediate: true });
         });
         onUnmounted(() => {
             if (state.editor) {

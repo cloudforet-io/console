@@ -97,7 +97,7 @@ const useDictBuffer = (props, context) => {
         if (dict !== mergeDict(destructDict.value)) {
             destructDict.value = destruct(dict);
         }
-    });
+    }, { immediate: true });
     return {
         destructDict,
         syncDict,

@@ -153,7 +153,7 @@ export default {
                 state.proxyThisPage = 1;
                 // emitChange({ thisPage: 1 });
             }
-        });
+        }, { immediate: true });
 
         const onChangePageSize = (pageSize: number) => {
             if (props.thisPage > (Math.ceil(props.totalCount / pageSize) || 1)) {

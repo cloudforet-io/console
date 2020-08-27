@@ -66,7 +66,7 @@ export default {
                 state.imgLoading = true;
                 state.isError = false;
             }
-        });
+        }, { immediate: true });
         return {
             ...toRefs(state),
             onLoad() {

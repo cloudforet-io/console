@@ -158,9 +158,7 @@ export default {
             if (ctx && !loading) {
                 drawChart(ctx);
             }
-        }, {
-            immediate: false,
-        });
+        }, { immediate: false });
 
         watch(() => props.dataset, () => {
             if (state.chart) {
@@ -170,7 +168,7 @@ export default {
                 });
                 state.chart.update();
             }
-        });
+        }, { immediate: true });
         return {
             ...toRefs(state),
         };

@@ -74,7 +74,7 @@ export default {
 
         watch(() => props.data, () => {
             state.items = makeDefItems(props.fields, props.data);
-        });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

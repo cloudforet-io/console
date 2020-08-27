@@ -161,12 +161,12 @@ export const setDrawTrigger = (props, context, svgTools) => {
         watch([() => props.data, () => state.isMounted], ([data, isMounted]) => {
             if (isDataReady(data) && isMounted) emitReadyEvent();
             else state.startDraw = false;
-        });
+        }, { immediate: true });
     } else {
         watch([() => props.loading, () => state.isMounted], ([loading, isMounted]) => {
             if (!loading && isMounted) emitReadyEvent();
             else state.startDraw = false;
-        });
+        }, { immediate: true });
     }
 
 

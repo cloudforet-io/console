@@ -39,7 +39,7 @@ export default {
                     (monaco.value as MEComponent).editor.trigger('default', 'editor.foldLevel3', {});
                     (monaco.value as MEComponent).editor.trigger('default', 'editor.foldLevel2', {});
                 }
-            });
+            }, { immediate: true });
         });
 
         return {
