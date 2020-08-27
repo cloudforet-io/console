@@ -1,21 +1,20 @@
 <template>
-    <nav class="bottom-pagination">
+    <nav class="pagination">
         <p-icon-button class="text"
                        name="ic_arrow_left"
                        :disabled="thisPage === 1"
                        @click="prevPage(thisPage)"
         />
-        <div class="page-number">
-            <div class="page-number-text">
+        <div class="page-number-wrapper">
+            <div class="page-number-list">
                 <span v-for="page in pageList.pages" :key="page"
                       @click="clickPage(page)"
                 >
-                    <span v-if="page === thisPage"><b>{{ thisPage }}</b></span>
-                    <span v-else> {{ page }} </span>
+                    <span v-if="page === thisPage" class="page-number"><b>{{ thisPage }}</b></span>
+                    <span v-else class="page-number"> {{ page }} </span>
                 </span>
             </div>
         </div>
-
         <p-icon-button class="text"
                        name="ic_arrow_right"
                        :disabled="thisPage === pageList.totalPages"
@@ -153,27 +152,26 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .bottom-pagination {
+    .pagination {
         @apply min-w-12;
         display: inline-flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: nowrap;
-
         @screen lg {
             @apply min-w-16;
         }
     }
-    .page-number {
+    .page-number-wrapper {
         @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-pointer;
-        .page-number-text {
+        .page-number-list {
             line-height: 1.2rem;
             font-size: 0.875rem;
-            .this-page {
-                font-weight: bold;
+            padding-left: 1.5rem;
+            .page-number {
+                padding-right: 1.5rem;
             }
         }
-
         @screen lg {
             @apply min-w-16;
         }

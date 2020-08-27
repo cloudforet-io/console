@@ -49,11 +49,17 @@
                 <slot name="toolbox-bottom" />
             </div>
         </div>
+        <slot v-if="loading" name="loading">
+            <div class="loading-backdrop fade-in" />
+            <p-lottie name="thin-spinner" :size="2.5"
+                      :auto="true" class="loading-spinner"
+            />
+        </slot>
         <transition-group name="fade-in" tag="div" class="transition-group">
-            <div v-if="loading" key="loading" class="transition-item">
-                <slot name="loading" />
-            </div>
-            <div v-else-if="items.length === 0" key="no-data" class="transition-item">
+            <!--            <div v-if="loading" key="loading" class="transition-item">-->
+            <!--                <slot name="loading" />-->
+            <!--            </div>-->
+            <div v-if="!items || items.length === 0" key="no-data" class="transition-item">
                 <slot name="no-data" />
             </div>
             <div v-else key="grid-layout" class="transition-item">
@@ -79,10 +85,12 @@ import {
 } from '@vue/composition-api';
 import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
 import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {
     name: 'PToolboxGridLayout',
     components: {
+        PLottie,
         PGridLayout,
         PTextPagination,
         PIconButton,
@@ -201,5 +209,32 @@ export default {
                 }
             }
         }
+
+    .loading-backdrop {
+        @apply absolute w-full h-full overflow-hidden;
+        background-color: white;
+        opacity: 0.5;
+        top: 0;
+        z-index: 1;
+    }
+    .loading-spinner {
+        @apply absolute flex justify-center items-center;
+        z-index: 1;
+        width: 80%;
+        height: 50%;
+    }
+    /* transitions */
+    .fade-in-enter-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-enter, .fade-in-leave-to {
+        opacity: 0;
+    }
+    .fade-in-leave, .fade-in-enter-to {
+        opacity: 0.5;
+    }
 
 </style>
