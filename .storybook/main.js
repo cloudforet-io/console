@@ -8,7 +8,7 @@ const postCssLoader = {
 
 module.exports = {
   stories: [
-    '../src/**/*.stories.(js|ts)',
+    '../src/**/*.stories.js',
   ],
   addons: [
     '@storybook/addon-actions',
@@ -16,7 +16,7 @@ module.exports = {
     '@storybook/addon-knobs',
     '@storybook/addon-storysource',
     '@storybook/addon-viewport',
-    '@storybook/addon-controls',
+      '@storybook/addon-a11y',
     {
       name: '@storybook/addon-docs',
       options: {
