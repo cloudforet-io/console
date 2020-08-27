@@ -205,7 +205,7 @@ export const isNotEmpty = (value): boolean => {
  *   @param root
  *   @returns
  */
-export const showErrorMessage = (errorTitle, error, root) => {
+export const showErrorMessage = (errorTitle, error, root?) => {
     const vm = getCurrentInstance();
     const vmRoot = root || vm;
     const errorMsg = error.response.data.error.message;

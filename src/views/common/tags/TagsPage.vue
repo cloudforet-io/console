@@ -58,7 +58,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, ref, ComponentRenderProxy,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
@@ -70,11 +70,16 @@ import {
     getNewDict,
     toDictItems,
 } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
-import { debounce } from 'lodash';
+import {
+    camelCase, debounce, get, map,
+} from 'lodash';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import FNB from '@/views/containers/fnb/FNB.vue';
+import { SpaceConnector } from '@/lib/space-connector';
+import { makeTrItems } from '@/lib/view-helper';
+import { showErrorMessage } from '@/lib/util';
 
 export default {
     name: 'CloudServicePage',
@@ -87,41 +92,37 @@ export default {
         PIconTextButton,
     },
     props: {
+        resourceKey: {
+            type: String,
+            default: '',
+            required: true,
+        },
         resourceId: {
             type: String,
             default: '',
-            // required: true,
+            required: true,
         },
-        nextPath: {
+        resourceType: {
             type: String,
             default: '',
-        },
-        visible: {
-            type: Boolean,
-            default: false,
+            required: true,
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance();
+        const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
+        const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
             showValidation: true,
-            loading: false,
-            items: [] as unknown as DictItem[],
-            parentRouter: computed(() => vm?.$route.matched[vm.$route.matched.length - 2]),
-            resource: computed(() => state.parentRouter?.meta),
+            loading: true,
+            items: [] as DictItem[],
         });
 
         const goBack = () => {
             context.emit('close');
         };
 
-        const tagsApi = new DictPanelAPI(state.resource.api);
-
-
         const { invalidMessages, allValidation, itemValidation } = dictValidation(computed(() => state.items as unknown as DictItem[]));
-        // const isAllValid = computed(() => _.every(invalidMessages.value, (item: any) => !item.key && !item.value));
-        const newDict = computed(() => getNewDict(state.items as unknown as DictItem[], invalidMessages.value));
 
         const dictIGListeners = {
             'change:value': debounce((idx) => { itemValidation(idx, 'value'); }, 100),
@@ -129,26 +130,57 @@ export default {
             'change:add': (idx) => { itemValidation(idx); },
             'change:delete': () => { allValidation(); },
         };
-        const reset = async () => {
-            tagsApi.setId(props.resourceId);
-            await tagsApi.getData();
-            state.items = toDictItems(tagsApi.ts.syncState.dict);
+
+        const getTags = async () => {
+            if (!api.value) {
+                state.items = [];
+                state.loading = false;
+            }
+
+            try {
+                const res = await api.value.get({
+                    [props.resourceKey]: props.resourceId,
+                    query: { only: ['tags'] },
+                });
+                state.items = toDictItems(res.tags);
+            } catch (e) {
+                state.items = [];
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
+
+
         const onSave = async () => {
             if (!state.showValidation) state.showValidation = true;
             if (!allValidation()) return;
-            tagsApi.ts.syncState.dict = newDict.value;
-            await tagsApi.updateData();
-            // goBack();
+            if (!api.value) {
+                showErrorMessage('Tags Update Failed', new Error());
+                return;
+            }
+
+            try {
+                await api.value.update({
+                    [props.resourceKey]: props.resourceId,
+                    tags: getNewDict(state.items, invalidMessages.value),
+                });
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Tags Update Failed', e);
+            } finally {
+                state.loading = false;
+            }
+
             context.emit('update');
         };
-        reset();
+
+        getTags();
 
         return {
             ...toRefs(state),
             invalidMessages,
             goBack,
-            tagsApi,
             onSave,
             dictIGListeners,
 
@@ -163,7 +195,9 @@ export default {
         @apply absolute flex flex-col left-0 w-full h-full;
         z-index: 99;
         top: $gnb-height;
-        /*transition: opacity 0.3s ease;*/
+
+        /* transition: opacity 0.3s ease; */
+
         max-height: calc(100vh - ($gnb-height));
         min-height: calc(100vh - ($gnb-height));
         max-width: 100vw;
@@ -200,7 +234,5 @@ export default {
         .fnb {
             @apply flex-grow-0 border-none bg-white;
         }
-
     }
-
 </style>

@@ -68,7 +68,7 @@ export default {
             state.loading = true;
             try {
                 // const query = new QueryHelper();
-                // query.setSort(state.sortBy, state.sortDesc).setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize);
+                // query.setSort(state.sortBy, state.sortDesc).setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
                 // const res = await SpaceConnector.client.statistics.topic.dailyJobSummary();
 
                 const res = await fluentApi.statisticsTest().history().stat<DataType>()

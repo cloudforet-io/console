@@ -1,26 +1,38 @@
 
-export const projectLinkFormatter = (baseUrl, referenceKey) => {
+interface ReferenceLinkFormatter {
+    (baseUrl: string, referenceKey: string): string;
+}
+
+export const projectLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}/${referenceKey}`;
     return queryString;
 };
 
-export const serverLinkFormatter = (baseUrl, referenceKey) => {
+export const serverLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}?f=server_id%3A${referenceKey}`;
     return queryString;
 };
 
-export const collectorLinkFormatter = (baseUrl, referenceKey) => {
+export const collectorLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}?f=collector_id%3A${referenceKey}`;
     return queryString;
 };
 
-export const serviceAccountLinkFormatter = (baseUrl, referenceKey) => {
+export const serviceAccountLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
     const queryString = `${baseUrl}/search/${referenceKey}`;
     return queryString;
 };
 
 
-export const RouterMap = {
+type ReferenceType =
+    | 'inventory.Server'
+    | 'identity.Project'
+    | 'inventory.Collector'
+    | 'identity.ServiceAccount'
+
+type RouterMap = Record<ReferenceType, { baseUrl: string; formatter: ReferenceLinkFormatter}>
+
+export const RouterMap: RouterMap = {
     'inventory.Server':
         {
             baseUrl: '/inventory/server',
@@ -43,7 +55,7 @@ export const RouterMap = {
         },
 };
 
-export const referenceRouter = (referenceType, referenceKey): string => {
+export const referenceRouter = (referenceType: ReferenceType|string, referenceKey): string => {
     const { baseUrl, formatter } = RouterMap[referenceType];
     const link = formatter(baseUrl, referenceKey);
     return link;

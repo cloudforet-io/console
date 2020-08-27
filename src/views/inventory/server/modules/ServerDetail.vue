@@ -21,7 +21,10 @@
                 />
             </template>
             <template slot="Raw Data">
-                <p-raw-data :item="data" />
+                <div class="raw-data">
+                    <p-panel-top title="Raw Data" />
+                    <p-raw-data :item="data" />
+                </div>
             </template>
         </p-button-tab>
     </div>
@@ -54,10 +57,12 @@ import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/q
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 
 export default {
     name: 'PServerDetail',
     components: {
+        PPanelTop,
         PRawData,
         PButtonTab,
         ServerBaseInfo,
@@ -294,3 +299,9 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+    .raw-data {
+        @apply px-4;
+    }
+</style>

@@ -50,21 +50,17 @@
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <p-server-detail :server-id="tableState.selectedItems[0].server_id" />
+                <p-server-detail :server-id="tableState.selectedServerIds[0]" />
             </template>
             <template #tag>
-                <s-tags-panel :is-show="singleItemTabState.activeTab==='tag'"
-                              :resource-id="tableState.selectedItems[0].server_id"
-                              tag-page-name="serverTags"
+                <s-tags-panel :resource-id="tableState.selectedServerIds[0]"
+                              resource-type="inventory.Server"
+                              resource-key="server_id"
                 />
             </template>
-            <!--                <template #admin>-->
-            <!--                    <s-dynamic-layout :api="adminApi"-->
-            <!--                                      :is-show="adminIsShow" :name="$t('TAB.MEMBER')"-->
-            <!--                                      v-bind="defaultAdminLayout"-->
-            <!--                                      :style="{borderWidth: 0}"-->
-            <!--                    />-->
-            <!--                </template>-->
+            <template #admin>
+                <server-admin :server-ids="tableState.selectedServerIds" />
+            </template>
             <!--                <template #history>-->
             <!--                    <s-dynamic-layout :api="historyApi"-->
             <!--                                      :is-show="historyIsShow" :name="$t('TAB.HISTORY')"-->
@@ -72,6 +68,9 @@
             <!--                                      :style="{borderWidth: 0}"-->
             <!--                    />-->
             <!--                </template>-->
+            <template #history>
+                <server-history :server-id="tableState.selectedServerIds[0]" />
+            </template>
             <template #monitoring>
                 <s-monitoring :resource-type="monitoringState.resourceType"
                               :resources="monitoringState.resources"
@@ -96,13 +95,9 @@
                     <template />
                 </p-data-table>
             </template>
-            <!--                <template #admin>-->
-            <!--                    <s-dynamic-layout :api="adminApi"-->
-            <!--                                      :is-show="adminIsShow" :name="$t('TAB.MEMBER')"-->
-            <!--                                      v-bind="defaultAdminLayout"-->
-            <!--                                      :style="{borderWidth: 0}"-->
-            <!--                    />-->
-            <!--                </template>-->
+            <template #admin>
+                <server-admin :server-ids="tableState.selectedServerIds" />
+            </template>
             <template #monitoring>
                 <s-monitoring :resource-type="monitoringState.resourceType"
                               :resources="monitoringState.resources"
@@ -191,6 +186,8 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
 
 import config from '@/lib/config';
+import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
+import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 import searchSchema from './default-schema/search.json';
 import tableSchema from './default-schema/base-table.json';
 
@@ -240,6 +237,8 @@ const serverStore = {
 export default {
     name: 'Server',
     components: {
+        ServerHistory,
+        ServerAdmin,
         PDynamicLayout,
         GeneralPageLayout,
         PStatus,
@@ -328,6 +327,7 @@ export default {
                 ['os_type', 'COMMON.O_TYPE'],
             ],
             context.parent)),
+            selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
 
         const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
@@ -418,7 +418,7 @@ export default {
         const changeProject = async (data?: ProjectItemResp|null) => {
             changeProjectState.loading = true;
             const changeAction = fluentApi.inventory().server().changeProject().clone()
-                .setSubIds(tableState.selectedItems.map(item => item.server_id));
+                .setSubIds(tableState.selectedServerIds);
             if (data) {
                 try {
                     await changeAction.setId(data.id).execute();
@@ -558,42 +558,6 @@ export default {
         const clickCollectData = () => {
             tableState.collectModalVisible = true;
         };
-
-        // const adminApi = computed<DynamicLayoutApiProp>(() => {
-        //     let servers: string[] = [];
-        //     if (tableState.selectedItems.length === 1) {
-        //         servers = [tableState.selectedItems[0].server_id];
-        //     } else {
-        //         servers = tableState.selectedItems.map(it => it.server_id);
-        //     }
-        //     return {
-        //         resource: fluentApi.inventory().server().memberList().setIds(servers),
-        //     };
-        // });
-
-        // const historyApi = computed<DynamicLayoutApiProp>(() => {
-        //     if (tableState.selectedItems.length === 0) {
-        //         return {
-        //             resource: fluentApi.inventory().server(),
-        //             getAction: (act: any) => act,
-        //         };
-        //     }
-        //
-        //     const selectIdForHistory = tableState.selectedItems[0].server_id;
-        //     return {
-        //         resource: fluentApi.inventory().server(),
-        //         getAction: (act: any) => act.setId(selectIdForHistory),
-        //     };
-        // });
-        // const historyIsShow = computed(() => {
-        //     let result = false;
-        //
-        //     if (tableState.selectedItems.length === 1 && singleItemTabState.activeTab === 'history') {
-        //         result = true;
-        //     }
-        //
-        //     return result;
-        // });
 
 
         /** Monitoring Tab */

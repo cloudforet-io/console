@@ -8,7 +8,7 @@ const postCssLoader = {
 
 module.exports = {
   stories: [
-    '../src/**/*.stories.js',
+    '../src/**/*.stories.(js|ts)',
   ],
   addons: [
     '@storybook/addon-actions',
@@ -16,11 +16,11 @@ module.exports = {
     '@storybook/addon-knobs',
     '@storybook/addon-storysource',
     '@storybook/addon-viewport',
-    '@storybook/addon-a11y',
+    '@storybook/addon-controls',
     {
       name: '@storybook/addon-docs',
       options: {
-        vueDocgenOptions: { alias: { '@': path.resolve(__dirname, '../src') }}
+          vueDocgenOptions: { alias: { '@': path.resolve(__dirname, '../src') }},
       }
     },
     '@storybook/addon-google-analytics',

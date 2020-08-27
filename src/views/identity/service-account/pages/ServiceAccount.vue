@@ -91,10 +91,9 @@
                             />
                         </template>
                         <template #tag>
-                            <s-tags-panel
-                                :is-show="singleItemTab.syncState.activeTab==='tag'"
-                                :resource-id="apiHandler.tableTS.selectState.firstSelectItem.service_account_id"
-                                tag-page-name="serviceAccountTags"
+                            <s-tags-panel :resource-id="apiHandler.tableTS.selectState.firstSelectItem.service_account_id"
+                                          resource-type="identity.ServiceAccount"
+                                          resource-key="service_account_id"
                             />
                         </template>
                         <template #credentials>

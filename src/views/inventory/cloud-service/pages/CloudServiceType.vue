@@ -184,6 +184,7 @@ import { KeyItem } from '@/components/organisms/search/query-search/type';
 import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios';
 import { APIError } from '@/lib/space-connector/api';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
 
@@ -406,7 +407,7 @@ export default {
                 .setKeyword(...or)
                 .setFilter(...and, ...filters);
             if (!isTriggeredBySideFilter) {
-                query.setPageStart(((state.thisPage - 1) * state.pageSize) + 1);
+                query.setPageStart(getPageStart(state.thisPage, state.pageSize));
             }
 
             return {

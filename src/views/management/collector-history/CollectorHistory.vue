@@ -83,6 +83,7 @@ import {
 } from '@/lib/component-utils/query-search';
 import router from '@/routes';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -173,7 +174,7 @@ export default {
             state.items = [];
             jobs.forEach((job, index) => {
                 const newJob = {
-                    sequence: (index + 1) + ((state.thisPage - 1) * state.pageSize),
+                    sequence: getPageStart(state.thisPage, state.pageSize) + index,
                     // eslint-disable-next-line camelcase
                     job_id: job.job_id,
                     'collector_info.name': job.collector_info.name,
@@ -203,7 +204,7 @@ export default {
             const query = new QueryHelper();
             query
                 .setSort(state.sortBy, state.sortDesc)
-                .setPage(((state.thisPage - 1) * state.pageSize) + 1, state.pageSize)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setKeyword(...or);
             if (statusValues.length > 0) {
                 query.setFilter({
