@@ -30,7 +30,7 @@ import { NSChart } from '@/lib/chart/s-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
 import {
-    black, coral, gray, primary,
+    black, red, gray, primary,
 } from '@/styles/colors';
 
 const TICKS_COUNT = 5;
@@ -38,7 +38,7 @@ const DEFAULT_MAX = 600;
 const DEFAULT_STEP_SIZE = 100;
 const LEGEND_COLORS: {[k: string]: string} = {
     success: primary,
-    failure: coral.default,
+    failure: red.default,
 };
 
 interface ChartDataType {

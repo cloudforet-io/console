@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="collector-history">
+    <general-page-layout class="collector-history-container">
         <div v-if="!selectedJobId">
             <p-page-navigation :routes="route" />
             <p-page-title :title="pageTitle" />
@@ -39,7 +39,7 @@
                     </template>
                     <template #th-total_tasks-format="{ value }">
                         <span>{{ value }}</span>
-                        <span class="th-additional-info-text">(completed / total)</span>
+                        <span class="th-additional-info-text"> (completed / total)</span>
                     </template>
                     <template #col-sequence-format="{ value }">
                         <span class="float-right">{{ value }}</span>
@@ -343,7 +343,7 @@ export default {
 </script>
 
 <style lang="postcss">
-.collector-history {
+.collector-history-container {
     .toolbox-top {
         .filter-button-lap {
             @apply border-r border-gray-200;
@@ -351,6 +351,9 @@ export default {
             padding: 0 1rem;
             &:first-child {
                 padding-left: 0;
+            }
+            &:last-child {
+                @apply border-none;
             }
         }
         .filter-button {
