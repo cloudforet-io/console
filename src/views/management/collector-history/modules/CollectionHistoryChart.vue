@@ -3,7 +3,10 @@
         <template #loader>
             <p-skeleton width="100%" height="16rem" />
         </template>
-        <p-date-pagination :date.sync="currentDate" />
+        <div class="top-lap">
+            <p-date-pagination :date.sync="currentDate" />
+        </div>
+        <span class="y-label-text">Job Count</span>
         <canvas ref="chartRef" />
     </p-chart-loader>
 </template>
@@ -173,6 +176,10 @@ export default {
                                 return value;
                             },
                         },
+                        afterTickToLabelConversion: (scaleInstance) => {
+                            scaleInstance.ticks[0] = '';
+                            scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
+                        },
                     }],
                     xAxes: [{
                         display: 'auto',
@@ -194,10 +201,11 @@ export default {
                 onClick: pointClickEvent,
             };
 
+            const currentMonthText = state.currentDate.format('M');
             state.chart = new NSChart(canvas, {
                 type: 'line',
                 data: {
-                    labels: range(1, state.dayCount + 1),
+                    labels: (range(1, state.dayCount + 1)).map(d => `${currentMonthText}/${d}`),
                     datasets,
                 },
                 options,
@@ -231,5 +239,19 @@ export default {
     height: 20rem;
     padding-top: 1rem;
     padding-bottom: 3rem;
+
+    .top-lap {
+        position: relative;
+        height: 2rem;
+        .p-date-pagination {
+            position: absolute;
+            right: 0;
+        }
+    }
+
+    .y-label-text {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+    }
 }
 </style>
