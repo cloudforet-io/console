@@ -58,6 +58,30 @@
                     />
                 </div>
             </p-pane-layout>
+            <p-button-modal
+                class="button-modal"
+                :header-title="modalHeaderTitle"
+                :centered="true"
+                :scrollable="false"
+                size="md"
+                :fade="true"
+                :backdrop="true"
+                :visible.sync="modalVisible"
+            >
+                <template #body>
+                    <p class="modal-content" v-html="modalContent" />
+                </template>
+                <template #confirm-button>
+                    <p-icon-text-button
+                        class="create-collector-button"
+                        style-type="primary-dark"
+                        name="ic_plus_bold"
+                        @click="$router.push({path: '/plugin/collector/create/plugins'})"
+                    >
+                        {{ $t('INVENTORY.CRT_COLL') }}
+                    </p-icon-text-button>
+                </template>
+            </p-button-modal>
         </div>
         <div v-else>
             <p-page-navigation v-if="selectedJobId" :routes="subRoute" />
@@ -82,7 +106,10 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -91,9 +118,8 @@ import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import {
     makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
 } from '@/lib/component-utils/query-search';
-import router from '@/routes';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import router from '@/routes';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -108,6 +134,8 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'PCollectorHistory',
     components: {
+        PIconTextButton,
+        PButtonModal,
         PPaneLayout,
         PPageNavigation,
         PCollectorHistoryChart,
@@ -167,12 +195,14 @@ export default {
                     status: makeValueHandlerWithSearchEnums(JOB_STATUS),
                 },
             },
+            //
+            modalHeaderTitle: 'Need to Set a Collector',
+            modalVisible: false,
+            modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
         });
-
         const routeState = reactive({
             route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' }],
         });
-
         const subRouteState = reactive({
             subRoute: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
                 { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` }],
@@ -246,6 +276,7 @@ export default {
                 const res = await SpaceConnector.client.inventory.job.list({ query });
                 state.jobs = res.results;
                 state.totalCount = res.total_count;
+                if (res.total_count === 0) state.modalVisible = true;
 
                 convertJobsToFieldItem(res.results);
             } catch (e) {
@@ -399,6 +430,17 @@ export default {
         padding-top: 1.5rem;
         bottom: 0;
         margin-bottom: 1.5rem;
+    }
+
+    .button-modal {
+        .modal-content {
+            line-height: 1.5rem;
+        }
+        .modal-btn {
+            .create-collector-button {
+                padding: 0;
+            }
+        }
     }
 }
 </style>
