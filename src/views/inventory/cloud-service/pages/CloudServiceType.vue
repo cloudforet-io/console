@@ -82,6 +82,9 @@
                                          :src="item.icon"
                                          :alt="item.name"
                                     >
+                                    <p-i v-else-if="providerStore.state.providers[item.provider] && item.icon === 0" name="ic_provider_other" width="48px"
+                                         height="48px"
+                                    />
                                     <img v-else-if="providerStore.state.providers[item.provider]"
                                          width="48px" height="48px"
                                          :src="providerStore.state.providers[item.provider].icon"

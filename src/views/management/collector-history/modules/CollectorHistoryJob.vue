@@ -372,7 +372,6 @@ export default {
         line-height: 150%;
         border-radius: 0.125rem;
         box-sizing: border-box;
-        margin-bottom: 1rem;
         padding: 1rem;
         .info-title {
             @apply text-gray-400;
