@@ -1,5 +1,5 @@
 <template>
-    <nav class="date-pagination">
+    <nav class="p-date-pagination">
         <p-icon-button class="text"
                        name="ic_arrow_left"
                        @click="onClickPrevMonth"
@@ -66,28 +66,23 @@ export default {
 </script>
 
 <style lang="postcss">
-.date-pagination {
+.p-date-pagination {
     @apply min-w-12;
     display: inline-flex;
-    float: right;
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
-    padding-bottom: 1rem;
 
-    @screen lg {
-        @apply min-w-16;
-    }
-}
-.date-text-lap {
-    @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
-    .date-text {
-        line-height: 1.2rem;
-        font-size: 0.875rem;
-    }
+    .date-text-lap {
+        @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
+        .date-text {
+            line-height: 1.2rem;
+            font-size: 0.875rem;
+        }
 
-    @screen lg {
-        @apply min-w-16;
+        @screen lg {
+            @apply min-w-16;
+        }
     }
 }
 </style>
