@@ -567,6 +567,7 @@ export default {
                 showErrorMessage('Request Fail', e, context.root);
             })
                 .finally(() => {
+                    extraOptionState.selectIndex = [];
                     listServerData();
                     resetCheckTableModalState();
                 });
