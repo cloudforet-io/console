@@ -1,6 +1,5 @@
 <template>
     <div class="collector-history-job">
-        <p-page-navigation :routes="route" />
         <p-collapsible-panel>
             <template #content>
                 <div class="more-information-lap">
@@ -49,7 +48,9 @@
                             </div>
                         </div>
                     </template>
-
+                    <template #col-sequence-format="{ value }">
+                        <span class="float-right">{{ value }}</span>
+                    </template>
                     <template #col-status-format="{ value }">
                         <span :class="value.toLowerCase()">{{ value }}</span>
                     </template>
@@ -117,7 +118,6 @@ enum JOB_TASK_STATUS {
 export default {
     name: 'PCollectorHistoryJob',
     components: {
-        PPageNavigation,
         PCollapsiblePanel,
         PEmpty,
         PDataTable,
@@ -203,10 +203,7 @@ export default {
             },
         });
 
-        const routeState = reactive({
-            route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
-                { name: props.jobId, path: `/management/collector-history#${props.jobId}` }],
-        });
+
 
         const convertStatus = (status) => {
             if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
@@ -351,7 +348,6 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(routeState),
             timestampFormatter,
             convertStatus,
             convertServiceAccountName,
@@ -396,6 +392,7 @@ export default {
         @apply border border-gray-200;
         border-radius: 0.125rem;
         padding-bottom: 2.375rem;
+        min-height: 27.5rem;
         .p-data-table {
             th {
                 border-top: none;

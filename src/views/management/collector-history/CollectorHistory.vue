@@ -3,58 +3,64 @@
         <div v-if="!selectedJobId">
             <p-page-navigation :routes="route" />
             <p-page-title :title="pageTitle" />
-            <p-collector-history-chart :loading="loading" />
-            <p-query-search-table
-                :fields="fields"
-                :items="items"
-                :loading="loading"
-                :query-tags="searchTags"
-                :key-items="querySearchHandlers.keyItems"
-                :value-handler-map="querySearchHandlers.valueHandlerMap"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :this-page.sync="thisPage"
-                :page-size.sync="pageSize"
-                :total-count="totalCount"
-                :style="{height: '100%'}"
-                :selectable="false"
-                :row-cursor-pointer="rowCursorPointer"
-                :excel-visible="false"
-                @change="onChange"
-                @rowLeftClick="onSelect"
-            >
-                <template #toolbox-top>
-                    <div class="toolbox-filter-button-lap">
-                        <div v-for="(status, idx) in statusList"
-                             :key="idx"
-                             class="filter-button-lap"
-                        >
-                            <span class="filter-button"
-                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                  @click="onClickStatus(status.key)"
-                            >{{ status.label }}</span>
+            <p-pane-layout class="collector-history-wrapper">
+                <p-collector-history-chart :loading="loading" class="history-chart" />
+                <p-query-search-table
+                    :fields="fields"
+                    :items="items"
+                    :loading="loading"
+                    :query-tags="searchTags"
+                    :key-items="querySearchHandlers.keyItems"
+                    :value-handler-map="querySearchHandlers.valueHandlerMap"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    :this-page.sync="thisPage"
+                    :page-size.sync="pageSize"
+                    :total-count="totalCount"
+                    :style="{height: '100%', border: 'none'}"
+                    :selectable="false"
+                    :row-cursor-pointer="rowCursorPointer"
+                    :excel-visible="false"
+                    @change="onChange"
+                    @rowLeftClick="onSelect"
+                >
+                    <template #toolbox-top>
+                        <div class="toolbox-filter-button-lap">
+                            <div v-for="(status, idx) in statusList"
+                                 :key="idx"
+                                 class="filter-button-lap"
+                            >
+                                <span class="filter-button"
+                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                      @click="onClickStatus(status.key)"
+                                >{{ status.label }}</span>
+                            </div>
                         </div>
-                    </div>
-                </template>
-                <template #th-total_tasks-format="{ value }">
-                    <span>{{ value }}</span>
-                    <span class="th-additional-info-text">(completed / total)</span>
-                </template>
-                <template #col-status-format="{ value }">
-                    <span :class="value.toLowerCase()">{{ value }}</span>
-                </template>
-            </p-query-search-table>
-            <div v-if="!loading && items.length > 0" class="pagination">
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
-                              @prevPage="onClickPrevPageButton"
-                              @nextPage="onClickNextPageButton"
-                              @clickPage="onClickPageNumber"
-                />
-            </div>
+                    </template>
+                    <template #th-total_tasks-format="{ value }">
+                        <span>{{ value }}</span>
+                        <span class="th-additional-info-text">(completed / total)</span>
+                    </template>
+                    <template #col-sequence-format="{ value }">
+                        <span class="float-right">{{ value }}</span>
+                    </template>
+                    <template #col-status-format="{ value }">
+                        <span :class="value.toLowerCase()">{{ value }}</span>
+                    </template>
+                </p-query-search-table>
+                <div v-if="!loading && items.length > 0" class="pagination">
+                    <p-pagination :total-count="totalCount"
+                                  :this-page.sync="thisPage"
+                                  :page-size.sync="pageSize"
+                                  @prevPage="onClickPrevPageButton"
+                                  @nextPage="onClickNextPageButton"
+                                  @clickPage="onClickPageNumber"
+                    />
+                </div>
+            </p-pane-layout>
         </div>
         <div v-else>
+            <p-page-navigation v-if="selectedJobId" :routes="subRoute" />
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
             <p-collector-history-job :job-id="selectedJobId" />
         </div>
@@ -87,6 +93,7 @@ import {
 } from '@/lib/component-utils/query-search';
 import router from '@/routes';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -101,6 +108,7 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'PCollectorHistory',
     components: {
+        PPaneLayout,
         PPageNavigation,
         PCollectorHistoryChart,
         PPagination,
@@ -115,7 +123,7 @@ export default {
             loading: false,
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
-                { label: 'No.', name: 'sequence' },
+                // { label: 'No.', name: 'sequence', width: '2rem' },
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info.name' },
                 { label: 'Status', name: 'status' },
@@ -163,6 +171,11 @@ export default {
 
         const routeState = reactive({
             route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' }],
+        });
+
+        const subRouteState = reactive({
+            subRoute: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
+                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` }],
         });
 
         const convertStatus = (status) => {
@@ -316,6 +329,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(routeState),
+            ...toRefs(subRouteState),
             onSelect,
             onChange,
             onClickPageNumber,
@@ -358,6 +372,12 @@ export default {
         }
     }
 
+    .history-chart {
+        margin-left: 3rem;
+        margin-right: 3rem;
+        margin-top: 2.5rem;
+    }
+
     .p-query-search-table {
         margin-top: 2rem;
         .p-data-table {
@@ -375,6 +395,7 @@ export default {
         text-align: center;
         padding-top: 1.5rem;
         bottom: 0;
+        margin-bottom: 1.5rem;
     }
 }
 </style>
