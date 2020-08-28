@@ -115,14 +115,14 @@ export default {
         margin-inline-end: 0;
         padding-inline-start: 2rem;
     }
-    h1, h2, h3, h4 {
-        @apply font-bold ;
+    h1, h3, h4 {
+        @apply font-bold;
     }
     h1 {
         @apply text-3xl mb-4 mt-8;
     }
     h2 {
-        @apply text-2xl mb-3 mt-8;
+        @apply font-normal text-2xl mb-3 mt-8;
     }
     h3 {
         @apply text-xl mb-2 mt-8;

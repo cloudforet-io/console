@@ -1,7 +1,19 @@
 <template>
     <details open>
-        <summary @click="changeSummary">
-            {{ summary }}
+        <summary
+            v-if="isActive"
+            @click="toggleSummary"
+        >
+            {{ text }}
+            <p-i class="hide-icon" name="ic_arrow_bottom" height="1rem"
+                 width="1rem" color="transparent inherit"
+            />
+        </summary>
+        <summary v-if="!isActive" @click="toggleSummary">
+            {{ text }}
+            <p-i class="show-icon" name="ic_arrow_bottom" height="1rem"
+                 width="1rem" color="transparent inherit"
+            />
         </summary>
         <p-pane-layout class="help-panel">
             <slot name="content" />
@@ -10,21 +22,27 @@
 </template>
 
 <script>
-import { ref } from '@vue/composition-api';
+import {
+    reactive, ref, toRefs, watch,
+} from '@vue/composition-api';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'PCollapsiblePanel',
-    components: { PPaneLayout },
+    components: { PI, PPaneLayout },
     setup() {
-        const summary = ref('hide');
-        const changeSummary = () => {
-            if (summary.value === 'hide') summary.value = 'See more';
-            else if (summary.value === 'See more') summary.value = 'hide';
+        const state = reactive({
+            text: 'hide',
+            isActive: true,
+        });
+        const toggleSummary = () => {
+            if (state.text === 'hide' && state.isActive) { state.text = 'See more'; state.isActive = !state.isActive; }
+            else if (state.text === 'See more' && !state.isActive) { state.text = 'hide'; state.isActive = !state.isActive; }
         };
         return {
-            summary,
-            changeSummary,
+            ...toRefs(state),
+            toggleSummary,
         };
     },
 };
@@ -47,6 +65,7 @@ export default {
         top: 0;
     }
     summary {
+        @apply text-blue-600;
         cursor: pointer;
         position: absolute;
         right: 1rem;
@@ -54,10 +73,13 @@ export default {
         z-index: 1;
         font-size: 0.75rem;
     }
-    summary:hover {
-        @apply text-secondary;
+    details ::-webkit-details-marker {
+        color: transparent;
     }
     details[open] ::-webkit-details-marker {
+        color: transparent;
+    }
+    .hide-icon {
         transform: rotate(180deg);
     }
     .help-panel {
