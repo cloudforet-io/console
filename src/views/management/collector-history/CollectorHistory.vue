@@ -31,6 +31,7 @@
                                  :key="idx"
                                  class="filter-button-lap"
                             >
+                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
                                 <span class="filter-button"
                                       :class="[activatedStatus === status.key ? 'active' : '', status.class]"
                                       @click="onClickStatus(status.key)"
@@ -152,7 +153,6 @@ export default {
             loading: false,
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
-                // { label: 'No.', name: 'sequence', width: '2rem' },
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info.name' },
                 { label: 'Status', name: 'status' },
@@ -163,8 +163,12 @@ export default {
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },
                 { key: 'inProgress', label: 'In-progress', class: 'in-progress' },
-                { key: 'success', label: 'Success', class: 'success' },
-                { key: 'failure', label: 'Failure', class: 'failure' },
+                {
+                    key: 'success', label: 'Success', class: 'success', icon: true,
+                },
+                {
+                    key: 'failure', label: 'Failure', class: 'failure', icon: true,
+                },
             ],
             activatedStatus: 'all',
             jobs: [] as JobModel[],
@@ -387,22 +391,35 @@ export default {
             &:last-child {
                 @apply border-none;
             }
-        }
-        .filter-button {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            cursor: pointer;
-            &:hover, &:focus {
-                @apply text-gray-900;
-            }
-            &.active {
-                @apply text-gray-900;
-                font-weight: bold;
-                &:before {
+            .legend-icon {
+                display: inline-block;
+                width: 0.75rem;
+                height: 0.75rem;
+                border-radius: 2px;
+                margin-right: 7px;
+                &.success {
+                    @apply bg-primary;
+                }
+                &.failure {
+                    @apply bg-red-500;
                 }
             }
-            &.failure:hover, &.failure:focus, &.failure.active {
-                @apply text-red-500;
+            .filter-button {
+                @apply text-gray-400;
+                font-size: 0.875rem;
+                cursor: pointer;
+                &:hover, &:focus {
+                    @apply text-gray-900;
+                }
+                &.active {
+                    @apply text-gray-900;
+                    font-weight: bold;
+                    &:before {
+                    }
+                }
+                &.failure:hover, &.failure:focus, &.failure.active {
+                    @apply text-red-500;
+                }
             }
         }
     }
