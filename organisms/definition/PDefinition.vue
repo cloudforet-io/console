@@ -69,7 +69,7 @@ export default {
         const showCopy = computed(() => !props.disableCopy && isNotEmpty(displayData.value));
 
         const copy = (): void => {
-            if (props.formatter) copyTextToClipboard(props.formatter(props.data, props));
+            if (props.formatter) copyAnyData(props.formatter(props.data, props));
             else copyAnyData(field.value?.innerText);
             emit('copy', props);
         };

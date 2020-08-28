@@ -3,5 +3,5 @@ export interface DefinitionProps {
     label?: string;
     data: any;
     disableCopy?: boolean;
-    formatter?: (data: any, props: DefinitionProps) => string;
+    formatter?: (data: any, props: DefinitionProps) => any;
 }
