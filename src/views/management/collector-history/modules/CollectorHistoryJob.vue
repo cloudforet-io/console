@@ -68,7 +68,7 @@
             </div>
             <p-data-table v-else
                           :fields="errorFields"
-                          :items="selectedItem.errors"
+                          :items="errorItems"
                           :sortable="false"
                           :selectable="false"
                           :row-height-fixed="false"
@@ -95,7 +95,6 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
@@ -141,6 +140,10 @@ export default {
             serviceAccounts: [],
             projects: [],
             items: [],
+            errorItems: computed(() => state.selectedItem?.errors.map((d, idx) => ({
+                sequence: idx + 1,
+                ...d,
+            }))),
             fields: [
                 { label: 'No.', name: 'sequence' },
                 { label: 'Service Account', name: 'service_account_id' },
@@ -202,8 +205,6 @@ export default {
                 },
             },
         });
-
-
 
         const convertStatus = (status) => {
             if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
