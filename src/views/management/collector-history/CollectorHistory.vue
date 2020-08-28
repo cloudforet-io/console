@@ -6,6 +6,7 @@
             <p-pane-layout class="collector-history-wrapper">
                 <p-collector-history-chart :loading="loading" class="history-chart" />
                 <p-query-search-table
+                    :class="items.length === 0 ? 'no-data' : ''"
                     :fields="fields"
                     :items="items"
                     :loading="loading"
@@ -276,7 +277,6 @@ export default {
                 const res = await SpaceConnector.client.inventory.job.list({ query });
                 state.jobs = res.results;
                 state.totalCount = res.total_count;
-                if (res.total_count === 0) state.modalVisible = true;
 
                 convertJobsToFieldItem(res.results);
             } catch (e) {
@@ -354,6 +354,7 @@ export default {
             }
             state.searchTags = urlQueryStringToSearchTags(vm.$route.query.f);
             await getJobs();
+            if (state.totalCount === 0) state.modalVisible = true;
         };
         init();
 
@@ -414,6 +415,11 @@ export default {
 
     .p-query-search-table {
         margin-top: 2rem;
+        &.no-data {
+            .p-data-table {
+                min-height: 18.75rem;
+            }
+        }
         .p-data-table {
             .error, .timeout, .canceled {
                 @apply text-red-500;
