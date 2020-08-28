@@ -6,7 +6,7 @@
             </slot>
         </span>
         <slot v-if="showIcon && target === '_blank'" name="icon" v-bind="$props">
-            <p-i name="ic_external-link" height="1rem" width="1rem" />
+            <p-i name="ic_external-link" height="1em" width="1em" />
         </slot>
     </a>
 </template>
@@ -51,10 +51,10 @@ export default {
 .p-anchor {
     @apply cursor-pointer inline-flex items-center;
     &:hover {
-       @apply text-secondary underline;
+       @apply underline;
     }
     .text {
-        @apply mr-1;
+        margin-right: 2px;
     }
 }
 </style>
