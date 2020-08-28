@@ -67,15 +67,6 @@
                     </template>
                 </p-text-list>
             </template>
-            <template #data-created_at="{data: value}">
-                {{ timestampFormatter(value) }}
-            </template>
-            <template #data-updated_at="{data: value}">
-                {{ timestampFormatter(value) }}
-            </template>
-            <template #data-deleted_at="{data: value}">
-                {{ timestampFormatter(value) }}
-            </template>
         </p-definition-table>
 
         <p-panel-top>Operation System</p-panel-top>
@@ -140,13 +131,13 @@ export default {
                 { name: 'server_id', label: 'ID' },
                 { name: 'name', label: 'Name' },
                 { name: 'primary_ip_address', label: 'Primary IP' },
-                { name: 'collection_info.state', label: 'Collection State', formatter: data => COLLECTION_STATE[data] },
-                { name: 'state', label: 'Life Cycle', formatter: data => LIFE_CYCLE[data] },
+                { name: 'collection_info.state', label: 'Collection State' },
+                { name: 'state', label: 'Life Cycle' },
                 { name: 'reference.resource_id', label: 'Resource ID' },
                 { name: 'os_type', label: 'OS Type' },
-                { name: 'server_type', label: 'Server Type', formatter: data => SERVER_TYPE[data] },
+                { name: 'server_type', label: 'Server Type' },
                 { name: 'project_id', label: 'Project', formatter: data => state.projects[data] },
-                { name: 'provider', label: 'Provider', formatter: data => state.providers[data] },
+                { name: 'provider', label: 'Provider' },
                 { name: 'collection_info.service_accounts', label: 'Service Accounts', formatter: data => state.serviceAccounts[data] },
                 { name: 'collection_info.secrets', label: 'Secrets', formatter: data => state.secrets[data] },
                 { name: 'collection_info.collectors', label: 'Collected By', formatter: data => state.collectors[data] },
@@ -203,7 +194,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-
-</style>

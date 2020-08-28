@@ -4,8 +4,10 @@
         <p-definition-table :fields="fields" :data="rootData" :loading="isLoading"
                             v-on="$listeners"
         >
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="{...scope, rootData}" />
+            <template v-for="(slot, i) of slots" v-slot:[slot.name]="slotProps">
+                <slot :name="slot.name" v-bind="slotProps">
+                    <p-dynamic-field :key="i" v-bind="slot" :data="slotProps.data" />
+                </slot>
             </template>
         </p-definition-table>
     </div>
@@ -17,16 +19,19 @@ import {
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import {
-    DynamicLayoutProps, DynamicLayoutApiProp, checkCanGetData, changeSetOnlys,
+    DynamicLayoutProps, DynamicLayoutApiProp, checkCanGetData, changeSetOnlys, makeTableSlots, DynamicFieldType,
 } from '@/views/common/dynamic-layout/toolset';
 import { GetAction, ResourceActions } from '@/lib/fluent-api';
 import { DefinitionField } from '@/components/organisms/tables/definition-table/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
+import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
+import { getTimezone } from '@/lib/util';
 
 export default {
     name: 'SDynamicLayoutItem',
     components: {
+        PDynamicField,
         PPanelTop,
         PDefinitionTable,
     },
@@ -127,9 +132,16 @@ export default {
             }
             return readonlyData.value;
         });
+
+        const slots = computed((): DynamicFieldType[] => (
+            props.options.fields ? props.options.fields.map(ds => ({
+                ...ds,
+                name: `data-${ds.key}`,
+            })) : []));
         return {
             fields,
             rootData,
+            slots,
         };
     },
 };
