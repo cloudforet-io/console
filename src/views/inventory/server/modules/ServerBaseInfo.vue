@@ -20,25 +20,25 @@
                 <p-anchor :href="referenceRouter('identity.Project', value)"
                           target="_blank"
                 >
-                    {{ projects[value] }}
+                    {{ projects[value] || value }}
                 </p-anchor>
             </template>
             <template #data-provider="{data: value}">
-                <p-badge v-if="providers[value] && providers[value].name"
+                <p-badge v-if="providers[value] && providers[value].name || value"
                          :background-color="providers[value] ? providers[value].color : null"
                 >
-                    {{ providers[value].name }}
+                    {{ providers[value] ? providers[value].name || value : value }}
                 </p-badge>
             </template>
             <template #data-collection_info.service_accounts="{data: value}">
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
-                        <p-badge v-if="serviceAccounts[d]"
+                        <p-badge v-if="d"
                                  :link="referenceRouter('identity.ServiceAccount', d)"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
-                            {{ serviceAccounts[d] }}
+                            {{ serviceAccounts[d] || d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -46,10 +46,10 @@
             <template #data-collection_info.secrets="{data: value}">
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
-                        <p-badge v-if="secrets[d]"
+                        <p-badge v-if="d"
                                  outline background-color="violet.500"
                         >
-                            {{ secrets[d] }}
+                            {{ secrets[d] || d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -57,12 +57,12 @@
             <template #data-collection_info.collectors="{data: value}">
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
-                        <p-badge v-if="collectors[d]"
+                        <p-badge v-if="d"
                                  :link="referenceRouter('inventory.Collector', d)"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
-                            {{ collectors[d] }}
+                            {{ collectors[d] || d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -136,11 +136,11 @@ export default {
                 { name: 'reference.resource_id', label: 'Resource ID' },
                 { name: 'os_type', label: 'OS Type' },
                 { name: 'server_type', label: 'Server Type' },
-                { name: 'project_id', label: 'Project', formatter: data => state.projects[data] },
+                { name: 'project_id', label: 'Project', formatter: data => state.projects[data] || data },
                 { name: 'provider', label: 'Provider' },
-                { name: 'collection_info.service_accounts', label: 'Service Accounts', formatter: data => state.serviceAccounts[data] },
-                { name: 'collection_info.secrets', label: 'Secrets', formatter: data => state.secrets[data] },
-                { name: 'collection_info.collectors', label: 'Collected By', formatter: data => state.collectors[data] },
+                { name: 'collection_info.service_accounts', label: 'Service Accounts', formatter: data => state.serviceAccounts[data] || data },
+                { name: 'collection_info.secrets', label: 'Secrets', formatter: data => state.secrets[data] || data },
+                { name: 'collection_info.collectors', label: 'Collected By', formatter: data => state.collectors[data] || data },
                 { name: 'created_at', label: 'Created', formatter: timestampFormatter },
                 { name: 'updated_at', label: 'Updated', formatter: timestampFormatter },
                 { name: 'deleted_at', label: 'Deleted', formatter: timestampFormatter },
