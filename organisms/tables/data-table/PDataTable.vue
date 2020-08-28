@@ -167,7 +167,7 @@ import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { PDataTableProps, DataTableField } from '@/components/organisms/tables/data-table/type';
-import { copyAnyData, selectToCopyToClipboard } from '@/components/util/helpers';
+import { copyAnyData, copyTextToClipboard } from '@/components/util/helpers';
 import { windowEventMount } from '@/components/util/composition-helpers';
 
 const color = ['default', 'light', 'primary4'];
@@ -338,7 +338,7 @@ export default {
                             result += makeTableText(copyTargetElement.value[tr]);
                         });
                     }
-                    selectToCopyToClipboard(result);
+                    copyTextToClipboard(result);
                 }
             }
         };

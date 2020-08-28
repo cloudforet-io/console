@@ -3,37 +3,35 @@
         <td class="key">
             {{ label || name }}
         </td>
-        <td class="value" :class="{hover: isMouseOver}">
-            <slot name="default" v-bind="{
-                label, name, type, options, data
-            }"
+        <td ref="field" class="value" :class="{hover: isMouseOver}">
+            <slot name="default" v-bind="{...$props, ...$data}">
+                {{ displayData }}
+            </slot>
+            <slot v-if="showCopy"
+                  name="copy" v-bind="{...$props, ...$data}"
             >
-                <p-dynamic-field ref="field" :type="type" :options="options"
-                                 :data="data"
+                <p-copy-button class="ml-2" width="0.8rem" height="0.8rem"
+                               @copy="copy"
+                               @mouseover="onMouseOver()" @mouseout="onMouseOut()"
                 />
             </slot>
-            <p-copy-button v-if="typeof data !== 'undefined' && data !== '' && data !== null"
-                           class="ml-2" width="0.8rem" height="0.8rem"
-                           @copy="copy"
-                           @mouseover="onMouseOver()" @mouseout="onMouseOut()"
-            />
         </td>
     </tr>
 </template>
 
 <script lang="ts">
 import {
+    computed,
     ref,
 } from '@vue/composition-api';
 import { DefinitionProps } from '@/components/organisms/definition/type';
-import { copyAnyData } from '@/components/util/helpers';
+import { copyAnyData, copyTextToClipboard, isNotEmpty } from '@/components/util/helpers';
 import { mouseOverState } from '@/components/util/composition-helpers';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
-import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 
 export default {
     name: 'PDefinition',
-    components: { PCopyButton, PDynamicField },
+    components: { PCopyButton },
     props: {
         name: {
             type: String,
@@ -56,16 +54,29 @@ export default {
             type: String,
             default: 'text',
         },
+        disableCopy: {
+            type: Boolean,
+            default: undefined,
+        },
+        formatter: {
+            type: Function,
+            default: undefined,
+        },
     },
     setup(props: DefinitionProps, { emit }) {
         const field = ref<HTMLFormElement|null>(null);
+        const displayData = computed(() => (props.formatter ? props.formatter(props.data, props) : props.data));
+        const showCopy = computed(() => !props.disableCopy && isNotEmpty(displayData.value));
 
         const copy = (): void => {
-            copyAnyData(field.value?.$el.innerText);
-            emit('copy');
+            if (props.formatter) copyTextToClipboard(props.formatter(props.data, props));
+            else copyAnyData(field.value?.innerText);
+            emit('copy', props);
         };
         return {
             field,
+            displayData,
+            showCopy,
             copy,
             ...mouseOverState(),
         };

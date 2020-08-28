@@ -2,11 +2,11 @@ import _, { get, toString } from 'lodash';
 import colors from '@/components/styles/colors';
 
 /** @function
- * @name selectToCopyToClipboard
+ * @name copyTextToClipboard
  * @description copy given text to clipboard
  * @param {String} text
  * */
-export const selectToCopyToClipboard = (t) => {
+export const copyTextToClipboard = (t) => {
     const textArea = document.createElement('textarea');
     textArea.value = t;
     document.body.appendChild(textArea);
@@ -17,11 +17,12 @@ export const selectToCopyToClipboard = (t) => {
 
 export const copyAnyData = (value) => {
     if (Array.isArray(value)) {
-        selectToCopyToClipboard(toString(value));
+        copyTextToClipboard(toString(value));
     } else if (typeof value === 'object') {
-        selectToCopyToClipboard(JSON.stringify(value));
-    } else selectToCopyToClipboard(value || '');
+        copyTextToClipboard(JSON.stringify(value));
+    } else copyTextToClipboard(value || '');
 };
+
 
 /** @function
  * @name isNotEmpty

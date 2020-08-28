@@ -1,4 +1,4 @@
-import { DynamicFieldOptions, DynamicFieldType } from '@/components/organisms/dynamic-field/type/field-schema';
+import { DefinitionProps } from '@/components/organisms/definition/type';
 
 export interface DefinitionData {
     [key: string]: any;
@@ -11,9 +11,4 @@ export interface DefinitionTableProps {
     skeletonRows: number;
 }
 
-export interface DefinitionField {
-    name: string;
-    label?: string;
-    type: DynamicFieldType;
-    options?: DynamicFieldOptions;
-}
+export type DefinitionField = Omit<DefinitionProps, 'data'>

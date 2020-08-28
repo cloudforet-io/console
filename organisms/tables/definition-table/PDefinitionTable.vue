@@ -11,6 +11,11 @@
                               class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
                 >
                     <slot :name="`data-${bind.name}`" v-bind="{...bind, index: idx, items}" />
+                    <template #copy>
+                        <slot name="copy" v-bind="{...bind, index: idx, items}">
+                            <slot :name="`copy-${bind.name}`" v-bind="{...bind, index: idx, items}" />
+                        </slot>
+                    </template>
                 </p-definition>
             </tbody>
         </table>
@@ -25,14 +30,13 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import {
     DefinitionTableProps, DefinitionData, DefinitionField,
 } from '@/components/organisms/tables/definition-table/type';
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { every, range, get } from 'lodash';
 import { DefinitionProps } from '@/components/organisms/definition/type';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
@@ -69,12 +73,8 @@ export default {
         const state = reactive({
             isNoData: computed(() => every(state.items, def => !def.data)),
             skeletons: computed(() => range(props.skeletonRows)),
-            items: [] as DefinitionProps[],
+            items: computed(() => makeDefItems(props.fields, props.data)),
         });
-
-        watch(() => props.data, () => {
-            state.items = makeDefItems(props.fields, props.data);
-        }, { immediate: true });
 
         return {
             ...toRefs(state),

@@ -91,7 +91,7 @@ const useDictBuffer = (props, context) => {
         const rawText = event.target.parentElement.innerText;
         const copyLength = this.$t('BTN.COPY').length;
         const text = rawText.slice(0, -copyLength).trim();
-        this.selectToCopyToClipboard(text);
+        this.copyTextToClipboard(text);
     };
     watch(() => props.dict, (dict) => {
         if (dict !== mergeDict(destructDict.value)) {
