@@ -2,7 +2,7 @@
     <div class="menu-container">
         <div class="left">
             <div class="menu-lap mx-4">
-                <site-map :is-domain-owner="isDomainOwner" />
+                <site-map :is-domain-owner="isDomainOwner" :visible.sync="sitemapVisible" />
             </div>
             <div class="menu-lap mr-6 md:mr-10 lg:mr-10">
                 <router-link to="/dashboard">
@@ -168,6 +168,7 @@ export default {
         });
         const state = reactive({
             openedMenu: null,
+            sitemapVisible: false,
             defaultMenuList: [
                 {
                     key: 'project',
@@ -280,6 +281,7 @@ export default {
         };
         const showMenu = (menu) => {
             state.openedMenu = menu;
+            state.sitemapVisible = false;
         };
         const toggleMenu = (menu) => {
             if (state.openedMenu === menu) {
