@@ -598,7 +598,7 @@ export default {
     .p-data-table {
         @apply h-full w-full relative overflow-auto;
         .table-container {
-            @apply h-full w-full;
+            @apply overflow-auto h-full w-full;
         }
         table {
             @apply min-w-full;

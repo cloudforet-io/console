@@ -21,10 +21,11 @@
                 <h4 class="p-table-check-modal-sub-title">
                     {{ subTitle }}
                 </h4>
-                <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
-                              :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                              :style="{'max-height': '100px'}"
-                />
+                <div class="overflow-auto" :style="{'max-height': '300px'}">
+                    <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
+                                  :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+                    />
+                </div>
                 <slot />
             </div>
         </template>

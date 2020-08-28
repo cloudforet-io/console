@@ -127,7 +127,7 @@ export default {
                 return props.options.fields.map(d => ({ label: d.name, name: d.key }));
             }),
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
-            selectIndex: bindExtra(props, 'selectIndex', []),
+            selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
 
             /** get data from fetch options */

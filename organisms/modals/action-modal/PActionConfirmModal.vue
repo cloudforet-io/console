@@ -21,10 +21,11 @@
                 <h4 class="p-table-check-modal-sub-title">
                     {{ subTitle }}
                 </h4>
-                <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
-                              :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                              :style="{'max-height': '100px'}"
-                />
+                <div class="overflow-auto" :style="{'max-height': '300px'}">
+                    <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
+                                  :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+                    />
+                </div>
                 <div v-if="doubleConfirm" style="width: 100%;">
                     <p-hr />
                     <p-row style="margin-top: 33px;">
@@ -179,6 +180,10 @@ export default {
 
 <style lang="postcss" scoped>
     .p-table-check-modal-sub-title {
-        margin-bottom: 2rem;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 1.5rem;
+        line-height: 1.9rem;
+        margin-bottom: 1.2rem;
     }
 </style>
