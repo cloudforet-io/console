@@ -23,6 +23,7 @@
       "type": "enum",
       "options": {
         "pending": {
+          "label": "PENDING",
           "type": "state",
           "options": {
             "icon": {
@@ -31,6 +32,7 @@
           }
         },
         "rebooting": {
+          "label": "REBOOTING",
           "type": "state",
           "options": {
             "icon": {
@@ -39,6 +41,7 @@
           }
         },
         "shutting-down": {
+          "label": "SHUTTING-DOWN",
           "type": "state",
           "options": {
             "icon": {
@@ -47,6 +50,7 @@
           }
         },
         "stopping": {
+          "label": "STOPPING",
           "type": "state",
           "options": {
             "icon": {
@@ -55,6 +59,7 @@
           }
         },
         "running": {
+          "label": "RUNNING",
           "type": "state",
           "options": {
             "icon": {
@@ -63,6 +68,7 @@
           }
         },
         "stopped": {
+          "label": "STOPPED",
           "type": "state",
           "options": {
             "text_color": "red.500",
@@ -72,6 +78,7 @@
           }
         },
         "terminated": {
+          "label": "TERMINATED",
           "type": "state",
           "options": {
             "text_color": "gray.500",
