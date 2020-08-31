@@ -101,10 +101,12 @@
                               :target-name="actFixFormTS.syncState.item.name"
         />
         <div class="bottom">
-            <p-button class="item" style-type="primary" @click="confirm">
+            <p-button class="item" style-type="primary-dark" size="lg"
+                      @click="confirm"
+            >
                 {{ $t('BTN.SAVE') }}
             </p-button>
-            <p-button class="item" style-type="outline gray900"
+            <p-button class="item" style-type="outline gray900" size="lg"
                       @click="goBack"
             >
                 {{ $t('BTN.CANCEL') }}
@@ -387,7 +389,8 @@ export default {
         }
     }
     .bottom {
-        @apply flex flex-row-reverse mt-8;
+        @apply flex flex-row-reverse;
+        margin-top: 1rem;
         .item {
             margin-left: 1rem;
         }

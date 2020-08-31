@@ -20,22 +20,25 @@
                 <p-anchor :href="referenceRouter('identity.Project', value)"
                           target="_blank"
                 >
-                    {{ projects[value] }}
+                    {{ projects[value] || value }}
                 </p-anchor>
             </template>
             <template #data-provider="{data: value}">
-                <p-badge :background-color="providers[value] ? providers[value].color : null">
-                    {{ providers[value] ? providers[value].name : '' }}
+                <p-badge v-if="providers[value] && providers[value].name || value"
+                         :background-color="providers[value] ? providers[value].color : null"
+                >
+                    {{ providers[value] ? providers[value].name || value : value }}
                 </p-badge>
             </template>
             <template #data-collection_info.service_accounts="{data: value}">
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
-                        <p-badge :link="referenceRouter('identity.ServiceAccount', d)"
+                        <p-badge v-if="d"
+                                 :link="referenceRouter('identity.ServiceAccount', d)"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
-                            {{ serviceAccounts[d] }}
+                            {{ serviceAccounts[d] || d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -43,8 +46,10 @@
             <template #data-collection_info.secrets="{data: value}">
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
-                        <p-badge outline background-color="violet.500">
-                            {{ secrets[d] }}
+                        <p-badge v-if="d"
+                                 outline background-color="violet.500"
+                        >
+                            {{ secrets[d] || d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -52,23 +57,15 @@
             <template #data-collection_info.collectors="{data: value}">
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
-                        <p-badge :link="referenceRouter('inventory.Collector', d)"
+                        <p-badge v-if="d"
+                                 :link="referenceRouter('inventory.Collector', d)"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
-                            {{ collectors[d] }}
+                            {{ collectors[d] || d }}
                         </p-badge>
                     </template>
                 </p-text-list>
-            </template>
-            <template #data-created_at="{data: value}">
-                {{ timestampFormatter(value) }}
-            </template>
-            <template #data-updated_at="{data: value}">
-                {{ timestampFormatter(value) }}
-            </template>
-            <template #data-deleted_at="{data: value}">
-                {{ timestampFormatter(value) }}
             </template>
         </p-definition-table>
 
@@ -139,14 +136,14 @@ export default {
                 { name: 'reference.resource_id', label: 'Resource ID' },
                 { name: 'os_type', label: 'OS Type' },
                 { name: 'server_type', label: 'Server Type' },
-                { name: 'project_id', label: 'Project' },
+                { name: 'project_id', label: 'Project', formatter: data => state.projects[data] || data },
                 { name: 'provider', label: 'Provider' },
-                { name: 'collection_info.service_accounts', label: 'Service Accounts' },
-                { name: 'collection_info.secrets', label: 'Secrets' },
-                { name: 'collection_info.collectors', label: 'Collected By' },
-                { name: 'created_at', label: 'Created' },
-                { name: 'updated_at', label: 'Updated' },
-                { name: 'deleted_at', label: 'Deleted' },
+                { name: 'collection_info.service_accounts', label: 'Service Accounts', formatter: data => state.serviceAccounts[data] || data },
+                { name: 'collection_info.secrets', label: 'Secrets', formatter: data => state.secrets[data] || data },
+                { name: 'collection_info.collectors', label: 'Collected By', formatter: data => state.collectors[data] || data },
+                { name: 'created_at', label: 'Created', formatter: timestampFormatter },
+                { name: 'updated_at', label: 'Updated', formatter: timestampFormatter },
+                { name: 'deleted_at', label: 'Deleted', formatter: timestampFormatter },
             ] as DefinitionField[],
             osFields: [
                 { name: 'os_distro', label: 'OS Distribution' },
@@ -169,6 +166,10 @@ export default {
                 { name: 'bios_version', label: 'Bios Version' },
                 { name: 'bios_released_at', label: 'Bios Released' },
             ] as DefinitionField[],
+            customBaseInfoFields: ['collection_info.state', 'state', 'server_type',
+                'project_id', 'provider', 'collection_info.service_accounts',
+                'collection_info.secrets', 'collection_info.collectors',
+                'created_at', 'updated_at', 'deleted_at'],
 
             // data
             osData: computed(() => get(props.data, 'data.os', {})),
@@ -193,7 +194,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-
-</style>

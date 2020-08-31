@@ -51,14 +51,17 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
         isDomainOwner: {
             type: Boolean,
             default: false,
         },
     },
-    setup() {
+    setup(props, { emit }) {
         const state = reactive({
-            visible: false,
             allMenu: [
                 {
                     label: 'Dashboard', link: '/dashboard', subMenus: [],
@@ -102,9 +105,9 @@ export default {
 
         return {
             ...toRefs(state),
-            show() { state.visible = true; },
-            hide() { state.visible = false; },
-            toggle() { state.visible = !state.visible; },
+            show() { emit('update:visible', true); },
+            hide() { emit('update:visible', false); },
+            toggle() { emit('update:visible', !props.visible); },
         };
     },
 };

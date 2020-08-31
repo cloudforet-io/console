@@ -1,60 +1,92 @@
 <template>
-    <general-page-layout class="collector-history">
+    <general-page-layout class="collector-history-container">
         <div v-if="!selectedJobId">
             <p-page-navigation :routes="route" />
             <p-page-title :title="pageTitle" />
-            <p-collector-history-chart :loading="loading" />
-            <p-query-search-table
-                :fields="fields"
-                :items="items"
-                :loading="loading"
-                :query-tags="searchTags"
-                :key-items="querySearchHandlers.keyItems"
-                :value-handler-map="querySearchHandlers.valueHandlerMap"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :this-page.sync="thisPage"
-                :page-size.sync="pageSize"
-                :total-count="totalCount"
-                :style="{height: '100%'}"
-                :selectable="false"
-                :row-cursor-pointer="rowCursorPointer"
-                :excel-visible="false"
-                @change="onChange"
-                @rowLeftClick="onSelect"
-            >
-                <template #toolbox-top>
-                    <div class="toolbox-filter-button-lap">
-                        <div v-for="(status, idx) in statusList"
-                             :key="idx"
-                             class="filter-button-lap"
-                        >
-                            <span class="filter-button"
-                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                  @click="onClickStatus(status.key)"
-                            >{{ status.label }}</span>
+            <p-pane-layout class="collector-history-wrapper">
+                <p-collector-history-chart :loading="loading" class="history-chart" />
+                <p-query-search-table
+                    :class="items.length === 0 ? 'no-data' : ''"
+                    :fields="fields"
+                    :items="items"
+                    :loading="loading"
+                    :query-tags="searchTags"
+                    :key-items="querySearchHandlers.keyItems"
+                    :value-handler-map="querySearchHandlers.valueHandlerMap"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    :this-page.sync="thisPage"
+                    :page-size.sync="pageSize"
+                    :total-count="totalCount"
+                    :style="{height: '100%', border: 'none'}"
+                    :selectable="false"
+                    :row-cursor-pointer="rowCursorPointer"
+                    :excel-visible="false"
+                    @change="onChange"
+                    @rowLeftClick="onSelect"
+                >
+                    <template #toolbox-top>
+                        <div class="toolbox-filter-button-lap">
+                            <div v-for="(status, idx) in statusList"
+                                 :key="idx"
+                                 class="filter-button-lap"
+                            >
+                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                                <span class="filter-button"
+                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                      @click="onClickStatus(status.key)"
+                                >{{ status.label }}</span>
+                            </div>
                         </div>
-                    </div>
+                    </template>
+                    <template #th-total_tasks-format="{ value }">
+                        <span>{{ value }}</span>
+                        <span class="th-additional-info-text"> (completed / total)</span>
+                    </template>
+                    <template #col-sequence-format="{ value }">
+                        <span class="float-right">{{ value }}</span>
+                    </template>
+                    <template #col-status-format="{ value }">
+                        <span :class="value.toLowerCase()">{{ value }}</span>
+                    </template>
+                </p-query-search-table>
+                <div v-if="!loading && items.length > 0" class="pagination">
+                    <p-pagination :total-count="totalCount"
+                                  :this-page.sync="thisPage"
+                                  :page-size.sync="pageSize"
+                                  @prevPage="onClickPrevPageButton"
+                                  @nextPage="onClickNextPageButton"
+                                  @clickPage="onClickPageNumber"
+                    />
+                </div>
+            </p-pane-layout>
+            <p-button-modal
+                class="button-modal"
+                :header-title="modalHeaderTitle"
+                :centered="true"
+                :scrollable="false"
+                size="md"
+                :fade="true"
+                :backdrop="true"
+                :visible.sync="modalVisible"
+            >
+                <template #body>
+                    <p class="modal-content" v-html="modalContent" />
                 </template>
-                <template #th-total_tasks-format="{ value }">
-                    <span>{{ value }}</span>
-                    <span class="th-additional-info-text">(completed / total)</span>
+                <template #confirm-button>
+                    <p-icon-text-button
+                        class="create-collector-button"
+                        style-type="primary-dark"
+                        name="ic_plus_bold"
+                        @click="$router.push({path: '/plugin/collector/create/plugins'})"
+                    >
+                        {{ $t('INVENTORY.CRT_COLL') }}
+                    </p-icon-text-button>
                 </template>
-                <template #col-status-format="{ value }">
-                    <span :class="value.toLowerCase()">{{ value }}</span>
-                </template>
-            </p-query-search-table>
-            <div v-if="!loading && items.length > 0" class="pagination">
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
-                              @prevPage="onClickPrevPageButton"
-                              @nextPage="onClickNextPageButton"
-                              @clickPage="onClickPageNumber"
-                />
-            </div>
+            </p-button-modal>
         </div>
         <div v-else>
+            <p-page-navigation v-if="selectedJobId" :routes="subRoute" />
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
             <p-collector-history-job :job-id="selectedJobId" />
         </div>
@@ -76,7 +108,10 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -85,8 +120,8 @@ import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import {
     makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
 } from '@/lib/component-utils/query-search';
-import router from '@/routes';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import router from '@/routes';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -101,6 +136,9 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'PCollectorHistory',
     components: {
+        PIconTextButton,
+        PButtonModal,
+        PPaneLayout,
         PPageNavigation,
         PCollectorHistoryChart,
         PPagination,
@@ -115,7 +153,6 @@ export default {
             loading: false,
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
-                { label: 'No.', name: 'sequence' },
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info.name' },
                 { label: 'Status', name: 'status' },
@@ -126,8 +163,12 @@ export default {
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },
                 { key: 'inProgress', label: 'In-progress', class: 'in-progress' },
-                { key: 'success', label: 'Success', class: 'success' },
-                { key: 'failure', label: 'Failure', class: 'failure' },
+                {
+                    key: 'success', label: 'Success', class: 'success', icon: true,
+                },
+                {
+                    key: 'failure', label: 'Failure', class: 'failure', icon: true,
+                },
             ],
             activatedStatus: 'all',
             jobs: [] as JobModel[],
@@ -159,10 +200,17 @@ export default {
                     status: makeValueHandlerWithSearchEnums(JOB_STATUS),
                 },
             },
+            //
+            modalHeaderTitle: 'Need to Set a Collector',
+            modalVisible: false,
+            modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
         });
-
         const routeState = reactive({
             route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' }],
+        });
+        const subRouteState = reactive({
+            subRoute: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
+                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` }],
         });
 
         const convertStatus = (status) => {
@@ -310,12 +358,14 @@ export default {
             }
             state.searchTags = urlQueryStringToSearchTags(vm.$route.query.f);
             await getJobs();
+            if (state.totalCount === 0) state.modalVisible = true;
         };
         init();
 
         return {
             ...toRefs(state),
             ...toRefs(routeState),
+            ...toRefs(subRouteState),
             onSelect,
             onChange,
             onClickPageNumber,
@@ -329,7 +379,7 @@ export default {
 </script>
 
 <style lang="postcss">
-.collector-history {
+.collector-history-container {
     .toolbox-top {
         .filter-button-lap {
             @apply border-r border-gray-200;
@@ -338,28 +388,55 @@ export default {
             &:first-child {
                 padding-left: 0;
             }
-        }
-        .filter-button {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            cursor: pointer;
-            &:hover, &:focus {
-                @apply text-gray-900;
+            &:last-child {
+                @apply border-none;
             }
-            &.active {
-                @apply text-gray-900;
-                font-weight: bold;
-                &:before {
+            .legend-icon {
+                display: inline-block;
+                width: 0.75rem;
+                height: 0.75rem;
+                border-radius: 2px;
+                margin-right: 7px;
+                &.success {
+                    @apply bg-primary;
+                }
+                &.failure {
+                    @apply bg-red-500;
                 }
             }
-            &.failure:hover, &.failure:focus, &.failure.active {
-                @apply text-red-500;
+            .filter-button {
+                @apply text-gray-400;
+                font-size: 0.875rem;
+                cursor: pointer;
+                &:hover, &:focus {
+                    @apply text-gray-900;
+                }
+                &.active {
+                    @apply text-gray-900;
+                    font-weight: bold;
+                    &:before {
+                    }
+                }
+                &.failure:hover, &.failure:focus, &.failure.active {
+                    @apply text-red-500;
+                }
             }
         }
     }
 
+    .history-chart {
+        margin-left: 3rem;
+        margin-right: 3rem;
+        margin-top: 2.5rem;
+    }
+
     .p-query-search-table {
         margin-top: 2rem;
+        &.no-data {
+            .p-data-table {
+                min-height: 18.75rem;
+            }
+        }
         .p-data-table {
             .error, .timeout, .canceled {
                 @apply text-red-500;
@@ -375,6 +452,18 @@ export default {
         text-align: center;
         padding-top: 1.5rem;
         bottom: 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .button-modal {
+        .modal-content {
+            line-height: 1.5rem;
+        }
+        .modal-btn {
+            .create-collector-button {
+                padding: 0;
+            }
+        }
     }
 }
 </style>

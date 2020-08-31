@@ -8,6 +8,9 @@
                 <p-lazy-img :img-url="baseState.data.tags.icon" width="1rem" height="1rem" />
                 <span class="ml-2 leading-none">{{ baseState.data.name }}</span>
             </template>
+            <template #data-plugin_info.options.supported_resource_type="{data}">
+                <p-text-list :items="data || []" delimiter=", " />
+            </template>
         </p-definition-table>
         <p-panel-top :use-total-count="true" :total-count="filterState.items? filterState.items.length:0">
             {{ filterState.name }}
@@ -20,17 +23,19 @@
 import {
     computed, reactive, watch,
 } from '@vue/composition-api';
-import { dateTimeViewType } from '@/lib/data-source';
 import { fluentApi } from '@/lib/fluent-api';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { get } from 'lodash';
+import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
+import { timestampFormatter } from '@/lib/util';
 
 export default {
     name: 'CollectorDetail',
     components: {
+        PTextList,
         PPanelTop,
         PDefinitionTable,
         PDataTable,
@@ -52,17 +57,9 @@ export default {
                 { label: 'Name', name: 'name' },
                 { label: 'Provider', name: 'provider' },
                 { label: 'Priority', name: 'priority' },
-                {
-                    label: 'Resource Type',
-                    name: 'plugin_info.options.supported_resource_type',
-                    type: 'list',
-                    options: {
-                        item: {},
-                        delimiter: ', ',
-                    },
-                },
-                { label: 'Last Collected', name: 'last_collected_at.seconds', ...dateTimeViewType },
-                { label: 'Created', name: 'created_at.seconds', ...dateTimeViewType },
+                { label: 'Resource Type', name: 'plugin_info.options.supported_resource_type' },
+                { label: 'Last Collected', name: 'last_collected_at.seconds', formatter: timestampFormatter },
+                { label: 'Created', name: 'created_at.seconds', formatter: timestampFormatter },
             ]),
             data: {},
         });

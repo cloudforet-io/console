@@ -167,11 +167,11 @@ export const getValue = (scope, paths, defaultValue) => {
 // };
 
 /** @function
- * @name selectToCopyToClipboard
+ * @name copyTextToClipboard
  * @description copy given text to clipboard
  * @param {String} text
  * */
-export const selectToCopyToClipboard = (t) => {
+export const copyTextToClipboard = (t) => {
     const textArea = document.createElement('textarea');
     textArea.value = t;
     document.body.appendChild(textArea);
@@ -182,10 +182,10 @@ export const selectToCopyToClipboard = (t) => {
 
 export const copyAnyData = (value) => {
     if (Array.isArray(value)) {
-        selectToCopyToClipboard(_.toString(value));
+        copyTextToClipboard(_.toString(value));
     } else if (typeof value === 'object') {
-        selectToCopyToClipboard(JSON.stringify(value));
-    } else selectToCopyToClipboard(value || '');
+        copyTextToClipboard(JSON.stringify(value));
+    } else copyTextToClipboard(value || '');
 };
 
 /** @function

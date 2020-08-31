@@ -12,12 +12,12 @@ export const Util = {
             return !!((v === '' || v === null || v === undefined || (v !== null && typeof v === 'object' && !Object.keys(v).length)));
         },
         /** ********************************************************************************
-         * Name       : selectToCopyToClipboard
+         * Name       : copyTextToClipboard
          * Input   => (t:text            =>  String)
          * Output  => (Empty):
          * Description:  copy given text to clipboard
          ********************************************************************************* */
-        selectToCopyToClipboard(t) {
+        copyTextToClipboard(t) {
             const textArea = document.createElement('textarea');
             textArea.value = t;
             document.body.appendChild(textArea);

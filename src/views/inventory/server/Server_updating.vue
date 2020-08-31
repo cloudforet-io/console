@@ -375,6 +375,9 @@ export default {
                     fetchOptionState.pageLimit = changed.pageLimit;
                     serverStore.setItem('pageLimit', changed.pageLimit);
                 }
+                if (changed.pageStart) {
+                    fetchOptionState.pageStart = changed.pageStart;
+                }
                 if (changed.queryTags) {
                     fetchOptionState.queryTags = changed.queryTags;
                     // sync updated query tags to url query string
@@ -567,6 +570,7 @@ export default {
                 showErrorMessage('Request Fail', e, context.root);
             })
                 .finally(() => {
+                    extraOptionState.selectIndex = [];
                     listServerData();
                     resetCheckTableModalState();
                 });
