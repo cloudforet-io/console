@@ -239,7 +239,7 @@
           "key": "os_arch",
           "name": "OS Architecture"
         },{
-          "key": "os_details",
+          "key": "details",
           "name": "OS Version Details"
         },{
           "key": "os_license",
