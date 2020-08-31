@@ -188,8 +188,8 @@ export default {
             }
         };
 
-        watch(() => props.collectorId, async () => {
-            await listSchedules();
+        watch(() => props.collectorId, () => {
+            listSchedules();
         }, { immediate: true });
 
 
