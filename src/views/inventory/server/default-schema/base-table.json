@@ -133,34 +133,17 @@
         "sub_key": "public_ip_address",
         "sort_key": "nics.public_ip_address"
       }
-    },{
-      "key": "provider",
-      "name": "Provider",
-      "type": "enum",
-      "options": {
-        "aws": {
-          "type": "badge",
-          "options": {
-            "color": "white",
-            "background_color": "#FF9900"
-          }
-        },
-        "google_cloud": {
-          "type": "badge",
-          "options": {
-            "color": "white",
-            "background_color": "#4285F4"
-          }
-        },
-        "azure": {
-          "type": "badge",
-          "options": {
-            "color": "white",
-            "background_color": "#00BCF2"
-          }
+    },
+      {
+        "key": "provider",
+        "name": "Provider",
+        "type": "enum",
+        "reference": {
+          "resource_type": "identity.Provider",
+          "reference_key": "provider"
         }
-      }
-    },{
+      },
+      {
       "key": "data.compute.account_id",
       "name": "Account ID"
     },{
