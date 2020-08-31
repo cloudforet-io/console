@@ -330,8 +330,10 @@ export default {
                 await fluentApi.identity().serviceAccount().create().setParameter(item)
                     .execute()
                     .then(async (resp) => {
-                        // eslint-disable-next-line camelcase
-                        crdFormTS.syncState.item.private_key = crdFormTS.syncState.item.private_key.replace(/\\n/g, '\n');
+                        if (crdFormTS.syncState.item.private_key) {
+                            // eslint-disable-next-line camelcase
+                            crdFormTS.syncState.item.private_key = crdFormTS.syncState.item.private_key.replace(/\\n/g, '\n');
+                        }
                         await fluentApi.secret().secret().create().setParameter({
                             name: crdFixFormTS.syncState.item.name,
                             data: crdFormTS.syncState.item,

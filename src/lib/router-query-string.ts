@@ -55,8 +55,8 @@ export const getQueryStringComputed = (
 };
 
 export const setQueryStringRefWatchable = (queryRef: Ref<any>, key: string) => {
-    const stop = watch(() => queryRef.value, debounce(async (val: string) => {
-        await replaceQuery(key, val);
+    const stop = watch(() => queryRef.value, debounce((val: string) => {
+        replaceQuery(key, val);
     }, 100), { immediate: false });
 
     onUnmounted(() => stop());
@@ -171,12 +171,12 @@ export const queryStringToQueryTags: Setter = (queryString: RouteQueryString): Q
 /** QueryString replacer Helpers */
 export const selectIndexAutoReplacer: AutoReplacer = (slRef: Ref<any>, key: string) => {
     let initValue = slRef.value;
-    const stop = watch(() => slRef.value, debounce(async (val: string) => {
+    const stop = watch(() => slRef.value, debounce((val: string) => {
         if (initValue.length > 0) {
             slRef.value = initValue;
             initValue = [];
         } else {
-            await replaceQuery(key, val);
+            replaceQuery(key, val);
         }
     }, 100), { immediate: false });
 

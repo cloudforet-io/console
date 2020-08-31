@@ -58,7 +58,7 @@
                             >
                                 Delete
                             </p-button>
-                            <p-search v-model="memberApiHandler.tableTS.searchText.value" @search="onSearch" @delete="onSearch()" />
+                            <p-search v-model="memberApiHandler.tableTS.searchText" @search="onSearch" @delete="onDelete" />
                         </div>
                     </template>
                 </p-toolbox-table>
@@ -382,15 +382,17 @@ export default {
                 },
             }),
             // eslint-disable-next-line camelcase
-            member_search: makeQueryStringComputed(ref(undefined),
-                { key: 'member_search' }),
+            // member_search: makeQueryStringComputed(ref(undefined),
+            //     { key: 'member_search' }),
         };
 
         // apply search keyword to query string only when search event occurred
         const onSearch = async (e) => {
-            if (!e) memberApiHandler.tableTS.searchText.value = '';
             await memberApiHandler.getData();
-            queryRefs.member_search.value = e || undefined;
+        };
+        const onDelete = async () => {
+            memberApiHandler.tableTS.searchText.value = '';
+            await memberApiHandler.getData();
         };
 
         const getPageNavigation = async () => {
@@ -413,7 +415,7 @@ export default {
 
         const init = () => {
             // init search text by query string
-            memberApiHandler.tableTS.searchText.value = vm.$route.query.member_search as string;
+            // memberApiHandler.tableTS.searchText.value = vm.$route.query.member_search as string;
             getPageNavigation();
         };
 
@@ -436,6 +438,7 @@ export default {
             memberDeleteClick,
             memberDeleteConfirm,
             onSearch,
+            onDelete,
         };
     },
 };

@@ -496,24 +496,23 @@ export default {
             deleteTS.state.verificationText = name;
             deleteTS.syncState.visible = true;
         };
-        const deleteConfirm = () => {
-            deleteAction.value.execute()
-                .then(() => {
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Deleted Success',
-                        text: 'Delete Secret Success',
-                        duration: 2000,
-                        speed: 1000,
-                    });
-                }).catch((e) => {
-                    showErrorMessage('Delete Failed', e, context.root);
-                })
-                .finally(() => {
-                    deleteTargetHandler.value.getData();
+        const deleteConfirm = async () => {
+            try {
+                await deleteAction.value.execute();
+                context.root.$notify({
+                    group: 'noticeTopRight',
+                    type: 'success',
+                    title: 'Deleted Success',
+                    text: 'Delete Secret Success',
+                    duration: 2000,
+                    speed: 1000,
                 });
-            deleteTS.syncState.visible = false;
+            } catch (e) {
+                showErrorMessage('Delete Failed', e, context.root);
+            } finally {
+                deleteTS.syncState.visible = false;
+                deleteTargetHandler.value.getData();
+            }
         };
 
         const secretDataSource: DataSourceItem[] = [

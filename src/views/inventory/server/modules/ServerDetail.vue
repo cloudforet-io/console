@@ -38,7 +38,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    get, debounce, set, find,
+    get, set, find,
 } from 'lodash';
 import baseInfoSchema from '@/views/inventory/server/default-schema/base-info.json';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
@@ -109,10 +109,7 @@ export default {
 
             // schema
             layouts: [] as DynamicLayout[],
-            currentLayout: computed<undefined|DynamicLayout>(() => {
-                const res: undefined|DynamicLayout = find(state.layouts, { name: state.activeTab });
-                return res;
-            }),
+            currentLayout: computed<undefined|DynamicLayout>(() => find(state.layouts, { name: state.activeTab })),
             searches: [] as SearchSchema[],
 
             // formatters
@@ -124,7 +121,7 @@ export default {
         });
 
         const schemaQuery = new QueryHelper().setOnly('metadata.view.sub_data.layouts', 'metadata.view.search');
-        const getSchema = debounce(async () => {
+        const getSchema = async () => {
             let layouts = layoutSchemaCacheMap[props.serverId];
             let searches = searchSchemaCacheMap[props.serverId];
 
@@ -149,8 +146,7 @@ export default {
             state.searches = searches || [];
 
             if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
-            else state.activeTab = state.activeTab;
-        }, 50);
+        };
 
         const getQuery = (layout: DynamicLayout) => {
             const query = new QueryHelper();
@@ -186,7 +182,7 @@ export default {
             return params;
         };
 
-        const getApi = () => {
+        const getApi = (): Promise<any> => {
             // eslint-disable-next-line camelcase
             if (state.currentLayout?.options?.root_path) {
                 return SpaceConnector.client.inventory.server.getData(getParams());
@@ -194,7 +190,7 @@ export default {
             return SpaceConnector.client.inventory.server.get(getParams());
         };
 
-        const getData = debounce(async () => {
+        const getData = async () => {
             state.loading = true;
 
             try {
@@ -217,7 +213,7 @@ export default {
             } finally {
                 state.loading = false;
             }
-        }, 50);
+        };
 
         watch(() => props.serverId, async (after, before) => {
             if (after && after !== before) {
@@ -225,12 +221,6 @@ export default {
                 await getData();
             }
         }, { immediate: true });
-
-        // watch(() => state.activeTab, async (after, before) => {
-        //     // if (after && after !== before) {
-        //     await getData();
-        //     // }
-        // }, { immediate: false });
 
         const onChangeTab = async (tab) => {
             state.activeTab = tab;

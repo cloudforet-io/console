@@ -161,7 +161,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 
-import { get } from 'lodash';
+import { get, forEach } from 'lodash';
 
 import {
     serverStateFormatter, showErrorMessage,
@@ -412,13 +412,29 @@ export default {
 
         const fieldHandler: DynamicFieldHandler = (item) => {
             if (item.extraData?.reference) {
-                item.options.link = referenceRouter(
-                    item.extraData.reference.resource_type,
-                    item.data,
-                );
-
-                if (item.extraData.reference.resource_type === 'identity.Project') {
+                switch (item.extraData.reference.resource_type) {
+                case 'identity.Project': {
                     item.data = project.state.projects[item.data];
+                    item.options.link = referenceRouter(
+                        item.extraData.reference.resource_type,
+                        item.data,
+                    );
+                    break;
+                }
+                case 'identity.Provider': {
+                    item.data = provider.state.providers[item.data].name;
+                    item.options = {};
+                    forEach(provider.state.providers, (d) => {
+                        item.options[d.name] = {
+                            type: 'badge',
+                            options: {
+                                background_color: d.color,
+                            },
+                        };
+                    });
+                    break;
+                }
+                default: break;
                 }
             }
             return item;

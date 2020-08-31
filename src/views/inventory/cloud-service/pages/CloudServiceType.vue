@@ -499,12 +499,12 @@ export default {
                 const res = queryRefs.provider.value;
                 selectedProvider.value = res || providerState.items[0].provider;
                 setSearchTags();
-                watch<string, boolean>(selectedProvider, debounce(async (after) => {
+                watch<string, boolean>(selectedProvider, debounce((after) => {
                     if (!after) return;
                     if (after) {
-                        await listRegionByProvider(after);
+                        listRegionByProvider(after);
                     }
-                    await replaceQuery('provider', after);
+                    replaceQuery('provider', after);
                 }, 50), { immediate: true });
                 await listCloudServiceType();
             }
