@@ -128,8 +128,6 @@ export default defineComponent({
                     domain_id: vm.$store.state.domain.domainId,
                     credentials: {
                         // eslint-disable-next-line camelcase
-                        user_type: 'DOMAIN_OWNER',
-                        // eslint-disable-next-line camelcase
                         user_id: state.userId,
                         password: state.password,
                     },
