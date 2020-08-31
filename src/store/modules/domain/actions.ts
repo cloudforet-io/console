@@ -23,7 +23,7 @@ export const load = async ({ commit, state }, name: string): Promise<void|Error>
         commit('setDomain', {
             domainId: domainResponse.domain_id,
             name: domainResponse.name,
-            authType: getAuthType(domainResponse.plugin_info.options?.auth_type),
+            authType: getAuthType(domainResponse.plugin_info?.options?.auth_type),
         });
     } else {
         throw new Error(`Can not found '${name}' domain.`);
