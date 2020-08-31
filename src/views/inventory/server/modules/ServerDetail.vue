@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-button-tab :tabs="tabs" :active-tab.sync="activeTab" keep-alive-all>
+        <p-button-tab :tabs="tabs" :active-tab="activeTab" keep-alive-all
+                      @update:activeTab="onChangeTab"
+        >
             <template slot="Base Information">
                 <server-base-info :data="data" :loading="loading" />
             </template>
@@ -35,7 +37,9 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { get, debounce, set } from 'lodash';
+import {
+    get, debounce, set, find,
+} from 'lodash';
 import baseInfoSchema from '@/views/inventory/server/default-schema/base-info.json';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -105,14 +109,8 @@ export default {
 
             // schema
             layouts: [] as DynamicLayout[],
-            currentLayout: computed<null|DynamicLayout>(() => {
-                let res: null|DynamicLayout = null;
-                state.layouts.some((d) => {
-                    if (d.name === state.activeTab) {
-                        res = d;
-                    }
-                    return d.name === state.activeTab;
-                });
+            currentLayout: computed<undefined|DynamicLayout>(() => {
+                const res: undefined|DynamicLayout = find(state.layouts, { name: state.activeTab });
                 return res;
             }),
             searches: [] as SearchSchema[],
@@ -149,6 +147,9 @@ export default {
 
             state.layouts = layouts || [];
             state.searches = searches || [];
+
+            if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
+            else state.activeTab = state.activeTab;
         }, 50);
 
         const getQuery = (layout: DynamicLayout) => {
@@ -195,6 +196,7 @@ export default {
 
         const getData = debounce(async () => {
             state.loading = true;
+
             try {
                 const res = await getApi();
 
@@ -224,11 +226,16 @@ export default {
             }
         }, { immediate: true });
 
-        watch(() => state.activeTab, async (after, before) => {
-            if (after && after !== before) {
-                await getData();
-            }
-        }, { immediate: false });
+        // watch(() => state.activeTab, async (after, before) => {
+        //     // if (after && after !== before) {
+        //     await getData();
+        //     // }
+        // }, { immediate: false });
+
+        const onChangeTab = async (tab) => {
+            state.activeTab = tab;
+            await getData();
+        };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
         const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
@@ -295,6 +302,7 @@ export default {
             getLayoutListeners,
             fetchOptionsMap,
             fieldHandler,
+            onChangeTab,
         };
     },
 };
