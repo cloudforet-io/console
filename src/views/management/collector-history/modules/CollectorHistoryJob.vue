@@ -164,7 +164,7 @@ export default {
             ],
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },
-                { key: 'inProgress', label: 'In-progress', class: 'in-progress' },
+                { key: 'inProgress', label: 'In-Progress', class: 'in-progress' },
                 { key: 'success', label: 'Success', class: 'success' },
                 { key: 'failure', label: 'Failure', class: 'failure' },
             ],
@@ -207,7 +207,7 @@ export default {
         });
 
         const convertStatus = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In Progress';
+            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
             return capitalize(status);
         };
         const convertServiceAccountName = (serviceAccountId) => {

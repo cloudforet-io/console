@@ -98,7 +98,7 @@ import { capitalize } from 'lodash';
 import moment from 'moment';
 
 import {
-    computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
@@ -162,7 +162,7 @@ export default {
             ]),
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },
-                { key: 'inProgress', label: 'In-progress', class: 'in-progress' },
+                { key: 'inProgress', label: 'In-Progress', class: 'in-progress' },
                 {
                     key: 'success', label: 'Success', class: 'success', icon: true,
                 },
@@ -214,7 +214,7 @@ export default {
         });
 
         const convertStatus = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-progress';
+            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
             return capitalize(status);
         };
         const convertFinishedAtToDuration = (createdAt, finishedAt) => {
@@ -361,6 +361,10 @@ export default {
             if (state.totalCount === 0) state.modalVisible = true;
         };
         init();
+
+        watch(() => vm.$route.hash, (after) => {
+            if (after === '') onClickGoBack();
+        });
 
         return {
             ...toRefs(state),
