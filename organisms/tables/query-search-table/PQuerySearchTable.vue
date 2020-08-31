@@ -71,7 +71,7 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { forEach } from 'lodash';
 import { QueryItem } from '@/components/organisms/search/query-search/type';
@@ -177,6 +177,12 @@ export default {
         const emitSelect = () => {
             emit('select', [...state.proxySelectIndex]);
         };
+
+        watch(() => props.totalCount, async (after, before) => {
+            if (before !== after) {
+                state.proxyThisPage = 1;
+            }
+        }, { immediate: true });
 
         const emitChange = (options: Partial<Options> = {}) => {
             state.proxySelectIndex = [];

@@ -58,7 +58,7 @@ import PSearch from '@/components/molecules/search/PSearch.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { forEach } from 'lodash';
@@ -148,6 +148,12 @@ export default {
         const emitSelect = () => {
             emit('select', [...state.proxySelectIndex]);
         };
+
+        watch(() => props.totalCount, async (after, before) => {
+            if (before !== after) {
+                state.proxyThisPage = 1;
+            }
+        }, { immediate: true });
 
         const emitChange = (options: Partial<Options> = {}) => {
             state.proxySelectIndex = [];
