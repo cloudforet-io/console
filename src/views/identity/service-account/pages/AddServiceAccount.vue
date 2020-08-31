@@ -23,7 +23,7 @@
                 </div>
             </template>
         </p-page-title>
-        <p-collapsible-panel>
+        <p-collapsible-panel v-if="description">
             <template #content>
                 <div class="p-4">
                     <s-dynamic-layout v-bind="description" :vbind="{showTitle:false}" />
@@ -114,39 +114,38 @@
         </div>
     </general-page-layout>
 </template>
-<script lang="ts">
 
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
-import {
-    CustomKeywords,
-    JsonSchemaFormToolSet,
-    CustomValidator,
-} from '@/components/organisms/forms/json-schema-form/toolset';
+<script lang="ts">
+import { AxiosResponse } from 'axios';
+import { get } from 'lodash';
+
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
-import { JsonSchemaObjectType } from '@/lib/type';
-import { fluentApi } from '@/lib/fluent-api';
 import {
     ComponentRenderProxy,
     computed,
     getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import { AxiosResponse } from 'axios';
+
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
+import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
+import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
+import { CustomKeywords, JsonSchemaFormToolSet, CustomValidator } from '@/components/organisms/forms/json-schema-form/toolset';
+import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
-import { useStore } from '@/store/toolset';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { get } from 'lodash';
-import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
-import { showErrorMessage } from '@/lib/util';
-import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
+
+import { JsonSchemaObjectType } from '@/lib/type';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { fluentApi } from '@/lib/fluent-api';
+import { useStore } from '@/store/toolset';
 
 const accountFormSetup = (props) => {
     const actFixFormTS = new JsonSchemaFormToolSet();
@@ -266,13 +265,16 @@ export default {
         },
     },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const { provider } = useStore();
         provider.getProvider();
+
+        const state = reactive({
+            providerIcon: computed(() => provider.state.providers[props.provider]?.icon),
+        });
         const tagsTS = new DictIGToolSet({
             showValidation: true,
         });
-        const providerIcon = computed(() => provider.state.providers[props.provider]?.icon);
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const {
             actFixFormTS,
             actJscTS,
@@ -328,6 +330,8 @@ export default {
                 await fluentApi.identity().serviceAccount().create().setParameter(item)
                     .execute()
                     .then(async (resp) => {
+                        // eslint-disable-next-line camelcase
+                        crdFormTS.syncState.item.private_key = crdFormTS.syncState.item.private_key.replace(/\\n/g, '\n');
                         await fluentApi.secret().secret().create().setParameter({
                             name: crdFixFormTS.syncState.item.name,
                             data: crdFormTS.syncState.item,
@@ -339,14 +343,7 @@ export default {
                         })
                             .execute()
                             .then(() => {
-                                context.root.$notify({
-                                    group: 'noticeTopRight',
-                                    type: 'success',
-                                    title: 'Add Success',
-                                    text: 'Service Account has been successfully registered.',
-                                    duration: 2000,
-                                    speed: 1000,
-                                });
+                                showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
                                 goBack();
                             })
                             .catch(async (errorResp) => {
@@ -363,6 +360,7 @@ export default {
         };
 
         return {
+            ...toRefs(state),
             ...toRefs(routeState),
             tagsTS,
             crdFormTS,
@@ -373,7 +371,6 @@ export default {
             schemaNames,
             actFixFormTS,
             actJscTS,
-            providerIcon,
             projectRef,
             description,
         };
