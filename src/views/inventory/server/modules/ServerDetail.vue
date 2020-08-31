@@ -148,11 +148,13 @@ export default {
             if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
         };
 
-        const getQuery = (layout: DynamicLayout) => {
+        const getQuery = (): undefined|any => {
+            if (!state.currentLayout) return undefined;
+
             const query = new QueryHelper();
 
-            if (fetchOptionsMap[layout.name]) {
-                const options = fetchOptionsMap[layout.name];
+            if (fetchOptionsMap[state.currentLayout.name]) {
+                const options = fetchOptionsMap[state.currentLayout.name];
                 if (options.sortBy) query.setSort(options.sortBy, options.sortDesc);
                 if (options.pageLimit) query.setPageLimit(options.pageLimit);
                 if (options.pageStart) query.setPageStart(options.pageStart);
@@ -164,8 +166,8 @@ export default {
                 }
             }
 
-            if (layout.options?.fields) {
-                query.setOnly(...layout.options.fields.map(d => d.name));
+            if (state.currentLayout.options?.fields) {
+                query.setOnly(...state.currentLayout.options.fields.map(d => d.name));
             }
 
             return query.data;
@@ -174,7 +176,8 @@ export default {
         const getParams = () => {
             // eslint-disable-next-line camelcase
             const params: any = { server_id: props.serverId };
-            if (state.currentLayout) params.query = getQuery(state.currentLayout);
+            const query = getQuery();
+            if (query) params.query = query;
             // eslint-disable-next-line camelcase
             const keyPath = state.currentLayout?.options?.root_path;
             // eslint-disable-next-line camelcase
