@@ -78,7 +78,7 @@
                 />
             </template>
             <template #credentials>
-                <collector-credentials :collector-id="selectedItems[0].collector_id" />
+                <collector-credentials :collector-id="selectedItems[0].collector_id" :provider="selectedItems[0].plugin_info.provider" />
             </template>
             <template #schedules>
                 <collector-schedules :collector-id="selectedItems[0].collector_id" />
@@ -417,7 +417,7 @@ export default {
                 .setFilter(...and)
                 .setOnly(
                     'collector_id', 'name', 'state', 'priority', 'last_collected_at',
-                    'created_at', 'provider', 'tags',
+                    'created_at', 'provider', 'tags', 'plugin_info',
                 );
             return query.data;
         };

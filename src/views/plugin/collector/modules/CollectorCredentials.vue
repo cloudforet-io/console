@@ -59,7 +59,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxT
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
-import { fluentApi } from '@/lib/fluent-api';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
@@ -78,6 +78,10 @@ export default {
     },
     props: {
         collectorId: {
+            type: String,
+            required: true,
+        },
+        provider: {
             type: String,
             required: true,
         },
@@ -107,6 +111,7 @@ export default {
         });
 
         const listApi = computed(() => fluentApi.secret().secret().list()
+            .setFilter({ key: 'provider', value: props.provider, operator: FILTER_OPERATOR.in })
             .setPageSize(state.pageSize)
             .setThisPage(state.thisPage)
             .setSortBy(state.sortBy)
