@@ -484,9 +484,9 @@ export default {
 
         const getValueFunc = computed(() => {
             if (every(fieldsName.value, field => !field.includes('.'))) {
-                return (item, field) => item[field] || '';
+                return (item, field) => item[field];
             }
-            return (item, field) => get(item, field, '');
+            return (item, field) => get(item, field);
         });
 
         const getTableWidth = () => {

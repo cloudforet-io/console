@@ -23,7 +23,7 @@
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
-                    <p-dynamic-field :key="item.name"
+                    <p-dynamic-field :key="slotName"
                                      v-bind="item"
                                      :data="data.value"
                                      :before-create="beforeCreateField"
@@ -55,7 +55,7 @@ import { forEach, get } from 'lodash';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
-import {getPageStart} from "@/lib/component-utils/pagination";
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
     if (props.typeOptions && props.typeOptions[name]) {
