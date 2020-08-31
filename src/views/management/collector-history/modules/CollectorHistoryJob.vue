@@ -27,6 +27,7 @@
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
                     :page-size.sync="pageSize"
+                    :total-count="totalCount"
                     :style="{height: `${height}px`}"
                     :multi-select="false"
                     :select-index.sync="selectedIndexes"
