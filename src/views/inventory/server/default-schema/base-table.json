@@ -79,6 +79,72 @@
               "color": "gray.500"
             }
           }
+        },
+        "PROVISIONING": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "color": "yellow.500"
+            }
+          }
+        },
+        "STAGING": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "color": "yellow.500"
+            }
+          }
+        },
+        "RUNNING": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "color": "green.500"
+            }
+          }
+        },
+        "STOPPING": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "color": "yellow.500"
+            }
+          }
+        },
+        "TERMINATED": {
+          "type": "state",
+          "options": {
+            "text_color": "gray.500",
+            "icon": {
+              "color": "gray.500"
+            }
+          }
+        },
+        "SUSPENDING": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "color": "yellow.500"
+            }
+          }
+        },
+        "SUSPENDED": {
+          "type": "state",
+          "options": {
+            "text_color": "red.500",
+            "icon": {
+              "color": "red.500"
+            }
+          }
+        },
+        "REPAIRING": {
+          "type": "state",
+          "options": {
+            "icon": {
+              "color": "yellow.500"
+            }
+          }
         }
       }
     },{
