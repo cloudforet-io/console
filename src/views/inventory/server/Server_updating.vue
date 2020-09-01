@@ -414,11 +414,11 @@ export default {
             if (item.extraData?.reference) {
                 switch (item.extraData.reference.resource_type) {
                 case 'identity.Project': {
-                    item.data = project.state.projects[item.data];
                     item.options.link = referenceRouter(
                         item.extraData.reference.resource_type,
                         item.data,
                     );
+                    item.data = project.state.projects[item.data];
                     break;
                 }
                 case 'identity.Provider': {
