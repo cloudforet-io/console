@@ -178,15 +178,14 @@ export default {
             emit('select', [...state.proxySelectIndex]);
         };
 
-        watch(() => props.totalCount, async (after, before) => {
-            if (before !== after) {
-                state.proxyThisPage = 1;
-            }
-        }, { immediate: true });
-
         const emitChange = (options: Partial<Options> = {}) => {
             state.proxySelectIndex = [];
             emitSelect();
+
+            if (options.queryTags || state.proxyThisPage > state.proxyPageSize) {
+                options.thisPage = 1;
+                state.proxyThisPage = 1;
+            }
 
             // check if each option value is 'undefined' to escape auto type casting
             emit('change', {

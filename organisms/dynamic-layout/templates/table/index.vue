@@ -56,6 +56,7 @@ import PSearchTable from '@/components/organisms/tables/search-table/PSearchTabl
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { Options } from '@/components/organisms/tables/query-search-table/type';
 
 const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
     if (props.typeOptions && props.typeOptions[name]) {
@@ -181,13 +182,13 @@ export default {
             emit('select', selectIndex);
         };
 
-        const onChange = (options: TableFetchOptions, changedOptions: Partial<TableFetchOptions>) => {
+        const onChange = (options: Options, changedOptions: Partial<Options>) => {
             const changedFetchOptions: Partial<TableFetchOptions> = {};
 
             // apply changed options to state and rename for dynamic fetch options
             forEach(changedOptions, (d, k) => {
                 state[k] = d;
-                if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
+                if (k === 'thisPage') changedFetchOptions.pageStart = getPageStart(d as number, changedOptions.pageSize || options.pageSize);
                 else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
                 else changedFetchOptions[k] = d;
             });

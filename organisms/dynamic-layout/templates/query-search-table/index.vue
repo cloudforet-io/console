@@ -56,6 +56,7 @@ import {
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import {Options} from "@/components/organisms/tables/query-search-table/type";
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
@@ -187,13 +188,13 @@ export default {
             emit('export', state.fetchOptionsParam, props.options.fields || []);
         };
 
-        const onChange = (options: QuerySearchTableFetchOptions, changedOptions: Partial<QuerySearchTableFetchOptions>) => {
+        const onChange = (options: Options, changedOptions: Partial<Options>) => {
             const changedFetchOptions: Partial<QuerySearchTableFetchOptions> = {};
 
             // apply changed options to state and rename for dynamic fetch options
             forEach(changedOptions, (d, k) => {
                 state[k] = d;
-                if (k === 'thisPage') changedFetchOptions.pageStart = d as number;
+                if (k === 'thisPage') changedFetchOptions.pageStart = getPageStart(d as number, changedOptions.pageSize || options.pageSize);
                 else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
                 else changedFetchOptions[k] = d;
             });
