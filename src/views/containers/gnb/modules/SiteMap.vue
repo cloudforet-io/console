@@ -98,6 +98,7 @@ export default {
                     subMenus: [
                         { label: 'Plugin', link: '/management/supervisor/plugins', isAdminMenu: true },
                         { label: 'Collector History', link: '/management/collector-history' },
+                        { label: 'Power Scheduler', link: '/management/power-scheduler' },
                     ],
                 },
             ]),

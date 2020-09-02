@@ -18,10 +18,14 @@
                 :query-tags="tags"
                 :key-items="keyItems"
                 :value-handler-map="valueHandlerMap"
-                card-height="16.8rem"
+                card-height="18.25rem"
+                card-min-width="25rem"
                 @change="onChange"
                 @refresh="onChange"
             >
+                <template #toolbox-bottom>
+                    <page-information />
+                </template>
                 <template #card="{item}">
                     <div class="project-description">
                         <div class="project">
@@ -32,8 +36,44 @@
                                 {{ item.name }}
                             </p>
                         </div>
+                        <div class="flex justify-between">
+                            <div class="scheduled-resources">
+                                <p class="mb-1 text-xs">
+                                    Scheduled Resources
+                                </p>
+                                <span class="font-bold text-primary text-xs">24</span>
+                                <span class="text-gray-400 text-xs">/ 50</span>
+                                <p-progress-bar
+                                    :percentage="45"
+                                    :style="'width: 160px'"
+                                    class="pt-2"
+                                />
+                            </div>
+                            <div class="saving">
+                                <p class="mb-1 text-xs">
+                                    Saving of This Month
+                                </p>
+                                <p class="text-gray-400 text-xs">
+                                    approx.
+                                </p>
+                                <span style="float: right;"><span class="text-primary font-bold">3.000  </span> <span>$</span></span>
+                            </div>
+                        </div>
                     </div>
                     <p-hr />
+                    <div class="schedule">
+                        <div>
+                            <p class="mb-4"><span class="font-bold text-gray-400 text-xs">SCHEDULE  </span><span class="text-gray-400 text-xs">(2)</span></p>
+                            <div>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br/>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br/>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br/>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 text-xs">S M T W T F S</span>
+                        </div>
+                    </div>
                 </template>
             </p-search-grid-layout>
         </div>
@@ -56,13 +96,23 @@ import router from '@/routes';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
+import PageInformation from '@/views/management/power-scheduler/modules/PageInformation.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 type UrlQueryString = string | (string | null)[] | null | undefined;
 
 export default {
     name: 'PowerScheduler',
     components: {
-        PPageTitle, PHr, PPageNavigation, GeneralPageLayout, PSearchGridLayout,
+        PI,
+        PageInformation,
+        PProgressBar,
+        PPageTitle,
+        PHr,
+        PPageNavigation,
+        GeneralPageLayout,
+        PSearchGridLayout,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -74,14 +124,10 @@ export default {
             {
                 title: 'Properties',
                 items: [
-                    { key: 'cloud_service_type', name: 'Cloud Service Type' },
-                    { key: 'cloud_service_group', name: 'Cloud Service Group' },
                     { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                    { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-                    { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
                 ],
             },
-            'inventory.CloudService',
+            'identity.Project',
         );
 
         const state = reactive({
@@ -220,19 +266,20 @@ export default {
         }
     }
 
+
     .project-description {
-        @apply mx-4 mt-6;
-
+        @apply mx-6 mt-6 mb-6;
         .project {
-            @apply mb-4;
-
             .project-group-name {
                 @apply text-gray-500 text-xs;
             }
-
             #project-name {
                 @apply text-lg font-bold truncate pb-6 overflow-hidden;
             }
         }
+    }
+
+    .schedule {
+        @apply mx-6 mt-6 mb-6 flex justify-between;
     }
 </style>

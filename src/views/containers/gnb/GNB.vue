@@ -226,6 +226,9 @@ export default {
                         {
                             type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history',
                         },
+                        {
+                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler',
+                        },
                     ],
                 },
             ]),
