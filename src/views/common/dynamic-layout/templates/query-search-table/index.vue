@@ -53,12 +53,12 @@
                                 :value-handler-map="apiHandler.tableTS.querySearch.valueHandlerMap"
                                 @search="apiHandler.tableTS.querySearch.onSearch"
                 />
-                <div v-if="tags.length !==0" class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
-                    <p-hr style="width: 100%;" />
-                    <p-query-search-tags style="margin-top: 0.5rem;"
-                                         :tags="tags"
-                                         @delete:tag="deleteTag"
-                                         @delete:all="deleteAllTags"
+                <div class="mt-4" :class="{ 'mb-4':$scopedSlots['toolbox-bottom']}">
+                    <p-hr v-if="tags.length > 0" style="width: 100%;" />
+                    <p-query-search-tags ref="tagsRef"
+                                         style="margin-top: 0.5rem;"
+                                         :tags.sync="apiHandler.tableTS.querySearch.tags"
+                                         @change="onQueryTagsChange"
                     />
                 </div>
                 <slot name="toolbox-bottom" />
@@ -94,7 +94,12 @@ import {
 } from '@/views/common/dynamic-layout/toolset';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import { makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
+import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
+import {
+    QuerySearchTagsFunctions,
+    QuerySearchTagsListeners,
+    QueryTag,
+} from '@/components/organisms/search/query-search-tags/type';
 
 
 export default {
@@ -183,7 +188,7 @@ export default {
             const keys = getKeys();
             const acMeta = {
                 keyItems: getKeyItems(keys),
-                valueHandlerMap: makeValueHandlerMapWithReference(
+                valueHandlerMap: makeDistinctValueHandlerMap(
                     keys,
                     props.resourceType as string,
                 ),
@@ -200,6 +205,7 @@ export default {
         let apiHandler = props.toolset as QuerySearchTableFluentAPI || makeApiToolset();
         const state = reactive({
             isToolsetMode: computed(() => !!props.toolset),
+            tagsRef: null as null|QuerySearchTagsFunctions,
         });
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
@@ -237,7 +243,7 @@ export default {
                             if (aft && aft !== bef) {
                                 const keys = getKeys();
                                 apiHandler.tableTS.querySearch.state.keyItems = getKeyItems(keys);
-                                apiHandler.tableTS.querySearch.valueHandlerMap = makeValueHandlerMapWithReference(keys, props.resourceType as string);
+                                apiHandler.tableTS.querySearch.valueHandlerMap = makeDistinctValueHandlerMap(keys, props.resourceType as string);
                                 exportToolSet.action = exportAction.setDataSource(aft.fields || []);
                                 await resetAction();
                             }
@@ -272,11 +278,9 @@ export default {
         });
 
         const tags = computed(() => apiHandler.tableTS.querySearch.tags.value || []);
-        const deleteTag = (event) => {
-            apiHandler.tableTS.querySearch.deleteTag(event);
-        };
-        const deleteAllTags = () => {
-            apiHandler.tableTS.querySearch.deleteAllTags();
+        const onQueryTagsChange: QuerySearchTagsListeners['change'] = (queryTags: QueryTag[]) => {
+            apiHandler.tableTS.querySearch.tags.value = queryTags;
+            getData();
         };
         return {
             ...toRefs(state),
@@ -287,8 +291,7 @@ export default {
             exportExcel,
             proxySearchText,
             tags,
-            deleteTag,
-            deleteAllTags,
+            onQueryTagsChange,
         };
     },
 };

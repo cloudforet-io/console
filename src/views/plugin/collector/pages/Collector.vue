@@ -153,7 +153,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 
 import router from '@/routes';
@@ -161,7 +161,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/query-search';
 import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
@@ -305,7 +305,7 @@ export default {
                 { name: 'priority', label: 'Priority' },
             ],
             // query
-            querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
+            querySearchHandlers: makeQuerySearchPropsWithSearchSchema({
                 title: 'Properties',
                 items: [
                     { key: 'collector_id', name: 'Collector ID' },

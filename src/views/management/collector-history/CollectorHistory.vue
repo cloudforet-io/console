@@ -107,7 +107,7 @@ import PCollectorHistoryChart from '@/views/management/collector-history/modules
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
@@ -118,7 +118,7 @@ import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import {
-    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
+    makeEnumValueHandler, makeDistinctValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import router from '@/routes';
@@ -199,8 +199,8 @@ export default {
                 ],
                 valueHandlerMap: {
                     // eslint-disable-next-line camelcase
-                    job_id: makeValueHandlerWithReference('inventory.Job', 'job_id'),
-                    status: makeValueHandlerWithSearchEnums(JOB_STATUS),
+                    job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
+                    status: makeEnumValueHandler(JOB_STATUS),
                 },
             },
             //

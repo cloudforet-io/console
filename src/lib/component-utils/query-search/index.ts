@@ -1,4 +1,5 @@
 import {
+    KeyDataType,
     KeyItem,
     QueryItem,
     QuerySearchProps,
@@ -12,7 +13,7 @@ import {
     forEach, map, size,
 } from 'lodash';
 import { ChangeTagCallBack, TagToolSet } from '@/components/molecules/tags/PTag.toolset';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { reactive, ref, Ref } from '@vue/composition-api';
 import {
     SearchEnumItem,
@@ -21,34 +22,21 @@ import {
 } from '@/lib/component-utils/query-search/type';
 import { fluentApi } from '@/lib/fluent-api';
 import { AutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
+import { convertQueryItemToQueryTag } from '@/components/organisms/search/query-search-tags/helper';
 
+type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
+type KeyParam = Array<KeyTuple | string | KeyItem>
 
-type KeyParam = Array<string[]|string|KeyItem>
+/**
+ * @name makeKeyItems
+ * @description A helper function that returns KeyItem[] necessary for QuerySearch component.
+ * @param keys
+ */
 export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
-    if (Array.isArray(d)) return { name: d[0], label: d[1] || d[0] };
+    if (Array.isArray(d)) return { name: d[0], label: d[1] || d[0], dataType: d[2] };
     if (typeof d === 'string') return { name: d, label: d };
     return d;
 });
-
-export function getEnumValueHandler(keys: KeyParam): ValueHandler {
-    const keyItems = makeKeyItems(keys);
-
-    return async (val: string, keyItem: KeyItem) => {
-        const res: ValueItem[] = [...keyItems];
-        const regex = RegExp(val, 'i');
-
-        if (val) {
-            forEach(keyItems, (d) => {
-                if ((regex.exec(d.label) || regex.exec(d.name))) res.push(d);
-            });
-        }
-
-        return {
-            results: res,
-            totalCount: keyItems.length,
-        };
-    };
-}
 
 // Do not use except in case of using PAutoCompleteSearch component
 export function makeAutocompleteHandlerWithReference(resourceType: string, distinct?: string, limit?: number): AutocompleteHandler {
@@ -72,11 +60,19 @@ export function makeAutocompleteHandlerWithReference(resourceType: string, disti
     };
 }
 
-export function makeValueHandlerWithReference(resourceType: string, distinct?: string, limit?: number): ValueHandler {
-    let api = fluentApi.addons().autocomplete().get()
+/**
+ * @name makeDistinctValueHandler
+ * @description A helper function that returns ValueHandler necessary for QuerySearch component.
+ * @param resourceType
+ * @param distinct
+ * @param dataType
+ * @param limit
+ */
+export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler {
+    const api = fluentApi.addons().autocomplete().get()
         .setResourceType(resourceType)
-        .setLimit(limit || 10);
-    if (distinct) api = api.setDistinct(distinct);
+        .setLimit(limit || 10)
+        .setDistinct(distinct);
     return async (inputText: string) => {
         try {
             const res = await api.setSearch(inputText).execute();
@@ -93,17 +89,40 @@ export function makeValueHandlerWithReference(resourceType: string, distinct?: s
     };
 }
 
-export function makeValueHandlerMapWithReference(keys: KeyParam, resourceType: string): ValueHandlerMap {
-    const res = {};
-    keys.forEach((k) => {
-        if (Array.isArray(k)) res[k[0]] = makeValueHandlerWithReference(resourceType, k[0]);
-        else if (typeof k === 'string') res[k] = makeValueHandlerWithReference(resourceType, k);
-        else res[k.name] = makeValueHandlerWithReference(resourceType, k.name);
-    });
-    return res;
+/**
+ * @name makeReferenceValueHandler
+ * @description A helper function that returns ValueHandler necessary for QuerySearch component.
+ *              resourceType parameter must be supported by reference autocomplete api.
+ * @param resourceType
+ * @param dataType
+ * @param limit
+ */
+export function makeReferenceValueHandler(resourceType: string, dataType?: string, limit?: number): ValueHandler {
+    const api = fluentApi.addons().autocomplete().get()
+        .setResourceType(resourceType)
+        .setLimit(limit || 10);
+    return async (inputText: string) => {
+        try {
+            const res = await api.setSearch(inputText).execute();
+            return {
+                results: res.data.results.map(d => ({ label: d.name, name: d.key })),
+                totalCount: res.data.total_count,
+            };
+        } catch (e) {
+            return {
+                results: [],
+                totalCount: 0,
+            };
+        }
+    };
 }
 
-export function makeValueHandlerWithSearchEnums(
+/**
+ * @name makeEnumValueHandler
+ * @description A helper function that returns ValueHandler necessary for QuerySearch component.
+ * @param enums
+ */
+export function makeEnumValueHandler(
     enums: SearchEnums,
 ): ValueHandler {
     const totalCount = size(enums);
@@ -132,18 +151,48 @@ export function makeValueHandlerWithSearchEnums(
     };
 }
 
-export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, resourceType: string): Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> {
+/**
+ * @name makeDistinctValueHandlerMap
+ * @description A helper function that returns valueHandlerMap necessary for QuerySearch component.
+ *              It uses keys as distinct keys for each valueHandler.
+ * @param keys
+ * @param resourceType
+ */
+export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string): ValueHandlerMap {
+    const res = {};
+    keys.forEach((k) => {
+        if (Array.isArray(k)) {
+            res[k[0]] = makeDistinctValueHandler(resourceType, k[0], k[2]);
+        } else if (typeof k === 'string') res[k] = makeDistinctValueHandler(resourceType, k);
+        else res[k.name] = makeDistinctValueHandler(resourceType, k.name, k.dataType);
+    });
+    return res;
+}
+
+/**
+ * @name makeQuerySearchPropsWithSearchSchema
+ * @description A helper function that returns props(keyItems, valueHandlerMap) necessary for QuerySearch component using search schema
+ * @param schema
+ * @param resourceType
+ */
+export function makeQuerySearchPropsWithSearchSchema(schema: SearchKeyGroup, resourceType: string): Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> {
     const res: Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> = { keyItems: [], valueHandlerMap: {} };
 
     res.keyItems = schema.items.map(d => ({ label: d.name, name: d.key, dataType: d.data_type }));
 
     schema.items.forEach((d) => {
         if (d.enums) {
-            res.valueHandlerMap[d.key] = makeValueHandlerWithSearchEnums(d.enums);
+            res.valueHandlerMap[d.key] = makeEnumValueHandler(d.enums);
+        } else if (d.reference) {
+            res.valueHandlerMap[d.key] = makeReferenceValueHandler(
+                d.reference,
+                d.data_type,
+            );
         } else {
-            res.valueHandlerMap[d.key] = makeValueHandlerWithReference(
-                d.reference || resourceType,
-                d.reference ? undefined : d.key,
+            res.valueHandlerMap[d.key] = makeDistinctValueHandler(
+                resourceType,
+                d.key,
+                d.data_type,
             );
         }
     });
@@ -151,7 +200,7 @@ export function makeQuerySearchHandlersWithSearchSchema(schema: SearchKeyGroup, 
     return res;
 }
 
-
+// will be deprecated
 export class QuerySearchToolSet extends TagToolSet<QueryTag> {
     state: QuerySearchState = reactive({
         keyItems: [],
@@ -173,7 +222,7 @@ export class QuerySearchToolSet extends TagToolSet<QueryTag> {
     constructor(
         keyItems: KeyItem[],
         valueHandlerMap: ValueHandlerMap,
-        tags: Ref<any[]> = ref([]),
+        tags: Ref<QueryTag[]> = ref([]),
         checkDuplicate = true,
         changeTagCallBack?: ChangeTagCallBack,
     ) {
@@ -184,7 +233,7 @@ export class QuerySearchToolSet extends TagToolSet<QueryTag> {
 
     addTag = (val: QueryItem) => {
         if (this.checkDuplicate && !this.validation(val)) return;
-        this.tags.value = [...this.tags.value, val];
+        this.tags.value = [...this.tags.value, convertQueryItemToQueryTag(val)];
     };
 
     validation = (query: QueryItem): boolean => this.tags.value.every((tag) => {

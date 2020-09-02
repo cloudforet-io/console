@@ -1,4 +1,4 @@
-import { KeyItem, ValueItem } from '@/components/organisms/search/query-search/type';
+import {KeyDataType, KeyItem, ValueItem} from '@/components/organisms/search/query-search/type';
 
 /** Search schema types */
 export interface SearchEnumItem {
@@ -8,7 +8,7 @@ export interface SearchEnumItem {
         color?: string;
     };
 }
-export type SearchDataType = 'string'|'integer'|'float'|'boolean'|'datetime'|'timestamp'
+export type SearchDataType = KeyDataType
 export type SearchEnums = Record<string, SearchEnumItem|string>|string[]
 
 export interface SearchKeyOptions {

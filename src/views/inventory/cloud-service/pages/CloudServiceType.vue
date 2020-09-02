@@ -163,9 +163,9 @@ import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { Location } from 'vue-router';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
-    makeQuerySearchHandlersWithSearchSchema,
+    makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import { RegionModel } from '@/lib/fluent-api/inventory/region';
@@ -242,7 +242,7 @@ export default {
             selectedRegionIdx: [] as number[],
             regionFilter: [] as string[],
         });
-        const handlers = makeQuerySearchHandlersWithSearchSchema(
+        const handlers = makeQuerySearchPropsWithSearchSchema(
             {
                 title: 'Properties',
                 items: [
@@ -407,9 +407,9 @@ export default {
                 .setPageLimit(state.pageSize)
                 .setKeyword(...or)
                 .setFilter(...and, ...filters);
-            if (!isTriggeredBySideFilter) {
-                query.setPageStart(getPageStart(state.thisPage, state.pageSize));
-            }
+
+            if (isTriggeredBySideFilter) state.thisPage = 1;
+            else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
                 show_all: true,

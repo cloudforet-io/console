@@ -1,9 +1,9 @@
 import { FilterItem } from '@/lib/fluent-api/type';
 import { OPERATOR_MAP } from '@/lib/fluent-api';
 import { get } from 'lodash';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
-    KeyItem, ValueHandlerMap, ValueItem,
+    KeyItem, QueryItem, ValueHandlerMap, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
@@ -31,13 +31,13 @@ export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[
         if (q.key !== null && q.key !== undefined && !q.invalid) {
             and.push({
                 key: q.key?.name as string,
-                value: q.value?.name || '',
+                value: String(q.value?.name || ''),
                 operator: q.operator,
             });
         } else if (keyItems) {
             setFilterOrWithSuggestKeys({
                 key: '',
-                value: q.value?.name || '',
+                value: String(q.value?.name || ''),
                 operator: q.operator,
             }, keyItems, or);
         }
@@ -50,19 +50,21 @@ export const getFiltersFromQueryTags = (tags: QueryTag[]): {and: Filter[]; or: s
     const or: string[] = [];
     const andMap: Record<string, Filter> = {};
     tags.forEach((q) => {
-        if (q.key !== null && q.key !== undefined && !q.invalid) {
-            const operator = OPERATOR_MAP[q.operator] as FilterOperator;
-            const filter = andMap[`${q.key.name}/${operator}`];
-            if (filter && filter.o === operator) {
-                filter.v.push(q.value?.name || '');
-            } else {
-                andMap[`${q.key.name}/${operator}`] = {
-                    k: q.key.name,
-                    v: [q.value?.name || ''],
-                    o: operator,
-                };
-            }
-        } else if (q.value.name) or.push(q.value.name);
+        if (!q.invalid) {
+            if (q.key !== null && q.key !== undefined) {
+                const operator = OPERATOR_MAP[q.operator] as FilterOperator;
+                const filter = andMap[`${q.key.name}/${operator}`];
+                if (filter && filter.o === operator) {
+                    filter.v.push(q.value?.name || '');
+                } else {
+                    andMap[`${q.key.name}/${operator}`] = {
+                        k: q.key.name,
+                        v: [q.value?.name || ''],
+                        o: operator,
+                    };
+                }
+            } else if (q.value.name) or.push(String(q.value.name));
+        }
     });
 
     return { and: Object.values(andMap), or };
@@ -71,7 +73,7 @@ export const getFiltersFromQueryTags = (tags: QueryTag[]): {and: Filter[]; or: s
 
 const tagRegex = new RegExp('^(?<key>.+?)?:(?<operator>[=|<|>|!|$]=?)?(?<value>.*)?');
 
-export const parseTag = (text: string): QueryTag => {
+export const parseTag = (text: string): QueryItem => {
     const parsed = tagRegex.exec(text);
 
     const key: string|undefined = get(parsed, 'groups.key', undefined);

@@ -3,7 +3,7 @@ const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/C
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
-const Server = () => import('@/views/inventory/server/Server_updating.vue');
+const Server = () => import('@/views/inventory/server/Server.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 

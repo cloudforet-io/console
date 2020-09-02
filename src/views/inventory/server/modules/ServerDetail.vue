@@ -57,7 +57,7 @@ import {
 } from '@/components/organisms/dynamic-field/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { SearchSchema } from '@/lib/component-utils/query-search/type';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/query-search';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -235,7 +235,7 @@ export default {
             init(options) {
                 if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
                 if (searchSchemaCacheMap[props.serverId]) {
-                    const { keyItems, valueHandlerMap } = makeQuerySearchHandlersWithSearchSchema(
+                    const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
                         searchSchemaCacheMap[props.serverId],
                         'inventory.Server',
                     );

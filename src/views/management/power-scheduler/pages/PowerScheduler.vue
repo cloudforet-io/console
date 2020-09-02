@@ -51,9 +51,9 @@ import {
 } from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/query-search';
 import router from '@/routes';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
@@ -70,7 +70,7 @@ export default {
         /**
          * Handlers for query search
          * */
-        const handlers = makeQuerySearchHandlersWithSearchSchema(
+        const handlers = makeQuerySearchPropsWithSearchSchema(
             {
                 title: 'Properties',
                 items: [

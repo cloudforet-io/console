@@ -166,7 +166,7 @@ import {
 } from '@/lib/router-query-string';
 import { MonitoringToolSet } from '@/views/common/monitoring/Monitoring.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
+import { makeKeyItems, makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 const rawLayout = {
@@ -309,7 +309,7 @@ export default {
             state.originFields = resp.data.results[0].metadata?.view?.table?.layout?.options?.fields || [];
             const keys = state.originFields.map(i => i.key);
             apiHandler.tableTS.querySearch.state.keyItems = makeKeyItems(keys);
-            apiHandler.tableTS.querySearch.valueHandlerMap = makeValueHandlerMapWithReference(keys, 'inventory.CloudService');
+            apiHandler.tableTS.querySearch.valueHandlerMap = makeDistinctValueHandlerMap(keys, 'inventory.CloudService');
         };
 
 

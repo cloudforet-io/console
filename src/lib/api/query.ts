@@ -1,9 +1,14 @@
 import _ from 'lodash';
 import { readonlyArgs } from '@/lib/type';
-import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
 import { OPERATOR_MAP } from '@/lib/fluent-api/toolset';
 
 const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
+
+interface SearchQueryType {
+    key: string;
+    operator: string;
+    value: any;
+}
 
 interface Sort {
     key: string;
