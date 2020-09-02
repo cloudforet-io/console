@@ -1,5 +1,6 @@
 <template>
     <vue-form-generator
+        :class="{'not-validation-mode': !validationMode}"
         :schema="schema"
         :model="model"
         :options="options"
@@ -8,13 +9,8 @@
 </template>
 
 <script lang="ts">
-import { component as VueFormGenerator } from 'vue-form-generator/dist/vfg';
-
 export default {
     name: 'PDynamicForm',
-    components: {
-        VueFormGenerator,
-    },
     props: {
         schema: {
             type: Object,
@@ -32,6 +28,10 @@ export default {
             type: Boolean,
             required: true,
         },
+        validationMode: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, { emit }) {
         const onValidated = (isValid) => {
@@ -48,6 +48,16 @@ export default {
 <style lang="postcss">
 .vue-form-generator {
     width: 100%;
+    &.not-validation-mode {
+        .form-group.error {
+            .form-control {
+                @apply border-gray-300;
+            }
+            .help-block.errors {
+                display: none;
+            }
+        }
+    }
     .form-group {
         label {
             @apply text-gray-900;
@@ -55,6 +65,11 @@ export default {
             font-size: .875rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
+        }
+        &.error {
+            .form-control {
+                background-color: transparent;
+            }
         }
         .form-control {
             @apply text-gray-900 border border-gray-300;
@@ -67,9 +82,12 @@ export default {
             box-shadow: none;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
-        }
-        .error {
-            background-color: transparent;
+            &:focus {
+                @apply border-blue-500;
+            }
+            &::placeholder {
+                @apply text-gray-300;
+            }
         }
         .help-block.errors {
             @apply text-red-500;

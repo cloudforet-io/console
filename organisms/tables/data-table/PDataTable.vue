@@ -640,7 +640,7 @@ export default {
             }
         }
         td {
-            @apply h-10 px-4 z-0 align-middle min-w-28 text-sm leading-normal;
+            @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
             vertical-align: middle;
         }
         tr {
