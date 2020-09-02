@@ -50,7 +50,7 @@ interface State {
     searchText: string;
     selectedKey: KeyItem|null;
     operator: OperatorType;
-    totalCount: number;
+    keyTotalCount: number;
     valueTotalCount: number;
     filteredKeyItems: KeyItem[];
     filteredValueItems: ValueItem[];
@@ -99,7 +99,7 @@ export default {
             searchText: props.value,
             selectedKey: null,
             operator: '',
-            totalCount: computed(() => {
+            keyTotalCount: computed(() => {
                 if (state.selectedKey) return 0;
                 return props.keyItems.length;
             }),
@@ -108,7 +108,7 @@ export default {
             filteredValueItems: [],
             keyMenu: computed(() => [
                 {
-                    label: `Key (${state.totalCount})`,
+                    label: `Key (${state.keyTotalCount})`,
                     type: CONTEXT_MENU_TYPE.header,
                 },
                 ...state.filteredKeyItems.map(d => ({
@@ -178,12 +178,7 @@ export default {
             return res ? res.data : undefined;
         };
 
-        const hideMenu = () => {
-            state.visibleMenu = false;
-            // state.valueTotalCount = 0;
-            // state.filteredKeyItems = [];
-            // state.filteredValueItems = [];
-        };
+        const hideMenu = () => { state.visibleMenu = false; };
         const focus = () => { state.isFocused = true; };
         const clearText = () => {
             state.searchText = '';
@@ -265,12 +260,11 @@ export default {
                 onSearch(val);
             } else {
                 const selected = state.keyMenu[idx];
-                state.selectedKey = {
-                    label: selected.label as string,
-                    name: selected.name as string,
-                };
-                onKeySelect(state.selectedKey);
-                showMenu();
+                if (selected.data) {
+                    state.selectedKey = selected.data;
+                    onKeySelect(state.selectedKey);
+                    showMenu();
+                }
             }
         };
 

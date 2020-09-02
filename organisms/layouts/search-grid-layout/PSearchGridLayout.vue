@@ -30,11 +30,10 @@
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
-                <div v-if="tags.length > 0" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
-                    <p-query-search-tags
-                        :tags="tags"
-                        @delete:tag="deleteTag"
-                        @delete:all="deleteAllTags"
+                <div :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
+                    <p-query-search-tags ref="tagsRef"
+                                         :tags="tags"
+                                         @change="onQueryTagsChange"
                     />
                 </div>
                 <slot name="toolbox-bottom" />
@@ -56,7 +55,11 @@ import {
 } from '@vue/composition-api';
 import { forEach } from 'lodash';
 import { QueryItem } from '@/components/organisms/search/query-search/type';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import {
+    QuerySearchTagsFunctions,
+    QuerySearchTagsListeners,
+    QueryTag,
+} from '@/components/organisms/search/query-search-tags/type';
 import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
@@ -125,6 +128,7 @@ export default {
             proxyPageSize: makeOptionalProxy('pageSize', vm),
             /** search */
             tags: makeOptionalProxy('queryTags', vm),
+            tagsRef: null as null|QuerySearchTagsFunctions,
             /** others */
             options: computed(() => ({
                 thisPage: state.proxyThisPage,
@@ -141,19 +145,16 @@ export default {
         });
 
         /** Event emitter */
-        const emitChange = (options?: Partial<Options>) => {
+        const emitChange = (options: Partial<Options> = {}) => {
+            if (options?.queryTags || state.proxyThisPage > state.proxyPageSize) {
+                options.thisPage = 1;
+                state.proxyThisPage = 1;
+            }
             emit('change', Object.freeze({
                 ...state.options,
                 ...options,
             }), Object.freeze({ ...options }));
         };
-
-        watch(() => props.totalCount, async (after, before) => {
-            if (before !== after) {
-                state.proxyThisPage = 1;
-                // emitChange({ thisPage: 1 });
-            }
-        }, { immediate: true });
 
         const onChangePageSize = (pageSize: number) => {
             if (props.thisPage > (Math.ceil(props.totalCount / pageSize) || 1)) {
@@ -171,44 +172,23 @@ export default {
         };
 
         /** Search event listeners */
-        const validation = (query: QueryItem): boolean => (state.tags as unknown as QueryTag[]).every((tag) => {
-            if (tag.key && query.key) {
-                return (query.key.name !== tag.key.name
-                        || query.operator !== tag.operator
-                        || query.value !== tag.value);
-            }
-            if (!tag.key && !query.key) {
-                return query.value !== tag.value;
-            }
-            return true;
-        });
-
-        const deleteTag = (idx: number) => {
-            state.tags.splice(idx, 1);
-            emitChange({ queryTags: state.tags });
-        };
-
-        const deleteAllTags = () => {
-            state.tags = [];
-            emitChange({ queryTags: state.tags });
-        };
-
         const onSearch = async (query: QueryItem) => {
-            if (!validation(query)) return;
-            // TODO: convert queryItem to queryTag with datatype
-            // @ts-ignore
-            state.tags = [...state.tags, query];
-            emitChange({ queryTags: state.tags });
+            if (!state.tagsRef) return;
+            state.tagsRef.addTag(query);
+        };
+
+        const onQueryTagsChange: QuerySearchTagsListeners['change'] = (tags: QueryTag[]) => {
+            state.tags = tags;
+            emitChange({ queryTags: tags });
         };
 
         return {
             ...toRefs(state),
-            deleteTag,
-            deleteAllTags,
             emitChange,
             onChangePageSize,
             onChangePageNumber,
             onSearch,
+            onQueryTagsChange,
             refresh,
         };
     },

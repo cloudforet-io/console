@@ -42,7 +42,7 @@ export default {
         &.deletable {
             padding-right: 0.15rem;
             .icon {
-                @apply text-gray-400;
+                @apply text-gray-400 ml-2;
                 cursor: pointer;
             }
             &:hover {

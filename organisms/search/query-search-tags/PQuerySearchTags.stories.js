@@ -7,7 +7,6 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import PQuerySearchTags from './PQuerySearchTags.vue';
-import { querySearchTagsProps } from './PQuerySearchTags.toolset';
 
 export default {
     title: 'organisms/search/QuerySearchTags',
@@ -24,9 +23,7 @@ export default {
 
 export const defaultCase = () => ({
     components: { PQuerySearchTags },
-    props: getKnobProps(querySearchTagsProps, {}, {
-        tags: true,
-    }),
+    props: {},
     template: `
     <div style="width: 80vw;">
         <PQuerySearchTags v-bind="$props"

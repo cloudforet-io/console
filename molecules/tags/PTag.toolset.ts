@@ -27,9 +27,9 @@ export class TagToolSet<T=any> {
         this.setTags([]);
     };
 
-    validation = (value: T): boolean => this.tags.value.every(tag => !isEqual(tag, value));
+    validation = (value: any): boolean => this.tags.value.every(tag => !isEqual(tag, value));
 
-     addTag = (value: T) => {
+     addTag = (value: any) => {
          let val: T = value;
          if (typeof value === 'string') val = value.trim() as unknown as T;
          if (!val) return;
