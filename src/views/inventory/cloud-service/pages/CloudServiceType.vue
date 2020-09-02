@@ -318,6 +318,8 @@ export default {
             state.tags.forEach((tag: QueryTag) => {
                 if (tag.key) {
                     if (tag.key.name === 'project_id') filters.push(tag);
+                    if (tag.key.name === 'data.region_name') filters.push(tag);
+                    if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
                 }
             });
             filterState.regionFilter.forEach((d) => {

@@ -49,14 +49,16 @@
                 </template>
                 <template #col-server_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        <router-link :to="`/inventory/server?p=1&ps=15&f=collection_info.service_accounts%3A${item.service_account_id}&f=project_id%3A%3D${item.project_id}`">
+                        <router-link :to="`/inventory/server?p=1&ps=15&filters=collection_info.service_accounts%3A${item.service_account_id}&filters=project_id%3A%3D${item.project_id}`">
                             {{ item.server_count || 0 }}
                         </router-link>
                     </div>
                 </template>
                 <template #col-cloud_service_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        {{ item.cloud_service_count || 0 }}
+                        <router-link :to="`/inventory/cloud-service?provider=all&f=collection_info.service_accounts%3A${item.service_account_id}&f=project_id%3A%3D${item.project_id}`">
+                            {{ item.cloud_service_count || 0 }}
+                        </router-link>
                     </div>
                 </template>
                 <template #col-secret_count-format="{index, field, item}">

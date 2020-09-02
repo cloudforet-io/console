@@ -24,6 +24,7 @@
                     <resources-by-region
                         :get-action="resources.server"
                         :project-filter="projectFilter"
+                        :project-id="projectId"
                         :is-server="true"
                     />
                 </template>
@@ -107,7 +108,7 @@ export default {
 
         const serverSummary = new ServiceSummaryWidgetState({
             title: 'servers',
-            to: `/inventory/server?p=1&ps=15&f=project_id%3A%3D${projectId.value}`,
+            to: `/inventory/server?filters=project_id%3A${projectId.value}`,
             color: secondary,
             getAction: api => api.setResourceType('identity.Project')
                 .setFilter({
@@ -126,7 +127,7 @@ export default {
 
         const cloudServiceSummary = new ServiceSummaryWidgetState({
             title: 'cloud services',
-            to: `/inventory/cloud-service?f=project_id%3A${projectId.value}&provider=all&g_p=1&g_ps=24`,
+            to: `/inventory/cloud-service?f=project_id%3A${projectId.value}&provider=all`,
             color: secondary1,
             getAction: api => api.setResourceType('identity.Project')
                 .setFilter({
@@ -174,6 +175,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(tabData),
+            projectId,
             projectFilter,
             serverSummary,
             cloudServiceSummary,
