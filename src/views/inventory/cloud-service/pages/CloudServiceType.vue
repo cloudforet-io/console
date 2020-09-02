@@ -166,7 +166,7 @@ import { Location } from 'vue-router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
     makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/query-search';
+} from '@/lib/component-utils/dynamic-layout';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
@@ -398,15 +398,16 @@ export default {
         });
 
         const getParams = (isTriggeredBySideFilter = false) => {
-            const { and, or } = getFiltersFromQueryTags(state.tags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
 
             const { filters, labels } = sidebarFilters.value;
 
             const query = new QueryHelper();
             query
                 .setPageLimit(state.pageSize)
-                .setKeyword(...or)
-                .setFilter(...and, ...filters);
+                .setKeyword(...keywords)
+                .setFilterOr(...orFilters)
+                .setFilter(...andFilters, ...filters);
 
             if (isTriggeredBySideFilter) state.thisPage = 1;
             else query.setPageStart(getPageStart(state.thisPage, state.pageSize));

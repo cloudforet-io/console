@@ -161,11 +161,11 @@ import { makeTrItems } from '@/lib/view-helper';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
-import { getFiltersFromQueryTags, getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
@@ -408,13 +408,14 @@ export default {
 
         // Table
         const getQuery = () => {
-            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
             const query = new QueryHelper();
             query
                 .setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...or)
-                .setFilter(...and)
+                .setKeyword(...keywords)
+                .setFilter(...andFilters)
+                .setFilterOr(...orFilters)
                 .setOnly(
                     'collector_id', 'name', 'state', 'priority', 'last_collected_at',
                     'created_at', 'provider', 'tags', 'plugin_info',

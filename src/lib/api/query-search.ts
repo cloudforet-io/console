@@ -1,29 +1,32 @@
 import { FilterItem } from '@/lib/fluent-api/type';
-import { OPERATOR_MAP } from '@/lib/fluent-api';
 import { get } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
-    KeyItem, QueryItem, ValueHandlerMap, ValueItem,
+    KeyDataType,
+    KeyItem, OperatorType, QueryItem, ValueHandlerMap, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
-
+// will be deprecated
 export interface ACHandlerMeta {
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
 }
 
+// will be deprecated
 export const defaultACHandler: ACHandlerMeta = {
     keyItems: [],
     valueHandlerMap: {},
 };
 
+// will be deprecated
 export const setFilterOrWithSuggestKeys = (query: FilterItem, keyItems: KeyItem[], filterOr: FilterItem[]): void => {
     keyItems.forEach((keyItem) => {
         filterOr.push({ ...query, key: keyItem.name });
     });
 };
 
+// will be deprecated
 export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[]): {and: FilterItem[]; or: FilterItem[]} => {
     const and: FilterItem[] = [];
     const or: FilterItem[] = [];
@@ -46,34 +49,104 @@ export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[
     return { and, or };
 };
 
-export const getFiltersFromQueryTags = (tags: QueryTag[]): {and: Filter[]; or: string[]} => {
-    const or: string[] = [];
-    const andMap: Record<string, Filter> = {};
+type OperatorMap = Record<OperatorType, FilterOperator>
+type DataTypeOperators = Record<KeyDataType, OperatorMap>;
+
+const defaultOperatorMap: OperatorMap = {
+    '': 'contain_in',
+    '!': 'not_contain',
+    '>': 'gt',
+    '>=': 'gte',
+    '<': 'lt',
+    '<=': 'lte',
+    '=': 'in',
+    '!=': 'not_in',
+    $: 'regex',
+};
+
+const singleOnlyOperators: OperatorType[] = ['>', '>=', '<', '<=', '$'];
+
+const dataTypeOperators: DataTypeOperators = {
+    string: defaultOperatorMap,
+    integer: defaultOperatorMap,
+    float: defaultOperatorMap,
+    boolean: defaultOperatorMap,
+    datetime: {
+        ...defaultOperatorMap,
+        '>': 'datetime_gt',
+        '>=': 'datetime_gte',
+        '<': 'datetime_lt',
+        '<=': 'datetime_lte',
+    },
+};
+
+type SingleValueFiltersMap = Record<string, Filter[]>
+type MultiValueFiltersMap = Record<string, Filter>
+interface QueryParam extends QueryTag {
+    key: KeyItem;
+}
+
+const setSingleValueFiltersMap = (query: QueryParam, filtersMap: SingleValueFiltersMap) => {
+    const filterKey = `${query.key.name}/${query.operator}`;
+    const newFilter = {
+        k: query.key.name,
+        v: query.value.name,
+        o: dataTypeOperators[query.key?.dataType || 'string'][query.operator],
+    };
+
+    if (filtersMap[filterKey]) filtersMap[filterKey].push(newFilter);
+    else filtersMap[filterKey] = [newFilter];
+};
+
+const setMultiValueFiltersMap = (query: QueryParam, filtersMap: MultiValueFiltersMap) => {
+    const filterKey = `${query.key.name}/${query.operator}`;
+    if (filtersMap[filterKey]) {
+        filtersMap[filterKey].v.push(query.value.name);
+    } else {
+        filtersMap[filterKey] = {
+            k: query.key.name,
+            v: [query.value.name],
+            o: dataTypeOperators[query.key?.dataType || 'string'][query.operator],
+        };
+    }
+};
+
+/**
+ * @name getFiltersFromQueryTags
+ * @description convert query tags to api filters and keywords.
+ * @param tags: QueryTag[]
+ */
+const getFiltersFromQueryTags = (tags: QueryTag[]): {andFilters: Filter[]; orFilters: Filter[]; keywords: string[]} => {
+    const keywords: string[] = [];
+    const singleValueFiltersMap: SingleValueFiltersMap = {};
+    const multiValueFiltersMap: MultiValueFiltersMap = {};
+
     tags.forEach((q) => {
         if (!q.invalid) {
             if (q.key !== null && q.key !== undefined) {
-                const operator = OPERATOR_MAP[q.operator] as FilterOperator;
-                const filter = andMap[`${q.key.name}/${operator}`];
-                if (filter && filter.o === operator) {
-                    filter.v.push(q.value?.name || '');
+                if (singleOnlyOperators.includes(q.operator)) {
+                    setSingleValueFiltersMap(q as QueryParam, singleValueFiltersMap);
                 } else {
-                    andMap[`${q.key.name}/${operator}`] = {
-                        k: q.key.name,
-                        v: [q.value?.name || ''],
-                        o: operator,
-                    };
+                    setMultiValueFiltersMap(q as QueryParam, multiValueFiltersMap);
                 }
-            } else if (q.value.name) or.push(String(q.value.name));
+            } else if (q.value.name) keywords.push(String(q.value.name));
         }
     });
 
-    return { and: Object.values(andMap), or };
+    return {
+        andFilters: [
+            ...Object.values(singleValueFiltersMap).flat(),
+            ...Object.values(multiValueFiltersMap),
+        ],
+        orFilters: [],
+        keywords,
+    };
 };
 
 
 const tagRegex = new RegExp('^(?<key>.+?)?:(?<operator>[=|<|>|!|$]=?)?(?<value>.*)?');
 
-export const parseTag = (text: string): QueryItem => {
+const parseTag = (text: string): QueryItem => {
     const parsed = tagRegex.exec(text);
 
     const key: string|undefined = get(parsed, 'groups.key', undefined);
@@ -89,4 +162,9 @@ export const parseTag = (text: string): QueryItem => {
         operator,
         value: valueItem,
     };
+};
+
+export {
+    getFiltersFromQueryTags,
+    parseTag,
 };

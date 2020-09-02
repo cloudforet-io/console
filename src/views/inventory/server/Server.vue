@@ -5,7 +5,7 @@
         </div>
         <p-page-title title="Server"
                       use-total-count use-selected-count
-                      :total-count="extraOptionState.totalCount"
+                      :total-count="typeOptionState.totalCount"
                       :selected-count="tableState.selectedItems.length"
         />
         <p-horizontal-layout>
@@ -14,7 +14,7 @@
                                   :options="tableSchema.options"
                                   :data="tableState.items"
                                   :fetch-options="fetchOptionState"
-                                  :type-options="extraOptionState"
+                                  :type-options="typeOptionState"
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
                                   @init="fetchTableData"
@@ -71,7 +71,7 @@
                 />
             </template>
         </p-tab>
-        <p-tab v-else-if="extraOptionState.selectIndex.length > 1"
+        <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
@@ -169,7 +169,7 @@ import {
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import {
     makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/query-search';
+} from '@/lib/component-utils/dynamic-layout';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { SearchKeyGroup } from '@/lib/component-utils/query-search/type';
 import {
@@ -184,6 +184,7 @@ import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { convertQueryItemToQueryTag } from '@/lib/component-utils/query-search-tags';
 import searchSchema from './default-schema/search.json';
 import tableSchema from './default-schema/base-table.json';
 
@@ -278,7 +279,7 @@ export default {
             queryTags: queryStringToQueryTags(vm.$route.query.filters, tableAutocompleteProps.keyItems),
         });
 
-        const extraOptionState: QuerySearchTableTypeOptions = reactive({
+        const typeOptionState: QuerySearchTableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => user.state.timezone || 'UTC'),
@@ -286,11 +287,12 @@ export default {
             selectable: true,
             keyItems: tableAutocompleteProps.keyItems,
             valueHandlerMap: tableAutocompleteProps.valueHandlerMap,
+            converter: convertQueryItemToQueryTag,
         });
 
         const tableState = reactive({
             items: [],
-            selectedItems: computed(() => extraOptionState.selectIndex.map(d => tableState.items[d])),
+            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             providers: computed(() => provider.state.providers || {}),
             consoleLink: computed(() => {
                 const res = get(tableState.selectedItems[0], 'data.reference.link')
@@ -327,34 +329,35 @@ export default {
         });
 
         const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
-            extraOptionState.selectIndex = selectIndex;
+            typeOptionState.selectIndex = selectIndex;
         };
 
         const getQuery = () => {
-            const { and, or } = getFiltersFromQueryTags(fetchOptionState.queryTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(fetchOptionState.queryTags);
 
             const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...and)
-                .setKeyword(...or);
+                .setFilter(...andFilters)
+                .setFilterOr(...orFilters)
+                .setKeyword(...keywords);
 
             return query.data;
         };
 
         const serverListApi = SpaceConnector.client.inventory.server.list;
         const listServerData = async () => {
-            extraOptionState.loading = true;
+            typeOptionState.loading = true;
             try {
                 const res = await serverListApi({ query: getQuery() });
                 tableState.items = res.results;
-                extraOptionState.totalCount = res.total_count;
+                typeOptionState.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
                 tableState.items = [];
-                extraOptionState.totalCount = 0;
+                typeOptionState.totalCount = 0;
             } finally {
-                extraOptionState.loading = false;
+                typeOptionState.loading = false;
             }
         };
 
@@ -392,7 +395,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: extraOptionState.timezone,
+                            timezone: typeOptionState.timezone,
                         },
                         data_source: tableSchema.options.fields,
                     },
@@ -579,7 +582,7 @@ export default {
                 showErrorMessage('Request Fail', e, context.root);
             })
                 .finally(() => {
-                    extraOptionState.selectIndex = [];
+                    typeOptionState.selectIndex = [];
                     listServerData();
                     resetCheckTableModalState();
                 });
@@ -623,7 +626,7 @@ export default {
             tableSchema,
             tableState,
             fetchOptionState,
-            extraOptionState,
+            typeOptionState,
             onSelect,
             exportServerData,
             listServerData,

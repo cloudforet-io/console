@@ -9,6 +9,7 @@ import { Dictionary } from 'vue-router/types/router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { parseTag } from '@/lib/api/query-search';
 import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
+import { convertQueryItemToQueryTag } from '@/lib/component-utils/query-search-tags';
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 export type RouteQuery = Dictionary<RouteQueryString>;
@@ -167,7 +168,7 @@ export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?:
                 if (queryItem.key?.name && keyItems) {
                     queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
                 }
-                res.push(queryItem);
+                res.push(convertQueryItemToQueryTag(queryItem));
             }
             return res;
         }, [] as QueryTag[]);
@@ -176,7 +177,7 @@ export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?:
     if (queryItem.key?.name && keyItems) {
         queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
     }
-    return [queryItem];
+    return [convertQueryItemToQueryTag(queryItem)];
 };
 
 /** QueryString replacer Helpers */

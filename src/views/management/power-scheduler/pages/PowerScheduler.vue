@@ -51,7 +51,7 @@ import {
 } from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import router from '@/routes';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
@@ -108,13 +108,14 @@ export default {
          * */
 
         const getParams = () => {
-            const { and, or } = getFiltersFromQueryTags(state.tags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
             const query = new QueryHelper();
             query
                 .setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize)
-                .setKeyword(...or)
-                .setFilter(...and);
+                .setKeyword(...keywords)
+                .setFilter(...andFilters)
+                .setFilterOr(...orFilters);
 
             return {
                 query: query.data,

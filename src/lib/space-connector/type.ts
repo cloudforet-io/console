@@ -10,9 +10,12 @@ export interface APIInfo {
 }
 
 
-export type FilterOperator = 'lt' | 'lte' | 'gt' | 'gte' | 'eq' | 'not' |'exists' | 'contain' | 'not_contain' | 'in' |
-    'not_in' | 'not_contain_in' | 'datetime_lt' | 'datetime_lte' | 'datetime_gt' | 'datetime_gte' |
-    'timediff_lt' | 'timediff_lte' | 'timediff_gt' | 'timediff_gte';
+export type FilterOperator =
+    | 'lt' | 'lte' | 'gt' | 'gte' | 'exists' | 'regex'
+    | 'eq' | 'contain' | 'not' | 'not_contain'
+    | 'in' | 'contain_in' | 'not_in' | 'not_contain_in'
+    | 'datetime_lt' | 'datetime_lte' | 'datetime_gt' | 'datetime_gte'
+    | 'timediff_lt' | 'timediff_lte' | 'timediff_gt' | 'timediff_gte';
 
 export interface Filter {
     k: string;

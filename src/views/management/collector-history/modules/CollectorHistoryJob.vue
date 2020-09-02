@@ -263,22 +263,22 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
 
-            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
 
-            const query = new QueryHelper();
-            query
+            const query = new QueryHelper()
                 .setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...or);
+                .setKeyword(...keywords)
+                .setFilterOr(...orFilters);
+
             if (statusValues.length > 0) {
-                query.setFilter({
+                andFilters.push({
                     k: 'status',
                     v: statusValues,
                     o: 'in',
-                }, ...and);
-            } else {
-                query.setFilter(...and);
+                });
             }
+            query.setFilter(...andFilters);
             return query;
         };
         const getJobTasks = async () => {

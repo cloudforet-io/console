@@ -2,7 +2,6 @@ import {
     KeyDataType,
     KeyItem,
     QueryItem,
-    QuerySearchProps,
     QuerySearchState,
     QuerySearchSyncState,
     ValueHandler,
@@ -18,11 +17,9 @@ import { reactive, ref, Ref } from '@vue/composition-api';
 import {
     SearchEnumItem,
     SearchEnums,
-    SearchKeyGroup,
 } from '@/lib/component-utils/query-search/type';
 import { fluentApi } from '@/lib/fluent-api';
 import { AutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
-import { convertQueryItemToQueryTag } from '@/components/organisms/search/query-search-tags/helper';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItem>
@@ -169,37 +166,6 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
     return res;
 }
 
-/**
- * @name makeQuerySearchPropsWithSearchSchema
- * @description A helper function that returns props(keyItems, valueHandlerMap) necessary for QuerySearch component using search schema
- * @param schema
- * @param resourceType
- */
-export function makeQuerySearchPropsWithSearchSchema(schema: SearchKeyGroup, resourceType: string): Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> {
-    const res: Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> = { keyItems: [], valueHandlerMap: {} };
-
-    res.keyItems = schema.items.map(d => ({ label: d.name, name: d.key, dataType: d.data_type }));
-
-    schema.items.forEach((d) => {
-        if (d.enums) {
-            res.valueHandlerMap[d.key] = makeEnumValueHandler(d.enums);
-        } else if (d.reference) {
-            res.valueHandlerMap[d.key] = makeReferenceValueHandler(
-                d.reference,
-                d.data_type,
-            );
-        } else {
-            res.valueHandlerMap[d.key] = makeDistinctValueHandler(
-                resourceType,
-                d.key,
-                d.data_type,
-            );
-        }
-    });
-
-    return res;
-}
-
 // will be deprecated
 export class QuerySearchToolSet extends TagToolSet<QueryTag> {
     state: QuerySearchState = reactive({
@@ -233,7 +199,7 @@ export class QuerySearchToolSet extends TagToolSet<QueryTag> {
 
     addTag = (val: QueryItem) => {
         if (this.checkDuplicate && !this.validation(val)) return;
-        this.tags.value = [...this.tags.value, convertQueryItemToQueryTag(val)];
+        this.tags.value = [...this.tags.value, val];
     };
 
     validation = (query: QueryItem): boolean => this.tags.value.every((tag) => {
