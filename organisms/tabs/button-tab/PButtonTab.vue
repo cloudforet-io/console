@@ -29,7 +29,7 @@ import {
     isOne, TabItem,
 } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
-import { ButtonTabProps } from '@/components/organisms/tabs/tab/type';
+import { ButtonTabProps } from '@/components/organisms/tabs/button-tab/type';
 import { makeProxy } from '@/components/util/composition-helpers';
 
 export default {
@@ -69,16 +69,9 @@ export default {
             }),
             buttons: computed(() => props.tabs.map((d: string|TabItem) => {
                 if (typeof d === 'string') {
-                    return {
-                        name: d, label: d, styleType: 'gray900', outline: props.activeTab !== d,
-                    };
+                    return { name: d, label: d };
                 }
-                return {
-                    name: d.name,
-                    label: d.label,
-                    styleType: 'gray900',
-                    outline: props.activeTab !== d.name,
-                };
+                return { name: d.name, label: d.label };
             })),
         };
     },
@@ -88,12 +81,6 @@ export default {
 <style lang="postcss">
     .p-button-tab {
         @apply mt-8;
-        .p-tab-bar {
-            @apply border-b-4 border-gray-100;
-            &.is-one {
-                @apply border-b-2;
-            }
-        }
         .tab-pane {
             @apply w-full pb-8;
         }

@@ -1,5 +1,7 @@
-import { QueryItem } from '@/components/organisms/search/query-search/type';
+# Types
 
+```typescript
+import { QueryItem } from 'QuerySearch';
 
 export interface QueryTag extends QueryItem<string|number|boolean> {
     invalid?: boolean;
@@ -32,3 +34,4 @@ export interface QuerySearchTagsListeners {
     'delete:all': () => void|Promise<void>;
     change: (tags: QueryTag[]) => void|Promise<void>;
 }
+```

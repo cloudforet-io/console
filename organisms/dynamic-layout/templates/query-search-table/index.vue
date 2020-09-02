@@ -17,8 +17,9 @@
                               :page-size.sync="pageSize"
                               :key-items="keyItems"
                               :value-handler-map="valueHandlerMap"
-                              :query-tags="queryTags"
+                              :query-tags.sync="queryTags"
                               :selectable="selectable"
+                              :converter="converter"
                               @select="onSelect"
                               @change="onChange"
                               @export="onExport"
@@ -42,7 +43,7 @@
 
 <script lang="ts">
 import {
-    computed, isReactive, isRef, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
@@ -56,16 +57,10 @@ import {
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import {Options} from "@/components/organisms/tables/query-search-table/type";
+import { Options } from '@/components/organisms/tables/query-search-table/type';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
-const bindExtra = (props: QuerySearchTableDynamicLayoutProps, name: string, init: any) => {
-    if (props.typeOptions && props.typeOptions[name]) {
-        return computed(() => (props.typeOptions ? props.typeOptions[name] : init));
-    }
-    return init;
-};
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
     components: {
@@ -128,6 +123,7 @@ export default {
                 return props.options.fields.map(d => ({ label: d.name, name: d.key }));
             }),
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
+            converter: computed(() => props.typeOptions?.converter || (d => d)),
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
 

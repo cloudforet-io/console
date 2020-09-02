@@ -1,5 +1,5 @@
 <template>
-    <div v-if="proxyTags.length > 0" class="p-query-search-tags">
+    <div v-if="convertedTags.length > 0" class="p-query-search-tags">
         <span class="filter">Filter: </span>
         <div class="delete-btn">
             <p-badge class="tag" outline style-type="gray900"
@@ -10,7 +10,7 @@
         </div>
         <div class="divider" />
         <div class="tags">
-            <p-tag v-for="(tag, idx) in proxyTags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
+            <p-tag v-for="(tag, idx) in convertedTags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                    class="tag"
                    :class="{invalid: tag.invalid}"
                    @delete="deleteTag(idx)"
@@ -38,13 +38,12 @@ import PBadge from '@/components/atoms/badges/PBadge.vue';
 import {
     QuerySearchTagsFunctions,
     QuerySearchTagsProps,
-    QueryTag, QueryValidator,
+    QueryTag, QueryTagConverter, QueryValidator,
 } from '@/components/organisms/search/query-search-tags/type';
 import {
     computed, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import { QueryItem } from '@/components/organisms/search/query-search/type';
-import { convertQueryItemToQueryTag } from '@/components/organisms/search/query-search-tags/helper';
 import PI from '@/components/atoms/icons/PI.vue';
 import { VTooltip } from 'v-tooltip';
 
@@ -58,22 +57,21 @@ export default {
             type: Array,
             required: true,
         },
+        converter: {
+            type: Function,
+            default: undefined,
+        },
     },
     setup(props: QuerySearchTagsProps, { emit, listeners }) {
-        const _tags = ref<QueryTag[]>(props.tags.map(d => convertQueryItemToQueryTag(d as QueryItem)));
+        const _tags = ref<QueryTag[]>(props.tags);
+        const converter = computed(() => props.converter || (d => d));
         const state = reactive({
-            proxyTags: computed<QueryTag[]>({
-                get() {
-                    if (listeners['update:tags']) return props.tags;
-                    return _tags.value;
-                },
-                set(val) {
-                    _tags.value = val;
-                    emit('update:tags', _tags.value);
-                },
+            convertedTags: computed<QueryTag[]>(() => {
+                if (listeners['update:tags']) return props.tags.map(d => converter.value(d as QueryItem));
+                return _tags.value.map(d => converter.value(d as QueryItem));
             }),
         });
-        const validation = (query: QueryItem): boolean => state.proxyTags.every((tag) => {
+        const validation = (query: QueryItem): boolean => state.convertedTags.every((tag) => {
             if (tag.key && query.key) {
                 return (query.key.name !== tag.key.name
                         || query.operator !== tag.operator
@@ -87,22 +85,24 @@ export default {
 
         const publicFunctions: QuerySearchTagsFunctions = {
             addTag(query: QueryItem, validator?: QueryValidator) {
-                console.debug('addTag', query);
                 if (validator) {
                     if (!validator(query)) return;
                 } else if (!validation(query)) return;
-                state.proxyTags = [...state.proxyTags, convertQueryItemToQueryTag(query)];
+                _tags.value = [...state.convertedTags, query];
+                emit('update:tags', _tags.value);
                 emit('add', _tags.value);
                 emit('change', _tags.value);
             },
             deleteTag(idx: number) {
-                state.proxyTags.splice(idx, 1);
+                _tags.value.splice(idx, 1);
+                emit('update:tags', _tags.value);
                 emit('delete', _tags.value);
                 emit('delete:tag', _tags.value);
                 emit('change', _tags.value);
             },
             deleteAllTags() {
-                state.proxyTags = [];
+                _tags.value = [];
+                emit('update:tags', _tags.value);
                 emit('delete', _tags.value);
                 emit('delete:all', _tags.value);
                 emit('change', _tags.value);

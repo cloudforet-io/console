@@ -3,8 +3,9 @@
         <div class="btns">
             <p-button v-for="btn in btnsData"
                       :key="btn.name"
-                      :class="{ active:selected === btn.name, 'select-btn': !space, 'select-next-btn': space }"
-                      v-bind="btn"
+                      :class="{ active:selected === btn.name }"
+                      :outline="selected !== btn.name"
+                      style-type="gray900"
                       @click="clickEvent(btn.name)"
             >
                 {{ btn.label }}

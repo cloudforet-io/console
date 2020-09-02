@@ -1,5 +1,5 @@
 import { DynamicLayoutOptions, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import {QueryTag, QueryTagConverter} from '@/components/organisms/search/query-search-tags/type';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { BeforeCreateDynamicField, DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
@@ -23,6 +23,7 @@ export interface DynamicLayoutTypeOptions {
     selectable: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
+    converter: QueryTagConverter;
     language: string;
     listMap?: Record<string, Partial<DynamicLayoutTypeOptions>>;
 }

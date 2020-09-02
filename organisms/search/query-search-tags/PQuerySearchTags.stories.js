@@ -6,6 +6,7 @@ import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
+import md from './PQuerySearchTags.md';
 import PQuerySearchTags from './PQuerySearchTags.vue';
 
 export default {
@@ -17,6 +18,7 @@ export default {
             components: { PQuerySearchTags },
         },
         knobs: { escapeHTML: false },
+        notes: md,
     },
 };
 

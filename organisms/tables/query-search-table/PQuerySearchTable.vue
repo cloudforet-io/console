@@ -52,6 +52,7 @@
                     <p-query-search-tags ref="tagsRef"
                                          style="margin-top: 0.5rem;"
                                          :tags="tags"
+                                         :converter="converter"
                                          @change="onQueryTagsChange"
                     />
                 </div>
@@ -153,6 +154,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        converter: {
+            type: Function,
+            default: undefined,
+        },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -178,9 +183,6 @@ export default {
             }),
         });
 
-        // watch(() => t, () => {
-        //     thisPage = 1
-        // })
 
         /** Event emitter */
         const emitSelect = () => {
