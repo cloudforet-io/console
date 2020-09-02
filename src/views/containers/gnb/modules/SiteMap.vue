@@ -39,7 +39,7 @@
 
 <script>
 import vClickOutside from 'v-click-outside';
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, computed } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
@@ -62,7 +62,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            allMenu: [
+            allMenu: computed(() => [
                 {
                     label: 'Dashboard', link: '/dashboard', subMenus: [],
                 },
@@ -94,13 +94,13 @@ export default {
                 },
                 {
                     label: 'Management',
-                    link: '/management',
+                    link: props.isDomainOwner ? '/management' : '/management/collector-history',
                     subMenus: [
                         { label: 'Plugin', link: '/management/supervisor/plugins', isAdminMenu: true },
                         { label: 'Collector History', link: '/management/collector-history' },
                     ],
                 },
-            ],
+            ]),
         });
 
         return {

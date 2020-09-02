@@ -122,6 +122,7 @@ import {
 } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import router from '@/routes';
+import { useStore } from '@/store/toolset';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -149,8 +150,10 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const { user } = useStore();
         const state = reactive({
             loading: false,
+            isDomainOwner: computed(() => user.state.isDomainOwner),
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
@@ -206,11 +209,17 @@ export default {
             modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
         });
         const routeState = reactive({
-            route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' }],
+            route: computed(() => [
+                { name: 'Management', path: state.isDomainOwner ? '/management' : '/management/collector-history' },
+                { name: 'Collector History', path: '/management/collector-history' },
+            ]),
         });
         const subRouteState = reactive({
-            subRoute: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
-                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` }],
+            subRoute: computed(() => [
+                { name: 'Management', path: state.isDomainOwner ? '/management' : '/management/collector-history' },
+                { name: 'Collector History', path: '/management/collector-history' },
+                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` },
+            ]),
         });
 
         const convertStatus = (status) => {

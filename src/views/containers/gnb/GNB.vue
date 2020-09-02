@@ -169,7 +169,7 @@ export default {
         const state = reactive({
             openedMenu: null,
             sitemapVisible: false,
-            defaultMenuList: [
+            defaultMenuList: computed(() => [
                 {
                     key: 'project',
                     link: '/project',
@@ -217,7 +217,7 @@ export default {
                 },
                 {
                     key: 'management',
-                    link: '/management',
+                    link: state.isDomainOwner ? '/management' : '/management/collector-history',
                     parentRoutes: ['management'],
                     menu: [
                         {
@@ -228,7 +228,7 @@ export default {
                         },
                     ],
                 },
-            ],
+            ]),
             supportMenu: [
                 {
                     type: 'item',
