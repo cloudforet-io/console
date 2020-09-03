@@ -41,10 +41,10 @@
                                 <p class="mb-1 text-xs">
                                     Scheduled Resources
                                 </p>
-                                <span class="font-bold text-primary text-xs">24</span>
-                                <span class="text-gray-400 text-xs">/ 50</span>
+                                <span class="font-bold text-primary text-xs">{{ currentScheduleResources }}</span>
+                                <span class="text-gray-400 text-xs">/ {{ maxScheduleResources }}</span>
                                 <p-progress-bar
-                                    :percentage="45"
+                                    :percentage="percentage"
                                     :style="'width: 160px'"
                                     class="pt-2"
                                 />
@@ -56,22 +56,27 @@
                                 <p class="text-gray-400 text-xs">
                                     approx.
                                 </p>
-                                <span style="float: right;"><span class="text-primary font-bold">3.000  </span> <span>$</span></span>
+                                <span style="float: right;"><span class="text-primary font-bold">{{ approximateCosts }}  </span> <span>$</span></span>
                             </div>
                         </div>
                     </div>
                     <p-hr />
                     <div class="schedule">
                         <div>
-                            <p class="mb-4"><span class="font-bold text-gray-400 text-xs">SCHEDULE  </span><span class="text-gray-400 text-xs">(2)</span></p>
+                            <p class="mb-4">
+                                <span class="font-bold text-gray-400 text-xs">SCHEDULE  </span><span class="text-gray-400 text-xs">(2)</span>
+                            </p>
                             <div>
-                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br/>
-                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br/>
-                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br/>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
                             </div>
                         </div>
                         <div>
                             <span class="text-gray-400 text-xs">S M T W T F S</span>
+                            <div class="schedule-matrix">
+                                <schedule-heatmap />
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -87,7 +92,7 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
@@ -99,12 +104,18 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 import PageInformation from '@/views/management/power-scheduler/modules/PageInformation.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import ScheduleHeatmap from '@/views/management/power-scheduler/modules/ScheduleHeatmap.vue';
 
 type UrlQueryString = string | (string | null)[] | null | undefined;
+interface Scheduler {
+    name: string;
+    heatMap: unknown;
+}
 
 export default {
     name: 'PowerScheduler',
     components: {
+        ScheduleHeatmap,
         PI,
         PageInformation,
         PProgressBar,
@@ -130,6 +141,10 @@ export default {
             'identity.Project',
         );
 
+        /** State : state for page (grid layout, query search, etc.)
+         *  scheduleState: state for scheduled resources (number, progress, money, scheduler..)
+         * */
+
         const state = reactive({
             items: [],
             cardClass: () => ['card-item', 'power-scheduler-list'],
@@ -141,6 +156,16 @@ export default {
             pageSize: 24,
             totalCount: 0,
         });
+
+        const scheduleState = reactive({
+            currentScheduleResources: Math.floor(Math.random() * 50),
+            maxScheduleResources: 50,
+            approximateCosts: Math.floor(Math.random() * 5000),
+            scheduler: [] as unknown as Scheduler,
+        });
+
+        const percentage = computed(() => (scheduleState.currentScheduleResources / scheduleState.maxScheduleResources) * 100);
+
 
         /**
          * Page Navigation
@@ -244,6 +269,8 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(routeState),
+            ...toRefs(scheduleState),
+            percentage,
             listProjects,
             onChange,
         };
