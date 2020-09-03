@@ -105,7 +105,6 @@ interface DynamicLayoutTypeOptions {
     selectable: boolean;
     keyItems: KeyItem[]; // See QuerySearchTable
     valueHandlerMap: ValueHandlerMap; // See QuerySearchTable
-    converter: QueryTagConverter; // See QuerySearchTags
     language: string;
     listMap: Record<string, Partial<DynamicLayoutTypeOptions>>;
 }
@@ -124,7 +123,6 @@ interface DynamicLayoutTypeOptions {
 | selectable | boolean | ```false``` | Used to make tables selectable. |
 | keyItems | KeyItem[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
 | valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
-| converter | QueryTagConverter | ```(queryItem => queryTag)``` | Only for query-search-table's query tag converter. |
 | language | string | ```'en'``` | NOT supported yet except markdown type. |
 | listMap | Record<string, Partial<DynamicLayoutTypeOptions>> | ```{}``` | Only for list type. Give layout's name as key, and type options as value. If value is ```undefined```, other type options will be automatically bound to each component. |
 
@@ -137,7 +135,7 @@ interface DynamicLayoutTypeOptions {
 | item | ```loading``` |
 | simple-table | ```loading```, ```totalCount```, ```timezone``` |
 | table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable``` |
-| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```keyItems```, ```valueHandlerMap```, ```converter``` |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```keyItems```, ```valueHandlerMap``` |
 | raw | - |
 | markdown | ```language``` |
 | list | ```listMap``` |

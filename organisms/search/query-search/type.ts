@@ -1,4 +1,11 @@
-export type KeyDataType = 'string'|'integer'|'float'|'boolean'|'datetime'
+export const inputDataTypes = {
+    string: 'text',
+    integer: 'number',
+    float: 'number',
+    boolean: 'text',
+    datetime: 'datetime-local',
+};
+export type KeyDataType = keyof typeof inputDataTypes;
 
 export interface KeyItem {
     label: string;
@@ -6,7 +13,8 @@ export interface KeyItem {
     dataType?: KeyDataType;
 }
 
-export type OperatorType = ''|'!'|'>'|'>='|'<'|'<='|'='|'!='|'$';
+export const operators = ['!', '>', '>=', '<', '<=', '=', '!=', '$'];
+export type OperatorType = typeof operators[number];
 
 export interface ValueItem<T=string> {
     label: string;

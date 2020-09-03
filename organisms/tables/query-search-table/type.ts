@@ -1,6 +1,6 @@
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import { QueryTag, QueryTagConverter } from '@/components/organisms/search/query-search-tags/type';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 export interface QuerySearchTableProps {
     fields: DataTableFieldType[];
@@ -19,7 +19,7 @@ export interface QuerySearchTableProps {
     multiSelect: boolean;
     excelVisible: boolean;
     rowCursorPointer: boolean;
-    converter: QueryTagConverter;
+    timezone: string;
 }
 
 export interface Options {
@@ -31,6 +31,7 @@ export interface Options {
 }
 
 export interface QuerySearchTableListeners {
+    init: (options: Readonly<Options>) => void|Promise<void>;
     change: (options: Readonly<Options>, changedOptions: Readonly<Options>) => void|Promise<void>;
     export: () => void|Promise<void>;
     select: (selectIndex: number[]) => void|Promise<void>;

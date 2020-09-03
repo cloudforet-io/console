@@ -12,58 +12,60 @@
                            @input="onInput"
                            @keyup.esc="hideMenu"
                            @keydown.delete="onDelete"
+                           @keydown="onKeydown"
                            @mousedown.stop="showMenu"
                            @menu:hide="hideMenu"
     >
-        <template #search-left>
-            <span v-if="selectedKey" class="key-tag"
-                  :class="{active: isFocused || visibleMenu}"
-            >{{ selectedKey.label }}</span>
-            <span v-if="operator" class="operator-tag">{{ operator }}</span>
+        <template #search-left="scope">
+            <slot name="search-left" v-bind="scope">
+                <span v-if="selectedKey" class="key-tag"
+                      :class="{active: isFocused || visibleMenu}"
+                >{{ selectedKey.label }}</span>
+                <span v-if="operator" class="operator-tag">{{ operator }}</span>
+            </slot>
+        </template>
+        <template #search-default="scope">
+            <input v-focus.lazy="scope.isFocused"
+                   :value="scope.value"
+                   :placeholder="scope.placeholder"
+                   :disabled="scope.disabled"
+                   :type="inputType"
+                   v-on="scope.inputListeners"
+            >
+        </template>
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot v-if="slot !== 'search-left'" :name="slot" v-bind="scope" />
         </template>
     </p-autocomplete-search>
 </template>
 
 <script lang="ts">
-
+import { focus as vFocus } from 'vue-focus';
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import {
-    computed, reactive, toRefs, UnwrapRef,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import {
     find, debounce,
 } from 'lodash';
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import {
+    inputDataTypes, KeyDataType,
     KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
 } from '@/components/organisms/search/query-search/type';
+import { Component } from 'vue';
 
 interface MenuItem<T> extends ContextMenuItem {
     data?: T;
 }
 
-interface State {
-    searchRef: any;
-    visibleMenu: boolean;
-    isFocused: boolean;
-    loading: boolean;
-    searchText: string;
-    selectedKey: KeyItem|null;
-    operator: OperatorType;
-    keyTotalCount: number;
-    valueTotalCount: number;
-    filteredKeyItems: KeyItem[];
-    filteredValueItems: ValueItem[];
-    keyMenu: Readonly<MenuItem<KeyItem>[]>;
-    valueMenu: Readonly<MenuItem<ValueItem>[]>;
-    menu: Readonly<MenuItem<KeyItem|ValueItem>[]>;
-}
-
-const operators = ['!', '>', '>=', '<', '<=', '=', '!=', '$'];
+const operatorChars: OperatorType[] = ['!', '>', '<', '=', '$'];
+const lastOnlyOperatorChars: OperatorType[] = ['=', '$'];
 
 export default {
     name: 'PQuerySearch',
     components: { PAutocompleteSearch },
+    directives: { focus: vFocus },
     model: {
         prop: 'value',
         event: 'update:value',
@@ -91,22 +93,28 @@ export default {
         },
     },
     setup(props: QuerySearchProps, { emit }) {
-        const state: UnwrapRef<State> = reactive({
-            searchRef: null,
+        const state = reactive({
+            searchRef: null as null|Component,
             visibleMenu: false,
             isFocused: props.focused,
             loading: false,
             searchText: props.value,
-            selectedKey: null,
-            operator: '',
+            selectedKey: null as KeyItem|null,
+            operator: '' as OperatorType,
+            inputType: computed(() => {
+                if (state.selectedKey?.dataType) {
+                    return inputDataTypes[state.selectedKey.dataType] || 'text';
+                }
+                return 'text';
+            }),
             keyTotalCount: computed(() => {
                 if (state.selectedKey) return 0;
                 return props.keyItems.length;
             }),
             valueTotalCount: 0,
-            filteredKeyItems: [],
-            filteredValueItems: [],
-            keyMenu: computed(() => [
+            filteredKeyItems: [] as KeyItem[],
+            filteredValueItems: [] as ValueItem[],
+            keyMenu: computed<MenuItem<KeyItem>[]>(() => [
                 {
                     label: `Key (${state.keyTotalCount})`,
                     type: CONTEXT_MENU_TYPE.header,
@@ -118,7 +126,7 @@ export default {
                     data: d,
                 })),
             ]),
-            valueMenu: computed(() => {
+            valueMenu: computed<MenuItem<ValueItem>[]>(() => {
                 if (state.selectedKey === null) return [];
                 return [
                     {
@@ -133,7 +141,7 @@ export default {
                     })),
                 ];
             }),
-            menu: computed(() => {
+            menu: computed<MenuItem<KeyItem|ValueItem>[]>(() => {
                 if (state.selectedKey) return state.valueMenu;
                 return state.keyMenu;
             }),
@@ -219,27 +227,11 @@ export default {
             }
         };
 
-        const setOperator = (operator: OperatorType) => {
-            if (state.operator) {
-                if (state.operator.length === 1 && !['=', '$'].includes(state.operator)) {
-                    state.searchText = state.searchText.substring(0, state.searchText.length - 1);
-                    state.operator += operator;
-                }
-            } else {
-                state.searchText = state.searchText.substring(0, state.searchText.length - 1);
-                state.operator = operator;
-            }
-        };
-
-
         const onInput = async (rawVal: string, e) => {
             const val = rawVal || ''; // rawVal.trim()
             state.searchText = val;
 
             if (state.selectedKey) {
-                if (val.length > 0 && val.length < 3 && operators.includes(e.data)) {
-                    setOperator(e.data);
-                }
                 await onValueInput(state.searchText);
             } else if (val.length > 1 && e.data === ':') await findAndSetKey(val);
             else await onKeyInput(val);
@@ -283,6 +275,19 @@ export default {
             }
         };
 
+        const onKeydown = (e: KeyboardEvent) => {
+            if (operatorChars.includes(e.key)) {
+                if (state.searchText.length > 0) return;
+                if (state.operator.length === 0) {
+                    state.operator = e.key;
+                    e.preventDefault();
+                } else if (state.operator.length === 1 && lastOnlyOperatorChars.includes(state.operator)) {
+                    state.operator += e.key;
+                    e.preventDefault();
+                }
+            }
+        };
+
 
         return {
             ...toRefs(state),
@@ -292,6 +297,7 @@ export default {
             showMenu,
             hideMenu,
             onDelete,
+            onKeydown,
         };
     },
 };

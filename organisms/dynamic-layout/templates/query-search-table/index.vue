@@ -19,9 +19,10 @@
                               :value-handler-map="valueHandlerMap"
                               :query-tags.sync="queryTags"
                               :selectable="selectable"
-                              :converter="converter"
-                              @select="onSelect"
+                              :timezone="timezone"
+                              @init="onInit"
                               @change="onChange"
+                              @select="onSelect"
                               @export="onExport"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
@@ -114,6 +115,7 @@ export default {
             }),
 
             /** get data from typeOptions prop */
+            timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
             loading: computed(() => (props.typeOptions?.loading || false)),
             totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
             keyItems: computed<KeyItem[]>(() => {
@@ -123,7 +125,6 @@ export default {
                 return props.options.fields.map(d => ({ label: d.name, name: d.key }));
             }),
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
-            converter: computed(() => props.typeOptions?.converter || (d => d)),
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
 
@@ -156,7 +157,6 @@ export default {
             if (!props.options.fields) return res;
 
             // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
-            const timezone = props.typeOptions?.timezone || 'UTC';
 
             props.options.fields.forEach((ds: DynamicField, i) => {
                 const item: Omit<DynamicFieldProps, 'data'> = {
@@ -166,7 +166,7 @@ export default {
                 };
 
                 if (ds.type === 'datetime') {
-                    item.typeOptions = { timezone };
+                    item.typeOptions = { timezone: state.timezone };
                 }
 
                 res[`col-${ds.key}-format`] = item;
@@ -182,6 +182,15 @@ export default {
 
         const onExport = () => {
             emit('export', state.fetchOptionsParam, props.options.fields || []);
+        };
+
+        const onInit = (options: Options) => {
+            // apply changed options to state.
+            forEach(options, (d, k) => {
+                state[k] = d;
+            });
+
+            emit('init', state.fetchOptionsParam);
         };
 
         const onChange = (options: Options, changedOptions: Partial<Options>) => {
@@ -202,11 +211,10 @@ export default {
             emit('fetch', ...args);
         };
 
-        emit('init', state.fetchOptionsParam);
-
 
         return {
             ...toRefs(state),
+            onInit,
             onChange,
             onSelect,
             onExport,

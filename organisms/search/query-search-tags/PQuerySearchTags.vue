@@ -38,7 +38,7 @@ import PBadge from '@/components/atoms/badges/PBadge.vue';
 import {
     QuerySearchTagsFunctions,
     QuerySearchTagsProps,
-    QueryTag, QueryTagConverter, QueryValidator,
+    QueryTag, QueryValidator,
 } from '@/components/organisms/search/query-search-tags/type';
 import {
     computed, reactive, ref, toRefs,
@@ -46,6 +46,7 @@ import {
 import { QueryItem } from '@/components/organisms/search/query-search/type';
 import PI from '@/components/atoms/icons/PI.vue';
 import { VTooltip } from 'v-tooltip';
+import { convertQueryItemToQueryTag } from '@/components/organisms/search/query-search-tags/helper';
 
 
 export default {
@@ -57,19 +58,24 @@ export default {
             type: Array,
             required: true,
         },
-        converter: {
-            type: Function,
-            default: undefined,
+        timezone: {
+            type: String,
+            default: 'UTC',
         },
     },
     setup(props: QuerySearchTagsProps, { emit, listeners }) {
         const _tags = ref<QueryTag[]>(props.tags);
-        const converter = computed(() => props.converter || (d => d));
         const state = reactive({
-            convertedTags: computed<QueryTag[]>(() => {
-                if (listeners['update:tags']) return props.tags.map(d => converter.value(d as QueryItem));
-                return _tags.value.map(d => converter.value(d as QueryItem));
-            }),
+            convertedTags: listeners['update:tags']
+                ? computed<QueryTag[]>(() => {
+                    // Do NOT delete the code below. This allows 'computed' to track timezone changes.
+                    const timezone = props.timezone;
+                    return props.tags.map(d => convertQueryItemToQueryTag(d as QueryItem, timezone));
+                }) : computed(() => {
+                    // Do NOT delete the code below. This allows 'computed' to track timezone changes.
+                    const timezone = props.timezone;
+                    return _tags.value.map(d => convertQueryItemToQueryTag(d as QueryItem, timezone));
+                }),
         });
         const validation = (query: QueryItem): boolean => state.convertedTags.every((tag) => {
             if (tag.key && query.key) {
@@ -108,6 +114,11 @@ export default {
                 emit('change', _tags.value);
             },
         };
+
+        emit('init', {
+            tags: state.convertedTags,
+            timezone: props.timezone,
+        } as QuerySearchTagsProps);
 
         return {
             ...toRefs(state),

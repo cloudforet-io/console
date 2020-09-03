@@ -52,7 +52,8 @@
                     <p-query-search-tags ref="tagsRef"
                                          style="margin-top: 0.5rem;"
                                          :tags="tags"
-                                         :converter="converter"
+                                         :timezone="timezone"
+                                         @init="onQueryTagsInit"
                                          @change="onQueryTagsChange"
                     />
                 </div>
@@ -83,6 +84,8 @@ import {
 } from '@/components/organisms/search/query-search-tags/type';
 import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
+
+const CHILDREN_INIT_COUNT = 1;
 
 export default {
     name: 'PQuerySearchTable',
@@ -154,9 +157,9 @@ export default {
             type: Boolean,
             default: false,
         },
-        converter: {
-            type: Function,
-            default: undefined,
+        timezone: {
+            type: String,
+            default: 'UTC',
         },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
@@ -187,6 +190,20 @@ export default {
         /** Event emitter */
         const emitSelect = () => {
             emit('select', [...state.proxySelectIndex]);
+        };
+
+        let initChildren = 0;
+        const emitInit = () => {
+            initChildren += 1;
+            if (initChildren < CHILDREN_INIT_COUNT) return;
+
+            emit('init', {
+                sortBy: state.proxySortBy,
+                sortDesc: state.proxySortDesc,
+                thisPage: state.proxyThisPage,
+                pageSize: state.proxyPageSize,
+                queryTags: state.tags,
+            } as Options);
         };
 
         const emitChange = (options: Partial<Options> = {}) => {
@@ -244,6 +261,11 @@ export default {
             state.tagsRef.addTag(query);
         };
 
+        const onQueryTagsInit: QuerySearchTagsListeners['init'] = ({ tags }) => {
+            state.tags = tags;
+            emitInit();
+        };
+
         const onQueryTagsChange: QuerySearchTagsListeners['change'] = (tags: QueryTag[]) => {
             state.tags = tags;
             emitChange({ queryTags: tags });
@@ -258,6 +280,7 @@ export default {
             onChangeSort,
             onSelect,
             onSearch,
+            onQueryTagsInit,
             onQueryTagsChange,
             onRefresh,
             byPassEvent,

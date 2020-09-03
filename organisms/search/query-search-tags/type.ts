@@ -6,13 +6,9 @@ export interface QueryTag extends QueryItem<string|number|boolean> {
     description?: string;
 }
 
-export interface QueryTagConverter {
-    (query: QueryItem): QueryTag;
-}
-
 export interface QuerySearchTagsProps {
     tags: QueryTag[];
-    converter?: QueryTagConverter;
+    timezone: string;
 }
 
 export interface QueryValidator {
@@ -26,6 +22,7 @@ export interface QuerySearchTagsFunctions {
 }
 
 export interface QuerySearchTagsListeners {
+    init: (props: QuerySearchTagsProps) => void|Promise<void>;
     add: (tags: QueryTag[]) => void|Promise<void>;
     delete: (tags: QueryTag[]) => void|Promise<void>;
     'delete:tag': (idx: number) => void|Promise<void>;

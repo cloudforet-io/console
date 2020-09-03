@@ -8,7 +8,6 @@ import {
 } from '@storybook/addon-knobs/vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
-import { searchProps } from '@/components/molecules/search/PSearch.toolset';
 
 export default {
     title: 'molecules/search-new',
@@ -25,9 +24,23 @@ export default {
 
 export const defaultCase = () => ({
     components: { PSearch },
-    props: getKnobProps(searchProps, {}, {
-        value: true,
-        isFocused: true,
+    props: getKnobProps({
+        placeholder: {
+            type: String,
+            default: 'Search',
+        },
+        focused: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        disableIcon: {
+            type: Boolean,
+            default: false,
+        },
     }),
     template: `
     <div class="bg-white py-10" style="width: 80vw;">
@@ -59,10 +72,19 @@ export const defaultCase = () => ({
 
 export const controlFocus = () => ({
     components: { PSearch, PButton },
-    props: getKnobProps(searchProps, {}, {
-        value: true,
-        isFocused: true,
-        focused: true,
+    props: getKnobProps({
+        placeholder: {
+            type: String,
+            default: 'Search',
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        disableIcon: {
+            type: Boolean,
+            default: false,
+        },
     }),
     template: `
         <div class="bg-white py-10" style="width: 80vw;">

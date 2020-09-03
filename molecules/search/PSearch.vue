@@ -34,11 +34,8 @@
 
 <script lang="ts">
 import { focus } from 'vue-focus';
-import { searchProps } from '@/components/molecules/search/PSearch.toolset';
 import {
-    ComponentRenderProxy,
-    computed,
-    getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { makeByPassListeners, makeProxy } from '@/components/util/composition-helpers';
@@ -51,36 +48,65 @@ export default {
         prop: 'value',
         event: 'update:value',
     },
-    props: searchProps,
-    setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    props: {
+        value: {
+            type: String,
+            default: '',
+            required: true,
+        },
+        placeholder: {
+            type: String,
+            default: 'Search',
+        },
+        focused: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        disableIcon: {
+            type: Boolean,
+            default: false,
+        },
+        /** sync */
+        isFocused: {
+            type: Boolean,
+            default: undefined,
+        },
+    },
+    setup(props, { emit, listeners }) {
         const state: any = reactive({
             proxyIsFocused: props.isFocused === undefined
                 ? props.focused
                 : makeProxy('isFocused', props, emit),
         });
+
+        const inputListeners = {
+            ...listeners,
+            input(e) {
+                emit('update:value', e.target.value);
+                makeByPassListeners(listeners, 'input', e.target.value, e);
+            },
+            blur(e) {
+                state.proxyIsFocused = false;
+                makeByPassListeners(listeners, 'blur', e);
+            },
+            focus(e) {
+                state.proxyIsFocused = true;
+                makeByPassListeners(listeners, 'focus', e);
+            },
+            keyup: (e) => {
+                if (e.code === 'Enter') emit('search', props.value, e);
+                makeByPassListeners(listeners, 'keyup', e);
+            },
+        };
+
         return {
             ...toRefs(state),
-            slotBind: computed(() => ({ ...props, isFocused: state.proxyIsFocused })),
-            inputListeners: {
-                ...vm.$listeners,
-                input(e) {
-                    emit('update:value', e.target.value);
-                    makeByPassListeners(vm.$listeners, 'input', e.target.value, e);
-                },
-                blur(e) {
-                    state.proxyIsFocused = false;
-                    makeByPassListeners(vm.$listeners, 'blur', e);
-                },
-                focus(e) {
-                    state.proxyIsFocused = true;
-                    makeByPassListeners(vm.$listeners, 'focus', e);
-                },
-                keyup: (e) => {
-                    if (e.code === 'Enter') emit('search', props.value, e);
-                    makeByPassListeners(vm.$listeners, 'keyup', e);
-                },
-            },
+            slotBind: computed(() => ({ ...props, isFocused: state.proxyIsFocused, inputListeners })),
+            inputListeners,
             onDelete() {
                 emit('delete', props.value);
                 emit('update:value', '');

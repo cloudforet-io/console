@@ -22,16 +22,27 @@ export default {
     },
 };
 
+const actions = {
+    init: action('init'),
+    add: action('add'),
+    delete: action('delete'),
+    'delete:tag': action('delete:tag'),
+    'delete:all': action('delete:all'),
+    change: action('change'),
+};
 
 export const defaultCase = () => ({
     components: { PQuerySearchTags },
-    props: {},
+    props: {
+        timezone: {
+            default: text('timezone', 'UTC'),
+        },
+    },
     template: `
     <div style="width: 80vw;">
-        <PQuerySearchTags v-bind="$props"
+        <PQuerySearchTags :timezone="timezone"
                           :tags="tags"
-                          @delete:tag="deleteTag"
-                          @delete:all="deleteAll"
+                          v-on="actions"
         ></PQuerySearchTags>
     </div>`,
     setup(props, context) {
@@ -44,8 +55,7 @@ export const defaultCase = () => ({
 
         return {
             ...toRefs(state),
-            deleteTag: action('delete:tag'),
-            deleteAll: action('delete:all'),
+            actions,
         };
     },
 });
