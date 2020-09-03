@@ -1,5 +1,7 @@
 <template>
     <p-autocomplete-search ref="searchRef"
+                           class="p-query-search"
+                           :class="{'no-menu': menu.length === 0}"
                            :value="searchText"
                            :placeholder="placeholder"
                            :loading="loading"
@@ -17,12 +19,10 @@
                            @menu:hide="hideMenu"
     >
         <template #search-left="scope">
-            <slot name="search-left" v-bind="scope">
-                <span v-if="selectedKey" class="key-tag"
-                      :class="{active: isFocused || visibleMenu}"
-                >{{ selectedKey.label }}</span>
-                <span v-if="operator" class="operator-tag">{{ operator }}</span>
-            </slot>
+            <span v-if="selectedKey" class="key-tag"
+                  :class="{active: isFocused || visibleMenu}"
+            >{{ selectedKey.label }}</span>
+            <span v-if="operator" class="operator-tag">{{ operator }}</span>
         </template>
         <template #search-default="scope">
             <input v-focus.lazy="scope.isFocused"
@@ -33,8 +33,11 @@
                    v-on="scope.inputListeners"
             >
         </template>
+        <template #menu-no-data>
+            <div />
+        </template>
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-            <slot v-if="slot !== 'search-left'" :name="slot" v-bind="scope" />
+            <slot v-if="!excludeSlots.includes(slot)" :name="slot" v-bind="scope" />
         </template>
     </p-autocomplete-search>
 </template>
@@ -50,10 +53,12 @@ import {
 } from 'lodash';
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
 import {
-    inputDataTypes, KeyDataType,
+    HandlerResponse,
+    inputDataTypes,
     KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Component } from 'vue';
+import { defaultValueHandler } from '@/components/organisms/search/query-search/helper';
 
 interface MenuItem<T> extends ContextMenuItem {
     data?: T;
@@ -111,7 +116,7 @@ export default {
                 if (state.selectedKey) return 0;
                 return props.keyItems.length;
             }),
-            valueTotalCount: 0,
+            valueTotalCount: 0 as undefined|number,
             filteredKeyItems: [] as KeyItem[],
             filteredValueItems: [] as ValueItem[],
             keyMenu: computed<MenuItem<KeyItem>[]>(() => [
@@ -128,18 +133,21 @@ export default {
             ]),
             valueMenu: computed<MenuItem<ValueItem>[]>(() => {
                 if (state.selectedKey === null) return [];
-                return [
-                    {
-                        label: `${state.selectedKey.label} (${state.valueTotalCount})`,
-                        type: CONTEXT_MENU_TYPE.header,
-                    },
-                    ...state.filteredValueItems.map(d => ({
-                        label: `${state.selectedKey?.label}:${state.operator} ${d.label}`,
-                        name: d.name,
-                        type: CONTEXT_MENU_TYPE.item,
-                        data: d,
-                    })),
-                ];
+                if (state.filteredValueItems.length > 0) {
+                    return [
+                        {
+                            label: `${state.selectedKey.label} ${state.valueTotalCount === undefined ? '' : `(${state.valueTotalCount})`}`,
+                            type: CONTEXT_MENU_TYPE.header,
+                        },
+                        ...state.filteredValueItems.map(d => ({
+                            label: `${state.selectedKey?.label}:${state.operator} ${d.label}`,
+                            name: d.name,
+                            type: CONTEXT_MENU_TYPE.item,
+                            data: d,
+                        })),
+                    ];
+                }
+                return [];
             }),
             menu: computed<MenuItem<KeyItem|ValueItem>[]>(() => {
                 if (state.selectedKey) return state.valueMenu;
@@ -162,18 +170,18 @@ export default {
         }, 150);
 
         const onValueInput = debounce(async (inputText: string): Promise<void> => {
+            let res: HandlerResponse = { results: [], totalCount: undefined };
+
             if (state.selectedKey) {
-                const handler = props.valueHandlerMap[state.selectedKey.name];
-                if (handler) {
-                    const res = await handler(inputText, state.selectedKey);
-                    state.valueTotalCount = res.totalCount;
-                    state.filteredValueItems = res.results;
-                    return;
-                }
+                const handler = props.valueHandlerMap[state.selectedKey.name] || defaultValueHandler;
+                const func = handler(inputText, state.selectedKey);
+                if (func instanceof Promise) {
+                    res = await func;
+                } else res = func;
             }
 
-            state.valueTotalCount = 0;
-            state.filteredValueItems = [];
+            state.valueTotalCount = res.totalCount;
+            state.filteredValueItems = res.results;
         }, 150);
 
         const findKey = (val: string): KeyItem|undefined => {
@@ -281,7 +289,7 @@ export default {
                 if (state.operator.length === 0) {
                     state.operator = e.key;
                     e.preventDefault();
-                } else if (state.operator.length === 1 && lastOnlyOperatorChars.includes(state.operator)) {
+                } else if (state.operator.length === 1 && lastOnlyOperatorChars.includes(e.key)) {
                     state.operator += e.key;
                     e.preventDefault();
                 }
@@ -298,23 +306,29 @@ export default {
             hideMenu,
             onDelete,
             onKeydown,
+            excludeSlots: ['search-left', 'search-default', 'menu-no-data'],
         };
     },
 };
 </script>
 
-<style lang="postcss" scoped>
-.key-tag {
-    @apply bg-gray-200 rounded-sm px-2 text-xs mr-2;
-    height: 1.125rem;
-    line-height: 1.125rem;
-    &.active {
-        @apply bg-blue-300;
+<style lang="postcss">
+.p-query-search {
+    .key-tag {
+        @apply bg-gray-200 rounded-sm px-2 text-xs mr-2;
+        height: 1.125rem;
+        line-height: 1.125rem;
+        &.active {
+            @apply bg-blue-300;
+        }
     }
-}
-.operator-tag {
-    @apply mr-2;
-    height: 1.125rem;
-    line-height: 1.125rem;
+    .operator-tag {
+        @apply mr-2;
+        height: 1.125rem;
+        line-height: 1.125rem;
+    }
+    &.no-menu .p-context-menu {
+        border-width: 0;
+    }
 }
 </style>

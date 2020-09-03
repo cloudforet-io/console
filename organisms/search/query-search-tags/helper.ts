@@ -2,10 +2,14 @@ import { KeyDataType, QueryItem } from '@/components/organisms/search/query-sear
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import moment from 'moment';
 
+const trueRegex = RegExp('true', 'i');
+const falseRegex = RegExp('false', 'i');
 const booleanConverter = (query: QueryItem): QueryTag => {
     const res: QueryTag = { ...query };
-    if (res.value.name === 'false') res.value.name = false;
-    else if (res.value.name === 'true') res.value.name = true;
+    const str = String(res.value.name) || '';
+
+    if (trueRegex.test(str)) res.value = { ...res.value, name: false };
+    else if (falseRegex.test(str)) res.value = { ...res.value, name: true };
     else {
         res.invalid = true;
         res.description = 'This is not suitable for boolean format.';
@@ -15,10 +19,12 @@ const booleanConverter = (query: QueryItem): QueryTag => {
 
 const datetimeConverter = (query: QueryItem, timezone: string): QueryTag => {
     const res: QueryTag = { ...query };
-    const utcTime = moment(String(query.value.name));
-    if (utcTime.isValid()) {
-        res.value.label = moment.tz(utcTime.utc(), timezone).format('YYYY-MM-DD HH:mm:ss');
-        res.value.name = utcTime.toISOString();
+    const time = moment(query.value.name);
+    if (time.isValid()) {
+        res.value = {
+            label: moment.tz(time, timezone).format('YYYY-MM-DD HH:mm:ss'),
+            name: time.utc().toISOString(),
+        };
     } else {
         res.invalid = true;
         res.description = 'This is not suitable for datetime format. e.g. 2020-05-03 00:00:00';
@@ -32,8 +38,7 @@ const integerConverter = (query: QueryItem): QueryTag => {
     if (Number.isNaN(number)) {
         res.invalid = true;
         res.description = 'This is not suitable for integer format.';
-    } else res.value.name = number;
-    console.debug('integerConverter', res.value.name, typeof res.value.name);
+    } else res.value = { ...res.value, name: number };
     return res;
 };
 
@@ -43,13 +48,13 @@ const floatConverter = (query: QueryItem): QueryTag => {
     if (Number.isNaN(number)) {
         res.invalid = true;
         res.description = 'This is not suitable for float format.';
-    } else res.value.name = number;
+    } else res.value = { ...res.value, name: number };
     return res;
 };
 
 const stringConverter = (query: QueryItem): QueryTag => {
     const res: QueryTag = { ...query };
-    res.value.name = String(query.value.name);
+    res.value = { ...res.value, name: String(query.value.name) };
     return res;
 };
 

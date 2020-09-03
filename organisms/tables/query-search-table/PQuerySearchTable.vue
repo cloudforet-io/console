@@ -186,6 +186,15 @@ export default {
             }),
         });
 
+        // check if each option value is 'undefined' to escape auto type casting
+        const getFullOptions = (options: Partial<Options>): Options => ({
+            sortBy: options.sortBy === undefined ? state.proxySortBy : options.sortBy,
+            sortDesc: options.sortDesc === undefined ? state.proxySortDesc : options.sortDesc,
+            thisPage: options.thisPage === undefined ? state.proxyThisPage : options.thisPage,
+            pageSize: options.pageSize === undefined ? state.proxyPageSize : options.pageSize,
+            queryTags: options.queryTags === undefined ? state.tags : options.queryTags,
+        });
+
 
         /** Event emitter */
         const emitSelect = () => {
@@ -193,17 +202,10 @@ export default {
         };
 
         let initChildren = 0;
-        const emitInit = () => {
+        const emitInit = (options: Partial<Options>) => {
             initChildren += 1;
             if (initChildren < CHILDREN_INIT_COUNT) return;
-
-            emit('init', {
-                sortBy: state.proxySortBy,
-                sortDesc: state.proxySortDesc,
-                thisPage: state.proxyThisPage,
-                pageSize: state.proxyPageSize,
-                queryTags: state.tags,
-            } as Options);
+            emit('init', getFullOptions(options));
         };
 
         const emitChange = (options: Partial<Options> = {}) => {
@@ -215,14 +217,7 @@ export default {
                 state.proxyThisPage = 1;
             }
 
-            // check if each option value is 'undefined' to escape auto type casting
-            emit('change', {
-                sortBy: options.sortBy === undefined ? state.proxySortBy : options.sortBy,
-                sortDesc: options.sortDesc === undefined ? state.proxySortDesc : options.sortDesc,
-                thisPage: options.thisPage === undefined ? state.proxyThisPage : options.thisPage,
-                pageSize: options.pageSize === undefined ? state.proxyPageSize : options.pageSize,
-                queryTags: options.queryTags === undefined ? state.tags : options.queryTags,
-            } as Options, options);
+            emit('change', getFullOptions(options), options);
         };
 
         const byPassEvent = (name, item, index, mouseEvent) => {
@@ -262,8 +257,7 @@ export default {
         };
 
         const onQueryTagsInit: QuerySearchTagsListeners['init'] = ({ tags }) => {
-            state.tags = tags;
-            emitInit();
+            emitInit({ queryTags: tags });
         };
 
         const onQueryTagsChange: QuerySearchTagsListeners['change'] = (tags: QueryTag[]) => {
