@@ -1,5 +1,5 @@
 <template>
-    <div v-if="convertedTags.length > 0" class="p-query-search-tags">
+    <div v-if="proxyTags.length > 0" class="p-query-search-tags">
         <span class="filter">Filter: </span>
         <div class="delete-btn">
             <p-badge class="tag" outline style-type="gray900"
@@ -10,13 +10,13 @@
         </div>
         <div class="divider" />
         <div class="tags">
-            <p-tag v-for="(tag, idx) in convertedTags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
+            <p-tag v-for="(tag, idx) in proxyTags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                    class="tag"
                    :class="{invalid: tag.invalid}"
                    @delete="deleteTag(idx)"
             >
                 <p-i v-if="tag.invalid"
-                     v-tooltip.bottom="{content: tag.description, delay: {show: 200}}"
+                     v-tooltip.bottom="{content: tag.description, delay: {show: 200}, classes: ['p-tooltip']}"
                      class="alert-icon"
                      name="ic_alert" height="1em" width="1em"
                 />
@@ -64,27 +64,21 @@ export default {
         },
     },
     setup(props: QuerySearchTagsProps, { emit, listeners }) {
-        const _tags = ref<QueryTag[]>(props.tags);
+        const timezone = computed(() => props.timezone);
+        const _tags = ref<QueryTag[]>(props.tags.map(d => convertQueryItemToQueryTag(d as QueryItem, timezone.value)));
         const state = reactive({
-            convertedTags: listeners['update:tags']
-                ? computed<QueryTag[]>(() => {
-                    // Do NOT delete the code below. This allows 'computed' to track timezone changes.
-                    const timezone = props.timezone;
-                    return props.tags.map(d => convertQueryItemToQueryTag(d as QueryItem, timezone));
-                }) : computed(() => {
-                    // Do NOT delete the code below. This allows 'computed' to track timezone changes.
-                    const timezone = props.timezone;
-                    return _tags.value.map(d => convertQueryItemToQueryTag(d as QueryItem, timezone));
-                }),
+            proxyTags: listeners['update:tags']
+                ? computed<QueryTag[]>(() => props.tags.map(d => convertQueryItemToQueryTag(d as QueryItem, timezone.value)))
+                : computed(() => _tags.value),
         });
-        const validation = (query: QueryItem): boolean => state.convertedTags.every((tag) => {
+        const validation = (query: QueryItem): boolean => state.proxyTags.every((tag) => {
             if (tag.key && query.key) {
                 return (query.key.name !== tag.key.name
                         || query.operator !== tag.operator
-                        || query.value !== tag.value);
+                        || query.value.name !== tag.value.name);
             }
             if (!tag.key && !query.key) {
-                return query.value !== tag.value;
+                return query.value.name !== tag.value.name;
             }
             return true;
         });
@@ -94,7 +88,11 @@ export default {
                 if (validator) {
                     if (!validator(query)) return;
                 } else if (!validation(query)) return;
-                _tags.value = [...state.convertedTags, query];
+
+                _tags.value = [
+                    ...state.proxyTags,
+                    convertQueryItemToQueryTag(query, timezone.value),
+                ];
                 emit('update:tags', _tags.value);
                 emit('add', _tags.value);
                 emit('change', _tags.value);
@@ -116,7 +114,7 @@ export default {
         };
 
         emit('init', {
-            tags: state.convertedTags,
+            tags: state.proxyTags,
             timezone: props.timezone,
         } as QuerySearchTagsProps);
 
@@ -144,6 +142,7 @@ export default {
         margin-top: 0.22rem;
     }
     .delete-btn {
+        @apply flex-shrink-0;
         .tag {
             @apply cursor-pointer rounded-sm flex-grow-0;
         }
