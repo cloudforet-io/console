@@ -104,7 +104,6 @@ const setSingleValueFiltersMap = (query: QueryParam, filtersMap: SingleValueFilt
 
 const setMultiValueFiltersMap = (query: QueryParam, filtersMap: MultiValueFiltersMap) => {
     const filterKey = `${query.key.name}/${query.operator}`;
-    console.debug('setMultiValueFiltersMap', query.value.name, typeof query.value.name)
     if (filtersMap[filterKey]) {
         filtersMap[filterKey].v.push(query.value.name);
     } else {

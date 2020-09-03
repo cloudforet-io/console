@@ -377,6 +377,9 @@ export default {
                     // sync updated query tags to url query string
                     replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
                 }
+            } else {
+                // init
+                fetchOptionState.queryTags = options.queryTags;
             }
 
             listServerData();

@@ -38,38 +38,6 @@ module.exports = {
     });
     config.resolve.extensions.push('.ts', '.tsx');
 
-    /* SASS settings */
-    config.module.rules.push(
-      {
-        test: /\.s?css$/,
-        use: ['style-loader', 'css-loader',postCssLoader,
-          {
-            loader: 'sass-loader',
-          },
-        ],
-        include: path.resolve(__dirname, '../'),
-        exclude:[
-            path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
-          path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
-
-        ],
-      }
-    );
-
-    /* SASS settings */
-    config.module.rules.push(
-        {
-          test: /\.postcss$/,
-          use: ['style-loader', 'css-loader',postCssLoader,],
-          include: path.resolve(__dirname, '../'),
-          exclude:[
-            path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
-            path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
-
-          ],
-        }
-    );
-
     /* alis settings */
     config.resolve.alias = {
       'vue': 'vue/dist/vue.common.js',
@@ -81,6 +49,38 @@ module.exports = {
     config.plugins.push(new MonacoWebpackPlugin({
       languages:['javascript','json','css','html']
     }));
+
+      /* SASS settings */
+      config.module.rules.push(
+          {
+              test: /\.s?css$/,
+              use: ['style-loader', 'css-loader',
+                  {
+                      loader: 'sass-loader',
+                  },
+              ],
+              include: path.resolve(__dirname, '../'),
+              exclude:[
+                  path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
+                  path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
+
+              ],
+          }
+      );
+
+      /* POSTCSS settings */
+      config.module.rules.push(
+          {
+              test: /\.(postcss|pcss)$/,
+              use: ['style-loader', 'css-loader', postCssLoader],
+              include: path.resolve(__dirname, '../'),
+              exclude:[
+                  path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
+                  path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
+
+              ],
+          }
+      );
 
     return config;
   },

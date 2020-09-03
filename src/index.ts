@@ -1,5 +1,4 @@
 /* eslint-disable import/first,import/newline-after-import */
-import './styles/style.scss';
 
 // lib
 import * as Fluent from './lib/fluent-api';

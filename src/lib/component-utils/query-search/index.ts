@@ -65,7 +65,9 @@ export function makeAutocompleteHandlerWithReference(resourceType: string, disti
  * @param dataType
  * @param limit
  */
-export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler {
+export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler|undefined {
+    if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
+
     const api = fluentApi.addons().autocomplete().get()
         .setResourceType(resourceType)
         .setLimit(limit || 10)
@@ -136,7 +138,7 @@ export function makeEnumValueHandler(
         if (inputText) {
             const regex = RegExp(inputText, 'i');
             res = allItems.reduce((result, d) => {
-                if (regex.exec(d.label) || regex.exec(d.name)) result.push(d);
+                if (regex.test(d.label) || regex.test(d.name)) result.push(d);
                 return result;
             }, [] as ValueItem[]);
         }

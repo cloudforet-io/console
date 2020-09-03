@@ -24,6 +24,7 @@ import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
 import "@/styles/style.scss";
+import "@/styles/style.pcss";
 
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
