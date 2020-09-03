@@ -37,8 +37,7 @@
                 <p-context-menu
                     v-if="openedMenu === dItem.key && dItem.menu.length > 0"
                     v-click-outside="hideMenu"
-                    class="white"
-                    :menu="dItem.menu"
+                    :menu="dItem.menu" theme="white"
                 >
                     <template #item-plugin>
                         <div v-if="!isDomainOwner" class="empty" />
@@ -66,8 +65,8 @@
                 <p-context-menu
                     v-if="openedMenu === 'support'"
                     v-click-outside="hideMenu"
-                    class="white right-align"
-                    :menu="supportMenu"
+                    class="right-align"
+                    :menu="supportMenu" theme="white"
                 >
                     <template #item--format="{item}" />
                 </p-context-menu>
@@ -85,6 +84,7 @@
                     v-click-outside="hideMenu"
                     class="white right-align"
                     :menu="accountMenu"
+                    theme="white"
                 >
                     <template #info--format>
                         <div class="context-info">

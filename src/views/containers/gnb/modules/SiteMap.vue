@@ -158,6 +158,10 @@ export default {
             &:hover {
                 @apply text-primary;
                 transition: all ease 0.3s;
+                &.menu .p-i-icon {
+                    @apply text-primary;
+                    transition: all ease 0.3s;
+                }
             }
             &.menu {
                 @apply font-bold;
@@ -165,7 +169,7 @@ export default {
                 padding-left: 1.5rem;
                 margin-top: 1.5rem;
                 .p-i-icon {
-                    @apply text-primary;
+                    @apply text-primary-dark;
                     margin-right: 0.25rem;
                 }
             }
