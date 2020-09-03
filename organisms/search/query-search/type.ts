@@ -30,14 +30,14 @@ export interface QueryItem<T=string> {
     value: ValueItem<T>;
 }
 
-
-export type ValueHandler = (inputText: string, keyItem: KeyItem) => Promise<{
+export interface HandlerResponse {
     results: ValueItem[];
-    totalCount: number;
-}>;
+    totalCount?: number;
+}
+export type ValueHandler = (inputText: string, keyItem: KeyItem) => Promise<HandlerResponse>|HandlerResponse;
 
 export interface ValueHandlerMap {
-    [key: string]: ValueHandler;
+    [key: string]: ValueHandler|undefined;
 }
 
 export interface QuerySearchState {
