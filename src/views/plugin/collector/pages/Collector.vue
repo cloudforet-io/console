@@ -162,12 +162,11 @@ import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
 import { getPageStart } from '@/lib/component-utils/pagination';
 

@@ -189,7 +189,7 @@ export default {
             }
         };
         const getNames = async () => {
-            const res = await fluentApi.inventory().collector().list()
+            const res = await fluentApi.inventory().collector().list().setOnly('name')
                 .execute();
             state.names = res.data.results.map(v => v.name);
         };
