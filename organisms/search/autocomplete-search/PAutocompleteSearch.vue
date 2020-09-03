@@ -213,7 +213,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
     .p-autocomplete-search {
         @apply w-full relative;
         .p-search {
@@ -222,7 +222,7 @@ export default {
         .menu-container {
             @apply w-full relative;
         }
-        .p-context-menu::v-deep {
+        .p-context-menu {
             @apply w-full font-normal;
             .secondary {
                 &.context-header {
