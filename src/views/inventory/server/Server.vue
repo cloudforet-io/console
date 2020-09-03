@@ -184,7 +184,6 @@ import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { convertQueryItemToQueryTag } from '@/lib/component-utils/query-search-tags';
 import searchSchema from './default-schema/search.json';
 import tableSchema from './default-schema/base-table.json';
 
@@ -287,7 +286,6 @@ export default {
             selectable: true,
             keyItems: tableAutocompleteProps.keyItems,
             valueHandlerMap: tableAutocompleteProps.valueHandlerMap,
-            converter: convertQueryItemToQueryTag,
         });
 
         const tableState = reactive({
@@ -361,7 +359,7 @@ export default {
             }
         };
 
-        const fetchTableData: QuerySearchTableListeners['fetch'] = (options, changed?) => {
+        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = (options, changed?) => {
             if (changed) {
                 if (changed.sortBy && changed.sortDesc) {
                     fetchOptionState.sortBy = changed.sortBy;
@@ -609,12 +607,6 @@ export default {
         serviceAccount.getServiceAccounts(true);
         secret.getSecrets(true);
         collector.getCollectors(true);
-
-        const init = async () => {
-            await listServerData();
-        };
-
-        init();
         /** ************************* */
 
 

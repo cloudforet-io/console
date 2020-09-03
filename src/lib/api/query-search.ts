@@ -35,12 +35,14 @@ export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[
             and.push({
                 key: q.key?.name as string,
                 value: String(q.value?.name || ''),
+                // @ts-ignore
                 operator: q.operator,
             });
         } else if (keyItems) {
             setFilterOrWithSuggestKeys({
                 key: '',
                 value: String(q.value?.name || ''),
+                // @ts-ignore
                 operator: q.operator,
             }, keyItems, or);
         }
@@ -54,13 +56,15 @@ type DataTypeOperators = Record<KeyDataType, OperatorMap>;
 
 const defaultOperatorMap: OperatorMap = {
     '': 'contain_in',
-    '!': 'not_contain',
+    '!': 'not_contain_in',
+    '=': 'in',
+    '!=': 'not_in',
+
+    // single only
     '>': 'gt',
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
-    '=': 'in',
-    '!=': 'not_in',
     $: 'regex',
 };
 
@@ -100,6 +104,7 @@ const setSingleValueFiltersMap = (query: QueryParam, filtersMap: SingleValueFilt
 
 const setMultiValueFiltersMap = (query: QueryParam, filtersMap: MultiValueFiltersMap) => {
     const filterKey = `${query.key.name}/${query.operator}`;
+    console.debug('setMultiValueFiltersMap', query.value.name, typeof query.value.name)
     if (filtersMap[filterKey]) {
         filtersMap[filterKey].v.push(query.value.name);
     } else {
