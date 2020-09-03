@@ -51,7 +51,7 @@ import {
 import {
     find, debounce,
 } from 'lodash';
-import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import {
     HandlerResponse,
     inputDataTypes,

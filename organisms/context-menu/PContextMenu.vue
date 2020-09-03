@@ -78,6 +78,7 @@ import {
 
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+
 import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/components/organisms/context-menu/type';
 
 const setAutoHeight = (props) => {
@@ -179,6 +180,13 @@ export default {
 </script>
 
 <style lang="postcss">
+@define-mixin context-menu-theme $bg-color, $border-color {
+    background-color: $bg-color;
+    border: 1px solid $border-color;
+    .context-divider {
+        border-top-color: $border-color;
+    }
+}
 @define-mixin context-item-theme $color, $hover-bg-color, $hover-color, $active-bg-color, $active-color, $disabled-color {
     color: $color;
     &:hover {
@@ -210,22 +218,6 @@ export default {
     }
 }
 
-@define-mixin context-header-theme $color {
-    color: $color;
-}
-
-@define-mixin context-menu-color $bg-color, $border-color {
-    background-color: $bg-color;
-    border: 1px solid $border-color;
-    .context-divider {
-        border-top-color: $border-color;
-    }
-}
-
-.no-drag {
-    user-select: none;
-}
-
 .p-context-menu {
     padding: 0;
     border-radius: 2px;
@@ -242,41 +234,21 @@ export default {
     max-height: 32rem;
     overflow-y: auto;
 
-    .context-divider {
-        margin: 0;
-        border-top-width: 1px;
-        border-top-style: solid;
-    }
-
     &.secondary {
-        @mixin context-menu-color theme('colors.white'), theme('colors.secondary');
+        @mixin context-menu-theme theme('colors.white'), theme('colors.secondary');
     }
     &.gray900 {
-        @mixin context-menu-color theme('colors.white'), theme('colors.gray.900');
+        @mixin context-menu-theme theme('colors.white'), theme('colors.gray.900');
     }
     &.white {
-        @apply bg-white border border-gray-200 text-gray-900;
+        @mixin context-menu-theme theme('colors.white'), theme('colors.gray.200');
         top: 2.5rem;
         left: -1.125rem;
         min-width: 10rem;
         font-size: 0.875rem;
         white-space: pre;
-        box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
         padding: 0.5rem;
-
-        .context-item {
-            line-height: 2rem;
-            padding: 0 0.5rem;
-            border-radius: 0.25rem;
-            &:hover, &:focus {
-                /* @apply bg-primary4 text-primary; */
-                @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
-                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
-            }
-        }
-        .context-divider {
-            @mixin context-menu-color theme('colors.white'), theme('colors.gray.200');
-        }
     }
     &.right-align {
         right: 0;
@@ -287,7 +259,6 @@ export default {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
     }
-
     .context-header {
         margin-top: 0.875rem;
         margin-bottom: 0.25rem;
@@ -295,40 +266,51 @@ export default {
         font-size: 0.75rem;
 
         &.secondary {
-            @mixin context-header-theme theme('colors.gray.900');
+            @apply text-gray-900;
         }
         &.gray900 {
-            @mixin context-header-theme theme('colors.gray.400');
+            @apply text-gray-400;
         }
     }
+    .context-divider {
+        margin: 0;
+        border-top-width: 1px;
+        border-top-style: solid;
+    }
     .context-item {
+        position: relative;
         display: block;
         padding-bottom: 0.5rem;
         padding-top: 0.5rem;
         line-height: 1rem;
         font-size: 0.875rem;
         cursor: pointer;
-        &:active {
-            /* font-weight: bold; */
-        }
         white-space: nowrap;
 
         .external-link-icon {
             position: absolute;
+            top: 0.5rem;
             right: 1rem;
             width: 1rem !important;
             height: 1rem !important;
-            margin-top: 0.4rem;
         }
 
         &.secondary {
-            @mixin context-item-theme theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
-            theme('colors.secondary'), theme('colors.gray.200');
+            @mixin context-item-theme theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'),
+            theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.200');
         }
         &.gray900 {
             @mixin context-item-theme theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
             theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
         }
+        &.white {
+            @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
+            theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+            border-radius: 0.25rem;
+        }
+    }
+    .no-drag {
+        user-select: none;
     }
 }
 </style>

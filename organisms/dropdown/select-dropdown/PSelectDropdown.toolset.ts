@@ -1,4 +1,4 @@
-import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,

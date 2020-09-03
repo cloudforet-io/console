@@ -1,4 +1,4 @@
-import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 import { ICON_BUTTON_STYLE_TYPE } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
 import { dropdownBtnProps } from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.toolset';
 
