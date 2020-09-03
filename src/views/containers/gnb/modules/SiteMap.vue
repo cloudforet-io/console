@@ -1,6 +1,6 @@
 <template>
     <div class="sitemap-container">
-        <div class="sitemap-button" @click="toggle">
+        <div class="sitemap-button" :class="visible ? 'visible' : ''" @click="toggle">
             <p-i class="sitemap-icon" :name="visible ? 'ic_delete' : 'ic_gnb_service_2'"
                  :color="visible ? 'transparent inherit' : 'inherit transparent'"
                  width="2rem" height="2rem"
@@ -13,8 +13,8 @@
                 <router-link :to="aItem.link">
                     <li class="menu" @click="hide">
                         <p-i :name="aItem.icon"
-                             color="inherit transparent"
-                             height="1rem" width="1rem"
+                             color="inherit inherit"
+                             height="1.5rem" width="1.5rem"
                         /> {{ aItem.label }}
                     </li>
                 </router-link>
@@ -100,7 +100,7 @@ export default {
                     link: props.isDomainOwner ? '/management' : '/management/collector-history',
                     icon: 'ic_management',
                     subMenus: [
-                        { label: 'Plugin', link: '/management/supervisor/plugins', isAdminMenu: true },
+                        { label: 'Plugin (admin)', link: '/management/supervisor/plugins', isAdminMenu: true },
                         { label: 'Collector History', link: '/management/collector-history', isNew: true },
                         { label: 'Power Scheduler', link: '/management/power-scheduler', isNew: true },
                     ],
@@ -130,6 +130,10 @@ export default {
                 @apply bg-primary4;
             }
         }
+        &.visible {
+            opacity: 1;
+            @apply text-primary;
+        }
         .sitemap-icon {
             @apply rounded-full;
         }
@@ -140,10 +144,10 @@ export default {
         position: absolute;
         top: 2.5rem;
         left: 0;
-        width: 14rem;
+        width: 15rem;
         box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
         z-index: 10;
-        padding: 1.5rem;
+        padding: 1.5rem 0;
         ul:first-child .menu {
             margin-top: 0;
         }
@@ -151,21 +155,24 @@ export default {
             @apply cursor-pointer;
             display: block;
             font-size: 0.875rem;
-            line-height: 1.5rem;
             &:hover {
                 @apply text-primary;
                 transition: all ease 0.3s;
             }
             &.menu {
                 @apply font-bold;
+                line-height: 2rem;
+                padding-left: 1.5rem;
                 margin-top: 1.5rem;
                 .p-i-icon {
+                    @apply text-primary;
                     margin-right: 0.25rem;
                 }
             }
             &.submenu {
                 @apply text-gray-500;
-                padding-left: 1.5rem;
+                line-height: 1.75rem;
+                padding-left: 3.5rem;
                 &:hover {
                     @apply text-primary;
                     transition: all ease 0.3s;
