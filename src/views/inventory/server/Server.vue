@@ -142,7 +142,7 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
-import PTableCheckModal from '@/components/organisms/modals/action-modal/PActionConfirmModal.vue';
+import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
