@@ -9,6 +9,7 @@ import {
 } from '@storybook/addon-knobs/vue';
 import PQuerySearch from './PQuerySearch.vue';
 import casual, { arrayOf } from '../../../../lib/casual';
+import md from './PQuerySearch.md';
 
 export default {
     title: 'organisms/search/QuerySearch',
@@ -19,51 +20,17 @@ export default {
             components: { PQuerySearch },
         },
         knobs: { escapeHTML: false },
-    },
-};
-
-const querySearchProps = {
-    value: {
-        type: String,
-        default: '',
-        required: true,
-    },
-    placeholder: {
-        type: String,
-        default: 'Search',
-    },
-    focused: {
-        type: Boolean,
-        default: true,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    keyItems: {
-        type: Array,
-        default: () => [],
-    },
-    valueItems: {
-        type: Array,
-        default: () => [],
+        notes: md,
     },
 };
 
 export const defaultCase = () => ({
     components: { PQuerySearch },
-    props: getKnobProps(querySearchProps, {
-    }, {
-        value: true,
-        keyItems: true,
-        valueItems: true,
-    }),
     template: `
     <div style="width: 80vw;">
-        <PQuerySearch v-bind="$props"
-                      v-model="value"
+        <PQuerySearch v-model="value"
                       :keyItems="keyItems"
-                      :valueItems="valueItems"
+                      :valueHandlerMap="valueHandlerMap"
                       @key:select="onKeySelect"
                       @search="onSearch"
                       @key:input="onKeyInput"
@@ -80,63 +47,84 @@ export const defaultCase = () => ({
             label: 'Project Group ID', name: 'project_group_id',
         }];
 
-        const state = reactive({
-            value: '',
-            keyItems,
-            valueItems: [],
-            queries: [],
-        });
-
-
         const valueItems = {
             project_id: arrayOf(10, () => casual.make_id('project')),
             name: arrayOf(10, () => casual.word),
             project_group_id: arrayOf(10, () => casual.make_id('pg')),
         };
 
-
-        const keyHandler = (inputText) => {
-            let res = keyItems;
-            if (inputText) {
-                res = keyItems.reduce((result, item) => {
-                    if (item.label.includes(inputText) || item.name.includes(inputText)) result.push(item);
+        const valueHandlerMap = {};
+        keyItems.forEach((k) => {
+            const items = valueItems[k.name];
+            valueHandlerMap[k.name] = inputText => ({
+                results: items.reduce((result, d) => {
+                    if (d.includes(inputText)) result.push({ label: d, name: d });
                     return result;
-                }, []);
-            }
+                }, []),
+                totalCount: items.length,
+            });
+        });
 
-            return res;
-        };
 
-        const valueHandler = (inputText, keyItem) => {
-            const items = valueItems[keyItem.key];
-            let res = items;
-            if (inputText) {
-                res = items.reduce((result, d) => {
-                    if (d.includes(inputText)) result.push(d);
-                    return result;
-                }, []);
-            }
-
-            return res;
-        };
+        const state = reactive({
+            value: '',
+            keyItems,
+            valueHandlerMap,
+            queries: [],
+        });
 
         return {
             ...toRefs(state),
-            onKeySelect(keyItem) {
-                state.valueItems = valueHandler('', keyItem);
-                action('key:select')(keyItem);
-            },
             onSearch(query) {
                 state.queries.push(query);
                 action('search')(query);
             },
-            onKeyInput(val) {
-                state.keyItems = keyHandler(val);
-                action('key:input')(val);
-            },
-            onValueInput(val, keyItem) {
-                state.valueItems = valueHandler(val, keyItem);
-                action('value:input')(val, keyItem);
+        };
+    },
+});
+
+
+export const defaultHandlers = () => ({
+    components: { PQuerySearch },
+    template: `
+    <div style="width: 80vw;">
+        <p class="my-8">
+            If no value handler map is given, the default handler is run. 
+            The default handler operates differently for each data type.
+        </p>
+        <PQuerySearch v-model="value"
+                      :keyItems="keyItems"
+                      @key:select="onKeySelect"
+                      @search="onSearch"
+                      @key:input="onKeyInput"
+                      @value:input="onValueInput"
+        ></PQuerySearch>
+        <pre class="mt-8">{{queries}}</pre>
+    </div>`,
+    setup(props, context) {
+        const keyItems = [{
+            label: 'Boolean', name: 'boolean', dataType: 'boolean',
+        }, {
+            label: 'String', name: 'string', dataType: 'string',
+        }, {
+            label: 'Integer', name: 'integer', dataType: 'integer',
+        }, {
+            label: 'Float', name: 'float', dataType: 'float',
+        }, {
+            label: 'Datetime', name: 'datetime', dataType: 'datetime',
+        }];
+
+        const state = reactive({
+            value: '',
+            keyItems,
+            queries: [],
+        });
+
+        return {
+            ...toRefs(state),
+            onSearch(query) {
+                state.queries.push(query);
+                action('search')(query);
             },
         };
     },
