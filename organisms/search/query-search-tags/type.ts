@@ -6,17 +6,24 @@ export interface QueryTag extends QueryItem<string|number|boolean> {
     description?: string;
 }
 
+export interface QueryTagValidator {
+    (query: QueryItem, tags: QueryTag[]): boolean;
+}
+
+export interface QueryTagConverter {
+    (query: QueryItem, timezone: string): QueryTag;
+}
+
 export interface QuerySearchTagsProps {
     tags: QueryTag[];
     timezone: string;
+    validator?: QueryTagValidator;
+    converter?: QueryTagConverter;
 }
 
-export interface QueryValidator {
-    (query: QueryItem): boolean;
-}
 
 export interface QuerySearchTagsFunctions {
-    addTag(query: QueryItem, validator?: QueryValidator): void;
+    addTag(...queries: QueryItem[]): void;
     deleteTag(index: number): void;
     deleteAllTags(): void;
 }

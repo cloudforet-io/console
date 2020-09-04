@@ -3,12 +3,11 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
+import casual, { arrayOf } from '@/components/util/casual';
 import PQuerySearch from './PQuerySearch.vue';
-import casual, { arrayOf } from '../../../../lib/casual';
 import md from './PQuerySearch.md';
 
 export default {
@@ -31,10 +30,7 @@ export const defaultCase = () => ({
         <PQuerySearch v-model="value"
                       :keyItems="keyItems"
                       :valueHandlerMap="valueHandlerMap"
-                      @key:select="onKeySelect"
                       @search="onSearch"
-                      @key:input="onKeyInput"
-                      @value:input="onValueInput"
         ></PQuerySearch>
         <pre class="mt-8">{{queries}}</pre>
     </div>`,
@@ -94,10 +90,7 @@ export const defaultHandlers = () => ({
         </p>
         <PQuerySearch v-model="value"
                       :keyItems="keyItems"
-                      @key:select="onKeySelect"
                       @search="onSearch"
-                      @key:input="onKeyInput"
-                      @value:input="onValueInput"
         ></PQuerySearch>
         <pre class="mt-8">{{queries}}</pre>
     </div>`,
