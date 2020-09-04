@@ -6,7 +6,7 @@
             </p>
             <p-hr class="sidebar-divider" />
             <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                <p-hr v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
+                <p-hr v-if="provider.provider && provider.provider !== 'aws'" class="provider-divider" />
                 <img v-if="provider.icon"
                      :src="provider.icon"
                      :alt="provider.provider"
@@ -29,7 +29,7 @@
             <p-horizontal-layout>
                 <template #container="{ height }">
                     <p-dynamic-layout type="table"
-                                      :options="tableSchema.options"
+                                      :options="tableState.schema.options"
                                       :data="tableState.items"
                                       :fetch-options="fetchOptionState"
                                       :type-options="extraOptionState"
@@ -38,6 +38,7 @@
                                       @init="fetchTableData"
                                       @fetch="fetchTableData"
                                       @select="onSelect"
+                                      @export="exportServiceAccountData"
                     />
                 </template>
             </p-horizontal-layout>
@@ -45,7 +46,11 @@
                    :tabs="singleItemTabState.tabs"
                    :active-tab.sync="singleItemTabState.activeTab"
             >
-                <template #detail />
+                <template #detail>
+                    <service-account-detail :selected-provider="selectedProvider"
+                                            :service-account-id="tableState.selectedAccountIds[0]"
+                    />
+                </template>
                 <template #tag>
                     <s-tags-panel :resource-id="tableState.selectedAccountIds[0]"
                                   resource-type="identity.ServiceAccount"
@@ -100,7 +105,7 @@ import {
 import { get } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
+// import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
 import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -118,11 +123,12 @@ import {
     TableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/table/type';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-
+import ServiceAccountDetail from '@/views/identity/service-account/modules/ServiceAccountDetail.vue';
 
 export default {
     name: 'ServiceAccount',
     components: {
+        ServiceAccountDetail,
         PEmpty,
         ServiceAccountMember,
         ServiceAccountCredentials,
@@ -143,16 +149,14 @@ export default {
             provider, project, secret, user,
         } = useStore();
         const providerStore: ProviderStoreType = provider;
-        providerStore.getProvider();
+        // providerStore.getProvider();
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const selectedProvider: Ref<string> = ref('all');
+        const selectedProvider: Ref<string> = ref('aws');
 
         const providerState = reactive({
             items: computed(() => {
-                const result = [{
-                    provider: 'all', icon: '', color: '', name: 'All',
-                }];
+                const result = [] as any;
                 if (providerStore.state.providers) {
                     result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
                 }
@@ -215,6 +219,7 @@ export default {
             ],
             context.parent)),
             selectedAccountIds: computed(() => tableState.selectedItems.map(d => d.service_account_id)),
+            schema: [],
         });
 
         const onSelect: TableEventListeners['select'] = (selectIndex) => {
@@ -223,15 +228,9 @@ export default {
 
         const getQuery = () => {
             const query = new QueryHelper();
-            if (selectedProvider.value !== 'all') {
-                query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
-                    .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                    .setFilter({ k: 'provider', v: [selectedProvider.value], o: 'in' })
-                    .setKeyword(fetchOptionState.searchText);
-                return query.data;
-            }
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
+                .setFilter({ k: 'provider', v: [selectedProvider.value], o: 'in' })
                 .setKeyword(fetchOptionState.searchText);
             return query.data;
         };
@@ -253,10 +252,6 @@ export default {
         };
 
         const fetchTableData: TableEventListeners['fetch'] = (options, changed?) => {
-            if (options.searchText === '') {
-                replaceQuery('filters', '');
-                fetchOptionState.searchText = '';
-            }
             if (changed) {
                 if (changed.sortBy && changed.sortDesc) {
                     fetchOptionState.sortBy = changed.sortBy;
@@ -268,7 +263,7 @@ export default {
                 if (changed.pageStart) {
                     fetchOptionState.pageStart = changed.pageStart;
                 }
-                if (changed.searchText) {
+                if (changed.searchText !== undefined) {
                     fetchOptionState.searchText = changed.searchText;
                     // sync updated query tags to url query string
                     replaceQuery('filters', changed.searchText);
@@ -290,13 +285,24 @@ export default {
                             fileType: 'xlsx',
                             timezone: extraOptionState.timezone,
                         },
-                        data_source: tableSchema.options.fields,
+                        data_source: tableState.schema.options.fields,
                     },
                 });
                 window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
             } catch (e) {
                 console.error(e);
             }
+        };
+
+        const getTableSchema = async () => {
+            const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                resource_type: 'identity.ServiceAccount',
+                schema: 'table',
+                options: {
+                    provider: selectedProvider.value,
+                },
+            });
+            tableState.schema = schema;
         };
 
         const fieldHandler: DynamicFieldHandler = (item) => {
@@ -390,6 +396,7 @@ export default {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
                 watch(selectedProvider, async (after, before) => {
                     if (after !== before) {
+                        await getTableSchema();
                         await listServiceAccountData();
                     }
                 }, { immediate: true });
@@ -404,7 +411,7 @@ export default {
             selectedProviderName,
             ...toRefs(routeState),
 
-            tableSchema,
+            // tableSchema,
             tableState,
             fetchOptionState,
             extraOptionState,
