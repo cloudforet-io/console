@@ -1,7 +1,7 @@
 <template>
     <p-autocomplete-search ref="searchRef"
                            class="p-query-search"
-                           :class="{'no-menu': menu.length === 0}"
+                           :class="{'no-menu': menu ? menu.length === 0 : false}"
                            :value="searchText"
                            :placeholder="placeholder"
                            :loading="loading"
@@ -30,6 +30,8 @@
                    :placeholder="scope.placeholder"
                    :disabled="scope.disabled"
                    :type="inputType"
+                   :step="currentDataType === 'integer' ? 1 : undefined"
+                   :min="currentDataType === 'integer' ? 0 : undefined"
                    v-on="scope.inputListeners"
             >
         </template>
@@ -106,6 +108,7 @@ export default {
             searchText: props.value,
             selectedKey: null as KeyItem|null,
             operator: '' as OperatorType,
+            currentDataType: computed(() => state.selectedKey?.dataType || 'string'),
             inputType: computed(() => {
                 if (state.selectedKey?.dataType) {
                     return inputDataTypes[state.selectedKey.dataType] || 'text';

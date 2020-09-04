@@ -1,29 +1,150 @@
+It displays <u>validated</u> and <u>converted</u> tags. <br>
+<br>
+
+## Validation
+
+Validation is for deciding whether to <b>show each tag or not</b>. <br>
+If the return value is ```false```, the tag will be removed. <br>
+If you give ```validator``` as ```props```, it will be executed. Otherwise, default validator will be executed. <br>
+
+### How default validator works 
+
+Default validator checks whether the tags are duplicated each other.<br>
+If there are two duplicated tags, the latest one(greater index) will be removed. <br>
+<br>
+
+#### Conditions considered as duplicates
+
+* When the tag has the same ```key name```, ```operator```, and ```value name```.
+* If there's no ```key```, checks ```value name``` only.
+
+<br>
+
+### When validation happens?
+
+```QuerySearchTags``` validates in two cases: <br>
+* When created, validates ```tags props```.
+* When ```addTag``` function is executed, validates the parameters.
+
+## Conversion
+
+```QuerySearchTags``` convert every item from ```QueryItem``` to ```QueryTag```<br>
+It converts the item's ```value name``` to fit the ```dataType``` of the item's ```key name```. <br>
+In this process, when it is impossible to convert, 
+or it is converted to an incorrect value, 
+it adds some information below:<br>
+* adds ```invalid``` property to item as ```true```
+* adds ```description``` property to item
+<br>
+If you give ```converter``` as props, it will be executed. Otherwise, default converter will be executed. <br>
+
+### What are QueryItem and QueryTag?
+```QueryItem``` is a type of search result of QuerySearch component.<br>
+```QueryTag``` is an extended and <u>converted</u> type of ```QueryItem```.<br>
+
+#### QueryItem type
+
+```typescript
+interface QueryItem<T=string> {
+    key?: KeyItem; // { label, name, dataType? }
+    operator: OperatorType; // '!', '>', '>=', '<', '<=', '=', '!=', '$'
+    value: ValueItem<T>; // { label, name(string) }
+}
+```
+
+<br>
+
+#### QueryTag type
+
+```typescript
+interface QueryTag extends QueryItem<string|number|boolean> {
+    invalid?: boolean;
+    description?: string;
+}
+```
+
+<br>
+
+### How converted tags will be displayed?
+
+ ```invalid``` property indicates whether the ```name``` of ```value``` property can be converted to ```dataType``` of ```key``` property. <br>
+ If this is ```true```, the tag will be displayed in invalid style(red style).<br>
+ <br> 
+ ```description``` property is description of why the item is invalid. <br>
+ It will be displayed when the exclamation mark icon of the invalid tag was hovered. <br>
+ <br>
+ Additionally, you can change tag's display by changing label of item's key or value.<br>
+
+### How default converter change tags
+
+It's different by ```dataType``` of an item.<br>
+
+| data type | valid condition |  label(display) | name(actual value) |
+| --------- | --------------- | --------------- |------------------- |
+| string(default) | - | - | - |
+| boolean | Whether the value is string 'true' or 'false' regardless of letter case. | 'TRUE' or 'FALSE'. |  ```true``` or ```false``` |
+| integer | If ```parseInt(value)``` is not ```NaN```.  | parsed integer. | parsed integer. |
+| float | If ```parseFloat(value)``` is not ```NaN```.  | parsed float. | parsed float. |
+| datetime | If the ```moment(value)``` is valid. Look for [moment.js](https://momentjs.com/guides/)  | local time with 'YYYY-MM-DD HH:mm:ss' format. | utc time with iso8601 format. |
+
+
+<br>
+<br>
+
+
+# Functions
+| Name | Description |
+| ---- | ----------- |
+| addTag | Use it when you want to add tag. <br> It takes ```QueryItem``` as parameters. |
+| deleteTag | Use it when you want to delete one tag. Give the index you want to delete as a parameter. |
+| deleteAllTags | Use it when you want to delete all tags. |
+
+```typescript
+interface QuerySearchTagsFunctions {
+    addTag(...queries: QueryItem[]): void;
+    deleteTag(index: number): void;
+    deleteAllTags(): void;
+}
+```
+
+<br>
+<br>
+
 # Types
+
+<hr>
 
 ```typescript
 import { QueryItem } from 'QuerySearch';
 
-export interface QueryTag extends QueryItem<string|number|boolean> {
+interface QueryTag extends QueryItem<string|number|boolean> {
     invalid?: boolean;
     description?: string;
 }
 
-export interface QuerySearchTagsProps {
+interface QueryTagValidator {
+    (query: QueryItem, tags: QueryTag[]): boolean;
+}
+
+interface QueryTagConverter {
+    (query: QueryItem, timezone: string): QueryTag;
+}
+
+interface QuerySearchTagsProps {
     tags: QueryTag[];
     timezone: string;
+    validator?: QueryTagValidator;
+    converter?: QueryTagConverter;
 }
 
-export interface QueryValidator {
-    (query: QueryItem): boolean;
-}
 
-export interface QuerySearchTagsFunctions {
-    addTag(query: QueryItem, validator?: QueryValidator): void;
+interface QuerySearchTagsFunctions {
+    addTag(...queries: QueryItem[]): void;
     deleteTag(index: number): void;
     deleteAllTags(): void;
 }
 
-export interface QuerySearchTagsListeners {
+interface QuerySearchTagsListeners {
     init: (props: QuerySearchTagsProps) => void|Promise<void>;
     add: (tags: QueryTag[]) => void|Promise<void>;
     delete: (tags: QueryTag[]) => void|Promise<void>;
