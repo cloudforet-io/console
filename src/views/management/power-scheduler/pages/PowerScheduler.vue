@@ -69,12 +69,13 @@
                             <div>
                                 <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
                                 <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
-                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
                             </div>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-xs">S M T W T F S</span>
-                            <div class="schedule-matrix">
+                            <span v-for="day in weekday" class="weekday">
+                                {{ day }}
+                            </span>
+                            <div class="schedule-matrix mt-4">
                                 <schedule-heatmap />
                             </div>
                         </div>
@@ -162,6 +163,7 @@ export default {
             maxScheduleResources: 50,
             approximateCosts: Math.floor(Math.random() * 5000),
             scheduler: [] as unknown as Scheduler,
+            weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
         });
 
         const percentage = computed(() => (scheduleState.currentScheduleResources / scheduleState.maxScheduleResources) * 100);
@@ -308,5 +310,9 @@ export default {
 
     .schedule {
         @apply mx-6 mt-6 mb-6 flex justify-between;
+        .weekday {
+            @apply text-gray-400 text-xs;
+            margin-right: 0.5625rem;
+        }
     }
 </style>

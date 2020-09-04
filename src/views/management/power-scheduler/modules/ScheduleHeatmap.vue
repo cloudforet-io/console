@@ -1,8 +1,10 @@
 <template>
-    <div class="flex">
+    <div class="flex flex-col">
         <div v-for="(color, index) in scheduleHeatMapColor" :key="index">
-            <div v-for="num in 7" :key="num">
-                <p class="circle inline-block" :class="`${ scheduleHeatMapColor[index][num]}`" />
+            <div>
+                <span v-for="(num, index) in 7">
+                    <span class="circle inline-block" :class="`${color[index]}`" />
+                </span>
             </div>
         </div>
     </div>
@@ -62,6 +64,7 @@ export default {
             },
         ];
 
+
         const getHeatMapColor = (length: number) => {
             let color = '';
             switch (true) {
@@ -96,6 +99,8 @@ export default {
             scheduleHeatMapColor.push(dailyHeatMapColor);
         });
 
+        console.debug(scheduleHeatMapColor)
+
 
         return {
             scheduleHeatMapColor,
@@ -110,5 +115,6 @@ export default {
         height: 0.625rem;
         border-radius: 50%;
         opacity: 0.5;
+        margin-right: 0.63em;
     }
 </style>
