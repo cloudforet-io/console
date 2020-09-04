@@ -1,9 +1,4 @@
-export enum BADGE_SHAPE {
-    ROUND='round',
-    SQUARE='square',
-}
-
-export enum BADGE_STYLE {
+export enum BUTTON_STYLE {
     primary = 'primary',
     'primary-dark' = 'primary-dark',
     primary1 = 'primary1',
@@ -18,17 +13,22 @@ export enum BADGE_STYLE {
     gray = 'gray',
     gray200 = 'gray200',
     gray100 = 'gray100',
+    gray900 = 'gray900',
+    'gray900-hover' = 'gray900-hover',
+    black = 'black',
     alert = 'alert',
     safe = 'safe',
-    gray900 = 'gray900',
 }
 
-export interface BadgeProps {
-    styleType: keyof BADGE_STYLE;
-    textColor?: string;
-    backgroundColor?: string;
-    shape: keyof typeof BADGE_SHAPE;
-    outline: boolean;
+export enum BUTTON_SIZE {
+    sm = 'sm',
+    lg = 'lg'
+}
+
+export interface Button {
     link?: string;
-    target?: string;
+    disabled?: boolean;
+    outline?: boolean;
+    styleType?: keyof BUTTON_STYLE;
+    size?: keyof BUTTON_SIZE;
 }

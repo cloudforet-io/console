@@ -33,15 +33,43 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { BUTTON_SIZE, BUTTON_STYLE } from '@/components/atoms/buttons/type';
 import color from '@/styles/colors';
-import { buttonProps } from '@/components/atoms/buttons/PButton.toolset';
-
 
 export default {
     name: 'PIconTextButton',
     components: { PButton, PI },
     props: {
-        ...buttonProps,
+        link: {
+            type: String,
+            default: undefined,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        outline: {
+            type: Boolean,
+            default: false,
+        },
+        styleType: {
+            type: String,
+            default: undefined,
+            validator(value) {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_STYLE).indexOf(value) !== -1;
+            },
+        },
+        size: {
+            type: String,
+            default: undefined,
+            validator(value) {
+                return [
+                    undefined,
+                    ...Object.keys(BUTTON_SIZE),
+                ].indexOf(value) !== -1;
+            },
+        },
         name: {
             type: String,
             default: '',

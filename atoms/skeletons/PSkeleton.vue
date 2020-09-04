@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/components/util/functional-helpers';
-import { skeletonProps } from '@/components/atoms/skeletons/PSkeleton.toolset';
+import { gray, primary3 } from '@/components/styles/colors';
 
 const isEmptyVNode = (nodes) => {
     if (!nodes) return true;
@@ -18,7 +18,40 @@ const isEmptyVNode = (nodes) => {
 export default {
     name: 'PSkeleton',
     functional: true,
-    props: skeletonProps,
+    props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
+        color: {
+            type: String,
+            default: primary3,
+        },
+        duration: {
+            type: Number,
+            default: 2,
+        },
+        highlight: {
+            type: String,
+            default: gray[100],
+        },
+        width: {
+            type: String,
+            default: null,
+        },
+        height: {
+            type: String,
+            default: null,
+        },
+        tag: {
+            type: String,
+            default: 'span',
+        },
+        animation: {
+            type: Boolean,
+            default: true,
+        },
+    },
     render(h, {
         props, slots, data,
     }) {

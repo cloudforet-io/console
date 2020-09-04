@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/components/util/functional-helpers';
-import { ButtonProps } from '@/components/atoms/buttons/PButton.toolset';
+import { Button } from '@/components/atoms/buttons/type';
 
 export default {
     name: 'PButton',
@@ -8,7 +8,7 @@ export default {
     render(h, {
         props, listeners, children, data,
     }) {
-        function getClass(attrs: ButtonProps) {
+        function getClass(attrs: Button) {
             const cls = {
                 'p-button': true,
                 disabled: !!attrs.disabled,

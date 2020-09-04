@@ -1,12 +1,40 @@
-import { IconProps, iconProps } from '@/components/atoms/icons/PI.toolset';
-
-
 export enum ICON_BUTTON_STYLE_TYPE {
     'primary-dark' = 'primary-dark'
 }
 
 export const iconButtonProps = {
-    ...iconProps,
+    name: {
+        type: String,
+        default: '',
+    },
+    dir: {
+        type: String,
+        default: null,
+    },
+    fill: {
+        type: Boolean,
+        default: true,
+    },
+    width: {
+        type: String,
+        default: '1.5rem',
+    },
+    height: {
+        type: String,
+        default: '1.5rem',
+    },
+    scale: {
+        type: String,
+        default: undefined,
+    },
+    original: {
+        type: Boolean,
+        default: true,
+    },
+    title: {
+        type: String,
+        default: undefined,
+    },
     color: {
         type: String,
         default: 'transparent inherit',
@@ -32,11 +60,3 @@ export const iconButtonProps = {
         default: false,
     },
 };
-
-
-export interface IconButtonProps extends IconProps {
-    styleType?: keyof ICON_BUTTON_STYLE_TYPE;
-    disabled: boolean;
-    outline: boolean;
-    solid: boolean;
-}

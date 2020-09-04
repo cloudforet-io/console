@@ -1,7 +1,7 @@
 <script lang="ts">
 import { getBindClass } from '@/components/util/functional-helpers';
-import { BADGE_STYLE, BADGE_SHAPE } from '@/components/atoms/badges/PBadge.toolset';
 import { getColor } from '@/components/util/helpers';
+import { BADGE_STYLE } from '@/components/atoms/badges/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 
 export default {

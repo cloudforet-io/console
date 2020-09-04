@@ -4,9 +4,7 @@ import { getBindClass } from '@/components/util/functional-helpers';
 export default {
     name: 'PEmpty',
     functional: true,
-    render(h, {
-        props, listeners, children, data,
-    }) {
+    render(h, { listeners, children, data }) {
         return h('div', {
             ...data,
             class: {

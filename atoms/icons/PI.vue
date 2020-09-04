@@ -3,11 +3,47 @@
 </template>
 <script lang="ts">
 import '@/components/atoms/icons/p-icons';
-import { iconProps } from '@/components/atoms/icons/PI.toolset';
 
 export default {
     name: 'PI',
-    props: iconProps,
+    props: {
+        name: {
+            type: String,
+            default: '',
+        },
+        dir: {
+            type: String,
+            default: null,
+        },
+        fill: {
+            type: Boolean,
+            default: true,
+        },
+        width: {
+            type: String,
+            default: '1.5rem',
+        },
+        height: {
+            type: String,
+            default: '1.5rem',
+        },
+        scale: {
+            type: String,
+            default: undefined,
+        },
+        color: {
+            type: String,
+            default: undefined,
+        },
+        original: {
+            type: Boolean,
+            default: true,
+        },
+        title: {
+            type: String,
+            default: undefined,
+        },
+    },
 };
 </script>
 

@@ -25,12 +25,9 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, computed, toRefs,
-} from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { iconProps } from '@/components/atoms/icons/PI.toolset';
 import { iconButtonProps } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
 
 export default {

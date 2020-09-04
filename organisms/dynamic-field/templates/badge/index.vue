@@ -2,9 +2,9 @@
 import { get } from 'lodash';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { getColor } from '@/components/organisms/dynamic-field/PDynamicField.toolset';
-import { BADGE_SHAPE, BadgeProps } from '@/components/atoms/badges/PBadge.toolset';
 import { BadgeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { BadgeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/badge/type';
+import { Badge, BADGE_SHAPE } from '@/components/atoms/badges/type';
 
 export default {
     name: 'PDynamicFieldBadge',
@@ -42,23 +42,23 @@ export default {
         const outline = get(options, ['outline_color'], null);
         const shape = get(options, ['shape'], null);
         const link = get(options, 'link', null);
-        const ps: BadgeProps = {} as any;
+        const badge: Badge = {} as any;
         if (shape) {
-            ps.shape = BADGE_SHAPE[shape];
+            badge.shape = BADGE_SHAPE[shape];
         }
 
         if (outline) {
-            ps.outline = true;
-            ps.backgroundColor = getColor(outline);
+            badge.outline = true;
+            badge.backgroundColor = getColor(outline);
         } else {
-            ps.backgroundColor = getColor(get(options, ['background_color'], null));
-            ps.textColor = getColor(get(options, ['text_color'], null));
+            badge.backgroundColor = getColor(get(options, ['background_color'], null));
+            badge.textColor = getColor(get(options, ['text_color'], null));
         }
         if (link) {
-            ps.link = link;
-            ps.target = '_blank';
+            badge.link = link;
+            badge.target = '_blank';
         }
-        return h(PBadge, { props: ps }, props.data);
+        return h(PBadge, { props: badge }, props.data);
     },
 };
 </script>

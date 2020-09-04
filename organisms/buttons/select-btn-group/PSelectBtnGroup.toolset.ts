@@ -1,6 +1,6 @@
-import { ButtonProps } from '@/components/atoms/buttons/PButton.toolset';
+import { Button } from '@/components/atoms/buttons/type';
 
-export interface SelectBtnType extends ButtonProps {
+export interface SelectBtnType extends Button {
     label: string;
     name: string;
 }
