@@ -287,7 +287,6 @@ export default {
             });
             return data;
         });
-
         const fieldsName = computed(() => flatMap(fieldsData.value, field => field.name));
         const sortIcon = computed(() => (props.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
         // @ts-ignore
@@ -383,22 +382,29 @@ export default {
         };
         const theadClick = (field, index, event) => {
             if (props.sortable && field.sortable) {
-                let sortBy = field.sortKey || field.name;
-                const sortDesc = props.sortDesc;
+                const clickedKey = field.sortKey || field.name;
+                let sortBy = props.sortBy;
+                let sortDesc = props.sortDesc;
 
-                if (props.sortBy !== sortBy) {
-                    context.emit('update:sortBy', sortBy);
-                    if (!sortDesc) {
-                        context.emit('update:sortDesc', true);
-                    }
-                } else {
-                    if (!sortDesc) {
+                // when clicked the same thead
+                if (sortBy === clickedKey) {
+                    // set reverse mode
+                    if (sortDesc) {
+                        sortDesc = false;
+                    // set default mode (sort nothing)
+                    } else if (sortDesc === false) {
                         sortBy = '';
-                        context.emit('update:sortBy', '');
+                        sortDesc = undefined;
                     }
-                    context.emit('update:sortDesc', !sortDesc);
+
+                // when clicked the other thead
+                } else {
+                    sortBy = clickedKey;
+                    sortDesc = true;
                 }
 
+                context.emit('update:sortBy', sortBy);
+                context.emit('update:sortDesc', sortDesc);
                 context.emit('changeSort', sortBy, sortDesc);
             }
             context.emit('theadClick', field, index, event);
