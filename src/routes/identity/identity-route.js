@@ -2,7 +2,6 @@ const AddServiceAccount = () => import('@/views/identity/service-account/pages/A
 
 const Identity = () => import('@/views/identity/Identity');
 
-const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
 const User = () => import('@/views/identity/user/User');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccount');
 const ServiceAccountSearch = () => import('@/views/identity/service-account/pages/ServiceAccountSearch');
@@ -14,7 +13,6 @@ export default {
     redirect: '/identity/service-account',
     meta: { label: 'Identity' },
     components: {
-        lnb: IdentityNavBar,
         main: Identity,
     },
     children: [

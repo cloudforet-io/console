@@ -1,10 +1,10 @@
 <template>
     <div class="menu-container">
         <div class="left">
-            <div class="menu-lap mx-4">
+            <div class="site-map-lap">
                 <site-map :is-domain-owner="isDomainOwner" :visible.sync="sitemapVisible" />
             </div>
-            <div class="menu-lap mr-6 md:mr-10 lg:mr-10">
+            <div class="logo-lap">
                 <router-link to="/dashboard">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden md:inline-block lg:inline-block"
@@ -14,7 +14,7 @@
             </div>
             <div v-for="(dItem, idx) in defaultMenuList"
                  :key="idx"
-                 class="menu-lap"
+                 class="menu-lap hidden md:inline-block lg:inline-block"
             >
                 <div class="menu-button opacity mr-4 lg:mr-8"
                      :class="[{
@@ -359,24 +359,17 @@ export default {
         padding-right: 1.5rem;
     }
 
+    .site-map-lap {
+        display: inline-block;
+        margin: 0 1rem;
+    }
     .menu-lap {
         position: relative;
-        display: inline-block;
 
         &.account {
             .p-context-menu {
                 min-width: 15.125rem;
             }
-        }
-
-        .brand-logo {
-            display: inline-block;
-            width: 2rem;
-            height: 2rem;
-        }
-        .brand-logo-text {
-            height: 0.875rem;
-            margin-left: 0.5rem;
         }
         .menu-button {
             @apply text-gray-900;
@@ -453,6 +446,20 @@ export default {
                     padding-right: 0.5rem;
                 }
             }
+        }
+    }
+    .logo-lap {
+        display: inline-block;
+        margin-right: 1.5rem;
+
+        .brand-logo {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+        }
+        .brand-logo-text {
+            height: 0.875rem;
+            margin-left: 0.5rem;
         }
     }
 }

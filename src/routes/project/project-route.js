@@ -1,4 +1,3 @@
-const ProjectNavBar = () => import('@/views/project/ProjectNavBar');
 const Project = () => import('@/views/project/project/pages/ProjectPage');
 const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail');
 
@@ -8,7 +7,6 @@ export default {
     path: 'project',
     meta: { label: 'Project' },
     components: {
-        lnb: ProjectNavBar,
         main: { template: '<router-view />' },
     },
     children: [

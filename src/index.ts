@@ -18,15 +18,12 @@ export { default as PI } from './components/atoms/icons/PI.vue';
 export { default as PButton } from './components/atoms/buttons/PButton.vue';
 export { default as PBadge } from './components/atoms/badges/PBadge.vue';
 export { default as PEmpty } from './components/atoms/empty/PEmpty.vue';
-export { default as PCol } from './components/atoms/grid/col/Col.vue';
-export { default as PRow } from './components/atoms/grid/row/Row.vue';
 export { default as PHr } from './components/atoms/hr/PHr.vue';
 export { default as PTextInput } from './components/atoms/inputs/PTextInput.vue';
 export { default as PLabel } from './components/atoms/labels/PLabel.vue';
 
 // molecule components
 export { default as PNoticeAlert } from './components/molecules/alert/notice/PNoticeAlert.vue';
-export { default as PRouteBreadcrumb } from './components/molecules/breadcrumbs/breadcrumb/PRouteBreadcrumb.vue';
 
 // molecule button components
 export { default as PCopyButton } from './components/molecules/buttons/copy-button/PCopyButton.vue';
