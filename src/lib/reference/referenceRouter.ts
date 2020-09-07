@@ -9,12 +9,12 @@ export const projectLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceK
 };
 
 export const serverLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}?f=server_id%3A${referenceKey}`;
+    const queryString = `${baseUrl}?filters=server_id%3A${referenceKey}`;
     return queryString;
 };
 
 export const collectorLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}?f=collector_id%3A${referenceKey}`;
+    const queryString = `${baseUrl}?filters=collector_id%3A${referenceKey}`;
     return queryString;
 };
 

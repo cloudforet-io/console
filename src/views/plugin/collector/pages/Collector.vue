@@ -402,7 +402,7 @@ export default {
             return [parseTag(urlQueryString as string)];
         };
         const setSearchTags = () => {
-            state.searchTags = urlQueryStringToSearchTags(vm.$route.query.f);
+            state.searchTags = urlQueryStringToSearchTags(vm.$route.query.filters);
         };
 
         // Table
@@ -444,7 +444,7 @@ export default {
             state.searchTags = item.queryTags;
             const urlQueryString = searchTagsToUrlQueryString(item.queryTags);
             // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
+            await vm.$router.replace({ query: { ...router.currentRoute.query, filters: urlQueryString } }).catch(() => {});
             try {
                 await getCollectors();
             } catch (e) {

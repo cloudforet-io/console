@@ -184,7 +184,7 @@ export default {
                     }
                     if (props.projectFilter && !props.isServer) {
                         vm.$router.push({
-                            path: `/inventory/cloud-service?provider=${item.provider || 'all'}${props.projectFilter}&f=data.region_name%3A${item.name}`,
+                            path: `/inventory/cloud-service?provider=${item.provider || 'all'}${props.projectFilter}&filters=data.region_name%3A${item.name}`,
                         });
                     }
                 },

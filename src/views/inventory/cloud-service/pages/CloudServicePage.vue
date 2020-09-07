@@ -481,7 +481,7 @@ export default {
         });
         makeQueryStringComputed(apiHandler.tableTS.querySearch.tags,
             {
-                key: 'f',
+                key: 'filters',
                 setter: queryStringToQueryTags,
                 getter: queryTagsToQueryString,
             });

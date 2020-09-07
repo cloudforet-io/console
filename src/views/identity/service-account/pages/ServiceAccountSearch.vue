@@ -18,7 +18,7 @@ const getDynamicLink = async (resourceType: string, search: string, searchKey?: 
             .setSearch(search);
         if (searchKey) api = api.setSearchKey(searchKey);
         const result = await api.execute();
-        return `${result.data.url}&t_se=${search}`;
+        return `${result.data.url}&filters=${search}`;
     } catch (e) {
         return '/identity/service-account';
     }

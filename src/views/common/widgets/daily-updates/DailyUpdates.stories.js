@@ -1,7 +1,7 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import PDailyUpdates from './DailyUpdates.vue';
+import PDailyUpdates from './DailyUpdates_new.vue';
 
 export default {
     title: 'views/widgets/DailyUpdates',

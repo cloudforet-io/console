@@ -154,7 +154,7 @@ import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
-    makeQueryStringComputed,
+    makeQueryStringComputed, makeQueryStringComputeds,
     queryStringToQueryTags,
     queryTagsToQueryString,
     replaceQuery,
@@ -185,6 +185,7 @@ import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios
 import { APIError } from '@/lib/space-connector/api';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import {ProjectGroup} from "@/views/project/project/modules/ProjectSearch.toolset";
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
 
@@ -333,7 +334,7 @@ export default {
                     name: item.cloud_service_type,
                 },
                 query: {
-                    f: queryTagsToQueryString(filters),
+                    filters: queryTagsToQueryString(filters),
                 },
             };
             return res;
@@ -363,21 +364,27 @@ export default {
         };
         const setSearchTags = () => {
             // @ts-ignore
-            state.tags = urlQueryStringToSearchTags(vm.$route.query.f);
+            state.tags = urlQueryStringToSearchTags(vm.$route.query.filters);
         };
         const queryRefs = {
             // @ts-ignore
-            f: makeQueryStringComputed(state.tags,
+            filters: makeQueryStringComputed(state.tags,
                 {
-                    key: 'f',
+                    key: 'filters',
                     setter: queryStringToQueryTags,
                     getter: queryTagsToQueryString,
                 }),
             provider: makeQueryStringComputed(selectedProvider, { key: 'provider', disableAutoReplace: true }),
-            // ...makeQueryStringComputeds(state, {
-            //     pageSize: { key: 'g_ps', setter: Number },
-            //     thisPage: { key: 'g_p', setter: Number },
-            // }),
+            ...makeQueryStringComputeds(filterState, {
+                regionFilter: {
+                    key: 'region',
+                    getter: (item) => {
+                        if (item) return item.region_code;
+                        return null;
+                    },
+                    disableSetter: true,
+                },
+            }),
         };
 
         const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
@@ -457,9 +464,7 @@ export default {
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
             const newQuery = {
-                // g_ps: Number(options.pageSize),
-                // g_p: Number(options.thisPage),
-                f: urlQueryString,
+                filters: urlQueryString,
             };
                 // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {

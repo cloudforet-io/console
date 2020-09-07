@@ -236,12 +236,12 @@ export default {
         };
         const setSearchTags = () => {
             // @ts-ignore
-            state.tags = urlQueryStringToSearchTags(vm.$route.query.f);
+            state.tags = urlQueryStringToSearchTags(vm.$route.query.filters);
         };
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
             const newQuery = {
-                f: urlQueryString,
+                filters: urlQueryString,
             };
             // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {

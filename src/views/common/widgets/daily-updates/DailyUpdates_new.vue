@@ -186,7 +186,7 @@ export default {
                         isServer: true,
                         created_count: d.created_count,
                         deleted_count: d.deleted_count,
-                        href: `/inventory/server?&f=server_type%3A${d.server_type}${props.projectFilter}`,
+                        href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,
@@ -208,7 +208,7 @@ export default {
                         isServer: true,
                         created_count: d.created_count,
                         deleted_count: d.deleted_count,
-                        href: `/inventory/server?&f=server_type%3A${d.server_type}`,
+                        href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,

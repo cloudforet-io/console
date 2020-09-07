@@ -42,7 +42,7 @@
                 </template>
                 <template #col-service_account_name="{index, field, item}">
                     <td v-tooltip.bottom="{content: item.service_account_name, delay: {show: 500}}">
-                        <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}&t_se=${item.service_account_name}`">
+                        <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}&filters=${item.service_account_name}`">
                             {{ item.service_account_name || 0 }}
                         </router-link>
                     </td>
@@ -56,7 +56,7 @@
                 </template>
                 <template #col-cloud_service_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        <router-link :to="`/inventory/cloud-service?provider=all&f=collection_info.service_accounts%3A${item.service_account_id}&f=project_id%3A%3D${item.project_id}`">
+                        <router-link :to="`/inventory/cloud-service?provider=all&filters=collection_info.service_accounts%3A${item.service_account_id}&filters=project_id%3A%3D${item.project_id}`">
                             {{ item.cloud_service_count || 0 }}
                         </router-link>
                     </div>
