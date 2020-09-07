@@ -156,13 +156,11 @@ export default {
             const res = {};
             if (!props.options.fields) return res;
 
-            // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
-
             props.options.fields.forEach((ds: DynamicField, i) => {
                 const item: Omit<DynamicFieldProps, 'data'> = {
                     type: ds.type || 'text',
                     options: ds.options || {},
-                    extraData: ds,
+                    extraData: { ...ds, index: i },
                 };
 
                 if (ds.type === 'datetime') {
