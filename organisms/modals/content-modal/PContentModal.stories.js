@@ -50,11 +50,15 @@ export const modal = () => ({
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-        ...autoProps(PContentModal, [
-            { name: 'headerVisible' },
-            { name: 'bodyVisible' },
-            { name: 'footerVisible' },
-        ]),
+        headerVisible: {
+            default: boolean('headerVisible', true),
+        },
+        bodyVisible: {
+            default: boolean('headerVisible', true),
+        },
+        footerVisible: {
+            default: boolean('headerVisible', true),
+        },
         size: {
             default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
         },
@@ -112,11 +116,15 @@ export const fade = () => ({
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-        ...autoProps(PContentModal, [
-            { name: 'headerVisible' },
-            { name: 'bodyVisible' },
-            { name: 'footerVisible' },
-        ]),
+        headerVisible: {
+            default: boolean('headerVisible', true),
+        },
+        bodyVisible: {
+            default: boolean('headerVisible', true),
+        },
+        footerVisible: {
+            default: boolean('headerVisible', true),
+        },
         size: {
             default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
         },
