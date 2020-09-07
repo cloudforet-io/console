@@ -356,6 +356,7 @@ export default {
         };
         const onClickStatus = (status) => {
             state.activatedStatus = status;
+            state.thisPage = 1;
             getJobs();
         };
 
