@@ -1,17 +1,10 @@
 /* eslint-disable camelcase */
 
 /** Metadata schema types for Dynamic field */
-export enum DYNAMIC_FIELD_TYPE {
-    badge = 'badge',
-    datetime = 'datetime',
-    dict = 'dict',
-    enum = 'enum',
-    list = 'list',
-    state = 'state',
-    text = 'text',
-}
 
-export type DynamicFieldType = keyof typeof DYNAMIC_FIELD_TYPE;
+export const DYNAMIC_FIELD_TYPE = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'list']
+
+export type DynamicFieldType = typeof DYNAMIC_FIELD_TYPE[number];
 
 export interface Reference {
     resource_type: string;

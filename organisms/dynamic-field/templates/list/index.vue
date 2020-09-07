@@ -19,7 +19,7 @@ export default {
         },
         data: {
             type: [String, Object, Array, Boolean, Number, null],
-            default: null,
+            default: undefined,
         },
         typeOptions: {
             type: Object,

@@ -10,29 +10,28 @@ export interface DynamicFieldTypeOptions {
     typeOptionsMap: Record<string, DynamicFieldTypeOptions>;
 }
 
-export interface DynamicFieldProps<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions> {
+export interface DynamicFieldProps<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions, ExtraData = any> {
     type: DynamicFieldType;
     options: Options;
     data: any;
     typeOptions?: Partial<TypeOptions>; // a set of typeOptions props for each component
-    extraData?: DynamicField;
+    extraData?: ExtraData;
     beforeCreate?: BeforeCreateDynamicField<Options>;
     handler?: DynamicFieldHandler;
 }
 
-export interface DynamicFieldMutableProps<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions> {
-    options: Options;
-    data: any;
-    typeOptions?: Partial<TypeOptions>; // a set of typeOptions props for each component
-    extraData?: DynamicField;
+export interface BeforeCreateDynamicField<
+    Options = DynamicFieldOptions,
+    TypeOptions = DynamicFieldTypeOptions,
+    ExtraData = any> {
+    (props: DynamicFieldProps<Options, TypeOptions, ExtraData>): void|Promise<void>;
 }
 
-export interface BeforeCreateDynamicField<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions> {
-    (props: DynamicFieldMutableProps<Options, TypeOptions>): void|Promise<void>;
-}
-
-export interface DynamicFieldHandler<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions> {
-    (props: DynamicFieldMutableProps<Options, TypeOptions>): DynamicFieldMutableProps;
+export interface DynamicFieldHandler<
+    Options = DynamicFieldOptions,
+    TypeOptions = DynamicFieldTypeOptions,
+     ExtraData = any> {
+    (props: DynamicFieldProps<Options, TypeOptions, ExtraData>): Partial<DynamicFieldProps>;
 }
 
 // TODO
