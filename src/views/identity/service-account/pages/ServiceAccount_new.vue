@@ -32,7 +32,7 @@
                                       :options="tableState.schema.options"
                                       :data="tableState.items"
                                       :fetch-options="fetchOptionState"
-                                      :type-options="extraOptionState"
+                                      :type-options="typeOptionState"
                                       :style="{height: `${height}px`}"
                                       :field-handler="fieldHandler"
                                       @init="fetchTableData"
@@ -64,7 +64,7 @@
                     <service-account-member :service-accounts="tableState.selectedAccountIds" />
                 </template>
             </p-tab>
-            <p-tab v-else-if="extraOptionState.selectIndex.length > 1"
+            <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
                    :tabs="multiItemTabState.tabs"
                    :active-tab.sync="multiItemTabState.activeTab"
             >
@@ -105,9 +105,8 @@ import {
 import { get } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-// import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
-import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldHandler, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { fluentApi } from '@/lib/fluent-api';
@@ -183,7 +182,7 @@ export default {
             searchText: '',
         });
 
-        const extraOptionState: TableTypeOptions = reactive({
+        const typeOptionState: TableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => user.state.timezone || 'UTC'),
@@ -193,11 +192,11 @@ export default {
 
         const tableState = reactive({
             items: [],
-            selectedItems: computed(() => extraOptionState.selectIndex.map(d => tableState.items[d])),
+            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             providers: computed(() => provider.state.providers || {}),
             consoleLink: computed(() => {
                 const res = get(tableState.selectedItems[0], 'data.reference.link')
-                    || get(tableState.selectedItems[0], 'reference.external_link');
+                        || get(tableState.selectedItems[0], 'reference.external_link');
                 return res;
             }),
             dropdown: computed(() => makeTrItems([
@@ -223,7 +222,7 @@ export default {
         });
 
         const onSelect: TableEventListeners['select'] = (selectIndex) => {
-            extraOptionState.selectIndex = selectIndex;
+            typeOptionState.selectIndex = selectIndex;
         };
 
         const getQuery = () => {
@@ -237,17 +236,17 @@ export default {
 
         const serviceAccountListApi = SpaceConnector.client.identity.serviceAccount.list;
         const listServiceAccountData = async () => {
-            extraOptionState.loading = true;
+            typeOptionState.loading = true;
             try {
                 const res = await serviceAccountListApi({ query: getQuery() });
                 tableState.items = res.results;
-                extraOptionState.totalCount = res.total_count;
+                typeOptionState.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
                 tableState.items = [];
-                extraOptionState.totalCount = 0;
+                typeOptionState.totalCount = 0;
             } finally {
-                extraOptionState.loading = false;
+                typeOptionState.loading = false;
             }
         };
 
@@ -283,7 +282,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: extraOptionState.timezone,
+                            timezone: typeOptionState.timezone,
                         },
                         data_source: tableState.schema.options.fields,
                     },
@@ -305,15 +304,20 @@ export default {
             tableState.schema = schema;
         };
 
-        const fieldHandler: DynamicFieldHandler = (item) => {
-            if (item.extraData?.reference) {
-                switch (item.extraData.reference.resource_type) {
+        const fieldHandler: DynamicFieldHandler = (field) => {
+            const item: Partial<DynamicFieldProps> = {};
+            if (field.extraData?.reference) {
+                console.debug(field, 'field');
+                switch (field.extraData.reference.resource_type) {
                 case 'identity.Project': {
-                    item.data = project.state.projects[item.data];
-                    item.options.link = referenceRouter(
-                        item.extraData.reference.resource_type,
-                        item.data,
-                    );
+                    item.data = project.state.projects[field.data];
+                    item.options = {
+                        ...field.options,
+                        link: referenceRouter(
+                            field.extraData.reference.resource_type,
+                            field.data,
+                        ),
+                    };
                     break;
                 }
                 default: break;
@@ -386,11 +390,10 @@ export default {
         };
 
         /** ******* Page Init ******* */
-        project.getProject(true);
-        provider.getProvider(true);
-        secret.getSecrets(true);
-
         const init = async () => {
+            await project.getProject(true);
+            await provider.getProvider(true);
+            // await secret.getSecrets(true);
             const providerFilter = queryRefs.provider.value;
             if (providerState.items.length > 0) {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
@@ -414,7 +417,7 @@ export default {
             // tableSchema,
             tableState,
             fetchOptionState,
-            extraOptionState,
+            typeOptionState,
             onSelect,
             exportServiceAccountData,
             listServiceAccountData,

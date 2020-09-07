@@ -8,10 +8,10 @@
 </template>
 
 <script lang="ts">
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
-import { useStore } from '@/store/toolset';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 
@@ -28,6 +28,7 @@ export default {
         serviceAccountId: {
             type: String,
             default: '',
+            required: true,
         },
     },
     setup(props) {
@@ -60,16 +61,13 @@ export default {
             await getDetails();
         };
 
-        const init = async () => {
-            // watch(props.serviceAccountId, async (after, before) => {
-            //     if (after !== before) {
-            //         await getDetailSchema();
-            //     }
-            // }, { immediate: true });
-            await getDetailSchema();
-        };
+        watch(() => props.serviceAccountId, async (after, before) => {
+            if (after !== before) {
+                await getDetailSchema();
+                await getDetails();
+            }
+        }, { immediate: true });
 
-        init();
         return {
             ...toRefs(state),
         };
