@@ -13,7 +13,7 @@
 <script lang="ts">
 import { map } from 'lodash';
 
-    interface ScheduleType {
+interface ScheduleType {
         name: string;
         scheduleRule: {
             rule: {
@@ -26,7 +26,8 @@ import { map } from 'lodash';
                 SUN: number[];
             };
         };
-    }
+}
+
 export default {
     name: 'ScheduleHeatmap',
     props: {
@@ -98,8 +99,6 @@ export default {
             const dailyHeatMapColor: string[] = map(sd.scheduleRule.rule, (day: number[]) => getHeatMapColor(day.length));
             scheduleHeatMapColor.push(dailyHeatMapColor);
         });
-
-        console.debug(scheduleHeatMapColor)
 
 
         return {
