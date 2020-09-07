@@ -17,7 +17,7 @@
                                   :type-options="typeOptionState"
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
-                                  @init="fetchTableData"
+                                  @init="initTableData"
                                   @fetch="fetchTableData"
                                   @select="onSelect"
                                   @export="exportServerData"
@@ -379,7 +379,7 @@ export default {
             }
         };
 
-        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = async (options, changed?: Partial<QuerySearchTableFetchOptions>) => {
+        const fetchTableData: QuerySearchTableListeners['fetch'] = async (options, changed: Partial<QuerySearchTableFetchOptions>) => {
             if (changed) {
                 if (changed.sortBy !== undefined) {
                     fetchOptionState.sortBy = changed.sortBy;
@@ -620,6 +620,26 @@ export default {
             }))) as unknown as MonitoringResourceType[],
         });
 
+
+        /** ******* Page Init ******* */
+        const initTableData: QuerySearchTableListeners['init'] = async (options) => {
+            fetchOptionState.queryTags = options.queryTags;
+            await getAllStoreData();
+
+            // TODO: move this code to provider store
+            forEach(provider.state.providers, (d) => {
+                providerSchemaOptions[d.name] = {
+                    type: 'badge',
+                    options: {
+                        background_color: d.color,
+                    },
+                };
+            });
+
+            await listServerData();
+        };
+        /** ************************* */
+
         return {
             /* Breadcrumb */
             routeState,
@@ -657,6 +677,9 @@ export default {
             monitoringState,
 
             serverStateFormatter,
+
+            /* Page Init */
+            initTableData,
         };
     },
 };
