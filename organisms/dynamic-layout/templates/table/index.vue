@@ -163,7 +163,7 @@ export default {
                 const item: Omit<DynamicFieldProps, 'data'> = {
                     type: ds.type || 'text',
                     options: ds.options || {},
-                    extraData: { ...ds, index: i },,
+                    extraData: { ...ds, index: i },
                 };
 
                 if (ds.type === 'datetime') {
