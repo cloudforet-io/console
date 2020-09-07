@@ -1,4 +1,6 @@
-import { ICON_BUTTON_STYLE_TYPE, iconButtonProps } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
+enum BUTTON_STYLE_TYPE {
+    'primary-dark' = 'primary-dark'
+}
 
 export const dropdownBtnProps = {
     /* sync */
@@ -22,7 +24,14 @@ export const dropdownBtnProps = {
         type: String,
         default: undefined,
     },
-    buttonStyleType: iconButtonProps.styleType,
+    buttonStyleType: {
+        type: String,
+        default: undefined,
+        validator: (value) => {
+            if (value === undefined) return true;
+            return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+        },
+    },
 };
 
 
@@ -32,5 +41,5 @@ export interface DropdownBtnProps {
     block: boolean;
     buttonOnly: boolean;
     buttonIcon?: string;
-    buttonStyleType?: keyof ICON_BUTTON_STYLE_TYPE;
+    buttonStyleType?: keyof BUTTON_STYLE_TYPE;
 }

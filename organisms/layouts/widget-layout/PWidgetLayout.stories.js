@@ -10,7 +10,7 @@ import { widgetLayoutProps } from '@/components/organisms/layouts/widget-layout/
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 
 export default {
-    title: 'orgaisms/layouts/WidgetLayout',
+    title: 'organisms/layouts/WidgetLayout',
     component: PWidgetLayout,
     parameters: {
         info: {
@@ -22,7 +22,7 @@ export default {
 };
 
 
-const getState = (props, context) => {
+const getState = () => {
     const state = reactive({});
 
     return state;

@@ -13,7 +13,6 @@
 
 <script lang="ts">
 import PI from '@/components/atoms/icons/PI.vue';
-import { reactive } from '@vue/composition-api';
 
 export default {
     name: 'PAnchor',
@@ -35,14 +34,6 @@ export default {
             type: String,
             default: '_blank',
         },
-    },
-    setup(props) {
-        const state = reactive({
-
-        });
-        return {
-
-        };
     },
 };
 </script>

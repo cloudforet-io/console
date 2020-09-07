@@ -26,16 +26,74 @@
 
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
+
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { iconButtonProps } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
+import { IconButtonProps, BUTTON_STYLE_TYPE } from '@/components/molecules/buttons/icon-button/type';
 
 export default {
     name: 'PIconButton',
     components: { PButton, PI },
-    props: iconButtonProps,
-    setup(props: any) {
-        const state: any = reactive({
+    props: {
+        name: {
+            type: String,
+            default: '',
+        },
+        dir: {
+            type: String,
+            default: null,
+        },
+        fill: {
+            type: Boolean,
+            default: true,
+        },
+        width: {
+            type: String,
+            default: '1.5rem',
+        },
+        height: {
+            type: String,
+            default: '1.5rem',
+        },
+        scale: {
+            type: String,
+            default: undefined,
+        },
+        original: {
+            type: Boolean,
+            default: true,
+        },
+        title: {
+            type: String,
+            default: undefined,
+        },
+        color: {
+            type: String,
+            default: 'transparent inherit',
+        },
+        styleType: {
+            type: String,
+            default: undefined,
+            validator: (value) => {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+            },
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        outline: {
+            type: Boolean,
+            default: false,
+        },
+        solid: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props: IconButtonProps) {
+        const state = reactive({
             isHover: false,
         });
         const onHover = (value) => {
@@ -44,7 +102,6 @@ export default {
         return {
             ...toRefs(state),
             onHover,
-
         };
     },
 };

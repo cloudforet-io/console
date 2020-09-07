@@ -13,11 +13,10 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { LoadingButtonProps } from '@/components/molecules/buttons/loading-button/type';
 
 export default {
     name: 'PLoadingButton',
@@ -38,7 +37,7 @@ export default {
             }),
         },
     },
-    setup(props) {
+    setup(props: LoadingButtonProps) {
         const state = reactive({
             mergedButtonBind: computed(() => ({
                 disabled: props.loading || props.disabled,
