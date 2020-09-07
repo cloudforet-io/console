@@ -75,10 +75,10 @@ export abstract class BaseTableFluentAPI<
         try {
             const res = await this.getAction().execute();
             this.tableTS.state.items = res.data.results;
-            this.totalCount = res.data.total_count;
+            this.totalCount.value = res.data.total_count;
             this.tableTS.setAllPage(res.data.total_count);
         } catch (e) {
-            console.error(e)
+            console.error(e);
             this.tableTS.state.items = [];
             this.tableTS.state.allPage = 1;
             this.totalCount.value = 0;

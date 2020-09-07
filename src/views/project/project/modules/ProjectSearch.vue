@@ -68,7 +68,7 @@ import {
     computed, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import { makeProxy } from '@/components/util/composition-helpers';
-import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { fluentApi, ProjectGroupInfo } from '@/lib/fluent-api';

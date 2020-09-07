@@ -1,10 +1,10 @@
 <template>
     <div class="menu-container">
         <div class="left">
-            <div class="menu-lap mx-4">
+            <div class="site-map-lap">
                 <site-map :is-domain-owner="isDomainOwner" :visible.sync="sitemapVisible" />
             </div>
-            <div class="menu-lap mr-6 md:mr-10 lg:mr-10">
+            <div class="logo-lap">
                 <router-link to="/dashboard">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden md:inline-block lg:inline-block"
@@ -14,7 +14,7 @@
             </div>
             <div v-for="(dItem, idx) in defaultMenuList"
                  :key="idx"
-                 class="menu-lap"
+                 class="menu-lap hidden md:inline-block lg:inline-block"
             >
                 <div class="menu-button opacity mr-4 lg:mr-8"
                      :class="[{
@@ -37,8 +37,7 @@
                 <p-context-menu
                     v-if="openedMenu === dItem.key && dItem.menu.length > 0"
                     v-click-outside="hideMenu"
-                    class="white"
-                    :menu="dItem.menu"
+                    :menu="dItem.menu" theme="white"
                 >
                     <template #item-plugin>
                         <div v-if="!isDomainOwner" class="empty" />
@@ -66,8 +65,8 @@
                 <p-context-menu
                     v-if="openedMenu === 'support'"
                     v-click-outside="hideMenu"
-                    class="white right-align"
-                    :menu="supportMenu"
+                    class="right-align"
+                    :menu="supportMenu" theme="white"
                 >
                     <template #item--format="{item}" />
                 </p-context-menu>
@@ -85,6 +84,7 @@
                     v-click-outside="hideMenu"
                     class="white right-align"
                     :menu="accountMenu"
+                    theme="white"
                 >
                     <template #info--format>
                         <div class="context-info">
@@ -169,7 +169,7 @@ export default {
         const state = reactive({
             openedMenu: null,
             sitemapVisible: false,
-            defaultMenuList: [
+            defaultMenuList: computed(() => [
                 {
                     key: 'project',
                     link: '/project',
@@ -217,7 +217,7 @@ export default {
                 },
                 {
                     key: 'management',
-                    link: '/management',
+                    link: state.isDomainOwner ? '/management' : '/management/collector-history',
                     parentRoutes: ['management'],
                     menu: [
                         {
@@ -226,9 +226,12 @@ export default {
                         {
                             type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history',
                         },
+                        {
+                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler',
+                        },
                     ],
                 },
-            ],
+            ]),
             supportMenu: [
                 {
                     type: 'item',
@@ -356,24 +359,17 @@ export default {
         padding-right: 1.5rem;
     }
 
+    .site-map-lap {
+        display: inline-block;
+        margin: 0 1rem;
+    }
     .menu-lap {
         position: relative;
-        display: inline-block;
 
         &.account {
             .p-context-menu {
                 min-width: 15.125rem;
             }
-        }
-
-        .brand-logo {
-            display: inline-block;
-            width: 2rem;
-            height: 2rem;
-        }
-        .brand-logo-text {
-            height: 0.875rem;
-            margin-left: 0.5rem;
         }
         .menu-button {
             @apply text-gray-900;
@@ -450,6 +446,20 @@ export default {
                     padding-right: 0.5rem;
                 }
             }
+        }
+    }
+    .logo-lap {
+        display: inline-block;
+        margin-right: 1.5rem;
+
+        .brand-logo {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+        }
+        .brand-logo-text {
+            height: 0.875rem;
+            margin-left: 0.5rem;
         }
     }
 }

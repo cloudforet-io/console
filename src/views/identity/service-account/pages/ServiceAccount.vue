@@ -43,8 +43,7 @@
                                 <p-page-navigation :routes="route" />
                             </div>
                             <p-page-title
-                                :use-selected-count="true" :use-total-count="true" :title="`${selectProviderItem ? selectProviderItem.name : ''} Account`"
-                                :total-count="apiHandler.totalCount"
+                                :use-selected-count="true" :title="`${selectProviderItem ? selectProviderItem.name : ''} Account`"
                                 :selected-count="apiHandler.tableTS.selectState.selectItems.length"
                             />
                             <s-dynamic-layout type="table"
@@ -174,9 +173,10 @@ import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import {
-    SearchTableFluentAPI, TabSearchTableFluentAPI,
+    TabSearchTableFluentAPI,
     defaultAdminLayout,
 } from '@/lib/api/table';
+import { SearchTableFluentAPI } from '@/views/identity/service-account/pages/table';
 import {
     makeQueryStringComputed,
     makeQueryStringComputeds,
@@ -512,6 +512,7 @@ export default {
             } finally {
                 deleteTS.syncState.visible = false;
                 deleteTargetHandler.value.getData();
+                await requestProvider();
             }
         };
 

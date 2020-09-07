@@ -1,13 +1,14 @@
 import {
-    forEach, get, set, debounce,
+    forEach, get, set, debounce, find,
 } from 'lodash';
 import router from '@/routes';
 import {
     computed, onUnmounted, watch, ref, Ref, UnwrapRef,
 } from '@vue/composition-api';
 import { Dictionary } from 'vue-router/types/router';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { parseTag } from '@/lib/api/query-search';
+import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 export type RouteQuery = Dictionary<RouteQueryString>;
@@ -145,27 +146,37 @@ export const queryStringToNumberArray: Setter = (val: RouteQueryString): number[
     return [];
 };
 
-export const queryTagsToQueryString: Getter = (tags: QueryTag[]): RouteQueryString => {
+export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
     if (Array.isArray(tags)) {
-        return tags.map((tag) => {
-            let item;
-            if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
-            else item = `${tag.value?.name}`;
-            return item;
-        });
+        return tags.reduce((results, tag) => {
+            if (tag.invalid) return results;
+            if (tag.key) results.push(`${tag.key.name}:${tag.operator}${tag.value?.name}`);
+            else results.push(`${tag.value?.name}`);
+            return results;
+        }, [] as string[]);
     }
     return null;
 };
 
-export const queryStringToQueryTags: Setter = (queryString: RouteQueryString): QueryTag[] => {
+export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?: KeyItem[]): QueryTag[] => {
     if (!queryString) return [];
     if (Array.isArray(queryString)) {
         return queryString.reduce((res, qs) => {
-            if (qs) res.push(parseTag(qs));
+            if (qs) {
+                const queryItem: QueryItem = parseTag(qs);
+                if (queryItem.key?.name && keyItems) {
+                    queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
+                }
+                res.push(queryItem);
+            }
             return res;
         }, [] as QueryTag[]);
     }
-    return [parseTag(queryString as string)];
+    const queryItem = parseTag(queryString as string);
+    if (queryItem.key?.name && keyItems) {
+        queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
+    }
+    return [queryItem];
 };
 
 /** QueryString replacer Helpers */

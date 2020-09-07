@@ -258,7 +258,7 @@ import {
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 import { Location } from 'vue-router';
 
     interface ProjectCardData{

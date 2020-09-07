@@ -57,7 +57,7 @@ import {
 } from '@/components/organisms/dynamic-field/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { SearchSchema } from '@/lib/component-utils/query-search/type';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -160,9 +160,10 @@ export default {
                 if (options.pageStart) query.setPageStart(options.pageStart);
                 if (options.searchText) query.setKeyword(options.searchText);
                 if (options.queryTags) {
-                    const { and, or } = getFiltersFromQueryTags(options.queryTags);
-                    query.setFilter(...and)
-                        .setKeyword(...or);
+                    const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(options.queryTags);
+                    query.setFilter(...andFilters)
+                        .setFilterOr(...orFilters)
+                        .setKeyword(...keywords);
                 }
             }
 
@@ -235,7 +236,7 @@ export default {
             init(options) {
                 if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
                 if (searchSchemaCacheMap[props.serverId]) {
-                    const { keyItems, valueHandlerMap } = makeQuerySearchHandlersWithSearchSchema(
+                    const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
                         searchSchemaCacheMap[props.serverId],
                         'inventory.Server',
                     );
@@ -304,5 +305,8 @@ export default {
 <style lang="postcss" scoped>
     .raw-data {
         @apply px-4;
+    }
+    .p-button-tab {
+        @apply mt-8;
     }
 </style>

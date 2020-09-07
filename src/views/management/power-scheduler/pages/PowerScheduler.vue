@@ -18,10 +18,14 @@
                 :query-tags="tags"
                 :key-items="keyItems"
                 :value-handler-map="valueHandlerMap"
-                card-height="16.8rem"
+                card-height="18.25rem"
+                card-min-width="25rem"
                 @change="onChange"
                 @refresh="onChange"
             >
+                <template #toolbox-bottom>
+                    <page-information />
+                </template>
                 <template #card="{item}">
                     <div class="project-description">
                         <div class="project">
@@ -32,8 +36,50 @@
                                 {{ item.name }}
                             </p>
                         </div>
+                        <div class="flex justify-between">
+                            <div class="scheduled-resources">
+                                <p class="mb-1 text-xs">
+                                    Scheduled Resources
+                                </p>
+                                <span class="font-bold text-primary text-xs">{{ currentScheduleResources }}</span>
+                                <span class="text-gray-400 text-xs">/ {{ maxScheduleResources }}</span>
+                                <p-progress-bar
+                                    :percentage="percentage"
+                                    :style="'width: 160px'"
+                                    class="pt-2"
+                                />
+                            </div>
+                            <div class="saving">
+                                <p class="mb-1 text-xs">
+                                    Saving of This Month
+                                </p>
+                                <p class="text-gray-400 text-xs">
+                                    approx.
+                                </p>
+                                <span style="float: right;"><span class="text-primary font-bold">{{ approximateCosts }}  </span> <span>$</span></span>
+                            </div>
+                        </div>
                     </div>
                     <p-hr />
+                    <div class="schedule">
+                        <div>
+                            <p class="mb-4">
+                                <span class="font-bold text-gray-400 text-xs">SCHEDULE  </span><span class="text-gray-400 text-xs">(2)</span>
+                            </p>
+                            <div>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
+                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
+                            </div>
+                        </div>
+                        <div>
+                            <span v-for="day in weekday" class="weekday">
+                                {{ day }}
+                            </span>
+                            <div class="schedule-matrix mt-4">
+                                <schedule-heatmap />
+                            </div>
+                        </div>
+                    </div>
                 </template>
             </p-search-grid-layout>
         </div>
@@ -47,22 +93,38 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import router from '@/routes';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
+import PageInformation from '@/views/management/power-scheduler/modules/PageInformation.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import ScheduleHeatmap from '@/views/management/power-scheduler/modules/ScheduleHeatmap.vue';
 
 type UrlQueryString = string | (string | null)[] | null | undefined;
+interface Scheduler {
+    name: string;
+    heatMap: unknown;
+}
 
 export default {
     name: 'PowerScheduler',
     components: {
-        PPageTitle, PHr, PPageNavigation, GeneralPageLayout, PSearchGridLayout,
+        ScheduleHeatmap,
+        PI,
+        PageInformation,
+        PProgressBar,
+        PPageTitle,
+        PHr,
+        PPageNavigation,
+        GeneralPageLayout,
+        PSearchGridLayout,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -70,19 +132,19 @@ export default {
         /**
          * Handlers for query search
          * */
-        const handlers = makeQuerySearchHandlersWithSearchSchema(
+        const handlers = makeQuerySearchPropsWithSearchSchema(
             {
                 title: 'Properties',
                 items: [
-                    { key: 'cloud_service_type', name: 'Cloud Service Type' },
-                    { key: 'cloud_service_group', name: 'Cloud Service Group' },
                     { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                    { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-                    { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
                 ],
             },
-            'inventory.CloudService',
+            'identity.Project',
         );
+
+        /** State : state for page (grid layout, query search, etc.)
+         *  scheduleState: state for scheduled resources (number, progress, money, scheduler..)
+         * */
 
         const state = reactive({
             items: [],
@@ -96,6 +158,17 @@ export default {
             totalCount: 0,
         });
 
+        const scheduleState = reactive({
+            currentScheduleResources: Math.floor(Math.random() * 50),
+            maxScheduleResources: 50,
+            approximateCosts: Math.floor(Math.random() * 5000),
+            scheduler: [] as unknown as Scheduler,
+            weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+        });
+
+        const percentage = computed(() => (scheduleState.currentScheduleResources / scheduleState.maxScheduleResources) * 100);
+
+
         /**
          * Page Navigation
          * */
@@ -108,13 +181,14 @@ export default {
          * */
 
         const getParams = () => {
-            const { and, or } = getFiltersFromQueryTags(state.tags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
             const query = new QueryHelper();
             query
                 .setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize)
-                .setKeyword(...or)
-                .setFilter(...and);
+                .setKeyword(...keywords)
+                .setFilter(...andFilters)
+                .setFilterOr(...orFilters);
 
             return {
                 query: query.data,
@@ -197,6 +271,8 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(routeState),
+            ...toRefs(scheduleState),
+            percentage,
             listProjects,
             onChange,
         };
@@ -219,19 +295,24 @@ export default {
         }
     }
 
+
     .project-description {
-        @apply mx-4 mt-6;
-
+        @apply mx-6 mt-6 mb-6;
         .project {
-            @apply mb-4;
-
             .project-group-name {
                 @apply text-gray-500 text-xs;
             }
-
             #project-name {
                 @apply text-lg font-bold truncate pb-6 overflow-hidden;
             }
+        }
+    }
+
+    .schedule {
+        @apply mx-6 mt-6 mb-6 flex justify-between;
+        .weekday {
+            @apply text-gray-400 text-xs;
+            margin-right: 0.5625rem;
         }
     }
 </style>

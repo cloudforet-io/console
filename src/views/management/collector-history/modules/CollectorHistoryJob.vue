@@ -27,6 +27,7 @@
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
                     :page-size.sync="pageSize"
+                    :total-count="totalCount"
                     :style="{height: `${height}px`}"
                     :multi-select="false"
                     :select-index.sync="selectedIndexes"
@@ -101,7 +102,7 @@ import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import {
-    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
+    makeReferenceValueHandler, makeEnumValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -198,10 +199,10 @@ export default {
                 ],
                 valueHandlerMap: {
                     // eslint-disable-next-line camelcase
-                    service_account_id: makeValueHandlerWithReference('identity.ServiceAccount'),
+                    service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
                     // eslint-disable-next-line camelcase
-                    project_id: makeValueHandlerWithReference('identity.Project'),
-                    status: makeValueHandlerWithSearchEnums(JOB_TASK_STATUS),
+                    project_id: makeReferenceValueHandler('identity.Project'),
+                    status: makeEnumValueHandler(JOB_TASK_STATUS),
                 },
             },
         });
@@ -262,22 +263,22 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
 
-            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
 
-            const query = new QueryHelper();
-            query
+            const query = new QueryHelper()
                 .setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...or);
+                .setKeyword(...keywords)
+                .setFilterOr(...orFilters);
+
             if (statusValues.length > 0) {
-                query.setFilter({
+                andFilters.push({
                     k: 'status',
                     v: statusValues,
                     o: 'in',
-                }, ...and);
-            } else {
-                query.setFilter(...and);
+                });
             }
+            query.setFilter(...andFilters);
             return query;
         };
         const getJobTasks = async () => {

@@ -1,19 +1,10 @@
-/* Main styles for this application */
-
-/* Reset */
-@import "reset";
-
-/* Import auto generated icons based on assets */
+/* Icons */
 $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 @import "~@fortawesome/fontawesome-free/scss/regular";
 @import "~@fortawesome/fontawesome-free/scss/brands";
 
-/* Tailwind */
-@import '~tailwindcss/base';
-@import '~tailwindcss/components';
-@import '~tailwindcss/utilities';
-
+/* Global component styles */
 @import '~highlight.js/scss/atom-one-dark';
-

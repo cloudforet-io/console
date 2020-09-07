@@ -36,7 +36,7 @@
       "key": "cloud_service_group",
       "name": "Cloud Service Group"
     },{
-      "key": "cloud_service_group",
+      "key": "cloud_service_type",
       "name": "Cloud Service Type"
     },{
       "key": "collection_info.state",

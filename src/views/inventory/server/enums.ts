@@ -1,5 +1,5 @@
 import { StatusProps } from '@/components/molecules/status/type';
-import { BadgeProps } from '@/components/atoms/badges/PBadge.toolset';
+import { Badge } from '@/components/atoms/badges/type';
 
 
 type Enum<T> = Record<string, T>
@@ -43,7 +43,7 @@ export const LIFE_CYCLE: Enum<StatusProps> = {
     },
 };
 
-export const SERVER_TYPE: Enum<Partial<BadgeProps>> = {
+export const SERVER_TYPE: Enum<Partial<Badge>> = {
     VM: {
         backgroundColor: 'indigo.500',
         outline: true,

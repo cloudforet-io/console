@@ -107,7 +107,7 @@ import PCollectorHistoryChart from '@/views/management/collector-history/modules
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
@@ -118,10 +118,11 @@ import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import {
-    makeValueHandlerWithReference, makeValueHandlerWithSearchEnums,
+    makeEnumValueHandler, makeDistinctValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import router from '@/routes';
+import { useStore } from '@/store/toolset';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -149,8 +150,10 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const { user } = useStore();
         const state = reactive({
             loading: false,
+            isDomainOwner: computed(() => user.state.isDomainOwner),
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
@@ -196,8 +199,8 @@ export default {
                 ],
                 valueHandlerMap: {
                     // eslint-disable-next-line camelcase
-                    job_id: makeValueHandlerWithReference('inventory.Job', 'job_id'),
-                    status: makeValueHandlerWithSearchEnums(JOB_STATUS),
+                    job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
+                    status: makeEnumValueHandler(JOB_STATUS),
                 },
             },
             //
@@ -206,11 +209,17 @@ export default {
             modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
         });
         const routeState = reactive({
-            route: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' }],
+            route: computed(() => [
+                { name: 'Management', path: state.isDomainOwner ? '/management' : '/management/collector-history' },
+                { name: 'Collector History', path: '/management/collector-history' },
+            ]),
         });
         const subRouteState = reactive({
-            subRoute: [{ name: 'Management', path: '/management' }, { name: 'Collector History', path: '/management/collector-history' },
-                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` }],
+            subRoute: computed(() => [
+                { name: 'Management', path: state.isDomainOwner ? '/management' : '/management/collector-history' },
+                { name: 'Collector History', path: '/management/collector-history' },
+                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` },
+            ]),
         });
 
         const convertStatus = (status) => {
@@ -255,23 +264,22 @@ export default {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
-            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
 
-            const query = new QueryHelper();
-            query
+            const query = new QueryHelper()
                 .setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...or);
+                .setKeyword(...keywords)
+                .setFilterOr(...orFilters);
+
             if (statusValues.length > 0) {
-                query.setFilter({
+                andFilters.push({
                     k: 'status',
                     v: statusValues,
                     o: 'in',
-                }, ...and);
-            } else {
-                query.setFilter(...and);
+                });
             }
-
+            query.setFilter(...andFilters);
             return query.data;
         };
         const getJobs = async () => {
@@ -348,6 +356,7 @@ export default {
         };
         const onClickStatus = (status) => {
             state.activatedStatus = status;
+            state.thisPage = 1;
             getJobs();
         };
 

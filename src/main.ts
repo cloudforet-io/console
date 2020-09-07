@@ -18,6 +18,7 @@ import VueFormGenerator from 'vue-form-generator';
 import 'vue-form-generator/dist/vfg.css';
 import App from './App.vue';
 import '@/styles/style.scss';
+import '@/styles/style.pcss';
 
 
 Vue.mixin(Util);

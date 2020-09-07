@@ -163,10 +163,10 @@ import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { Location } from 'vue-router';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
-    makeQuerySearchHandlersWithSearchSchema,
-} from '@/lib/component-utils/query-search';
+    makeQuerySearchPropsWithSearchSchema,
+} from '@/lib/component-utils/dynamic-layout';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
@@ -242,7 +242,7 @@ export default {
             selectedRegionIdx: [] as number[],
             regionFilter: [] as string[],
         });
-        const handlers = makeQuerySearchHandlersWithSearchSchema(
+        const handlers = makeQuerySearchPropsWithSearchSchema(
             {
                 title: 'Properties',
                 items: [
@@ -318,6 +318,8 @@ export default {
             state.tags.forEach((tag: QueryTag) => {
                 if (tag.key) {
                     if (tag.key.name === 'project_id') filters.push(tag);
+                    if (tag.key.name === 'data.region_name') filters.push(tag);
+                    if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
                 }
             });
             filterState.regionFilter.forEach((d) => {
@@ -396,18 +398,19 @@ export default {
         });
 
         const getParams = (isTriggeredBySideFilter = false) => {
-            const { and, or } = getFiltersFromQueryTags(state.tags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
 
             const { filters, labels } = sidebarFilters.value;
 
             const query = new QueryHelper();
             query
                 .setPageLimit(state.pageSize)
-                .setKeyword(...or)
-                .setFilter(...and, ...filters);
-            if (!isTriggeredBySideFilter) {
-                query.setPageStart(getPageStart(state.thisPage, state.pageSize));
-            }
+                .setKeyword(...keywords)
+                .setFilterOr(...orFilters)
+                .setFilter(...andFilters, ...filters);
+
+            if (isTriggeredBySideFilter) state.thisPage = 1;
+            else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
                 show_all: true,

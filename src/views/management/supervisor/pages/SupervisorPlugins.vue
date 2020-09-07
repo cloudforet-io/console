@@ -90,7 +90,7 @@ import {
     queryStringToQueryTags,
     queryTagsToQueryString, selectIndexAutoReplacer,
 } from '@/lib/router-query-string';
-import { makeKeyItems, makeValueHandlerMapWithReference } from '@/lib/component-utils/query-search';
+import { makeKeyItems, makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
 
 export default {
     name: 'Supervisor',
@@ -157,7 +157,7 @@ export default {
             undefined,
             {
                 keyItems: makeKeyItems(pluginKeyAutoCompletes),
-                valueHandlerMap: makeValueHandlerMapWithReference(
+                valueHandlerMap: makeDistinctValueHandlerMap(
                     pluginKeyAutoCompletes, 'plugin.Supervisor',
                 ),
             },

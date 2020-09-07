@@ -1,33 +1,29 @@
 <template>
     <div class="pt-8 pb-16">
         <section>
-            <slot name="buttons" :tools="tools" :selectedToolId="selectedToolId">
-                <p-select-btn-group class="mb-8" :buttons="tools" :selected.sync="selectedToolId" />
-            </slot>
+            <p-select-btn-group class="px-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
         </section>
         <section class="mb-8">
-            <slot name="legends">
-                <span class="title">
-                    {{ $t('WORD.RESOURCE') }}
-                </span>
-                <span class="ml-4 text-gray text-sm">
-                    * {{ $t('ACTION.LIMIT_OF', {
-                        limitCount: 10,
-                        itemName: $t('WORD.RESOURCE')
-                    }) }}
-                </span>
-                <div>
-                    <div v-for="(resource, idx) in availableResources" :key="resource.id" class="legend">
-                        <span class="flex-shrink-0 rounded-sm h-3 w-3 mr-2"
-                              :style="{ backgroundColor: colors[idx] }"
-                        />
-                        <span v-tooltip.bottom="{content: legendFormatter(resource), delay: 200}"
-                              class="truncate"
-                        >{{ legendFormatter(resource) }}
-                        </span>
-                    </div>
+            <span class="title">
+                {{ $t('WORD.RESOURCE') }}
+            </span>
+            <span class="ml-4 text-gray text-sm">
+                * {{ $t('ACTION.LIMIT_OF', {
+                    limitCount: 10,
+                    itemName: $t('WORD.RESOURCE')
+                }) }}
+            </span>
+            <div>
+                <div v-for="(resource, idx) in availableResources" :key="resource.id" class="legend">
+                    <span class="flex-shrink-0 rounded-sm h-3 w-3 mr-2"
+                          :style="{ backgroundColor: colors[idx] }"
+                    />
+                    <span v-tooltip.bottom="{content: legendFormatter(resource), delay: 200}"
+                          class="truncate"
+                    >{{ legendFormatter(resource) }}
+                    </span>
                 </div>
-            </slot>
+            </div>
         </section>
         <section class="toolbox-section">
             <div class="inline-flex items-center">
@@ -178,7 +174,7 @@ export default {
             tools: computed(() => state.dataTools.map(d => ({
                 name: d.id,
                 label: d.name,
-                vbind: { styleType: 'black', outline: state.selectedToolId !== d.id },
+                // vbind: { styleType: 'black', outline: state.selectedToolId !== d.id },
             }))),
             selectedTimeRange: '1h',
             statisticsTypes: computed(() => {

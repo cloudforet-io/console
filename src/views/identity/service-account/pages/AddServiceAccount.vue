@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout>
+    <general-page-layout class="add-service-account-container">
         <div class="page-navigation">
             <p-page-navigation :routes="route" />
         </div>
@@ -7,44 +7,46 @@
             class="mb-6"
             title="Add Service Account"
             child
-            @goBack="goBack"
+            @goBack="onClickGoBack"
         >
             <template #before-title>
-                <div class="inline-block ml-2 mr-2 -mt-1">
+                <div class="icon">
                     <img v-if="providerIcon"
                          width="32px" height="32px"
-                         :src="providerIcon"
-                         :alt="provider"
+                         :src="providerIcon" :alt="provider"
                     >
                     <p-i v-else name="ic_provider_other"
-                         width="32px"
-                         height="32px"
+                         width="32px" height="32px"
                     />
                 </div>
             </template>
         </p-page-title>
         <p-collapsible-panel v-if="description">
             <template #content>
-                <div class="p-4">
-                    <s-dynamic-layout v-bind="description" :vbind="{showTitle:false}" />
-                </div>
+                <p-markdown
+                    :markdown="description.options.markdown"
+                    :data="description.options.markdown"
+                />
             </template>
         </p-collapsible-panel>
-        <p-pane-layout class="panel">
+
+        <p-pane-layout>
             <div class="title">
                 Base Information
             </div>
-            <div class="form-box">
-                <p-json-schema-form v-bind="actFixFormTS.state" :item.sync="actFixFormTS.syncState.item" />
-                <p-json-schema-form v-bind="actJscTS.state" :item.sync="actJscTS.syncState.item" />
-            </div>
+            <p-dynamic-form :schema="accountBasicSchema" :model="accountBasicModel" :options="inputOptions"
+                            :is-valid.sync="isAccountBasicValid" :validation-mode="validationMode"
+            />
+            <p-dynamic-form :schema="accountCustomSchema" :model="accountCustomModel" :options="inputOptions"
+                            :is-valid.sync="isAccountCustomValid" :validation-mode="validationMode"
+            />
             <div class="tag-title">
                 {{ $t('PANEL.TAG') }}
             </div>
             <div class="tag-help-msg">
                 <i18n path="ACTION.DICT.ADD_TAG_BY">
                     <template #name>
-                        <span v-if="actFixFormTS.syncState.item.name" class="font-bold">[{{ actFixFormTS.syncState.item.name }}]</span>
+                        <span v-if="accountBasicModel.name" class="font-bold">[{{ accountBasicModel.name }}]</span>
                         <span v-else> Account</span>
                     </template>
                 </i18n>
@@ -68,46 +70,43 @@
                 </template>
             </p-dict-input-group>
         </p-pane-layout>
-        <p-pane-layout class="panel">
+
+        <p-pane-layout>
             <div class="title">
                 Credentials
             </div>
-            <div class="form-box">
-                <p-json-schema-form v-bind="crdFixFormTS.state" :item.sync="crdFixFormTS.syncState.item" />
-            </div>
+            <p-dynamic-form :schema="credentialBasicSchema" :model="credentialBasicModel" :options="inputOptions"
+                            :is-valid.sync="isCredentialBasicValid" :validation-mode="validationMode"
+            />
 
-            <p-field-group
-                label="Secret Type"
-                required
-            >
+            <p-field-group label="Secret Type" required>
                 <div class="flex">
-                    <span v-for="(name, idx) in schemaNames" :key="idx" class="secret-type-name">
-                        <p-radio
-                            v-model="selectSchema"
-                            :value="name"
-                        />
-                        {{ name }}
+                    <span v-for="(type, idx) in secretTypes" :key="idx" class="secret-type-text">
+                        <p-radio v-model="selectedSecretType" :value="type" />
+                        {{ type }}
                     </span>
                 </div>
             </p-field-group>
             <div class="custom-schema-box">
-                <div class="form-box">
-                    <p-json-schema-form v-bind="crdFormTS.state" :item.sync="crdFormTS.syncState.item" />
-                </div>
+                <p-dynamic-form :schema="credentialCustomSchema" :model="credentialCustomModel" :options="inputOptions"
+                                :is-valid.sync="isCredentialCustomValid"
+                                :validation-mode="validationMode"
+                />
             </div>
         </p-pane-layout>
-        <s-project-tree-panel ref="projectRef" class="panel"
+
+        <s-project-tree-panel ref="projectRef" class="tree-panel"
                               :resource-name="$t('WORD.SERVICE_ACCOUNT')"
-                              :target-name="actFixFormTS.syncState.item.name"
+                              :target-name="accountBasicModel.name"
         />
-        <div class="bottom">
-            <p-button class="item" style-type="primary-dark" size="lg"
-                      @click="confirm"
+        <div class="button-lap">
+            <p-button class="text-button" style-type="primary-dark" size="lg"
+                      @click="onClickSave"
             >
                 {{ $t('BTN.SAVE') }}
             </p-button>
-            <p-button class="item" style-type="outline gray900" size="lg"
-                      @click="goBack"
+            <p-button class="text-button" style-type="outline gray900" size="lg"
+                      @click="onClickGoBack"
             >
                 {{ $t('BTN.CANCEL') }}
             </p-button>
@@ -116,132 +115,45 @@
 </template>
 
 <script lang="ts">
-import { AxiosResponse } from 'axios';
-import { get } from 'lodash';
+import { get, map, random } from 'lodash';
+import VueFormGenerator from 'vue-form-generator/dist/vfg';
 
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import {
-    ComponentRenderProxy,
-    computed,
-    getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    ComponentRenderProxy, getCurrentInstance,
+    reactive, computed, ref, toRefs, watch,
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
-import SDynamicLayout from '@/views/common/dynamic-layout/SDynamicLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
-import { CustomKeywords, JsonSchemaFormToolSet, CustomValidator } from '@/components/organisms/forms/json-schema-form/toolset';
+import PDynamicForm from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
+import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { JsonSchemaObjectType } from '@/lib/type';
+import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { fluentApi } from '@/lib/fluent-api';
-import { useStore } from '@/store/toolset';
-
-const accountFormSetup = (props) => {
-    const actFixFormTS = new JsonSchemaFormToolSet();
-    const schema = new JsonSchemaObjectType();
-    schema.addStringProperty('name', 'Name', true, 'Cloud Account Name');
-
-    actFixFormTS.setProperty(schema, ['name']);
-
-    const actJscTS = new JsonSchemaFormToolSet();
-    onMounted(async () => {
-        const resp = await fluentApi.identity().provider().get().setId(props.provider)
-            .setOnly('template.service_account.schema')
-            .execute();
-        actJscTS.setProperty(resp.data.template.service_account.schema as JsonSchemaObjectType);
-    });
-    return {
-        actFixFormTS,
-        actJscTS,
-    };
-};
-
-const credentialsFormSetup = (props) => {
-    const crdFixFormTS = new JsonSchemaFormToolSet();
-    const schemaNames = ref<string[]>([]);
-    const selectSchema = ref<string>('');
-    const description = ref<string|undefined>(undefined);
-    const crdState = reactive({
-        formSchema: {},
-    });
-
-    const checkNameUnique = (...args: any[]) => fluentApi.secret().secret().list()
-        .setFilter({ key: 'name', operator: '=', value: args[1] })
-        .setCountOnly()
-        .execute()
-        .then(resp => resp.data.total_count === 0);
-
-    const validation: CustomKeywords = {
-        uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
-    };
-
-    const makeFixSchema = () => {
-        const sch = new JsonSchemaObjectType(undefined, undefined, true);
-        sch.addStringProperty('name', 'Name', true, 'Credentials Name', { uniqueName: true });
-        return sch;
-    };
-    watch(schemaNames, (after, before) => {
-        if (after !== before) {
-            const sch = makeFixSchema();
-            crdFixFormTS.setProperty(sch, ['name'], validation);
-            selectSchema.value = schemaNames.value[0];
-        }
-    }, { immediate: true });
-
-
-    const crdFormTS = new JsonSchemaFormToolSet();
-    const getSchema = async (name) => {
-        if (name) {
-            const resp: AxiosResponse<any> = await fluentApi.repository().schema().getByName().setId(name)
-                .execute();
-            crdFormTS.setProperty(resp.data.schema);
-        }
-    };
-
-    watch(selectSchema, async (after, before) => {
-        if (after && after !== before) {
-            await getSchema(after);
-        }
-    }, { immediate: true });
-    onMounted(async () => {
-        const descriptionPath = 'metadata.view.layouts.help:service_account:create';
-        const resp = await fluentApi.identity().provider().get().setId(props.provider)
-            .setOnly('template.service_account.schema', 'capability.supported_schema', descriptionPath)
-            .execute();
-        crdState.formSchema = resp.data.template.service_account.schema;
-        schemaNames.value = resp.data.capability.supported_schema;
-        // eslint-disable-next-line camelcase
-        description.value = get(resp.data, descriptionPath);
-    });
-    return {
-        crdFormTS,
-        crdFixFormTS,
-        selectSchema,
-        schemaNames,
-        description,
-    };
-};
+import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 
 export default {
-    name: 'SSecretCreateFormModal',
+    name: 'AddServiceAccount',
     components: {
+        PMarkdown,
+        PDynamicForm,
         PCollapsiblePanel,
         PPageTitle,
         PPageNavigation,
         PFieldGroup,
         PDictInputGroup,
-        PJsonSchemaForm,
         PPaneLayout,
         GeneralPageLayout,
         PIconTextButton,
@@ -249,14 +161,6 @@ export default {
         PRadio,
         SProjectTreePanel,
         PI,
-        SDynamicLayout,
-    },
-    directives: {
-        focus: {
-            inserted(el) {
-                el.focus();
-            },
-        },
     },
     props: {
         provider: {
@@ -266,157 +170,319 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { provider } = useStore();
-        provider.getProvider();
-
         const state = reactive({
-            providerIcon: computed(() => provider.state.providers[props.provider]?.icon),
+            providerObj: {} as ProviderModel,
+            serviceAccountId: '',
+            providerIcon: computed(() => get(state.providerObj, 'tags.icon', '')),
+            description: computed(() => get(state.providerObj, 'metadata.view.layouts.help:service_account:create', undefined)),
+            selectedSecretType: '',
+            serviceAccountNames: [] as string[],
+            credentialNames: [] as string[],
+            secretTypes: computed(() => get(state.providerObj, 'capability.supported_schema', [])),
+            //
+            isAccountBasicValid: false,
+            accountBasicModel: { name: '' },
+            accountBasicSchema: {
+                fields: [
+                    {
+                        id: 'accountName',
+                        type: 'input',
+                        inputType: 'text',
+                        label: vm.$t('COMMON.NAME'),
+                        model: 'name',
+                        placeholder: 'Cloud Account Name',
+                        min: 2,
+                        required: true,
+                        validator: [VueFormGenerator.validators.string.locale({
+                            fieldIsRequired: 'should NOT be shorter than 2 characters',
+                            textTooSmall: 'should NOT be shorter than 2 characters',
+                        }), (value) => {
+                            if (state.serviceAccountNames.includes(value)) {
+                                return ['Name is duplicated'];
+                            }
+                            return [];
+                        }],
+                    },
+                ],
+            },
+            isAccountCustomValid: false,
+            accountCustomModel: {},
+            accountCustomSchema: {},
+            //
+            isCredentialBasicValid: false,
+            credentialBasicModel: { name: '' },
+            credentialBasicSchema: {
+                fields: [
+                    {
+                        id: 'credentialName',
+                        type: 'input',
+                        inputType: 'text',
+                        label: vm.$t('COMMON.NAME'),
+                        placeholder: 'Credentials Name',
+                        model: 'name',
+                        min: 2,
+                        required: true,
+                        validator: [VueFormGenerator.validators.string.locale({
+                            fieldIsRequired: 'should NOT be shorter than 2 characters',
+                            textTooSmall: 'should NOT be shorter than 2 characters',
+                        }), (value) => {
+                            if (state.credentialNames.includes(value)) {
+                                return ['Name is duplicated'];
+                            }
+                            return [];
+                        }],
+                    },
+                ],
+            },
+            isCredentialCustomValid: false,
+            credentialCustomSchema: {},
+            credentialCustomModel: {},
+            //
+            inputOptions: {
+                validateAfterLoad: true,
+                validateAfterChanged: true,
+                validateAsync: true,
+            },
+            validationMode: false,
+            isValid: computed(() => state.isAccountBasicValid && state.isAccountCustomValid && state.isCredentialBasicValid && state.isCredentialCustomValid),
+            // TODO: tagsTS should be deprecated
+            tagsTS: new DictIGToolSet({ showValidation: true }),
         });
-        const tagsTS = new DictIGToolSet({
-            showValidation: true,
-        });
-        const {
-            actFixFormTS,
-            actJscTS,
-        } = accountFormSetup(props);
-        const {
-            crdFormTS,
-            crdFixFormTS,
-            selectSchema,
-            schemaNames,
-            description,
-        } = credentialsFormSetup(props);
-
         const routeState = reactive({
             route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
                 { name: 'Add Account', path: `/identity/service-account/add/${props.provider}` }],
         });
-
-        const goBack = () => {
-            const nextPath = vm?.$route.query.nextPath as string|undefined;
-            if (nextPath) {
-                vm.$router.push(nextPath);
-            } else {
-                vm.$router.back();
-            }
-        };
-
-        const deleteAccount = async (accountId: string) => {
-            await fluentApi.identity().serviceAccount().delete().setId(accountId)
-                .execute();
-        };
         const projectRef = ref<any>(null);
-        const confirm = async () => {
-            const actFixFormValid = await actFixFormTS.formState.validator();
-            const actJscFormValid = await actJscTS.formState.validator();
 
-            const crdFixFormValid = await crdFixFormTS.formState.validator();
-            const crdJscFormValid = await crdFormTS.formState.validator();
-            if (tagsTS.allValidation()
-                && actFixFormValid && actJscFormValid
-                && crdFixFormValid && crdJscFormValid
-                && !projectRef.value.error
-            ) {
-                const item: any = {
-                    name: actFixFormTS.syncState.item.name,
-                    provider: props.provider,
-                    data: actJscTS.syncState.item,
-                    tags: tagsTS.vdState.newDict,
-                };
-                if (projectRef.value.selectNode) {
-                    // eslint-disable-next-line camelcase
-                    item.project_id = projectRef.value.selectNode.node.data.id;
+        const convertMetaSchemaToCustomSchema = (schema) => {
+            const customSchema = { fields: [] as object[] };
+            const customModel = {};
+            map(schema.properties, (v, k) => {
+                const field: any = {};
+                field.id = random(10000);
+                field.model = k;
+                field.label = v.title;
+                if (v.minLength) field.min = v.minLength;
+                if (schema.required.includes(k)) field.required = true;
+                if (v.examples) field.placeholder = v.examples;
+                if (v.type === 'number' || v.type === 'integer') {
+                    field.type = 'input';
+                    field.inputType = 'number';
+                    if (schema.required.includes(k)) field.validator = ['integer', 'required'];
+                } else if (v.type === 'enum') {
+                    field.type = 'select';
+                    field.values = v.enum;
+                    if (schema.required.includes(k)) field.validator = ['select', 'required'];
+                } else {
+                    field.type = 'input';
+                    field.inputType = 'text';
+                    if (schema.required.includes(k)) {
+                        field.validator = VueFormGenerator.validators.string.locale({
+                            fieldIsRequired: `should NOT be shorter than ${v.minLength} characters`,
+                            textTooSmall: `should NOT be shorter than ${v.minLength} characters`,
+                        });
+                    }
                 }
-                await fluentApi.identity().serviceAccount().create().setParameter(item)
-                    .execute()
-                    .then(async (resp) => {
-                        if (crdFormTS.syncState.item.private_key) {
-                            // eslint-disable-next-line camelcase
-                            crdFormTS.syncState.item.private_key = crdFormTS.syncState.item.private_key.replace(/\\n/g, '\n');
-                        }
-                        await fluentApi.secret().secret().create().setParameter({
-                            name: crdFixFormTS.syncState.item.name,
-                            data: crdFormTS.syncState.item,
-                            schema: selectSchema.value,
-                            // eslint-disable-next-line camelcase
-                            secret_type: 'CREDENTIALS',
-                            // eslint-disable-next-line camelcase
-                            service_account_id: resp.data.service_account_id,
-                        })
-                            .execute()
-                            .then(() => {
-                                showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
-                                goBack();
-                            })
-                            .catch(async (errorResp) => {
-                                console.error(errorResp);
-                                await deleteAccount(resp.data.service_account_id);
-                                showErrorMessage('Fail to Add Account', errorResp, context.root);
-                            });
-                    })
-                    .catch((eResp) => {
-                        console.error(eResp);
-                        showErrorMessage('Request Fail', eResp, context.root);
-                    });
+                customSchema.fields.push(field);
+                customModel[k] = null; // todo:
+            });
+            return [customSchema, customModel];
+        };
+
+        const getProvider = async () => {
+            const res = await fluentApi.identity().provider().get().setId(props.provider)
+                .execute();
+            state.providerObj = res.data;
+            state.selectedSecretType = res.data.capability.supported_schema[0];
+        };
+        const getCredentialNames = async () => {
+            const res = await fluentApi.secret().secret().list().setOnly('name')
+                .execute();
+            state.credentialNames = res.data.results.map(v => v.name);
+        };
+        const getServiceAccountNames = async () => {
+            const res = await fluentApi.identity().serviceAccount().list().setOnly('name')
+                .execute();
+            state.serviceAccountNames = res.data.results.map(v => v.name);
+        };
+        const getServiceAccountSchema = async () => {
+            const schema = state.providerObj.template.service_account.schema;
+            [state.accountCustomSchema, state.accountCustomModel] = convertMetaSchemaToCustomSchema(schema);
+        };
+        const getCredentialSchema = async (selectedSecretType) => {
+            const res = await fluentApi.repository().schema().getByName().setId(selectedSecretType)
+                .setOnly('schema')
+                .execute();
+            const schema = res.data.schema;
+            [state.credentialCustomSchema, state.credentialCustomModel] = convertMetaSchemaToCustomSchema(schema);
+        };
+
+        const deleteServiceAccount = async () => {
+            await fluentApi.identity().serviceAccount().delete().setId(state.serviceAccountId)
+                .execute();
+            state.serviceAccountId = '';
+        };
+        const createServiceAccount = async () => {
+            const item: any = {
+                name: state.accountBasicModel.name,
+                provider: props.provider,
+                data: state.accountCustomModel,
+                tags: state.tagsTS.vdState.newDict,
+            };
+
+            if (projectRef.value.selectNode) {
+                // eslint-disable-next-line camelcase
+                item.project_id = projectRef.value.selectNode.node.data.id;
+            }
+
+            try {
+                const res = await fluentApi.identity().serviceAccount().create().setParameter(item)
+                    .execute();
+                state.serviceAccountId = res.data.service_account_id;
+            } catch (e) {
+                showErrorMessage('Request Fail', e, context.root);
             }
         };
+        const createSecret = async () => {
+            try {
+                await fluentApi.secret().secret().create()
+                    .setParameter({
+                        name: state.credentialBasicModel.name,
+                        data: state.credentialCustomModel,
+                        schema: state.selectedSecretType,
+                        // eslint-disable-next-line camelcase
+                        secret_type: 'CREDENTIALS',
+                        // eslint-disable-next-line camelcase
+                        service_account_id: state.serviceAccountId,
+                    })
+                    .execute();
+                vm.$router.back();
+                showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
+            } catch (e) {
+                await deleteServiceAccount();
+                showErrorMessage('Fail to Add Account', e, context.root);
+            }
+        };
+
+        const onClickSave = async () => {
+            state.validationMode = true;
+            if (!state.isValid) {
+                return;
+            }
+            if (state.tagsTS.allValidation() && !projectRef.value.error) {
+                await createServiceAccount();
+                if (state.serviceAccountId) {
+                    if (state.credentialCustomModel.private_key) {
+                        // eslint-disable-next-line camelcase
+                        state.credentialCustomModel.private_key = state.credentialCustomModel.private_key.replace(/\\n/g, '\n');
+                    }
+                    await createSecret();
+                }
+            }
+        };
+        const onClickGoBack = () => {
+            const nextPath = vm?.$route.query.nextPath as string|undefined;
+            if (nextPath) vm.$router.push(nextPath);
+            else vm.$router.back();
+        };
+
+        const init = async () => {
+            await getProvider();
+            await getServiceAccountNames();
+            await getCredentialNames();
+            //
+            await getServiceAccountSchema();
+        };
+        init();
+
+        watch(() => state.selectedSecretType, async (after, before) => {
+            if (after && after !== before) {
+                await getCredentialSchema(after);
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
             ...toRefs(routeState),
-            tagsTS,
-            crdFormTS,
-            crdFixFormTS,
-            confirm,
-            goBack,
-            selectSchema,
-            schemaNames,
-            actFixFormTS,
-            actJscTS,
             projectRef,
-            description,
+            onClickSave,
+            onClickGoBack,
         };
     },
 };
 </script>
 
-<style lang="postcss" scoped>
-    .panel {
-        @apply w-full px-4 py-8 mb-4;
+<style lang="postcss">
+.add-service-account-container {
+    .p-page-title {
+        .icon {
+            display: inline-block;
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            margin-top: -0.25rem;
+        }
+    }
+    .p-pane-layout {
+        width: 100%;
+        padding: 2rem 1rem;
+        margin-bottom: 1rem;
         &:nth-last-child(1) {
             @apply mb-0;
         }
+        .title {
+            font-size: 1.5rem;
+            line-height: 120%;
+            margin-bottom: 2rem;
+        }
+        .tag-title {
+            font-size: 0.875rem;
+            font-weight: bold;
+            line-height: 120%;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .tag-help-msg {
+            font-size: 0.875rem;
+            line-height: 150%;
+            margin-bottom: 1.5rem;
+        }
+        .vue-form-generator {
+            .form-group {
+                .form-control {
+                    max-width: 100%;
+                    @screen lg {
+                        max-width: 50%;
+                    }
+                }
+            }
+        }
+        .secret-type-text {
+            margin-right: 4.375rem;
+        }
+        .custom-schema-box {
+            @apply border border-gray-200;
+            border-radius: 0.125rem;
+            border-left-width: 0.25rem;
+            padding: 1.25rem 2rem;
+        }
     }
-    .bottom {
-        @apply flex flex-row-reverse;
+
+    .tree-panel {
+        width: 100%;
+        padding: 2rem 1rem;
+        margin-bottom: 1rem;
+        &:nth-last-child(1) {
+            margin-bottom: 0;
+        }
+    }
+
+    .button-lap {
+        display: flex;
+        flex-direction: row-reverse;
         margin-top: 1rem;
-        .item {
+        .text-button {
             margin-left: 1rem;
         }
     }
-    .title {
-        @apply text-2xl mb-8;
-        line-height: 120%;
-    }
-    .tag-title {
-        @apply text-sm font-bold mb-2 mt-8;
-        line-height: 120%;
-    }
-    .tag-help-msg {
-        @apply text-sm mb-6;
-        line-height: 150%;
-    }
-    .form-box {
-        @apply w-full;
-
-        @screen lg {
-            @apply max-w-1/2;
-        }
-    }
-    .secret-type-name {
-        margin-right: 4.375rem;
-    }
-    .custom-schema-box {
-        @apply border rounded-sm border-gray-200 border-l-4 px-8 py-5;
-    }
+}
 </style>

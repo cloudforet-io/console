@@ -153,7 +153,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
-import { QueryTag } from '@/components/organisms/search/query-search-tags/PQuerySearchTags.toolset';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 
 import router from '@/routes';
@@ -161,13 +161,12 @@ import { makeTrItems } from '@/lib/view-helper';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
-import { makeQuerySearchHandlersWithSearchSchema } from '@/lib/component-utils/query-search';
-import { ActionAPIInterface, FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { makeQueryStringComputeds } from '@/lib/router-query-string';
-import { getFiltersFromQueryTags, getQueryItemsToFilterItems, parseTag } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import tableSchema from '@/views/inventory/server/default-schema/base-table.json';
 import config from '@/lib/config';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
@@ -305,7 +304,7 @@ export default {
                 { name: 'priority', label: 'Priority' },
             ],
             // query
-            querySearchHandlers: makeQuerySearchHandlersWithSearchSchema({
+            querySearchHandlers: makeQuerySearchPropsWithSearchSchema({
                 title: 'Properties',
                 items: [
                     { key: 'collector_id', name: 'Collector ID' },
@@ -408,13 +407,14 @@ export default {
 
         // Table
         const getQuery = () => {
-            const { and, or } = getFiltersFromQueryTags(state.searchTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
             const query = new QueryHelper();
             query
                 .setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...or)
-                .setFilter(...and)
+                .setKeyword(...keywords)
+                .setFilter(...andFilters)
+                .setFilterOr(...orFilters)
                 .setOnly(
                     'collector_id', 'name', 'state', 'priority', 'last_collected_at',
                     'created_at', 'provider', 'tags', 'plugin_info',

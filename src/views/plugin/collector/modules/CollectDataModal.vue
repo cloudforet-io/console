@@ -96,7 +96,7 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
 import { SecretModel } from '@/lib/fluent-api/secret/secret';
-import { MenuItem } from '@/components/organisms/context-menu/PContextMenu.toolset';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 import { showErrorMessage } from '@/lib/util';
 import { formValidation, requiredValidation } from '@/components/util/composition-helpers';
 

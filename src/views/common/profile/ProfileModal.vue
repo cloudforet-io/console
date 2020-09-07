@@ -16,8 +16,8 @@
                     @confirm="onClickConfirm"
     >
         <template #body>
-            <p-row class="profile-form" wrap="wrap">
-                <p-col class="form-div" :col="6">
+            <div class="profile-form grid grid-cols-2">
+                <div class="form-div col-span-1">
                     <p-field-group :label="$t('COMMON.ID')">
                         <br>
                         <p-text-input :value="userId" disabled block />
@@ -71,8 +71,8 @@
                             </template>
                         </p-field-group>
                     </form>
-                </p-col>
-                <p-col class="form-div" :col="6">
+                </div>
+                <div class="form-div col-span-1">
                     <p-field-group :label="$t('COMMON.MOBILE')">
                         <br>
                         <p-text-input v-model="userState.mobile"
@@ -97,8 +97,8 @@
                                            auto-height
                         />
                     </p-field-group>
-                </p-col>
-            </p-row>
+                </div>
+            </div>
         </template>
     </p-button-modal>
 </template>
@@ -114,8 +114,6 @@ import { showErrorMessage } from '@/lib/util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
@@ -128,8 +126,6 @@ export default {
         PButtonModal,
         PFieldGroup,
         PTextInput,
-        PRow,
-        PCol,
     },
     props: {
         visible: Boolean,

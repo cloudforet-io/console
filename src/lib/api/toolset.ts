@@ -4,11 +4,15 @@ import { readonlyArgs } from '@/lib/type';
 import {
     ActionAPI, BaseResources,
 } from '@/lib/fluent-api';
-import { SearchQueryType } from '@/components/organisms/search/query-search-bar/type';
 import { api } from './axios';
 
 export abstract class DynamicAPI {}
 
+interface SearchQueryType {
+    key: string;
+    operator: string;
+    value: any;
+}
 
 interface GetDataAPI {
     getData: (...args: any[]) => void|any;
