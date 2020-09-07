@@ -26,6 +26,7 @@ import {
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { isEqual } from 'lodash';
 import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
+import {dynamicLayoutTypes} from "@/components/organisms/dynamic-layout/type/layout-schema";
 
 
 export default {
@@ -80,10 +81,11 @@ export default {
             try {
                 await state.loader();
                 if (props.beforeCreate) await props.beforeCreate(props);
+
+                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicFieldTypes}. ${props.type} is not acceptable.`)
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/item/index.vue');
-            } finally {
             }
         };
 
