@@ -35,12 +35,9 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, getCurrentInstance, Ref, UnwrapRef,
+    toRefs, reactive, getCurrentInstance, Ref, UnwrapRef, ComponentRenderProxy,
 } from '@vue/composition-api';
-import {
-    dictIGProps, DictIGPropsType,
-    DictItem,
-} from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
+import { DictInputGroupProps, DictItem } from '@/components/organisms/forms/dict-input-group/type';
 
 import { makeProxy } from '@/components/util/composition-helpers';
 
@@ -56,9 +53,34 @@ export default {
         PDictInput,
         PIconTextButton,
     },
-    props: dictIGProps,
-    setup(props: DictIGPropsType, { emit }): any {
-        const vm: any = getCurrentInstance();
+    props: {
+        items: {
+            type: Array,
+            default: () => [],
+        },
+        showValidation: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        showEmptyInput: {
+            type: Boolean,
+            default: false,
+        },
+        invalidMessages: {
+            type: Object,
+            default: () => ({}),
+        },
+        showHeader: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props: DictInputGroupProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         interface StateType {
             proxyItems: Ref<DictItem[]>;

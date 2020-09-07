@@ -1,11 +1,9 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import { definitionTableProps } from '@/components/organisms/tables/definition-table/PDefinitionTable.toolset';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
@@ -27,9 +25,9 @@ export const defaultCase = () => ({
     props: {
         fields: {
             default: object('fields', [
-                { name: 'id', key: 'collector_id' },
-                { name: 'name', key: 'name' },
-                { name: 'provider', key: 'provider' },
+                { label: 'id', name: 'collector_id' },
+                { label: 'name', name: 'name' },
+                { label: 'provider', name: 'provider' },
             ]),
         },
         data: {
@@ -49,7 +47,7 @@ export const defaultCase = () => ({
     },
     template: `
     <div style="width: 80vw; background-color: white;">
-        <PDefinitionTable v-bind="$props"></PDefinitionTable>
+        <p-definition-table v-bind="$props"></p-definition-table>
     </div>`,
     setup(props, context) {
         const state = reactive({
@@ -67,9 +65,9 @@ export const slotCase = () => ({
     props: {
         fields: {
             default: object('fields', [
-                { name: 'id', key: 'collector_id' },
-                { name: 'name', key: 'name' },
-                { name: 'provider', key: 'provider' },
+                { label: 'id', name: 'collector_id' },
+                { label: 'name', name: 'name' },
+                { label: 'provider', name: 'provider' },
             ]),
         },
         data: {
@@ -92,7 +90,7 @@ export const slotCase = () => ({
     },
     template: `
         <div style="width: 80vw; background-color: white;">
-            <PDefinitionTable v-bind="$props">
+            <p-definition-table v-bind="$props">
                 <template #data-name>
                     <p-lazy-img :img-url="data.tags.icon" width="1rem" height="1rem" />
                     <span class="ml-2 leading-none">{{ data.name }}</span>
@@ -105,7 +103,7 @@ export const slotCase = () => ({
                 <template #data-test2="item">
                     <pre>{{item}}</pre>
                 </template>
-            </PDefinitionTable>
+            </p-definition-table>
         </div>
         `,
     setup(props, context) {
@@ -119,12 +117,12 @@ export const slotCase = () => ({
 
 export const noData = () => ({
     components: { PDefinitionTable },
-    props: getKnobProps(definitionTableProps, {
+    props: {
         items: [],
-    }),
+    },
     template: `
     <div style="width: 80vw; background-color: white;">
-        <PDefinitionTable v-bind="$props"></PDefinitionTable>
+        <p-definition-table v-bind="$props"></p-definition-table>
     </div>`,
     setup(props, context) {
         const state = reactive({});

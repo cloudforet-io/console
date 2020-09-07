@@ -35,8 +35,7 @@
 import { defineComponent } from '@vue/composition-api';
 import PInputText from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import { dictInputProps, DictInputPropsInterface }
-    from '@/components/molecules/forms/dict-input/PDictInput.toolset';
+import { DictInputProps } from '@/components/molecules/forms/dict-input/type';
 
 export default defineComponent({
     name: 'PDictInput',
@@ -48,8 +47,39 @@ export default defineComponent({
             },
         },
     },
-    props: dictInputProps,
-    setup(props: DictInputPropsInterface, { emit }) {
+    props: {
+        name: {
+            type: String,
+            default: '',
+            required: true,
+        },
+        value: {
+            type: [String, Number],
+            default: '',
+            required: true,
+        },
+        keyInvalid: {
+            type: Boolean,
+            default: false,
+        },
+        valueInvalid: {
+            type: Boolean,
+            default: false,
+        },
+        keyInvalidText: {
+            type: String,
+            default: undefined,
+        },
+        valueInvalidText: {
+            type: String,
+            default: undefined,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props: DictInputProps, { emit }) {
         return {
             onInput(type, val) {
                 emit(`update:${type}`, val);

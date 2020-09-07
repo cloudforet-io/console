@@ -1,6 +1,6 @@
 <template>
     <p-pane-layout class="p-card-item" v-on="$listeners">
-        <div flex-shrink-0>
+        <div>
             <slot name="side">
                 <p-lazy-img :img-url="icon"
                             :error-icon="defaultIcon"
@@ -27,29 +27,48 @@
 <script lang="ts">
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import { cardItemProps } from '@/components/molecules/cards/PCardItem.toolset';
-import { defineComponent } from '@vue/composition-api';
 
 export default {
     name: 'PCardItem',
     components: {
         PPaneLayout, PLazyImg,
     },
-    props: cardItemProps,
+    props: {
+        icon: {
+            type: String,
+            default: '',
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        contents: {
+            type: String,
+            default: '',
+        },
+        defaultIcon: {
+            type: String,
+            default: 'ic_collector_tags',
+        },
+    },
     setup() {
         return {};
     },
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-card-item {
-    @apply flex p-4;
+    display: flex;
+    padding: 1rem;
     &:hover {
         box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.22);
     }
     .p-card-body {
-        @apply w-full h-full pl-6 overflow-hidden;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        padding-left: 1.5rem;
         .title {
             font-size: 1rem;
             font-weight: bold;

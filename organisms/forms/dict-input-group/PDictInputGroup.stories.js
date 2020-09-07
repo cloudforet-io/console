@@ -9,9 +9,7 @@ import {
 import { getKnobProps } from '@sb/storybook-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import {
-    dictIGProps,
-    DictIGToolSet, dictValidation,
-    toDictItems,
+    DictIGToolSet, dictValidation, toDictItems,
 } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
@@ -38,8 +36,19 @@ const actions = {
 
 export const defaultCase = () => ({
     components: { PDictInputGroup, PButton },
-    props: getKnobProps(dictIGProps, {
-        showValidation: true,
+    props: getKnobProps({
+        showValidation: {
+            type: Boolean,
+            default: true,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        showEmptyInput: {
+            type: Boolean,
+            default: false,
+        },
     }, {
         items: true,
         invalidMessages: true,
@@ -74,8 +83,19 @@ export const defaultCase = () => ({
 
 export const autoValidation = () => ({
     components: { PDictInputGroup, PButton },
-    props: getKnobProps(dictIGProps, {
-        showValidation: true,
+    props: getKnobProps({
+        showValidation: {
+            type: Boolean,
+            default: true,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        showEmptyInput: {
+            type: Boolean,
+            default: false,
+        },
     }, {
         items: true,
         invalidMessages: true,

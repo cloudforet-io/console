@@ -5,7 +5,7 @@
         :options="options"
         :data="data"
         :fetch-options="fetchOptions"
-        :typeOptions="typeOptions"
+        :type-options="typeOptions"
         :before-create="beforeCreate"
         :before-create-field="beforeCreateField"
         :field-handler="fieldHandler"
@@ -26,7 +26,8 @@ import {
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { isEqual } from 'lodash';
 import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
-import {dynamicLayoutTypes} from "@/components/organisms/dynamic-layout/type/layout-schema";
+import { dynamicLayoutTypes } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { dynamicFieldTypes } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
 export default {
@@ -82,7 +83,7 @@ export default {
                 await state.loader();
                 if (props.beforeCreate) await props.beforeCreate(props);
 
-                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicFieldTypes}. ${props.type} is not acceptable.`)
+                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicFieldTypes}. ${props.type} is not acceptable.`);
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/item/index.vue');

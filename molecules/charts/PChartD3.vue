@@ -27,7 +27,7 @@ import {
     reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { colorset } from '@/components/molecules/charts/PChartD3.toolset';
+import { colorset } from '@/lib/util';
 
 
 export const setTooltips = () => {
