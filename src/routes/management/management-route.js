@@ -1,5 +1,5 @@
 const Management = () => import('@/views/management/management');
-const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins_new.vue');
+const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 const PowerScheduler = () => import('@/views/management/power-scheduler/pages/PowerScheduler.vue');
 
