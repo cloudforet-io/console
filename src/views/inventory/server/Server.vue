@@ -544,8 +544,8 @@ export default {
             params: null as any,
         });
 
-        const stateChangeApi = SpaceConnector.client.server.changeState;
-        const deleteApi = SpaceConnector.client.server.delete;
+        const stateChangeApi = SpaceConnector.client.inventory.server.changeState;
+        const deleteApi = SpaceConnector.client.inventory.server.delete;
 
         const resetCheckTableModalState = () => {
             checkTableModalState.visible = false;
