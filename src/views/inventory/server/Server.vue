@@ -143,34 +143,22 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
-import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
-import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
+/* Page Modules */
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
+import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
+import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
+import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
+import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 
-import { get, forEach } from 'lodash';
-
-import {
-    serverStateFormatter, showErrorMessage,
-} from '@/lib/util';
-import { makeTrItems } from '@/lib/view-helper';
-import { fluentApi, MultiItemAction } from '@/lib/fluent-api';
-import { ServerModel } from '@/lib/fluent-api/inventory/server';
-import { useStore } from '@/store/toolset';
-import {
-    queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
-} from '@/lib/router-query-string';
+/* types */
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import {
-    makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/dynamic-layout';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { SearchKeyGroup } from '@/lib/component-utils/query-search/type';
 import {
     QuerySearchTableTypeOptions,
@@ -178,18 +166,34 @@ import {
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
+import { ServerModel } from '@/models/inventory/server';
 
-import config from '@/lib/config';
-import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
-import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
-import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
+
+import { get, forEach } from 'lodash';
+import {
+    serverStateFormatter, showErrorMessage, showSuccessMessage,
+} from '@/lib/util';
+import { makeTrItems } from '@/lib/view-helper';
+import { useStore } from '@/store/toolset';
+import {
+    queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
+} from '@/lib/router-query-string';
+import {
+    makeQuerySearchPropsWithSearchSchema,
+} from '@/lib/component-utils/dynamic-layout';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import config from '@/lib/config';
 import searchSchema from './default-schema/search.json';
 import tableSchema from './default-schema/base-table.json';
 
-const STORAGE_PREFIX = 'inventory/server';
+
 const DEFAULT_PAGE_SIZE = 15;
 
+// TODO: move this code to store
+const STORAGE_PREFIX = 'inventory/server';
 const serverStore = {
     getItem<T>(name: string, type = 'string'): T {
         const res = localStorage.getItem(`${STORAGE_PREFIX}/${name}`);
@@ -254,9 +258,22 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        // TODO: Change to new store
         const {
             project, provider, serviceAccount, secret, collector, user,
         } = useStore();
+
+        // TODO: Remove it after change to new store
+        const getAllStoreData = async () => {
+            await Promise.all([
+                provider.getProvider(true),
+                project.getProject(true),
+                serviceAccount.getServiceAccounts(true),
+                secret.getSecrets(true),
+                collector.getCollectors(true),
+            ]);
+        };
 
 
         /** Breadcrumb */
@@ -266,6 +283,9 @@ export default {
 
 
         /** Server Table */
+        // TODO: Remove it after change to new provider store
+        const providerSchemaOptions = {};
+
         const tableAutocompleteProps = makeQuerySearchPropsWithSearchSchema(
             searchSchema as SearchKeyGroup, 'inventory.Server',
         );
@@ -359,20 +379,20 @@ export default {
             }
         };
 
-        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = (options, changed?) => {
+        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = async (options, changed?: Partial<QuerySearchTableFetchOptions>) => {
             if (changed) {
-                if (changed.sortBy && changed.sortDesc) {
+                if (changed.sortBy !== undefined) {
                     fetchOptionState.sortBy = changed.sortBy;
-                    fetchOptionState.sortDesc = changed.sortDesc;
+                    fetchOptionState.sortDesc = !!changed.sortDesc;
                 }
-                if (changed.pageLimit) {
+                if (changed.pageLimit !== undefined) {
                     fetchOptionState.pageLimit = changed.pageLimit;
                     serverStore.setItem('pageLimit', changed.pageLimit);
                 }
-                if (changed.pageStart) {
+                if (changed.pageStart !== undefined) {
                     fetchOptionState.pageStart = changed.pageStart;
                 }
-                if (changed.queryTags) {
+                if (changed.queryTags !== undefined) {
                     fetchOptionState.queryTags = changed.queryTags;
                     // sync updated query tags to url query string
                     replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
@@ -380,9 +400,20 @@ export default {
             } else {
                 // init
                 fetchOptionState.queryTags = options.queryTags;
+                await getAllStoreData();
+
+                // TODO: move this code to provider store
+                forEach(provider.state.providers, (d) => {
+                    providerSchemaOptions[d.name] = {
+                        type: 'badge',
+                        options: {
+                            background_color: d.color,
+                        },
+                    };
+                });
             }
 
-            listServerData();
+            await listServerData();
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
@@ -407,28 +438,25 @@ export default {
             }
         };
 
-        const fieldHandler: DynamicFieldHandler = (item) => {
-            if (item.extraData?.reference) {
-                switch (item.extraData.reference.resource_type) {
+        // TODO: make it as helper
+        const fieldHandler: DynamicLayoutFieldHandler = (field) => {
+            const item: Partial<DynamicFieldProps> = {};
+            if (field.extraData?.reference) {
+                switch (field.extraData.reference.resource_type) {
                 case 'identity.Project': {
-                    item.options.link = referenceRouter(
-                        item.extraData.reference.resource_type,
-                        item.data,
-                    );
-                    item.data = project.state.projects[item.data];
+                    item.options = {
+                        ...field.options,
+                        link: referenceRouter(
+                            field.extraData.reference.resource_type,
+                            field.data,
+                        ),
+                    };
+                    item.data = project.state.projects[field.data];
                     break;
                 }
                 case 'identity.Provider': {
-                    item.data = provider.state.providers[item.data].name;
-                    item.options = {};
-                    forEach(provider.state.providers, (d) => {
-                        item.options[d.name] = {
-                            type: 'badge',
-                            options: {
-                                background_color: d.color,
-                            },
-                        };
-                    });
+                    item.data = provider.state.providers[field.data]?.name || field.data;
+                    item.options = providerSchemaOptions;
                     break;
                 }
                 default: break;
@@ -450,19 +478,16 @@ export default {
         const clickProject = () => { changeProjectState.visible = true; };
         const changeProject = async (data?: ProjectItemResp|null) => {
             changeProjectState.loading = true;
-            const changeAction = fluentApi.inventory().server().changeProject().clone()
-                .setSubIds(tableState.selectedServerIds);
+
+            const api = SpaceConnector.client.inventory.server.changeProject;
+            const params: any = {
+                servers: tableState.selectedServerIds,
+            };
             if (data) {
                 try {
-                    await changeAction.setId(data.id).execute();
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Project has been successfully changed.',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                    params.project_id = data.id;
+                    await api(params);
+                    showSuccessMessage('Success', 'Project has been successfully changed.', context.root);
                 } catch (e) {
                     showErrorMessage('Fail to Change Project', e, context.root);
                 } finally {
@@ -471,15 +496,9 @@ export default {
                 }
             } else {
                 try {
-                    await changeAction.setReleaseProject().execute();
-                    context.root.$notify({
-                        group: 'noticeTopRight',
-                        type: 'success',
-                        title: 'Success',
-                        text: 'Release Project Success',
-                        duration: 2000,
-                        speed: 1000,
-                    });
+                    params.release_project = true;
+                    await api(params);
+                    showSuccessMessage('Success', 'Release Project Success', context.root);
                 } catch (e) {
                     showErrorMessage('Fail to Release Project', e, context.root);
                 } finally {
@@ -517,76 +536,74 @@ export default {
         /** Actions & Checking */
         const checkTableModalState = reactive({
             visible: false,
-            mode: '',
             item: null,
-            action: null as unknown as MultiItemAction<any, any>,
             title: '',
             subTitle: '',
             themeColor: '',
+            api: null as any,
+            params: null as any,
         });
 
-        const stateChangeAction = fluentApi.inventory().server().changeState();
-        const deleteAction = fluentApi.inventory().server().delete();
+        const stateChangeApi = SpaceConnector.client.server.changeState;
+        const deleteApi = SpaceConnector.client.server.delete;
 
         const resetCheckTableModalState = () => {
             checkTableModalState.visible = false;
-            checkTableModalState.mode = '';
-            checkTableModalState.action = null as unknown as MultiItemAction<any, any>;
             checkTableModalState.title = '';
             checkTableModalState.subTitle = '';
             checkTableModalState.themeColor = '';
+            checkTableModalState.api = null;
+            checkTableModalState.params = null;
         };
 
         const clickDelete = () => {
-            checkTableModalState.mode = 'delete';
-            checkTableModalState.action = deleteAction;
             checkTableModalState.title = 'Server Delete';
             checkTableModalState.subTitle = 'Are you Sure?';
             checkTableModalState.themeColor = 'alert';
             checkTableModalState.visible = true;
+            checkTableModalState.api = deleteApi;
+            checkTableModalState.params = {};
         };
         const clickMaintenance = () => {
-            checkTableModalState.mode = 'maintenance';
-            checkTableModalState.action = stateChangeAction.setMaintenance();
             checkTableModalState.title = 'Set Maintenance';
             checkTableModalState.subTitle = 'change Server State';
             checkTableModalState.themeColor = 'primary';
             checkTableModalState.visible = true;
+            checkTableModalState.api = stateChangeApi;
+            checkTableModalState.params = { state: 'MAINTENANCE' };
         };
+
         const clickInService = () => {
-            checkTableModalState.mode = 'in-service';
-            checkTableModalState.action = stateChangeAction.setInService();
             checkTableModalState.title = 'Set In-Service';
             checkTableModalState.subTitle = 'change Server State';
             checkTableModalState.themeColor = 'primary';
             checkTableModalState.visible = true;
+            checkTableModalState.api = stateChangeApi;
+            checkTableModalState.params = { state: 'INSERVICE' };
         };
         const clickClosed = () => {
-            checkTableModalState.mode = 'closed';
-            checkTableModalState.action = stateChangeAction.setClosed();
             checkTableModalState.title = 'Set Closed';
             checkTableModalState.subTitle = 'change Server State';
             checkTableModalState.themeColor = 'primary';
             checkTableModalState.visible = true;
+            checkTableModalState.api = stateChangeApi;
+            checkTableModalState.params = { state: 'CLOSED' };
         };
 
-        const checkModalConfirm = (items: ServerModel[]) => {
-            checkTableModalState.action.setIds(items.map(item => item.server_id)).execute().then(() => {
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    duration: 2000,
-                    speed: 1000,
+        const checkModalConfirm = async (items: ServerModel[]) => {
+            try {
+                await checkTableModalState.api({
+                    ...checkTableModalState,
+                    servers: items.map(item => item.server_id),
                 });
-            }).catch((e) => {
+                showSuccessMessage('Success', '', context.root);
+            } catch (e) {
                 showErrorMessage('Request Fail', e, context.root);
-            })
-                .finally(() => {
-                    typeOptionState.selectIndex = [];
-                    listServerData();
-                    resetCheckTableModalState();
-                });
+            } finally {
+                typeOptionState.selectIndex = [];
+                resetCheckTableModalState();
+                await listServerData();
+            }
         };
 
         const clickCollectData = () => {
@@ -602,16 +619,6 @@ export default {
                 name: d.name,
             }))) as unknown as MonitoringResourceType[],
         });
-
-
-        /** ******* Page Init ******* */
-        project.getProject(true);
-        provider.getProvider(true);
-        serviceAccount.getServiceAccounts(true);
-        secret.getSecrets(true);
-        collector.getCollectors(true);
-        /** ************************* */
-
 
         return {
             /* Breadcrumb */
