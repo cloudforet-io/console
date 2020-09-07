@@ -18,7 +18,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number, null],
+            type: [String, Object, Array, Boolean, Number],
             default: undefined,
         },
         typeOptions: {

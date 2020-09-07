@@ -2,7 +2,6 @@
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { TextDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/text/type';
-import { computed } from '@vue/composition-api';
 
 export default {
     name: 'PDynamicFieldText',
@@ -14,7 +13,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number, null],
+            type: [String, Object, Array, Boolean, Number],
             default: null,
         },
         typeOptions: {

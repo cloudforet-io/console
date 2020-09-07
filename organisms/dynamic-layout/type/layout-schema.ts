@@ -3,8 +3,9 @@
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 
 /** Metadata schema types for Dynamic layout */
-export type DynamicLayoutType = 'item'|'simple-table'|'table'|'query-search-table'
-    |'raw'|'markdown'|'list';
+export const dynamicLayoutTypes = ['item', 'simple-table', 'table', 'query-search-table',
+    'raw', 'markdown', 'list'];
+export type DynamicLayoutType = typeof dynamicLayoutTypes[number];
 
 export interface CommonOptions {
     root_path?: string;
