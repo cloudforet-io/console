@@ -18,8 +18,8 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: '',
+            type: [String, Object, Array, Boolean, Number, null],
+            default: undefined,
         },
         typeOptions: {
             type: Object,
@@ -44,7 +44,7 @@ export default {
             icon: get(options, ['icon', 'image'], null),
             iconColor: getColor(get(options, ['icon', 'color'], null)),
             textColor: getColor(get(options, ['text_color'], null)),
-            text: props.data,
+            text: props.data === null || props.data === undefined ? '' : String(props.data),
         };
 
         const statusEl = h(PStatus, {

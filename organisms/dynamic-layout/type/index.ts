@@ -1,8 +1,12 @@
 import { DynamicLayoutOptions, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import { BeforeCreateDynamicField, DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
-import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
+import {
+    BeforeCreateDynamicField,
+    DynamicFieldHandler,
+    DynamicFieldTypeOptions,
+} from '@/components/organisms/dynamic-field/type';
+import { DynamicField, DynamicFieldOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
 export interface DynamicLayoutFetchOptions {
@@ -40,8 +44,18 @@ export interface DynamicLayoutProps<
     typeOptions?: TypeOptions;
     beforeCreate?: (props: any) => void|Promise<void>;
     beforeCreateField?: BeforeCreateDynamicField;
-    fieldHandler?: DynamicFieldHandler;
+    fieldHandler?: DynamicLayoutFieldHandler;
 }
+
+export interface DynamicLayoutFieldExtraData extends DynamicField {
+    index: number;
+}
+
+export type DynamicLayoutFieldHandler = DynamicFieldHandler<
+    DynamicFieldOptions,
+    DynamicFieldTypeOptions,
+    DynamicLayoutFieldExtraData
+    >
 
 
 export interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> {

@@ -3,8 +3,9 @@
                :options="proxy.options"
                :data="proxy.data"
                :type-options="proxy.typeOptions"
-               :before-create="beforeCreate"
-               :handler="handler"
+               :extra-data="proxy.extraData"
+               :before-create="proxy.beforeCreate"
+               :handler="proxy.handler"
                v-on="$listeners"
     />
 </template>
@@ -13,8 +14,7 @@
 import {
     computed, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { DynamicFieldMutableProps, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { makeProxy } from '@/components/util/composition-helpers';
+import { DynamicFieldHandler, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 
 
 interface State {
@@ -35,7 +35,7 @@ export default {
         },
         data: {
             type: [String, Object, Array, Boolean, Number, null],
-            default: '',
+            default: undefined,
         },
         extraData: {
             type: Object,
@@ -59,15 +59,20 @@ export default {
         const state = reactive<any>({
             component: null,
             loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
-            proxy: computed<DynamicFieldMutableProps>(() => {
-                const res: DynamicFieldMutableProps = {
+            proxy: computed<DynamicFieldProps>(() => {
+                let res: DynamicFieldProps = {
+                    type: props.type,
                     options: props.options,
                     data: props.data,
                     typeOptions: props.typeOptions,
                     extraData: props.extraData,
+                    beforeCreate: props.beforeCreate,
+                    handler: props.handler,
                 };
-                if (props.handler) return props.handler(res);
-
+                if (props.handler) {
+                    if (['list', 'enum'].includes(props.type)) res.handler = undefined;
+                    res = { ...res, ...props.handler(props) };
+                }
                 return res;
             }),
         });
@@ -75,7 +80,7 @@ export default {
             try {
                 if (props.beforeCreate) {
                     const res = props.beforeCreate(props);
-                    if (res instanceof Promise) await res;
+                    if (res) await res;
                 }
                 state.component = async () => state.loader();
             } catch (e) {

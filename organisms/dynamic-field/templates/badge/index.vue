@@ -17,8 +17,9 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number, null],
             required: true,
+            default: undefined,
         },
         typeOptions: {
             type: Object,
@@ -58,7 +59,7 @@ export default {
             badge.link = link;
             badge.target = '_blank';
         }
-        return h(PBadge, { props: badge }, props.data);
+        return h(PBadge, { props: badge }, props.data === undefined || props.data === null ? '' : props.data);
     },
 };
 </script>

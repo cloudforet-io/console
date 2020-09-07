@@ -17,8 +17,9 @@ export default {
             }),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number, null],
             required: true,
+            default: undefined,
         },
         typeOptions: {
             type: Object,

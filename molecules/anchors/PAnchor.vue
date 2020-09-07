@@ -35,6 +35,15 @@ export default {
             default: '_blank',
         },
     },
+    setup(props) {
+        const state = reactive({
+
+        });
+
+        return {
+
+        };
+    },
 };
 </script>
 

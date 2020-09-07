@@ -20,6 +20,56 @@
 | fieldHandler | ``` Function ``` | ``` undefined ``` | handler that executed for handling dynamic field props that bound to dynamic field component. |
 
 <br>
+
+## What is field handler?
+
+If you want to replace a value of particular field's ```props```, give field handler.<br>
+<br>
+
+### How field handler works?
+
+It works only with types that have ```fields``` in ```options```.<br>
+It takes ```DynamicField``` as a parameter and returns ```Partial<DynamcField>```.<br>
+The ```props``` binding to DynamicField component will be merged with returned object. <br>
+
+<br>
+
+## Parameter of field handler
+
+```extraData``` of ```DynamicField``` is all data of the ```field```.<br>
+For example, if the given ```fields``` are as follows,<br>
+
+```json5
+[
+  { key: 'first', name: 'First', type: 'text', hello: 'world' },
+  { key: 'second', name: 'Second', type: 'text', hello: 'foo', hi: 'spaceOne' }
+]
+``` 
+
+the handler will be executed twice.<br>
+each handler's parameter will be each item.<br>
+
+## Field handler doesn't work recursively
+
+In case of ```enum``` or ```list``` type, it can also have DynamicField as children.<br>
+In these cases, field handler doesn't work with the children fields.<br>  
+It will be invoked only at the parent level.<br>
+For example, <br>
+
+```json5
+[
+  {key: 'parent', name: 'Parent', type: 'enum', options: {
+      first: {type: 'badge', ...}, second: {type: 'badge', ...},
+    }
+  }
+]
+```
+<br>
+in this case, field handler will be invoked once with parent item.<br>
+
+
+
+<br>
 <br>
 
 # Supported Types
@@ -68,7 +118,6 @@ interface DynamicLayoutFetchOptions {
     pageStart: number;
     pageLimit: number;
     queryTags: QueryTag[]; // See QuerySearchTags
-    selectIndex: number[];
     searchText: string;
     listMap: Record<string, Partial<DynamicLayoutFetchOptions>>;
 }

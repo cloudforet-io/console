@@ -2,6 +2,7 @@
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { TextDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/text/type';
+import { computed } from '@vue/composition-api';
 
 export default {
     name: 'PDynamicFieldText',
@@ -34,15 +35,18 @@ export default {
         },
     },
     render(h, { props, data }: {props: TextDynamicFieldProps; data: any}) {
-        let text = (typeof props.data === 'string') ? props.data : JSON.stringify(props.data);
-        text = (text === null || text === undefined) ? '' : text;
+        let text: string;
+        if (props.data === null || props.data === undefined) text = '';
+        else text = typeof props.data === 'string' ? props.data : JSON.stringify(props.data);
+
+        const textEl = h('span', data, text);
         if ((props.options as TextOptions).link) {
             return h(PAnchor, {
-                ...data,
                 attrs: { href: (props.options as TextOptions).link, target: '_blank' },
-            }, text);
+                props: { text, showIcon: !!text },
+            });
         }
-        return h('span', data, text);
+        return textEl;
     },
 };
 </script>
