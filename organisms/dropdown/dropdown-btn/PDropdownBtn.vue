@@ -25,14 +25,12 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { DropdownBtnProps, dropdownBtnProps } from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.toolset';
 
-export default defineComponent({
+export default {
     name: 'PDropdownBtn',
     components: { PButton, PIconButton },
     props: dropdownBtnProps,
@@ -54,7 +52,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

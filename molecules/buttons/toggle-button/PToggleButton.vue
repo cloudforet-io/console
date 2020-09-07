@@ -9,7 +9,7 @@
 <script lang="ts">
 import { ToggleButton } from 'vue-js-toggle-button';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import styles from '@/components/styles/colors';
+import { ToggleButtonProps } from '@/components/molecules/buttons/toggle-button/type';
 import color from '@/styles/colors';
 
 enum TOGGLE_BUTTON_THEME {
@@ -65,11 +65,11 @@ export default {
         },
     },
 
-    setup(props, context) {
+    setup(props: ToggleButtonProps) {
         const state = reactive({
             colors: computed(() => {
                 if (props.theme === 'secondary') return { checked: color.blue[500], unchecked: color.gray[200] };
-                if (props.theme === 'white') return { checked: '#00FF00', unchecked: '#FF0000' }
+                if (props.theme === 'white') return { checked: '#00FF00', unchecked: '#FF0000' };
                 return { checked: color.blue[500], unchecked: color.gray[200] };
             }),
             buttonBind: computed(() => ({

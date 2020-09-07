@@ -1,6 +1,5 @@
 import { text, select } from '@storybook/addon-knobs/vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
-import { alertPositionMapping, alertTypeMapping } from '@/components/molecules/alert/notice/PNoticeAlert.toolset';
 
 export default {
     title: 'molecules/alert',
@@ -32,10 +31,10 @@ export const noticeAlert = () => ({
             default: text('title', 'This is Title.'),
         },
         alertPosition: {
-            default: select('Position', [...Object.keys(alertPositionMapping)], 'noticeBottomLeft'),
+            default: select('Position', ['noticeBottomLeft', 'noticeBottomRight', 'noticeTopLeft', 'noticeTopRight'], 'noticeBottomLeft'),
         },
         alertType: {
-            default: select('Alert Type', [...Object.keys(alertTypeMapping)], 'alert'),
+            default: select('Alert Type', ['alert', 'success', 'warning'], 'alert'),
         },
         contents: {
             default: text('text', 'This is Contents.'),

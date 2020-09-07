@@ -1,6 +1,8 @@
 import { MenuItem } from '@/components/organisms/context-menu/type';
-import { ICON_BUTTON_STYLE_TYPE } from '@/components/molecules/buttons/icon-button/PIconButton.toolset';
-import { dropdownBtnProps } from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.toolset';
+
+enum BUTTON_STYLE_TYPE {
+    'primary-dark' = 'primary-dark'
+}
 
 export const dropdownMenuBtnProps = {
     menu: {
@@ -23,9 +25,22 @@ export const dropdownMenuBtnProps = {
         type: Boolean,
         default: false,
     },
-    buttonOnly: dropdownBtnProps.buttonOnly,
-    buttonIcon: dropdownBtnProps.buttonIcon,
-    buttonStyleType: dropdownBtnProps.buttonStyleType,
+    buttonOnly: {
+        type: Boolean,
+        default: false,
+    },
+    buttonIcon: {
+        type: String,
+        default: undefined,
+    },
+    buttonStyleType: {
+        type: String,
+        default: undefined,
+        validator: (value) => {
+            if (value === undefined) return true;
+            return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+        },
+    },
 };
 
 export interface DropdownMenuBtnProps {
@@ -36,5 +51,5 @@ export interface DropdownMenuBtnProps {
     disabled: boolean;
     buttonOnly: boolean;
     buttonIcon?: string;
-    buttonStyleType?: keyof ICON_BUTTON_STYLE_TYPE;
+    buttonStyleType?: keyof BUTTON_STYLE_TYPE;
 }

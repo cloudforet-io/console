@@ -28,12 +28,13 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, computed, toRefs,
-} from '@vue/composition-api';
+import { reactive, computed, toRefs } from '@vue/composition-api';
+
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { IconTextButtonProps } from '@/components/molecules/buttons/icon-text-button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/components/atoms/buttons/type';
+
 import color from '@/styles/colors';
 
 export default {
@@ -43,22 +44,6 @@ export default {
         link: {
             type: String,
             default: undefined,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        outline: {
-            type: Boolean,
-            default: false,
-        },
-        styleType: {
-            type: String,
-            default: undefined,
-            validator(value) {
-                if (value === undefined) return true;
-                return Object.keys(BUTTON_STYLE).indexOf(value) !== -1;
-            },
         },
         size: {
             type: String,
@@ -70,41 +55,10 @@ export default {
                 ].indexOf(value) !== -1;
             },
         },
-        name: {
-            type: String,
-            default: '',
-        },
-        /** @type {string} */
-        dir: {
-            type: String,
-            default: null,
-        },
-        /** @type {boolean} */
-        fill: {
-            type: Boolean,
-            default: true,
-        },
-        /** @type {string} */
-        width: {
-            type: String,
-            default: '1rem',
-        },
-        /** @type {string} */
-        height: {
-            type: String,
-            default: '1rem',
-        },
-        /** @type {string} */
-        scale: {
-            type: String,
-            default: undefined,
-        },
-        /** @type {string} */
         iconColor: {
             type: String,
             default: undefined,
         },
-        /** @type {string} */
         iconDirection: {
             type: String,
             default: 'left',
@@ -112,9 +66,50 @@ export default {
                 return ['left', 'right'].indexOf(value) !== -1;
             },
         },
+        //
+        name: {
+            type: String,
+            default: '',
+        },
+        dir: {
+            type: String,
+            default: null,
+        },
+        fill: {
+            type: Boolean,
+            default: true,
+        },
+        width: {
+            type: String,
+            default: '1rem',
+        },
+        height: {
+            type: String,
+            default: '1rem',
+        },
+        scale: {
+            type: String,
+            default: undefined,
+        },
+        styleType: {
+            type: String,
+            default: undefined,
+            validator(value) {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_STYLE).indexOf(value) !== -1;
+            },
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        outline: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: any) {
-        const state: any = reactive({
+    setup(props: IconTextButtonProps) {
+        const state = reactive({
             isHover: false,
         });
         const defaultIconColor = computed(() => {
@@ -123,7 +118,7 @@ export default {
             } if (state.isHover) {
                 return color.white;
             }
-            if (props.outline) {
+            if (props.outline && props.styleType) {
                 return color[props.styleType];
             }
             return color.white;

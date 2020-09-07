@@ -13,7 +13,6 @@
 
 <script lang="ts">
 import PI from '@/components/atoms/icons/PI.vue';
-import { reactive } from '@vue/composition-api';
 
 export default {
     name: 'PAnchor',

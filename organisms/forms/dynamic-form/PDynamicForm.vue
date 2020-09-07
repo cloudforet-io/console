@@ -9,6 +9,12 @@
 </template>
 
 <script lang="ts">
+
+/**
+ * Used library: vue-form-generator
+ * https://github.com/vue-generators/vue-form-generator
+ */
+
 export default {
     name: 'PDynamicForm',
     props: {

@@ -10,12 +10,14 @@
     /></span>
 </template>
 
-<script>
-import { copyAnyData, isNotEmpty } from '@/lib/util';
-import PI from '@/components/atoms/icons/PI.vue';
+<script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import color from '@/styles/colors';
+import PI from '@/components/atoms/icons/PI.vue';
+import { CopyButtonProps } from '@/components/molecules/buttons/copy-button/type';
+
+import { copyAnyData, isNotEmpty } from '@/lib/util';
 import { mouseOverState } from '@/lib/compostion-util';
+import color from '@/styles/colors';
 
 export default {
     name: 'PCopyButton',
@@ -23,7 +25,7 @@ export default {
     event: ['copy'],
     props: {
         value: {
-            type: [String, Array, Number, Object, Boolean, null],
+            type: String,
             default: null,
         },
         width: {
@@ -35,7 +37,7 @@ export default {
             default: '1rem',
         },
     },
-    setup(props, context) {
+    setup(props: CopyButtonProps, context) {
         const { isMouseOver, onMouseOut, onMouseOver } = mouseOverState();
 
         const state = reactive({
@@ -48,25 +50,28 @@ export default {
                 return undefined;
             }),
         });
+
         const mouseOut = () => {
             state.click = false;
             onMouseOut();
         };
+        const copyText = () => {
+            if (state.click) {
+                if (isNotEmpty(props.value)) {
+                    copyAnyData(props.value);
+                } else {
+                    context.emit('copy');
+                }
+                state.click = false;
+            }
+        };
+
         return {
             ...toRefs(state),
             isMouseOver,
             onMouseOver,
             mouseOut,
-            copyText() {
-                if (state.click) {
-                    if (isNotEmpty(props.value)) {
-                        copyAnyData(props.value);
-                    } else {
-                        context.emit('copy');
-                    }
-                    state.click = false;
-                }
-            },
+            copyText,
         };
     },
 
