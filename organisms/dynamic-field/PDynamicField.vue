@@ -15,6 +15,7 @@ import {
     computed, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { DynamicFieldHandler, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { dynamicFieldTypes } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
 interface State {
@@ -34,7 +35,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number, null],
+            type: [String, Object, Array, Boolean, Number],
             default: undefined,
         },
         extraData: {
@@ -82,6 +83,7 @@ export default {
                     const res = props.beforeCreate(props);
                     if (res) await res;
                 }
+                if (!dynamicFieldTypes.includes(props.type)) throw new Error(`[DynamicField] Unacceptable Type: field type must be one of ${dynamicFieldTypes}. ${props.type} is not acceptable.`);
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/text/index.vue');
