@@ -1,5 +1,4 @@
 const Plugin = () => import('@/views/plugin/plugin');
-const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
 
 const Collector = () => import('@/views/plugin/collector/pages/Collector.vue');
 
@@ -12,7 +11,6 @@ export default {
     redirect: '/plugin/collector',
     meta: { label: 'Plugin' },
     components: {
-        lnb: PluginNavBar,
         main: Plugin,
     },
     children: [

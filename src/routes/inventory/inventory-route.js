@@ -2,7 +2,6 @@ const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/Clo
 const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
-const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
@@ -13,7 +12,6 @@ export default {
     redirect: 'inventory/server',
     meta: { label: 'Inventory' },
     components: {
-        lnb: InventoryNavBar,
         main: Inventory,
     },
     children: [
