@@ -24,12 +24,13 @@
             <p-hr class="sidebar-divider" />
             <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
                  :class="{selected: checked}"
-                 class="service-categories" @click.stop="onClickService(service)"
+                 class="service-categories"
             >
-                <p-check-box :selected="filterState.serviceCategories[service]" :value="true"
-                             @change="onClickService(service)"
-                />
-                <span class="service">{{ service }}</span>
+                <p-check-box :selected="filterState.serviceFilter" :value="service"
+                             @change="onClickService(service, ...arguments)"
+                >
+                    <span class="service">{{ service }}</span>
+                </p-check-box>
             </div>
             <p id="region-title">
                 Regions
@@ -42,13 +43,14 @@
             </div>
             <div v-for="(region, idx) in filterState.regionList" :key="idx"
                  :class="{selected: region}"
-                 class="region-list" @click.stop="onClickRegion(idx, region)"
+                 class="region-list"
             >
-                <p-check-box :selected="filterState.selectedRegionIdx" :value="idx"
-                             @change="onClickRegion(idx, region)"
-                />
-                <span class="region-type">[{{ region.region_type }}] {{ region.name }} <br> </span>
-                <span class="region-code">{{ region.region_code }} </span>
+                <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
+                             @change="onClickRegion(region, ...arguments)"
+                >
+                    <span class="region-type">[{{ region.region_type }}] {{ region.name }} <br> </span>
+                    <span class="region-code">{{ region.region_code }} </span>
+                </p-check-box>
             </div>
         </template>
         <template #default>
@@ -157,7 +159,7 @@ import {
     makeQueryStringComputed, makeQueryStringComputeds,
     queryStringToQueryTags,
     queryTagsToQueryString,
-    replaceQuery,
+    replaceQuery, RouteQueryString,
 } from '@/lib/router-query-string';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
@@ -185,7 +187,8 @@ import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios
 import { APIError } from '@/lib/space-connector/api';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import {ProjectGroup} from "@/views/project/project/modules/ProjectSearch.toolset";
+import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
+import { select } from '@storybook/addon-knobs';
 
 export type UrlQueryString = string | (string | null)[] | null | undefined;
 
@@ -209,7 +212,6 @@ export default {
             provider,
         } = useStore();
         const providerStore: ProviderStoreType = provider;
-        providerStore.getProvider();
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const selectedProvider: Ref<string> = ref('all');
@@ -264,7 +266,7 @@ export default {
             loading: false,
             keyItems: handlers.keyItems as KeyItem[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: [],
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
@@ -289,26 +291,11 @@ export default {
                 console.error(e);
             }
         };
-        const onClickService = async (val) => {
-            filterState.serviceCategories[val] = !filterState.serviceCategories[val];
-            if (filterState.serviceFilter.includes(val)) {
-                const idx = filterState.serviceFilter.indexOf(val);
-                if (idx > -1) {
-                    filterState.serviceFilter.splice(idx, 1);
-                }
-            } else if (!filterState.serviceFilter.includes(val)) filterState.serviceFilter.push(val);
+        const onClickService = async (region, res, isSelected) => {
+            filterState.serviceFilter = res;
         };
-        const onClickRegion = async (val, region) => {
-            if (filterState.selectedRegionIdx.includes(val)) {
-                const idx = filterState.selectedRegionIdx.indexOf(val);
-                if (idx > -1) {
-                    filterState.selectedRegionIdx.splice(idx, 1);
-                    filterState.regionFilter.splice(idx, 1);
-                }
-            } else if (!filterState.selectedRegionIdx.includes(val)) {
-                filterState.selectedRegionIdx.push(val);
-                filterState.regionFilter.push(region.region_code);
-            }
+        const onClickRegion = async (region, res, isSelected) => {
+            filterState.regionFilter = res;
         };
 
         /**
@@ -361,30 +348,6 @@ export default {
                 }, [] as QueryTag[]);
             }
             return [parseTag(urlQueryString as string)];
-        };
-        const setSearchTags = () => {
-            // @ts-ignore
-            state.tags = urlQueryStringToSearchTags(vm.$route.query.filters);
-        };
-        const queryRefs = {
-            // @ts-ignore
-            filters: makeQueryStringComputed(state.tags,
-                {
-                    key: 'filters',
-                    setter: queryStringToQueryTags,
-                    getter: queryTagsToQueryString,
-                }),
-            provider: makeQueryStringComputed(selectedProvider, { key: 'provider', disableAutoReplace: true }),
-            ...makeQueryStringComputeds(filterState, {
-                regionFilter: {
-                    key: 'region',
-                    getter: (item) => {
-                        if (item) return item.region_code;
-                        return null;
-                    },
-                    disableSetter: true,
-                },
-            }),
         };
 
         const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
@@ -458,17 +421,14 @@ export default {
             if (after !== before) {
                 // await listCloudServiceType(after);
                 await listCloudServiceType(true);
+                await replaceQuery('provider', selectedProvider.value);
+                await replaceQuery('region', filterState.regionFilter);
+                await replaceQuery('service', filterState.serviceFilter);
             }
         }, { immediate: false });
 
         const changeQueryString = async (options) => {
-            const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
-            const newQuery = {
-                filters: urlQueryString,
-            };
-                // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {
-            });
+            await replaceQuery('filters', queryTagsToQueryString(options.queryTags));
         };
 
         const clickPage = async (page) => {
@@ -501,19 +461,51 @@ export default {
             route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' }],
         });
 
-        const init = async () => {
+        const queryStringToStringArray = (queryString: RouteQueryString): string[] => {
+            if (queryString === undefined || queryString === null) return [];
+            if (typeof queryString === 'string') return [queryString];
+            return queryString.reduce((res, d) => {
+                if (d !== null) res.push(d);
+                return res;
+            }, [] as string[]);
+        };
+
+        const checkProvider = async (queryStringForCheck) => {
+            // console.debug(providerState.items.map(d => d.provider));
+            let providerQueryString = queryStringForCheck;
+            const providerList = Object.keys(providerStore.state.providers);
+            if (!providerList.includes(queryStringForCheck)) {
+                providerQueryString = 'all';
+            }
+            return providerQueryString;
+        };
+
+        const initProvider = async () => {
+            let queryString: RouteQueryString = vm.$route.query.provider;
             if (providerState.items.length > 0) {
-                // set selected provider
-                const res = queryRefs.provider.value;
-                selectedProvider.value = res || providerState.items[0].provider;
-                setSearchTags();
-                watch<string, boolean>(selectedProvider, debounce((after) => {
+                if (typeof queryString === 'undefined' || !queryString) queryString = 'all';
+                if (typeof queryString === 'string') {
+                    queryString = await checkProvider(queryString);
+                }
+            } else {
+                queryString = 'all';
+            }
+            return queryString;
+        };
+
+        const init = async () => {
+            await provider.getProvider();
+            const providerQueryString = await initProvider();
+            if (providerQueryString) {
+                selectedProvider.value = providerQueryString.toString();
+                filterState.serviceFilter = queryStringToStringArray(vm.$route.query.service);
+                filterState.regionFilter = queryStringToStringArray(vm.$route.query.region);
+                watch<string, boolean>(() => selectedProvider.value, debounce((after) => {
                     if (!after) return;
                     if (after) {
                         listRegionByProvider(after);
                     }
-                    replaceQuery('provider', after);
-                }, 50), { immediate: true });
+                }, 50), {immediate: true});
                 await listCloudServiceType();
             }
         };
