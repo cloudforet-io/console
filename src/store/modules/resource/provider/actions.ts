@@ -14,6 +14,8 @@ export const load = async ({ commit }): Promise<void|Error> => {
             label: providerInfo.name,
             color: providerInfo.tags.color,
             icon: providerInfo.tags.icon,
+            // eslint-disable-next-line camelcase
+            linkTemplate: providerInfo.tags?.external_link_template,
         };
     });
 
