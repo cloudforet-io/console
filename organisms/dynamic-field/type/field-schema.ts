@@ -6,11 +6,6 @@ export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 
 
 export type DynamicFieldType = typeof dynamicFieldTypes[number];
 
-export interface Reference {
-    resource_type: string;
-    reference_key: string;
-}
-
 export interface CommonOptions {
     link?: string;
     tooltip?: string;
@@ -52,7 +47,11 @@ export interface StateOptions extends CommonOptions {
 }
 
 export interface EnumOptions {
-    [data: string]: Omit<DynamicField, 'key'|'name'>;
+    [data: string]: {
+        name?: string;
+        type: DynamicFieldType;
+        options?: DynamicFieldOptions;
+    };
 }
 
 export type DictOptions = CommonOptions
@@ -71,5 +70,4 @@ export interface DynamicField {
     name: string;
     type: DynamicFieldType;
     options?: DynamicFieldOptions;
-    reference?: Reference;
 }

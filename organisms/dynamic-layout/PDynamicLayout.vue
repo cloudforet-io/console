@@ -83,7 +83,7 @@ export default {
                 await state.loader();
                 if (props.beforeCreate) await props.beforeCreate(props);
 
-                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicFieldTypes}. ${props.type} is not acceptable.`);
+                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicLayoutTypes}. ${props.type} is not acceptable.`)
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/item/index.vue');

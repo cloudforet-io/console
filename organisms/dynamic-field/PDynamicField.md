@@ -31,11 +31,6 @@ export const DYNAMIC_FIELD_TYPE = ['text', 'badge', 'datetime', 'dict', 'state',
 
 export type DynamicFieldType = typeof DYNAMIC_FIELD_TYPE[number];
 
-interface Reference {
-    resource_type: string;
-    reference_key: string;
-}
-
 interface CommonOptions {
     link?: string;
     tooltip?: string;
