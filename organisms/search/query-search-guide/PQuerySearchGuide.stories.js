@@ -20,7 +20,7 @@ export const modal = () => ({
     components: { PQuerySearchGuide, PButton },
     template: `<div>
         <p-button styleType="primary" @click="click">Launch a modal</p-button>
-        <p-query-search-guide :visible="visible"></p-query-search-guide></div>`,
+        <p-query-search-guide :visible.sync="visible"></p-query-search-guide></div>`,
 
     setup(props, context) {
         const state = reactive({

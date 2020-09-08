@@ -15,7 +15,7 @@
                 Search Guide
             </span>
             <p-i name="ic_delete" color="transparent inherit"
-                 class="float-right close-btn"
+                 class="close-btn"
                  @click.stop="onClickClose"
             />
         </template>
@@ -105,7 +105,7 @@ export default {
             ],
         });
         const onClickClose = () => {
-            state.proxyVisible.value = false;
+            state.proxyVisible = false;
             context.emit('close');
         };
         return {
@@ -120,6 +120,12 @@ export default {
 <style lang="postcss" scoped>
     .header-title {
         line-height: 120%;
+    }
+    .close-btn {
+        @apply float-right cursor-pointer text-gray-900;
+        &:hover {
+            @apply text-secondary;
+        }
     }
     .number {
         @apply font-bold text-sm;
