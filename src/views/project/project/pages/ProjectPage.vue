@@ -113,12 +113,6 @@
                             </div>
                         </div>
                     </template>
-                    <template #loading>
-                        <p-lottie name="thin-spinner" class="loading"
-                                  :size="2"
-                                  :auto="true"
-                        />
-                    </template>
                     <template #card="{item}">
                         <div v-if="item">
                             <div class="project-description">

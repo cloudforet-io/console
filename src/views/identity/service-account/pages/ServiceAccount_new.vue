@@ -39,7 +39,25 @@
                                       @fetch="fetchTableData"
                                       @select="onSelect"
                                       @export="exportServiceAccountData"
-                    />
+                    >
+                        <template #toolbox-left>
+                            <p-icon-text-button style-type="primary-dark"
+                                                name="ic_plus_bold"
+                                                class="-ml-4 mr-4"
+                                                @click="clickAddServiceAccount"
+                            >
+                                {{ $t('BTN.ADD') }}
+                            </p-icon-text-button>
+                            <p-dropdown-menu-btn
+                                class="left-toolbox-item mr-4"
+                                :menu="tableState.dropdown"
+                                @click-delete="clickDeleteServiceAccount"
+                                @click-project="clickProject"
+                            >
+                                {{ $t('BTN.ACTION') }}
+                            </p-dropdown-menu-btn>
+                        </template>
+                    </p-dynamic-layout>
                 </template>
             </p-horizontal-layout>
             <p-tab v-if="tableState.selectedItems.length === 1"
@@ -83,50 +101,87 @@
             <div v-else class="empty-space">
                 <p-empty>Select a Service Account above for details.</p-empty>
             </div>
+            <p-double-check-modal
+                :visible.sync="doubleCheckModalState.visible"
+                :header-title="doubleCheckModalState.title"
+                :sub-title="doubleCheckModalState.subTitle"
+                :verification-text="doubleCheckModalState.verificationText"
+                :theme-color="doubleCheckModalState.themeColor"
+                :centered="true"
+                @confirm="deleteServiceAccount"
+            />
+            <s-project-tree-modal :visible.sync="changeProjectState.visible"
+                                  :project-id="changeProjectState.projectId"
+                                  :loading="changeProjectState.loading"
+                                  @confirm="changeProject"
+            />
         </template>
     </p-vertical-page-layout>
 </template>
 <script lang="ts">
-import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import { ProviderStoreType, useStore } from '@/store/toolset';
+/* external library */
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, ref, Ref, toRefs, watch,
 } from '@vue/composition-api';
+import { get } from 'lodash';
+
+/* components */
+import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import {
-    makeQueryStringComputed, replaceQuery,
-} from '@/lib/router-query-string';
-import { get } from 'lodash';
-import { makeTrItems } from '@/lib/view-helper';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import config from '@/lib/config';
-import { DynamicFieldHandler, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { fluentApi } from '@/lib/fluent-api';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
+import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
+
+/* page modules*/
+import ServiceAccountDetail from '@/views/identity/service-account/modules/ServiceAccountDetail.vue';
 import ServiceAccountCredentials from '@/views/identity/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
+
+/* utils */
+import { ProviderStoreType, useStore } from '@/store/toolset';
+import {
+    makeQueryStringComputed, replaceQuery,
+} from '@/lib/router-query-string';
+import { makeTrItems } from '@/lib/view-helper';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import config from '@/lib/config';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+
+/* types */
 import {
     TableEventListeners,
     TableFetchOptions,
     TableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/table/type';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import ServiceAccountDetail from '@/views/identity/service-account/modules/ServiceAccountDetail.vue';
+import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
+
+interface ProjectItemResp {
+    id: string;
+    name: string;
+    has_child: boolean;
+    item_type: 'PROJECT_GROUP'|'PROJECT';
+}
 
 export default {
     name: 'ServiceAccount',
     components: {
+        SProjectTreeModal,
+        PDoubleCheckModal,
+        PDropdownMenuBtn,
+        PIconTextButton,
         ServiceAccountDetail,
         PEmpty,
         ServiceAccountMember,
@@ -148,11 +203,10 @@ export default {
             provider, project, secret, user,
         } = useStore();
         const providerStore: ProviderStoreType = provider;
-        // providerStore.getProvider();
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        /** Provider(located at sidebar) & Page Title * */
         const selectedProvider: Ref<string> = ref('aws');
-
         const providerState = reactive({
             items: computed(() => {
                 const result = [] as any;
@@ -171,9 +225,13 @@ export default {
             });
             return name;
         });
+
+        /** Page Navigation * */
         const routeState = reactive({
             route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Accounts', path: '/identity/service-account' }],
         });
+
+        /** States for Dynamic Layout(search table type) * */
         const fetchOptionState: TableFetchOptions = reactive({
             pageStart: 1,
             pageLimit: 15,
@@ -200,7 +258,7 @@ export default {
                 return res;
             }),
             dropdown: computed(() => makeTrItems([
-                ['delete', 'BTN.DELETE'],
+                ['delete', 'BTN.DELETE', { type: 'item', disabled: tableState.selectedItems.length !== 1 }],
                 [null, null, { type: 'divider' }],
                 ['project', 'COMMON.CHG_PRO'],
                 [null, null, { type: 'divider' }],
@@ -224,6 +282,8 @@ export default {
         const onSelect: TableEventListeners['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
+
+        /** Handling API with SpaceConnector * */
 
         const getQuery = () => {
             const query = new QueryHelper();
@@ -250,6 +310,7 @@ export default {
             }
         };
 
+        /** Change Detection of Main Table * */
         const fetchTableData: TableEventListeners['fetch'] = (options, changed?) => {
             if (changed) {
                 if (changed.sortBy && changed.sortDesc) {
@@ -271,6 +332,7 @@ export default {
             listServiceAccountData();
         };
 
+        /** API for Excel export * */
         const exportApi = SpaceConnector.client.addOns.excel.export;
         const exportServiceAccountData = async () => {
             try {
@@ -293,24 +355,13 @@ export default {
             }
         };
 
-        const getTableSchema = async () => {
-            const schema = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'identity.ServiceAccount',
-                schema: 'table',
-                options: {
-                    provider: selectedProvider.value,
-                },
-            });
-            tableState.schema = schema;
-        };
+        /** Field Handler for display formatting(project id -> project name)* */
 
-        const fieldHandler: DynamicFieldHandler = (field) => {
+        const fieldHandler: DynamicLayoutFieldHandler = (field) => {
             const item: Partial<DynamicFieldProps> = {};
             if (field.extraData?.reference) {
-                console.debug(field, 'field');
                 switch (field.extraData.reference.resource_type) {
                 case 'identity.Project': {
-                    item.data = project.state.projects[field.data];
                     item.options = {
                         ...field.options,
                         link: referenceRouter(
@@ -318,6 +369,7 @@ export default {
                             field.data,
                         ),
                     };
+                    item.data = project.state.projects[field.data];
                     break;
                 }
                 default: break;
@@ -326,7 +378,55 @@ export default {
             return item;
         };
 
-        /** Change Project */
+        /** Add & Delete Service Accounts Action (Dropdown) * */
+        const clickAddServiceAccount = () => {
+            vm.$router.push({
+                name: 'addServiceAccount',
+                params: { provider: selectedProvider.value },
+                query: { nextPath: vm.$route.fullPath },
+            });
+        };
+
+        const doubleCheckModalState = reactive({
+            visible: false,
+            item: null,
+            title: '',
+            subTitle: '',
+            verificationText: '',
+            themeColor: '',
+            api: null as any,
+            params: null as any,
+        });
+
+        const deleteApi = SpaceConnector.client.identity.serviceAccount.delete;
+
+        const clickDeleteServiceAccount = () => {
+            const selectedIndex = computed(() => typeOptionState.selectIndex).value as unknown as number;
+            const nameOfSelectedServiceAccount = tableState.items[selectedIndex].name;
+            doubleCheckModalState.visible = true;
+            doubleCheckModalState.title = 'Delete Account';
+            doubleCheckModalState.subTitle = `You will Permanently lose your [${nameOfSelectedServiceAccount}]`;
+            doubleCheckModalState.verificationText = nameOfSelectedServiceAccount;
+            doubleCheckModalState.themeColor = 'alert';
+            doubleCheckModalState.api = deleteApi;
+        };
+
+        const deleteServiceAccount = async () => {
+            try {
+                await doubleCheckModalState.api({
+                    ...doubleCheckModalState,
+                    service_account_id: tableState.selectedAccountIds[0],
+                });
+                showSuccessMessage('Success', 'Success to Delete Account', context.root);
+            } catch (e) {
+                showErrorMessage('Delete Failed', e, context.root);
+            } finally {
+                doubleCheckModalState.visible = false;
+                await listServiceAccountData();
+            }
+        };
+
+        /** Change Project & Release Project Action */
         const changeProjectState = reactive({
             visible: false,
             loading: false,
@@ -335,15 +435,32 @@ export default {
                 return get(tableState.selectedItems[0], 'project_id', '');
             }),
         });
+
         const clickProject = () => { changeProjectState.visible = true; };
+
+        const releaseProject = async (action) => {
+            try {
+                await action({
+                    service_accounts: tableState.selectedAccountIds,
+                    release_project: true,
+                });
+                showSuccessMessage('Success', 'Success to Release Project', context.root);
+            } catch (e) {
+                showErrorMessage('Fail to Release Project', e, context.root);
+            } finally {
+                await listServiceAccountData();
+            }
+        };
+
         const changeProject = async (data?: ProjectItemResp|null) => {
             changeProjectState.loading = true;
-            // TODO: SpaceConnector로 변경하기
-            const changeAction = fluentApi.identity().serviceAccount().changeProject().clone()
-                .setSubIds(tableState.selectedAccountIds);
+            const action = SpaceConnector.client.identity.serviceAccount.changeProject;
             if (data) {
                 try {
-                    await changeAction.setId(data.id).execute();
+                    await action({
+                        service_accounts: tableState.selectedAccountIds,
+                        project_id: data.id,
+                    });
                     showSuccessMessage('Success', 'Project has been successfully changed.', context.root);
                 } catch (e) {
                     showErrorMessage('Fail to Change Project', e, context.root);
@@ -352,14 +469,7 @@ export default {
                     await listServiceAccountData();
                 }
             } else {
-                try {
-                    await changeAction.setReleaseProject().execute();
-                    showSuccessMessage('Success', 'Success to Release Project', context.root);
-                } catch (e) {
-                    showErrorMessage('Fail to Release Project', e, context.root);
-                } finally {
-                    await listServiceAccountData();
-                }
+                await releaseProject(action);
             }
             changeProjectState.loading = false;
             changeProjectState.visible = false;
@@ -390,10 +500,20 @@ export default {
         };
 
         /** ******* Page Init ******* */
+        const getTableSchema = async () => {
+            const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                resource_type: 'identity.ServiceAccount',
+                schema: 'table',
+                options: {
+                    provider: selectedProvider.value,
+                },
+            });
+            tableState.schema = schema;
+        };
+
         const init = async () => {
             await project.getProject(true);
             await provider.getProvider(true);
-            // await secret.getSecrets(true);
             const providerFilter = queryRefs.provider.value;
             if (providerState.items.length > 0) {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
@@ -414,7 +534,6 @@ export default {
             selectedProviderName,
             ...toRefs(routeState),
 
-            // tableSchema,
             tableState,
             fetchOptionState,
             typeOptionState,
@@ -426,6 +545,11 @@ export default {
 
             changeProjectState,
             clickProject,
+            clickAddServiceAccount,
+
+            doubleCheckModalState,
+            deleteServiceAccount,
+            clickDeleteServiceAccount,
             changeProject,
 
             singleItemTabState,

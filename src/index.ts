@@ -33,7 +33,6 @@ export { default as PLoadingButton } from './components/molecules/buttons/loadin
 // molecule form components
 export { default as PCheckBox } from './components/molecules/forms/checkbox/PCheckBox.vue';
 export { default as PDictInput } from './components/molecules/forms/dict-input/PDictInput.vue';
-import * as PDictInputToolset from './components/molecules/forms/dict-input/PDictInput.toolset';
 export { default as PTagsInput } from './components/organisms/forms/tags-input/PTagsInput.vue';
 export { default as PRadio } from './components/molecules/forms/radio/PRadio.vue';
 export { default as PSelect } from './components/molecules/forms/select/PSelect.vue';
@@ -71,14 +70,7 @@ import * as PToolboxTableToolSet from './components/organisms/tables/toolbox-tab
 
 // tool sets
 export {
-    // @ts-ignore
-    PDictInputToolset,
-    // @ts-ignore
-    PTableToolset,
-    // @ts-ignore
     PJsonSchemaFormToolSet,
-    // @ts-ignore
     PDataTableToolSet,
-    // @ts-ignore
     PToolboxTableToolSet,
 };

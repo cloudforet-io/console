@@ -38,8 +38,10 @@
                 <confirm-credentials :provider="provider" :supported-schema="supportedSchema" class="mt-8" />
             </template>
             <template #contents-tags>
-                <p-dict-input-group :dict.sync="tags" show-empty-input
-                                    edit-mode class="mt-8"
+                <p-dict-input-group
+                    :items.sync="tags"
+                    :show-empty-input="true"
+                    class="mt-8"
                 />
             </template>
         </p-progress-wizard>
@@ -57,7 +59,7 @@ import {
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup_deprecated.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PDynamicForm from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -85,7 +87,7 @@ export default {
             imageUrl: computed(() => get(state.plugin, 'tags.icon', '')),
             provider: computed(() => get(state.plugin, 'provider', '')),
             pluginId: get(root, '$route.params.pluginId', ''),
-            tags: {},
+            tags: [],
             supportedSchema: [],
             //
             versions: [],
@@ -182,7 +184,9 @@ export default {
                     .execute();
                 state.plugin = res.data;
                 state.supportedSchema = res.data.capability.supported_schema;
-                if (res.data.tags?.icon) state.tags.icon = res.data.tags.icon;
+                if (res.data.tags?.icon) {
+                    state.tags.push({ key: 'icon', value: res.data.tags.icon });
+                }
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Get Plugin', e, root);
@@ -225,10 +229,14 @@ export default {
             }
 
             tabState.loading = true;
+            const tagDict = {};
+            state.tags.forEach((d) => {
+                tagDict[d.key] = d.value;
+            });
             const params = {
                 name: state.inputModel.name,
                 priority: state.inputModel.priority,
-                tags: state.tags,
+                tags: tagDict,
                 plugin_info: {
                     plugin_id: state.pluginId,
                     version: state.inputModel.version,

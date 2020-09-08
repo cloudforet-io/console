@@ -95,7 +95,7 @@ export default {
             },
         });
         const projectId = computed<string>(() => context.root.$route.params.id as string);
-        const projectFilter = `&f=project_id%3A%3D${projectId.value}`;
+        const projectFilter = `&filters=project_id%3A%3D${projectId.value}`;
 
         const tabData = reactive({
             tabs: makeTrItems([
@@ -127,7 +127,7 @@ export default {
 
         const cloudServiceSummary = new ServiceSummaryWidgetState({
             title: 'cloud services',
-            to: `/inventory/cloud-service?f=project_id%3A${projectId.value}&provider=all`,
+            to: `/inventory/cloud-service?filters=project_id%3A${projectId.value}&provider=all`,
             color: secondary1,
             getAction: api => api.setResourceType('identity.Project')
                 .setFilter({

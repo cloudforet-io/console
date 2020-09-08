@@ -157,11 +157,11 @@ export default {
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
-                { label: 'Collector Name', name: 'collector_info.name' },
+                { label: 'Collector Name', name: 'collector_info.name', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Task', name: 'total_tasks' },
                 { label: 'Start Time', name: 'created_at' },
-                { label: 'Duration', name: 'duration' },
+                { label: 'Duration', name: 'duration', sortable: false },
             ]),
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },

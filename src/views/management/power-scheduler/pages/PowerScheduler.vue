@@ -36,13 +36,11 @@
                                 {{ item.name }}
                             </p>
                         </div>
-                        <div class="flex justify-between">
+                        <div class="resources">
                             <div class="scheduled-resources">
-                                <p class="mb-1 text-xs">
-                                    Scheduled Resources
-                                </p>
-                                <span class="font-bold text-primary text-xs">{{ currentScheduleResources }}</span>
-                                <span class="text-gray-400 text-xs">/ {{ maxScheduleResources }}</span>
+                                <p>Scheduled Resources</p>
+                                <span class="current-schedule-resources">{{ currentScheduleResources }}</span>
+                                <span class="max-schedule-resources">/ {{ maxScheduleResources }}</span>
                                 <p-progress-bar
                                     :percentage="percentage"
                                     :style="'width: 160px'"
@@ -50,13 +48,13 @@
                                 />
                             </div>
                             <div class="saving">
-                                <p class="mb-1 text-xs">
+                                <p class="saving-this-month">
                                     Saving of This Month
                                 </p>
-                                <p class="text-gray-400 text-xs">
+                                <p class="approximate">
                                     approx.
                                 </p>
-                                <span style="float: right;"><span class="text-primary font-bold">{{ approximateCosts }}  </span> <span>$</span></span>
+                                <span class="costs"><span class="approx-costs">{{ approximateCosts }}</span> <span>$</span></span>
                             </div>
                         </div>
                     </div>
@@ -64,15 +62,15 @@
                     <div class="schedule">
                         <div>
                             <p class="mb-4">
-                                <span class="font-bold text-gray-400 text-xs">SCHEDULE  </span><span class="text-gray-400 text-xs">(2)</span>
+                                <span class="schedule-title">SCHEDULE  <span class="schedule-title-num">(2)</span></span>
                             </p>
                             <div>
-                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
-                                <p-i name="ic_clock-history" height="0.75em" width="0.75em" /> <span class="ml-1 text-xs">Korea_DEVScheduler</span><br>
+                                <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name">Korea_DEVScheduler</span><br>
+                                <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name">Korea_DEVScheduler</span><br>
                             </div>
                         </div>
                         <div>
-                            <span v-for="day in weekday" class="weekday">
+                            <span v-for="day in weekday" :key="day" class="weekday">
                                 {{ day }}
                             </span>
                             <div class="schedule-matrix mt-4">
@@ -87,25 +85,33 @@
 </template>
 
 <script lang="ts">
-import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import router from '@/routes';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+
+/* Components */
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+
+/* Page Modules */
+import PageInformation from '@/views/management/power-scheduler/modules/PageInformation.vue';
+import ScheduleHeatmap from '@/views/management/power-scheduler/modules/ScheduleHeatmap.vue';
+
+/* Utils */
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
-import PageInformation from '@/views/management/power-scheduler/modules/PageInformation.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import ScheduleHeatmap from '@/views/management/power-scheduler/modules/ScheduleHeatmap.vue';
+
+/* Types */
+import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 type UrlQueryString = string | (string | null)[] | null | undefined;
 interface Scheduler {
@@ -145,7 +151,6 @@ export default {
         /** State : state for page (grid layout, query search, etc.)
          *  scheduleState: state for scheduled resources (number, progress, money, scheduler..)
          * */
-
         const state = reactive({
             items: [],
             cardClass: () => ['card-item', 'power-scheduler-list'],
@@ -179,7 +184,6 @@ export default {
         /**
          * Search Query, Page parameter for API
          * */
-
         const getParams = () => {
             const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
             const query = new QueryHelper();
@@ -194,7 +198,6 @@ export default {
                 query: query.data,
             };
         };
-
         const listProjects = async () => {
             state.loading = true;
             try {
@@ -233,12 +236,12 @@ export default {
         };
         const setSearchTags = () => {
             // @ts-ignore
-            state.tags = urlQueryStringToSearchTags(vm.$route.query.f);
+            state.tags = urlQueryStringToSearchTags(vm.$route.query.filters);
         };
         const changeQueryString = async (options) => {
             const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
             const newQuery = {
-                f: urlQueryString,
+                filters: urlQueryString,
             };
             // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {
@@ -308,8 +311,45 @@ export default {
         }
     }
 
+    .resources {
+        @apply flex justify-between;
+        .scheduled-resources {
+            p {
+                @apply mb-1 text-xs;
+            }
+            .current-schedule-resources {
+                @apply font-bold text-primary text-xs;
+            }
+            .max-schedule-resources {
+                @apply text-gray-400 text-xs;
+            }
+        }
+        .saving {
+            .saving-this-month {
+                @apply mb-1 text-xs;
+            }
+            .approximate {
+                @apply text-gray-400 text-xs;
+            }
+            .costs {
+                @apply float-right;
+                .approx-costs {
+                    @apply text-primary font-bold;
+                }
+            }
+        }
+    }
     .schedule {
         @apply mx-6 mt-6 mb-6 flex justify-between;
+        .schedule-title {
+            @apply font-bold text-gray-400 text-xs;
+            .schedule-title-num {
+                @apply font-normal;
+            }
+        }
+        .scheduler-name {
+            @apply ml-1 text-xs;
+        }
         .weekday {
             @apply text-gray-400 text-xs;
             margin-right: 0.5625rem;

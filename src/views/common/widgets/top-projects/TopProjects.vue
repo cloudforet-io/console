@@ -84,14 +84,14 @@
                         </td>
                         <td class="text-center">
                             <p-badge :background-color="colors.servers">
-                                <router-link :to="`/inventory/server?p=1&ps=15&f=project_id%3A%3D${item.project_id}`">
+                                <router-link :to="`/inventory/server?p=1&ps=15&filters=project_id%3A%3D${item.project_id}`">
                                     {{ item.servers || 0 }}
                                 </router-link>
                             </p-badge>
                         </td>
                         <td class="text-center">
                             <p-badge :background-color="colors.cloud_services">
-                                <router-link :to="`/inventory/cloud-service?f=project_id%3A%3D${item.project_id}`">
+                                <router-link :to="`/inventory/cloud-service?filters=project_id%3A%3D${item.project_id}`">
                                     {{ item.cloud_services || 0 }}
                                 </router-link>
                             </p-badge>
@@ -121,14 +121,14 @@
                 </template>
                 <template #col-servers-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        <router-link :to="`/inventory/server?p=1&ps=15&f=project_id%3A%3D${item.project_id}`">
+                        <router-link :to="`/inventory/server?filters=project_id%3A%3D${item.project_id}`">
                             {{ item.servers || 0 }}
                         </router-link>
                     </div>
                 </template>
                 <template #col-cloud_services-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        <router-link :to="`/inventory/cloud-service?f=project_id%3A%3D${item.project_id}`">
+                        <router-link :to="`/inventory/cloud-service?filters=project_id%3A%3D${item.project_id}`">
                             {{ item.cloud_services || 0 }}
                         </router-link>
                     </div>
