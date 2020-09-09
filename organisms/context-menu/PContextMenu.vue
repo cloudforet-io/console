@@ -36,7 +36,9 @@
                             <slot name="item--format" v-bind="{...$props, uuid, item, index}">
                                 <slot :name="`item-${item.name}-format`" v-bind="{...$props, uuid, item, index}">
                                     <span>{{ item.label }}</span>
-                                    <p-i v-if="item.target === '_blank'" class="external-link-icon" name="ic_external-link" />
+                                    <p-i v-if="item.target === '_blank'" class="external-link-icon" name="ic_external-link"
+                                         width="0.875rem" height="0.875rem"
+                                    />
                                 </slot>
                             </slot>
                         </a>
@@ -291,8 +293,6 @@ export default {
             position: absolute;
             top: 0.5rem;
             right: 1rem;
-            width: 1rem !important;
-            height: 1rem !important;
         }
 
         &.secondary {

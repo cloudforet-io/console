@@ -192,7 +192,7 @@ export default {
         },
         items: {
             type: Array,
-            required: true,
+            default: () => [],
         },
         sortable: {
             type: Boolean,
