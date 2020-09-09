@@ -77,12 +77,12 @@
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table
-                    :fields="tableState.multiFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="tableState.selectedItems"
-                    :col-copy="true"
+                <p-data-table class="selected-data-tab"
+                              :fields="tableState.multiFields"
+                              :sortable="false"
+                              :selectable="false"
+                              :items="tableState.selectedItems"
+                              :col-copy="true"
                 >
                     <template v-slot:col-state-format="data">
                         <p-status v-bind="serverStateFormatter(data.value)" />
@@ -280,6 +280,7 @@ export default {
             selectable: true,
             keyItems: [],
             valueHandlerMap: {},
+            colCopy: false,
         });
 
         const tableState = reactive({
@@ -333,6 +334,14 @@ export default {
                 .setFilter(...andFilters)
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
+
+            query.setOnly(...typeOptionState.keyItems.map(d => d.name), 'server_id');
+            if (tableState.schema?.options?.fields) {
+                query.setOnly(...tableState.schema.options.fields.map((d) => {
+                    if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
+                    return d.key;
+                }), 'server_id');
+            }
 
             return query.data;
         };
@@ -667,6 +676,10 @@ export default {
         text-align: center;
         margin-bottom: 0.5rem;
         font-size: 1.5rem;
+    }
+
+    .selected-data-tab {
+        @apply mt-8;
     }
 
     >>> .p-dynamic-layout-query-search-table .p-query-search-table {

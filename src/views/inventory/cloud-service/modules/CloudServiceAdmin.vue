@@ -34,12 +34,12 @@ import config from '@/lib/config';
 import { getTimezone } from '@/lib/util';
 
 export default {
-    name: 'ServerAdmin',
+    name: 'CloudServiceAdmin',
     components: {
         PPanelTop, PBadge, PTextList, PSearchTable,
     },
     props: {
-        serverIds: {
+        cloudServiceIds: {
             type: Array,
             default: () => [],
         },
@@ -67,13 +67,14 @@ export default {
             .setKeyword(state.options.searchText)
             .data;
 
-        const api = SpaceConnector.client.inventory.server.member.list;
+        const api = SpaceConnector.client.inventory.cloudService.member.list;
         const listAdmin = async () => {
             state.loading = true;
 
             try {
                 const res = await api({
-                    servers: props.serverIds,
+                    // eslint-disable-next-line camelcase
+                    cloud_services: props.cloudServiceIds,
                     query: getQuery(),
                 });
 
@@ -96,9 +97,10 @@ export default {
             try {
                 const res = await exportApi({
                     source: {
-                        url: '/inventory/server/member/list',
+                        url: '/inventory/cloud-service/member/list',
                         param: {
-                            servers: props.serverIds,
+                            // eslint-disable-next-line camelcase
+                            cloud_services: props.cloudServiceIds,
                             query: getQuery(),
                         },
                     },
@@ -125,7 +127,7 @@ export default {
             }
         };
 
-        watch(() => props.serverIds, (after, before) => {
+        watch(() => props.cloudServiceIds, (after, before) => {
             if (after !== before) listAdmin();
         }, { immediate: true });
 
@@ -139,7 +141,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
->>> .p-search-table {
-    border-width: 0;
-}
+    >>> .p-search-table {
+        border-width: 0;
+    }
 </style>

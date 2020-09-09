@@ -247,6 +247,7 @@ export default {
             timezone: computed(() => user.state.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
+            colCopy: false,
         });
 
         const tableState = reactive({

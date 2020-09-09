@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="Members" :total-count="totalCount" />
+        <p-panel-top title="History" :total-count="totalCount" />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"
@@ -17,6 +17,9 @@
                     </p-badge>
                 </p-text-list>
             </template>
+            <template #col-updated_at-format="{value}">
+                {{ iso8601Formatter(value) }}
+            </template>
         </p-search-table>
     </div>
 </template>
@@ -31,26 +34,27 @@ import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import config from '@/lib/config';
-import { getTimezone } from '@/lib/util';
+import { getTimezone, iso8601Formatter } from '@/lib/util';
 
 export default {
-    name: 'ServerAdmin',
+    name: 'CloudServiceHistory',
     components: {
         PPanelTop, PBadge, PTextList, PSearchTable,
     },
     props: {
-        serverIds: {
-            type: Array,
-            default: () => [],
+        cloudServiceId: {
+            type: String,
+            default: '',
+            required: true,
         },
     },
     setup(props) {
         const state = reactive({
             fields: [
-                { label: 'User ID', name: 'user_info.user_id' },
-                { label: 'Name', name: 'user_info.name' },
-                { label: 'Email', name: 'user_info.email' },
-                { label: 'Labels', name: 'labels' },
+                { label: 'Key', name: 'key' },
+                { label: 'Job ID', name: 'job_id' },
+                { label: 'Updated By', name: 'updated_by' },
+                { label: 'Updated', name: 'updated_at' },
             ],
             items: [],
             loading: true,
@@ -58,24 +62,28 @@ export default {
             options: {} as Options,
         });
 
-        const getQuery = () => new QueryHelper()
-            .setSort(state.options.sortBy, state.options.sortDesc)
-            .setPage(
-                getPageStart(state.options.thisPage, state.options.pageSize),
-                state.options.pageSize,
-            )
-            .setKeyword(state.options.searchText)
-            .data;
+        const getParams = () => ({
+            // eslint-disable-next-line camelcase
+            cloud_service_id: props.cloudServiceId,
+            // eslint-disable-next-line camelcase
+            key_path: 'collection_info.change_history',
+            query: new QueryHelper()
+                .setSort(state.options.sortBy, state.options.sortDesc)
+                .setPage(
+                    getPageStart(state.options.thisPage, state.options.pageSize),
+                    state.options.pageSize,
+                )
+                .setKeyword(state.options.searchText)
+                .data,
+        });
 
-        const api = SpaceConnector.client.inventory.server.member.list;
-        const listAdmin = async () => {
+
+        const api = SpaceConnector.client.inventory.cloudService.getData;
+        const listHistory = async () => {
             state.loading = true;
 
             try {
-                const res = await api({
-                    servers: props.serverIds,
-                    query: getQuery(),
-                });
+                const res = await api(getParams());
 
                 state.items = res.results;
                 state.totalCount = res.total_count;
@@ -88,7 +96,7 @@ export default {
 
         const onChange: SearchTableListeners['change'] = async (options) => {
             state.options = options;
-            await listAdmin();
+            await listHistory();
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
@@ -96,11 +104,8 @@ export default {
             try {
                 const res = await exportApi({
                     source: {
-                        url: '/inventory/server/member/list',
-                        param: {
-                            servers: props.serverIds,
-                            query: getQuery(),
-                        },
+                        url: '/inventory/cloud-service/get-data',
+                        param: getParams(),
                     },
                     template: {
                         options: {
@@ -109,12 +114,17 @@ export default {
                         },
                         // eslint-disable-next-line camelcase
                         data_source: [
-                            { name: 'User ID', key: 'user_info.user_id' },
-                            { name: 'Name', key: 'user_info.name' },
-                            { name: 'Email', key: 'user_info.email' },
+                            { name: 'Key', key: 'key' },
+                            { name: 'Job ID', key: 'job_id' },
+                            { name: 'Updated By', key: 'updated_by' },
                             {
-                                // eslint-disable-next-line camelcase
-                                name: 'Labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
+                                name: 'Updated',
+                                key: 'updated_at',
+                                type: 'datetime',
+                                options: {
+                                    // eslint-disable-next-line camelcase
+                                    source_type: 'timestamp',
+                                },
                             },
                         ],
                     },
@@ -125,21 +135,22 @@ export default {
             }
         };
 
-        watch(() => props.serverIds, (after, before) => {
-            if (after !== before) listAdmin();
-        }, { immediate: true });
+        watch(() => props.cloudServiceId, (after, before) => {
+            if (after !== before) listHistory();
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
             onChange,
             onExport,
+            iso8601Formatter,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
->>> .p-search-table {
-    border-width: 0;
-}
+    >>> .p-search-table {
+        border-width: 0;
+    }
 </style>
