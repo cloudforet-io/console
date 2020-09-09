@@ -1,5 +1,5 @@
 <template>
-    <div class="p-loader">
+    <div class="p-chart-loader">
         <transition name="fade-in">
             <div v-if="loading" class="loader w-full h-full">
                 <slot name="loader" :loading="loading">
@@ -36,20 +36,20 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-    .p-loader {
+<style lang="postcss">
+    .p-chart-loader {
         position: relative;
-    }
-    .loader {
-        position: absolute;
-    }
-    .fade-in-leave-active, .fade-in-enter-active {
-        transition: opacity 0.5s;
-    }
-    .fade-in-leave-to, .fade-in-enter {
-        opacity: 0;
-    }
-    .fade-in-enter-to, .fade-in-leave {
-        opacity: 1;
+        .loader {
+            position: absolute;
+        }
+        .fade-in-leave-active, .fade-in-enter-active {
+            transition: opacity 0.5s;
+        }
+        .fade-in-leave-to, .fade-in-enter {
+            opacity: 0;
+        }
+        .fade-in-enter-to, .fade-in-leave {
+            opacity: 1;
+        }
     }
 </style>
