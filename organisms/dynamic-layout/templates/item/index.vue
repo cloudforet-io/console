@@ -7,12 +7,11 @@
                             v-on="$listeners"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="slotProps">
-                <slot :name="slotName" v-bind="slotProps">
-                    <p-dynamic-field :key="slotName" v-bind="item" :data="slotProps.data"
-                                     :before-create="beforeCreateField"
-                                     :handler="fieldHandler"
-                    />
-                </slot>
+                <p-dynamic-field :key="slotName" v-bind="item"
+                                 :data="slotProps.data"
+                                 :before-create="beforeCreateField"
+                                 :handler="fieldHandler"
+                />
             </template>
         </p-definition-table>
     </div>
@@ -20,6 +19,7 @@
 
 <script lang="ts">
 import {
+    ComponentRenderProxy,
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
@@ -31,7 +31,7 @@ import {
 } from '@/components/organisms/dynamic-layout/templates/item/type';
 import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
-import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
+import { DynamicField, ListOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 
 export default {
     name: 'PDynamicLayoutItem',
@@ -70,13 +70,29 @@ export default {
             default: undefined,
         },
     },
-    setup(props: ItemDynamicLayoutProps, { emit }) {
+    setup(props: ItemDynamicLayoutProps, { emit, refs }) {
         const state = reactive({
             fields: computed<DefinitionField[]>(() => {
                 if (!props.options.fields) return [];
-                return props.options.fields.map(d => ({
-                    label: d.name, name: d.key, type: d.type, options: d.options,
-                } as DefinitionField));
+                return props.options.fields.map((d, i) => {
+                    const res = {
+                        label: d.name, name: d.key,
+                    } as DefinitionField;
+
+                    // in case of type 'list', it generate html elements recursively.
+                    // it can cause definition's 'showCopy'(flag for showing or not copy button) works wrong.
+                    // so should check there is copiable value, and give the result to each field's 'disableCopy' property.
+                    if (d.type === 'list') {
+                        const subKey = (d.options as ListOptions).sub_key as string;
+                        const matchedData = get(state.rootData, d.key);
+                        if (Array.isArray(matchedData)) {
+                            res.disableCopy = matchedData.some(data => !get(data, subKey));
+                        } else {
+                            res.disableCopy = !get(matchedData, subKey);
+                        }
+                    }
+                    return res;
+                });
             }),
             rootData: computed<DefinitionData>(() => {
                 if (props.options.root_path) {
@@ -87,14 +103,12 @@ export default {
             }),
             loading: computed(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
             fetchOptionsParam: computed<ItemFetchOptions>(() => ({})),
+            timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
         });
 
-        const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
+        const dynamicFieldSlots = computed(() => {
             const res = {};
             if (!props.options.fields) return res;
-
-            // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
-            const timezone = props.typeOptions?.timezone || 'UTC';
 
             props.options.fields.forEach((ds: DynamicField, i) => {
                 const item: Omit<DynamicFieldProps, 'data'> = {
@@ -104,9 +118,10 @@ export default {
                 };
 
                 if (ds.type === 'datetime') {
-                    item.typeOptions = { timezone };
+                    item.typeOptions = { timezone: state.timezone };
                 }
-                res[`data-${ds.key}`] = item;
+
+                res[`data-${i}`] = item;
             });
 
             return res;
