@@ -76,15 +76,18 @@
                 </div>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="tableState.selectedItems.length === 1" :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab">
-            <!--            <template #detail>-->
-            <!--                <s-dynamic-sub-data-->
-            <!--                    :layouts="mergeLayouts"-->
-            <!--                    :resource-api="resourceApi"-->
-            <!--                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id||''"-->
-            <!--                    :is-show="subDataIsShow"-->
-            <!--                />-->
-            <!--            </template>-->
+        <p-tab v-if="tableState.selectedItems.length === 1"
+               :tabs="singleItemTabState.tabs"
+               :active-tab.sync="singleItemTabState.activeTab"
+        >
+            <template #detail>
+                <cloud-service-detail
+                    :cloud-service-id="tableState.selectedCloudServiceIds[0]"
+                    :provider="provider"
+                    :cloud-service-group="group"
+                    :cloud-service-type="name"
+                />
+            </template>
 
             <template #tag>
                 <s-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
@@ -165,6 +168,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
+import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
 import { useStore } from '@/store/toolset';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
@@ -247,6 +251,7 @@ export default {
         getValue,
     },
     components: {
+        CloudServiceDetail,
         PDynamicLayout,
         GeneralPageLayout,
         PHorizontalLayout,
