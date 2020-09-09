@@ -31,7 +31,7 @@ export interface DynamicFieldHandler<
     Options = DynamicFieldOptions,
     TypeOptions = DynamicFieldTypeOptions,
      ExtraData = any> {
-    (props: DynamicFieldProps<Options, TypeOptions, ExtraData>): Partial<DynamicFieldProps>|void;
+    (props: DynamicFieldProps<Options, TypeOptions, ExtraData>): Partial<DynamicFieldProps>;
 }
 
 // TODO

@@ -5,7 +5,7 @@
                :type-options="proxy.typeOptions"
                :extra-data="proxy.extraData"
                :before-create="proxy.beforeCreate"
-               :handler="proxy.handler"
+               :handler="nextHandler"
                v-on="$listeners"
     />
 </template>
@@ -14,7 +14,7 @@
 import {
     computed, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { DynamicFieldHandler, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { dynamicFieldTypes } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
@@ -59,38 +59,56 @@ export default {
         // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
-            proxy: computed<DynamicFieldProps>(() => {
-                let res: DynamicFieldProps = {
-                    type: props.type,
-                    options: props.options,
-                    data: props.data,
-                    typeOptions: props.typeOptions,
-                    extraData: props.extraData,
-                    beforeCreate: props.beforeCreate,
-                    handler: props.handler,
-                };
-                if (props.handler) {
-                    if (['list', 'enum'].includes(props.type)) res.handler = undefined;
-                    res = { ...res, ...props.handler(props) };
-                }
-                return res;
-            }),
+            nextHandler: props.handler,
+            isHandlerInvoked: false,
         });
-        onMounted(async () => {
+
+
+        const loadComponent = async (fieldProps: DynamicFieldProps) => {
             try {
-                if (props.beforeCreate) {
-                    const res = props.beforeCreate(props);
-                    if (res) await res;
+                if (!dynamicFieldTypes.includes(fieldProps.type)) {
+                    throw new Error(`[DynamicField] Unacceptable Type:
+                                    field type must be one of ${dynamicFieldTypes}.
+                                    ${fieldProps.type} is not acceptable.`);
                 }
-                if (!dynamicFieldTypes.includes(props.type)) throw new Error(`[DynamicField] Unacceptable Type: field type must be one of ${dynamicFieldTypes}. ${props.type} is not acceptable.`);
-                state.component = async () => state.loader();
+
+                state.component = () => import(`./templates/${fieldProps.type}/index.vue`);
             } catch (e) {
                 state.component = () => import('./templates/text/index.vue');
             }
+        };
+
+        const proxy = computed<DynamicFieldProps>(() => {
+            let res: DynamicFieldProps = {
+                type: props.type,
+                options: props.options,
+                data: props.data,
+                typeOptions: props.typeOptions,
+                extraData: props.extraData,
+                beforeCreate: props.beforeCreate,
+                handler: props.handler,
+            };
+            if (!state.isHandlerInvoked && props.handler) {
+                state.isHandlerInvoked = true;
+                res = { ...res, ...props.handler(Object.freeze(props)) };
+                if (['list', 'enum'].includes(res.type)) state.nextHandler = undefined;
+                if (res.type !== props.type) { loadComponent(res); }
+            }
+            return res;
         });
+
+
+        onMounted(async () => {
+            if (props.beforeCreate) {
+                const res = props.beforeCreate(props);
+                if (res) await res;
+            }
+            await loadComponent(props);
+        });
+
         return {
             ...toRefs(state),
+            proxy,
         };
     },
 };
