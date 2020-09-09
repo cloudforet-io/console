@@ -37,16 +37,14 @@ export default {
         },
     },
     render(h, { props, listeners }: {props: EnumDynamicFieldProps; listeners: any}) {
-        // eslint-disable-next-line camelcase
-        const enumOptions: EnumOptions = props.options;
-        const option: Omit<DynamicFieldProps, 'data'|'typeOptions'|'options'> = get(
-            enumOptions, props.data,
+        const option: EnumOptions[string] = get(
+            props.options, props.data,
             { type: 'text' },
         );
         return h(PDynamicField, {
             props: {
                 ...option,
-                data: props.data,
+                data: option.name || props.data,
                 typeOptions: props.typeOptions,
                 beforeCreate: props.beforeCreate,
                 handler: props.handler,
