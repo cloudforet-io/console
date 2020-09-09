@@ -29,7 +29,7 @@
                 <template v-else>
                     <router-link v-for="(item, index) in data" :key="index" :to="item.href">
                         <p-selectable-item
-                                :icon-url="iconUrl(item)" theme="card"
+                            :icon-url="iconUrl(item)" theme="card"
                         >
                             <template #contents>
                                 <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
@@ -61,17 +61,17 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed, reactive, toRefs, UnwrapRef,
-    } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import { range } from 'lodash';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { store } from '@/store';
 
 export default {
     name: 'CloudServices',
@@ -96,11 +96,6 @@ export default {
         },
     },
     setup(props) {
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
-
         interface Value {
             provider: string;
             group: string;
@@ -110,15 +105,17 @@ export default {
             href: [string, object];
         }
 
-        interface StateInterface {
-            data: Value[];
-            loading: boolean;
-            providers: ProviderInfo;
-        }
-        const state: UnwrapRef<StateInterface> = reactive({
-            data: [],
+        const state = reactive({
+            data: [] as Array<{
+                count: number;
+                group: string;
+                icon: string;
+                name: string;
+                provider: string;
+                href: string;
+            }>,
             loading: true,
-            providers: computed(() => providerStore.state.providers),
+            providers: computed(() => store.state.resource.provider.items),
         });
 
         const api = fluentApi.statisticsTest().resource().stat<Value>()
@@ -138,7 +135,7 @@ export default {
 
         const getData = async (): Promise<void> => {
             state.loading = true;
-            await providerStore.getProvider();
+            await store.dispatch('resource/provider/load');
             try {
                 const res = await props.getAction(api).execute();
                 if (props.projectFilter) {
@@ -179,7 +176,7 @@ export default {
         return {
             ...toRefs(state),
             skeletons: range(12),
-            iconUrl: (item: Value): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
+            iconUrl: (item: Value): string => item.icon || state.providers[item.provider]?.icon || '',
             // onSelected(item): void {
             //     if (props.projectFilter) {
             //         vm.$router.push({

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, {Module, ModuleTree} from 'vuex';
+import Vuex, { Module, ModuleTree } from 'vuex';
 import user from './modules/user';
 import domain from './modules/domain';
 import resource from './modules/resource';
@@ -23,10 +23,10 @@ interface Store {
         collector: typeof collector.state;
         provider: typeof provider.state;
         region: typeof region.state;
-    }
+    };
 }
 
-export const store = new Vuex.Store<Store>({
+const store = new Vuex.Store<Store>({
     modules: {
         user,
         domain,
@@ -35,4 +35,5 @@ export const store = new Vuex.Store<Store>({
     plugins,
 });
 
+export { store };
 export default store;

@@ -51,7 +51,6 @@ import PSelectableItem from '@/components/molecules/selectable-item/PSelectableI
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import { SPieChart } from '@/lib/chart/pie-chart';
-import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import { violet, yellow } from '@/styles/colors';
 import { map, forEach, range } from 'lodash';
 import Color from 'color';
@@ -62,6 +61,7 @@ import {
     serviceAccountsProps,
     ServiceAccountsPropsType,
 } from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
+import { store } from '@/store';
 
 export default {
     name: 'ServiceAccounts',
@@ -76,11 +76,6 @@ export default {
     props: serviceAccountsProps,
     setup(props: ServiceAccountsPropsType) {
         const vm: any = getCurrentInstance();
-
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
 
         interface Value {
             provider: string;
@@ -131,7 +126,7 @@ export default {
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
             ts.state.data = [];
-            await providerStore.getProvider();
+            await store.dispatch('resource/provider/load');
             try {
                 const res = await props.getAction(api).execute();
                 const others: Item = {
@@ -142,20 +137,24 @@ export default {
                     provider: '',
                     href: '/identity/service-account',
                 };
-                const providers: ProviderInfo = providerStore.state.providers;
+                const providers = store.state.resource.provider.items;
 
                 if (res.data.results.length > 0) {
                     forEach(res.data.results, (d: Value, i) => {
                         if (providers[d.provider]) {
                             ts.state.data.push({
-                                ...providers[d.provider],
+                                name: providers[d.provider].label,
+                                icon: providers[d.provider].icon,
+                                color: providers[d.provider].color,
                                 href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
                                 count: d.count,
                             });
                         } else others.count += d.count;
                     });
                 } else {
-                    ts.state.data = map(providers, p => ({ ...p, count: 0 }));
+                    ts.state.data = map(providers, p => ({
+                        name: p.label, icon: p.icon, color: p.color, count: 0,
+                    }));
                 }
                 ts.state.data.push(others);
             } catch (e) {

@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
-import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates_new.vue';
+import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';

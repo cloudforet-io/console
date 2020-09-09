@@ -43,25 +43,23 @@ import {
 import baseInfoSchema from '@/views/inventory/server/default-schema/base-info.json';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { ProviderInfo, useStore } from '@/store/toolset';
 import ServerBaseInfo from '@/views/inventory/server/modules/ServerBaseInfo.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import {
-    DynamicLayoutEventListeners,
+    DynamicLayoutEventListeners, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
 import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
-import {
-    DynamicFieldHandler,
-} from '@/components/organisms/dynamic-field/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { SearchSchema } from '@/lib/component-utils/query-search/type';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import { store } from '@/store';
+import { Reference } from '@/lib/reference/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 export default {
     name: 'PServerDetail',
@@ -79,9 +77,6 @@ export default {
         },
     },
     setup(props) {
-        const {
-            project, provider, serviceAccount, secret, collector, user,
-        } = useStore();
         const layoutSchemaCacheMap = {};
         const searchSchemaCacheMap = {};
         const fetchOptionsMap = {};
@@ -95,7 +90,7 @@ export default {
             selectIndex: [] as number[],
             keyItems: [] as KeyItem[],
             valueHandlerMap: {} as ValueHandlerMap,
-            language: computed(() => user.state.language),
+            language: computed(() => store.state.user.language),
 
             // button tab
             tabs: computed<string[]>(() => {
@@ -111,13 +106,6 @@ export default {
             layouts: [] as DynamicLayout[],
             currentLayout: computed<undefined|DynamicLayout>(() => find(state.layouts, { name: state.activeTab })),
             searches: [] as SearchSchema[],
-
-            // formatters
-            projects: computed(() => project.state.projects || {}),
-            providers: computed<ProviderInfo>(() => provider.state.providers || {}),
-            serviceAccounts: computed(() => serviceAccount.state.serviceAccounts || {}),
-            secrets: computed(() => secret.state.secrets || {}),
-            collectors: computed(() => collector.state.collectors || {}),
         });
 
         const schemaQuery = new QueryHelper().setOnly('metadata.view.sub_data.layouts', 'metadata.view.search');
@@ -273,27 +261,12 @@ export default {
                 }
             },
         });
-
-        const fieldHandler: DynamicFieldHandler = (item) => {
-            if (item.extraData?.reference) {
-                return {
-                    options: {
-                        ...item.options,
-                        link: referenceRouter(
-                            item.extraData.reference.resource_type,
-                            item.extraData.reference.reference_key,
-                        ),
-                    },
-                };
+        const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
+            if (field.extraData?.reference) {
+                return referenceFieldFormatter(field.extraData.reference, field.data);
             }
             return {};
         };
-
-        project.getProject();
-        provider.getProvider();
-        serviceAccount.getServiceAccounts();
-        secret.getSecrets();
-        collector.getCollectors();
 
         return {
             ...toRefs(state),

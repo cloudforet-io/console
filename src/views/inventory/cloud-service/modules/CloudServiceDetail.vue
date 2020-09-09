@@ -47,17 +47,17 @@ import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
 
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import { DynamicFieldHandler } from '@/components/organisms/dynamic-field/type';
-import { DynamicLayoutEventListeners } from '@/components/organisms/dynamic-layout/type';
+import { DynamicLayoutEventListeners, DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { SearchSchema } from '@/lib/component-utils/query-search/type';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
 import config from '@/lib/config';
 import { store } from '@/store';
+import { Reference } from '@/lib/reference/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 export default {
     name: 'CloudServiceDetail',
@@ -253,17 +253,9 @@ export default {
                 }
             },
         });
-        const fieldHandler: DynamicFieldHandler = (item) => {
-            if (item.extraData?.reference) {
-                return {
-                    options: {
-                        ...item.options,
-                        link: referenceRouter(
-                            item.extraData.reference.resource_type,
-                            item.extraData.reference.reference_key,
-                        ),
-                    },
-                };
+        const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
+            if (field.extraData?.reference) {
+                return referenceFieldFormatter(field.extraData.reference, field.data);
             }
             return {};
         };
@@ -290,7 +282,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-
-</style>

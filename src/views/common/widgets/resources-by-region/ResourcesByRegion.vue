@@ -48,7 +48,7 @@
 <script lang="ts">
 import {
     computed,
-    getCurrentInstance, Ref, toRefs, watch,
+    getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
@@ -56,20 +56,42 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import { SPieChart } from '@/lib/chart/pie-chart';
-import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
 import {
-    blue, coral, green, peacock, violet, yellow,
+    black,
+    blue, coral, green, peacock, violet, white, yellow,
 } from '@/styles/colors';
-import { map, forEach, range } from 'lodash';
+import {
+    map, range
+} from 'lodash';
 import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
-import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import {
     resourceByRegionProps,
     ResourcesByRegionProps,
 } from '@/views/common/widgets/resources-by-region/ResourcesByRegion.toolset';
+import { store } from '@/store';
+import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+
+interface Value {
+    provider: string;
+    count: number;
+    // eslint-disable-next-line camelcase
+    region_name: string;
+}
+interface Item {
+    name: string;
+    icon: string;
+    color: string;
+    count: number;
+}
+const colors = [coral[500], blue[500], violet[500], yellow[500], green[400],
+    coral[400], peacock[600], coral[200], peacock[400], green[200],
+    coral[300], peacock[700], coral[300], peacock[300], green[300],
+];
+const DEFAULT_COUNT = 4;
+const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 
 export default {
     name: 'ResourcesByRegion',
@@ -85,117 +107,191 @@ export default {
     setup(props: ResourcesByRegionProps) {
         const vm: any = getCurrentInstance();
 
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
+        const api = fluentApi.statisticsTest().resource().stat<Value>()
+            .addGroupKey('provider', 'provider')
+            .addGroupField('count', STAT_OPERATORS.count);
 
-            interface Value {
-                provider: string;
-                count: number;
-                region_name: string;
-            }
+        const state = reactive({
+            chartRef: null,
+            loaderRef: null,
+            data: [],
+            loading: true,
+            isNoData: computed(() => state.data.length === 0),
+        });
 
-            const api = fluentApi.statisticsTest().resource().stat<Value>()
-                .addGroupKey('provider', 'provider')
-                .addGroupField('count', STAT_OPERATORS.count);
-
-            interface Item {
-                name: string;
-                icon: string;
-                color: string;
-                count: number;
-            }
-            interface StateInterface {
-                loaderRef: HTMLCanvasElement | null;
-                data: Item[];
-                loading: boolean;
-                isNoData: Ref<boolean>;
-            }
-
-            const colors = [coral[500], blue[500], violet[500], yellow[500], green[400],
-                coral[400], peacock[600], coral[200], peacock[400], green[200],
-                coral[300], peacock[700], coral[300], peacock[300], green[300],
-            ];
-            const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
-                chart => chart.addData(map(ts.state.data, d => d.count), 'Account')
-                    .setLabels(map(ts.state.data, d => d.name))
-                    .setDefaultCount(4)
-                    .setColors(colors)
-                    .apply(), {
-                    loaderRef: null,
-                    data: [],
-                    loading: true,
-                    isNoData: computed(() => ts.state.data.length === 0),
-                });
-
-            watch(() => ts.state.loaderRef, () => {
-                if (!ts.state.loaderRef) return;
-                new SPieChart(ts.state.loaderRef)
-                    .addData([8, 2], '').setTooltipEnabled(false)
-                    .setColors([violet[200], Color(violet[200]).alpha(0.5).toString()])
-                    .setBorderWidth(0)
-                    .setShowTotalCount(false)
-                    .setAnimationDuration(0)
-                    .apply();
-            }, { immediate: true });
-
-            const defaultItems = range(4).map((d, index) => ({
-                name: 'region',
-                color: colors[index],
-                count: 0,
-                icon: 'ic_provider_other',
-            }));
-
-            const getData = async (): Promise<void> => {
-                ts.state.loading = true;
-                ts.state.data = [];
-                await providerStore.getProvider();
-                const providers: ProviderInfo = providerStore.state.providers;
-                try {
-                    const res = await props.getAction(api).execute();
-                    ts.state.data = res.data.results.map((item, index) => ({
-                        name: item.region_name,
-                        count: item.count,
-                        provider: item.provider,
-                        icon: providers[item.provider].icon,
-                        color: colors[index],
-                    }));
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    ts.state.loading = false;
-                }
-            };
-
-            setTimeout(() => {
-                getData();
-            }, 1000);
-
-            return {
-                ...toRefs(ts.state),
-                skeletons: range(4),
-                defaultItems,
-                onSelected(item) {
-                    if (props.projectFilter && props.isServer) {
-                        vm.$router.push({
-                            path: `/inventory/server?&filters=data.compute.region_name%3A${item.name}&filters=project_id%3A%3D${props.projectId}`,
-                        });
-                    }
-                    if (props.projectFilter && !props.isServer) {
-                        vm.$router.push({
-                            path: `/inventory/cloud-service?provider=${item.provider || 'all'}${props.projectFilter}&filters=data.region_name%3A${item.name}`,
-                        });
-                    }
+        const drawChart = (canvas, isLoading = false) => {
+            let totalCount = 0;
+            let labels = map(state.data, d => d.name);
+            const data = map(state.data, (d) => {
+                totalCount += d.count;
+                return d.count;
+            });
+            let datasets: ChartDataSets[] = [{
+                label: 'Account',
+                data,
+                backgroundColor: colors,
+                borderColor: white,
+                borderWidth: 2,
+            }];
+            let options: ChartOptions = {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: -10,
+                        bottom: -10,
+                    },
                 },
+                legend: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                            display: false,
+                        },
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                            display: false,
+                        },
+                    }],
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 0,
+                    },
+                },
+                responsive: true,
+                cutoutPercentage: 70,
+                aspectRatio: 1,
+                tooltips,
             };
+
+            // if it's loading, set configs for loading pie chart.
+            if (isLoading) {
+                labels = [];
+                datasets = [{
+                    data: [8, 2],
+                    backgroundColor: DEFAULT_COLORS,
+                    borderWidth: 0,
+                }];
+                options = {
+                    ...options,
+                    animation: {
+                        duration: 0,
+                    },
+                    tooltips: { enabled: false },
+                };
+            // if all total count of data is 0, set configs for default pie chart.
+            } else if (!totalCount) {
+                datasets = [{
+                    data: range(DEFAULT_COUNT).fill(1),
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                }];
+                options = {
+                    ...options,
+                    animation: {
+                        duration: 0,
+                    },
+                    tooltips: { enabled: false },
+                };
+            }
+
+            state.chart = new NSChart(canvas, {
+                type: 'pie',
+                data: {
+                    labels,
+                    datasets,
+                },
+                options,
+                plugins: [{
+                    beforeDraw(chart): void {
+                        const ctx: CanvasRenderingContext2D = chart.ctx as CanvasRenderingContext2D;
+                        if (isLoading || !ctx) return;
+
+                        const txt = `${totalCount}`;
+                        ctx.font = '2rem Roboto';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        const centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+                        const centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+                        ctx.fillStyle = black;
+
+                        ctx.fillText(txt, centerX, centerY);
+                    },
+                }],
+            });
+        };
+
+        watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
+            if (loaderCtx) {
+                drawChart(loaderCtx, true);
+            } else if (chartCtx) drawChart(chartCtx, false);
+        }, { immediate: true });
+
+        const defaultItems = range(DEFAULT_COUNT).map((d, index) => ({
+            name: 'region',
+            color: colors[index],
+            count: 0,
+            icon: 'ic_provider_other',
+        }));
+
+        const getData = async (): Promise<void> => {
+            state.loading = true;
+            state.data = [];
+            await store.dispatch('resource/provider/load');
+            const providers = store.state.resource.provider.items;
+            try {
+                const res = await props.getAction(api).execute();
+                state.data = res.data.results.map((item, index) => ({
+                    name: item.region_name,
+                    count: item.count,
+                    provider: item.provider,
+                    icon: providers[item.provider].icon,
+                    color: colors[index],
+                }));
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        setTimeout(() => {
+            getData();
+        }, 1000);
+
+        return {
+            ...toRefs(state),
+            skeletons: range(4),
+            defaultItems,
+            onSelected(item) {
+                if (props.projectFilter && props.isServer) {
+                    vm.$router.push({
+                        path: `/inventory/server?&filters=data.compute.region_name%3A${item.name}&filters=project_id%3A%3D${props.projectId}`,
+                    });
+                }
+                if (props.projectFilter && !props.isServer) {
+                    vm.$router.push({
+                        path: `/inventory/cloud-service?provider=${item.provider || 'all'}${props.projectFilter}&filters=data.region_name%3A${item.name}`,
+                    });
+                }
+            },
+        };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
     .resources-by-region {
-        border:none;
+        border: none;
         height: 27.1rem;
     &::v-deep .widget-contents {
          overflow-y: auto;
@@ -226,6 +322,7 @@ export default {
             min-width: 40%;
             .chart {
                 height: 13.3rem;
+                width: 100%;
             }
         }
       }
