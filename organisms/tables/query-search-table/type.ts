@@ -1,5 +1,5 @@
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import {KeyItem, QueryItem, ValueHandlerMap} from '@/components/organisms/search/query-search/type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 export interface QuerySearchTableProps {
@@ -28,6 +28,12 @@ export interface Options {
     thisPage: number;
     pageSize: number;
     queryTags: QueryTag[];
+}
+
+export interface QuerySearchTableFunctions {
+    addTag(...queries: QueryItem[]): void;
+    deleteTag(index: number): void;
+    deleteAllTags(): void;
 }
 
 export interface QuerySearchTableListeners {
