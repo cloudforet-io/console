@@ -161,6 +161,10 @@ export default {
             type: String,
             default: 'UTC',
         },
+        colCopy: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

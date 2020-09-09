@@ -16,6 +16,7 @@ export interface QuerySearchTableProps {
     valueHandlerMap: ValueHandlerMap;
     queryTags: QueryTag[]; // sync
     selectable: boolean;
+    colCopy: boolean;
     multiSelect: boolean;
     excelVisible: boolean;
     rowCursorPointer: boolean;

@@ -14,6 +14,7 @@ export interface SearchTableProps {
     selectable: boolean;
     multiSelect: boolean;
     excelVisible: boolean;
+    colCopy: boolean;
 }
 
 export interface Options {
