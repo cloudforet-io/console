@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
 
 env:
-  ORGANIZATION: pyengine
   SERVICE: console
 
 
@@ -45,7 +44,7 @@ jobs:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           account_id: ${{ secrets.AWS_ROOT_ID }}
-          repo: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
+          repo: spaceone/${{ env.SERVICE }}
           region: ap-northeast-2
           tags: latest,${{ env.VERSION }}
           create_repo: false
