@@ -90,6 +90,37 @@ export const slotCase = () => ({
     },
     template: `
         <div style="width: 80vw; background-color: white;">
+            <div class="my-8">
+                <p>Slots</p>
+                'data-{field index}' : Slot for definition field.
+                'data-{field.name}' : Slot for definition field. Use it only when all field names are distinct. Otherwise, it can cause unexpected error.<br>
+                It's useful when field names are duplicated. 
+                * Don't use 'data-{field.name}' slot together. It can cause multiple definition field.<br>
+                no-data : Slot for no data case.<br>
+                copy : Slot for all copy button. It replaces all copy button. <br>
+                'copy-{field index}' : Slot for field's copy button. <br>
+                'copy-{field.name}' : Slot for field's copy button. Use it only when all field names are distinct. Otherwise, it can cause unexpected error.<br>
+                <br>
+                <br>
+                <p>SlotScope</p>
+                Except for 'no-data' slot, all slots provide slot props.<br>
+                 - all Definition component's slot scope. <br>
+                <div class="pl-4">
+                    all Props(name, label, data, disableCopy, formatter)<br>
+                    field: 'td' element that wrapping definition text.<br>
+                    displayData: actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'.<br>
+                    showCopy: boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText.<br>
+                    copy: function that invoked when copy button is clicked.<br>
+                    isMouseOver: boolean value that indicates whether copy button is mouse over or out.<br>
+                    onMouseOver: function that invoked when copy button is mouse over.<br>
+                    onMouseOut: function that invoked when copy button is mouse out.<br>
+                </div>
+                 - index <br>
+                 - items(merged fields with data)<br>
+            </div>
+            
+            
+            
             <p-definition-table v-bind="$props">
                 <template #data-name>
                     <p-lazy-img :img-url="data.tags.icon" width="1rem" height="1rem" />
