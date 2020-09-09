@@ -251,6 +251,16 @@ export default {
         };
 
         /** Search event listeners */
+        const addTag = computed(() => (state.tagsRef ? state.tagsRef.addTag : () => {
+            throw new Error('[QuerySearchTable] addTag must be invoked after component is mounted.');
+        }));
+        const deleteTag = computed(() => (state.tagsRef ? state.tagsRef.deleteTag : () => {
+            throw new Error('[QuerySearchTable] deleteTag must be invoked after component is mounted.');
+        }));
+        const deleteAllTags = computed(() => (state.tagsRef ? state.tagsRef.deleteAllTags : () => {
+            throw new Error('[QuerySearchTable] deleteAllTags must be invoked after component is mounted.');
+        }));
+
         const onSearch = async (query: QueryItem) => {
             if (!state.tagsRef) return;
             state.tagsRef.addTag(query);
@@ -278,6 +288,9 @@ export default {
             onQueryTagsChange,
             onRefresh,
             byPassEvent,
+            addTag,
+            deleteTag,
+            deleteAllTags,
         };
     },
 };

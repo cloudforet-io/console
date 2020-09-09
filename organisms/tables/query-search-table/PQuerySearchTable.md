@@ -1,3 +1,19 @@
+
+# Functions
+| Name | Description |
+| ---- | ----------- |
+| addTag | Use it when you want to add tag. <br> It takes ```QueryItem``` as parameters. |
+| deleteTag | Use it when you want to delete one tag. Give the index you want to delete as a parameter. |
+| deleteAllTags | Use it when you want to delete all tags. |
+
+```typescript
+interface QuerySearchTableFunctions {
+    addTag(...queries: QueryItem[]): void;
+    deleteTag(index: number): void;
+    deleteAllTags(): void;
+}
+```
+
 ### Types
 
 ```typescript
