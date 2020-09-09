@@ -195,6 +195,7 @@ import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitori
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
+import { Reference } from '@/lib/reference/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -526,7 +527,7 @@ export default {
             const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setOnly(...typeOptionState.keyItems.map(d => d.name))
+                .setOnly(...typeOptionState.keyItems.map(d => d.name), 'cloud_service_id')
                 .setFilter(...andFilters)
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
@@ -599,7 +600,7 @@ export default {
         };
 
         // TODO: make it as helper
-        const fieldHandler: DynamicLayoutFieldHandler = (field) => {
+        const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             const item: Partial<DynamicFieldProps> = {};
             if (field.extraData?.reference) {
                 switch (field.extraData.reference.resource_type) {

@@ -276,12 +276,17 @@ export default {
 
         const fieldHandler: DynamicFieldHandler = (item) => {
             if (item.extraData?.reference) {
-                item.options.link = referenceRouter(
-                    item.extraData.reference.resource_type,
-                    item.extraData.reference.reference_key,
-                );
+                return {
+                    options: {
+                        ...item.options,
+                        link: referenceRouter(
+                            item.extraData.reference.resource_type,
+                            item.extraData.reference.reference_key,
+                        ),
+                    },
+                };
             }
-            return item;
+            return {};
         };
 
         project.getProject();

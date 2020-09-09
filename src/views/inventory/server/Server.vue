@@ -10,14 +10,15 @@
         />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <p-dynamic-layout type="query-search-table"
-                                  :options="tableSchema.options"
+                <p-dynamic-layout v-if="tableState.schema"
+                                  type="query-search-table"
+                                  :options="tableState.schema.options"
                                   :data="tableState.items"
                                   :fetch-options="fetchOptionState"
                                   :type-options="typeOptionState"
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
-                                  @init="initTableData"
+                                  @init="listServerData"
                                   @fetch="fetchTableData"
                                   @select="onSelect"
                                   @export="exportServerData"
@@ -160,23 +161,18 @@ import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 /* types */
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { SearchKeyGroup } from '@/lib/component-utils/query-search/type';
-import {
-    QuerySearchTableTypeOptions,
-    QuerySearchTableFetchOptions, QuerySearchTableListeners,
-} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
+import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { ServerModel } from '@/models/inventory/server';
 
 
-import { get, forEach } from 'lodash';
+import { get } from 'lodash';
 import {
     serverStateFormatter, showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import { useStore } from '@/store/toolset';
 import {
     queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
 } from '@/lib/router-query-string';
@@ -184,10 +180,12 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import config from '@/lib/config';
-import searchSchema from './default-schema/search.json';
-import tableSchema from './default-schema/base-table.json';
+import { Reference } from '@/lib/reference/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { store } from '@/store';
+import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -259,23 +257,6 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        // TODO: Change to new store
-        const {
-            project, provider, serviceAccount, secret, collector, user,
-        } = useStore();
-
-        // TODO: Remove it after change to new store
-        const getAllStoreData = async () => {
-            await Promise.all([
-                provider.getProvider(true),
-                project.getProject(true),
-                serviceAccount.getServiceAccounts(true),
-                secret.getSecrets(true),
-                collector.getCollectors(true),
-            ]);
-        };
-
-
         /** Breadcrumb */
         const routeState = reactive({
             route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Server', path: '/inventory/server' }],
@@ -283,35 +264,28 @@ export default {
 
 
         /** Server Table */
-        // TODO: Remove it after change to new provider store
-        const providerSchemaOptions = {};
-
-        const tableAutocompleteProps = makeQuerySearchPropsWithSearchSchema(
-            searchSchema as SearchKeyGroup, 'inventory.Server',
-        );
-
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
             pageStart: 1,
             pageLimit: serverStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: queryStringToQueryTags(vm.$route.query.filters, tableAutocompleteProps.keyItems),
+            queryTags: [],
         });
 
         const typeOptionState: QuerySearchTableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
-            timezone: computed(() => user.state.timezone || 'UTC'),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
-            keyItems: tableAutocompleteProps.keyItems,
-            valueHandlerMap: tableAutocompleteProps.valueHandlerMap,
+            keyItems: [],
+            valueHandlerMap: {},
         });
 
         const tableState = reactive({
+            schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            providers: computed(() => provider.state.providers || {}),
             consoleLink: computed(() => {
                 const res = get(tableState.selectedItems[0], 'data.reference.link')
                     || get(tableState.selectedItems[0], 'reference.external_link');
@@ -379,41 +353,68 @@ export default {
             }
         };
 
-        const fetchTableData: QuerySearchTableListeners['fetch'] = async (options, changed: Partial<QuerySearchTableFetchOptions>) => {
-            if (changed) {
-                if (changed.sortBy !== undefined) {
-                    fetchOptionState.sortBy = changed.sortBy;
-                    fetchOptionState.sortDesc = !!changed.sortDesc;
-                }
-                if (changed.pageLimit !== undefined) {
-                    fetchOptionState.pageLimit = changed.pageLimit;
-                    serverStore.setItem('pageLimit', changed.pageLimit);
-                }
-                if (changed.pageStart !== undefined) {
-                    fetchOptionState.pageStart = changed.pageStart;
-                }
-                if (changed.queryTags !== undefined) {
-                    fetchOptionState.queryTags = changed.queryTags;
-                    // sync updated query tags to url query string
-                    replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
-                }
-            } else {
-                // init
-                fetchOptionState.queryTags = options.queryTags;
-                await getAllStoreData();
-
-                // TODO: move this code to provider store
-                forEach(provider.state.providers, (d) => {
-                    providerSchemaOptions[d.name] = {
-                        type: 'badge',
-                        options: {
-                            background_color: d.color,
-                        },
-                    };
-                });
+        const fetchTableData: QuerySearchTableListeners['fetch'] = async (options, changed) => {
+            if (changed.sortBy !== undefined) {
+                fetchOptionState.sortBy = changed.sortBy;
+                fetchOptionState.sortDesc = !!changed.sortDesc;
+            }
+            if (changed.pageLimit !== undefined) {
+                fetchOptionState.pageLimit = changed.pageLimit;
+                serverStore.setItem('pageLimit', changed.pageLimit);
+            }
+            if (changed.pageStart !== undefined) {
+                fetchOptionState.pageStart = changed.pageStart;
+            }
+            if (changed.queryTags !== undefined) {
+                fetchOptionState.queryTags = changed.queryTags;
+                // sync updated query tags to url query string
+                replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
             }
 
             await listServerData();
+        };
+
+        const getTableSchema = async () => {
+            try {
+                const res = await SpaceConnector.client.addOns.pageSchema.get({
+                    resource_type: 'inventory.Server',
+                    schema: 'table',
+                });
+
+                // TODO: remove it after api bug fixed
+                res.options.fields.forEach((d, i) => {
+                    if (d.key === 'provider') {
+                        res.options.search.items[i] = {
+                            key: 'provider',
+                            name: 'Provider',
+                            reference: {
+                                resource_type: 'identity.Provider',
+                                reference_key: 'provider',
+                            },
+                        };
+                    }
+                });
+
+                // declare keyItems and valueHandlerMap with search schema
+                if (res?.options?.search) {
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search, 'inventory.Server');
+                    typeOptionState.keyItems = searchProps.keyItems;
+                    typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
+
+                    // declare keyItems and valueHandlerMap with table fields
+                } else if (res?.options?.fields) {
+                    typeOptionState.keyItems = res.options.fields.map(d => ({ label: d.name, name: d.key }));
+                    typeOptionState.valueHandlerMap = makeDistinctValueHandlerMap(typeOptionState.keyItems, 'inventory.Server');
+                }
+
+                // initiate queryTags with keyItems
+                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItems);
+
+                // set schema to tableState -> create dynamic layout
+                tableState.schema = res;
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
@@ -429,7 +430,7 @@ export default {
                             fileType: 'xlsx',
                             timezone: typeOptionState.timezone,
                         },
-                        data_source: tableSchema.options.fields,
+                        data_source: tableState.schema.options.fields,
                     },
                 });
                 window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
@@ -438,31 +439,11 @@ export default {
             }
         };
 
-        // TODO: make it as helper
-        const fieldHandler: DynamicLayoutFieldHandler = (field) => {
-            const item: Partial<DynamicFieldProps> = {};
+        const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
-                switch (field.extraData.reference.resource_type) {
-                case 'identity.Project': {
-                    item.options = {
-                        ...field.options,
-                        link: referenceRouter(
-                            field.extraData.reference.resource_type,
-                            field.data,
-                        ),
-                    };
-                    item.data = project.state.projects[field.data];
-                    break;
-                }
-                case 'identity.Provider': {
-                    item.data = provider.state.providers[field.data]?.name || field.data;
-                    item.options = providerSchemaOptions;
-                    break;
-                }
-                default: break;
-                }
+                return referenceFieldFormatter(field.extraData.reference, field.data);
             }
-            return item;
+            return {};
         };
 
 
@@ -491,7 +472,7 @@ export default {
                 } catch (e) {
                     showErrorMessage('Fail to Change Project', e, context.root);
                 } finally {
-                    await project.getProject(true);
+                    await store.dispatch('resource/project/load');
                     await listServerData();
                 }
             } else {
@@ -622,22 +603,13 @@ export default {
 
 
         /** ******* Page Init ******* */
-        const initTableData: QuerySearchTableListeners['init'] = async (options) => {
-            fetchOptionState.queryTags = options.queryTags;
-            await getAllStoreData();
-
-            // TODO: move this code to provider store
-            forEach(provider.state.providers, (d) => {
-                providerSchemaOptions[d.name] = {
-                    type: 'badge',
-                    options: {
-                        background_color: d.color,
-                    },
-                };
-            });
-
+        const init = async () => {
+            await getTableSchema();
+            await store.dispatch('resource/loadAll');
             await listServerData();
         };
+
+        init();
         /** ************************* */
 
         return {
@@ -645,7 +617,6 @@ export default {
             routeState,
 
             /* Server Table */
-            tableSchema,
             tableState,
             fetchOptionState,
             typeOptionState,
@@ -677,9 +648,6 @@ export default {
             monitoringState,
 
             serverStateFormatter,
-
-            /* Page Init */
-            initTableData,
         };
     },
 };
