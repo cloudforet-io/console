@@ -10,10 +10,14 @@
                 <p-definition v-for="(bind, idx) in items" :key="idx"
                               class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
                 >
-                    <slot :name="`data-${bind.name}`" v-bind="{...bind, index: idx, items}" />
-                    <template #copy>
-                        <slot name="copy" v-bind="{...bind, index: idx, items}">
-                            <slot :name="`copy-${bind.name}`" v-bind="{...bind, index: idx, items}" />
+                    <template #default="scope">
+                        <slot :name="`data-${bind.name}`" v-bind="{...scope, index: idx, items}" />
+                        <slot :name="`data-${idx}`" v-bind="{...scope, index: idx, items}" />
+                    </template>
+                    <template #copy="scope">
+                        <slot name="copy" v-bind="{...scope, index: idx, items}">
+                            <slot :name="`copy-${bind.name}`" v-bind="{...scope, index: idx, items}" />
+                            <slot :name="`copy-${idx}`" v-bind="{...scope, index: idx, items}" />
                         </slot>
                     </template>
                 </p-definition>

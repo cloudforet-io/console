@@ -1,17 +1,36 @@
+<template>
+    <p-text-list :items="items"
+                 :delimiter="options.delimiter"
+                 :sub-key="options.sub_key"
+                 :link="options.link"
+    >
+        <template #default="{value, data}">
+            <p-dynamic-field v-if="isNotEmpty(value)"
+                             :type="options.item ? options.item.type : 'text'"
+                             :options="options.item ? options.item.options : undefined"
+                             :data="value"
+                             :type-options="typeOptions"
+                             :extra-data="extraData"
+                             :before-create="beforeCreate"
+                             :handler="handler"
+            />
+        </template>
+        <template v-if="!options.delimiter" #delimiter>
+            <br>
+        </template>
+    </p-text-list>
+</template>
+
 <script lang="ts">
-import {
-    fill, flatten, zip,
-} from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
-import { getBindClass } from '@/components/util/functional-helpers';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { DynamicFieldOptions, ListOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { isNotEmpty } from '@/components/util/helpers';
 import { ListDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/list/type';
 
 export default {
     name: 'PDynamicFieldList',
-    functional: true,
-    components: { PDynamicField },
+    components: { PDynamicField, PTextList },
     props: {
         options: {
             type: Object,
@@ -21,11 +40,11 @@ export default {
             type: [String, Object, Array, Boolean, Number],
             default: undefined,
         },
-        typeOptions: {
+        extraData: {
             type: Object,
             default: () => ({}),
         },
-        extraData: {
+        typeOptions: {
             type: Object,
             default: () => ({}),
         },
@@ -38,70 +57,19 @@ export default {
             default: undefined,
         },
     },
-    render(h, { props, data: compData, listeners }: {props: ListDynamicFieldProps; data: any; listeners: any}) {
-        const listOptions: ListOptions = props.options || {};
+    setup(props: ListDynamicFieldProps) {
+        const state = reactive({
+            items: computed(() => {
+                if (Array.isArray(props.data)) return props.data;
+                if (props.data instanceof Object && props.options.sub_key) return props.data;
+                return [props.data];
+            }),
+        });
 
-        const options: DynamicFieldOptions = {
-            ...listOptions.item?.options,
+        return {
+            ...toRefs(state),
+            isNotEmpty,
         };
-        if (listOptions.link) options.link = listOptions.link;
-
-        const childOptions: Omit<DynamicFieldProps, 'data'> = {
-            type: listOptions.item ? listOptions.item.type : 'text',
-            options,
-            typeOptions: props.typeOptions,
-            extraData: props.extraData,
-            beforeCreate: props.beforeCreate,
-            handler: props.handler,
-        };
-
-
-        let childrenData: any[] = [];
-
-        const getValue = (data, paths: string[], results: DynamicFieldProps[]): DynamicFieldProps[] => {
-            if (Array.isArray(data)) {
-                data.forEach((v, idx) => {
-                    getValue(data[idx], paths, results);
-                });
-            } else if (typeof data === 'object' && data !== null) {
-                getValue(data[paths[0]], paths.slice(1), results);
-            } else if (paths.length === 0 && data !== '' && data !== null && data !== undefined) {
-                results.push(data);
-            }
-
-            return results;
-        };
-        if (listOptions.sub_key) {
-            childrenData = getValue(props.data, listOptions.sub_key.split('.'), []);
-        } else {
-            childrenData = props.data;
-        }
-        let children: any[] = [];
-        if (Array.isArray(childrenData)) {
-            children = childrenData.map(data => h(PDynamicField, { props: { ...childOptions, data }, on: listeners }));
-        }
-
-
-        const delimiter = listOptions.delimiter || '<br>';
-        let delimiterEl;
-        if (delimiter === '<br>') {
-            delimiterEl = h('br');
-        } else {
-            delimiterEl = h('span', delimiter);
-        }
-
-        if (children.length) {
-            const dim = fill(Array(children.length - 1), delimiterEl);
-            children = flatten(zip(children, dim));
-        }
-
-        return h('span', {
-            ...compData,
-            class: {
-                ...getBindClass(compData.class),
-                'dynamic-layout-list': true,
-            },
-        }, children);
     },
 };
 </script>
