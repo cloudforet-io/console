@@ -69,7 +69,7 @@ export default {
         background-color: currentColor;
     }
     .contents {
-        @apply flex items-center w-full content-between p-2 overflow-hidden;
+        @apply flex items-center w-full content-between p-2 overflow-hidden leading-normal;
     }
     &:hover {
         background-color: $hover-bg-color;
