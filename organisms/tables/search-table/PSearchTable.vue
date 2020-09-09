@@ -120,6 +120,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        colCopy: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: SearchTableProps, { emit, slots }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
