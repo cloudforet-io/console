@@ -9,6 +9,7 @@
         <p-data-table :items="rootData"
                       :fields="fields"
                       :loading="loading"
+                      :col-copy="colCopy"
                       v-on="$listeners"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
@@ -101,6 +102,7 @@ export default {
             }),
             loading: computed(() => (props.typeOptions?.loading || false)),
             totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
+            colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             /** others */
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};

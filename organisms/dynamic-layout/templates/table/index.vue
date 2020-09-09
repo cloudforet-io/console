@@ -17,6 +17,7 @@
                         :page-size.sync="pageSize"
                         :search-text="searchText"
                         :selectable="selectable"
+                        :col-copy="colCopy"
                         @select="onSelect"
                         @change="onChange"
                         @export="onExport"
@@ -127,6 +128,7 @@ export default {
             allPage: computed(() => (state.totalCount ? Math.ceil(state.totalCount / state.pageSize) : 1)),
             selectIndex: bindExtra(props, 'selectIndex', []),
             selectable: computed(() => (props.typeOptions?.selectable || false)),
+            colCopy: computed(() => (props.typeOptions?.colCopy || false)),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',

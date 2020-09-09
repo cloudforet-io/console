@@ -19,6 +19,7 @@
                               :value-handler-map="valueHandlerMap"
                               :query-tags.sync="queryTags"
                               :selectable="selectable"
+                              :col-copy="colCopy"
                               :timezone="timezone"
                               @init="onInit"
                               @change="onChange"
@@ -127,6 +128,7 @@ export default {
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
+            colCopy: computed(() => (props.typeOptions?.colCopy || false)),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',

@@ -25,6 +25,7 @@ export interface DynamicLayoutTypeOptions {
     timezone: string;
     selectIndex: number[];
     selectable: boolean;
+    colCopy: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     language: string;
