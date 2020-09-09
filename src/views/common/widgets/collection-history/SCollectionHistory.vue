@@ -1,5 +1,14 @@
 <template>
-    <p-widget-layout title="History">
+    <p-widget-layout class="p-widget-layout-container">
+        <template #title>
+            <b>History</b>
+            <router-link to="/management/collector-history" class="see-more-text">
+                <span>see more</span>
+                <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                     color="transparent currentColor" class="ml-1"
+                />
+            </router-link>
+        </template>
         <div class="text-gray text-xs mb-2">
             Job Count
         </div>
@@ -9,34 +18,38 @@
             </template>
             <canvas ref="chartRef" />
         </p-chart-loader>
-        <template #extra>
+        <div class="legend-lap">
             <span v-for="(legend) in legends" :key="legend.name" class="legend">
                 <span class="color" :style="{color: legend.color}" />
                 {{ legend.name }}
             </span>
-        </template>
+        </div>
     </p-widget-layout>
 </template>
 
 <script lang="ts">
-    import {
-        computed, reactive, toRefs, UnwrapRef, watch,
-    } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import {
-    coral, gray, primary, black,
-} from '@/styles/colors';
+import Chart from 'chart.js';
+import moment from 'moment';
 import _ from 'lodash';
-import { SBarChart } from '@/lib/chart/bar-chart';
+import numeral from 'numeral';
+
+import {
+    computed, reactive, toRefs, UnwrapRef, watch,
+} from '@vue/composition-api';
+
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import moment from 'moment';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import PI from '@/components/atoms/icons/PI.vue';
+
+import { SBarChart } from '@/lib/chart/bar-chart';
 import { HistoryStat } from '@/lib/fluent-api/statistics/history';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
-import Chart from 'chart.js';
-import numeral from 'numeral';
+import { SpaceConnector } from '@/lib/space-connector';
+import { getTimezone } from '@/lib/util';
+import {
+    coral, gray, primary2, black,
+} from '@/styles/colors';
 
 interface Data {
     date: string;
@@ -56,6 +69,7 @@ const DEFAULT_STEP_SIZE = 100;
 export default {
     name: 'SCollectionHistory',
     components: {
+        PI,
         PWidgetLayout,
         PChartLoader,
         PSkeleton,
@@ -79,8 +93,8 @@ export default {
             loading: boolean;
         }
         const LEGEND_COLORS: {[k: string]: string} = {
-            success: primary,
             failure: coral.default,
+            success: primary2,
         };
 
         const state: UnwrapRef<InitDataType> = reactive({
@@ -108,11 +122,15 @@ export default {
             const datasets = [{
                 label: 'Success',
                 data: data.map(d => d.success) as number[],
+                barPercentage: 0.4,
+                categoryPercentage: 0.3,
                 backgroundColor: LEGEND_COLORS.success,
                 borderColor: LEGEND_COLORS.success,
             }, {
                 label: 'Failure',
                 data: data.map(d => d.failure) as number[],
+                barPercentage: 0.4,
+                categoryPercentage: 0.3,
                 backgroundColor: LEGEND_COLORS.failure,
                 borderColor: LEGEND_COLORS.failure,
             }];
@@ -217,21 +235,17 @@ export default {
             immediate: false,
         });
 
-
-        const api = fluentApi.statisticsTest().history().stat<Data>()
-            .setTopic('daily_job_summary')
-            .addGroupKey('created_at', 'date')
-            .addGroupField('success', STAT_OPERATORS.sum, 'values.success_count')
-            .addGroupField('failure', STAT_OPERATORS.sum, 'values.fail_count')
-            .setFilter({ key: 'created_at', value: `now/d-${DAY_COUNT - 1}d`, operator: FILTER_OPERATOR.gtTime });
-
-
         const getData = async (): Promise<void> => {
             state.loading = true;
             state.data = [];
             try {
-                const res = await props.getAction(api).execute();
-                state.data = _.orderBy(res.data.results, ['date'], ['asc']);
+                const now = moment().tz(getTimezone());
+                const start = moment().tz(getTimezone()).subtract(6, 'days');
+                const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
+                    start: start.format(),
+                    end: now.format(),
+                });
+                state.data = _.orderBy(res.results, ['date'], ['asc']);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -252,21 +266,38 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-.chart {
-    height: 254px;
-}
-.legend {
-    @apply uppercase ml-6 inline-flex items-center float-right;
-    font-size: 0.875rem;
-    font-weight: normal;
-    .color {
-        display: inline-block;
-        width: 0.75rem;
-        height: 0.75rem;
-        margin-right: 0.5rem;
-        border-radius: 2px;
-        background-color: currentColor;
+<style lang="postcss">
+.p-widget-layout-container {
+    .see-more-text {
+        @apply text-blue-600;
+        margin-left: 1.5rem;
+        font-size: 0.875rem;
+        &:hover {
+            @apply text-blue-600;
+        }
+    }
+
+    .chart {
+        height: 254px;
+    }
+
+    .legend-lap {
+        width: 100%;
+        text-align: center;
+        text-transform: uppercase;
+        padding-top: 0.5rem;
+        .legend {
+            font-size: 0.875rem;
+            padding: 0 1rem;
+        }
+        .color {
+            display: inline-block;
+            width: 0.75rem;
+            height: 0.75rem;
+            margin-right: 0.5rem;
+            border-radius: 2px;
+            background-color: currentColor;
+        }
     }
 }
 </style>
