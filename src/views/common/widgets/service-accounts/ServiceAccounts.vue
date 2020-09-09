@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import {
-    getCurrentInstance, toRefs, watch,
+    getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
@@ -50,18 +50,24 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import { SPieChart } from '@/lib/chart/pie-chart';
-import { violet, yellow } from '@/styles/colors';
+import {
+    black, violet, white, yellow,
+} from '@/styles/colors';
 import { map, forEach, range } from 'lodash';
 import Color from 'color';
 import { fluentApi } from '@/lib/fluent-api';
-import { SChartToolSet } from '@/lib/chart/toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import {
     serviceAccountsProps,
     ServiceAccountsPropsType,
 } from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
 import { store } from '@/store';
+import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
+import { NSChart, tooltips } from '@/lib/chart/s-chart';
+
+const DEFAULT_COUNT = 4;
+const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
+
 
 export default {
     name: 'ServiceAccounts',
@@ -95,37 +101,144 @@ export default {
             count: number;
             href: string;
         }
-        interface StateInterface {
-            loaderRef: HTMLCanvasElement | null;
-            data: Item[];
-            loading: boolean;
-        }
 
-        const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
-            chart => chart.addData(map(ts.state.data, d => d.count), 'Account')
-                .setLabels(map(ts.state.data, d => d.name))
-                .setColors(map(ts.state.data, d => d.color))
-                .setDefaultCount(4)
-                .apply(), {
-                loaderRef: null,
-                data: [],
-                loading: true,
+        const state = reactive({
+            loaderRef: null,
+            chartRef: null,
+            data: [] as Array<{
+                name: string;
+                icon: string;
+                color: string;
+                count: number;
+                href: string;
+            }>,
+            loading: true,
+            chart: null as null|Chart,
+        });
+
+        const drawChart = (canvas, isLoading = false) => {
+            const colors = map(state.data, d => d.color);
+            let labels = map(state.data, d => d.name);
+            let totalCount = 0;
+            const data = map(state.data, (d) => {
+                totalCount += d.count;
+                return d.count;
             });
+            let datasets: ChartDataSets[] = [{
+                label: 'Account',
+                data,
+                backgroundColor: colors,
+                borderColor: white,
+                borderWidth: 2,
+            }];
+            let options: ChartOptions = {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: -10,
+                        bottom: -10,
+                    },
+                },
+                legend: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                            display: false,
+                        },
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                            display: false,
+                        },
+                    }],
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 0,
+                    },
+                },
+                responsive: true,
+                cutoutPercentage: 70,
+                aspectRatio: 1,
+                tooltips,
+            };
 
-        watch(() => ts.state.loaderRef, () => {
-            if (!ts.state.loaderRef) return;
-            new SPieChart(ts.state.loaderRef)
-                .addData([8, 2], '').setTooltipEnabled(false)
-                .setColors([violet[200], Color(violet[200]).alpha(0.5).toString()])
-                .setBorderWidth(0)
-                .setShowTotalCount(false)
-                .setAnimationDuration(0)
-                .apply();
+            // if it's loading, set configs for loading pie chart.
+            if (isLoading) {
+                labels = [];
+                datasets = [{
+                    data: [8, 2],
+                    backgroundColor: DEFAULT_COLORS,
+                    borderWidth: 0,
+                }];
+                options = {
+                    ...options,
+                    animation: {
+                        duration: 0,
+                    },
+                    tooltips: { enabled: false },
+                };
+                // if all total count of data is 0, set configs for default pie chart.
+            } else if (!totalCount) {
+                datasets = [{
+                    data: range(DEFAULT_COUNT).fill(1),
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                }];
+                options = {
+                    ...options,
+                    animation: {
+                        duration: 0,
+                    },
+                    tooltips: { enabled: false },
+                };
+            }
+
+            state.chart = new NSChart(canvas, {
+                type: 'pie',
+                data: {
+                    labels,
+                    datasets,
+                },
+                options,
+                plugins: [{
+                    beforeDraw(chart): void {
+                        const ctx: CanvasRenderingContext2D = chart.ctx as CanvasRenderingContext2D;
+                        if (isLoading || !ctx) return;
+
+                        const txt = `${totalCount}`;
+                        ctx.font = '2rem Roboto';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        const centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+                        const centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+                        ctx.fillStyle = black;
+
+                        ctx.fillText(txt, centerX, centerY);
+                    },
+                }],
+            });
+        };
+
+        // draw loader chart or data chart
+        watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
+            if (loaderCtx) {
+                drawChart(loaderCtx, true);
+            } else if (chartCtx) drawChart(chartCtx, false);
         }, { immediate: true });
 
+
         const getData = async (): Promise<void> => {
-            ts.state.loading = true;
-            ts.state.data = [];
+            state.loading = true;
+            state.data = [];
             await store.dispatch('resource/provider/load');
             try {
                 const res = await props.getAction(api).execute();
@@ -142,32 +255,32 @@ export default {
                 if (res.data.results.length > 0) {
                     forEach(res.data.results, (d: Value, i) => {
                         if (providers[d.provider]) {
-                            ts.state.data.push({
-                                name: providers[d.provider].label,
-                                icon: providers[d.provider].icon,
-                                color: providers[d.provider].color,
+                            state.data.push({
+                                name: providers[d.provider].label || d.provider,
+                                icon: providers[d.provider].icon || '',
+                                color: providers[d.provider].color || '',
                                 href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
                                 count: d.count,
                             });
                         } else others.count += d.count;
                     });
                 } else {
-                    ts.state.data = map(providers, p => ({
-                        name: p.label, icon: p.icon, color: p.color, count: 0,
+                    state.data = map(providers, p => ({
+                        name: p.label || '', icon: p.icon || '', color: p.color || '', count: 0, href: '',
                     }));
                 }
-                ts.state.data.push(others);
+                state.data.push(others);
             } catch (e) {
                 console.error(e);
             } finally {
-                ts.state.loading = false;
+                state.loading = false;
             }
         };
 
         getData();
 
         return {
-            ...toRefs(ts.state),
+            ...toRefs(state),
             skeletons: range(4),
             onSelected(item): void {
                 vm.$router.push('/identity/service-account');
@@ -180,6 +293,7 @@ export default {
 <style lang="postcss" scoped>
     .chart {
         height: 11.25rem;
+        width: 100%;
     }
     .count {
         font-size: 0.875rem;
