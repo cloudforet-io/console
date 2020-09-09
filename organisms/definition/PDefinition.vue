@@ -7,10 +7,9 @@
             <slot name="default" v-bind="{...$props, ...$data}">
                 {{ displayData }}
             </slot>
-            <slot v-if="showCopy"
-                  name="copy" v-bind="{...$props, ...$data}"
-            >
-                <p-copy-button class="ml-2" width="0.8rem" height="0.8rem"
+            <slot name="copy" v-bind="{...$props, ...$data}">
+                <p-copy-button v-if="showCopy"
+                               class="ml-2" width="0.8rem" height="0.8rem"
                                @copy="copy"
                                @mouseover="onMouseOver()" @mouseout="onMouseOut()"
                 />
@@ -45,15 +44,6 @@ export default {
             type: [String, Object, Array, Boolean, Number],
             default: undefined,
         },
-        options: {
-            type: Object,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            default: (): any => ({}),
-        },
-        type: {
-            type: String,
-            default: 'text',
-        },
         disableCopy: {
             type: Boolean,
             default: undefined,
@@ -63,16 +53,24 @@ export default {
             default: undefined,
         },
     },
-    setup(props: DefinitionProps, { emit }) {
+    setup(props: DefinitionProps, { emit, slots }) {
         const field = ref<HTMLFormElement|null>(null);
         const displayData = computed(() => (props.formatter ? props.formatter(props.data, props) : props.data));
-        const showCopy = computed(() => !props.disableCopy && isNotEmpty(displayData.value));
+        const searchElemInnerText = (elem: HTMLElement): string => elem.innerText;
+
+        const showCopy = computed(() => {
+            if (props.disableCopy) return false;
+            if (slots.default) return isNotEmpty(displayData.value);
+            if (field.value) return !!searchElemInnerText(field.value);
+            return true;
+        });
 
         const copy = (): void => {
             if (props.formatter) copyAnyData(props.formatter(props.data, props));
-            else copyAnyData(field.value?.innerText);
+            else if (field.value) copyTextToClipboard(searchElemInnerText(field.value));
             emit('copy', props);
         };
+
         return {
             field,
             displayData,

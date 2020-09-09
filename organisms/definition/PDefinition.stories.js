@@ -29,6 +29,24 @@ export const defaultCase = () => ({
         data: 'data',
     }),
     template: `
+        <div class="my-8">
+            <p>Slots</p>
+            default : Slot for replacing definition text. <br>
+            copy: Slot for replacing copy button. <br>
+            <br>
+            <br>
+            <p>SlotScope(Props)</p>
+            all Props(name, label, data, disableCopy, formatter)<br>
+            field: 'td' element that wrapping definition text.<br>
+            displayData: actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'.<br> 
+            showCopy: boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText.<br>  
+            copy: function that invoked when copy button is clicked.<br>
+            isMouseOver: boolean value that indicates whether copy button is mouse over or out.<br>
+            onMouseOver: function that invoked when copy button is mouse over.<br>
+            onMouseOut: function that invoked when copy button is mouse out.<br>
+            
+            
+        </div>
     <div style="width: 80vw;">
         <PDefinition v-bind="$props"></PDefinition>
     </div>`,
