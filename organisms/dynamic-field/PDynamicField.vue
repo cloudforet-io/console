@@ -60,7 +60,6 @@ export default {
         const state = reactive<any>({
             component: null,
             nextHandler: props.handler,
-            isHandlerInvoked: false,
         });
 
 
@@ -88,11 +87,12 @@ export default {
                 beforeCreate: props.beforeCreate,
                 handler: props.handler,
             };
-            if (!state.isHandlerInvoked && props.handler) {
-                state.isHandlerInvoked = true;
+            if (props.handler) {
                 res = { ...res, ...props.handler(Object.freeze(props)) };
                 if (['list', 'enum'].includes(res.type)) state.nextHandler = undefined;
-                if (res.type !== props.type) { loadComponent(res); }
+                if (res.type !== props.type) {
+                    loadComponent(res);
+                }
             }
             return res;
         });
