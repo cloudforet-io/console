@@ -1,0 +1,44 @@
+name: "[CI]reflect branch update to master"
+on:
+  repository_dispatch:
+    types: [update_master_version]
+
+jobs:
+  reflect_branch_update:
+    env:
+      VERSION: ${{ github.event.client_payload.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: get existing official version
+        run: |
+          echo "::set-env name=current::$(echo src/VERSION | cut -c 2-6)"
+          echo "::set-env name=new_ver::$(echo ${{ env.VERSION }} | cut -c 1-5)"
+      - name: Is new_ver is latest?
+        run: |
+          if [ $(echo ${{ env.current }} | cut -c 1) \> $(echo ${{ env.new_ver }} | cut -c 1) ]
+          then
+            echo "::set-env name=LATEST_TAG::false"
+          else
+            if [ $(echo ${{ env.current }} | cut -c 3) \> $(echo ${{ env.new_ver }} | cut -c 3) ]
+            then
+              echo "::set-env name=LATEST_TAG::false"
+            else
+              if [ $(echo ${{ env.current }} | cut -c 5) \> $(echo ${{ env.new_ver }} | cut -c 5) ]
+              then
+                echo "::set-env name=LATEST_TAG::false"
+              else
+                echo "::set-env name=LATEST_TAG::true"
+              fi
+            fi
+          fi
+      - name: Latest Update - update version file & tagging
+        if: ${{ env.LATEST_TAG }} == 'true'
+        uses: actions/checkout@v2
+      - run: |
+          echo v${{ env.VERSION }} > src/VERSION
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "[CI/CD] release version v${{ env.VERSION }}"
+          git push

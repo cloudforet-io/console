@@ -1,0 +1,61 @@
+name: "[CI]master push"
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  ORGANIZATION: pyengine
+  SERVICE: console
+
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.job1.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: calculate current date
+        run: |
+          sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+          echo "::set-env name=TIME::$(date +'%Y%m%d.%H%M%S')"
+      - name: calculate_version
+        id: job1
+        run: |
+          echo "::set-output name=VERSION::$(cat src/VERSION | cut -c 2-).${{ env.TIME }}"
+
+  docker:
+    if: github.repository_owner == 'spaceone-dev'
+    needs: versioning
+    env:
+      VERSION: ${{ needs.versioning.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Only console use submodule
+      - name: Checkout submodules
+        uses: srt32/git-actions@v0.0.3
+        with:
+          args: git submodule update --init --recursive
+      - name: Upload the docker image on ECR
+        uses: kciter/aws-ecr-action@v1
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ROOT_ID }}
+          repo: ${{ env.IMAGE_PREFIX }}/${{ env.SERVICE }}
+          region: ap-northeast-2
+          tags: latest,${{ env.VERSION }}
+          create_repo: false
+          
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.2.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          author_name: Github Action Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
