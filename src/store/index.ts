@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, {Module, ModuleTree} from 'vuex';
 import user from './modules/user';
 import domain from './modules/domain';
 import resource from './modules/resource';
@@ -9,6 +9,7 @@ import serviceAccount from './modules/resource/service-account';
 import secret from './modules/resource/secret';
 import collector from './modules/resource/collector';
 import provider from './modules/resource/provider';
+import region from './modules/resource/region';
 
 Vue.use(Vuex);
 
@@ -21,7 +22,8 @@ interface Store {
         secret: typeof secret.state;
         collector: typeof collector.state;
         provider: typeof provider.state;
-    };
+        region: typeof region.state;
+    }
 }
 
 export const store = new Vuex.Store<Store>({

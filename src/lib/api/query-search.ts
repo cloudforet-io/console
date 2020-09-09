@@ -120,6 +120,14 @@ const setMultiValueFiltersMap = (query: QueryParam, filtersMap: MultiValueFilter
  * @description convert query tags to api filters and keywords.
  * @param tags: QueryTag[]
  */
+/**
+ * // TODO: 문 서 화 ㅠ ㅠ
+ * What? Operator 를 FilterOperator로 변환
+ *    - 복수 value 가 가능한 operator 인지 확인 후, filter 포맷 정함
+ *       - single value filters: {k, v, o}[]
+ *       - multi value filters: {k, v[], o}[]
+ *    - dataType 에 맞는 FilterOperator 선택
+ */
 const getFiltersFromQueryTags = (tags: QueryTag[]): {andFilters: Filter[]; orFilters: Filter[]; keywords: string[]} => {
     const keywords: string[] = [];
     const singleValueFiltersMap: SingleValueFiltersMap = {};

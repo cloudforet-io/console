@@ -2,7 +2,7 @@
 import { Reference, ReferenceType } from '@/lib/reference/type';
 import { store } from '@/store';
 import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import referenceRouter from '@/lib/reference/referenceRouter';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 interface FieldFormatter {
     (data: string): Partial<DynamicFieldProps>;
@@ -31,6 +31,9 @@ const formatterMap: FormatterMap = {
     'identity.ServiceAccount': data => ({
         data: store.state.resource.serviceAccount.items[data]?.label || data,
         link: referenceRouter('identity.ServiceAccount', data),
+    }),
+    'inventory.Region': data => ({
+        data: store.state.resource.region.items[data]?.label || data,
     }),
 };
 

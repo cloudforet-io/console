@@ -5,5 +5,6 @@ export const loadAll = async ({ dispatch }): Promise<void|Error> => {
         dispatch('serviceAccount/load'),
         dispatch('secret/load'),
         dispatch('collector/load'),
+        dispatch('region/load'),
     ]);
 };
