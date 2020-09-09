@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <div>
-                            <span v-for="day in weekday" :key="day" class="weekday">
+                            <span v-for="(day, index) in weekday" :key="index" class="weekday">
                                 {{ day }}
                             </span>
                             <div class="schedule-matrix mt-4">

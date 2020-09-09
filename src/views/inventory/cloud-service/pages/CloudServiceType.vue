@@ -154,7 +154,6 @@ import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import {
     makeQueryStringComputed, makeQueryStringComputeds,
     queryStringToQueryTags,
@@ -187,10 +186,6 @@ import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios
 import { APIError } from '@/lib/space-connector/api';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
-import { select } from '@storybook/addon-knobs';
-
-export type UrlQueryString = string | (string | null)[] | null | undefined;
 
 
 export default {
@@ -327,29 +322,6 @@ export default {
             return res;
         };
 
-        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
-            if (Array.isArray(tags)) {
-                return tags.map((tag) => {
-                    let item;
-                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
-                    else item = `${tag.value?.name}`;
-                    return item;
-                });
-            }
-            return null;
-        };
-
-        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
-            if (!urlQueryString) return [];
-            if (Array.isArray(urlQueryString)) {
-                return urlQueryString.reduce((res, qs) => {
-                    if (qs) res.push(parseTag(qs));
-                    return res;
-                }, [] as QueryTag[]);
-            }
-            return [parseTag(urlQueryString as string)];
-        };
-
         const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
             const res = {
                 filters: [] as Filter[],
@@ -397,7 +369,6 @@ export default {
                 listCloudServiceRequest.cancel('Next request has been called.');
                 listCloudServiceRequest = undefined;
             }
-
             // create a new token for upcoming request (overwrite the previous one)
             listCloudServiceRequest = axios.CancelToken.source();
 

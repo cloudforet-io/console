@@ -329,6 +329,8 @@ export default {
                     // sync updated query tags to url query string
                     replaceQuery('filters', changed.searchText);
                 }
+            } else {
+                fetchOptionState.searchText = vm.$route.query.filters?.toString();
             }
             listServiceAccountData();
         };
