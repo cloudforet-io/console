@@ -69,10 +69,11 @@ export default {
 
         .sub-title {
             @apply mx-6 text-xs mb-4;
+            margin-top: -1.5rem;
         }
 
         .help {
-            @apply text-gray-300;
+            @apply text-gray-400;
             display: inline-flex;
             cursor: help;
         }
