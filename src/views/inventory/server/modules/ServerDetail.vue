@@ -120,6 +120,7 @@ export default {
                         server_id: props.serverId,
                         query: schemaQuery.data,
                     });
+
                     layouts = get(res, 'metadata.view.sub_data.layouts', null);
                     searches = get(res, 'metadata.view.search', null);
                 } catch (e) {

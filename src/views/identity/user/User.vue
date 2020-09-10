@@ -184,11 +184,22 @@ export default {
                     name: 'group',
                     label: 'Group',
                 },
+                {
+                    name: 'email',
+                    label: 'E-mail',
+                },
+                {
+                    name: 'mobile',
+                    label: 'Phone',
+                },
             ],
             valueHandlerMap: {
+                // eslint-disable-next-line camelcase
                 user_id: makeDistinctValueHandler('identity.User', 'user_id'),
                 name: makeDistinctValueHandler('identity.User', 'name'),
                 group: makeDistinctValueHandler('identity.User', 'group'),
+                email: makeDistinctValueHandler('identity.User', 'email'),
+                mobile: makeDistinctValueHandler('identity.User', 'group'),
             },
         };
         const state = reactive({
@@ -416,7 +427,7 @@ export default {
         const disableUser = async (items) => {
             try {
                 await parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async () => {
-                    showSuccessMessage('Success', 'disable users', root);
+                    showSuccessMessage('Success to Disable User', 'disable users', root);
                 });
             } catch (e) {
                 showErrorMessage('Fail to Disable User', e, root);

@@ -9,7 +9,6 @@ import {
     ComponentRenderProxy,
 } from '@vue/composition-api';
 
-// TODO: Code Review
 // TODO: move this file to lib as common dynamic link formatter
 const getDynamicLink = async (resourceType: string, search: string, searchKey?: string) => {
     try {
@@ -39,22 +38,5 @@ export default {
             vm.$router.push(link);
         });
     },
-    // setup(props) {
-    //     const vm = getCurrentInstance() as ComponentRenderProxy;
-    //     const url = ref('');
-    //     const getDynamicLink = async () => {
-    //         const result = await fluentApi.addons().pageDiscovery().get().setId('sa-50889b1079bc')
-    //             .setResourceType('identity.ServiceAccount')
-    //             .execute();
-    //         const baseUrl = result.data.url;
-    //         url.value = `${baseUrl}&t_se=sa-50889b1079bc`;
-    //         await vm.$router.push(vm.$data.url);
-    //     };
-    //     getDynamicLink();
-    //     return {
-    //         url,
-    //         getDynamicLink,
-    //     };
-    // },
 };
 </script>

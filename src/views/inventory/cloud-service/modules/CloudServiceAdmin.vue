@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="Members" :total-count="totalCount" />
+        <p-panel-top title="Member" :total-count="totalCount" />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"

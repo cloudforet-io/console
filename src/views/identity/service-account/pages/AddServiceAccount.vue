@@ -75,6 +75,7 @@
             <div class="title">
                 Credentials
             </div>
+            <p-select-btn-group :buttons="credentialInputOptionButton" :selected.sync="selectedCredentialInputOption" class="pt-20 float-right" />
             <p-dynamic-form :schema="credentialBasicSchema" :model="credentialBasicModel" :options="inputOptions"
                             :is-valid.sync="isCredentialBasicValid" :validation-mode="validationMode"
             />
@@ -87,11 +88,14 @@
                     </span>
                 </div>
             </p-field-group>
-            <div class="custom-schema-box">
+            <div v-if="selectedCredentialInputOption === 'Input Form'" class="custom-schema-box">
                 <p-dynamic-form :schema="credentialCustomSchema" :model="credentialCustomModel" :options="inputOptions"
                                 :is-valid.sync="isCredentialCustomValid"
                                 :validation-mode="validationMode"
                 />
+            </div>
+            <div v-if="selectedCredentialInputOption === 'Json Code'">
+                <p-monaco-editor :style="'height: 272px;'" :code.sync="jsonForCredential" />
             </div>
         </p-pane-layout>
 
@@ -143,10 +147,17 @@ import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDi
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { fluentApi } from '@/lib/fluent-api';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
+import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
+import { SpaceConnector } from '@/lib/space-connector';
+
+const credentialInputOptionButton = ['Input Form', 'Json Code'];
 
 export default {
     name: 'AddServiceAccount',
     components: {
+        PMonacoEditor,
+        PSelectBtnGroup,
         PMarkdown,
         PDynamicForm,
         PCollapsiblePanel,
@@ -209,6 +220,8 @@ export default {
             accountCustomModel: {},
             accountCustomSchema: {},
             //
+            selectedCredentialInputOption: 'Input Form',
+            jsonForCredential: '',
             isCredentialBasicValid: false,
             credentialBasicModel: { name: '' },
             credentialBasicSchema: {
@@ -244,7 +257,12 @@ export default {
                 validateAsync: true,
             },
             validationMode: false,
-            isValid: computed(() => state.isAccountBasicValid && state.isAccountCustomValid && state.isCredentialBasicValid && state.isCredentialCustomValid),
+            isValid: computed(() => {
+                if (state.selectedCredentialInputOption === 'Json Code') {
+                    return state.isAccountBasicValid && state.isAccountCustomValid && state.isCredentialBasicValid;
+                }
+                return state.isAccountBasicValid && state.isAccountCustomValid && state.isCredentialBasicValid && state.isCredentialCustomValid;
+            }),
             // TODO: tagsTS should be deprecated
             tagsTS: new DictIGToolSet({ showValidation: true }),
         });
@@ -290,36 +308,42 @@ export default {
         };
 
         const getProvider = async () => {
-            const res = await fluentApi.identity().provider().get().setId(props.provider)
-                .execute();
-            state.providerObj = res.data;
-            state.selectedSecretType = res.data.capability.supported_schema[0];
+            const res = await SpaceConnector.client.identity.provider.get({
+                provider: props.provider,
+            });
+            state.providerObj = res;
+            state.selectedSecretType = res.capability.supported_schema[0];
         };
         const getCredentialNames = async () => {
-            const res = await fluentApi.secret().secret().list().setOnly('name')
-                .execute();
-            state.credentialNames = res.data.results.map(v => v.name);
+            const res = await SpaceConnector.client.secret.secret.list({
+                only: 'name',
+            });
+            state.credentialNames = res.results.map(v => v.name);
         };
         const getServiceAccountNames = async () => {
-            const res = await fluentApi.identity().serviceAccount().list().setOnly('name')
-                .execute();
-            state.serviceAccountNames = res.data.results.map(v => v.name);
+            const res = await SpaceConnector.client.identity.serviceAccount.list({
+                only: 'name',
+            });
+            state.serviceAccountNames = res.results.map(v => v.name);
         };
         const getServiceAccountSchema = async () => {
             const schema = state.providerObj.template.service_account.schema;
             [state.accountCustomSchema, state.accountCustomModel] = convertMetaSchemaToCustomSchema(schema);
         };
         const getCredentialSchema = async (selectedSecretType) => {
-            const res = await fluentApi.repository().schema().getByName().setId(selectedSecretType)
-                .setOnly('schema')
-                .execute();
-            const schema = res.data.schema;
+            const res = await SpaceConnector.client.repository.schema.get({
+                name: selectedSecretType,
+                only: ['schema'],
+            });
+            const schema = res.schema;
             [state.credentialCustomSchema, state.credentialCustomModel] = convertMetaSchemaToCustomSchema(schema);
         };
 
         const deleteServiceAccount = async () => {
-            await fluentApi.identity().serviceAccount().delete().setId(state.serviceAccountId)
-                .execute();
+            await SpaceConnector.client.identity.serviceAccount.delete({
+                // eslint-disable-next-line camelcase
+                service_account_id: state.serviceAccountId,
+            });
             state.serviceAccountId = '';
         };
         const createServiceAccount = async () => {
@@ -334,28 +358,52 @@ export default {
                 // eslint-disable-next-line camelcase
                 item.project_id = projectRef.value.selectNode.node.data.id;
             }
-
             try {
-                const res = await fluentApi.identity().serviceAccount().create().setParameter(item)
-                    .execute();
-                state.serviceAccountId = res.data.service_account_id;
+                const res = await SpaceConnector.client.identity.serviceAccount.create({
+                    ...item,
+                });
+                state.serviceAccountId = res.service_account_id;
             } catch (e) {
+                console.error(e);
                 showErrorMessage('Request Fail', e, context.root);
             }
         };
+        const createSecretWithForm = async () => {
+            await SpaceConnector.client.secret.secret.create({
+                name: state.credentialBasicModel.name,
+                data: state.credentialCustomModel,
+                schema: state.selectedSecretType,
+                // eslint-disable-next-line camelcase
+                secret_type: 'CREDENTIALS',
+                // eslint-disable-next-line camelcase
+                service_account_id: state.serviceAccountId,
+            });
+        };
+        const createSecretWithJson = async (jsonData) => {
+            await SpaceConnector.client.secret.secret.create({
+                data: jsonData,
+                name: state.credentialBasicModel.name,
+                schema: state.selectedSecretType,
+                // eslint-disable-next-line camelcase
+                secret_type: 'CREDENTIALS',
+                // eslint-disable-next-line camelcase
+                service_account_id: state.serviceAccountId,
+            });
+        };
         const createSecret = async () => {
             try {
-                await fluentApi.secret().secret().create()
-                    .setParameter({
-                        name: state.credentialBasicModel.name,
-                        data: state.credentialCustomModel,
-                        schema: state.selectedSecretType,
-                        // eslint-disable-next-line camelcase
-                        secret_type: 'CREDENTIALS',
-                        // eslint-disable-next-line camelcase
-                        service_account_id: state.serviceAccountId,
-                    })
-                    .execute();
+                if (state.selectedCredentialInputOption === 'Json Code') {
+                    try {
+                        const json = JSON.parse(state.jsonForCredential);
+                        await createSecretWithJson(json);
+                    } catch (e) {
+                        console.error(e);
+                        showErrorMessage('Fail to Add Account', 'Please put the appropriate json format in the form.', context.root);
+                        await deleteServiceAccount();
+                        return;
+                    }
+                }
+                if (state.selectedCredentialInputOption === 'Input Form') await createSecretWithForm();
                 vm.$router.back();
                 showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
             } catch (e) {
@@ -367,6 +415,7 @@ export default {
         const onClickSave = async () => {
             state.validationMode = true;
             if (!state.isValid) {
+                showErrorMessage('Fail to Add Account', 'Please check all input forms.', context.root);
                 return;
             }
             if (state.tagsTS.allValidation() && !projectRef.value.error) {
@@ -402,6 +451,7 @@ export default {
         }, { immediate: true });
 
         return {
+            credentialInputOptionButton,
             ...toRefs(state),
             ...toRefs(routeState),
             projectRef,

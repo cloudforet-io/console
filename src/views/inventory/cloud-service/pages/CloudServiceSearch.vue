@@ -2,30 +2,41 @@
 
 <script lang="ts">
 
-import { fluentApi } from '@/lib/fluent-api';
 import {
     ComponentRenderProxy,
-    getCurrentInstance, ref,
 } from '@vue/composition-api';
+import { SpaceConnector } from '@/lib/space-connector';
+
+// TODO: move this file to lib as common dynamic link formatter
+const getDynamicLink = async (resourceType: string, search: string, searchKey?: string) => {
+    try {
+        const result = await SpaceConnector.client.addOns.pageDiscovery.get({
+            // eslint-disable-next-line camelcase
+            resource_type: 'inventory.CloudService',
+            search,
+            // eslint-disable-next-line camelcase
+            search_key: 'reference.resource_id',
+        });
+        return `${result.url}&filters=${search}`;
+    } catch (e) {
+        return '/inventory/cloud-service';
+    }
+};
 
 export default {
     name: 'CloudServiceSearch',
-    setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const url = ref('');
-        const getDynamicLink = async () => {
-            const result = await fluentApi.addons().pageDiscovery().get().setId('vpc-0494b1f302cb92153')
-                .setResourceType('inventory.CloudService')
-                .execute();
-            const baseUrl = result.data.url;
-            url.value = `${baseUrl}/?f=vpc-0494b1f302cb92153`;
-            await vm.$router.push(vm.$data.url);
-        };
-        getDynamicLink();
-        return {
-            url,
-            getDynamicLink,
-        };
+    props: {
+        id: {
+            type: String,
+            default: undefined,
+        },
+    },
+    // TODO: move this code to route file
+    beforeRouteEnter(to, from, next) {
+        next(async (vm: ComponentRenderProxy) => {
+            const link = await getDynamicLink('inventory.CloudService', vm.$props.id);
+            vm.$router.push(link);
+        });
     },
 };
 </script>

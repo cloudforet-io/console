@@ -15,7 +15,7 @@
                 <p-i v-else name="ic_provider_other"
                      class="provider-icon"
                 />
-                <span class="provider-name">{{ provider.name }}</span>
+                <span class="provider-name">{{ provider.label }}</span>
                 <p-radio v-model="selectedProvider" :value="provider.provider" class="provider-radio-btn" />
             </div>
         </template>
@@ -28,14 +28,14 @@
             />
             <p-horizontal-layout>
                 <template #container="{ height }">
-                    <p-dynamic-layout type="table"
+                    <p-dynamic-layout v-if="tableState.schema"
+                                      type="table"
                                       :options="tableState.schema.options"
                                       :data="tableState.items"
                                       :fetch-options="fetchOptionState"
                                       :type-options="typeOptionState"
                                       :style="{height: `${height}px`}"
                                       :field-handler="fieldHandler"
-                                      @init="fetchTableData"
                                       @fetch="fetchTableData"
                                       @select="onSelect"
                                       @export="exportServiceAccountData"
@@ -149,10 +149,7 @@ import ServiceAccountCredentials from '@/views/identity/service-account/modules/
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
 
 /* utils */
-import { ProviderStoreType, useStore } from '@/store/toolset';
-import {
-    makeQueryStringComputed, replaceQuery,
-} from '@/lib/router-query-string';
+import { replaceQuery } from '@/lib/router-query-string';
 import { makeTrItems } from '@/lib/view-helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
@@ -168,10 +165,13 @@ import {
 } from '@/components/organisms/dynamic-layout/templates/table/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
+import { store } from '@/store';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 interface ProjectItemResp {
     id: string;
     name: string;
+    // eslint-disable-next-line camelcase
     has_child: boolean;
     item_type: 'PROJECT_GROUP'|'PROJECT';
 }
@@ -200,32 +200,17 @@ export default {
         PTab,
     },
     setup(props, context) {
-        const {
-            provider, project, secret, user,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         /** Provider(located at sidebar) & Page Title * */
         const selectedProvider: Ref<string> = ref('aws');
         const providerState = reactive({
-            items: computed(() => {
-                const result = [] as any;
-                if (providerStore.state.providers) {
-                    result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
-                }
-                return result;
-            }),
+            items: computed(() => Object.keys(store.state.resource.provider.items).map(k => ({
+                provider: k,
+                ...store.state.resource.provider.items[k],
+            }))),
         });
-        const selectedProviderName = computed(() => {
-            let name = '';
-            providerState.items.forEach((d) => {
-                if (d.provider === selectedProvider.value) {
-                    name = d.name;
-                }
-            });
-            return name;
-        });
+        const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.label || selectedProvider.value);
 
         /** Page Navigation * */
         const routeState = reactive({
@@ -244,7 +229,7 @@ export default {
         const typeOptionState: TableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
-            timezone: computed(() => user.state.timezone || 'UTC'),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
             colCopy: false,
@@ -253,7 +238,6 @@ export default {
         const tableState = reactive({
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            providers: computed(() => provider.state.providers || {}),
             consoleLink: computed(() => {
                 const res = get(tableState.selectedItems[0], 'data.reference.link')
                         || get(tableState.selectedItems[0], 'reference.external_link');
@@ -359,26 +343,11 @@ export default {
         };
 
         /** Field Handler for display formatting(project id -> project name)* */
-
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
-            const item: Partial<DynamicFieldProps> = {};
             if (field.extraData?.reference) {
-                switch (field.extraData.reference.resource_type) {
-                case 'identity.Project': {
-                    item.options = {
-                        ...field.options,
-                        link: referenceRouter(
-                            field.extraData.reference.resource_type,
-                            field.data,
-                        ),
-                    };
-                    item.data = project.state.projects[field.data];
-                    break;
-                }
-                default: break;
-                }
+                return referenceFieldFormatter(field.extraData.reference, field.data);
             }
-            return item;
+            return {};
         };
 
         /** Add & Delete Service Accounts Action (Dropdown) * */
@@ -473,7 +442,7 @@ export default {
                 } catch (e) {
                     showErrorMessage('Fail to Change Project', e, context.root);
                 } finally {
-                    await project.getProject(true);
+                    await store.dispatch('resource/project/load');
                     await listServiceAccountData();
                 }
             } else {
@@ -502,10 +471,6 @@ export default {
             activeTab: 'data',
         });
 
-        /** Query String */
-        const queryRefs = {
-            provider: makeQueryStringComputed(selectedProvider, { key: 'provider' }),
-        };
 
         /** ******* Page Init ******* */
         const getTableSchema = async () => {
@@ -521,14 +486,15 @@ export default {
         };
 
         const init = async () => {
-            await Promise.all([project.getProject(true), provider.getProvider(true)]);
-            const providerFilter = queryRefs.provider.value;
+            await Promise.all([store.dispatch('resource/project/load'), store.dispatch('resource/provider/load')]);
+            const providerFilter = Array.isArray(vm.$route.query.provider) ? vm.$route.query.provider[0] : vm.$route.query.provider;
             if (providerState.items.length > 0) {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
                 watch(selectedProvider, async (after, before) => {
                     if (after !== before) {
+                        replaceQuery('provider', after);
                         await getTableSchema();
-                        await listServiceAccountData();
+                        await listServiceAccountData()
                     }
                 }, { immediate: true });
             }

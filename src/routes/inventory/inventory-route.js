@@ -1,4 +1,4 @@
-const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage_updating.vue');
+const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
@@ -49,11 +49,12 @@ export default {
                     component: CloudService,
                 },
                 {
-                    path: 'search',
+                    path: 'search/:id',
                     name: 'cloudServiceSearch',
                     meta: {
                         label: 'search',
                     },
+                    props: true,
                     component: CloudServiceSearch,
                 },
                 {

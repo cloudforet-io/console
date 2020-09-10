@@ -54,7 +54,13 @@ export default {
         PSkeleton,
         PChartLoader,
     },
-    setup() {
+    props: {
+        selectedDate: {
+            type: String,
+            default: null,
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
             loading: true,
             chartRef: null as HTMLCanvasElement|null,
@@ -69,7 +75,6 @@ export default {
             currentMonthStart: computed(() => moment(state.currentDateText).startOf('month')),
             currentMonthEnd: computed(() => moment(state.currentDateText).endOf('month')),
             dayCount: computed(() => state.currentDate.daysInMonth()),
-            selectedDate: '',
         });
 
         const initChartData = (rawData) => {
@@ -77,7 +82,7 @@ export default {
 
             const orderedData = orderBy(rawData, ['date'], ['asc']);
             const dateFormattedData = orderedData.map(d => ({
-                date: moment(d.date).tz(getTimezone()).format('YYYY-MM-DD'),
+                date: moment(d.date).tz(getTimezone()).subtract(1, 'day').format('YYYY-MM-DD'),
                 success: d.success,
                 failure: d.failure,
             }));
@@ -112,8 +117,8 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
-                    start: state.currentMonthStart.format(),
-                    end: state.currentMonthEnd.format(),
+                    start: state.currentMonthStart.tz('UTC').format(),
+                    end: state.currentMonthEnd.tz('UTC').format(),
                 });
                 state.chartData = initChartData(res.results);
             } catch (e) {
@@ -151,14 +156,15 @@ export default {
                 displayColors: false,
                 backgroundColor: gray[900],
                 callbacks: {
-                    title: tooltipItems => `8/${tooltipItems[0].xLabel}`,
+                    title: tooltipItems => `${tooltipItems[0].xLabel}`,
                 },
             };
             const pointClickEvent = (point, event) => {
                 const item = event[0];
                 if (item) {
                     const clickedData = state.chartData[item._index];
-                    state.selectedDate = clickedData.date;
+                    // const selectedDate = moment(clickedData.date).tz(getTimezone()).format('YYYY-MM-DD');
+                    // emit('update:selectedDate', selectedDate);
                 }
             };
 

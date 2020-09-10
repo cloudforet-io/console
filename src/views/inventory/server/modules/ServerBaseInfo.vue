@@ -20,14 +20,14 @@
                 <p-anchor :href="referenceRouter('identity.Project', value)"
                           target="_blank"
                 >
-                    {{ projects[value] || value }}
+                    {{ projects[value] ? projects[value].label : value }}
                 </p-anchor>
             </template>
             <template #data-provider="{data: value}">
                 <p-badge v-if="providers[value] && providers[value].name || value"
                          :background-color="providers[value] ? providers[value].color : null"
                 >
-                    {{ providers[value] ? providers[value].name || value : value }}
+                    {{ providers[value] ? providers[value].label || value : value }}
                 </p-badge>
             </template>
             <template #data-collection_info.service_accounts="{data: value}">
@@ -38,7 +38,7 @@
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
-                            {{ serviceAccounts[d] || d }}
+                            {{ serviceAccounts[d] ? serviceAccounts[d].label : d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -49,7 +49,7 @@
                         <p-badge v-if="d"
                                  outline background-color="violet.500"
                         >
-                            {{ secrets[d] || d }}
+                            {{ secrets[d] ? secrets[d].label : d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -62,7 +62,7 @@
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
-                            {{ collectors[d] || d }}
+                            {{ collectors[d] ? collectors[d].label : d }}
                         </p-badge>
                     </template>
                 </p-text-list>
@@ -99,6 +99,7 @@ import { timestampFormatter } from '@/lib/util';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { SpaceConnector } from '@/lib/space-connector';
+import store from "@/store";
 
 export default {
     name: 'ServerBaseInfo',
@@ -121,10 +122,6 @@ export default {
         },
     },
     setup(props) {
-        const {
-            project, provider, serviceAccount, secret, collector,
-        } = useStore();
-
 
         const state = reactive({
             baseInfoFields: [
@@ -136,11 +133,12 @@ export default {
                 { name: 'reference.resource_id', label: 'Resource ID' },
                 { name: 'os_type', label: 'OS Type' },
                 { name: 'server_type', label: 'Server Type' },
-                { name: 'project_id', label: 'Project', formatter: data => state.projects[data] || data },
+                { name: 'project_id', label: 'Project', formatter: data => state.projects[data]?.label || data },
                 { name: 'provider', label: 'Provider' },
-                { name: 'collection_info.service_accounts', label: 'Service Accounts', formatter: data => state.serviceAccounts[data] || data },
-                { name: 'collection_info.secrets', label: 'Secrets', formatter: data => state.secrets[data] || data },
-                { name: 'collection_info.collectors', label: 'Collected By', formatter: data => state.collectors[data] || data },
+                { name: 'region_code', label: 'Region', formatter: data => state.regions[data]?.label || data },
+                { name: 'collection_info.service_accounts', label: 'Service Accounts', formatter: data => state.serviceAccounts[data]?.label || data },
+                { name: 'collection_info.secrets', label: 'Secrets', formatter: data => state.secrets[data]?.label || data },
+                { name: 'collection_info.collectors', label: 'Collected By', formatter: data => state.collectors[data]?.label || data },
                 { name: 'created_at', label: 'Created', formatter: timestampFormatter },
                 { name: 'updated_at', label: 'Updated', formatter: timestampFormatter },
                 { name: 'deleted_at', label: 'Deleted', formatter: timestampFormatter },
@@ -176,11 +174,12 @@ export default {
             hardwareData: computed(() => get(props.data, 'data.hardware', {})),
 
             // formatters
-            projects: computed(() => project.state.projects || {}),
-            providers: computed<ProviderInfo>(() => provider.state.providers || {}),
-            serviceAccounts: computed(() => serviceAccount.state.serviceAccounts || {}),
-            secrets: computed(() => secret.state.secrets || {}),
-            collectors: computed(() => collector.state.collectors || {}),
+            projects: computed(() => store.state.resource.project.items),
+            providers: computed(() => store.state.resource.provider.items),
+            regions: computed(() => store.state.resource.region.items),
+            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            secrets: computed(() => store.state.resource.secret.items),
+            collectors: computed(() => store.state.resource.collector.items),
         });
 
         return {

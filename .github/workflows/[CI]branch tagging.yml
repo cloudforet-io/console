@@ -44,7 +44,7 @@ jobs:
       - name: update master version
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.TEST_PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
           event-type: update_master_version
           client-payload: '{"version": "${{ github.event.inputs.tag }}"}'
 
