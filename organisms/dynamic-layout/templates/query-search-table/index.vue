@@ -26,9 +26,9 @@
                               @select="onSelect"
                               @export="onExport"
         >
-            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
+            <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
-                    <p-dynamic-field :key="item.name"
+                    <p-dynamic-field :key="i"
                                      v-bind="item"
                                      :data="data.value"
                                      :before-create="beforeCreateField"
