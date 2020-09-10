@@ -83,7 +83,8 @@ export default {
                     // it can cause definition's 'showCopy'(flag for showing or not copy button) works wrong.
                     // so should check there is copiable value, and give the result to each field's 'disableCopy' property.
                     if (d.type === 'list') {
-                        const subKey = (d.options as ListOptions).sub_key as string;
+                        // eslint-disable-next-line camelcase
+                        const subKey = (d.options as ListOptions)?.sub_key as string;
                         const matchedData = get(state.rootData, d.key);
                         if (Array.isArray(matchedData)) {
                             res.disableCopy = matchedData.some(data => !get(data, subKey));

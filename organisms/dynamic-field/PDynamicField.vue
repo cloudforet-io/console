@@ -78,7 +78,7 @@ export default {
         };
 
         const proxy = computed<DynamicFieldProps>(() => {
-            let res: DynamicFieldProps = {
+            const res: DynamicFieldProps = {
                 type: props.type,
                 options: props.options,
                 data: props.data,
@@ -88,7 +88,15 @@ export default {
                 handler: props.handler,
             };
             if (props.handler) {
-                res = { ...res, ...props.handler(Object.freeze(props)) };
+                const handlerRes = props.handler(Object.freeze(props));
+                if (handlerRes.type) res.type = handlerRes.type;
+                if (handlerRes.data) res.data = handlerRes.data;
+                if (handlerRes.beforeCreate) res.beforeCreate = handlerRes.beforeCreate;
+                if (handlerRes.handler) res.handler = handlerRes.handler;
+                if (handlerRes.options) res.options = { ...res.options, ...handlerRes.options };
+                if (res.typeOptions) res.typeOptions = { ...res.typeOptions, ...handlerRes.typeOptions };
+                if (res.extraData) res.extraData = { ...res.extraData, ...handlerRes.extraData };
+
                 if (['list', 'enum'].includes(res.type)) state.nextHandler = undefined;
                 if (res.type !== props.type) {
                     loadComponent(res);
