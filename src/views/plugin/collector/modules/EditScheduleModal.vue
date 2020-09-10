@@ -59,10 +59,10 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
-import { showErrorMessage } from '@/lib/util';
-import { useStore } from '@/store/toolset';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { store } from '@/store';
+import { SpaceConnector } from '@/lib/space-connector';
 
 class MenuItem {
     name: string;
@@ -105,13 +105,12 @@ export default {
     },
     setup(props, { emit, root }) {
         const vm: any = getCurrentInstance();
-        const store = useStore();
         const state: any = reactive({
             loading: false,
             schedule: null,
             proxyVisible: makeProxy('visible', props, emit),
             name: '',
-            timezone: store.user.state.timezone || 'UTC',
+            timezone: store.state.user.timezone || 'UTC',
             hoursMatrix: range(24),
             selectedHours: {},
             selectedUTCHoursList: computed(() => flatMap(state.selectedHours, time => moment.utc(time).hour())),
@@ -171,19 +170,11 @@ export default {
                         hours: state.selectedUTCHoursList,
                     },
                 };
-                await fluentApi.inventory().collector().schedule().add()
-                    .setParameter(params)
-                    .execute();
+
+                await SpaceConnector.client.inventory.collector.schedule.add(params);
 
                 emit('success');
-                root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Add Schedule',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('Success', 'Add Schedule', root);
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Add Schedule', e, root);
@@ -203,19 +194,10 @@ export default {
                     },
                 };
 
-                await fluentApi.inventory().collector().schedule().update()
-                    .setParameter(params)
-                    .execute();
+                await SpaceConnector.client.inventory.collector.schedule.update(params);
 
                 emit('success');
-                root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Update Schedule',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('Success', 'Updated Schedule', root);
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Update Schedule', e, root);
@@ -236,11 +218,12 @@ export default {
         const getSchedule = async (): Promise<void> => {
             state.loading = true;
             try {
-                const res = await fluentApi.inventory().collector().schedule().get()
-                    .setId(props.scheduleId)
-                    .setCollectorId(props.collectorId)
-                    .execute();
-                state.schedule = res.data;
+                const res = await SpaceConnector.client.inventory.collector.schedule.get({
+                    // eslint-disable-next-line camelcase
+                    schedule_id: props.scheduleId,
+                    collector_id: props.collectorId,
+                });
+                state.schedule = res;
                 state.name = state.schedule.name;
                 initSelectedHours();
             } catch (e) {
