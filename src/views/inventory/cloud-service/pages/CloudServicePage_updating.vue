@@ -13,36 +13,6 @@
         />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <!--                <s-dynamic-layout name="cloudService"-->
-                <!--                                  type="query-search-table"-->
-                <!--                                  :toolset="apiHandler"-->
-                <!--                                  :options="options"-->
-                <!--                                  :style="{'height': height+'px'}"-->
-                <!--                                  :vbind="{-->
-                <!--                                      showTitle: false,-->
-                <!--                                      exportFields: mergeFields,-->
-                <!--                                      resourceType: 'inventory.CloudService'-->
-                <!--                                  }"-->
-                <!--                >-->
-                <!--                    <template #toolbox-left>-->
-                <!--                        <p-icon-text-button style-type="primary-dark"-->
-                <!--                                            name="ic_plus_bold"-->
-                <!--                                            :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"-->
-                <!--                                            @click="clickCollectData"-->
-                <!--                        >-->
-                <!--                            {{ $t('BTN.COLLECT_DATA') }}-->
-                <!--                        </p-icon-text-button>-->
-
-                <!--                        <p-dropdown-menu-btn-->
-                <!--                            class="left-toolbox-item mr-4"-->
-                <!--                            :menu="csDropdownMenu"-->
-                <!--                            @click-project="clickProject"-->
-                <!--                            @click-link="apiHandler.tableTS.linkState.openLink()"-->
-                <!--                        >-->
-                <!--                            Action-->
-                <!--                        </p-dropdown-menu-btn>-->
-                <!--                    </template>-->
-                <!--                </s-dynamic-layout>-->
                 <div v-if="tableState.schema">
                     <p-dynamic-layout type="query-search-table"
                                       :options="tableState.schema.options"
@@ -76,15 +46,18 @@
                 </div>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="tableState.selectedItems.length === 1" :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab">
-            <!--            <template #detail>-->
-            <!--                <s-dynamic-sub-data-->
-            <!--                    :layouts="mergeLayouts"-->
-            <!--                    :resource-api="resourceApi"-->
-            <!--                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id||''"-->
-            <!--                    :is-show="subDataIsShow"-->
-            <!--                />-->
-            <!--            </template>-->
+        <p-tab v-if="tableState.selectedItems.length === 1"
+               :tabs="singleItemTabState.tabs"
+               :active-tab.sync="singleItemTabState.activeTab"
+        >
+            <template #detail>
+                <cloud-service-detail
+                    :cloud-service-id="tableState.selectedCloudServiceIds[0]"
+                    :provider="provider"
+                    :cloud-service-group="group"
+                    :cloud-service-type="name"
+                />
+            </template>
 
             <template #tag>
                 <s-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
@@ -92,47 +65,39 @@
                               resource-key="cloud_service_id"
                 />
             </template>
-            <!--            <template #member>-->
-            <!--                <s-dynamic-layout :api="adminApi"-->
-            <!--                                  :is-show="adminIsShow" :name="$t('TAB.MEMBER')"-->
-            <!--                                  v-bind="defaultAdminLayout"-->
-            <!--                                  :style="{borderWidth: 0}"-->
-            <!--                />-->
-            <!--            </template>-->
-            <!--            <template #history>-->
-            <!--                <s-dynamic-layout :api="historyApi"-->
-            <!--                                  :is-show="historyIsShow" :name="$t('TAB.HISTORY')"-->
-            <!--                                  v-bind="defaultHistoryLayout"-->
-            <!--                                  :style="{borderWidth: 0}"-->
-            <!--                />-->
-            <!--            </template>-->
+            <template #member>
+                <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
+            </template>
+            <template #history>
+                <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" />
+            </template>
             <template #monitoring>
-                <s-monitoring v-bind="monitoringTS.state" />
+                <s-monitoring :resource-type="monitoringState.resourceType"
+                              :resources="monitoringState.resources"
+                />
             </template>
         </p-tab>
         <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
-            <!--            <template #data>-->
-            <!--                <s-dynamic-layout-->
-            <!--                    type="simple-table"-->
-            <!--                    :options="options"-->
-            <!--                    :data="apiHandler.tableTS.selectState.selectItems"-->
-            <!--                    :vbind="{-->
-            <!--                        showTitle:false,-->
-
-            <!--                    }"-->
-            <!--                />-->
-            <!--            </template>-->
-            <!--            <template #member>-->
-            <!--                <s-dynamic-layout :api="adminApi"-->
-            <!--                                  :is-show="adminIsShow" :name="$t('TAB.MEMBER')"-->
-            <!--                                  v-bind="defaultAdminLayout"-->
-            <!--                />-->
-            <!--            </template>-->
+            <template #data>
+                <p-dynamic-layout v-if="tableState.schema"
+                                  class="selected-data-tab"
+                                  type="simple-table"
+                                  :field-handler="fieldHandler"
+                                  :options="tableState.schema.options"
+                                  :type-options="{ colCopy: true }"
+                                  :data="tableState.selectedItems"
+                />
+            </template>
+            <template #member>
+                <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
+            </template>
             <template #monitoring>
-                <s-monitoring v-bind="monitoringTS.state" />
+                <s-monitoring :resource-type="monitoringState.resourceType"
+                              :resources="monitoringState.resources"
+                />
             </template>
         </p-tab>
         <p-empty v-else style="height: auto; margin-top: 4rem;">
@@ -154,7 +119,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
+    reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -165,6 +130,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
+import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
 import { useStore } from '@/store/toolset';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
@@ -189,12 +155,15 @@ import {
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
-import { DynamicFieldHandler, DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
+import { Reference } from '@/lib/reference/type';
+import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
+import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -246,6 +215,9 @@ export default {
         getValue,
     },
     components: {
+        CloudServiceDetail,
+        CloudServiceHistory,
+        CloudServiceAdmin,
         PDynamicLayout,
         GeneralPageLayout,
         PHorizontalLayout,
@@ -310,6 +282,7 @@ export default {
             selectable: true,
             keyItems: [],
             valueHandlerMap: {},
+            colCopy: false,
         });
 
         const tableState = reactive({
@@ -340,13 +313,6 @@ export default {
             context.parent,
             { type: 'item', disabled: true })),
             collectModalVisible: false,
-            multiFields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
-                ['primary_ip_address', 'COMMON.IP'],
-                ['os_type', 'COMMON.O_TYPE'],
-            ],
-            context.parent)),
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
         });
 
@@ -526,10 +492,16 @@ export default {
             const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setOnly(...typeOptionState.keyItems.map(d => d.name))
                 .setFilter(...andFilters)
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
+
+            if (tableState.schema?.options?.fields) {
+                query.setOnly(...tableState.schema.options.fields.map((d) => {
+                    if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
+                    return d.key;
+                }), 'cloud_service_id');
+            }
 
             return query.data;
         };
@@ -589,7 +561,7 @@ export default {
                             fileType: 'xlsx',
                             timezone: typeOptionState.timezone,
                         },
-                        data_source: tableState.schema.options?.fields,
+                        data_source: tableState.schema.options.fields,
                     },
                 });
                 window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
@@ -599,7 +571,7 @@ export default {
         };
 
         // TODO: make it as helper
-        const fieldHandler: DynamicLayoutFieldHandler = (field) => {
+        const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             const item: Partial<DynamicFieldProps> = {};
             if (field.extraData?.reference) {
                 switch (field.extraData.reference.resource_type) {
@@ -783,6 +755,10 @@ export default {
         @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
+    }
+
+    .selected-data-tab {
+        @apply mt-8;
     }
 
     >>> .p-dynamic-layout-query-search-table .p-query-search-table {

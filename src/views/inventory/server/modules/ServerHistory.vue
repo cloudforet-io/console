@@ -17,6 +17,9 @@
                     </p-badge>
                 </p-text-list>
             </template>
+            <template #col-updated_at-format="{value}">
+                {{ iso8601Formatter(value) }}
+            </template>
         </p-search-table>
     </div>
 </template>
@@ -31,7 +34,7 @@ import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import config from '@/lib/config';
-import { getTimezone } from '@/lib/util';
+import { getTimezone, iso8601Formatter } from '@/lib/util';
 
 export default {
     name: 'ServerHistory',
@@ -142,6 +145,7 @@ export default {
             ...toRefs(state),
             onChange,
             onExport,
+            iso8601Formatter,
         };
     },
 };

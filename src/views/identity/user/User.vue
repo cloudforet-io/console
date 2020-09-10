@@ -4,27 +4,25 @@
         <p-page-title title="User" />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <p-toolbox-table
+                <p-query-search-table
                     :loading="loading"
                     :items="users"
                     :fields="fields"
-                    selectable
-                    sortable
-                    hover
                     :setting-visible="false"
+                    :excel-visible="false"
                     :responsive="true"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    :all-page="allPage"
                     :this-page.sync="thisPage"
-                    :select-index.sync="selectedIndexes"
                     :page-size.sync="pageSize"
+                    :total-count="totalCount"
+                    :key-items="keyItems"
+                    :value-handler-map="valueHandlerMap"
+                    :query-tags="tags"
                     :style="{'height': height+'px'}"
                     use-cursor-loading
-                    @changePageSize="getUsers"
-                    @changePageNumber="getUsers"
-                    @clickRefresh="getUsers"
-                    @changeSort="getUsers"
+                    @select="onSelect"
+                    @change="onChange"
                 >
                     <template slot="toolbox-left">
                         <p-icon-text-button style-type="primary-dark"
@@ -35,7 +33,7 @@
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="dropdown-btn"
-                            class="left-toolbox-item"
+                            class="left-toolbox-item mr-4"
                             :menu="dropdownMenu"
                             @click-enable="clickEnable"
                             @click-disable="clickDisable"
@@ -44,30 +42,15 @@
                         >
                             Action
                         </p-dropdown-menu-btn>
-                        <div class="left-toolbox-item hidden lg:block">
-                            <p-autocomplete-search v-model="searchText"
-                                                   :handler="autocompleteHandler"
-                                                   @search="getUsers"
-                            />
-                        </div>
-                    </template>
-                    <template #toolbox-bottom>
-                        <div class="flex flex-col flex-1">
-                            <p-autocomplete-search v-model="searchText"
-                                                   class="block lg:hidden mt-4"
-                                                   :handler="autocompleteHandler"
-                                                   @search="getUsers"
-                            />
-                        </div>
                     </template>
                     <template #col-state-format="{value}">
                         <p-status v-bind="userStateFormatter(value)" />
                     </template>
-                </p-toolbox-table>
+                </p-query-search-table>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="selectedIndexes.length === 1" :tabs="singleItemTab.state.tabs"
-               :active-tab.sync="singleItemTab.syncState.activeTab"
+        <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
+               :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
                 <p-user-detail ref="userDetail"
@@ -75,8 +58,8 @@
                 />
             </template>
         </p-tab>
-        <p-tab v-else-if="selectedIndexes.length > 1" :tabs="multiItemTab.state.tabs"
-               :active-tab.sync="multiItemTab.syncState.activeTab"
+        <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
+               :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
                 <p-data-table
@@ -126,40 +109,42 @@ import {
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';
 import PUserDetail from '@/views/identity/user/modules/UserDetail.vue';
-import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-
 import { showErrorMessage, showSuccessMessage, userStateFormatter } from '@/lib/util';
-import { makeAutocompleteHandlerWithReference } from '@/lib/component-utils/query-search';
 import { makeTrItems } from '@/lib/view-helper';
-import { fluentApi, Tags, TimeStamp } from '@/lib/fluent-api';
 import { useStore } from '@/store/toolset';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
+import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { Options } from '@/components/organisms/tables/query-search-table/type';
+import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { Timestamp } from '@/components/util/type';
 
 interface UserModel {
     // eslint-disable-next-line camelcase
-    created_at: TimeStamp;
+    created_at: Timestamp;
     domain_id: string;
     email: string;
     group: string;
     language: string;
     // eslint-disable-next-line camelcase
-    last_accessed_at: TimeStamp;
+    last_accessed_at: Timestamp;
     mobile: string;
     name: string;
     roles: string[];
     state: string;
-    tags: Tags;
+    tags: {};
     timezone: string;
     // eslint-disable-next-line camelcase
     user_id: string;
@@ -168,14 +153,13 @@ interface UserModel {
 export default {
     name: 'User',
     components: {
-        PAutocompleteSearch,
+        PQuerySearchTable,
         PPageNavigation,
         PIconTextButton,
         GeneralPageLayout,
         PUserForm,
         PStatus,
         PHorizontalLayout,
-        PToolboxTable,
         PDropdownMenuBtn,
         PUserDetail,
         PTab,
@@ -186,6 +170,27 @@ export default {
     setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const { user } = useStore();
+        const handlers = {
+            keyItems: [
+                {
+                    name: 'user_id',
+                    label: 'User ID',
+                },
+                {
+                    name: 'name',
+                    label: 'Name',
+                },
+                {
+                    name: 'group',
+                    label: 'Group',
+                },
+            ],
+            valueHandlerMap: {
+                user_id: makeDistinctValueHandler('identity.User', 'user_id'),
+                name: makeDistinctValueHandler('identity.User', 'name'),
+                group: makeDistinctValueHandler('identity.User', 'group'),
+            },
+        };
         const state = reactive({
             loading: false,
             users: [] as UserModel[],
@@ -206,12 +211,11 @@ export default {
             pageSize: 15,
             thisPage: 1,
             totalCount: 0,
-            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             // selected
-            selectedIndexes: [],
+            selectedIndex: [],
             selectedUsers: computed(() => {
                 const users = [] as UserModel[];
-                state.selectedIndexes.map(d => users.push(state.users[d]));
+                state.selectedIndex.map(d => users.push(state.users[d]));
                 return users;
             }),
             multiSelectFields: computed(() => [
@@ -223,15 +227,15 @@ export default {
                 ], null),
             ]),
             dropdownMenu: computed(() => (makeTrItems([
-                ['update', 'BTN.UPDATE', { disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0 }],
-                ['delete', 'BTN.DELETE', { disabled: state.selectedIndexes.length === 0 }],
+                ['update', 'BTN.UPDATE', { disabled: state.selectedIndex.length > 1 || state.selectedIndex.length === 0 }],
+                ['delete', 'BTN.DELETE', { disabled: state.selectedIndex.length === 0 }],
                 [null, null, { type: 'divider' }],
-                ['enable', 'BTN.ENABLE', { disabled: state.selectedIndexes.length === 0 }],
-                ['disable', 'BTN.DISABLE', { disabled: state.selectedIndexes.length === 0 }],
+                ['enable', 'BTN.ENABLE', { disabled: state.selectedIndex.length === 0 }],
+                ['disable', 'BTN.DISABLE', { disabled: state.selectedIndex.length === 0 }],
             ], parent, { type: 'item', disabled: true }))),
-            //
-            autocompleteHandler: makeAutocompleteHandlerWithReference('identity.User'),
-            searchText: '',
+            keyItems: handlers.keyItems as KeyItem[],
+            valueHandlerMap: handlers.valueHandlerMap,
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
         });
         const modalState = reactive({
             visible: false,
@@ -250,42 +254,68 @@ export default {
             routes: [{ name: 'Identity', path: '/identity' }, { name: 'User', path: '/identity/user' }],
         });
 
-        const singleItemTab = new TabBarState(
-            {
-                tabs: computed(() => makeTrItems([
-                    ['detail', 'COMMON.DETAILS', { keepAlive: true }],
-                ],
-                parent)),
-            },
-            {
-                activeTab: 'detail',
-            },
-        );
-        const multiItemTab = new TabBarState(
-            {
-                tabs: makeTrItems([
-                    ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
-                ], parent),
-            },
-            {
-                activeTab: 'data',
-            },
-        );
+        const singleItemTabState = reactive({
+            tabs: computed(() => makeTrItems([
+                ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+            ], parent)),
+            activeTab: 'detail',
+        });
+
+        const multiItemTabState = reactive({
+            tabs: makeTrItems([
+                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
+            ], parent),
+            activeTab: 'data',
+        });
+
+        const getQuery = () => {
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
+            const query = new QueryHelper();
+            query.setSort(state.sortBy, state.sortDesc)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFilter(...andFilters)
+                .setFilterOr(...orFilters)
+                .setKeyword(...keywords);
+            return query.data;
+        };
 
         const getUsers = async () => {
             state.loading = true;
-            const res = await fluentApi.identity().user().list()
-                .setPageSize(state.pageSize)
-                .setThisPage(state.thisPage)
-                .setSortBy(state.sortBy)
-                .setSortDesc(state.sortDesc)
-                .setKeyword(state.searchText)
-                .setOnly('user_id', 'name', 'email',
-                    'state', 'mobile', 'group', 'timezone', 'language')
-                .execute();
-            state.users = res.data.results;
-            state.totalCount = res.data.total_count;
-            state.loading = false;
+            try {
+                const res = await SpaceConnector.client.identity.user.list({
+                    query: getQuery(),
+                    only: ['user_id', 'name', 'email', 'state', 'mobile', 'group', 'timezone', 'language'],
+                });
+                state.users = res.results;
+                state.totalCount = res.total_count;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+                state.items = [];
+                state.totalCount = 0;
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        const changeQueryString = async (options) => {
+            await replaceQuery('filters', queryTagsToQueryString(options.queryTags));
+        };
+
+        const onSelect = (index) => {
+            state.selectedIndex = index;
+        };
+
+        const onChange = async (options: Options, changed: Partial<Options>) => {
+            if (changed) {
+                if (changed.pageSize !== undefined) state.pageSize = changed.pageSize;
+                if (changed.thisPage !== undefined) state.thisPage = changed.thisPage;
+                if (changed.queryTags !== undefined) {
+                    state.tags = changed.queryTags;
+                    replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
+                }
+            }
+            await getUsers();
         };
 
         const clickAdd = () => {
@@ -298,7 +328,7 @@ export default {
             userFormState.visible = true;
             userFormState.updateMode = true;
             userFormState.headerTitle = 'Update User';
-            userFormState.item = state.users[state.selectedIndexes[0]];
+            userFormState.item = state.users[state.selectedIndex[0]];
             userFormState.visible = true;
         };
         const clickDelete = () => {
@@ -323,10 +353,12 @@ export default {
             modalState.visible = true;
         };
 
+        const getUsersParam = items => ({ users: map(items, 'user_id') });
         const addUser = async (item) => {
             try {
-                await fluentApi.identity().user().create().setParameter({ ...item })
-                    .execute();
+                await SpaceConnector.client.identity.user.create({
+                    ...item,
+                });
                 showSuccessMessage('Success', 'User has been successfully added.', root);
             } catch (e) {
                 showErrorMessage('Fail to Add User', e, root);
@@ -335,8 +367,9 @@ export default {
         };
         const updateUser = async (item) => {
             try {
-                await fluentApi.identity().user().update().setParameter({ ...item })
-                    .execute();
+                await SpaceConnector.client.identity.user.update({
+                    ...item,
+                });
                 if (user.state.userId === item.user_id) {
                     await user.setUser('USER', item.user_id, vm);
                     vm.$i18n.locale = item.language;
@@ -355,19 +388,18 @@ export default {
             }
             await getUsers();
         };
-
-        const getUsersParam = items => ({ users: map(items, 'user_id') });
         const deleteUser = async (items) => {
             try {
-                await parent.$http.post('/identity/user/delete', getUsersParam(items)).then(async () => {
-                    await getUsers();
-                    showSuccessMessage('Success', 'delete users', root);
+                await SpaceConnector.client.identity.user.delete({
+                    users: getUsersParam(items),
                 });
+                showSuccessMessage('Success', 'Success to Delete Users', root);
             } catch (e) {
                 showErrorMessage('Fail to Delete User', e, root);
+            } finally {
+                await getUsers();
+                modalState.visible = false;
             }
-            await getUsers();
-            modalState.visible = false;
         };
         const enableUser = async (items) => {
             try {
@@ -376,9 +408,10 @@ export default {
                 });
             } catch (error) {
                 showErrorMessage('Fail to Enable User', error, root);
+            } finally {
+                await getUsers();
+                modalState.visible = false;
             }
-            await getUsers();
-            modalState.visible = false;
         };
         const disableUser = async (items) => {
             try {
@@ -387,9 +420,10 @@ export default {
                 });
             } catch (e) {
                 showErrorMessage('Fail to Disable User', e, root);
+            } finally {
+                await getUsers();
+                modalState.visible = false;
             }
-            await getUsers();
-            modalState.visible = false;
         };
         const checkModalConfirm = async (item) => {
             if (modalState.mode === 'delete') await deleteUser(item);
@@ -408,8 +442,8 @@ export default {
             userFormState,
             userStateFormatter,
             modalState,
-            singleItemTab,
-            multiItemTab,
+            singleItemTabState,
+            multiItemTabState,
             getUsers,
             clickAdd,
             clickUpdate,
@@ -418,6 +452,9 @@ export default {
             clickDisable,
             userFormConfirm,
             checkModalConfirm,
+            onSelect,
+            onChange,
+            changeQueryString,
         };
     },
 };

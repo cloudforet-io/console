@@ -4,7 +4,7 @@
                       @update:activeTab="onChangeTab"
         >
             <template slot="Base Information">
-                <server-base-info :data="data" :loading="loading" />
+                <cloud-service-base-info :data="data" :loading="loading" />
             </template>
             <template v-for="(layout, idx) in layouts" :slot="layout.name">
                 <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
@@ -33,54 +33,63 @@
 </template>
 
 <script lang="ts">
+import { find, get, set } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import {
-    get, set, find,
-} from 'lodash';
-import baseInfoSchema from '@/views/inventory/server/default-schema/base-info.json';
+
+import CloudServiceBaseInfo from '@/views/inventory/cloud-service/modules/CloudServiceBaseInfo.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import ServerBaseInfo from '@/views/inventory/server/modules/ServerBaseInfo.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
-import {
-    DynamicLayoutEventListeners, DynamicLayoutFieldHandler,
-} from '@/components/organisms/dynamic-layout/type';
-import { getTimezone } from '@/lib/util';
-import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { SearchSchema } from '@/lib/component-utils/query-search/type';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
-import config from '@/lib/config';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import { DynamicLayoutEventListeners, DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
+
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { SearchSchema } from '@/lib/component-utils/query-search/type';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getTimezone } from '@/lib/util';
+import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 export default {
-    name: 'PServerDetail',
+    name: 'CloudServiceDetail',
     components: {
-        PPanelTop,
-        PRawData,
-        PButtonTab,
-        ServerBaseInfo,
+        CloudServiceBaseInfo,
         PDynamicLayout,
+        PRawData,
+        PPanelTop,
+        PButtonTab,
     },
     props: {
-        serverId: {
+        cloudServiceId: {
             type: String,
-            default: '',
+            required: true,
+        },
+        provider: {
+            type: String,
+            required: true,
+        },
+        cloudServiceGroup: {
+            type: String,
+            required: true,
+        },
+        cloudServiceType: {
+            type: String,
+            required: true,
         },
     },
     setup(props) {
         const layoutSchemaCacheMap = {};
         const searchSchemaCacheMap = {};
         const fetchOptionsMap = {};
-
 
         const state = reactive({
             data: {} as any,
@@ -110,14 +119,14 @@ export default {
 
         const schemaQuery = new QueryHelper().setOnly('metadata.view.sub_data.layouts', 'metadata.view.search');
         const getSchema = async () => {
-            let layouts = layoutSchemaCacheMap[props.serverId];
-            let searches = searchSchemaCacheMap[props.serverId];
+            let layouts = layoutSchemaCacheMap[props.cloudServiceId];
+            let searches = searchSchemaCacheMap[props.cloudServiceId];
 
             if (!layouts || !searches) {
                 try {
-                    const res = await SpaceConnector.client.inventory.server.get({
+                    const res = await SpaceConnector.client.inventory.cloudService.get({
                         // eslint-disable-next-line camelcase
-                        server_id: props.serverId,
+                        cloud_service_id: props.cloudServiceId,
                         query: schemaQuery.data,
                     });
                     layouts = get(res, 'metadata.view.sub_data.layouts', null);
@@ -125,17 +134,15 @@ export default {
                 } catch (e) {
                     console.error(e);
                 }
+
+                layoutSchemaCacheMap[props.cloudServiceId] = layouts;
+                searchSchemaCacheMap[props.cloudServiceId] = searches;
+
+                state.layouts = layouts || [];
+                state.searches = searches || [];
             }
-
-            layoutSchemaCacheMap[props.serverId] = layouts;
-            searchSchemaCacheMap[props.serverId] = searches;
-
-            state.layouts = layouts || [];
-            state.searches = searches || [];
-
-            if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
         };
-
+        //
         const getQuery = (): undefined|any => {
             if (!state.currentLayout) return undefined;
 
@@ -161,10 +168,9 @@ export default {
 
             return query.data;
         };
-
         const getParams = () => {
             // eslint-disable-next-line camelcase
-            const params: any = { server_id: props.serverId };
+            const params: any = { cloud_service_id: props.cloudServiceId };
             const query = getQuery();
             if (query) params.query = query;
             // eslint-disable-next-line camelcase
@@ -173,15 +179,13 @@ export default {
             if (keyPath) params.key_path = keyPath;
             return params;
         };
-
         const getApi = (): Promise<any> => {
             // eslint-disable-next-line camelcase
             if (state.currentLayout?.options?.root_path) {
-                return SpaceConnector.client.inventory.server.getData(getParams());
+                return SpaceConnector.client.inventory.cloudService.getData(getParams());
             }
-            return SpaceConnector.client.inventory.server.get(getParams());
+            return SpaceConnector.client.inventory.cloudService.get(getParams());
         };
-
         const getData = async () => {
             state.loading = true;
 
@@ -207,26 +211,14 @@ export default {
             }
         };
 
-        watch(() => props.serverId, async (after, before) => {
-            if (after && after !== before) {
-                await getSchema();
-                await getData();
-            }
-        }, { immediate: true });
-
-        const onChangeTab = async (tab) => {
-            state.activeTab = tab;
-            await getData();
-        };
-
         const exportApi = SpaceConnector.client.addOns.excel.export;
         const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
             init(options) {
                 if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
-                if (searchSchemaCacheMap[props.serverId]) {
+                if (searchSchemaCacheMap[props.cloudServiceId]) {
                     const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                        searchSchemaCacheMap[props.serverId],
-                        'inventory.Server',
+                        searchSchemaCacheMap[props.cloudServiceId],
+                        'inventory.CloudService',
                     );
                     state.keyItems = keyItems;
                     state.valueHandlerMap = valueHandlerMap;
@@ -243,7 +235,7 @@ export default {
                 try {
                     const res = await exportApi({
                         source: {
-                            url: '/inventory/server/get-data',
+                            url: '/inventory/cloud-service/get-data',
                             param: getParams(),
                         },
                         template: {
@@ -268,23 +260,25 @@ export default {
             return {};
         };
 
+        const onChangeTab = async (tab) => {
+            state.activeTab = tab;
+            await getData();
+        };
+
+        watch(() => props.cloudServiceId, async (after, before) => {
+            if (after && after !== before) {
+                await getSchema();
+                await getData();
+            }
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
-            baseInfoSchema,
+            onChangeTab,
             getLayoutListeners,
             fetchOptionsMap,
             fieldHandler,
-            onChangeTab,
         };
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-    .raw-data {
-        @apply px-4;
-    }
-    .p-button-tab {
-        @apply mt-8;
-    }
-</style>

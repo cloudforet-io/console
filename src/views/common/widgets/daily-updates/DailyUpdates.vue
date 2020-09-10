@@ -69,7 +69,7 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
-import { ProviderStoreType, useStore } from '@/store/toolset';
+import { store } from '@/store';
 
     interface CloudService {
         // eslint-disable-next-line camelcase
@@ -80,7 +80,9 @@ import { ProviderStoreType, useStore } from '@/store/toolset';
         total_count: number;
         provider: string;
         icon: string;
+        // eslint-disable-next-line camelcase
         created_count: number;
+        // eslint-disable-next-line camelcase
         deleted_count: number;
     }
 
@@ -89,7 +91,9 @@ import { ProviderStoreType, useStore } from '@/store/toolset';
         server_type: string;
         // eslint-disable-next-line camelcase
         total_count: number;
+        // eslint-disable-next-line camelcase
         created_count: number;
+        // eslint-disable-next-line camelcase
         deleted_count: number;
     }
 
@@ -136,11 +140,6 @@ export default {
         },
     },
     setup(props) {
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
-
         const state: UnwrapRef<State> = reactive({
             serverData: [],
             cloudServiceData: [],
@@ -175,8 +174,7 @@ export default {
 
         const getData = async (): Promise<void> => {
             state.loading = true;
-            await providerStore.getProvider();
-            await Promise.all([getServerData(), getCloudServiceData()]);
+            await Promise.all([store.dispatch('resource/provider/load'), getServerData(), getCloudServiceData()]);
             if (props.projectFilter) {
                 state.data = [
                     ...state.serverData.map(d => ({
@@ -184,7 +182,9 @@ export default {
                         type: d.server_type,
                         count: d.total_count,
                         isServer: true,
+                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
+                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
                     })),
@@ -193,9 +193,11 @@ export default {
                         type: d.cloud_service_type,
                         count: d.total_count,
                         provider: d.provider,
+                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
+                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
-                        icon: d.icon || providerStore.state.providers[d.provider]?.icon,
+                        icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
                     })),
                 ];
@@ -206,7 +208,9 @@ export default {
                         type: d.server_type,
                         count: d.total_count,
                         isServer: true,
+                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
+                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
                     })),
@@ -214,10 +218,12 @@ export default {
                         group: d.cloud_service_group,
                         type: d.cloud_service_type,
                         count: d.total_count,
+                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
+                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         provider: d.provider,
-                        icon: d.icon || providerStore.state.providers[d.provider]?.icon,
+                        icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
                     })),
                 ];
@@ -230,7 +236,7 @@ export default {
 
         return {
             ...toRefs(state),
-            iconUrl: (item): string => item.icon || providerStore.state.providers[item.provider]?.icon || '',
+            iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
         };
     },
 };
@@ -300,6 +306,5 @@ export default {
                 line-height: 120%;
             }
         }
-
     }
 </style>

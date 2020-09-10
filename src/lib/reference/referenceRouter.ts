@@ -1,3 +1,4 @@
+import { ReferenceType } from '@/lib/reference/type';
 
 interface ReferenceLinkFormatter {
     (baseUrl: string, referenceKey: string): string;
@@ -24,15 +25,9 @@ export const serviceAccountLinkFormatter: ReferenceLinkFormatter = (baseUrl, ref
 };
 
 
-type ReferenceType =
-    | 'inventory.Server'
-    | 'identity.Project'
-    | 'inventory.Collector'
-    | 'identity.ServiceAccount'
-
 type RouterMap = Record<ReferenceType, { baseUrl: string; formatter: ReferenceLinkFormatter}>
 
-export const RouterMap: RouterMap = {
+const routerMap: RouterMap = {
     'inventory.Server':
         {
             baseUrl: '/inventory/server',
@@ -56,7 +51,7 @@ export const RouterMap: RouterMap = {
 };
 
 export const referenceRouter = (referenceType: ReferenceType|string, referenceKey): string => {
-    const { baseUrl, formatter } = RouterMap[referenceType];
+    const { baseUrl, formatter } = routerMap[referenceType];
     const link = formatter(baseUrl, referenceKey);
     return link;
 };

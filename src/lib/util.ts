@@ -1,4 +1,4 @@
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
@@ -113,6 +113,10 @@ export const getTimestamp = (momentTime: Moment) => ({
 // formatter
 export const timestampFormatter = (value) => {
     if (value && value.seconds) return getLocalDatetimeFromTimeStamp(value.seconds);
+    return '';
+};
+export const iso8601Formatter = (time?: string, timezone?: string) => {
+    if (time) return moment.tz(moment(time), timezone || getTimezone()).format('YYYY-MM-DD HH:mm:ss');
     return '';
 };
 

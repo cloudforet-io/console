@@ -143,7 +143,7 @@ import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 
-/* page modules*/
+/* page modules */
 import ServiceAccountDetail from '@/views/identity/service-account/modules/ServiceAccountDetail.vue';
 import ServiceAccountCredentials from '@/views/identity/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
@@ -167,6 +167,7 @@ import {
     TableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/table/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
+import { Reference } from '@/lib/reference/type';
 
 interface ProjectItemResp {
     id: string;
@@ -237,7 +238,7 @@ export default {
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            searchText: '',
+            searchText: vm.$route.query.filters?.toString(),
         });
 
         const typeOptionState: TableTypeOptions = reactive({
@@ -246,6 +247,7 @@ export default {
             timezone: computed(() => user.state.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
+            colCopy: false,
         });
 
         const tableState = reactive({
@@ -311,7 +313,7 @@ export default {
         };
 
         /** Change Detection of Main Table * */
-        const fetchTableData: TableEventListeners['fetch'] = (options, changed?) => {
+        const fetchTableData: TableEventListeners['fetch'] = (options, changed) => {
             if (changed) {
                 if (changed.sortBy && changed.sortDesc) {
                     fetchOptionState.sortBy = changed.sortBy;
@@ -346,6 +348,7 @@ export default {
                             fileType: 'xlsx',
                             timezone: typeOptionState.timezone,
                         },
+                        // eslint-disable-next-line camelcase
                         data_source: tableState.schema.options.fields,
                     },
                 });
@@ -357,7 +360,7 @@ export default {
 
         /** Field Handler for display formatting(project id -> project name)* */
 
-        const fieldHandler: DynamicLayoutFieldHandler = (field) => {
+        const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             const item: Partial<DynamicFieldProps> = {};
             if (field.extraData?.reference) {
                 switch (field.extraData.reference.resource_type) {
@@ -415,6 +418,7 @@ export default {
             try {
                 await doubleCheckModalState.api({
                     ...doubleCheckModalState,
+                    // eslint-disable-next-line camelcase
                     service_account_id: tableState.selectedAccountIds[0],
                 });
                 showSuccessMessage('Success', 'Success to Delete Account', context.root);
@@ -441,7 +445,9 @@ export default {
         const releaseProject = async (action) => {
             try {
                 await action({
+                    // eslint-disable-next-line camelcase
                     service_accounts: tableState.selectedAccountIds,
+                    // eslint-disable-next-line camelcase
                     release_project: true,
                 });
                 showSuccessMessage('Success', 'Success to Release Project', context.root);
@@ -458,7 +464,9 @@ export default {
             if (data) {
                 try {
                     await action({
+                        // eslint-disable-next-line camelcase
                         service_accounts: tableState.selectedAccountIds,
+                        // eslint-disable-next-line camelcase
                         project_id: data.id,
                     });
                     showSuccessMessage('Success', 'Project has been successfully changed.', context.root);
@@ -502,6 +510,7 @@ export default {
         /** ******* Page Init ******* */
         const getTableSchema = async () => {
             const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                // eslint-disable-next-line camelcase
                 resource_type: 'identity.ServiceAccount',
                 schema: 'table',
                 options: {
@@ -512,8 +521,7 @@ export default {
         };
 
         const init = async () => {
-            await project.getProject(true);
-            await provider.getProvider(true);
+            await Promise.all([project.getProject(true), provider.getProvider(true)]);
             const providerFilter = queryRefs.provider.value;
             if (providerState.items.length > 0) {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
