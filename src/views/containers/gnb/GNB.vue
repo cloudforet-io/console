@@ -44,7 +44,10 @@
                     </template>
                     <template #item--format="{item}">
                         <router-link :to="item.link" @click.native="hideMenu">
-                            <div>{{ item.label }}</div>
+                            <div>
+                                {{ item.label }}
+                                <span v-if="item.isNew" class="new-text">new</span>
+                            </div>
                         </router-link>
                     </template>
                 </p-context-menu>
@@ -224,10 +227,10 @@ export default {
                             type: 'item', label: 'Plugin', name: 'plugin', link: '/management/supervisor/plugins',
                         },
                         {
-                            type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history',
+                            type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history', isNew: true,
                         },
                         {
-                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler',
+                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler', isNew: true,
                         },
                     ],
                 },
@@ -445,6 +448,14 @@ export default {
                     @apply text-gray-500 font-bold;
                     padding-right: 0.5rem;
                 }
+            }
+            .new-text {
+                font-size: 0.75rem;
+                background: linear-gradient(to right, theme('colors.primary'), 50%, theme('colors.secondary'));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                vertical-align: text-top;
+                cursor: default;
             }
         }
     }
