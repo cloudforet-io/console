@@ -110,7 +110,7 @@ import {
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
-import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectionHistoryChart.vue';
+import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
@@ -220,14 +220,14 @@ export default {
             modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
         });
         const routeState = reactive({
-            route: computed(() => [
-                { name: 'Management', path: state.isDomainOwner ? '/management' : '/management/collector-history' },
+            route: [
+                { name: 'Management', path: '/management/collector-history' },
                 { name: 'Collector History', path: '/management/collector-history' },
-            ]),
+            ],
         });
         const subRouteState = reactive({
             subRoute: computed(() => [
-                { name: 'Management', path: state.isDomainOwner ? '/management' : '/management/collector-history' },
+                { name: 'Management', path: '/management/collector-history' },
                 { name: 'Collector History', path: '/management/collector-history' },
                 { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` },
             ]),

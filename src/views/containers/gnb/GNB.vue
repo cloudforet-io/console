@@ -172,7 +172,7 @@ export default {
         const state = reactive({
             openedMenu: null,
             sitemapVisible: false,
-            defaultMenuList: computed(() => [
+            defaultMenuList: [
                 {
                     key: 'project',
                     link: '/project',
@@ -220,7 +220,7 @@ export default {
                 },
                 {
                     key: 'management',
-                    link: state.isDomainOwner ? '/management' : '/management/collector-history',
+                    link: '/management/collector-history',
                     parentRoutes: ['management'],
                     menu: [
                         {
@@ -229,12 +229,12 @@ export default {
                         {
                             type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history', isNew: true,
                         },
-                        {
-                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler', isNew: true,
-                        },
+                        // {
+                        //     type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler', isNew: true,
+                        // },
                     ],
                 },
-            ]),
+            ],
             supportMenu: [
                 {
                     type: 'item',
