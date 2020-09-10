@@ -17,7 +17,7 @@ const getDynamicLink = async (resourceType: string, search: string, searchKey?: 
             // eslint-disable-next-line camelcase
             search_key: 'reference.resource_id',
         });
-        return `${result.url}&filters=${search}`;
+        return `${result.url}?filters=${search}`;
     } catch (e) {
         return '/inventory/cloud-service';
     }
