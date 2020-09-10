@@ -35,6 +35,18 @@
                    v-on="scope.inputListeners"
             >
         </template>
+        <template #search-right="scope">
+            <div class="right">
+                <span v-if="selectedKey || scope.value" class="delete-btn" @click="onDeleteAll">
+                    <p-i class="icon" name="ic_delete" height="1rem"
+                         width="1rem"
+                    />
+                </span>
+                <div class="separator" />
+                <span class="help" @click="onHelpClick">help</span>
+                <p-query-search-guide v-model="visibleSearchGuide" />
+            </div>
+        </template>
         <template #menu-no-data>
             <div />
         </template>
@@ -61,6 +73,8 @@ import {
 } from '@/components/organisms/search/query-search/type';
 import { Component } from 'vue';
 import { defaultValueHandler } from '@/components/organisms/search/query-search/helper';
+import PQuerySearchGuide from '@/components/organisms/search/query-search-guide/PQuerySearchGuide.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 interface MenuItem<T> extends ContextMenuItem {
     data?: T;
@@ -71,7 +85,7 @@ const lastOnlyOperatorChars: OperatorType[] = ['=', '$'];
 
 export default {
     name: 'PQuerySearch',
-    components: { PAutocompleteSearch },
+    components: { PI, PQuerySearchGuide, PAutocompleteSearch },
     directives: { focus: vFocus },
     model: {
         prop: 'value',
@@ -156,6 +170,7 @@ export default {
                 if (state.selectedKey) return state.valueMenu;
                 return state.keyMenu;
             }),
+            visibleSearchGuide: false,
         });
 
         const onKeyInput = debounce(async (val: string) => {
@@ -286,6 +301,11 @@ export default {
             }
         };
 
+        const onDeleteAll = () => {
+            state.selectedKey = null;
+            state.searchText = '';
+        };
+
         const onKeydown = (e: KeyboardEvent) => {
             if (operatorChars.includes(e.key)) {
                 if (state.searchText.length > 0) return;
@@ -299,6 +319,10 @@ export default {
             }
         };
 
+        const onHelpClick = () => {
+            state.visibleSearchGuide = true;
+        };
+
 
         return {
             ...toRefs(state),
@@ -308,8 +332,10 @@ export default {
             showMenu,
             hideMenu,
             onDelete,
+            onDeleteAll,
             onKeydown,
-            excludeSlots: ['search-left', 'search-default', 'menu-no-data'],
+            excludeSlots: ['search-left', 'search-default', 'menu-no-data', 'search-right'],
+            onHelpClick,
         };
     },
 };
@@ -332,6 +358,34 @@ export default {
     }
     &.no-menu .p-context-menu {
         border-width: 0;
+    }
+    .right {
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        .delete-btn {
+            @apply cursor-pointer inline-block flex-shrink-0;
+            position: relative;
+            border-radius: 100px;
+            height: 1rem;
+            width: 1rem;
+            &:hover {
+                @apply bg-gray-200;
+            }
+            .icon {
+                position: absolute;
+            }
+        }
+        .separator {
+            @apply border-l border-gray-300;
+            height: 1rem;
+            margin-left: 0.625rem;
+            margin-right: 0.625rem;
+        }
+        .help:hover {
+            @apply text-secondary;
+            cursor: pointer;
+        }
     }
 }
 </style>

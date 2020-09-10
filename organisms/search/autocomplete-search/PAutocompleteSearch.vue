@@ -184,7 +184,10 @@ export default {
                 showMenu();
                 makeByPassListeners(listeners, 'click', e);
             },
-            delete: onDelete,
+            delete(...args) {
+                onDelete()
+                makeByPassListeners(listeners, 'delete', args);
+            },
             search: onSearch,
             input: onInput,
         };

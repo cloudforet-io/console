@@ -71,6 +71,10 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 export default {
     name: 'PQuerySearchGuide',
     components: { PHr, PI, PContentModal },
+    model: {
+        prop: 'visible',
+        event: 'update:visible',
+    },
     props: {
         visible: {
             type: Boolean,
