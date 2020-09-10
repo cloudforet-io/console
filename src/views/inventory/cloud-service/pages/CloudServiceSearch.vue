@@ -6,9 +6,11 @@ import {
     ComponentRenderProxy,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
+import { showErrorMessage } from '@/lib/util';
 
+const DEFAULT_URL = '/inventory/cloud-service';
 // TODO: move this file to lib as common dynamic link formatter
-const getDynamicLink = async (resourceType: string, search: string, searchKey?: string) => {
+const getDynamicLink = async (resourceType: string, search: string, root) => {
     try {
         const result = await SpaceConnector.client.addOns.pageDiscovery.get({
             // eslint-disable-next-line camelcase
@@ -17,9 +19,18 @@ const getDynamicLink = async (resourceType: string, search: string, searchKey?: 
             // eslint-disable-next-line camelcase
             search_key: 'reference.resource_id',
         });
-        return `${result.url}&filters=${search}`;
+        if (result.url === DEFAULT_URL) {
+            showErrorMessage('No Resource',
+                'There are no matching resources. It will redirect to Cloud Service main page.',
+                root);
+            return DEFAULT_URL;
+        }
+        return `${result.url}?filters=${search}`;
     } catch (e) {
-        return '/inventory/cloud-service';
+        showErrorMessage('No Resource',
+            'There are no matching resources. It will redirect to Cloud Service main page.',
+            root);
+        return DEFAULT_URL;
     }
 };
 
@@ -34,7 +45,7 @@ export default {
     // TODO: move this code to route file
     beforeRouteEnter(to, from, next) {
         next(async (vm: ComponentRenderProxy) => {
-            const link = await getDynamicLink('inventory.CloudService', vm.$props.id);
+            const link = await getDynamicLink('inventory.CloudService', vm.$props.id, vm.$root);
             vm.$router.push(link);
         });
     },

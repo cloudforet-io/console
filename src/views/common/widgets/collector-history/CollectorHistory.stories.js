@@ -1,15 +1,15 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
+import CollectorHistory from '@/views/common/widgets/collector-history/CollectorHistory.vue';
 
 export default {
     title: 'views/widgets/CollectionHistory',
-    component: SCollectionHistory,
+    component: CollectorHistory,
     parameters: {
         info: {
             summary: '',
-            components: { SCollectionHistory },
+            components: { CollectorHistory },
         },
         knobs: { escapeHTML: false },
     },
@@ -29,11 +29,11 @@ const getState = (props, context) => {
 };
 
 export const defaultCase = () => ({
-    components: { SCollectionHistory },
+    components: { CollectorHistory },
     props: getProps(),
     template: `
     <div style="width: 80vw;">
-        <SCollectionHistory v-bind="$props"></SCollectionHistory>
+        <collector-history v-bind="$props"></collector-history>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);

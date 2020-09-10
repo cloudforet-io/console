@@ -24,7 +24,7 @@
         <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
                              lg:row-start-2"
         />
-        <s-collection class="col-start-1 col-end-13" />
+        <collectors class="col-start-1 col-end-13" />
         <cloud-services class="col-start-1 col-end-13"
                         :more-info="true"
                         :get-action="cloudServiceWidgetGetAction"
@@ -42,7 +42,7 @@ import { blue, secondary, secondary1 } from '@/styles/colors';
 import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-import SCollection from '@/views/common/widgets/collection/Collection.vue';
+import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
 
 export default {
@@ -54,7 +54,7 @@ export default {
         ServiceAccounts,
         ServiceSummary,
         TopProjects,
-        SCollection,
+        Collectors,
     },
     setup() {
         const projects = new ServiceSummaryWidgetState({

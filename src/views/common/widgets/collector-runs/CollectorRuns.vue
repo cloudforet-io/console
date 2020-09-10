@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Recent Collecting Runs" :help="$t('DASHBOARD.ACTION.RECENT_COLLECTING')">
+    <p-widget-layout title="Run Collectors">
         <template #extra>
             <div class="flex justify-end">
                 <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
@@ -54,7 +54,7 @@ import { getTimezone } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
-    name: 'SCollectingRuns',
+    name: 'CollectorRuns',
     components: {
         PSkeleton,
         PWidgetLayout,
@@ -68,8 +68,8 @@ export default {
             items: [] as JobModel[],
             fields: [
                 { label: 'Collector', name: 'collector_info.name' },
-                { label: 'Start Time', name: 'created_at' },
                 { label: 'Completed / Total', name: 'progress' },
+                { label: 'Start Time', name: 'created_at' },
             ],
         });
 
@@ -133,7 +133,7 @@ export default {
     th {
         @apply relative border-0;
         .th-contents {
-            @apply text-gray;
+            @apply text-gray-500;
         }
         &:first-child .th-contents {
             padding-left: 0;

@@ -62,7 +62,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            allMenu: computed(() => [
+            allMenu: [
                 {
                     label: 'Dashboard', link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
                 },
@@ -97,15 +97,15 @@ export default {
                 },
                 {
                     label: 'Management',
-                    link: props.isDomainOwner ? '/management' : '/management/collector-history',
+                    link: '/management/collector-history',
                     icon: 'ic_management',
                     subMenus: [
                         { label: 'Plugin (admin)', link: '/management/supervisor/plugins', isAdminMenu: true },
                         { label: 'Collector History', link: '/management/collector-history', isNew: true },
-                        { label: 'Power Scheduler', link: '/management/power-scheduler', isNew: true },
+                        // { label: 'Power Scheduler', link: '/management/power-scheduler', isNew: true },
                     ],
                 },
-            ]),
+            ],
         });
 
         return {

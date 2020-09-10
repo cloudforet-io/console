@@ -34,19 +34,20 @@ import _ from 'lodash';
 import numeral from 'numeral';
 
 import {
-    computed, reactive, toRefs, UnwrapRef, watch,
+    computed, reactive, toRefs, watch, UnwrapRef, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { SBarChart } from '@/lib/chart/bar-chart';
-import { HistoryStat } from '@/lib/fluent-api/statistics/history';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
+import { queryTagsToQueryString } from '@/lib/router-query-string';
 import {
     coral, gray, primary2, black,
 } from '@/styles/colors';
@@ -56,54 +57,60 @@ interface Data {
     success: number;
     failure: number;
 }
-
-interface Props {
-    getAction: (api: HistoryStat<Data>) => HistoryStat<Data>;
+interface State {
+    chartRef: HTMLCanvasElement|null;
+    chart: Chart|null;
+    data: Data[];
+    loading: boolean;
 }
-
 const TICKS_COUNT = 5;
 const DAY_COUNT = 7;
 const DEFAULT_MAX = 600;
 const DEFAULT_STEP_SIZE = 100;
 
 export default {
-    name: 'SCollectionHistory',
+    name: 'CollectorHistory',
     components: {
         PI,
         PWidgetLayout,
         PChartLoader,
         PSkeleton,
     },
-    props: {
-        getAction: {
-            type: Function,
-            default: api => api,
-        },
-    },
-    setup(props: Props) {
-        interface DataType {
-            date: string;
-            success: number;
-            failure: number;
-        }
-        interface InitDataType {
-            chartRef: HTMLCanvasElement|null;
-            chart: Chart|null;
-            data: DataType[];
-            loading: boolean;
-        }
+    setup() {
         const LEGEND_COLORS: {[k: string]: string} = {
             failure: coral.default,
             success: primary2,
         };
 
-        const state: UnwrapRef<InitDataType> = reactive({
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state: UnwrapRef<State> = reactive({
             chartRef: null,
             chart: null,
             data: [],
             loading: true,
         });
 
+        // const onClickChart = (point, event) => {
+        //     const item = event[0];
+        //     if (item) {
+        //         const clickedData = state.data[item._index];
+        //         const queryTags: QueryTag[] = [];
+        //
+        //         const selectedDate = moment(clickedData.date).format('YYYY-MM-DD');
+        //         const nextDate = moment(selectedDate).add(1, 'day').format('YYYY-MM-DD');
+        //         queryTags.push({
+        //             key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+        //             operator: '>=',
+        //             value: { label: selectedDate, name: selectedDate },
+        //         });
+        //         queryTags.push({
+        //             key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+        //             operator: '<',
+        //             value: { label: nextDate, name: nextDate },
+        //         });
+        //         vm.$router.push({ name: 'collectorHistory', query: { filter: queryTagsToQueryString(queryTags) } });
+        //     }
+        // };
         const drawChart = (canvas) => {
             let data;
             if (state.data.length > 0) {
@@ -197,6 +204,7 @@ export default {
                             },
                         }],
                     },
+                    // onClick: onClickChart,
                 },
                 plugins: [{
                     beforeDraw(chart: SBarChart): void {

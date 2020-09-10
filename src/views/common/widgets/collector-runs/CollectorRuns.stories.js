@@ -1,15 +1,15 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import PCollectingRuns from '@/views/common/widgets/collecting-runs/SCollectingRuns.vue';
+import CollectorRuns from '@/views/common/widgets/collector-runs/CollectorRuns.vue';
 
 export default {
     title: 'views/widgets/CollectingRuns',
-    component: PCollectingRuns,
+    component: CollectorRuns,
     parameters: {
         info: {
             summary: '',
-            components: { PCollectingRuns },
+            components: { CollectorRuns },
         },
         knobs: { escapeHTML: false },
     },
@@ -29,11 +29,11 @@ const getState = () => {
 };
 
 export const defaultCase = () => ({
-    components: { PCollectingRuns },
+    components: { CollectorRuns },
     props: getProps(),
     template: `
     <div style="width: 80vw;">
-        <PCollectingRuns v-bind="$props"></PCollectingRuns>
+        <collector-runs v-bind="$props"></collector-runs>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);

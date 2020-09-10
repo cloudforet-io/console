@@ -42,7 +42,6 @@ const formatterMap: FormatterMap = {
         data: store.state.resource.region.items[data]?.label || data,
     }),
     'inventory.CloudService': (data) => {
-        console.debug('formatter, cloud service');
         return {
             options: {
                 link: referenceRouter('inventory.CloudService', data),
