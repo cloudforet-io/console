@@ -6,7 +6,7 @@
 import {
     computed, reactive, watch,
 } from '@vue/composition-api';
-import nunjucks from 'nunjucks';
+import { render } from 'ejs';
 import { get } from 'lodash';
 import DOMPurify from 'dompurify';
 import { MarkdownProps } from '@/components/molecules/markdown/type';
@@ -48,7 +48,7 @@ export default {
         const md = computed(() => {
             let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
             if (props.data) {
-                doc = nunjucks.renderString(doc, props.data);
+                doc = render(doc, props.data);
             }
             doc = marked(doc).replace(/<pre>/g, '<pre class="hljs"');
             return DOMPurify.sanitize(doc);
@@ -119,19 +119,24 @@ export default {
         @apply font-bold;
     }
     h1 {
-        @apply text-3xl mb-4 mt-8;
+        @apply mb-4 mt-8;
+        font-size: 1.5rem;
+        line-height: 120%;
     }
     h2 {
-        @apply font-normal text-2xl mb-3 mt-8;
+        @apply font-bold;
+        font-size: 1rem;
+        line-height: 120%;
     }
     h3 {
-        @apply text-xl mb-2 mt-8;
+        @apply mb-2 mt-8;
+        font-size: 0.875rem;
+        line-height: 120%;
     }
-    h4 {
-        @apply text-base mb-2 mt-5;
-    }
-    h5, h6 {
-        @apply text-base mb-2 mt-5 ;
+    h4, h5, h6 {
+        @apply mb-2 mt-5;
+        font-size: 0.75rem;
+        line-height: 120%;
     }
     p, ul > li, ol > li {
         @apply text-sm leading-tight ;
