@@ -212,7 +212,9 @@ export const isNotEmpty = (value): boolean => {
 export const showErrorMessage = (errorTitle, error, root?) => {
     const vm = getCurrentInstance();
     const vmRoot = root || vm;
-    const errorMsg = error.response.data.error.message;
+    let errorMsg = '';
+    if (error.response) { errorMsg = error.response.data.error.message; }
+    else { errorMsg = error; }
     if (vmRoot) {
         vmRoot.$notify({
             group: 'noticeTopRight',

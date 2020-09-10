@@ -416,7 +416,7 @@ export default {
         const disableUser = async (items) => {
             try {
                 await parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async () => {
-                    showSuccessMessage('Success', 'disable users', root);
+                    showSuccessMessage('Success to Disable User', 'disable users', root);
                 });
             } catch (e) {
                 showErrorMessage('Fail to Disable User', e, root);
