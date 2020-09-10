@@ -4,8 +4,12 @@
             <p-page-navigation :routes="route" />
             <p-page-title :title="pageTitle" />
             <p-pane-layout class="collector-history-wrapper">
-                <p-collector-history-chart :loading="loading" class="history-chart" />
+                <p-collector-history-chart
+                    class="history-chart"
+                    :selected-date.sync="selectedDateFromChart"
+                />
                 <p-query-search-table
+                    ref="querySearchRef"
                     :class="items.length === 0 ? 'no-data' : ''"
                     :fields="fields"
                     :items="items"
@@ -47,7 +51,10 @@
                         <span class="float-right">{{ value }}</span>
                     </template>
                     <template #col-status-format="{ value }">
-                        <span :class="value.toLowerCase()">{{ value }}</span>
+                        <span :class="value.toLowerCase()">{{ statusFormatter(value) }}</span>
+                    </template>
+                    <template #col-created_at-format="{value}">
+                        {{ timestampFormatter(value) }}
                     </template>
                 </p-query-search-table>
                 <div v-if="!loading && items.length > 0" class="pagination">
@@ -78,7 +85,7 @@
                         class="create-collector-button"
                         style-type="primary-dark"
                         name="ic_plus_bold"
-                        @click="$router.push({path: '/plugin/collector/create/plugins'})"
+                        @click="$router.push({ name: 'createCollector' })"
                     >
                         {{ $t('INVENTORY.CRT_COLL') }}
                     </p-icon-text-button>
@@ -107,22 +114,21 @@ import PCollectorHistoryChart from '@/views/management/collector-history/modules
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
-import {
-    makeEnumValueHandler, makeDistinctValueHandler,
-} from '@/lib/component-utils/query-search';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
+import { makeEnumValueHandler, makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { store } from '@/store';
 import router from '@/routes';
-import { useStore } from '@/store/toolset';
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -132,7 +138,6 @@ enum JOB_STATUS {
     error = 'ERROR',
     timeout = 'TIMEOUT',
 }
-type UrlQueryString = string | (string | null)[] | null | undefined;
 
 export default {
     name: 'PCollectorHistory',
@@ -150,16 +155,15 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { user } = useStore();
         const state = reactive({
             loading: false,
-            isDomainOwner: computed(() => user.state.isDomainOwner),
+            isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info.name', sortable: false },
                 { label: 'Status', name: 'status' },
-                { label: 'Task', name: 'total_tasks' },
+                { label: 'Task', name: 'task' },
                 { label: 'Start Time', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ]),
@@ -185,7 +189,9 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
+            selectedDateFromChart: '',
             searchTags: [],
+            querySearchRef: null as null|QuerySearchTableFunctions,
             querySearchHandlers: {
                 keyItems: [
                     {
@@ -196,6 +202,11 @@ export default {
                         name: 'status',
                         label: 'Status',
                     },
+                    // {
+                    //     dataType: 'datetime',
+                    //     name: 'created_at',
+                    //     label: 'Start Time',
+                    // },
                 ],
                 valueHandlerMap: {
                     // eslint-disable-next-line camelcase
@@ -222,11 +233,11 @@ export default {
             ]),
         });
 
-        const convertStatus = (status) => {
+        const statusFormatter = (status) => {
             if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
             return capitalize(status);
         };
-        const convertFinishedAtToDuration = (createdAt, finishedAt) => {
+        const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
                 const createdAtMoment = moment(timestampFormatter(createdAt));
                 const finishedAtMoment = moment(timestampFormatter(finishedAt));
@@ -240,15 +251,9 @@ export default {
             jobs.forEach((job, index) => {
                 const newJob = {
                     sequence: getPageStart(state.thisPage, state.pageSize) + index,
-                    // eslint-disable-next-line camelcase
-                    job_id: job.job_id,
-                    'collector_info.name': job.collector_info.name,
-                    status: convertStatus(job.status),
-                    // eslint-disable-next-line camelcase
-                    total_tasks: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
-                    // eslint-disable-next-line camelcase
-                    created_at: timestampFormatter(job.created_at),
-                    duration: convertFinishedAtToDuration(job.created_at, job.finished_at),
+                    task: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
+                    duration: durationFormatter(job.created_at, job.finished_at),
+                    ...job,
                 };
                 state.items.push(newJob);
             });
@@ -298,28 +303,6 @@ export default {
             }
         };
 
-        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
-            if (Array.isArray(tags)) {
-                return tags.map((tag) => {
-                    let item;
-                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
-                    else item = `${tag.value?.name}`;
-                    return item;
-                });
-            }
-            return null;
-        };
-        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
-            if (!urlQueryString) return [];
-            if (Array.isArray(urlQueryString)) {
-                return urlQueryString.reduce((res, qs) => {
-                    if (qs) res.push(parseTag(qs));
-                    return res;
-                }, [] as QueryTag[]);
-            }
-            return [parseTag(urlQueryString as string)];
-        };
-
         const onSelect = (item) => {
             state.selectedJobId = item.job_id;
             // eslint-disable-next-line no-empty-function
@@ -327,9 +310,9 @@ export default {
         };
         const onChange = async (item) => {
             state.searchTags = item.queryTags;
-            const urlQueryString = searchTagsToUrlQueryString(item.queryTags);
+            const urlQueryString = queryTagsToQueryString(item.queryTags);
             // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, f: urlQueryString } }).catch(() => {});
+            await vm.$router.replace({ query: { ...router.currentRoute.query, filter: urlQueryString } }).catch(() => {});
             try {
                 await getJobs();
             } catch (e) {
@@ -365,7 +348,7 @@ export default {
             if (hash) {
                 state.selectedJobId = hash.replace('#', '');
             }
-            state.searchTags = urlQueryStringToSearchTags(vm.$route.query.f);
+            state.searchTags = queryStringToQueryTags(vm.$route.query.filter);
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;
         };
@@ -374,6 +357,24 @@ export default {
         watch(() => vm.$route.hash, (after) => {
             if (after === '') onClickGoBack();
         });
+
+        // watch(() => state.selectedDateFromChart, (after) => {
+        //     if (after) {
+        //         const nextDate = moment(state.selectedDateFromChart).add(1, 'day').format('YYYY-MM-DD');
+        //         state.querySearchRef.addTag(
+        //             {
+        //                 key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+        //                 value: { label: state.selectedDateFromChart, name: state.selectedDateFromChart },
+        //                 operator: '>=',
+        //             },
+        //             {
+        //                 key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+        //                 value: { label: nextDate, name: nextDate },
+        //                 operator: '<',
+        //             },
+        //         );
+        //     }
+        // }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -386,6 +387,8 @@ export default {
             onClickNextPageButton,
             onClickGoBack,
             onClickStatus,
+            statusFormatter,
+            timestampFormatter,
         };
     },
 };
