@@ -43,6 +43,7 @@ module.exports = {
       'vue': 'vue/dist/vue.common.js',
       '@': path.resolve(__dirname, '../src'),
       '@sb': path.resolve(__dirname, './'),
+      'fs': path.resolve(__dirname, 'fsMock.js'),
     };
 
     /* plugins settings */
