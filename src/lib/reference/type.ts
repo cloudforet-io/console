@@ -2,7 +2,7 @@
 
 const referenceTypes = ['inventory.Server', 'identity.Project',
     'inventory.Collector', 'identity.ServiceAccount', 'identity.Provider',
-    'inventory.Region'];
+    'inventory.Region', 'inventory.CloudService'];
 export type ReferenceType = typeof referenceTypes[number]
 
 export interface Reference {

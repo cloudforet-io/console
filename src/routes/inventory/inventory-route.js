@@ -49,11 +49,12 @@ export default {
                     component: CloudService,
                 },
                 {
-                    path: 'search',
+                    path: 'search/:id',
                     name: 'cloudServiceSearch',
                     meta: {
                         label: 'search',
                     },
+                    props: true,
                     component: CloudServiceSearch,
                 },
                 {

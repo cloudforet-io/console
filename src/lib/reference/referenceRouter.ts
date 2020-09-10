@@ -24,6 +24,11 @@ export const serviceAccountLinkFormatter: ReferenceLinkFormatter = (baseUrl, ref
     return queryString;
 };
 
+export const cloudServiceLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
+    const queryString = `${baseUrl}/search/${referenceKey}`;
+    return queryString;
+};
+
 
 type RouterMap = Record<ReferenceType, { baseUrl: string; formatter: ReferenceLinkFormatter}>
 
@@ -47,6 +52,11 @@ const routerMap: RouterMap = {
         {
             baseUrl: '/identity/service-account',
             formatter: serviceAccountLinkFormatter,
+        },
+    'inventory.CloudService':
+        {
+            baseUrl: '/inventory/cloud-service',
+            formatter: cloudServiceLinkFormatter,
         },
 };
 

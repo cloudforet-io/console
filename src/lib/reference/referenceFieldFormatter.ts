@@ -22,21 +22,41 @@ const formatterMap: FormatterMap = {
     }),
     'identity.Project': data => ({
         data: store.state.resource.project.items[data]?.label || data,
-        link: referenceRouter('identity.Project', data),
+        options: {
+            link: referenceRouter('identity.Project', data),
+        },
     }),
     'inventory.Collector': data => ({
         data: store.state.resource.collector.items[data]?.label || data,
-        link: referenceRouter('inventory.Collector', data),
+        options: {
+            link: referenceRouter('inventory.Collector', data),
+        },
     }),
     'identity.ServiceAccount': data => ({
         data: store.state.resource.serviceAccount.items[data]?.label || data,
-        link: referenceRouter('identity.ServiceAccount', data),
+        options: {
+            link: referenceRouter('identity.ServiceAccount', data),
+        },
     }),
     'inventory.Region': data => ({
         data: store.state.resource.region.items[data]?.label || data,
     }),
+    'inventory.CloudService': (data) => {
+        console.debug('formatter, cloud service');
+        return {
+            options: {
+                link: referenceRouter('inventory.CloudService', data),
+            },
+        };
+    },
 };
 
 export const referenceFieldFormatter = (
     reference: Reference, data: string,
-): ReturnType<FieldFormatter> => formatterMap[reference.resource_type](data);
+): ReturnType<FieldFormatter> => {
+    if (formatterMap[reference.resource_type]) {
+        return formatterMap[reference.resource_type](data);
+    }
+    console.error(`[referenceFieldFormatter]: ${reference.resource_type} is not supported`);
+    return {};
+};
