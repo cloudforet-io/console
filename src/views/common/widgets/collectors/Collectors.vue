@@ -1,20 +1,20 @@
 <template>
-    <p-widget-layout title="Collection" class="collection">
+    <p-widget-layout title="Collectors" help="Manage resources by custom plugins">
         <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
-            <s-collection-history class="widget" />
-            <s-collecting-runs class="widget" />
+            <collector-history class="widget" />
+            <collector-runs class="widget" />
         </div>
     </p-widget-layout>
 </template>
 
 <script lang="ts">
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import SCollectionHistory from '@/views/common/widgets/collection-history/SCollectionHistory.vue';
-import SCollectingRuns from '@/views/common/widgets/collecting-runs/SCollectingRuns.vue';
+import CollectorHistory from '@/views/common/widgets/collector-history/CollectorHistory.vue';
+import CollectorRuns from '@/views/common/widgets/collector-runs/CollectorRuns.vue';
 
 export default {
-    name: 'Collection',
-    components: { PWidgetLayout, SCollectionHistory, SCollectingRuns },
+    name: 'Collectors',
+    components: { PWidgetLayout, CollectorHistory, CollectorRuns },
     setup() {
         return {};
     },
