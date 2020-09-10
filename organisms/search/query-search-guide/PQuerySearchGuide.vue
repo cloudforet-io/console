@@ -39,14 +39,14 @@
                     <table class="search-operator">
                         <tr>
                             <td class="left-content">
-                                <div v-for="(value, index) in operators" :key="index" class="pb-4">
+                                <div v-for="(value, index) in operators" :key="index">
                                     <span id="search-key">key</span>
                                     <span id="search-operator">{{ value.operator }}</span>
                                     <span id="search-operand">{{ value.operand }}</span>
                                 </div>
                             </td>
                             <td class="right-content">
-                                <div v-for="(value, index) in operators" :key="index" class="pb-4">
+                                <div v-for="(value, index) in operators" :key="index">
                                     <span id="search-value">{{ value.value }} </span>
                                 </div>
                             </td>
@@ -155,7 +155,6 @@ export default {
     .third {
         .left-content {
             @apply text-xs;
-            padding-top: 1rem;
             width: 6.125rem;
             border-right: 1px solid theme('colors.gray.200');;
             margin-right: 1rem;
@@ -173,7 +172,6 @@ export default {
         }
         .right-content {
             @apply text-xs;
-            padding-top: 1rem;
             padding-left: 1rem;
         }
     }
