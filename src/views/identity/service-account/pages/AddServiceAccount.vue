@@ -75,7 +75,7 @@
             <div class="title">
                 Credentials
             </div>
-            <p-select-btn-group :buttons="credentialInputOptionButton" :selected.sync="selectedCredentialInputOption" class="float-right" />
+            <p-select-btn-group :buttons="credentialInputOptionButton" :selected.sync="selectedCredentialInputOption" class="pt-20 float-right" />
             <p-dynamic-form :schema="credentialBasicSchema" :model="credentialBasicModel" :options="inputOptions"
                             :is-valid.sync="isCredentialBasicValid" :validation-mode="validationMode"
             />
@@ -399,6 +399,7 @@ export default {
                     } catch (e) {
                         console.error(e);
                         showErrorMessage('Fail to Add Account', 'Please put the appropriate json format in the form.', context.root);
+                        await deleteServiceAccount();
                         return;
                     }
                 }
