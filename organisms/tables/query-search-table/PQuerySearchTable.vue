@@ -60,8 +60,8 @@
                 <slot name="toolbox-bottom" />
             </div>
         </template>
-        <template v-for="name in slotNames" v-slot:[name]="data">
-            <slot :name="name" v-bind="data" />
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot v-if="!excludeSlotNames.includes(slot)" :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>
@@ -181,13 +181,7 @@ export default {
             tags: makeOptionalProxy('queryTags', vm),
             tagsRef: null as null|QuerySearchTagsFunctions,
             /** others */
-            slotNames: computed(() => {
-                const res: string[] = [];
-                forEach(slots, (func, name) => {
-                    if (!['toolbox-left', 'toolbox-bottom', 'toolbox-top'].includes(name)) res.push(name);
-                });
-                return res;
-            }),
+            excludeSlotNames: ['toolbox-left', 'toolbox-bottom', 'toolbox-top'],
         });
 
         // check if each option value is 'undefined' to escape auto type casting

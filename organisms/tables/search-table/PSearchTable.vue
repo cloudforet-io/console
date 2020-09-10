@@ -47,8 +47,8 @@
             </div>
             <slot name="toolbox-bottom" />
         </template>
-        <template v-for="name in slotNames" v-slot:[name]="data">
-            <slot :name="name" v-bind="data" />
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot v-if="!excludeSlotNames.includes(slot)" :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>
@@ -139,13 +139,7 @@ export default {
             /** search */
             proxySearchText: makeOptionalProxy('searchText', vm),
             /** others */
-            slotNames: computed(() => {
-                const res: string[] = [];
-                forEach(slots, (func, name) => {
-                    if (!['toolbox-left', 'toolbox-bottom'].includes(name)) res.push(name);
-                });
-                return res;
-            }),
+            excludeSlotNames: ['toolbox-left', 'toolbox-bottom'],
         });
 
         /** Event emitter */

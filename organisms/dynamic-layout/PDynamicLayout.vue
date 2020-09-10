@@ -27,7 +27,6 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { isEqual } from 'lodash';
 import { DynamicLayoutProps } from '@/components/organisms/dynamic-layout/type';
 import { dynamicLayoutTypes } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { dynamicFieldTypes } from '@/components/organisms/dynamic-field/type/field-schema';
 
 
 export default {
