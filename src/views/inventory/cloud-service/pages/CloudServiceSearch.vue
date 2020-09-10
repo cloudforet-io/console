@@ -25,7 +25,7 @@ const getDynamicLink = async (root, resourceType: string, search: string, search
                 root);
             return DEFAULT_URL;
         }
-        return `${result.url}?filters=${search}`;
+        return `${result.url}?filters=${searchKey}:${search}`;
     } catch (e) {
         showErrorMessage('No Resource',
             'There are no matching resources. It will redirect to Cloud Service main page.',
@@ -43,8 +43,8 @@ export default {
         },
         searchKey: {
             type: String,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     // TODO: move this code to route file
     beforeRouteEnter(to, from, next) {
