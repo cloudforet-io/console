@@ -167,7 +167,7 @@ import {
     TableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/table/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
-import {Reference} from "@/lib/reference/type";
+import { Reference } from '@/lib/reference/type';
 
 interface ProjectItemResp {
     id: string;
@@ -238,7 +238,7 @@ export default {
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            searchText: '',
+            searchText: vm.$route.query.filters?.toString(),
         });
 
         const typeOptionState: TableTypeOptions = reactive({
@@ -330,8 +330,6 @@ export default {
                     // sync updated query tags to url query string
                     replaceQuery('filters', changed.searchText);
                 }
-            } else {
-                fetchOptionState.searchText = vm.$route.query.filters?.toString();
             }
             listServiceAccountData();
         };
