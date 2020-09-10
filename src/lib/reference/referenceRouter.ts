@@ -1,31 +1,31 @@
-import { ReferenceType } from '@/lib/reference/type';
+import { Reference, ReferenceType } from '@/lib/reference/type';
 
 interface ReferenceLinkFormatter {
-    (baseUrl: string, referenceKey: string): string;
+    (baseUrl: string, data: string, reference: Reference): string;
 }
 
-export const projectLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}/${referenceKey}`;
+export const projectLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
+    const queryString = `${baseUrl}/${data}`;
     return queryString;
 };
 
-export const serverLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}?filters=server_id%3A${referenceKey}`;
+export const serverLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
+    const queryString = `${baseUrl}?filters=server_id%3A${data}`;
     return queryString;
 };
 
-export const collectorLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}?filters=collector_id%3A${referenceKey}`;
+export const collectorLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
+    const queryString = `${baseUrl}?filters=collector_id%3A${data}`;
     return queryString;
 };
 
-export const serviceAccountLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}/search/${referenceKey}`;
+export const serviceAccountLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
+    const queryString = `${baseUrl}/search/${data}`;
     return queryString;
 };
 
-export const cloudServiceLinkFormatter: ReferenceLinkFormatter = (baseUrl, referenceKey) => {
-    const queryString = `${baseUrl}/search/${referenceKey}`;
+export const cloudServiceLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
+    const queryString = `${baseUrl}/search/${reference.reference_key || 'reference.resource_id'}/${data}`;
     return queryString;
 };
 
@@ -60,10 +60,16 @@ const routerMap: RouterMap = {
         },
 };
 
-export const referenceRouter = (referenceType: ReferenceType|string, referenceKey): string => {
-    const { baseUrl, formatter } = routerMap[referenceType];
-    const link = formatter(baseUrl, referenceKey);
-    return link;
+export const referenceRouter = (data: string, reference: Reference): string => {
+    if (routerMap[reference.resource_type]) {
+        const { baseUrl, formatter } = routerMap[reference.resource_type];
+        const link = formatter(baseUrl, data, reference);
+        return link;
+    }
+    console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);
+
+
+    return '';
 };
 
 export default referenceRouter;

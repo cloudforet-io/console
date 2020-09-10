@@ -5,7 +5,7 @@ import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 interface FieldFormatter {
-    (data: string): Partial<DynamicFieldProps>;
+    (data: string, reference: Reference): Partial<DynamicFieldProps>;
 }
 
 type FormatterMap = Record<ReferenceType, FieldFormatter>
@@ -16,45 +16,43 @@ type FormatterMap = Record<ReferenceType, FieldFormatter>
  */
 const formatterMap: FormatterMap = {
     'identity.Provider': data => store.getters['resource/provider/fieldItems'],
-    'inventory.Server': data => ({
+    'inventory.Server': (data, reference) => ({
         data,
-        link: referenceRouter('inventory.Server', data),
+        link: referenceRouter(data, reference),
     }),
-    'identity.Project': data => ({
+    'identity.Project': (data, reference) => ({
         data: store.state.resource.project.items[data]?.label || data,
         options: {
-            link: referenceRouter('identity.Project', data),
+            link: referenceRouter(data, reference),
         },
     }),
-    'inventory.Collector': data => ({
+    'inventory.Collector': (data, reference) => ({
         data: store.state.resource.collector.items[data]?.label || data,
         options: {
-            link: referenceRouter('inventory.Collector', data),
+            link: referenceRouter(data, reference),
         },
     }),
-    'identity.ServiceAccount': data => ({
+    'identity.ServiceAccount': (data, reference) => ({
         data: store.state.resource.serviceAccount.items[data]?.label || data,
         options: {
-            link: referenceRouter('identity.ServiceAccount', data),
+            link: referenceRouter(data, reference),
         },
     }),
-    'inventory.Region': data => ({
+    'inventory.Region': (data, reference) => ({
         data: store.state.resource.region.items[data]?.label || data,
     }),
-    'inventory.CloudService': (data) => {
-        return {
-            options: {
-                link: referenceRouter('inventory.CloudService', data),
-            },
-        };
-    },
+    'inventory.CloudService': (data, reference) => ({
+        options: {
+            link: referenceRouter(data, reference),
+        },
+    }),
 };
 
 export const referenceFieldFormatter = (
     reference: Reference, data: string,
 ): ReturnType<FieldFormatter> => {
     if (formatterMap[reference.resource_type]) {
-        return formatterMap[reference.resource_type](data);
+        return formatterMap[reference.resource_type](data, reference);
     }
     console.error(`[referenceFieldFormatter]: ${reference.resource_type} is not supported`);
     return {};

@@ -10,14 +10,14 @@ import { showErrorMessage } from '@/lib/util';
 
 const DEFAULT_URL = '/inventory/cloud-service';
 // TODO: move this file to lib as common dynamic link formatter
-const getDynamicLink = async (resourceType: string, search: string, root) => {
+const getDynamicLink = async (root, resourceType: string, search: string, searchKey: string) => {
     try {
         const result = await SpaceConnector.client.addOns.pageDiscovery.get({
             // eslint-disable-next-line camelcase
             resource_type: 'inventory.CloudService',
             search,
             // eslint-disable-next-line camelcase
-            search_key: 'reference.resource_id',
+            search_key: searchKey,
         });
         if (result.url === DEFAULT_URL) {
             showErrorMessage('No Resource',
@@ -41,11 +41,15 @@ export default {
             type: String,
             default: undefined,
         },
+        searchKey: {
+            type: String,
+            default: undefined
+        }
     },
     // TODO: move this code to route file
     beforeRouteEnter(to, from, next) {
         next(async (vm: ComponentRenderProxy) => {
-            const link = await getDynamicLink('inventory.CloudService', vm.$props.id, vm.$root);
+            const link = await getDynamicLink(vm.$root, 'inventory.CloudService', vm.$props.id, vm.$props.searchKey);
             vm.$router.push(link);
         });
     },

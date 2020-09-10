@@ -154,8 +154,6 @@ import { replaceQuery } from '@/lib/router-query-string';
 import { makeTrItems } from '@/lib/view-helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 /* types */

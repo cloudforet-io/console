@@ -49,7 +49,7 @@ export default {
                     component: CloudService,
                 },
                 {
-                    path: 'search/:id',
+                    path: 'search/:searchKey/:id',
                     name: 'cloudServiceSearch',
                     meta: {
                         label: 'search',

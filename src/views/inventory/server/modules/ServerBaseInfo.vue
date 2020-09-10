@@ -17,7 +17,7 @@
                 </p-badge>
             </template>
             <template #data-project_id="{data: value}">
-                <p-anchor :href="referenceRouter('identity.Project', value)"
+                <p-anchor :href="referenceRouter(value, {resource_type: 'identity.Project'})"
                           target="_blank"
                 >
                     {{ projects[value] ? projects[value].label : value }}
@@ -34,7 +34,7 @@
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
                         <p-badge v-if="d"
-                                 :link="referenceRouter('identity.ServiceAccount', d)"
+                                 :link="referenceRouter(d, {resource_type: 'identity.ServiceAccount'})"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
@@ -58,7 +58,7 @@
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
                         <p-badge v-if="d"
-                                 :link="referenceRouter('inventory.Collector', d)"
+                                 :link="referenceRouter( d, {resource_type: 'inventory.Collector'})"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
@@ -93,13 +93,11 @@ import { DefinitionField } from '@/components/organisms/tables/definition-table/
 import { COLLECTION_STATE, LIFE_CYCLE, SERVER_TYPE } from '@/views/inventory/server/enums';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import { ProviderInfo, useStore } from '@/store/toolset';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import { timestampFormatter } from '@/lib/util';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
-import { SpaceConnector } from '@/lib/space-connector';
-import store from "@/store";
+import { store } from '@/store';
 
 export default {
     name: 'ServerBaseInfo',
@@ -122,7 +120,6 @@ export default {
         },
     },
     setup(props) {
-
         const state = reactive({
             baseInfoFields: [
                 { name: 'server_id', label: 'ID' },
