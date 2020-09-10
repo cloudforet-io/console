@@ -22,7 +22,7 @@
                     <slot name="extra" />
                 </div>
             </div>
-            <slot name="sub-title">
+            <slot v-if="subTitle" name="sub-title">
                 <p class="sub-title"> {{ subTitle }}</p>
             </slot>
         </slot>
@@ -58,13 +58,13 @@ export default {
         width: 100%;
 
         .top {
-            @apply flex items-center mx-6 mt-8;
+            @apply flex items-center;
+            margin: 2rem 1.5rem 1.5rem 1.5rem;
         }
 
         .title {
             @apply text-lg capitalize font-bold mr-2;
             line-height: 120%;
-            margin-bottom: 0.03125rem;
         }
 
         .sub-title {
