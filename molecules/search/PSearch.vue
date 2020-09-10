@@ -149,7 +149,7 @@ export default {
         }
     }
     .right {
-        @apply inline-flex;
+        @apply inline-flex items-center;
     }
     .delete-btn {
         @apply cursor-pointer inline-block flex-shrink-0;
