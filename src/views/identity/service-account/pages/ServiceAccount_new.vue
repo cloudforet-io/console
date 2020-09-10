@@ -36,7 +36,6 @@
                                       :type-options="typeOptionState"
                                       :style="{height: `${height}px`}"
                                       :field-handler="fieldHandler"
-                                      @init="fetchTableData"
                                       @fetch="fetchTableData"
                                       @select="onSelect"
                                       @export="exportServiceAccountData"
@@ -495,6 +494,7 @@ export default {
                     if (after !== before) {
                         replaceQuery('provider', after);
                         await getTableSchema();
+                        await listServiceAccountData()
                     }
                 }, { immediate: true });
             }
