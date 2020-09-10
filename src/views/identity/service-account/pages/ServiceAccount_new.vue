@@ -124,6 +124,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, ref, Ref, toRefs, watch,
 } from '@vue/composition-api';
 import { get } from 'lodash';
+import { render } from 'ejs';
 
 /* components */
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
@@ -238,11 +239,12 @@ export default {
         const tableState = reactive({
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            consoleLink: computed(() => {
-                const res = get(tableState.selectedItems[0], 'data.reference.link')
-                        || get(tableState.selectedItems[0], 'reference.external_link');
-                return res;
-            }),
+            // consoleLink: computed(() => {
+            //     const res = get(tableState.selectedItems[0], 'data.reference.link')
+            //             || get(tableState.selectedItems[0], 'reference.external_link');
+            //     return res;
+            // }),
+            consoleLink: '',
             dropdown: computed(() => makeTrItems([
                 ['delete', 'BTN.DELETE', { type: 'item', disabled: tableState.selectedItems.length !== 1 }],
                 [null, null, { type: 'divider' }],
@@ -265,8 +267,36 @@ export default {
             schema: [],
         });
 
+        const getLinkTemplate = (data) => {
+            let linkTemplate: string | undefined;
+            let link: string;
+            switch (selectedProvider.value) {
+            case 'aws':
+                linkTemplate = providerState.items[0].linkTemplate;
+                link = render(linkTemplate as string, data);
+                break;
+            // case 'google_cloud':
+            //     linkTemplate = providerState.items[1].linkTemplate;
+            //     tableState.consoleLink = render(linkTemplate, data);
+            //     break;
+            default:
+                link = '';
+            }
+            return link;
+        };
+
+        const getConsoleLink = () => {
+            if (tableState.selectedItems.length === 1) {
+                tableState.consoleLink = getLinkTemplate(tableState.selectedItems[0]);
+
+            } else {
+                tableState.consoleLink = '';
+            }
+        };
+
         const onSelect: TableEventListeners['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
+            getConsoleLink();
         };
 
         /** Handling API with SpaceConnector * */
@@ -494,7 +524,7 @@ export default {
                     if (after !== before) {
                         replaceQuery('provider', after);
                         await getTableSchema();
-                        await listServiceAccountData()
+                        await listServiceAccountData();
                     }
                 }, { immediate: true });
             }
