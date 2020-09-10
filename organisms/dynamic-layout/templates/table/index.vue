@@ -15,7 +15,7 @@
                         :select-index="selectIndex"
                         :this-page.sync="thisPage"
                         :page-size.sync="pageSize"
-                        :search-text="searchText"
+                        :search-text.sync="searchText"
                         :selectable="selectable"
                         :col-copy="colCopy"
                         @select="onSelect"
@@ -43,7 +43,7 @@
 /* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
@@ -139,13 +139,6 @@ export default {
 
             /** others */
             pageStart: computed(() => getPageStart(state.thisPage, state.pageSize)),
-            fetchOptionsParam: computed(() => ({
-                sortBy: state.sortBy,
-                sortDesc: state.sortDesc,
-                pageStart: state.pageStart,
-                pageLimit: state.pageSize,
-                searchText: state.searchText,
-            } as TableFetchOptions)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
                     return get(props.data, props.options.root_path, []);
@@ -153,6 +146,12 @@ export default {
                 return props.data;
             }),
         });
+
+        // watch(() => props.fetchOptions, (options) => {
+        //     forEach(options, (d, k) => {
+        //         state[k] = d;
+        //     });
+        // });
 
         const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
             const res = {};
@@ -197,17 +196,35 @@ export default {
 
             // emit
             const args: Parameters<TableEventListeners['fetch']> = [
-                state.fetchOptionsParam, changedFetchOptions,
+                {
+                    sortBy: state.sortBy,
+                    sortDesc: state.sortDesc,
+                    pageStart: state.pageStart,
+                    pageLimit: state.pageSize,
+                    searchText: state.searchText,
+                } as TableFetchOptions, changedFetchOptions,
             ];
             emit('fetch', ...args);
         };
 
         const onExport = () => {
-            emit('export', state.fetchOptionsParam, props.options.fields || []);
+            emit('export', {
+                sortBy: state.sortBy,
+                sortDesc: state.sortDesc,
+                pageStart: state.pageStart,
+                pageLimit: state.pageSize,
+                searchText: state.searchText,
+            } as TableFetchOptions, props.options.fields || []);
         };
 
 
-        emit('init', state.fetchOptionsParam);
+        emit('init', {
+            sortBy: state.sortBy,
+            sortDesc: state.sortDesc,
+            pageStart: state.pageStart,
+            pageLimit: state.pageSize,
+            searchText: state.searchText,
+        } as TableFetchOptions);
 
         return {
             ...toRefs(state),
