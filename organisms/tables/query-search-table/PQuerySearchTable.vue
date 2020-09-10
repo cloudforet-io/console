@@ -27,41 +27,38 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
-        <template #toolbox-top>
-            <slot name="toolbox-top" />
-        </template>
-        <template #toolbox-left>
-            <slot name="toolbox-left" />
-            <div class="left-toolbox-item hidden lg:block">
-                <p-query-search :key-items="keyItems"
-                                :value-handler-map="valueHandlerMap"
-                                @search="onSearch"
-                />
-            </div>
-        </template>
-        <template #toolbox-bottom>
-            <div class="flex flex-col flex-1">
-                <p-query-search class="block lg:hidden mt-4"
-                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
-                                :key-items="keyItems"
-                                :value-handler-map="valueHandlerMap"
-                                @search="onSearch"
-                />
-                <div class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
-                    <p-hr v-if="tags.length > 0" style="width: 100%;" />
-                    <p-query-search-tags ref="tagsRef"
-                                         style="margin-top: 0.5rem;"
-                                         :tags="tags"
-                                         :timezone="timezone"
-                                         @init="onQueryTagsInit"
-                                         @change="onQueryTagsChange"
+        <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-if="slot === 'toolbox-left'">
+                <slot name="toolbox-left" />
+                <div :key="i" class="left-toolbox-item hidden lg:block">
+                    <p-query-search :key-items="keyItems"
+                                    :value-handler-map="valueHandlerMap"
+                                    @search="onSearch"
                     />
                 </div>
-                <slot name="toolbox-bottom" />
-            </div>
-        </template>
-        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-            <slot v-if="!excludeSlotNames.includes(slot)" :name="slot" v-bind="scope" />
+            </template>
+            <template v-else-if="slot === 'toolbox-bottom'">
+                <div :key="i" class="flex flex-col flex-1">
+                    <p-query-search class="block lg:hidden mt-4"
+                                    :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
+                                    :key-items="keyItems"
+                                    :value-handler-map="valueHandlerMap"
+                                    @search="onSearch"
+                    />
+                    <div class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
+                        <p-hr v-if="tags.length > 0" style="width: 100%;" />
+                        <p-query-search-tags ref="tagsRef"
+                                             style="margin-top: 0.5rem;"
+                                             :tags="tags"
+                                             :timezone="timezone"
+                                             @init="onQueryTagsInit"
+                                             @change="onQueryTagsChange"
+                        />
+                    </div>
+                    <slot name="toolbox-bottom" />
+                </div>
+            </template>
+            <slot v-else :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>

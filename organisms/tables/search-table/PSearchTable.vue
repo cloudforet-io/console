@@ -27,28 +27,31 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
-        <template #toolbox-left>
-            <slot name="toolbox-left" />
-            <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                <p-search v-model="proxySearchText"
-                          @search="onSearch"
-                          @delete="onSearch()"
-                />
-            </div>
-        </template>
-        <template #toolbox-bottom>
-            <div class="flex-1 2xs:block lg:hidden mt-4"
-                 :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
-            >
-                <p-search v-model="proxySearchText"
-                          @search="onSearch"
-                          @delete="onSearch()"
-                />
-            </div>
-            <slot name="toolbox-bottom" />
-        </template>
-        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-            <slot v-if="!excludeSlotNames.includes(slot)" :name="slot" v-bind="scope" />
+        <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-if="slot === 'toolbox-left'">
+                <slot name="toolbox-left" />
+                <div :key="i"
+                     class="left-toolbox-item w-1/2 2xs:hidden lg:block"
+                >
+                    <p-search v-model="proxySearchText"
+                              @search="onSearch"
+                              @delete="onSearch()"
+                    />
+                </div>
+            </template>
+            <template v-else-if="slot === 'toolbox-bottom'">
+                <div :key="i"
+                     class="flex-1 2xs:block lg:hidden mt-4"
+                     :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
+                >
+                    <p-search v-model="proxySearchText"
+                              @search="onSearch"
+                              @delete="onSearch()"
+                    />
+                </div>
+                <slot name="toolbox-bottom" />
+            </template>
+            <slot v-else :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>
