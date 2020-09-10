@@ -97,8 +97,8 @@ export default {
                 if (res.typeOptions) res.typeOptions = { ...res.typeOptions, ...handlerRes.typeOptions };
                 if (res.extraData) res.extraData = { ...res.extraData, ...handlerRes.extraData };
 
-                if (['list', 'enum'].includes(res.type)) state.nextHandler = undefined;
                 if (res.type !== props.type) {
+                    if (['list', 'enum'].includes(res.type)) state.nextHandler = undefined;
                     loadComponent(res);
                 }
             }
