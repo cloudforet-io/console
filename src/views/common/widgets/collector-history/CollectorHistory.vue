@@ -30,11 +30,11 @@
 <script lang="ts">
 import Chart from 'chart.js';
 import moment from 'moment';
-import _ from 'lodash';
+import _, { orderBy, chain, range } from 'lodash';
 import numeral from 'numeral';
 
 import {
-    computed, reactive, toRefs, watch, UnwrapRef, ComponentRenderProxy, getCurrentInstance,
+    computed, reactive, toRefs, watch, UnwrapRef,
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
@@ -80,7 +80,6 @@ export default {
             success: primary2,
         };
 
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state: UnwrapRef<State> = reactive({
             chartRef: null,
             chart: null,
@@ -114,7 +113,7 @@ export default {
             if (state.data.length > 0) {
                 data = state.data;
             } else {
-                data = _.chain(_.range(0, DAY_COUNT))
+                data = chain(range(0, DAY_COUNT))
                     .map(i => ({
                         failure: 0,
                         success: 0,
@@ -245,13 +244,13 @@ export default {
             state.loading = true;
             state.data = [];
             try {
-                const now = moment().tz(getTimezone());
-                const start = moment().tz(getTimezone()).subtract(6, 'days');
-                const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
-                    start: start.format(),
-                    end: now.format(),
-                });
-                state.data = _.orderBy(res.results, ['date'], ['asc']);
+                const res = await SpaceConnector.client.statistics.topic.dailyJobSummary();
+                const orderedData = orderBy(res.results, ['date'], ['asc']);
+                state.data = orderedData.map(d => ({
+                    date: moment(d.date).tz(getTimezone()).subtract(1, 'day').format('YYYY-MM-DD'),
+                    success: d.success,
+                    failure: d.failure,
+                }));
             } catch (e) {
                 console.error(e);
             } finally {
