@@ -143,6 +143,7 @@ export default {
             color: inherit;
             font-size: 0.875rem;
             appearance: none;
+            height: calc(2rem - 2px);
             &::placeholder {
                 @apply text-gray-300;
             }
