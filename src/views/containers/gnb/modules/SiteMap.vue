@@ -190,6 +190,7 @@ export default {
                     -webkit-text-fill-color: transparent;
                     vertical-align: super;
                     cursor: default;
+                    margin-left: 0.25rem;
                 }
             }
         }
