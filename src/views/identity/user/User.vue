@@ -199,7 +199,7 @@ export default {
                 name: makeDistinctValueHandler('identity.User', 'name'),
                 group: makeDistinctValueHandler('identity.User', 'group'),
                 email: makeDistinctValueHandler('identity.User', 'email'),
-                mobile: makeDistinctValueHandler('identity.User', 'group'),
+                mobile: makeDistinctValueHandler('identity.User', 'mobile'),
             },
         };
         const state = reactive({
