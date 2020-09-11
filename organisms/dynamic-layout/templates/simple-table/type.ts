@@ -8,7 +8,7 @@ import { SimpleTableOptions } from '@/components/organisms/dynamic-layout/type/l
 export type SimpleTableFetchOptions = Pick<DynamicLayoutFetchOptions, never>
 
 export type SimpleTableTypeOptions = Pick<DynamicLayoutTypeOptions,
-    'loading'|'totalCount'|'timezone'|'colCopy'
+    'loading'|'timezone'|'colCopy'
     >
 export type SimpleTableDynamicLayoutProps = DynamicLayoutProps<
     SimpleTableOptions,

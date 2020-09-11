@@ -1,9 +1,6 @@
 <template>
     <div>
-        <p-panel-top v-if="name"
-                     :use-total-count="true"
-                     :total-count="totalCount"
-        >
+        <p-panel-top v-if="name">
             {{ name }}
         </p-panel-top>
         <p-data-table :items="rootData"
@@ -101,7 +98,6 @@ export default {
                 return props.data;
             }),
             loading: computed(() => (props.typeOptions?.loading || false)),
-            totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             /** others */
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
