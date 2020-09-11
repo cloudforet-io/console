@@ -382,11 +382,11 @@ export default {
             margin-left: 0.625rem;
             margin-right: 0.625rem;
         }
-        .help:hover {
-            @apply text-secondary;
+        .help {
             cursor: pointer;
             font-size: 0.75rem;
             margin-right: 0.125rem;
+            &:hover { @apply text-secondary; }
         }
     }
 }
