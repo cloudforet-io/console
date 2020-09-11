@@ -27,8 +27,7 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
-        <template #toolbox-left="scope">
-            <slot name="toolbox-left" v-bind="scope" />
+        <template v-if="!$scopedSlots['toolbox-left']" #toolbox-left="scope">
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
                 <p-search v-model="proxySearchText"
                           @search="onSearch"
@@ -36,7 +35,7 @@
                 />
             </div>
         </template>
-        <template #toolbox-bottom="scope">
+        <template v-if="!$scopedSlots['toolbox-bottom']" #toolbox-bottom="scope">
             <div class="flex-1 2xs:block lg:hidden mt-4"
                  :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
             >
@@ -45,10 +44,28 @@
                           @delete="onSearch()"
                 />
             </div>
-            <slot name="toolbox-bottom" v-bind="scope" />
         </template>
-        <template v-for="(slot) of tableSlots" v-slot:[slot]="scope">
-            <slot :name="slot" v-bind="scope" />
+
+        <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-if="slot === 'toolbox-left'">
+                <slot name="toolbox-left" v-bind="scope" />
+                <div :key="i" class="left-toolbox-item w-1/2 2xs:hidden lg:block">
+                    <p-search v-model="proxySearchText"
+                              @search="onSearch"
+                              @delete="onSearch()"
+                    />
+                </div>
+            </template>
+            <div v-else-if="slot === 'toolbox-bottom'" :key="i" class="flex-1 2xs:block lg:hidden mt-4"
+                 :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
+            >
+                <p-search v-model="proxySearchText"
+                          @search="onSearch"
+                          @delete="onSearch()"
+                />
+                <slot name="toolbox-bottom" v-bind="scope" />
+            </div>
+            <slot v-else :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>
@@ -140,13 +157,6 @@ export default {
             proxySearchText: makeOptionalProxy('searchText', vm),
             /** others */
             excludeSlotNames: ['toolbox-left', 'toolbox-bottom'],
-            tableSlots: computed(() => {
-                const res: string[] = [];
-                forEach(vm.$scopedSlots, (fn, name) => {
-                    if (!['toolbox-left', 'toolbox-bottom'].includes(name)) res.push(name);
-                });
-                return res;
-            }),
         });
 
         /** Event emitter */

@@ -22,16 +22,18 @@
                         @change="onChange"
                         @export="onExport"
         >
-            <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
-                <slot v-if="dynamicFieldSlots[slot]" :name="slot" v-bind="scope">
+            <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="data">
+                <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="i"
-                                     v-bind="dynamicFieldSlots[slot]"
-                                     :data="scope.value"
+                                     v-bind="item"
+                                     :data="data.value"
                                      :before-create="beforeCreateField"
                                      :handler="fieldHandler"
                     />
                 </slot>
-                <slot v-else :name="slot" v-bind="scope" />
+            </template>
+            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <slot v-if="!slot.startsWith('col-')" :name="slot" v-bind="scope" />
             </template>
         </p-search-table>
     </div>
