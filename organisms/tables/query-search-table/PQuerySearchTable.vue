@@ -60,7 +60,7 @@
                 <slot name="toolbox-bottom" />
             </div>
         </template>
-        <template v-for="name in slotNames" v-slot:[name]="data">
+        <template v-for="name in tableSlots" v-slot:[name]="data">
             <slot :name="name" v-bind="data" />
         </template>
     </p-toolbox-table>
@@ -181,9 +181,9 @@ export default {
             tags: makeOptionalProxy('queryTags', vm),
             tagsRef: null as null|QuerySearchTagsFunctions,
             /** others */
-            slotNames: computed(() => {
+            tableSlots: computed(() => {
                 const res: string[] = [];
-                forEach(slots, (func, name) => {
+                forEach(vm.$scopedSlots, (func, name) => {
                     if (!['toolbox-left', 'toolbox-bottom', 'toolbox-top'].includes(name)) res.push(name);
                 });
                 return res;
