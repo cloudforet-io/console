@@ -76,9 +76,7 @@ import { fluentApi } from '@/lib/fluent-api';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import {
-    collectModalProps, CollectModalPropsType,
-} from '@/views/common/collect-modal/CollectModal.toolset';
+import { CollectModalPropsType } from '@/views/common/collect-modal/CollectModal.toolset';
 import { showErrorMessage } from '@/lib/util';
 
 
@@ -90,27 +88,31 @@ export default {
         PSelectableList,
         PBadge,
     },
-    props: collectModalProps,
+    props: {
+        resources: {
+            type: Array,
+            default: () => [],
+            validator(resources) {
+                return resources.every(resource => resource && resource.collection_info && resource.collection_info.collectors);
+            },
+        },
+        // sync
+        visible: Boolean,
+        idKey: {
+            type: String,
+            default: '',
+        },
+        nameKey: {
+            type: String,
+            default: 'name',
+        },
+    },
     setup(props: CollectModalPropsType, context: SetupContext) {
-        // const vm: any = getCurrentInstance();
-        // const dataSource = computed(() => props.dataSource || [
-        //     {
-        //         name: vm.$t('COMMON.ID'),
-        //         key: props.idKey,
-        //     },
-        //     {
-        //         name: vm.$t('COMMON.NAME'),
-        //         key: 'name',
-        //     },
-        // ]);
-
-
         const state = reactive({
             loading: true,
             resourceLoading: true,
             proxyVisible: makeProxy('visible', props, context.emit),
             collectors: [],
-            // fields: computed(() => dataSource.value.map(d => ({ label: d.name, name: d.key }))),
             fields: makeTrItems(
                 [[props.idKey, 'COMMON.ID'], [props.nameKey, 'COMMON.NAME']],
                 context.parent,
@@ -157,9 +159,6 @@ export default {
 
             try {
                 const res = await collectorApi.list().setFilter({
-                    // key: 'plugin_info.options.supported_resource_type',
-                    // value: props.type,
-                    // operator: '',
                     key: 'collector_id',
                     value: state.mergedCollectorIds,
                     operator: '',
