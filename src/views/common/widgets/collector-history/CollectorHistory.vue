@@ -5,7 +5,7 @@
             <router-link to="/management/collector-history" class="see-more-text">
                 <span>see more</span>
                 <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                     color="transparent currentColor" class="ml-1"
+                     color="transparent currentColor"
                 />
             </router-link>
         </template>
@@ -41,13 +41,11 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetL
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { SBarChart } from '@/lib/chart/bar-chart';
 import { NSChart, tooltips } from '@/lib/chart/s-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
 import {
     coral, gray, primary2, black,
 } from '@/styles/colors';
@@ -129,15 +127,15 @@ export default {
             const datasets = [{
                 label: 'Success',
                 data: data.map(d => d.success) as number[],
-                barPercentage: 0.4,
-                categoryPercentage: 0.3,
+                barPercentage: 0.5,
+                categoryPercentage: 0.25,
                 backgroundColor: LEGEND_COLORS.success,
                 borderColor: LEGEND_COLORS.success,
             }, {
                 label: 'Failure',
                 data: data.map(d => d.failure) as number[],
-                barPercentage: 0.4,
-                categoryPercentage: 0.3,
+                barPercentage: 0.5,
+                categoryPercentage: 0.25,
                 backgroundColor: LEGEND_COLORS.failure,
                 borderColor: LEGEND_COLORS.failure,
             }];
@@ -292,7 +290,7 @@ export default {
     .legend-lap {
         width: 100%;
         text-align: center;
-        text-transform: uppercase;
+        text-transform: capitalize;
         padding-top: 0.5rem;
         .legend {
             font-size: 0.875rem;

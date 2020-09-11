@@ -456,6 +456,7 @@ export default {
                 -webkit-text-fill-color: transparent;
                 vertical-align: text-top;
                 cursor: default;
+                margin-left: 0.25rem;
             }
         }
     }

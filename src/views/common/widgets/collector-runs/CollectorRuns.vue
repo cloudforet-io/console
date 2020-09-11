@@ -24,11 +24,16 @@
                     </td>
                 </tr>
             </template>
-            <template #col-collector_info.name-format="{value}">
+            <template #col-collector_info-format="{value}">
                 <p-i class="working-icon" name="ic_working"
                      height="1rem" width="1rem"
                 />
-                <span class="text-sm font-bold ml-2">{{ value }}</span>
+                <p-lazy-img
+                    :img-url="providers.find(d => d.provider === value.provider).tags.icon"
+                    width="1rem" height="1rem"
+                    class="ml-3"
+                />
+                <span class="text-sm ml-2">{{ value.name }}</span>
             </template>
             <template #col-created_at-format="{value}">
                 {{ timeFormatter(value) }}
@@ -47,15 +52,18 @@ import {
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { JOB_STATE, JobModel } from '@/lib/fluent-api/inventory/job';
 import { getTimezone } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 
 export default {
     name: 'CollectorRuns',
     components: {
+        PLazyImg,
         PSkeleton,
         PWidgetLayout,
         PI,
@@ -67,10 +75,11 @@ export default {
             loading: false,
             items: [] as JobModel[],
             fields: [
-                { label: 'Collector', name: 'collector_info.name' },
+                { label: 'Collector', name: 'collector_info' },
                 { label: 'Completed / Total', name: 'progress' },
                 { label: 'Start Time', name: 'created_at' },
             ],
+            providers: [] as ProviderModel[],
         });
 
         const convertJobsToFieldItem = (jobs) => {
@@ -100,8 +109,22 @@ export default {
                 state.loading = false;
             }
         };
+        const getProviders = async () => {
+            try {
+                const query = new QueryHelper();
+                query.setOnly('provider', 'tags.icon');
+                const res = await SpaceConnector.client.identity.provider.list({ query: query.data });
+                state.providers = res.results;
+            } catch (e) {
+                console.error(e);
+            }
+        };
 
-        getData();
+        const init = async () => {
+            await getProviders();
+            await getData();
+        };
+        init();
 
         return {
             ...toRefs(state),
