@@ -1,6 +1,8 @@
 <template>
     <div>
-        <slot name="container" :height="containerHeight" />
+        <div :style="{height: `${containerHeight}px`}">
+            <slot name="container" :height="containerHeight" />
+        </div>
 
         <div class="dragger-container">
             <div class="line left"
@@ -93,7 +95,10 @@ export default {
         },
         onMouseup() {
             if ((this as any).dragging) {
-                (this as any).dragging = false;
+                // @ts-ignore
+                this.$emit('drag:end', this.containerHeight);
+                // @ts-ignore
+                this.dragging = false;
                 (this as any).pageY = null;
                 window.document.removeEventListener('mousemove', this.onMousemove);
                 window.document.removeEventListener('mouseup', this.onMouseup);
