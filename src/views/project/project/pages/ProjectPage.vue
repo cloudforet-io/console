@@ -48,7 +48,7 @@
                                             name="ic_plus_bold"
                                             @click="openProjectGroupForm(null)"
                         >
-                            {{ $t('IDENTITY.CRT_PROJ_GRP') }}
+                            {{ $t('IDENTITY.CRT_GRP') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn v-if="searchedProjectGroup"
                                              :menu="settingMenu"
@@ -819,6 +819,7 @@ export default {
             @apply mb-4;
             .project-group-name {
                 @apply text-gray-500 text-xs;
+                margin-bottom: 0.125rem;
             }
             #project-name {
                 @apply text-lg font-bold truncate pb-6 overflow-hidden;

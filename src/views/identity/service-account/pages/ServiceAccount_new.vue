@@ -43,7 +43,7 @@
                         <template #toolbox-left>
                             <p-icon-text-button style-type="primary-dark"
                                                 name="ic_plus_bold"
-                                                class="-ml-4 mr-4"
+                                                class="mr-4"
                                                 @click="clickAddServiceAccount"
                             >
                                 {{ $t('BTN.ADD') }}
@@ -572,7 +572,6 @@ export default {
         margin-top: 0.5625rem;
         margin-bottom: 1rem;
     }
-
     .provider-list {
         @apply justify-between text-sm;
         padding-left: 1rem;
@@ -595,5 +594,8 @@ export default {
         .provider-radio-btn {
             @apply float-right;
         }
+    }
+    >>> .p-dynamic-layout-table .p-search-table {
+        border-width: 1px;
     }
 </style>

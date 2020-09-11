@@ -7,6 +7,7 @@
                         :total-count="totalCount"
                         :selectable="false"
                         :excel-visible="false"
+                        :style="{height: '100%', border: 'none'}"
                         @init="onChange"
                         @change="onChange"
         />
