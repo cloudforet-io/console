@@ -327,14 +327,14 @@ export default {
         /** Change Detection of Main Table * */
         const fetchTableData: TableEventListeners['fetch'] = (options, changed) => {
             if (changed) {
-                if (changed.sortBy && changed.sortDesc) {
+                if (changed.sortBy !== undefined) {
                     fetchOptionState.sortBy = changed.sortBy;
-                    fetchOptionState.sortDesc = changed.sortDesc;
+                    fetchOptionState.sortDesc = !!changed.sortDesc;
                 }
-                if (changed.pageLimit) {
+                if (changed.pageLimit !== undefined) {
                     fetchOptionState.pageLimit = changed.pageLimit;
                 }
-                if (changed.pageStart) {
+                if (changed.pageStart !== undefined) {
                     fetchOptionState.pageStart = changed.pageStart;
                 }
                 if (changed.searchText !== undefined) {
