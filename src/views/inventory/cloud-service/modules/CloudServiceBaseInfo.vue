@@ -9,7 +9,7 @@
                 <p-status v-bind="COLLECTION_STATE[value]" />
             </template>
             <template #data-project_id="{data: value}">
-                <p-anchor :href="referenceRouter('identity.Project', value)"
+                <p-anchor :href="referenceRouter(value, {resource_type: 'identity.Project'})"
                           target="_blank"
                 >
                     {{ projects[value] || value }}
@@ -26,7 +26,7 @@
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
                         <p-badge v-if="d"
-                                 :link="referenceRouter('identity.ServiceAccount', d)"
+                                 :link="referenceRouter(d, {resource_type: 'identity.ServiceAccount'})"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >
@@ -50,7 +50,7 @@
                 <p-text-list :items="value" delimiter=" ">
                     <template #default="{value: d}">
                         <p-badge v-if="d"
-                                 :link="referenceRouter('inventory.Collector', d)"
+                                 :link="referenceRouter(d, {resource_type: 'inventory.Collector'})"
                                  target="_blank"
                                  outline background-color="violet.500"
                         >

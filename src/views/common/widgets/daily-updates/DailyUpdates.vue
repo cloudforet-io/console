@@ -257,15 +257,15 @@ export default {
     }
 
     @screen lg {
-        .daily-updates {
-            background-color: rgba(theme('colors.white'), 0.8);
-        &::v-deep {
-                .title {
-                    @apply text-sm leading-normal;
-                }
-                .top {
-                    @apply mt-6;
-                }
+        .daily-updates::v-deep {
+            &.p-pane-layout {
+                background-color: rgba(theme('colors.white'), 0.8);
+            }
+            .title {
+                @apply text-sm leading-normal;
+            }
+            .top {
+                @apply mt-6;
             }
         }
     }

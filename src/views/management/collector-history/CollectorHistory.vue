@@ -43,7 +43,7 @@
                             </div>
                         </div>
                     </template>
-                    <template #th-total_tasks-format="{ value }">
+                    <template #th-task-format="{ value }">
                         <span>{{ value }}</span>
                         <span class="th-additional-info-text"> (completed / total)</span>
                     </template>

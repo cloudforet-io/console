@@ -224,7 +224,7 @@ export default {
                     parentRoutes: ['management'],
                     menu: [
                         {
-                            type: 'item', label: 'Plugin', name: 'plugin', link: '/management/supervisor/plugins',
+                            type: 'item', label: 'Plugin (admin)', name: 'plugin', link: '/management/supervisor/plugins',
                         },
                         {
                             type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history', isNew: true,
@@ -456,6 +456,7 @@ export default {
                 -webkit-text-fill-color: transparent;
                 vertical-align: text-top;
                 cursor: default;
+                margin-left: 0.25rem;
             }
         }
     }

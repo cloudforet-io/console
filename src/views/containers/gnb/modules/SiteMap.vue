@@ -140,14 +140,16 @@ export default {
     }
 
     .sitemap {
-        @apply bg-white border border-gray-200 text-gray-900 text-sm;
+        @apply bg-white border border-gray-200 text-gray-900;
         position: absolute;
         top: 2.5rem;
         left: 0;
         width: 15rem;
+        font-size: 0.875rem;
         box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
         z-index: 10;
         padding: 1.5rem 0;
+        margin-left: 1.5rem;
         ul:first-child .menu {
             margin-top: 0;
         }
@@ -188,6 +190,7 @@ export default {
                     -webkit-text-fill-color: transparent;
                     vertical-align: super;
                     cursor: default;
+                    margin-left: 0.25rem;
                 }
             }
         }

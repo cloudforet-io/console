@@ -11,9 +11,9 @@
                       :selected-count="tableState.selectedItems.length"
                       @goBack="$router.go(-1)"
         />
-        <p-horizontal-layout>
+        <p-horizontal-layout :height="tableState.tableHeight" @drag:end="onTableHeightChange">
             <template #container="{ height }">
-                <div v-if="tableState.schema">
+                <template v-if="tableState.schema">
                     <p-dynamic-layout type="query-search-table"
                                       :options="tableState.schema.options"
                                       :data="tableState.items"
@@ -43,7 +43,7 @@
                             </p-dropdown-menu-btn>
                         </template>
                     </p-dynamic-layout>
-                </div>
+                </template>
             </template>
         </p-horizontal-layout>
         <p-tab v-if="tableState.selectedItems.length === 1"
@@ -155,8 +155,6 @@ import {
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
@@ -164,6 +162,8 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { Reference } from '@/lib/reference/type';
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { store } from '@/store';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -249,12 +249,6 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        // TODO: Change to new store
-        const {
-            project, provider, serviceAccount, secret, collector, user,
-        } = useStore();
-
-
         /** Breadcrumb */
         const routeState = reactive({
             route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' },
@@ -277,7 +271,7 @@ export default {
         const typeOptionState: QuerySearchTableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
-            timezone: computed(() => user.state.timezone || 'UTC'),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
             keyItems: [],
@@ -289,7 +283,6 @@ export default {
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            providers: computed(() => provider.state.providers || {}),
             consoleLink: computed(() => {
                 const res = get(tableState.selectedItems[0], 'data.reference.link')
                     || get(tableState.selectedItems[0], 'reference.external_link');
@@ -314,7 +307,14 @@ export default {
             { type: 'item', disabled: true })),
             collectModalVisible: false,
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
+            tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
         });
+
+        const onTableHeightChange = (height) => {
+            console.debug('height changed', height);
+            tableState.tableHeight = height;
+            cloudServiceStore.setItem('tableHeight', height, 'number');
+        };
 
         const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
@@ -322,144 +322,19 @@ export default {
 
         const getTableSchema = async () => {
             try {
-                // const schema = await SpaceConnector.client.addOns.pageSchema.get({
-                //     resource_type: 'inventory.CloudService',
-                //     schema: 'table',
-                //     options: {
-                //         provider: props.provider,
-                //         group: props.group,
-                //         name: props.name,
-                //     },
-                // });
-
-                // TODO: Change it to above code after new api is ready
-                const res = await SpaceConnector.client.inventory.cloudServiceType.list({
-                    query: {
-                        only: ['metadata.view.table.layout', 'metadata.view.search'],
-                        filter: [
-                            { key: 'provider', operator: 'eq', value: props.provider },
-                            { key: 'group', operator: 'eq', value: props.group },
-                            { key: 'name', operator: 'eq', value: props.name },
-                        ],
+                const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                    resource_type: 'inventory.CloudService',
+                    schema: 'table',
+                    options: {
+                        provider: props.provider,
+                        cloud_service_group: props.group,
+                        cloud_service_type: props.name,
                     },
                 });
-                const schema = res.results[0]?.metadata?.view?.table?.layout;
-                if (schema?.options && res.results[0]?.metadata?.view?.search) {
-                    schema.options.fields = [
-                        ...schema.options.fields,
-                        {
-                            key: 'collection_info.state',
-                            name: 'Collection State',
-                            type: 'enum',
-                            options: {
-                                ACTIVE: {
-                                    type: 'state',
-                                    options: {
-                                        icon: {
-                                            image: 'ic_state_active',
-                                        },
-                                    },
-                                },
-                                DUPLICATED: {
-                                    type: 'state',
-                                    options: {
-                                        icon: {
-                                            image: 'ic_state_duplicated',
-                                        },
-                                    },
-                                },
-                                DISCONNECTED: {
-                                    type: 'state',
-                                    options: {
-                                        icon: {
-                                            image: 'ic_state_disconnected',
-                                        },
-                                    },
-                                },
-                                MANUAL: {
-                                    type: 'state',
-                                    options: {
-                                        icon: {
-                                            image: 'ic_state_manual',
-                                        },
-                                    },
-                                },
-                            },
-                        }, {
-                            key: 'provider',
-                            name: 'Provider',
-                            type: 'enum',
-                            reference: {
-                                resource_type: 'identity.Provider',
-                                reference_key: 'provider',
-                            },
-                        }, {
-                            key: 'project_id',
-                            name: 'Project',
-                            reference: {
-                                resource_type: 'identity.Project',
-                                reference_key: 'project_id',
-                            },
-                        }, {
-                            key: 'updated_at.seconds',
-                            name: 'Updated',
-                            type: 'datetime',
-                            options: {
-                                source_type: 'timestamp',
-                                source_format: 'seconds',
-                            },
-                        },
-                    ];
-                    schema.options.search = {
-                        items: [
-                            ...res.results[0]?.metadata?.view?.search,
-                            {
-                                key: 'collection_info.state',
-                                name: 'Collection State',
-                                enums: {
-                                    ACTIVE: {
-                                        label: 'Active',
-                                    },
-                                    DISCONNECTED: {
-                                        label: 'Disconnected',
-                                    },
-                                    MANUAL: {
-                                        label: 'Manual',
-                                    },
-                                },
-                            }, {
-                                key: 'provider',
-                                name: 'Provider',
-                                enums: {
-                                    aws: {
-                                        label: 'AWS',
-                                    },
-                                    google_cloud: {
-                                        label: 'Google Cloud',
-                                    },
-                                    azure: {
-                                        label: 'Azure',
-                                    },
-                                    openstack: {
-                                        label: 'OpenStack',
-                                    },
-                                    vmware: {
-                                        label: 'VMWare',
-                                    },
-                                },
-                            }, {
-                                key: 'project_id',
-                                name: 'Project',
-                                reference: 'identity.Project',
-                            }, { key: 'updated_at', name: 'Updated', data_type: 'datetime' },
-                        ],
-                    };
-                }
-
 
                 // declare keyItems and valueHandlerMap with search schema
-                if (schema?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService');
+                if (schema?.options?.search[0]) {
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search[0], 'inventory.CloudService');
                     typeOptionState.keyItems = searchProps.keyItems;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
 
@@ -476,7 +351,6 @@ export default {
                 tableState.schema = schema;
             } catch (e) {
                 console.error(e);
-                await vm.$router.push({ name: 'error' });
             }
         };
 
@@ -572,29 +446,10 @@ export default {
 
         // TODO: make it as helper
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
-            const item: Partial<DynamicFieldProps> = {};
             if (field.extraData?.reference) {
-                switch (field.extraData.reference.resource_type) {
-                case 'identity.Project': {
-                    item.options = {
-                        ...field.options,
-                        link: referenceRouter(
-                            field.extraData.reference.resource_type,
-                            field.data,
-                        ),
-                    };
-                    item.data = project.state.projects[field.data];
-                    break;
-                }
-                case 'identity.Provider': {
-                    item.data = provider.state.providers[field.data]?.name || field.data;
-                    item.options = providerSchemaOptions;
-                    break;
-                }
-                default: break;
-                }
+                return referenceFieldFormatter(field.extraData.reference, field.data);
             }
-            return item;
+            return {};
         };
 
 
@@ -624,7 +479,7 @@ export default {
                 } catch (e) {
                     showErrorMessage('Fail to Change Project', e, context.root);
                 } finally {
-                    await project.getProject(true);
+                    await store.dispatch('resource/project/load');
                     await listCloudServiceData();
                 }
             } else {
@@ -683,25 +538,7 @@ export default {
 
         /** ******* Page Init ******* */
         const init = async () => {
-            // TODO: Remove it after change to new store
-            await Promise.all([
-                project.getProject(true),
-                provider.getProvider(true),
-                serviceAccount.getServiceAccounts(true),
-                secret.getSecrets(true),
-                collector.getCollectors(true),
-            ]);
-
-            // TODO: move this code to provider store
-            forEach(provider.state.providers, (d) => {
-                providerSchemaOptions[d.name] = {
-                    type: 'badge',
-                    options: {
-                        background_color: d.color,
-                    },
-                };
-            });
-
+            await store.dispatch('resource/loadAll');
             await getTableSchema();
         };
 
@@ -717,11 +554,13 @@ export default {
             tableState,
             fetchOptionState,
             typeOptionState,
+            onTableHeightChange,
             onSelect,
             exportCloudServiceData,
             listCloudServiceData,
             fetchTableData,
             fieldHandler,
+
 
             /* Change Project */
             changeProjectState,

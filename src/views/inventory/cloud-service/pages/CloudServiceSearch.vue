@@ -1,5 +1,3 @@
-<template />
-
 <script lang="ts">
 
 import {
@@ -9,30 +7,6 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage } from '@/lib/util';
 
 const DEFAULT_URL = '/inventory/cloud-service';
-// TODO: move this file to lib as common dynamic link formatter
-const getDynamicLink = async (resourceType: string, search: string, root) => {
-    try {
-        const result = await SpaceConnector.client.addOns.pageDiscovery.get({
-            // eslint-disable-next-line camelcase
-            resource_type: 'inventory.CloudService',
-            search,
-            // eslint-disable-next-line camelcase
-            search_key: 'reference.resource_id',
-        });
-        if (result.url === DEFAULT_URL) {
-            showErrorMessage('No Resource',
-                'There are no matching resources. It will redirect to Cloud Service main page.',
-                root);
-            return DEFAULT_URL;
-        }
-        return `${result.url}?filters=${search}`;
-    } catch (e) {
-        showErrorMessage('No Resource',
-            'There are no matching resources. It will redirect to Cloud Service main page.',
-            root);
-        return DEFAULT_URL;
-    }
-};
 
 export default {
     name: 'CloudServiceSearch',
@@ -41,11 +15,26 @@ export default {
             type: String,
             default: undefined,
         },
+        searchKey: {
+            type: String,
+            default: undefined,
+        },
     },
-    // TODO: move this code to route file
     beforeRouteEnter(to, from, next) {
         next(async (vm: ComponentRenderProxy) => {
-            const link = await getDynamicLink('inventory.CloudService', vm.$props.id, vm.$root);
+            let link = DEFAULT_URL;
+            try {
+                const result = await SpaceConnector.client.addOns.pageDiscovery.get({
+                    resource_type: 'inventory.CloudService',
+                    search: vm.$props.id,
+                    search_key: vm.$props.searchKey,
+                });
+                if (result.url === DEFAULT_URL) {
+                    showErrorMessage('No Resource', 'There are no matching resources. It will redirect to Cloud Service main page.', vm.$root);
+                } else link = `${result.url}?filters=${vm.$props.searchKey}:${vm.$props.id}`;
+            } catch (e) {
+                showErrorMessage('No Resource', 'There are no matching resources. It will redirect to Cloud Service main page.', vm.$root);
+            }
             vm.$router.push(link);
         });
     },

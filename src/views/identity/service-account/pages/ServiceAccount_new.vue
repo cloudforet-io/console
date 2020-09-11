@@ -43,7 +43,7 @@
                         <template #toolbox-left>
                             <p-icon-text-button style-type="primary-dark"
                                                 name="ic_plus_bold"
-                                                class="-ml-4 mr-4"
+                                                class="mr-4"
                                                 @click="clickAddServiceAccount"
                             >
                                 {{ $t('BTN.ADD') }}
@@ -154,8 +154,6 @@ import { replaceQuery } from '@/lib/router-query-string';
 import { makeTrItems } from '@/lib/view-helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 /* types */
@@ -329,14 +327,14 @@ export default {
         /** Change Detection of Main Table * */
         const fetchTableData: TableEventListeners['fetch'] = (options, changed) => {
             if (changed) {
-                if (changed.sortBy && changed.sortDesc) {
+                if (changed.sortBy !== undefined) {
                     fetchOptionState.sortBy = changed.sortBy;
-                    fetchOptionState.sortDesc = changed.sortDesc;
+                    fetchOptionState.sortDesc = !!changed.sortDesc;
                 }
-                if (changed.pageLimit) {
+                if (changed.pageLimit !== undefined) {
                     fetchOptionState.pageLimit = changed.pageLimit;
                 }
-                if (changed.pageStart) {
+                if (changed.pageStart !== undefined) {
                     fetchOptionState.pageStart = changed.pageStart;
                 }
                 if (changed.searchText !== undefined) {
@@ -574,7 +572,6 @@ export default {
         margin-top: 0.5625rem;
         margin-bottom: 1rem;
     }
-
     .provider-list {
         @apply justify-between text-sm;
         padding-left: 1rem;
@@ -597,5 +594,8 @@ export default {
         .provider-radio-btn {
             @apply float-right;
         }
+    }
+    >>> .p-dynamic-layout-table .p-search-table {
+        border-width: 1px;
     }
 </style>

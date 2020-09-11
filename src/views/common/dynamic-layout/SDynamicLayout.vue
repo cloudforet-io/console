@@ -85,18 +85,6 @@ export default defineComponent({
 
         const getComponent = async () => {
             try {
-                // reference to link fields pre-process
-
-                // for (const field of state.fields) {
-                //     if (field.reference) {
-                //         // eslint-disable-next-line no-await-in-loop
-                //         field.options.link = await referenceRouter(
-                //             field.reference.reference_type,
-                //             field.reference.reference_key,
-                //         );
-                //     }
-                // }
-
                 await state.loader();
                 state.component = async () => state.loader();
             } catch (e) {

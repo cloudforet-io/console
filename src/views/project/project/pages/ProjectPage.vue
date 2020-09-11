@@ -16,7 +16,9 @@
                     <header>
                         <span class="title">Project Groups</span>
                         <p-button class="action-btn" @click="openProjectGroupForm(null)">
-                            Create
+                            <p-i name="ic_plus" width="1rem" height="1rem"
+                                 color="transparent inherit"
+                            /> Create
                         </p-button>
                     </header>
                     <project-group-tree ref="treeRef"
@@ -28,38 +30,44 @@
             </div>
         </template>
         <template #default>
-            <div>
-                <div class="parents-info">
-                    <span v-if="projectGroupNavigation.length > 0" class="group-name">
-                        <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
-                    </span>
-                </div>
-                <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
-                                  : 'All Project'"
-                              use-total-count
-                              :total-count="apiHandler.totalCount"
-                >
-                    <template #extra-area>
-                        <div class="btns">
-                            <p-dropdown-menu-btn v-if="searchedProjectGroup"
-                                                 :menu="settingMenu"
-                                                 button-only
-                                                 button-icon="ic_setting"
-                                                 button-style-type="primary-dark"
-                                                 @edit:select="openProjectGroupEditForm"
-                                                 @delete:select="openProjectGroupDeleteForm"
-                            />
-                            <p-icon-text-button v-if="searchedProjectGroup"
-                                                style-type="primary-dark"
-                                                name="ic_plus_bold"
-                                                @click="openProjectForm"
-                            >
-                                {{ $t('INVENTORY.CRT_PROJ') }}
-                            </p-icon-text-button>
-                        </div>
-                    </template>
-                </p-page-title>
+            <div class="parents-info">
+                <span v-if="projectGroupNavigation.length > 0" class="group-name">
+                    <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
+                </span>
             </div>
+            <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
+                              : 'All Project'"
+                          use-total-count
+                          :total-count="apiHandler.totalCount"
+            >
+                <template #extra-area>
+                    <div class="btns">
+                        <p-icon-text-button v-if="!searchedProjectGroup"
+                                            style-type="primary-dark"
+                                            outline
+                                            name="ic_plus_bold"
+                                            @click="openProjectGroupForm(null)"
+                        >
+                            {{ $t('IDENTITY.CRT_GRP') }}
+                        </p-icon-text-button>
+                        <p-dropdown-menu-btn v-if="searchedProjectGroup"
+                                             :menu="settingMenu"
+                                             button-only
+                                             button-icon="ic_setting"
+                                             button-style-type="primary-dark"
+                                             @edit:select="openProjectGroupEditForm"
+                                             @delete:select="openProjectGroupDeleteForm"
+                        />
+                        <p-icon-text-button v-if="searchedProjectGroup"
+                                            style-type="primary-dark"
+                                            name="ic_plus_bold"
+                                            @click="openProjectForm"
+                        >
+                            {{ $t('INVENTORY.CRT_PROJ') }}
+                        </p-icon-text-button>
+                    </div>
+                </template>
+            </p-page-title>
             <div class="pb-8">
                 <p-toolbox-grid-layout
                     v-bind="apiHandler.gridTS.state"
@@ -728,7 +736,7 @@ export default {
             cursor: help;
         }
         .action-btn {
-            @apply ml-auto justify-end;
+            @apply ml-auto justify-end text-primary-dark;
             height: auto;
             font-size: 0.75rem;
             line-height: 1.2;
@@ -811,6 +819,7 @@ export default {
             @apply mb-4;
             .project-group-name {
                 @apply text-gray-500 text-xs;
+                margin-bottom: 0.125rem;
             }
             #project-name {
                 @apply text-lg font-bold truncate pb-6 overflow-hidden;
