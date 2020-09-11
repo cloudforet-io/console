@@ -150,9 +150,9 @@ export default {
         });
 
         const resources = ({
-            server: api => api.addGroupKey('data.compute.region_name', 'region_name')
+            server: api => api.addGroupKey('region_code', 'region_name')
                 .setFilter({
-                    key: 'data.compute.region_name',
+                    key: 'region_code',
                     value: [null, ''],
                     operator: FILTER_OPERATOR.notIn,
                 }, {
