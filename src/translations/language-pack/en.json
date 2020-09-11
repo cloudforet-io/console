@@ -286,6 +286,7 @@
 		},
 		"CHECK_HASH": "Please, Check Hash Tag format.",
 		"CRT_FAIL_ARG": "Fail to create {0}. Please, check your action.",
+		"CRT_GRP": "Create Group",
 		"CRT_PROJ": "Create Project",
 		"CRT_PROJ_GRP": "Create Project Group",
 		"CRT_SUCC_ARG": "New {0} is successfully created.",
