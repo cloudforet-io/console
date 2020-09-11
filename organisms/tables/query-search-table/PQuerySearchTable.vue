@@ -27,11 +27,7 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
-        <template #toolbox-top>
-            <slot name="toolbox-top" />
-        </template>
-        <template #toolbox-left>
-            <slot name="toolbox-left" />
+        <template v-if="!$scopedSlots['toolbox-left']" #toolbox-left>
             <div class="left-toolbox-item hidden lg:block">
                 <p-query-search :key-items="keyItems"
                                 :value-handler-map="valueHandlerMap"
@@ -39,8 +35,37 @@
                 />
             </div>
         </template>
-        <template #toolbox-bottom>
+        <template v-if="!$scopedSlots['toolbox-bottom']" #toolbox-bottom>
             <div class="flex flex-col flex-1">
+                <p-query-search class="block lg:hidden mt-4"
+                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
+                                :key-items="keyItems"
+                                :value-handler-map="valueHandlerMap"
+                                @search="onSearch"
+                />
+                <div class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
+                    <p-hr v-if="tags.length > 0" style="width: 100%;" />
+                    <p-query-search-tags ref="tagsRef"
+                                         style="margin-top: 0.5rem;"
+                                         :tags="tags"
+                                         :timezone="timezone"
+                                         @init="onQueryTagsInit"
+                                         @change="onQueryTagsChange"
+                    />
+                </div>
+            </div>
+        </template>
+        <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-if="slot === 'toolbox-left'" >
+                <slot name="toolbox-left" />
+                <div :key="i" class="left-toolbox-item hidden lg:block">
+                    <p-query-search :key-items="keyItems"
+                                    :value-handler-map="valueHandlerMap"
+                                    @search="onSearch"
+                    />
+                </div>
+            </template>
+            <div v-else-if="slot === 'toolbox-bottom'" :key="i" class="flex flex-col flex-1">
                 <p-query-search class="block lg:hidden mt-4"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
                                 :key-items="keyItems"
@@ -59,9 +84,7 @@
                 </div>
                 <slot name="toolbox-bottom" />
             </div>
-        </template>
-        <template v-for="name in tableSlots" v-slot:[name]="data">
-            <slot :name="name" v-bind="data" />
+            <slot v-else :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>
@@ -180,14 +203,6 @@ export default {
             /** search */
             tags: makeOptionalProxy('queryTags', vm),
             tagsRef: null as null|QuerySearchTagsFunctions,
-            /** others */
-            tableSlots: computed(() => {
-                const res: string[] = [];
-                forEach(vm.$scopedSlots, (func, name) => {
-                    if (!['toolbox-left', 'toolbox-bottom', 'toolbox-top'].includes(name)) res.push(name);
-                });
-                return res;
-            }),
         });
 
         // check if each option value is 'undefined' to escape auto type casting
