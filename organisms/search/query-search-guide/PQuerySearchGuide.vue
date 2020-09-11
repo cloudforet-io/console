@@ -28,8 +28,8 @@
                     >
                 </div>
                 <div class="second">
-                    <span class="number">2.</span> Add and Delete <b>filters</b> to narrow your results.<br>
-                    <span class="wrapped-text">OR Search for the same filters, And Search for different filters.</span>
+                    <span class="number">2.</span> Add and Delete <b>filters</b> to narrow your results.
+                    <p class="wrapped-text">OR Search for the same filters, And Search for different filters.</p>
                     <img src="@/assets/help guide/help_search_filter.gif" width="643px" height="114px"
                          class="help-search-img"
                     >
@@ -132,16 +132,20 @@ export default {
         }
     }
     .number {
-        @apply font-bold text-sm;
+        @apply font-bold text-sm text-gray-500;
         margin-right: 0.6875rem;
     }
     .help-search-img {
+        @apply border border-gray-200;
         margin-top: 0.625rem;
         margin-bottom: 2.5rem;
         margin-left: 1.625rem;
+        padding: 2px;
+        border-radius: 2px;
     }
     .wrapped-text {
         margin-left: 1.625rem;
+        line-height: 1.5;
     }
     .search-operator {
         @apply border border-gray-200;

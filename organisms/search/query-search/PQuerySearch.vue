@@ -385,6 +385,8 @@ export default {
         .help:hover {
             @apply text-secondary;
             cursor: pointer;
+            font-size: 0.75rem;
+            margin-right: 0.125rem;
         }
     }
 }

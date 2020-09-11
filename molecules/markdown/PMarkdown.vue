@@ -84,6 +84,8 @@ export default {
     }
     a {
         @apply text-blue-600;
+        font-size: 0.75rem;
+        line-height: 150%;
         &:hover { @apply underline; }
     }
     code {
@@ -115,11 +117,11 @@ export default {
         margin-inline-end: 0;
         padding-inline-start: 2rem;
     }
-    h1, h3, h4 {
+    h3, h4 {
         @apply font-bold;
     }
     h1 {
-        @apply mb-4 mt-8;
+        @apply mt-8 font-normal;
         font-size: 1.5rem;
         line-height: 120%;
     }
@@ -139,7 +141,8 @@ export default {
         line-height: 120%;
     }
     p, ul > li, ol > li {
-        @apply text-sm leading-tight ;
+        font-size: 0.75rem;
+        line-height: 150%;
     }
 }
 
