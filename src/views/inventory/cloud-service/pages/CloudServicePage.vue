@@ -11,9 +11,9 @@
                       :selected-count="tableState.selectedItems.length"
                       @goBack="$router.go(-1)"
         />
-        <p-horizontal-layout>
+        <p-horizontal-layout :height="tableState.tableHeight" @drag:end="onTableHeightChange">
             <template #container="{ height }">
-                <div v-if="tableState.schema">
+                <template v-if="tableState.schema">
                     <p-dynamic-layout type="query-search-table"
                                       :options="tableState.schema.options"
                                       :data="tableState.items"
@@ -43,7 +43,7 @@
                             </p-dropdown-menu-btn>
                         </template>
                     </p-dynamic-layout>
-                </div>
+                </template>
             </template>
         </p-horizontal-layout>
         <p-tab v-if="tableState.selectedItems.length === 1"
@@ -307,7 +307,14 @@ export default {
             { type: 'item', disabled: true })),
             collectModalVisible: false,
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
+            tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
         });
+
+        const onTableHeightChange = (height) => {
+            console.debug('height changed', height);
+            tableState.tableHeight = height;
+            cloudServiceStore.setItem('tableHeight', height, 'number');
+        };
 
         const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
@@ -547,11 +554,13 @@ export default {
             tableState,
             fetchOptionState,
             typeOptionState,
+            onTableHeightChange,
             onSelect,
             exportCloudServiceData,
             listCloudServiceData,
             fetchTableData,
             fieldHandler,
+
 
             /* Change Project */
             changeProjectState,
