@@ -1,14 +1,14 @@
 <template>
     <div class="p-toolbox-table">
         <div class="toolbox">
-            <div v-if="$slots['toolbox-top']" class="toolbox-block toolbox-top">
+            <div v-if="$scopedSlots['toolbox-top']" class="toolbox-block toolbox-top">
                 <slot name="toolbox-top" />
             </div>
             <div class="toolbox-block toolbox-middle">
-                <div class="left" :style="{width:$slots['toolbox-center'] ? 'auto' : '100%'}">
+                <div class="left" :style="{width:$scopedSlots['toolbox-center'] ? 'auto' : '100%'}">
                     <slot name="toolbox-left" />
                 </div>
-                <div v-if="$slots['toolbox-center']" class="center">
+                <div v-if="$scopedSlots['toolbox-center']" class="center">
                     <slot name="toolbox-center" />
                 </div>
                 <div class="right">
@@ -49,7 +49,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="$slots['toolbox-bottom']" class="toolbox-block toolbox-bottom">
+            <div v-if="$scopedSlots['toolbox-bottom']" class="toolbox-block toolbox-bottom">
                 <slot name="toolbox-bottom" />
             </div>
         </div>
@@ -78,7 +78,7 @@
             @changeSort="changeSort"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="scope" />
+                <slot v-if="!slot.startsWith('toolbox')" :name="slot" v-bind="scope" />
             </template>
         </p-data-table>
     </div>

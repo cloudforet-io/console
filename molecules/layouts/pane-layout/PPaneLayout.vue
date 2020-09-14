@@ -10,7 +10,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-pane-layout {
     @apply bg-white border border-gray-200;
     border-radius: 2px;
