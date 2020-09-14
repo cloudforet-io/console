@@ -37,8 +37,9 @@
                                 />
                             </div>
                             <div class="daily-update-contents">
-                                <div class="group">
-                                    {{ item.group }} <span>({{ item.count || 0 }})</span>
+                                <div class="top">
+                                    <span class="group">{{ item.group }}</span>
+                                    <span class="count">({{ item.count || 0 }})</span>
                                     <span class="type">{{ item.type }}</span>
                                 </div>
                                 <p v-if="item.created_count && item.deleted_count" class="state">
@@ -282,12 +283,19 @@ export default {
         .daily-update-contents {
             @apply overflow-hidden text-sm whitespace-no-wrap;
             line-height: 150%;
+            .top {
+                width: 100%;
+                display: flex;
+            }
             .group {
-                @apply pr-1 font-bold;
-                .type {
-                    @apply truncate text-xs font-light text-gray-500 pl-2;
-                    max-width: 80px;
-                }
+                @apply font-bold pr-1;
+            }
+            .count {
+                @apply font-bold;
+            }
+            .type {
+                @apply truncate text-xs font-light text-gray-500 pl-2;
+                max-width: 80px;
             }
             .state {
                 @apply text-xs;
