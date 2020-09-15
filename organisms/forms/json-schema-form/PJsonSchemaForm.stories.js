@@ -2,12 +2,10 @@
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
 import {
-    CustomKeywords,
-    CustomValidator,
-    JsonSchemaFormToolSet,
+    CustomValidator, JsonSchemaFormToolSet,
 } from '@/components/organisms/forms/json-schema-form/toolset';
 import { JsonSchemaObjectType } from '@/components/util/type';
 
@@ -18,74 +16,83 @@ export default {
 const defaultSchema = {
     type: 'object',
     properties: {
-        domain: {
-            title: 'Email Domain',
+        required_string: {
+            title: 'string (required, minLength=4)',
             type: 'string',
-            default: 'one@spaceone.dev',
-            examples: ['type your email'],
+            default: 'default string',
+            minLength: 4,
         },
-        'not-required': {
-            title: 'not-required & placeholder',
+        not_required_string: {
+            title: 'string (not-required, placeholder)',
             type: 'string',
-            examples: ['type your email'],
+            examples: ['type string'],
         },
-        number_field: {
-            title: 'I am number type',
+        //
+        required_number: {
+            title: 'number (required, minimum=1, maximum=3)',
             type: 'number',
-            examples: ['type number'],
-        },
-        integer_field: {
-            title: 'I am integer type',
-            type: 'integer',
+            minimum: 1,
+            maximum: 3,
             default: 1,
         },
-        boolean_field: {
-            title: 'I am boolean type',
-            type: 'boolean',
+        required_integer: {
+            title: 'integer (required, minimum=0, maximum=5)',
+            type: 'integer',
+            minimum: 0,
+            maximum: 5,
+            default: 1,
         },
-        enum_field: {
-            title: 'I am enum Type',
-            type: 'string',
-            enum: ['hi', 'abcd', 'etc'],
-        },
-        enum_number_field: {
-            title: 'I am enum Type(number)',
-            type: 'number',
-            enum: [1, 2, 3, 4, 3.14],
-        },
-        array: {
-            title: 'I am Array Type',
-            type: 'array',
-        },
-        number_array: {
-            title: 'I am Array(Number) Type',
-            type: 'array',
-            examples: ['type number'],
-            items: {
-                type: 'number',
-            },
-        },
+        // required_array: {
+        //     title: 'array (required)',
+        //     type: 'array',
+        // },
+        //
+        // boolean_field: {
+        //     title: 'I am boolean type',
+        //     type: 'boolean',
+        // },
+        // required_enum_string: {
+        //     title: 'string (required, enum)',
+        //     type: 'string',
+        //     enum: ['choice A', 'choice B', 'choice C'],
+        // },
+        // required_enum_number: {
+        //     title: 'string (required, enum)',
+        //     type: 'number',
+        //     enum: [1, 2, 3, 4, 5],
+        // },
+        // number_array: {
+        //     title: 'I am Array(Number) Type',
+        //     type: 'array',
+        //     examples: ['type number'],
+        //     items: {
+        //         type: 'number',
+        //     },
+        // },
     },
-    required: ['domain', 'not-required', 'number_field', 'integer_field'],
+    required: ['required_string', 'required_number', 'required_integer'],
 };
 
 export const defaultCase = () => ({
     components: { PJsonSchemaForm, PButton },
     template: `
-    <div class="w-64">
-        <PJsonSchemaForm
-          v-bind="jscTS.state"
-          :item.sync="jscTS.syncState.item" 
+    <div style="width: 50rem">
+        <p-json-schema-form 
+                :model.sync="model" 
+                :schema="schema"
+                :is-valid.sync="isValid"
         />
-        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
-        <pre>{{jscTS.syncState.item}}</pre>
+        <pre>{{ model }}</pre>
     </div>
   `,
     setup(props, context) {
-        const jscTS = new JsonSchemaFormToolSet();
-        jscTS.setProperty(defaultSchema);
+        const state = reactive({
+            schema: defaultSchema,
+            model: {},
+            isValid: false,
+        });
         return {
-            jscTS,
+            ...toRefs(state),
         };
     },
 });
@@ -94,11 +101,11 @@ export const customSchemaForm = () => ({
     components: { PJsonSchemaForm, PButton },
     template: `
     <div class="w-64">
-        <PJsonSchemaForm
+        <p-json-schema-form
           v-bind="jscTS.state"
           :item.sync="jscTS.syncState.item" 
         />
-        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
+        <p-button style-type="primary" @click="jscTS.formState.validator()"> Validate!</p-button>
         <pre>{{jscTS.syncState.item}}</pre>
     </div>
   `,
@@ -119,7 +126,7 @@ export const customValidatorForm = () => ({
     components: { PJsonSchemaForm, PButton },
     template: `
     <div class="w-64">
-        <PJsonSchemaForm
+        <p-json-schema-form
           v-bind="jscTS.state"
           :item.sync="jscTS.syncState.item" 
         />

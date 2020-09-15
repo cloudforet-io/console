@@ -36,7 +36,7 @@
             </div>
         </template>
         <template v-if="!$scopedSlots['toolbox-bottom']" #toolbox-bottom>
-            <div class="flex flex-col flex-1">
+            <div class="flex flex-col flex-1 block lg:hidden">
                 <p-query-search class="block lg:hidden mt-4"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
                                 :key-items="keyItems"

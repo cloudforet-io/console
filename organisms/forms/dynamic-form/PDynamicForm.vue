@@ -1,111 +1,211 @@
 <template>
-    <vue-form-generator
-        :class="{'not-validation-mode': !validationMode}"
-        :schema="schema"
-        :model="model"
-        :options="options"
-        @validated="onValidated"
-    />
+    <div>
+        <p-field-group :label="formData.label"
+                       :required="formData.required"
+                       :invalid-text="invalidText"
+                       :invalid="typeof invalid === 'boolean' ? invalid : false"
+        >
+            <slot>
+                <div class="form-container">
+                    <p-text-input v-if="formType === 'input'"
+                                  v-model="proxyValue"
+                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
+                                  :type="inputType"
+                                  :placeholder="formData.placeholder"
+                                  class="form"
+                                  @input="onChange"
+                    />
+                    <template v-else-if="formType === 'radio'">
+                        <span v-for="(bool) in [true, false]" :key="bool">
+                            <p-radio v-model="proxyValue"
+                                     :value="bool"
+                                     @change="onChange"
+                            />
+                            {{ bool }}
+                        </span>
+                    </template>
+                    <p-dropdown-menu-btn v-else-if="formType === 'dropdown'"
+                                         :menu="setDropdownMenu(formData.menu)"
+                                         block
+                                         class="form"
+                                         @select="onClickMenu"
+                    >
+                        {{ value || formData.placeholder }}
+                    </p-dropdown-menu-btn>
+                    <p-tags-input v-else-if="formType === 'tags'"
+                                  :tags.sync="proxyValue"
+                                  :placeholder="formData.placeholder"
+                                  :focus="false"
+                                  class="form"
+                                  @change="onChange"
+                    />
+                </div>
+            </slot>
+        </p-field-group>
+    </div>
 </template>
 
 <script lang="ts">
+import { mapValues } from 'lodash';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
+import {
+    formValidation, requiredValidation,
+} from '@/components/util/composition-helpers';
+
+
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+
+const PTextInput = () => import('@/components/atoms/inputs/PTextInput.vue');
+const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue');
+const PTagsInput = () => import('@/components/organisms/forms/tags-input/PTagsInput.vue');
+
+export const map = {
+    key: 'key',
+    label: 'name',
+    required: 'is_required',
+    placeholder: 'example',
+    type: 'type',
+    default: 'default',
+    menu: 'enums',
+};
+
+const setFormState = (props) => {
+    const formData = computed(() => mapValues(map, val => props.form[val]));
+    const formType = computed(() => {
+        if (formData.value.menu) return 'dropdown';
+        switch (formData.value.type) {
+        case 'bool': return 'radio';
+        case 'list': return 'tags';
+        default: return 'input';
+        }
+    });
+    const inputType = computed(() => {
+        switch (formData.value.type) {
+        case 'str': return 'text';
+        default: return 'number';
+        }
+    });
+    const setDropdownMenu = menu => menu.map(item => ({ type: 'item', label: item, name: item }));
+
+    return reactive({
+        formData,
+        formType,
+        inputType,
+        setDropdownMenu,
+    });
+};
+
+const setValueState = (props, emit, formState) => {
+    const proxyValue = computed({
+        get: () => props.value,
+        set: (val) => {
+            emit('input', val); // for v-model
+        },
+    });
+
+    const setDefaultValue = () => {
+        if (formState.formData.default !== undefined) {
+            proxyValue.value = formState.formData.default;
+        }
+    };
+
+    setDefaultValue();
+
+    return reactive({
+        proxyValue,
+    });
+};
+
+const setChangeActions = (valueState, emit) => ({
+    onChange: (e) => { emit('change', e); },
+    onClickMenu(name) {
+        valueState.proxyValue = name;
+        emit('change', name);
+    },
+});
 
 /**
- * Used library: vue-form-generator
- * https://github.com/vue-generators/vue-form-generator
+ *
+ * @param forms {Array<Object>}
+ * @param values {Array<Object>}
+ * @returns {{fieldValidation: *, invalidMsg: *, invalidState: *}}
  */
+export const setValidation = (forms, values) => {
+    const formKey = map.key;
+    const vd = {};
+
+    forms.forEach((form) => {
+        vd[form[formKey]] = form[map.required] ? [requiredValidation()] : [];
+    });
+
+    const {
+        allValidation,
+        fieldValidation,
+        invalidMsg,
+        invalidState,
+        isAllValid,
+    } = formValidation(values, vd);
+
+    return {
+        formKey,
+        allValidation,
+        fieldValidation,
+        invalidMsg,
+        invalidState,
+        isAllValid,
+    };
+};
 
 export default {
     name: 'PDynamicForm',
+    components: {
+        PFieldGroup,
+        PTextInput,
+        PRadio,
+        PDropdownMenuBtn,
+        PTagsInput,
+    },
+    model: {
+        prop: 'value',
+        event: 'input',
+    },
     props: {
-        schema: {
-            type: Object,
-            required: true,
+        form: Object,
+        value: {
+            default: undefined,
         },
-        model: {
-            type: Object,
-            required: true,
+        invalidText: {
+            type: String,
+            default: '',
         },
-        options: {
-            type: Object,
-            required: true,
-        },
-        isValid: {
+        invalid: {
             type: Boolean,
-            required: true,
-        },
-        validationMode: {
-            type: Boolean,
-            default: true,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
-        const onValidated = (isValid) => {
-            emit('update:isValid', isValid);
-        };
-
+        const formState = setFormState(props);
+        const valueState = setValueState(props, emit, formState);
+        const changeActions = setChangeActions(valueState, emit);
         return {
-            onValidated,
+            map,
+            ...toRefs(formState),
+            ...toRefs(valueState),
+            ...changeActions,
         };
     },
 };
 </script>
 
-<style lang="postcss">
-.vue-form-generator {
+<style lang="postcss" scoped>
+.form-container {
+    display: flex;
     width: 100%;
-    &.not-validation-mode {
-        .form-group.error {
-            .form-control {
-                @apply border-gray-300;
-            }
-            .help-block.errors {
-                display: none;
-            }
-        }
-    }
-    .form-group {
-        label {
-            @apply text-gray-900;
-            display: inline-block;
-            font-size: .875rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        &.error {
-            .form-control {
-                background-color: transparent;
-            }
-        }
-        .form-control {
-            @apply text-gray-900 border border-gray-300;
-            width: 100%;
-            max-width: 19rem;
-            appearance: none;
-            font-size: 0.875rem;
-            line-height: 1.3rem;
-            border-radius: 0.125rem;
-            box-shadow: none;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            &:focus {
-                @apply border-blue-500;
-            }
-            &::placeholder {
-                @apply text-gray-300;
-            }
-        }
-        .help-block.errors {
-            @apply text-red-500;
-            margin-top: 0.25rem;
-            span {
-                font-size: 0.75rem;
-                line-height: 0.875rem;
-                font-weight: 400;
-                background-image: none;
-                padding-left: 0;
-            }
-        }
+    .form {
+        width: 100%;
     }
 }
 </style>
