@@ -7,42 +7,39 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
+        :disabled="!isValid"
         @confirm="confirm"
     >
         <template #body>
-            <p-json-schema-form v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
-            <!--            <PFieldGroup-->
-            <!--                label="Tags"-->
-            <!--            >-->
-            <!--                <p-dict-input-group-->
-            <!--                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"-->
-            <!--                    v-bind="tagsTS.state"-->
-            <!--                    :items.sync="tagsTS.syncState.items"-->
-            <!--                    v-on="tagsTS.events"-->
-            <!--                />-->
-            <!--            </PFieldGroup>-->
+            <p-field-group label="name"
+                           :invalid-text="projectGroupNameInvalidText"
+                           :invalid="projectGroupName && !isValid"
+                           :required="true"
+            >
+                <template #default="{invalid}">
+                    <p-text-input v-model="projectGroupName" class="block w-full" :class="{'is-invalid': invalid}"
+                                  placeholder="Project Name"
+                    />
+                </template>
+            </p-field-group>
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import {
-    makeProxy,
-} from '@/lib/compostion-util';
-import {
-    CustomKeywords,
-    JsonSchemaFormToolSet,
-    CustomValidator,
-} from '@/components/organisms/forms/json-schema-form/toolset';
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
-import { JsonSchemaObjectType } from '@/lib/type';
-import { fluentApi } from '@/lib/fluent-api';
-import { showErrorMessage } from '@/lib/util';
-import { watch } from '@vue/composition-api';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
+
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { makeProxy } from '@/lib/compostion-util';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 interface Props {
     visible: boolean;
@@ -53,8 +50,9 @@ interface Props {
 export default {
     name: 'ProjectGroupCreateFormModal',
     components: {
+        PTextInput,
+        PFieldGroup,
         PButtonModal,
-        PJsonSchemaForm,
     },
     directives: {
         focus: {
@@ -81,87 +79,62 @@ export default {
             default: undefined,
         },
     },
-    setup(props: Props, context) {
-        // const tagsTS = new DictIGToolSet({
-        //     showValidation: true,
-        // });
-
-        let fixFormTS = new JsonSchemaFormToolSet();
-
-        const checkNameUnique = (...args: any[]) => fluentApi.identity().projectGroup().list()
-            .setFilter({ key: 'name', operator: '=', value: args[1] })
-            .setCountOnly()
-            .execute()
-            .then(resp => resp.data.total_count === 0);
-
-        const checkNameLength = (...args) => {
-            const prom = new Promise<boolean>((resolve, reject) => {
-                const data = args[1] || '';
-                if (data.length <= 40) {
-                    resolve(true);
+    setup(props: Props, { emit, root }) {
+        const state = reactive({
+            proxyVisible: makeProxy('visible', props, emit),
+            projectGroupNames: [] as string[],
+            projectGroupName: undefined as undefined | string,
+            projectGroupNameInvalidText: computed(() => {
+                let invalidText = '';
+                if (typeof state.projectGroupName === 'string') {
+                    if (state.projectGroupName.length === 0) {
+                        invalidText = 'Should have required property \'name\'';
+                    } else if (state.projectGroupName.length > 40) {
+                        invalidText = 'Should not be longer than 40 characters';
+                    } else if (state.projectGroupNames.includes(state.projectGroupName)) {
+                        invalidText = 'Name is duplicated';
+                    }
                 }
-                resolve(false);
+                return invalidText;
+            }),
+            isValid: computed(() => {
+                if (state.projectGroupName) {
+                    return !(state.projectGroupName.length === 0 || state.projectGroupName.length > 40 || state.projectGroupNames.includes(state.projectGroupName));
+                }
+                return false;
+            }),
+        });
+
+        const getProjectGroupNames = async () => {
+            const query = new QueryHelper().setOnly('name');
+            const res = await SpaceConnector.client.identity.projectGroup.list({
+                query: query.data,
             });
-            return prom;
+            state.projectGroupNames = res.results.map(d => d.name);
         };
-
-        const validation: CustomKeywords = {
-            uniqueName: new CustomValidator(checkNameUnique, 'The name already exists.'),
-            longName: new CustomValidator(checkNameLength, 'Should not be longer than 40 characters'),
-        };
-
 
         const getProjectGroup = async () => {
-            const res = await fluentApi.identity().projectGroup().get()
-                .setId(props.id as string)
-                .setOnly('project_group_id', 'name')
-                .execute();
-            fixFormTS.syncState.item.project_group_id = res.data.project_group_id;
-            fixFormTS.syncState.item.name = res.data.name;
+            const query = new QueryHelper().setOnly('project_group_id', 'name');
+            const res = await SpaceConnector.client.identity.projectGroup.get({
+                project_group_id: props.id,
+                query: query.data,
+            });
+            state.projectGroupName = res.name;
         };
-
-        const resetForm = () => {
-            fixFormTS.syncState.item.project_group_id = '';
-            fixFormTS.syncState.item.name = '';
-        };
-
-        const initForm = async () => {
-            fixFormTS = new JsonSchemaFormToolSet();
-            const sch = new JsonSchemaObjectType(undefined, undefined, true);
-            sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true, longName: true });
-            fixFormTS.setProperty(sch, ['name'], validation);
-            if (props.id) await getProjectGroup();
-            else {
-                resetForm();
-            }
-        };
-
-        watch(() => props.id, async (id) => {
-            await initForm();
-        }, { immediate: true });
 
         const createProjectGroup = async (item) => {
             try {
                 const params = item;
                 if (props.parent) params.parent_project_group_id = props.parent.id;
-                const res = await fluentApi.identity().projectGroup().create()
-                    .setParameter(params)
-                    .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Create Project Group',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                const res = await SpaceConnector.client.identity.projectGroup.create(params);
+                showSuccessMessage('Success', 'Create Project Group', root);
 
-                context.emit('create', {
-                    id: res.data.project_group_id,
+                emit('create', {
+                    id: res.project_group_id,
                     name: item.name,
                 } as ProjectGroup, props);
             } catch (e) {
-                showErrorMessage('Fail to Create Project Group', e, context.root);
+                showErrorMessage('Fail to Create Project Group', e, root);
             }
         };
 
@@ -169,46 +142,41 @@ export default {
             try {
                 const params = item;
                 if (props.id) params.project_group_id = props.id;
-                await fluentApi.identity().projectGroup().update().setParameter(params)
-                    .execute();
+                await SpaceConnector.client.identity.projectGroup.update(params);
+                showSuccessMessage('Success', 'Update Project Group', root);
 
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Update Project Group',
-                    duration: 2000,
-                    speed: 1000,
-                });
-
-                context.emit('update', {
+                emit('update', {
                     id: props.id,
                     name: item.name,
                 } as ProjectGroup, props);
             } catch (e) {
-                showErrorMessage('Fail to Update Project Group', e, context.root);
+                showErrorMessage('Fail to Update Project Group', e, root);
             }
         };
-        const projectGroupFormConfirm = async (item) => {
+        const confirm = async () => {
+            if (!state.isValid) return;
+            const item = {
+                name: state.projectGroupName,
+            };
             if (!props.updateMode) {
                 await createProjectGroup(item);
             } else {
                 await updateProjectGroup(item);
             }
         };
-        const confirm = async () => {
-            const fixFormValid = await fixFormTS.formState.validator();
-            if (fixFormValid) {
-                const item = {
-                    name: fixFormTS.syncState.item.name,
-                };
-                await projectGroupFormConfirm(item);
-            }
+
+        watch(() => props.id, async (after) => {
+            if (after) await getProjectGroup();
+            else state.projectGroupName = undefined; // init form
+        }, { immediate: true });
+
+        const init = async () => {
+            await getProjectGroupNames();
         };
+        init();
 
         return {
-            proxyVisible: makeProxy('visible', props, context.emit),
-            fixFormTS,
+            ...toRefs(state),
             confirm,
         };
     },

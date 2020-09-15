@@ -34,19 +34,25 @@
             <div class="title">
                 Base Information
             </div>
-            <p-dynamic-form :schema="accountBasicSchema" :model="accountBasicModel" :options="inputOptions"
-                            :is-valid.sync="isAccountBasicValid" :validation-mode="validationMode"
-            />
-            <p-dynamic-form :schema="accountCustomSchema" :model="accountCustomModel" :options="inputOptions"
-                            :is-valid.sync="isAccountCustomValid" :validation-mode="validationMode"
-            />
+            <p-field-group label="name"
+                           :invalid-text="accountNameInvalidText"
+                           :invalid="accountName && !isAccountNameValid"
+                           :required="true"
+            >
+                <template #default="{invalid}">
+                    <p-text-input v-model="accountName" class="block" :class="{'is-invalid': invalid}"
+                                  placeholder="Cloud Account Name"
+                    />
+                </template>
+            </p-field-group>
+            <p-json-schema-form :model.sync="accountModel" :schema="accountSchema" :is-valid.sync="isAccountModelValid" />
             <div class="tag-title">
                 {{ $t('PANEL.TAG') }}
             </div>
             <div class="tag-help-msg">
                 <i18n path="ACTION.DICT.ADD_TAG_BY">
                     <template #name>
-                        <span v-if="accountBasicModel.name" class="font-bold">[{{ accountBasicModel.name }}]</span>
+                        <span v-if="accountName" class="font-bold">[{{ accountName }}]</span>
                         <span v-else> Account</span>
                     </template>
                 </i18n>
@@ -76,9 +82,17 @@
                 Credentials
             </div>
             <p-select-btn-group :buttons="credentialInputOptionButton" :selected.sync="selectedCredentialInputOption" class="pt-20 float-right" />
-            <p-dynamic-form :schema="credentialBasicSchema" :model="credentialBasicModel" :options="inputOptions"
-                            :is-valid.sync="isCredentialBasicValid" :validation-mode="validationMode"
-            />
+            <p-field-group label="name"
+                           :invalid-text="credentialNameInvalidText"
+                           :invalid="credentialName && !isCredentialNameValid"
+                           :required="true"
+            >
+                <template #default="{invalid}">
+                    <p-text-input v-model="credentialName" class="block" :class="{'is-invalid': invalid}"
+                                  placeholder="Credentials Name"
+                    />
+                </template>
+            </p-field-group>
 
             <p-field-group label="Secret Type" required>
                 <div class="flex">
@@ -89,10 +103,7 @@
                 </div>
             </p-field-group>
             <div v-if="selectedCredentialInputOption === 'Input Form'" class="custom-schema-box">
-                <p-dynamic-form :schema="credentialCustomSchema" :model="credentialCustomModel" :options="inputOptions"
-                                :is-valid.sync="isCredentialCustomValid"
-                                :validation-mode="validationMode"
-                />
+                <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid" />
             </div>
             <div v-if="selectedCredentialInputOption === 'Json Code'">
                 <p-monaco-editor :style="'height: 272px;'" :code.sync="jsonForCredential" />
@@ -101,10 +112,11 @@
 
         <s-project-tree-panel ref="projectRef" class="tree-panel"
                               :resource-name="$t('WORD.SERVICE_ACCOUNT')"
-                              :target-name="accountBasicModel.name"
+                              :target-name="accountName"
         />
         <div class="button-lap">
             <p-button class="text-button" style-type="primary-dark" size="lg"
+                      :disabled="!isValid"
                       @click="onClickSave"
             >
                 {{ $t('BTN.SAVE') }}
@@ -119,8 +131,7 @@
 </template>
 
 <script lang="ts">
-import { get, map, random } from 'lodash';
-import VueFormGenerator from 'vue-form-generator/dist/vfg';
+import { get } from 'lodash';
 
 import {
     ComponentRenderProxy, getCurrentInstance,
@@ -131,7 +142,9 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import PDynamicForm from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
+import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
+import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -140,15 +153,12 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-
 import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { fluentApi } from '@/lib/fluent-api';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 
 const credentialInputOptionButton = ['Input Form', 'Json Code'];
@@ -156,10 +166,11 @@ const credentialInputOptionButton = ['Input Form', 'Json Code'];
 export default {
     name: 'AddServiceAccount',
     components: {
+        PTextInput,
+        PJsonSchemaForm,
         PMonacoEditor,
         PSelectBtnGroup,
         PMarkdown,
-        PDynamicForm,
         PCollapsiblePanel,
         PPageTitle,
         PPageNavigation,
@@ -190,122 +201,72 @@ export default {
             serviceAccountNames: [] as string[],
             credentialNames: [] as string[],
             secretTypes: computed(() => get(state.providerObj, 'capability.supported_schema', [])),
+            // TODO: tagsTS should be deprecated
+            tagsTS: new DictIGToolSet({ showValidation: true }),
+        });
+        const formState = reactive({
+            /* static input */
+            accountName: undefined as undefined | string,
+            accountNameInvalidText: computed(() => {
+                let invalidText = '';
+                if (typeof formState.accountName === 'string') {
+                    if (formState.accountName.length < 2) {
+                        invalidText = 'should NOT be shorter than 2 characters';
+                    } else if (state.serviceAccountNames.includes(formState.accountName)) {
+                        invalidText = 'Name is duplicated';
+                    }
+                }
+                return invalidText;
+            }),
+            isAccountNameValid: computed(() => {
+                if (formState.accountName) {
+                    return !(formState.accountName.length < 2 || state.serviceAccountNames.includes(formState.accountName));
+                }
+                return false;
+            }),
             //
-            isAccountBasicValid: false,
-            accountBasicModel: { name: '' },
-            accountBasicSchema: {
-                fields: [
-                    {
-                        id: 'accountName',
-                        type: 'input',
-                        inputType: 'text',
-                        label: vm.$t('COMMON.NAME'),
-                        model: 'name',
-                        placeholder: 'Cloud Account Name',
-                        min: 2,
-                        required: true,
-                        validator: [VueFormGenerator.validators.string.locale({
-                            fieldIsRequired: 'should NOT be shorter than 2 characters',
-                            textTooSmall: 'should NOT be shorter than 2 characters',
-                        }), (value) => {
-                            if (state.serviceAccountNames.includes(value)) {
-                                return ['Name is duplicated'];
-                            }
-                            return [];
-                        }],
-                    },
-                ],
-            },
-            isAccountCustomValid: false,
-            accountCustomModel: {},
-            accountCustomSchema: {},
+            credentialName: undefined as undefined | string,
+            credentialNameInvalidText: computed(() => {
+                let invalidText = '';
+                if (typeof formState.credentialName === 'string') {
+                    if (formState.credentialName.length < 2) {
+                        invalidText = 'should NOT be shorter than 2 characters';
+                    } else if (state.credentialNames.includes(formState.credentialName)) {
+                        invalidText = 'Name is duplicated';
+                    }
+                }
+                return invalidText;
+            }),
+            isCredentialNameValid: computed(() => {
+                if (formState.credentialName) {
+                    return !(formState.credentialName.length < 2 || state.credentialNames.includes(formState.credentialName));
+                }
+                return false;
+            }),
+            /* schema input */
+            accountModel: {},
+            accountSchema: {},
+            isAccountModelValid: false,
+            //
+            credentialModel: {},
+            credentialSchema: {},
+            isCredentialModelValid: false,
             //
             selectedCredentialInputOption: 'Input Form',
             jsonForCredential: '',
-            isCredentialBasicValid: false,
-            credentialBasicModel: { name: '' },
-            credentialBasicSchema: {
-                fields: [
-                    {
-                        id: 'credentialName',
-                        type: 'input',
-                        inputType: 'text',
-                        label: vm.$t('COMMON.NAME'),
-                        placeholder: 'Credentials Name',
-                        model: 'name',
-                        min: 2,
-                        required: true,
-                        validator: [VueFormGenerator.validators.string.locale({
-                            fieldIsRequired: 'should NOT be shorter than 2 characters',
-                            textTooSmall: 'should NOT be shorter than 2 characters',
-                        }), (value) => {
-                            if (state.credentialNames.includes(value)) {
-                                return ['Name is duplicated'];
-                            }
-                            return [];
-                        }],
-                    },
-                ],
-            },
-            isCredentialCustomValid: false,
-            credentialCustomSchema: {},
-            credentialCustomModel: {},
             //
-            inputOptions: {
-                validateAfterLoad: true,
-                validateAfterChanged: true,
-                validateAsync: true,
-            },
-            validationMode: false,
             isValid: computed(() => {
-                if (state.selectedCredentialInputOption === 'Json Code') {
-                    return state.isAccountBasicValid && state.isAccountCustomValid && state.isCredentialBasicValid;
+                if (formState.selectedCredentialInputOption === 'Json Code') {
+                    return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid;
                 }
-                return state.isAccountBasicValid && state.isAccountCustomValid && state.isCredentialBasicValid && state.isCredentialCustomValid;
+                return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid && formState.isCredentialModelValid;
             }),
-            // TODO: tagsTS should be deprecated
-            tagsTS: new DictIGToolSet({ showValidation: true }),
         });
         const routeState = reactive({
             route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
                 { name: 'Add Account', path: `/identity/service-account/add/${props.provider}` }],
         });
         const projectRef = ref<any>(null);
-
-        const convertMetaSchemaToCustomSchema = (schema) => {
-            const customSchema = { fields: [] as object[] };
-            const customModel = {};
-            map(schema.properties, (v, k) => {
-                const field: any = {};
-                field.id = random(10000);
-                field.model = k;
-                field.label = v.title;
-                if (v.minLength) field.min = v.minLength;
-                if (schema.required.includes(k)) field.required = true;
-                if (v.examples) field.placeholder = v.examples;
-                if (v.type === 'number' || v.type === 'integer') {
-                    field.type = 'input';
-                    field.inputType = 'number';
-                    if (schema.required.includes(k)) field.validator = ['integer', 'required'];
-                } else if (v.type === 'enum') {
-                    field.type = 'select';
-                    field.values = v.enum;
-                    if (schema.required.includes(k)) field.validator = ['select', 'required'];
-                } else {
-                    field.type = 'input';
-                    field.inputType = 'text';
-                    if (schema.required.includes(k)) {
-                        field.validator = VueFormGenerator.validators.string.locale({
-                            fieldIsRequired: `should NOT be shorter than ${v.minLength} characters`,
-                            textTooSmall: `should NOT be shorter than ${v.minLength} characters`,
-                        });
-                    }
-                }
-                customSchema.fields.push(field);
-                customModel[k] = null; // todo:
-            });
-            return [customSchema, customModel];
-        };
 
         const getProvider = async () => {
             const res = await SpaceConnector.client.identity.provider.get({
@@ -327,16 +288,14 @@ export default {
             state.serviceAccountNames = res.results.map(v => v.name);
         };
         const getServiceAccountSchema = async () => {
-            const schema = state.providerObj.template.service_account.schema;
-            [state.accountCustomSchema, state.accountCustomModel] = convertMetaSchemaToCustomSchema(schema);
+            formState.accountSchema = state.providerObj.template.service_account.schema;
         };
         const getCredentialSchema = async (selectedSecretType) => {
             const res = await SpaceConnector.client.repository.schema.get({
                 name: selectedSecretType,
                 only: ['schema'],
             });
-            const schema = res.schema;
-            [state.credentialCustomSchema, state.credentialCustomModel] = convertMetaSchemaToCustomSchema(schema);
+            formState.credentialSchema = res.schema;
         };
 
         const deleteServiceAccount = async () => {
@@ -348,9 +307,9 @@ export default {
         };
         const createServiceAccount = async () => {
             const item: any = {
-                name: state.accountBasicModel.name,
+                name: formState.accountName,
                 provider: props.provider,
-                data: state.accountCustomModel,
+                data: formState.accountModel,
                 tags: state.tagsTS.vdState.newDict,
             };
 
@@ -370,8 +329,8 @@ export default {
         };
         const createSecretWithForm = async () => {
             await SpaceConnector.client.secret.secret.create({
-                name: state.credentialBasicModel.name,
-                data: state.credentialCustomModel,
+                name: formState.credentialName,
+                data: formState.credentialModel,
                 schema: state.selectedSecretType,
                 // eslint-disable-next-line camelcase
                 secret_type: 'CREDENTIALS',
@@ -382,7 +341,7 @@ export default {
         const createSecretWithJson = async (jsonData) => {
             await SpaceConnector.client.secret.secret.create({
                 data: jsonData,
-                name: state.credentialBasicModel.name,
+                name: formState.credentialModel.name,
                 schema: state.selectedSecretType,
                 // eslint-disable-next-line camelcase
                 secret_type: 'CREDENTIALS',
@@ -392,9 +351,9 @@ export default {
         };
         const createSecret = async () => {
             try {
-                if (state.selectedCredentialInputOption === 'Json Code') {
+                if (formState.selectedCredentialInputOption === 'Json Code') {
                     try {
-                        const json = JSON.parse(state.jsonForCredential);
+                        const json = JSON.parse(formState.jsonForCredential);
                         await createSecretWithJson(json);
                     } catch (e) {
                         console.error(e);
@@ -403,7 +362,7 @@ export default {
                         return;
                     }
                 }
-                if (state.selectedCredentialInputOption === 'Input Form') await createSecretWithForm();
+                if (formState.selectedCredentialInputOption === 'Input Form') await createSecretWithForm();
                 vm.$router.back();
                 showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
             } catch (e) {
@@ -413,17 +372,16 @@ export default {
         };
 
         const onClickSave = async () => {
-            state.validationMode = true;
-            if (!state.isValid) {
+            if (!formState.isValid) {
                 showErrorMessage('Fail to Add Account', 'Please check all input forms.', context.root);
                 return;
             }
             if (state.tagsTS.allValidation() && !projectRef.value.error) {
                 await createServiceAccount();
                 if (state.serviceAccountId) {
-                    if (state.credentialCustomModel.private_key) {
+                    if (formState.credentialModel.private_key) {
                         // eslint-disable-next-line camelcase
-                        state.credentialCustomModel.private_key = state.credentialCustomModel.private_key.replace(/\\n/g, '\n');
+                        formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
                     }
                     await createSecret();
                 }
@@ -453,6 +411,7 @@ export default {
         return {
             credentialInputOptionButton,
             ...toRefs(state),
+            ...toRefs(formState),
             ...toRefs(routeState),
             projectRef,
             onClickSave,
@@ -496,13 +455,11 @@ export default {
             line-height: 150%;
             margin-bottom: 1.5rem;
         }
-        .vue-form-generator {
-            .form-group {
-                .form-control {
-                    max-width: 100%;
-                    @screen lg {
-                        max-width: 50%;
-                    }
+        .p-field-group {
+            .p-text-input {
+                width: 100%;
+                @screen lg {
+                    max-width: 50%;
                 }
             }
         }
