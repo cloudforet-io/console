@@ -107,7 +107,6 @@ export default {
                     errorContainerUiSchema.children.push(newErrorUiSchema);
                 }
             }
-            console.log(errorContainerUiSchema);
             return errorContainerUiSchema;
         };
         const generateUiSchema = (schema: JsonSchema) => {

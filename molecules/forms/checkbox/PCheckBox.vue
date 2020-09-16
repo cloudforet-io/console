@@ -18,11 +18,14 @@
 </template>
 
 <script lang="ts">
-import _ from 'lodash';
-import PI from '@/components/atoms/icons/PI.vue';
+import { indexOf, pull } from 'lodash';
+
 import {
-    computed, reactive, ref, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
+
+import PI from '@/components/atoms/icons/PI.vue';
+import { CheckboxProps } from '@/components/molecules/forms/checkbox/type';
 
 export default {
     name: 'PCheckBox',
@@ -32,27 +35,33 @@ export default {
         event: 'change',
     },
     props: {
-        value: [Boolean, String, Number, Object],
-        selected: [Boolean, Array],
+        value: {
+            type: [Boolean, String, Number, Object],
+            default: undefined,
+        },
+        selected: {
+            type: [Boolean, Array],
+            default: () => ([]),
+        },
         hovered: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, context) {
+    setup(props: CheckboxProps, context) {
         const state = reactive({
             mouseover: false,
             isSelected: computed(() => {
                 if (typeof props.selected === 'boolean') {
                     return props.selected;
                 }
-                return _.indexOf(props.selected, props.value) !== -1;
+                return indexOf(props.selected, props.value) !== -1;
             }),
             checkBoxBind: computed(() => {
                 let name = 'ic_checkbox';
                 if (state.isSelected) {
                     name = 'ic_checkbox--checked';
-                } else if (props.hovered || props.mouseover) {
+                } else if (props.hovered) {
                     name = 'ic_checkbox--hover';
                 }
                 return name;
@@ -64,7 +73,7 @@ export default {
             } else {
                 const newResult = [...props.selected];
                 if (state.isSelected) {
-                    _.pull(newResult, props.value);
+                    pull(newResult, props.value);
                 } else { newResult.push(props.value); }
                 context.emit('change', newResult, state.isSelected);
             }
