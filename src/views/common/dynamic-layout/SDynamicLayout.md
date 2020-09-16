@@ -4,7 +4,7 @@
 - [ ] query-search-table: table view (api base, query search)
 - [ ] simple-table: table without search and pagination (raw data)
 - [ ] list : list(<dynamic_layout>)
-- [ ] raw  ( readonly monaco editor)
+- [ ] raw  ()
 
 # Layout Format
 ## default

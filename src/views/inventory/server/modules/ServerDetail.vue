@@ -49,7 +49,7 @@ import {
     DynamicLayoutEventListeners, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
-import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import PRawData from '@/components/organisms/text-editor/raw-data/PRawData_new.vue';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { SearchSchema } from '@/lib/component-utils/query-search/type';

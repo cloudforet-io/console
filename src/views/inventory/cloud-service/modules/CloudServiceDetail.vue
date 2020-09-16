@@ -43,7 +43,7 @@ import CloudServiceBaseInfo from '@/views/inventory/cloud-service/modules/CloudS
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import PRawData from '@/components/organisms/text-editor/raw-data/PRawData_new.vue';
 
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
