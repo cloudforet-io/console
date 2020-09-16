@@ -96,10 +96,9 @@
                         </p-field-group>
 
                         <p-field-group :label="$t('WORD.TAGS')">
-                            <p-dict-input-group class="tag-input"
-                                                :use-full-col="true"
-                                                :edit-mode="true"
-                                                :dict.sync="formState.tags"
+                            <p-dict-input-group
+                                :items.sync="formState.tagItems"
+                                class="tag-input"
                             />
                         </p-field-group>
                     </div>
@@ -110,11 +109,12 @@
 </template>
 
 <script>
+/* eslint-disable camelcase */
 import { reactive, computed } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup_deprecated.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -163,7 +163,6 @@ export default {
         item: {
             type: Object,
             default: () => ({
-                // eslint-disable-next-line camelcase
                 user_id: '',
                 password1: '',
                 password2: '',
@@ -185,7 +184,6 @@ export default {
         const state = contentModalSetup(props, context);
         const { domain } = useStore();
         const formState = reactive({
-            // eslint-disable-next-line camelcase
             user_id: '',
             password1: '',
             password2: '',
@@ -196,8 +194,8 @@ export default {
             language: 'en',
             timezone: 'UTC',
             tags: {},
+            tagItems: Object.entries(props.item.tags).map(([k, v]) => ({ key: k, value: v })),
             isLastCheck: false,
-            // eslint-disable-next-line camelcase
             is_local_auth: computed(() => domain.state.isLocalType),
             ...props.item,
         });
@@ -223,7 +221,6 @@ export default {
 
         const pluginAuthIDValidation = () => new Validation(async (value) => {
             let result = false;
-            // eslint-disable-next-line camelcase
             await context.parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: domain.state.domainId }).then((res) => {
                 if (res.data.total_count >= 1) {
                     result = true;
@@ -240,10 +237,8 @@ export default {
         }, "ID doesn't exists!");
 
         if (!formState.is_local_auth) { // plugin auth type
-            // eslint-disable-next-line camelcase
             addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation(context.parent)];
         } else {
-            // eslint-disable-next-line camelcase
             addUserValidations.user_id = [...userIdVds];
             addUserValidations.password1 = [requiredValidation(), noEmptySpaceValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
             addUserValidations.password2 = [requiredValidation(), pwdCheckValidation];
@@ -278,11 +273,14 @@ export default {
                         }
                     }
                 }
-                ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
+                ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone'].forEach((key) => {
                     if (formState[key]) {
                         data[key] = formState[key];
                     }
                 });
+                const tagDict = {};
+                formState.tagItems.forEach((d) => { tagDict[d.key] = d.value; });
+                data.tags = tagDict;
                 context.emit('confirm', data);
             }
         };
@@ -301,7 +299,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .user-form-modal {
     .user-input-lap {
         .top-lap {
@@ -338,6 +336,9 @@ export default {
         .tag-input {
             @apply bg-primary4;
             padding-top: 0.5rem;
+            .p-dict-input .input-box {
+                width: auto;
+            }
         }
         .user-id-check-button {
             margin-left: 0.5rem;
