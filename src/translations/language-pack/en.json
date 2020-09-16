@@ -445,6 +445,7 @@
 		"MEMBER": "Member",
 		"MONITORING": "Monitoring",
 		"RAW_DATA": "Raw Data",
+		"REPORT": "Report",
 		"SECRET": "Secret",
 		"SELECTED_DATA": "Selected Data",
 		"TAG": "Tag"
