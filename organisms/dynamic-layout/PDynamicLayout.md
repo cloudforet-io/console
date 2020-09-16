@@ -82,7 +82,7 @@ in this case, field handler will be invoked once with parent item.<br>
 | simple-table | table without search and pagination |
 | table | table view (keyword search) |
 | query-search-table | table view (query search) |
-| raw | readonly monaco editor |
+| raw |
 | markdown | - |
 | list | list(<dynamic_layout>) |
 
