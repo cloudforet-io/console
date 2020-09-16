@@ -17,12 +17,9 @@
 import {
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import 'codemirror/theme/ayu-mirage.css';
-import 'codemirror/addon/lint/lint.css';
-import 'codemirror/lib/codemirror.css';
+
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/json-lint';
-import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/fold/brace-fold';
 import 'codemirror/addon/fold/comment-fold';
 import 'codemirror/addon/fold/foldcode';
@@ -93,6 +90,10 @@ export default {
 </script>
 
 <style lang="postcss">
+    @import 'codemirror/theme/ayu-mirage.css';
+    @import 'codemirror/addon/lint/lint.css';
+    @import 'codemirror/lib/codemirror.css';
+    @import 'codemirror/addon/fold/foldgutter.css';
     .p-text-editor {
         .CodeMirror {
             font-family: Inconsolata, monospace;
