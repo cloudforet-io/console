@@ -44,21 +44,6 @@ module.exports = {
             },
         },
         devtool: 'source-map',
-        // module: {
-        //     rules: [
-        //         {
-        //             test: /\.(png|jpe?g|gif|svg)$/,
-        //             use: [
-        //                 {
-        //                     loader: 'file-loader',
-        //                     options: {
-        //                         esModule: false, // <- here
-        //                     },
-        //                 },
-        //             ],
-        //         },
-        //     ],
-        // },
         plugins: [
             ...extraPlugins,
         ],
