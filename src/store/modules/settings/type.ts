@@ -1,7 +1,7 @@
 export interface SetItemRequest {
-    page: string;
     key: string;
     value: any;
+    path?: string;
 }
 
 export type SettingItem = Record<string, any>;

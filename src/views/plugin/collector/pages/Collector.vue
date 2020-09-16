@@ -206,20 +206,18 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        // onMounted(async () => {
+        onMounted(async () => {
         //     await vm.$store.dispatch('resource/loadAll');
         //     console.log(vm.$store.state.resource.project.items['project-18655561c535']?.label);
         //     console.log(vm.$store.state.resource.serviceAccount);
         //     console.log(vm.$store.state.resource.secret.items);
         //     console.log(vm.$store.state.resource.collector.items);
         //     console.log(vm.$store.state.resource.provider.items);
-        //     vm.$store.dispatch('settings/setItem', {
-        //         page: '/plugin/collector',
-        //         key: 'pageSize',
-        //         value: 15,
-        //     });
-        //     console.log(vm.$store.getters['settings/getItem']('/plugin/collector', 'pageSize'));
-        // });
+        //     vm.$store.dispatch('settings/setItem', { key: 'pageSize', value: 12 });
+        //     console.log(vm.$store.getters['settings/getItem']('pageSize'));
+        //     vm.$store.dispatch('settings/setItem', { key: 'pageSize', value: 24, path: '/plugin/collector' });
+        //     console.log(vm.$store.getters['settings/getItem']('pageSize', '/plugin/collector'));
+        });
         const state = reactive({
             fields: [
                 { name: 'name', label: 'Name', options: { width: '14rem' } },
