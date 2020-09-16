@@ -1,6 +1,5 @@
 import { SettingsState } from './type';
 
-export const getItem = (state: SettingsState): any => (page: string, key: string) => {
-    const itemKey = `${page}:${key}`;
-    return state.items[itemKey];
+export const getItem = (state: SettingsState): any => (key: string, path = '/') => {
+    return state.items[`${path}:${key}`];
 };

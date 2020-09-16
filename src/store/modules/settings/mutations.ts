@@ -1,6 +1,9 @@
-import { SetItemRequest, SettingsState } from './type';
+import { SettingsState, SetItemRequest } from './type';
 
 export const setItem = (state: SettingsState, item: SetItemRequest): void => {
-    const itemKey = `${item.page}:${item.key}`;
-    state.items[itemKey] = item.value;
+    if (!item.path) {
+        item.path = '/';
+    }
+
+    state.items[`${item.path}:${item.key}`] = item.value;
 };
