@@ -14,8 +14,6 @@ import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
-import VueFormGenerator from 'vue-form-generator';
-import 'vue-form-generator/dist/vfg.css';
 import App from './App.vue';
 import '@/styles/style.scss';
 import '@/styles/style.pcss';
@@ -32,7 +30,6 @@ Vue.use(LiquorTree);
 // @ts-ignore
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-Vue.use(VueFormGenerator);
 
 Vue.prototype.$velocity = velocity;
 

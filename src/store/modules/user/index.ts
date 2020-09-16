@@ -3,14 +3,14 @@ import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 
-export const USER_STORAGE_KEY = 'store/user';
+export const STORAGE_KEY = 'store/user';
 
 let storedUserState: UserState = {};
 
 try {
-    storedUserState = JSON.parse(window.localStorage.getItem(USER_STORAGE_KEY) || '{}');
+    storedUserState = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
 } catch (e) {
-    window.localStorage.removeItem(USER_STORAGE_KEY);
+    window.localStorage.removeItem(STORAGE_KEY);
 }
 
 const state: UserState = {

@@ -1,6 +1,7 @@
 import Vue from 'vue';
-import Vuex, { Module, ModuleTree } from 'vuex';
+import Vuex from 'vuex';
 import user from './modules/user';
+import settings from './modules/settings';
 import domain from './modules/domain';
 import resource from './modules/resource';
 import plugins from './plugins';
@@ -15,6 +16,7 @@ Vue.use(Vuex);
 
 interface Store {
     user: typeof user.state;
+    settings: typeof settings.state;
     domain: typeof domain.state;
     resource: {
         project: typeof project.state;
@@ -29,6 +31,7 @@ interface Store {
 const store = new Vuex.Store<Store>({
     modules: {
         user,
+        settings,
         domain,
         resource,
     },

@@ -25,12 +25,25 @@
                                 width="5.5rem" height="5.5rem"
                     />
                     <div class="flex-grow">
-                        <p-dynamic-form
-                            :schema="inputSchema"
-                            :model="inputModel"
-                            :options="inputOptions"
-                            :is-valid.sync="isValid"
-                        />
+                        <p-field-group label="name" :invalid-text="nameInvalidText" :invalid="!isNameValid"
+                                       :required="true"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="inputModel.name" class="block" :class="{'is-invalid': invalid}" />
+                            </template>
+                        </p-field-group>
+                        <p-field-group label="priority" :invalid-text="priorityInvalidText" :invalid="!isPriorityValid"
+                                       :required="true"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="inputModel.priority" type="number" class="block"
+                                              :class="{'is-invalid': invalid}"
+                                />
+                            </template>
+                        </p-field-group>
+                        <p-field-group label="version" :invalid="!isVersionValid" :required="true">
+                            <p-select-dropdown v-model="inputModel.version" :items="versions" auto-height />
+                        </p-field-group>
                     </div>
                 </div>
             </template>
@@ -50,7 +63,6 @@
 
 <script lang="ts">
 import { get, some } from 'lodash';
-import VueFormGenerator from 'vue-form-generator/dist/vfg';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
@@ -60,18 +72,22 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import PDynamicForm from '@/components/organisms/forms/dynamic-form/PDynamicForm.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
-import { fluentApi } from '@/lib/fluent-api';
+import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
     name: 'CollectorCreator',
     components: {
-        PDynamicForm,
+        PSelectDropdown,
+        PTextInput,
+        PFieldGroup,
         GeneralPageLayout,
         ConfirmCredentials,
         PProgressWizard,
@@ -90,63 +106,41 @@ export default {
             tags: [],
             supportedSchema: [],
             //
+            collectorNames: [],
             versions: [],
-            names: [],
-            //
-            isValid: false,
+        });
+        const formState = reactive({
             inputModel: {
                 name: '',
                 priority: 10,
                 version: '',
             },
-            inputSchema: {
-                fields: [
-                    {
-                        type: 'input',
-                        inputType: 'text',
-                        label: vm.$t('COMMON.NAME'),
-                        model: 'name',
-                        min: 2,
-                        required: true,
-                        validator: [VueFormGenerator.validators.string.locale({
-                            fieldIsRequired: 'should NOT be shorter than 2 characters',
-                            textTooSmall: 'should NOT be shorter than 2 characters',
-                        }), (value) => {
-                            if (state.names.includes(value)) {
-                                return ['Name is duplicated'];
-                            }
-                            return [];
-                        }],
-                    },
-                    {
-                        type: 'input',
-                        inputType: 'number',
-                        label: vm.$t('COMMON.PRIORITY'),
-                        model: 'priority',
-                        min: 1,
-                        max: 10,
-                        required: true,
-                        validator: VueFormGenerator.validators.number.locale({
-                            numberTooSmall: 'should be >= 1',
-                            numberTooBig: 'should be <= 10',
-                        }),
-                    },
-                    {
-                        type: 'select',
-                        label: vm.$t('COMMON.VERSION'),
-                        model: 'version',
-                        values: [],
-                        hideNoneSelectedText: true,
-                        required: true,
-                        validator: VueFormGenerator.validators.select,
-                    },
-                ],
-            },
-            inputOptions: {
-                validateAfterLoad: true,
-                validateAfterChanged: true,
-                validateAsync: true,
-            },
+            nameInvalidText: computed(() => {
+                if (formState.inputModel.name.length < 2) {
+                    return 'should NOT be shorter than 2 characters';
+                } if (state.collectorNames.includes(formState.inputModel.name)) {
+                    return 'Name is duplicated';
+                }
+                return '';
+            }),
+            isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
+            priorityInvalidText: computed(() => {
+                if (formState.inputModel.priority < 1) {
+                    return 'should be >= 1';
+                } if (formState.inputModel.priority > 10) {
+                    return 'should be <= 10';
+                }
+                return '';
+            }),
+            isPriorityValid: computed(() => !(formState.inputModel.priority < 1 || formState.inputModel.priority > 10)),
+            versionInvalidText: computed(() => {
+                if (formState.inputModel.version.length === 0) {
+                    return 'select version';
+                }
+                return '';
+            }),
+            isVersionValid: computed(() => !(formState.inputModel.version.length === 0)),
+            isValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
         });
         const routeState = reactive({
             routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' },
@@ -171,7 +165,7 @@ export default {
             activeIdx: 0,
             loading: false,
             invalidState: computed(() => ({
-                conf: !state.isValid,
+                conf: !formState.isValid,
                 credentials: false,
                 tags: false,
             })),
@@ -180,12 +174,13 @@ export default {
 
         const getPlugin = async () => {
             try {
-                const res = await fluentApi.repository().plugin().get().setId(state.pluginId)
-                    .execute();
-                state.plugin = res.data;
-                state.supportedSchema = res.data.capability.supported_schema;
-                if (res.data.tags?.icon) {
-                    state.tags.push({ key: 'icon', value: res.data.tags.icon });
+                const res = await SpaceConnector.client.repository.plugin.get({
+                    plugin_id: state.pluginId,
+                });
+                state.plugin = res;
+                state.supportedSchema = res.capability.supported_schema;
+                if (res.tags?.icon) {
+                    state.tags.push({ key: 'icon', value: res.tags.icon });
                 }
             } catch (e) {
                 console.error(e);
@@ -193,24 +188,27 @@ export default {
             }
         };
         const getNames = async () => {
-            const res = await fluentApi.inventory().collector().list().setOnly('name')
-                .execute();
-            state.names = res.data.results.map(v => v.name);
+            const res = await SpaceConnector.client.inventory.collector.list({
+                query: {
+                    only: ['name'],
+                },
+            });
+            state.collectorNames = res.results.map(v => v.name);
         };
         const getVersions = async () => {
             try {
                 state.versions = [];
-                const res = await fluentApi.repository().plugin().getVersions().setId(state.pluginId)
-                    .execute();
-                res.data.results.forEach((value, index) => {
+                const res = await SpaceConnector.client.repository.plugin.getVersions({
+                    plugin_id: state.pluginId,
+                });
+                res.results.forEach((value, index) => {
                     if (index === 0) {
-                        state.versions.push({ name: `${value} (latest)`, id: value });
+                        state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
                     } else {
-                        state.versions.push({ name: value, id: value });
+                        state.versions.push({ type: 'item', label: value, name: value });
                     }
                 });
-                state.inputModel.version = res.data.results[0];
-                state.inputSchema.fields[2].values = state.versions;
+                formState.inputModel.version = res.results[0];
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Get Versions', e, root);
@@ -224,7 +222,7 @@ export default {
             root.$router.go(-1);
         };
         const onClickConfirm = async () => {
-            if (!state.isValid) {
+            if (!formState.isValid) {
                 return;
             }
 
@@ -234,19 +232,17 @@ export default {
                 tagDict[d.key] = d.value;
             });
             const params = {
-                name: state.inputModel.name,
-                priority: state.inputModel.priority,
+                name: formState.inputModel.name,
+                priority: formState.inputModel.priority,
                 tags: tagDict,
                 plugin_info: {
                     plugin_id: state.pluginId,
-                    version: state.inputModel.version,
+                    version: formState.inputModel.version,
                     provider: state.provider,
                 },
             };
             try {
-                await fluentApi.inventory().collector().create()
-                    .setParameter(params)
-                    .execute();
+                await SpaceConnector.client.inventory.collector.create(params);
                 showSuccessMessage('success', 'Create Collector', root);
                 await root.$router.push('/plugin/collector');
             } catch (e) {
@@ -266,6 +262,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(formState),
             ...toRefs(routeState),
             tabState,
             onClickCancel,
@@ -283,6 +280,9 @@ export default {
         width: 50%;
         padding: 2.5rem;
         margin-top: 2rem;
+        .p-text-input {
+            width: 100%;
+        }
     }
 }
 </style>

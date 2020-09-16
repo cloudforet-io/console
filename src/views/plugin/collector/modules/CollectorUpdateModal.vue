@@ -12,6 +12,7 @@
                     }"
                     :footer-confirm-button-bind="confirmBtnBind"
                     :visible.sync="proxyVisible"
+                    :disabled="loading || !isValid"
                     @confirm="onClickConfirm"
     >
         <template #body>
@@ -23,11 +24,11 @@
                 <div class="flex-grow">
                     <p-field-group :label="$t('COMMON.NAME')"
                                    :invalid-text="nameInvalidText"
-                                   :invalid="!nameValidator.valid"
+                                   :invalid="!isNameValid"
                                    :required="true"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="name" block
+                            <p-text-input v-model="inputModel.name" block
                                           class="block"
                                           :class="{'is-invalid': invalid}"
                             />
@@ -36,11 +37,11 @@
 
                     <p-field-group :label="$t('COMMON.PRIORITY')"
                                    :invalid-text="priorityInvalidText"
-                                   :invalid="!priorityValidator.valid"
+                                   :invalid="!isPriorityValid"
                                    :required="true"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model.number="priority" block
+                            <p-text-input v-model.number="inputModel.priority" block
                                           type="number"
                                           class="block"
                                           :class="{'is-invalid': invalid}"
@@ -50,7 +51,7 @@
                     <p-field-group :label="$t('COMMON.VERSION')"
                                    :required="true"
                     >
-                        <p-select-dropdown v-model="version" :items="versions" />
+                        <p-select-dropdown v-model="inputModel.version" :items="versions" />
                     </p-field-group>
                 </div>
             </div>
@@ -72,7 +73,6 @@
 
 <script lang="ts">
 import { get, cloneDeep } from 'lodash';
-import { Validator } from 'jsonschema';
 
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
@@ -83,10 +83,10 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
-import { fluentApi } from '@/lib/fluent-api';
 import { makeProxy } from '@/lib/compostion-util';
-import { CollectorPluginModel, CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { CollectorPluginModel, CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 
 export default {
     name: 'CollectorUpdateModal',
@@ -106,7 +106,6 @@ export default {
         },
     },
     setup(props, { root, emit }) {
-        const validator = new Validator();
         const state = reactive({
             loading: true,
             collector: null,
@@ -114,66 +113,68 @@ export default {
             proxyVisible: makeProxy<boolean>('visible', props, emit),
             pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info')),
             confirmBtnBind: computed(() => {
-                const defaultStyle: any = { style: { padding: 0 }, disabled: !state.isValid };
+                const defaultStyle: any = { style: { padding: 0 } };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
             //
             collectorUpdateParam: {} as CollectorUpdateParameter,
+            collectorNames: [] as string[],
             versions: [],
-            names: [],
-            name: '',
-            priority: 10,
-            version: null,
-            //
-            errorText: {
-                format: 'name is duplicated',
-                minLength: 'should NOT be shorter than 2 characters',
-                minimum: 'should be >= 1',
-                maximum: 'should be <= 10',
+        });
+        const formState = reactive({
+            inputModel: {
+                name: '',
+                priority: 10,
+                version: '',
             },
-            nameValidator: computed(() => validator.validate(state.name, {
-                type: 'string',
-                required: true,
-                minLength: 2,
-                format: 'nameFormat',
-            })),
-            priorityValidator: computed(() => validator.validate(state.priority, {
-                type: 'number',
-                required: true,
-                minimum: 1,
-                maximum: 10,
-            })),
-            nameInvalidText: computed(() => state.errorText[state.nameValidator.errors[0]?.name]),
-            priorityInvalidText: computed(() => state.errorText[state.priorityValidator.errors[0]?.name]),
-            isValid: computed(() => state.nameValidator.valid && state.priorityValidator.valid),
+            nameInvalidText: computed(() => {
+                if (formState.inputModel.name.length < 2) {
+                    return 'should NOT be shorter than 2 characters';
+                } if (state.collectorNames.includes(formState.inputModel.name)) {
+                    return 'Name is duplicated';
+                }
+                return '';
+            }),
+            isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
+            priorityInvalidText: computed(() => {
+                if (formState.inputModel.priority < 1) {
+                    return 'should be >= 1';
+                } if (formState.inputModel.priority > 10) {
+                    return 'should be <= 10';
+                }
+                return '';
+            }),
+            isPriorityValid: computed(() => !(formState.inputModel.priority < 1 || formState.inputModel.priority > 10)),
+            isValid: computed(() => formState.isNameValid && formState.isPriorityValid),
         });
 
         const getCollector = async (): Promise<void> => {
             try {
-                const res = await fluentApi.inventory().collector().get().setId(props.collectorId)
-                    .execute();
-                state.collector = res.data;
-                state.name = res.data.name;
-                state.priority = Number(res.data.priority);
-                state.version = res.data.plugin_info.version;
+                const res = await SpaceConnector.client.inventory.collector.get({
+                    collector_id: props.collectorId,
+                });
+                state.collector = res;
+                formState.inputModel.name = res.name;
+                formState.inputModel.priority = Number(res.priority);
+                formState.inputModel.version = res.plugin_info.version;
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Get Collector', e, root);
             }
         };
         const getNames = async () => {
-            const res = await fluentApi.inventory().collector().list()
-                .setFilter({ key: 'name', operator: '!=', value: state.name })
-                .execute();
-            state.names = res.data.results.map(v => v.name);
+            const query = new QueryHelper().setFilter({ k: 'name', o: 'not', v: formState.inputModel.name });
+            const res = await SpaceConnector.client.inventory.collector.list({ query: query.data });
+            state.collectorNames = res.results.map(v => v.name);
         };
         const getVersions = async () => {
             try {
                 state.versions = [];
-                const res = await fluentApi.repository().plugin().getVersions().setId(state.pluginInfo.plugin_id)
-                    .execute();
-                res.data.results.forEach((value, index) => {
+                const res = await SpaceConnector.client.repository.plugin.getVersions({
+                    plugin_id: state.pluginInfo.plugin_id,
+                });
+                res.results.forEach((value, index) => {
                     if (index === 0) {
                         state.versions.push({ label: `${value} (latest)`, name: value, type: 'item' });
                     } else {
@@ -181,38 +182,36 @@ export default {
                     }
                 });
             } catch (e) {
-                console.error(e);
                 showErrorMessage('Fail to Get Versions', e, root);
             }
         };
 
         const onClickReset = (): void => {
             if (state.loading) return;
-            state.name = get(state.collector, 'name', '');
-            state.priority = get(state.collector, 'priority', null);
-            state.version = get(state.collector, 'plugin_info.version', null);
+            formState.inputModel.name = get(state.collector, 'name', '');
+            formState.inputModel.priority = get(state.collector, 'priority', null);
+            formState.inputModel.version = get(state.collector, 'plugin_info.version', state.versions[0]);
         };
         const onClickConfirm = async (): Promise<void> => {
-            if (state.isValid) {
+            if (formState.isValid) {
                 state.loading = true;
 
                 const newPluginInfo = cloneDeep(state.pluginInfo);
-                newPluginInfo.version = state.version;
+                newPluginInfo.version = formState.inputModel.version;
                 state.collectorUpdateParam = {
                     collector_id: props.collectorId,
-                    name: state.name,
+                    name: formState.inputModel.name,
                     plugin_info: newPluginInfo,
-                    priority: state.priority,
+                    priority: formState.inputModel.priority,
                 };
 
                 try {
-                    await fluentApi.inventory().collector().update()
-                        .setParameter(state.collectorUpdateParam)
-                        .setId(props.collectorId)
-                        .execute();
+                    await SpaceConnector.client.inventory.collector.update({
+                        collector_id: props.collectorId,
+                        ...state.collectorUpdateParam,
+                    });
                     showSuccessMessage('success', 'Update Collector', root);
                 } catch (e) {
-                    console.error(e);
                     showErrorMessage('Fail to Update Collector', e, root);
                 } finally {
                     state.loading = false;
@@ -224,10 +223,7 @@ export default {
         const init = async () => {
             state.loading = true;
             await getCollector();
-            //
             await getNames();
-            validator.customFormats.nameFormat = input => !(state.names.includes(input)); // set name custom format
-            //
             await getVersions();
             state.loading = false;
         };
@@ -235,6 +231,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(formState),
             onClickReset,
             onClickConfirm,
         };
