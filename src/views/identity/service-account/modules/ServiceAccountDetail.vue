@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p-dynamic-layout type="list"
-                          :options="schema.options"
+        <p-dynamic-layout v-if="schema"
+                          v-bind="schema"
                           :data="items"
         />
     </div>
@@ -9,9 +9,7 @@
 
 <script lang="ts">
 
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 
@@ -34,12 +32,13 @@ export default {
     setup(props) {
         const state = reactive({
             items: [],
-            schema: [],
+            schema: null as null | object,
         });
 
         const getDetails = async () => {
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.get({
+                    // eslint-disable-next-line camelcase
                     service_account_id: props.serviceAccountId,
                 });
                 state.items = res;
@@ -50,14 +49,15 @@ export default {
         };
 
         const getDetailSchema = async () => {
-            const schema = await SpaceConnector.client.addOns.pageSchema.get({
+            const res = await SpaceConnector.client.addOns.pageSchema.get({
+                // eslint-disable-next-line camelcase
                 resource_type: 'identity.ServiceAccount',
                 schema: 'details',
                 options: {
                     provider: 'aws',
                 },
             });
-            state.schema = schema;
+            state.schema = res.details[0];
             await getDetails();
         };
 

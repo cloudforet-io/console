@@ -47,6 +47,13 @@
                         <span>{{ value }}</span>
                         <span class="th-additional-info-text"> (completed / total)</span>
                     </template>
+                    <template #col-collector_info-format="{ value }">
+                        <p-lazy-img
+                            :img-url="providers.find(d => d.provider === value.provider).tags.icon"
+                            width="1rem" height="1rem"
+                        />
+                        <span class="pl-2">{{ value.name }}</span>
+                    </template>
                     <template #col-sequence-format="{ value }">
                         <span class="float-right">{{ value }}</span>
                     </template>
@@ -115,12 +122,14 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 
 import { JobModel } from '@/lib/fluent-api/inventory/job';
+import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
@@ -142,6 +151,7 @@ enum JOB_STATUS {
 export default {
     name: 'PCollectorHistory',
     components: {
+        PLazyImg,
         PIconTextButton,
         PButtonModal,
         PPaneLayout,
@@ -157,11 +167,12 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            providers: [] as ProviderModel[],
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
-                { label: 'Collector Name', name: 'collector_info.name', sortable: false },
+                { label: 'Collector Name', name: 'collector_info', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Task', name: 'task' },
                 { label: 'Start Time', name: 'created_at' },
@@ -302,6 +313,16 @@ export default {
                 state.loading = false;
             }
         };
+        const getProviders = async () => {
+            try {
+                const query = new QueryHelper();
+                query.setOnly('provider', 'tags.icon');
+                const res = await SpaceConnector.client.identity.provider.list({ query: query.data });
+                state.providers = res.results;
+            } catch (e) {
+                console.error(e);
+            }
+        };
 
         const onSelect = (item) => {
             state.selectedJobId = item.job_id;
@@ -344,11 +365,14 @@ export default {
         };
 
         const init = async () => {
+            await getProviders();
+
             const hash = router.currentRoute.hash;
             if (hash) {
                 state.selectedJobId = hash.replace('#', '');
             }
             state.searchTags = queryStringToQueryTags(vm.$route.query.filter);
+
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;
         };
