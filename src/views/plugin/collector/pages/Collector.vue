@@ -213,6 +213,12 @@ export default {
         //     console.log(vm.$store.state.resource.secret.items);
         //     console.log(vm.$store.state.resource.collector.items);
         //     console.log(vm.$store.state.resource.provider.items);
+        //     vm.$store.dispatch('settings/setItem', {
+        //         page: '/plugin/collector',
+        //         key: 'pageSize',
+        //         value: 15,
+        //     });
+        //     console.log(vm.$store.getters['settings/getItem']('/plugin/collector', 'pageSize'));
         // });
         const state = reactive({
             fields: [

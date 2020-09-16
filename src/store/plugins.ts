@@ -1,24 +1,11 @@
 import createLogger from 'vuex/dist/logger';
-import { Store } from 'vuex';
-import { USER_STORAGE_KEY } from '@/store/modules/user';
+import userPlugins from '@/store/modules/user/plugins';
+import settingsPlugins from '@/store/modules/settings/plugins';
 
 const DEBUG = process.env.NODE_ENV !== 'production';
+const PLUGINS = [
+    ...userPlugins,
+    ...settingsPlugins,
+];
 
-const MUTATION_MAP: Record<string, [string, string]> = {
-    'user/setUser': ['user', USER_STORAGE_KEY],
-};
-
-const saveLocalStorage = (storageKey: string, data: any): void => {
-    window.localStorage.setItem(storageKey, JSON.stringify(data));
-};
-
-const localStoragePlugin = (store: Store<any>) => {
-    store.subscribe((mutation, state) => {
-        if (mutation.type in MUTATION_MAP) {
-            const [name, storageKey] = MUTATION_MAP[mutation.type];
-            saveLocalStorage(storageKey, state[name]);
-        }
-    });
-};
-
-export default DEBUG ? [createLogger(), localStoragePlugin] : [localStoragePlugin];
+export default DEBUG ? [createLogger(), ...PLUGINS] : PLUGINS;
