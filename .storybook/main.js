@@ -1,6 +1,5 @@
  // { INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
  const path = require('path');
- const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const postCssLoader = {
         loader: 'postcss-loader',
         options: require('../postcss.config'),
@@ -46,11 +45,6 @@ module.exports = {
       'fs': path.resolve(__dirname, 'fsMock.js'),
     };
 
-    /* plugins settings */
-    config.plugins.push(new MonacoWebpackPlugin({
-      languages:['javascript','json','css','html']
-    }));
-
       /* SASS settings */
       config.module.rules.push(
           {
@@ -61,11 +55,6 @@ module.exports = {
                   },
               ],
               include: path.resolve(__dirname, '../'),
-              exclude:[
-                  path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
-                  path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
-
-              ],
           }
       );
 
@@ -75,11 +64,6 @@ module.exports = {
               test: /\.(postcss|pcss)$/,
               use: ['style-loader', 'css-loader', postCssLoader],
               include: path.resolve(__dirname, '../'),
-              exclude:[
-                  path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
-                  path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
-
-              ],
           }
       );
 

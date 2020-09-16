@@ -16,6 +16,7 @@ import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
 import Fragment from "vue-fragment";
+import Codemirror from "vue-codemirror";
 
 import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
@@ -37,6 +38,7 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
+Vue.use(Codemirror);
 
 Vue.prototype.$velocity = velocity;
 webFontLoader.load({

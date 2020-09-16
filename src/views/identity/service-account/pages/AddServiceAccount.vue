@@ -106,7 +106,7 @@
                 <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid" />
             </div>
             <div v-if="selectedCredentialInputOption === 'Json Code'">
-                <p-monaco-editor :style="'height: 272px;'" :code.sync="jsonForCredential" />
+                <p-text-editor :code.sync="jsonForCredential" mode="edit"/>
             </div>
         </p-pane-layout>
 
@@ -144,7 +144,6 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
-import PMonacoEditor from '@/components/molecules/text-editor/monaco/PMonacoEditor.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -160,6 +159,7 @@ import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDi
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { SpaceConnector } from '@/lib/space-connector';
+import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
 
 const credentialInputOptionButton = ['Input Form', 'Json Code'];
 
@@ -168,7 +168,7 @@ export default {
     components: {
         PTextInput,
         PJsonSchemaForm,
-        PMonacoEditor,
+        PTextEditor,
         PSelectBtnGroup,
         PMarkdown,
         PCollapsiblePanel,
@@ -341,7 +341,7 @@ export default {
         const createSecretWithJson = async (jsonData) => {
             await SpaceConnector.client.secret.secret.create({
                 data: jsonData,
-                name: formState.credentialModel.name,
+                name: formState.credentialName,
                 schema: state.selectedSecretType,
                 // eslint-disable-next-line camelcase
                 secret_type: 'CREDENTIALS',
@@ -357,7 +357,7 @@ export default {
                         await createSecretWithJson(json);
                     } catch (e) {
                         console.error(e);
-                        showErrorMessage('Fail to Add Account', 'Please put the appropriate json format in the form.', context.root);
+                        showErrorMessage('Fail to Add Account', e, context.root);
                         await deleteServiceAccount();
                         return;
                     }
@@ -471,6 +471,15 @@ export default {
             border-radius: 0.125rem;
             border-left-width: 0.25rem;
             padding: 1.25rem 2rem;
+        }
+        .p-text-editor {
+            .CodeMirror {
+                font-family: Inconsolata, monospace;
+                line-height: 1.5;
+                height: 30rem;
+                margin: 1rem;
+                padding: 1rem;
+            }
         }
     }
 

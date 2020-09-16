@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const postcssConfig = require('./postcss.config');
 
 
@@ -34,7 +33,6 @@ module.exports = {
         loaderOptions: {
             sass: {
                 includePaths: ['./node_modules'],
-                excludePaths: [path.resolve(__dirname, '..', 'node_modules/monaco-text-editor')],
             },
             postcss: postcssConfig,
         },
@@ -62,9 +60,6 @@ module.exports = {
         //     ],
         // },
         plugins: [
-            new MonacoWebpackPlugin({
-                languages: ['json', 'html', 'python', 'javascript', 'css'],
-            }),
             ...extraPlugins,
         ],
     },
