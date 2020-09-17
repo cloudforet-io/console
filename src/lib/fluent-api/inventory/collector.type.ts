@@ -70,7 +70,8 @@ export interface CollectorCreateParameter extends Tags {
 
 
 export interface Schedule {
-    hours: string[];
+    hours?: string[];
+    interval?: number;
 }
 
 export interface ScheduleAddParameter {

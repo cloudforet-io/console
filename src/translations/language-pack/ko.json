@@ -202,6 +202,7 @@
 		"SUMMARY": "요약 정보",
 		"TAG": "태그",
 		"TIMEZONE": "표준 시간대",
+		"TIME_SCHEDULE": "시간 스케줄",
 		"TITLE": "{1} {0}",
 		"TR_NOTI": "아이디/비밀번호 찾기",
 		"TR_NOTI_CON": "",

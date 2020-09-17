@@ -202,6 +202,7 @@
 		"SUMMARY": "Summary",
 		"TAG": "Tag",
 		"TIMEZONE": "Timezone",
+		"TIME_SCHEDULE": "Time Schedule",
 		"TITLE": "{0} {1}",
 		"TR_NOTI": "Have trouble singing in? find ID/PW",
 		"TR_NOTI_CON": "",

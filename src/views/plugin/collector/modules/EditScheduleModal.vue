@@ -1,12 +1,14 @@
 <template>
-    <p-button-modal :header-title="addMode ? $t('INVENTORY.ADD_SCHEDULE') : $t('INVENTORY.UPT_SCHEDULE')"
-                    centered
-                    fade
-                    backdrop
-                    size="lg"
-                    :loading="loading"
-                    :visible.sync="proxyVisible"
-                    @confirm="onClickEditConfirm"
+    <p-button-modal
+        class="edit-schedule-modal-container"
+        :header-title="editMode ? $t('INVENTORY.UPT_SCHEDULE') : $t('INVENTORY.ADD_SCHEDULE')"
+        centered
+        fade
+        backdrop
+        size="lg"
+        :loading="loading"
+        :visible.sync="proxyVisible"
+        @confirm="onClickEditConfirm"
     >
         <template #body>
             <p-field-group :label="$t('COMMON.NAME')">
@@ -19,25 +21,47 @@
                                    @input="changeTimezone"
                 />
             </p-field-group>
-            <p-field-group :label="$t('INVENTORY.COLL_TIME')"
+            <p-field-group :label="$t('COMMON.TIME_SCHEDULE')"
                            required
                            :invalid="showValidation && !isValid"
                            invalid-text="Please select time"
             >
-                <div class="time-block-container">
-                    <span v-for="(hour) in hoursMatrix" :key="hour"
-                          class="time-block"
-                          :class="{active: selectedHours[hour] }"
-                          @click="onClickHour(hour)"
-                    >
-                        {{ hour }}
-                    </span>
-                    <p-button style-type="gray" :outline="!isAllHours"
-                              class="all-btn"
-                              @click="onClickAllHours"
-                    >
-                        {{ $t('COMMON.ALL') }}
-                    </p-button>
+                <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
+                     class="schedule-lap"
+                     :class="scheduleType === type ? 'selected' : ''"
+                     @click="scheduleType = type"
+                >
+                    <div class="w-1/3">
+                        <p-radio
+                            v-model="scheduleType"
+                            :value="type"
+                        /> <span class="schedule-type-text">{{ scheduleTypes[type] }}</span>
+                    </div>
+                    <div class="w-2/3">
+                        <div v-if="type === 'custom'" class="custom-schedule-lap">
+                            <span v-for="(hour) in hoursMatrix" :key="hour"
+                                  class="time-block"
+                                  :class="{active: selectedHours[hour] }"
+                                  @click="onClickHour(hour)"
+                            >
+                                {{ hour }}
+                            </span>
+                            <p-button :outline="!isAllHours"
+                                      class="all-button"
+                                      @click="onClickAllHours"
+                            >
+                                {{ $t('COMMON.ALL') }}
+                            </p-button>
+                        </div>
+                        <div v-else class="interval-lap">
+                            <p-field-group label="Every" class="w-1/2">
+                                <p-text-input v-model="intervalTime" type="number" />
+                            </p-field-group>
+                            <div class="w-1/2">
+                                <p-select-dropdown v-model="intervalTimeType" :items="intervalTimeTypes" auto-height />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </p-field-group>
         </template>
@@ -46,23 +70,26 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, watch,
-} from '@vue/composition-api';
-import {
     range, flatMap, get, forEach,
 } from 'lodash';
 import moment from 'moment';
-import { makeProxy } from '@/lib/compostion-util';
+
+import {
+    reactive, toRefs, computed, watch,
+} from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
+import { makeProxy } from '@/lib/compostion-util';
+import { store } from '@/store';
 
 class MenuItem {
     name: string;
@@ -81,6 +108,7 @@ class MenuItem {
 export default {
     name: 'EditScheduleModal',
     components: {
+        PRadio,
         PTextInput,
         PButton,
         PSelectDropdown,
@@ -98,14 +126,13 @@ export default {
             type: String,
             default: '',
         },
-        addMode: {
+        editMode: {
             type: Boolean,
             default: true,
         },
     },
     setup(props, { emit, root }) {
-        const vm: any = getCurrentInstance();
-        const state: any = reactive({
+        const state = reactive({
             loading: false,
             schedule: null,
             proxyVisible: makeProxy('visible', props, emit),
@@ -116,10 +143,28 @@ export default {
             selectedUTCHoursList: computed(() => flatMap(state.selectedHours, time => moment.utc(time).hour())),
             isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
             showValidation: false,
-            isValid: computed(() => state.selectedUTCHoursList.length !== 0),
+            isValid: computed(() => {
+                if (state.scheduleType === 'custom') return state.selectedUTCHoursList.length !== 0;
+                return state.intervalTime > 0;
+            }),
+            //
+            scheduleTypes: { custom: 'Custom Schedule', interval: 'Interval' },
+            scheduleType: 'custom',
+            intervalTime: undefined as undefined | number,
+            intervalTimeInSeconds: computed(() => {
+                if (state.intervalTimeType === 'minutes') return state.intervalTime * 60;
+                if (state.intervalTimeType === 'hours') return state.intervalTime * 3600;
+                return state.intervalTime;
+            }),
+            intervalTimeTypes: [
+                { label: 'seconds', name: 'seconds', type: 'item' },
+                { label: 'minutes', name: 'minutes', type: 'item' },
+                { label: 'hours', name: 'hours', type: 'item' },
+            ],
+            intervalTimeType: 'minutes',
         });
 
-        const timezones: any = state.timezone === 'UTC'
+        const timezones = state.timezone === 'UTC'
             ? [new MenuItem(state.timezone)] : [
                 new MenuItem(state.timezone),
                 new MenuItem('UTC'),
@@ -144,32 +189,49 @@ export default {
             state.selectedHours = res;
         };
 
-        const onClickHour = (hour) => {
-            if (state.selectedHours[hour]) delete state.selectedHours[hour];
-            else state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
-            state.selectedHours = { ...state.selectedHours };
-        };
-
-        const onClickAllHours = () => {
-            if (state.isAllHours) state.selectedHours = {};
-            else {
-                state.hoursMatrix.forEach((hour) => {
-                    state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
+        const getSchedule = async (): Promise<void> => {
+            state.loading = true;
+            try {
+                const res = await SpaceConnector.client.inventory.collector.schedule.get({
+                    // eslint-disable-next-line camelcase
+                    schedule_id: props.scheduleId,
+                    collector_id: props.collectorId,
                 });
-                state.selectedHours = { ...state.selectedHours };
+                state.schedule = res;
+                state.name = res.name;
+                if (res.schedule.hours.length > 0) {
+                    state.scheduleType = 'custom';
+                    initSelectedHours();
+                } else {
+                    state.scheduleType = 'interval';
+                    const interval = res.schedule.interval;
+                    if (interval < 60) {
+                        state.intervalTimeType = 'seconds';
+                        state.intervalTime = interval;
+                    } else if (interval >= 60 && interval < 3600) {
+                        state.intervalTimeType = 'minutes';
+                        state.intervalTime = Math.trunc(interval / 60);
+                    } else {
+                        state.intervalTimeType = 'hours';
+                        state.intervalTime = Math.trunc(interval / 3600);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
-
         const addSchedule = async () => {
             try {
                 const params: ScheduleAddParameter = {
                     // eslint-disable-next-line camelcase
                     collector_id: props.collectorId,
                     name: state.name,
-                    schedule: {
-                        hours: state.selectedUTCHoursList,
-                    },
+                    schedule: {},
                 };
+                if (state.scheduleType === 'custom') params.schedule = { hours: state.selectedUTCHoursList };
+                else params.schedule = { interval: state.intervalTimeInSeconds };
 
                 await SpaceConnector.client.inventory.collector.schedule.add(params);
 
@@ -180,7 +242,6 @@ export default {
                 showErrorMessage('Fail to Add Schedule', e, root);
             }
         };
-
         const updateSchedule = async () => {
             try {
                 const params: ScheduleUpdateParameter = {
@@ -189,10 +250,10 @@ export default {
                     // eslint-disable-next-line camelcase
                     collector_id: props.collectorId,
                     name: state.name,
-                    schedule: {
-                        hours: state.selectedUTCHoursList,
-                    },
+                    schedule: {},
                 };
+                if (state.scheduleType === 'custom') params.schedule = { hours: state.selectedUTCHoursList };
+                else params.schedule = { interval: state.intervalTimeInSeconds };
 
                 await SpaceConnector.client.inventory.collector.schedule.update(params);
 
@@ -209,35 +270,30 @@ export default {
             if (!state.isValid) return;
 
             state.loading = true;
-            if (props.addMode) await addSchedule();
-            else await updateSchedule();
+            if (props.editMode) await updateSchedule();
+            else await addSchedule();
             state.loading = false;
             state.proxyVisible = false;
         };
-
-        const getSchedule = async (): Promise<void> => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.inventory.collector.schedule.get({
-                    // eslint-disable-next-line camelcase
-                    schedule_id: props.scheduleId,
-                    collector_id: props.collectorId,
+        const onClickHour = (hour) => {
+            if (state.selectedHours[hour]) delete state.selectedHours[hour];
+            else state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
+            state.selectedHours = { ...state.selectedHours };
+        };
+        const onClickAllHours = () => {
+            if (state.isAllHours) state.selectedHours = {};
+            else {
+                state.hoursMatrix.forEach((hour) => {
+                    state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
                 });
-                state.schedule = res;
-                state.name = state.schedule.name;
-                initSelectedHours();
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.loading = false;
+                state.selectedHours = { ...state.selectedHours };
             }
         };
 
         watch([() => props.collectorId, () => props.scheduleId],
             async ([collectorId, scheduleId]) => {
-                if (!props.addMode && collectorId && scheduleId) await getSchedule();
+                if (props.editMode && collectorId && scheduleId) await getSchedule();
             }, { immediate: true });
-
 
         return {
             ...toRefs(state),
@@ -251,39 +307,75 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
+.edit-schedule-modal-container {
+    .modal-content .modal-body-container.scrollable {
+        min-height: 34rem;
+    }
+
     .name, .timezone {
         width: 60%;
     }
-    .all-btn {
-        @apply text-black border-gray-300;
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-        vertical-align: unset;
-        &:hover {
-            background-color: theme('colors.black') !important;
-        }
-    }
-    .time-block-container {
-        @apply grid;
-        gap: 0.5rem;
-        grid-template-columns: repeat(12, 2rem);
-        grid-template-rows: auto;
-    }
-    .time-block {
-        @apply border border-gray-300;
-        display: inline-block;
-        height: 2rem;
-        line-height: 2rem;
-        text-align: center;
-        border-radius: 2px;
-        font-size: 0.875rem;
+
+    .schedule-lap {
+        @apply border border-gray-200;
+        display: flex;
         cursor: pointer;
-        &:hover {
-            @apply bg-green-600 text-white;
+        padding: 1.75rem;
+        &:first-child {
+            border-bottom: none;
         }
-        &.active {
-            @apply bg-safe text-white;
+        &:hover {
+            @apply bg-secondary2;
+        }
+        &.selected {
+            @apply border-blue-500;
+        }
+
+        .schedule-type-text {
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding-left: 0.5rem;
+        }
+        .custom-schedule-lap {
+            display: grid;
+            gap: 0.5rem;
+            grid-template-columns: repeat(12, 2rem);
+            grid-template-rows: auto;
+
+            .time-block {
+                @apply bg-white border border-gray-300;
+                display: inline-block;
+                height: 2rem;
+                line-height: 2rem;
+                text-align: center;
+                border-radius: 2px;
+                font-size: 0.875rem;
+                cursor: pointer;
+                &:hover {
+                    @apply bg-green-600 text-white;
+                }
+                &.active {
+                    @apply bg-safe text-white;
+                }
+            }
+            .all-button {
+                @apply bg-white text-black border-gray-300;
+                margin-right: 0.5rem;
+                margin-bottom: 0.5rem;
+                vertical-align: unset;
+                &:hover {
+                    @apply bg-black text-white;
+                }
+            }
+        }
+        .interval-lap {
+            display: inline-flex;
+            width: 100%;
+            .p-select-dropdown {
+                @apply bg-white;
+            }
         }
     }
+}
 </style>
