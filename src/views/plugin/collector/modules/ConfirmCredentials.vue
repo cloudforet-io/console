@@ -30,12 +30,12 @@
 <script lang="ts">
 import { makeTrItems } from '@/lib/view-helper';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 interface Value {
     name: string;
@@ -71,33 +71,39 @@ export default {
             ], context.parent)),
         });
 
-
-        const providerApi = fluentApi.identity().provider();
-        const statApi = fluentApi.statisticsTest().resource().stat<Value>()
-            .addGroupKey('schema', 'name')
-            .addGroupField('count', STAT_OPERATORS.count)
-            .setResourceType('secret.Secret');
-
+        // const providerApi = fluentApi.identity().provider();
 
         const getProviderSchemaList = async () => {
             try {
-                const res = await providerApi.get().setId(props.provider).execute();
+                const res = await SpaceConnector.client.identity.provider.get({
+                    provider: props.provider,
+                });
+                // const res = await providerApi.get().setId(props.provider).execute();
                 // all schema list that supported by provider
-                state.schemaItems = res.data.capability.supported_schema.map(name => ({ name }));
+                state.schemaItems = res.capability.supported_schema.map(name => ({ name }));
             } catch (e) {
                 console.error(e);
             }
         };
 
+        const getQuery = () => {
+            const query = new QueryHelper();
+            query
+                .setFilter({
+                    k: 'provider',
+                    v: props.provider,
+                    o: 'eq',
+                });
+            return query.data;
+        };
+
         const listSecretCount = async () => {
             try {
-                const res = await statApi.setFilter({
-                    key: 'provider',
-                    value: props.provider,
-                    operator: FILTER_OPERATOR.in,
-                }).execute();
+                const res = await SpaceConnector.client.statistics.topic.secretCount({
+                    query: getQuery(),
+                });
                 state.secretCount = {};
-                res.data.results.forEach((d) => {
+                res.results.forEach((d) => {
                     state.secretCount[d.name] = d.count;
                 });
             } catch (e) {

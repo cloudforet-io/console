@@ -229,9 +229,9 @@ export default {
                         {
                             type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history', isNew: true,
                         },
-                        // {
-                        //     type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler', isNew: true,
-                        // },
+                        {
+                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/management/power-scheduler', isNew: true,
+                        },
                     ],
                 },
             ],

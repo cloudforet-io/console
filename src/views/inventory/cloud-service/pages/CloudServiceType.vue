@@ -150,12 +150,10 @@ import {
     computed, getCurrentInstance, reactive, Ref, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProviderStoreType, useStore } from '@/store/toolset';
 import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import {
-    makeQueryStringComputed, makeQueryStringComputeds,
     queryStringToQueryTags,
     queryTagsToQueryString,
     replaceQuery, RouteQueryString,
@@ -175,9 +173,7 @@ import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
 import {
     getFiltersFromQueryTags,
-    parseTag,
 } from '@/lib/api/query-search';
-import router from '@/routes';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { Filter } from '@/lib/space-connector/type';
@@ -267,20 +263,26 @@ export default {
             totalCount: 0,
         });
 
+        const getRegionQuery = (value) => {
+            const regionQuery = new QueryHelper();
+            regionQuery.setFilter({
+                k: 'region_type',
+                v: value,
+                o: 'contain',
+            });
+            return regionQuery.data;
+        };
+
         const listRegionByProvider = async (selectedProviderValue) => {
             try {
                 if (selectedProviderValue === 'all') {
-                    const res = await fluentApi.inventory().region().list()
-                        .execute();
-                    filterState.regionList = res.data.results.map(d => ({ ...d }));
+                    const res = await SpaceConnector.client.inventory.region.list();
+                    filterState.regionList = res.results.map(d => ({ ...d }));
                 } else if (selectedProviderValue) {
-                    const res = await fluentApi.inventory().region().list().setFixFilter({
-                        key: 'region_type',
-                        value: selectedProviderValue,
-                        operator: FILTER_OPERATOR.contain,
-                    })
-                        .execute();
-                    filterState.regionList = res.data.results.map(d => ({ ...d }));
+                    const res = await SpaceConnector.client.inventory.region.list({
+                        query: getRegionQuery(selectedProviderValue),
+                    });
+                    filterState.regionList = res.results.map(d => ({ ...d }));
                 }
             } catch (e) {
                 console.error(e);
@@ -306,7 +308,7 @@ export default {
                 }
             });
             filterState.regionFilter.forEach((d) => {
-                filters.push({ key: { name: 'data.region_name', label: 'region' }, value: { name: d, label: d }, operator: FILTER_OPERATOR.in });
+                filters.push({ key: { name: 'data.region_name', label: 'region' }, value: { name: d, label: d }, operator: 'in' });
             });
             const res: Location = {
                 name: 'cloudServicePage',
@@ -476,7 +478,7 @@ export default {
                     if (after) {
                         listRegionByProvider(after);
                     }
-                }, 50), {immediate: true});
+                }, 50), { immediate: true });
                 await listCloudServiceType();
             }
         };
