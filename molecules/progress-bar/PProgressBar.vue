@@ -1,16 +1,19 @@
 <template>
     <div class="progress-bar">
         <div class="info">
-            <label class="percentage"> {{label}}  </label>
+            <label class="percentage"> {{ label }}  </label>
         </div>
         <div class="background-bar" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
-            <div class="tracker-bar" />
+            <div ref="progressBar" class="tracker-bar" />
         </transition>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+
+import { computed, ref, watch } from '@vue/composition-api';
+
 export default {
     name: 'PProgressBar',
     props: {
@@ -24,6 +27,7 @@ export default {
         },
     },
     setup(props) {
+        const progressBar = ref(null);
         const beforeEnter = (element) => {
             element.style.width = 0;
         };
@@ -33,9 +37,16 @@ export default {
             element.style.transition = 'width 1s linear';
         };
 
+        watch(() => props.percentage, (after, before) => {
+            if (after !== before) {
+                enter(progressBar.value);
+            }
+        });
+
         return {
             beforeEnter,
             enter,
+            progressBar,
         };
     },
 };
