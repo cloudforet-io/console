@@ -171,7 +171,7 @@ export default {
                     item.typeOptions = { timezone };
                 }
 
-                res[`col-${ds.key}-format`] = item;
+                res[`col-${i}-format`] = item;
             });
 
             return res;
