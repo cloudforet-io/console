@@ -1,28 +1,20 @@
 name: "[CI]create branch"
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: ' `x.y.z` 형태로 버전을 입력해주세요. v접두사와 -rc0 접미사는 자동으로 첨가됩니다.'
-        required: true
-        default: 1.2.3
+  # workflow_dispatch:
+  #   inputs:
+  #     tag:
+  #       description: ' `x.y.z` 형태로 버전을 입력해주세요. v접두사와 -rc0 접미사는 자동으로 첨가됩니다.'
+  #       required: true
+  #       default: 1.2.3
+  repository_dispatch:
+    types: [create_release_branch]
+
+env:
+  VERSION: v${{ github.event.client_payload.version }}-rc0
+  BRANCH: release-${{ github.event.client_payload.version }}
 
 jobs:
-  condition_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: if not master, exit
-        run: |
-          if [ ${{ github.ref }} != refs/heads/master ]
-            then exit 1
-          fi
-
   create_branch:
-    needs: condition_check
-    env:
-      VERSION: v${{ github.event.inputs.tag }}-rc0
-      BRANCH: Release-v${{ github.event.inputs.tag }}
     runs-on: ubuntu-latest
     steps:
       - name: task
