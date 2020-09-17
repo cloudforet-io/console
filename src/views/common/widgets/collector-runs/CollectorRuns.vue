@@ -25,8 +25,8 @@
                 </tr>
             </template>
             <template #col-collector_info-format="{value}">
-                <p-i class="working-icon" name="ic_working"
-                     height="1rem" width="1rem"
+                <p-lottie class="status-icon"
+                          :size="2" :auto="true" name="lottie_working"
                 />
                 <p-lazy-img
                     :img-url="providers.find(d => d.provider === value.provider).tags.icon"
@@ -50,10 +50,11 @@ import {
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 import { JOB_STATE, JobModel } from '@/lib/fluent-api/inventory/job';
 import { getTimezone } from '@/lib/util';
@@ -63,6 +64,7 @@ import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 export default {
     name: 'CollectorRuns',
     components: {
+        PLottie,
         PLazyImg,
         PSkeleton,
         PWidgetLayout,
@@ -145,8 +147,8 @@ export default {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.working-icon {
-    animation: spin 2s linear infinite;
+.status-icon {
+    display: inline-flex;
 }
 .p-data-table::v-deep {
     overflow-y: auto;
