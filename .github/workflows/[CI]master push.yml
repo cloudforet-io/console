@@ -39,26 +39,49 @@ jobs:
           echo "::set-env name=SERVICE::$(echo ${{ github.repository }} | cut -c 14-)"
 
       - name: build "build image" for caching
-        uses: docker/build-push-action@v1
+        run: |
+          mv Dockerfile Dockerfile2
+          mv build_Dockerfile Dockerfile
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+          docker pull pyengine/build:console
+          \docker build -t pyengine/build:console -c 2048 --cache-from pyengine/build:console .
+          docker push pyengine/build:console
+          rm Dockerfile
+          mv Dockerfile2 Dockerfile
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          path: .
-          dockerfile: ./build_Dockerfile
-          repository: pyengine/build
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: console
-          cache_froms: pyengine/build:console
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: upload the docker image on ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
+          \docker build -t ${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/spaceone/console:latest -c 2048 .
+          docker tag ${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/spaceone/console:latest ${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/spaceone/console:${{ env.VERSION }}
+          docker push ${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/spaceone/console:latest
+          docker push ${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/spaceone/console:${{ env.VERSION }}
+        # - name: build "build image" for caching
+        # uses: docker/build-push-action@v1
+        # with:
+        #   path: .
+        #   dockerfile: ./build_Dockerfile
+        #   repository: pyengine/build
+        #   username: ${{ secrets.DOCKER_USERNAME }}
+        #   password: ${{ secrets.DOCKER_PASSWORD }}
+        #   tags: console
+        #   cache_froms: pyengine/build:console
 
-      - name: Upload the docker image on ECR
-        uses: kciter/aws-ecr-action@v1
-        with:
-          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          account_id: ${{ secrets.AWS_ROOT_ID }}
-          repo: spaceone/${{ env.SERVICE }}
-          region: ap-northeast-2
-          tags: latest,${{ env.VERSION }}
-          create_repo: false
+      # - name: Upload the docker image on ECR
+      #   uses: kciter/aws-ecr-action@v1
+      #   with:
+      #     access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     account_id: ${{ secrets.AWS_ROOT_ID }}
+      #     repo: spaceone/${{ env.SERVICE }}
+      #     region: ap-northeast-2
+      #     tags: latest,${{ env.VERSION }}
+      #     create_repo: false
           
       - name: Slack
         if: always()

@@ -3,8 +3,16 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'src/components/**'
+    paths-ignore:
+      - '.github/**'
+      - 'pkg/**'
+      - 'public/**'
+      - 'build_Dockerfile'
+      - 'Dockerfile'
+      - 'README.md'
+      - 'src/d**'
+      - 'src/s**'
+      - 'src/VERSION'
   workflow_dispatch:
 jobs:
   cd:
