@@ -15,8 +15,10 @@ RUN mkdir -p ${BUILD_PATH} \
     && mkdir -p ${BUILD_PATH} && mkdir -p ${LOG_PATH}/nginx
     
 COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console.conf
-COPY tsconfig.json ${BUILD_PATH}/
-COPY vue.config.js ${BUILD_PATH}/
 COPY public ${BUILD_PATH}/public
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
+
 RUN npm install
+
+COPY tsconfig.json ${BUILD_PATH}/
+COPY vue.config.js ${BUILD_PATH}/
