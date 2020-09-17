@@ -123,13 +123,21 @@
                                             v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
                                         >
                                             <slot
-                                                :name="'col-'+field+'-format'"
+                                                :name="`col-${field}-format`"
                                                 :item="item"
                                                 :value="getValueFunc(item,field)"
                                                 :index="index"
                                                 :field="field"
                                             >
-                                                {{ getValueFunc(item,field) }}
+                                                <slot
+                                                    :name="`col-${i}-format`"
+                                                    :item="item"
+                                                    :value="getValueFunc(item,field)"
+                                                    :index="index"
+                                                    :field="field"
+                                                >
+                                                    {{ getValueFunc(item,field) }}
+                                                </slot>
                                             </slot>
                                         </td>
                                     </slot>
