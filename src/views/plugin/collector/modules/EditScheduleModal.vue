@@ -24,7 +24,7 @@
             <p-field-group :label="$t('COMMON.TIME_SCHEDULE')"
                            required
                            :invalid="showValidation && !isValid"
-                           invalid-text="Please select time"
+                           :invalid-text="invalidText"
             >
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
                      class="schedule-lap"
@@ -35,7 +35,13 @@
                         <p-radio
                             v-model="scheduleType"
                             :value="type"
-                        /> <span class="schedule-type-text">{{ scheduleTypes[type] }}</span>
+                        >
+                            <template #icon>
+                                <p-i class="radio-icon" width="1.25rem" height="1.25rem"
+                                     :name="scheduleType === type ? 'ic_checkbox_circle--checked' : 'ic_radio'"
+                                />
+                            </template>
+                        </p-radio> <span class="schedule-type-text">{{ scheduleTypes[type] }}</span>
                     </div>
                     <div class="w-2/3">
                         <div v-if="type === 'custom'" class="custom-schedule-lap">
@@ -84,6 +90,7 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -105,9 +112,13 @@ class MenuItem {
     }
 }
 
+const INTERVAL_MAX_SECONDS = 3600;
+const INTERVAL_MIN_SECONDS = 30;
+
 export default {
     name: 'EditScheduleModal',
     components: {
+        PI,
         PRadio,
         PTextInput,
         PButton,
@@ -143,9 +154,21 @@ export default {
             selectedUTCHoursList: computed(() => flatMap(state.selectedHours, time => moment.utc(time).hour())),
             isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
             showValidation: false,
+            invalidText: computed(() => {
+                if (state.scheduleType === 'custom' && state.selectedUTCHoursList.length) {
+                    return 'Please select time';
+                } if (state.scheduleType === 'interval') {
+                    if (state.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
+                        return 'should be >= 30 seconds';
+                    } if (state.intervalTimeInSeconds > INTERVAL_MAX_SECONDS) {
+                        return 'should be <= 1 hour';
+                    }
+                }
+                return '';
+            }),
             isValid: computed(() => {
                 if (state.scheduleType === 'custom') return state.selectedUTCHoursList.length !== 0;
-                return state.intervalTime > 0;
+                return state.intervalTimeInSeconds >= INTERVAL_MIN_SECONDS && state.intervalTimeInSeconds <= INTERVAL_MAX_SECONDS;
             }),
             //
             scheduleTypes: { custom: 'Custom Schedule', interval: 'Interval' },
@@ -205,13 +228,13 @@ export default {
                 } else {
                     state.scheduleType = 'interval';
                     const interval = res.schedule.interval;
-                    if (interval < 60) {
-                        state.intervalTimeType = 'seconds';
-                        state.intervalTime = interval;
-                    } else if (interval >= 60 && interval < 3600) {
+
+                    state.intervalTimeType = 'seconds';
+                    state.intervalTime = interval;
+                    if (interval >= 60 && interval < 3600 && interval % 60 === 0) {
                         state.intervalTimeType = 'minutes';
                         state.intervalTime = Math.trunc(interval / 60);
-                    } else {
+                    } else if (interval === 3600) {
                         state.intervalTimeType = 'hours';
                         state.intervalTime = Math.trunc(interval / 3600);
                     }

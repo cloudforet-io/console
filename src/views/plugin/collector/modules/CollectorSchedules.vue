@@ -44,8 +44,8 @@
                     </span>
                 </span>
                 <span v-else>
-                    <p-lottie class="inline-block" style="display: inline-block" name="lottie_interval" auto
-                              :size="2"
+                    <p-lottie class="inline-block mr-1" style="display: inline-block" name="lottie_interval"
+                              auto :size="1"
                     />
                     <span>{{ intervalFormatter(value.interval) }}</span>
                 </span>
@@ -152,9 +152,12 @@ export default {
             if (interval < 60) {
                 return `${interval} sec`;
             } if (interval >= 60 && interval < 3600) {
-                return `${Math.trunc(interval / 60)} hour`;
+                if (interval % 60 === 0) {
+                    return `${Math.trunc(interval / 60)} min`;
+                }
+                return `${interval} sec`;
             }
-            return `${Math.trunc(interval / 3600)} min`;
+            return `${Math.trunc(interval / 3600)} hour`;
         };
 
         const openEditModal = (editMode: boolean) => {
