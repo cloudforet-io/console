@@ -3,7 +3,8 @@
         <div class="input-lap">
             <p><b>SpaceONE</b> offers Monthly Report based on this project. We will provide more options soon.</p>
             <p-field-group label="Company Name on the Report Cover"
-                           :invalid="inputModel.companyName.length === 0"
+                           :invalid="inputModel.companyName && !isValid"
+                           :invalid-text="invalidText"
                            :required="true"
             >
                 <template #default="{invalid}">
@@ -11,12 +12,13 @@
                 </template>
             </p-field-group>
             <p-field-group label="Period(Last one month)" class="absolute pl-12" :required="true">
-                <p-select-dropdown v-model="inputModel.period" :items="periods" auto-height />
+                <p-select-dropdown v-model="inputModel.period" :items="periodItems" auto-height />
             </p-field-group>
         </div>
         <div class="button-lap">
             <p-button class="txt-btn"
                       style-type="gray900" :outline="true" size="lg"
+                      :disabled="!isValid"
             >
                 Download file
             </p-button>
@@ -32,13 +34,17 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import moment from 'moment';
 
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
+
+import { getTimezone, MenuItem } from '@/lib/util';
 
 export default {
     name: 'ProjectReportTab',
@@ -49,14 +55,45 @@ export default {
         PTextInput,
         PFieldGroup,
     },
-    setup(props, context) {
+    setup() {
         const state = reactive({
             inputModel: {
-                companyName: '',
+                companyName: undefined,
                 period: '',
             },
-            periods: [],
+            periodItems: computed(() => {
+                const sixMonthAgo = moment().tz(getTimezone()).subtract(6, 'months');
+                const now = moment().tz(getTimezone()).subtract(1, 'month');
+                const periods = [] as MenuItem[];
+                while (now.isAfter(sixMonthAgo)) {
+                    periods.push({
+                        name: now.format('YYYY-MM'),
+                        label: now.format('YYYY-MM'),
+                        type: 'item',
+                    });
+                    now.subtract(1, 'month');
+                }
+                return periods;
+            }),
+            invalidText: computed(() => {
+                if (typeof state.inputModel.companyName === 'string') {
+                    if (state.inputModel.companyName.length === 0) return 'Should have required property \'name\'';
+                    if (state.inputModel.companyName.length > 60) return 'Should not be longer than 60 characters';
+                }
+                return '';
+            }),
+            isValid: computed(() => {
+                if (state.inputModel.companyName) {
+                    return !(state.inputModel.companyName.length === 0 || state.inputModel.companyName.length > 60);
+                }
+                return false;
+            }),
         });
+
+        const init = () => {
+            state.inputModel.period = state.periodItems[0].name;
+        };
+        init();
 
         return {
             ...toRefs(state),

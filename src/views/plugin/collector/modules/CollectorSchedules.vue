@@ -152,7 +152,7 @@ export default {
             if (interval < 60) {
                 return `${interval} sec`;
             } if (interval >= 60 && interval < 3600) {
-                return `${Math.trunc(interval / 60)} min`;
+                return `${Math.trunc(interval / 60)} hour`;
             }
             return `${Math.trunc(interval / 3600)} min`;
         };
