@@ -14,16 +14,16 @@
 import { map } from 'lodash';
 
 interface ScheduleType {
-        name: string;
-            rule: {
-                MON: number[];
-                TUE: number[];
-                WED: number[];
-                THU: number[];
-                FRI: number[];
-                SAT: number[];
-                SUN: number[];
-            };
+    name: string;
+    rule: {
+        MON: number[];
+        TUE: number[];
+        WED: number[];
+        THU: number[];
+        FRI: number[];
+        SAT: number[];
+        SUN: number[];
+    };
 }
 
 export default {
@@ -42,15 +42,12 @@ export default {
                 color = 'bg-white';
                 break;
             case (length < 7):
-                color = 'bg-gray-100';
-                break;
-            case (length < 13):
                 color = 'bg-primary2';
                 break;
-            case (length < 19):
+            case (length < 13):
                 color = 'bg-primary1';
                 break;
-            case (length < 25):
+            case (length < 19):
                 color = 'bg-primary';
                 break;
             case (length < 25):
@@ -63,11 +60,16 @@ export default {
             return color;
         };
 
-        const scheduleHeatMapColor: string[][] = [];
-        map(props.schedule, (sd: ScheduleType) => {
-            const dailyHeatMapColor: string[] = map(sd.rule, (day: number[]) => getHeatMapColor(day.length));
-            scheduleHeatMapColor.push(dailyHeatMapColor);
-        });
+        let scheduleHeatMapColor: string[][] = [];
+
+        if (props.schedule.length > 0) {
+            map(props.schedule, (sd) => {
+                const dailyHeatMapColor: string[] = map(sd.rule, (day: number[]) => getHeatMapColor(day.length));
+                scheduleHeatMapColor.push(dailyHeatMapColor);
+            });
+        } else {
+            scheduleHeatMapColor = [];
+        }
 
         return {
             scheduleHeatMapColor,

@@ -39,10 +39,10 @@
                         <div class="resources">
                             <div class="scheduled-resources">
                                 <p>Scheduled Resources</p>
-                                <span class="current-schedule-resources">{{ scheduledResources[index].managed_count }}</span>
-                                <span class="max-schedule-resources">/ {{ scheduledResources[index].total_count }}</span>
+                                <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
+                                <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
                                 <p-progress-bar
-                                    :percentage="percentage[index].value"
+                                    :percentage="item.percentage"
                                     :style="'width: 160px'"
                                     class="pt-2"
                                 />
@@ -63,12 +63,12 @@
                         <div>
                             <p class="mb-4">
                                 <span class="schedule-title">SCHEDULE
-                                    <span v-if="scheduler[index].length < 4" class="schedule-title-num">({{ scheduler[index].length }})</span>
+                                    <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
                                     <span v-else>(3+)</span>
                                 </span>
                             </p>
-                            <div v-if="scheduler[index].length > 0">
-                                <div v-for="(schedule, idx) in scheduler[index]" :key="idx">
+                            <div v-if="item.scheduler.length > 0">
+                                <div v-for="(schedule, idx) in item.scheduler" :key="idx">
                                     <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span><br>
                                 </div>
                             </div>
@@ -79,12 +79,12 @@
                                 /> <span class="schedule-add-text">Create Scheduler</span>
                             </div>
                         </div>
-                        <div v-if="scheduler[index].length > 0">
+                        <div>
                             <span v-for="(day, index) in weekday" :key="index" class="weekday">
                                 {{ day }}
                             </span>
-                            <div class="schedule-matrix mt-4">
-                                <schedule-heatmap :schedule="scheduler[index]" />
+                            <div v-if="item.scheduler.length > 0" class="schedule-matrix mt-4">
+                                <schedule-heatmap :schedule="item.scheduler" />
                             </div>
                         </div>
                     </div>
@@ -98,7 +98,6 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import router from '@/routes';
 
 /* Components */
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
@@ -122,10 +121,40 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { Timestamp } from '@/components/util/type';
+
+interface CardItem {
+    // eslint-disable-next-line camelcase
+    created_at: Timestamp;
+    // eslint-disable-next-line camelcase
+    created_by: string;
+    // eslint-disable-next-line camelcase
+    deleted_at: unknown;
+    domain_id: string;
+    name: string;
+    percentage: number;
+    // eslint-disable-next-line camelcase
+    project_id: string;
+    // eslint-disable-next-line camelcase
+    project_group_info: object;
+    scheduler: Scheduler;
+    scheduledResources: ScheduledResource;
+    state: string;
+    tags: object;
+}
+
+interface ScheduledResource {
+    // eslint-disable-next-line camelcase
+    managed_count: number;
+    // eslint-disable-next-line camelcase
+    total_count: number;
+}
 
 interface Scheduler {
     name: string;
-    heatMap: unknown;
+    rule: object;
+    // eslint-disable-next-line camelcase
+    schedule_id: string;
 }
 
 export default {
@@ -159,7 +188,9 @@ export default {
                 },
             ],
             valueHandlerMap: {
+                // eslint-disable-next-line camelcase
                 project_id: makeReferenceValueHandler('identity.Project'),
+                // eslint-disable-next-line camelcase
                 schedule_id: makeReferenceValueHandler('power_scheduler.Schedule'),
             },
         };
@@ -181,7 +212,7 @@ export default {
         });
 
         const scheduleState = reactive({
-            scheduledResources: [] as any,
+            scheduledResources: [] as unknown as ScheduledResource,
             approximateCosts: 0,
             percentage: [] as any,
             scheduler: [] as unknown as Scheduler,
@@ -213,26 +244,17 @@ export default {
             };
         };
 
-        const getProjects = async (items) => {
-            try {
-                await state.projectIdList.push(items.map(d => d.project_id));
-            } catch (e) {
-                console.error(e);
-            }
-            return state.projectIdList;
-        };
-
         const getScheduledResources = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.powerSchedulerResources({ projects: state.projectIdList[0] },
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerResources({ projects: state.items.map(d => d.project_id) },
                     {
                         headers: {
                             'Mock-Mode': 'true',
                         },
                     });
-                for (let i = 0; i < state.items.length; i++) {
-                    scheduleState.scheduledResources[i] = res.projects[state.items[i].project_id];
-                    scheduleState.percentage[i] = computed(() => (scheduleState.scheduledResources[i].managed_count / scheduleState.scheduledResources[i].total_count) * 100);
+                for (let i = 0; i < Object.keys(state.items).length; i++) {
+                    state.items[i].scheduledResources = res.projects[state.items[i].project_id];
+                    state.items[i].percentage = (computed(() => (state.items[i].scheduledResources.managed_count / state.items[i].scheduledResources.total_count) * 100)).value;
                 }
             } catch (e) {
                 console.error(e);
@@ -241,14 +263,14 @@ export default {
 
         const getScheduleList = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: state.projectIdList[0] },
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: state.items.map(d => d.project_id) },
                     {
                         headers: {
                             'Mock-Mode': 'true',
                         },
                     });
-                for (let i = 0; i < state.items.length; i++) {
-                    scheduleState.scheduler[i] = res.projects[state.items[i].project_id];
+                for (let i = 0; i < Object.keys(state.items).length; i++) {
+                    state.items[i].scheduler = res.projects[state.items[i].project_id];
                 }
             } catch (e) {
                 console.error(e);
@@ -260,9 +282,8 @@ export default {
             try {
                 const res = await SpaceConnector.client.identity.project.list(getParams());
                 state.items = res.results;
-                state.totalCount = res.total_count || 0;
-                await getProjects(res.results);
                 await Promise.all([getScheduledResources(), getScheduleList()]);
+                state.totalCount = res.total_count || 0;
                 state.loading = false;
             } catch (e) {
                 console.error(e);
