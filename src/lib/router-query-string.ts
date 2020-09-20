@@ -9,6 +9,14 @@ import { Dictionary } from 'vue-router/types/router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { parseTag } from '@/lib/api/query-search';
 import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
+import { store } from '@/store';
+
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(tz);
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 export type RouteQuery = Dictionary<RouteQueryString>;
@@ -158,25 +166,32 @@ export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
     return null;
 };
 
+const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]): QueryItem => {
+    const queryItem: QueryItem = parseTag(queryString);
+    if (queryItem.key?.name && keyItems) {
+        queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
+    }
+    if (queryItem.key?.dataType === 'datetime') {
+        const time = dayjs.utc(queryItem.value.name);
+        if (time.isValid()) {
+            queryItem.value = {
+                label: dayjs.tz(time, store.state.user.timezone || 'UTC').format('YYYY-MM-DD'),
+                name: time.format('YYYY-MM-DD'),
+            };
+        }
+    }
+    return queryItem;
+};
+
 export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?: KeyItem[]): QueryTag[] => {
     if (!queryString) return [];
     if (Array.isArray(queryString)) {
         return queryString.reduce((res, qs) => {
-            if (qs) {
-                const queryItem: QueryItem = parseTag(qs);
-                if (queryItem.key?.name && keyItems) {
-                    queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
-                }
-                res.push(queryItem);
-            }
+            if (qs) res.push(getQueryItemFromQueryString(qs, keyItems));
             return res;
         }, [] as QueryTag[]);
     }
-    const queryItem = parseTag(queryString as string);
-    if (queryItem.key?.name && keyItems) {
-        queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
-    }
-    return [queryItem];
+    return [getQueryItemFromQueryString(queryString as string, keyItems)];
 };
 
 /** QueryString replacer Helpers */
