@@ -3,7 +3,7 @@ export const inputDataTypes = {
     integer: 'number',
     float: 'number',
     boolean: 'text',
-    datetime: 'datetime-local',
+    datetime: 'text',
 };
 export type KeyDataType = keyof typeof inputDataTypes;
 
