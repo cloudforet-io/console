@@ -1,14 +1,16 @@
 <template>
     <div v-if="_tags.length > 0" class="p-query-search-tags">
-        <span class="filter">Filter: </span>
-        <div class="delete-btn">
-            <p-badge class="tag" outline style-type="gray900"
-                     @click="deleteAllTags"
-            >
-                Clear all
-            </p-badge>
+        <div class="left">
+            <span class="filter">Filter: </span>
+            <div class="delete-btn">
+                <p-badge class="tag" outline style-type="gray900"
+                         @click="deleteAllTags"
+                >
+                    Clear all
+                </p-badge>
+            </div>
+            <div class="divider" />
         </div>
-        <div class="divider" />
         <div class="tags">
             <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                    class="tag"
@@ -22,10 +24,13 @@
                 />
                 <span v-if="tag.key">
                     <span class="key-label">{{ tag.key.label || tag.key.name }}</span>
-                    :{{ tag.operator }} {{ tag.value.label || tag.value.name }}
+                    :{{ tag.operator }}
+                    <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
+                        <span class="value-label">{{ tag.value.label || tag.value.name }}</span>
+                    </slot>
                 </span>
                 <template v-else>
-                    {{ tag.value.label || tag.value.name }}
+                    <span class="value-label">{{ tag.value.label || tag.value.name }}</span>
                 </template>
             </p-tag>
         </div>
@@ -77,8 +82,9 @@ export default {
         const converter = computed(() => props.converter || defaultConverter);
 
         const getConvertedQueryTags = (queries: QueryItem[], tags: QueryTag[]): QueryTag[] => queries.reduce((validatedTags, query) => {
-            if (validator.value(query, validatedTags)) {
-                validatedTags.push(converter.value(query, timezone.value));
+            const converted = converter.value(query, timezone.value);
+            if (validator.value(converted, validatedTags)) {
+                validatedTags.push(converted);
             }
             return validatedTags;
         }, [...tags]);
@@ -107,7 +113,7 @@ export default {
 
         emit('init', {
             tags: _tags.value,
-            timezone: props.timezone,
+            timezone: timezone.value,
         } as QuerySearchTagsProps);
 
         return {
@@ -122,22 +128,26 @@ export default {
 .p-query-search-tags {
     @apply flex flex-row w-full;
     margin-bottom: 0.37rem;
+    .left {
+        @apply flex-shrink-0;
+        display: flex;
+        height: 1.2rem;
+        align-items: center;
+    }
     .filter {
         @apply mr-4 rounded-sm;
         font-size: 0.75rem;
-        line-height: 1.8;
-    }
-    .divider {
-        @apply inline-block my-0 mx-4 text-gray-200;
-        height: 1rem;
-        border-left-width: 1px;
-        margin-top: 0.22rem;
     }
     .delete-btn {
         @apply flex-shrink-0;
         .tag {
             @apply cursor-pointer rounded-sm flex-grow-0;
         }
+    }
+    .divider {
+        @apply inline-block my-0 mx-4 text-gray-200;
+        height: 1rem;
+        border-left-width: 1px;
     }
     .tags {
         flex-grow: 1;

@@ -7,7 +7,7 @@ export interface QueryTag extends QueryItem<string|number|boolean> {
 }
 
 export interface QueryTagValidator {
-    (query: QueryItem, tags: QueryTag[]): boolean;
+    (query: QueryTag, tags: QueryTag[]): boolean;
 }
 
 export interface QueryTagConverter {

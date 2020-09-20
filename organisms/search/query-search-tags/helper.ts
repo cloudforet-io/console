@@ -1,6 +1,12 @@
 import { KeyDataType, QueryItem } from '@/components/organisms/search/query-search/type';
 import { QueryTagConverter, QueryTag, QueryTagValidator } from '@/components/organisms/search/query-search-tags/type';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(tz);
+
 
 const trueRegex = RegExp('true', 'i');
 const falseRegex = RegExp('false', 'i');
@@ -17,17 +23,18 @@ const booleanConverter = (query: QueryItem): QueryTag => {
     return res;
 };
 
+const datetimeRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
 const datetimeConverter = (query: QueryItem, timezone: string): QueryTag => {
     const res: QueryTag = { ...query };
-    const time = moment(query.value.name);
-    if (time.isValid()) {
+    if (datetimeRegex.test(query.value.name)) {
+        const time = dayjs.utc(query.value.name);
         res.value = {
-            label: moment.tz(time, timezone).format('YYYY-MM-DD HH:mm:ss'),
-            name: time.utc().toISOString(),
+            label: dayjs.tz(time, timezone).format('YYYY-MM-DD'),
+            name: time.format('YYYY-MM-DD'),
         };
     } else {
         res.invalid = true;
-        res.description = 'This is not suitable for datetime format. e.g. 2020-05-03 00:00:00';
+        res.description = 'This is not suitable for datetime format. e.g. 2020-05-03';
     }
     return res;
 };
@@ -76,7 +83,7 @@ const defaultConverter = (query: QueryItem, timezone: string): QueryTag => {
     return query;
 };
 
-const defaultValidator: QueryTagValidator = (query: QueryItem, tags: QueryTag[]): boolean => tags.every((tag) => {
+const defaultValidator: QueryTagValidator = (query: QueryTag, tags: QueryTag[]): boolean => tags.every((tag) => {
     if (tag.key && query.key) {
         return (query.key.name !== tag.key.name
             || query.operator !== tag.operator

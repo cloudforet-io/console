@@ -27,7 +27,7 @@
         <template #search-default="scope">
             <input v-focus.lazy="scope.isFocused"
                    :value="scope.value"
-                   :placeholder="scope.placeholder"
+                   :placeholder="currentPlaceholder || scope.placeholder"
                    :disabled="scope.disabled"
                    :type="inputType"
                    :step="currentDataType === 'integer' ? 1 : undefined"
@@ -68,20 +68,59 @@ import {
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import {
     HandlerResponse,
-    inputDataTypes,
+    inputDataTypes, KeyDataType,
     KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Component } from 'vue';
 import { defaultValueHandler } from '@/components/organisms/search/query-search/helper';
 import PQuerySearchGuide from '@/components/organisms/search/query-search-guide/PQuerySearchGuide.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface MenuItem<T> extends ContextMenuItem {
     data?: T;
 }
-
-const operatorChars: OperatorType[] = ['!', '>', '<', '=', '$'];
+const defaultOperatorChars = ['!', '>', '<', '=', '$'];
+const operatorChars: Record<KeyDataType, OperatorType[]> = {
+    string: defaultOperatorChars,
+    integer: defaultOperatorChars,
+    float: defaultOperatorChars,
+    boolean: defaultOperatorChars,
+    datetime: ['>', '<', '='],
+};
 const lastOnlyOperatorChars: OperatorType[] = ['=', '$'];
+
+
+const operatorMenuMap = {
+    datetime: [
+        { label: '>: Greater than', name: '>', type: CONTEXT_MENU_TYPE.item },
+        { label: '<: Less than', name: '<', type: CONTEXT_MENU_TYPE.item },
+        { label: '=: Range', name: '=', type: CONTEXT_MENU_TYPE.item },
+    ],
+};
+
+const placeholderMap = {
+    datetime: 'YYYY-MM-DD',
+};
+
+const datetimeFormatRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
+const formatterMap = {
+    datetime: (value) => {
+        const res = datetimeFormatRegex.exec(value);
+        if (res) return res[0];
+        return value;
+    },
+};
+
+const datetimeRegex = RegExp(/^(\d)|[-]$/);
+const operatorCheckerMap = {
+    datetime: value => datetimeRegex.test(value),
+};
 
 export default {
     name: 'PQuerySearch',
@@ -123,12 +162,8 @@ export default {
             selectedKey: null as KeyItem|null,
             operator: '' as OperatorType,
             currentDataType: computed(() => state.selectedKey?.dataType || 'string'),
-            inputType: computed(() => {
-                if (state.selectedKey?.dataType) {
-                    return inputDataTypes[state.selectedKey.dataType] || 'text';
-                }
-                return 'text';
-            }),
+            currentPlaceholder: computed(() => placeholderMap[state.selectedKey?.dataType] || undefined),
+            inputType: computed(() => inputDataTypes[state.selectedKey?.dataType] || 'text'),
             keyTotalCount: computed(() => {
                 if (state.selectedKey) return 0;
                 return props.keyItems.length;
@@ -167,7 +202,13 @@ export default {
                 return [];
             }),
             menu: computed<MenuItem<KeyItem|ValueItem>[]>(() => {
-                if (state.selectedKey) return state.valueMenu;
+                if (state.selectedKey) {
+                    if (operatorMenuMap[state.selectedKey.dataType]) {
+                        if (state.operator) return state.valueMenu;
+                        return operatorMenuMap[state.selectedKey.dataType];
+                    }
+                    return state.valueMenu;
+                }
                 return state.keyMenu;
             }),
             visibleSearchGuide: false,
@@ -233,11 +274,17 @@ export default {
         };
 
         const emitSearch = (val: ValueItem) => {
-            emit('search', {
+            const queryItem = {
                 key: state.selectedKey,
                 value: val,
                 operator: state.operator,
-            } as QueryItem);
+            } as QueryItem;
+
+            if (queryItem.key?.dataType && formatterMap[queryItem.key.dataType]) {
+                queryItem.value.name = formatterMap[queryItem.key.dataType](val.name);
+            }
+
+            emit('search', queryItem);
             clearText();
             if (state.selectedKey) {
                 state.selectedKey = null;
@@ -274,8 +321,13 @@ export default {
 
         const onMenuSelect = (value: string, idx: number) => {
             if (state.selectedKey) {
-                const val = state.valueMenu[idx].data;
-                onSearch(val);
+                if (operatorMenuMap[state.selectedKey.dataType]) {
+                    state.operator = value;
+                    focus();
+                } else {
+                    const val = state.valueMenu[idx].data;
+                    onSearch(val);
+                }
             } else {
                 const selected = state.keyMenu[idx];
                 if (selected.data) {
@@ -307,7 +359,9 @@ export default {
         };
 
         const onKeydown = (e: KeyboardEvent) => {
-            if (operatorChars.includes(e.key)) {
+            if (!state.selectedKey) return;
+
+            if (operatorChars[state.selectedKey.dataType || 'string'].includes(e.key)) {
                 if (state.searchText.length > 0) return;
                 if (state.operator.length === 0) {
                     state.operator = e.key;
@@ -316,6 +370,9 @@ export default {
                     state.operator += e.key;
                     e.preventDefault();
                 }
+            } else if (!['Backspace', 'Enter'].includes(e.key)) {
+                const checker = operatorCheckerMap[state.selectedKey.dataType];
+                if (!checker(e.key)) e.preventDefault();
             }
         };
 
