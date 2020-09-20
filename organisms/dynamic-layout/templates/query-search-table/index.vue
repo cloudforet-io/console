@@ -37,7 +37,7 @@
                 </slot>
             </template>
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot v-if="!slot.startsWith('col-')" :name="slot" v-bind="scope" />
+                <slot v-if="!dynamicFieldSlots[slot] && slot !== 'tag-data-type-datetime'" :name="slot" v-bind="scope" />
             </template>
         </p-query-search-table>
     </div>
