@@ -27,7 +27,13 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
-        <template v-if="!$scopedSlots['toolbox-left']" #toolbox-left>
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot v-if="!['toolbox-bottom', 'toolbox-left'].includes(slot) && !slot.startsWith('tag-')"
+                  :name="slot" v-bind="scope"
+            />
+        </template>
+        <template #toolbox-left="scope">
+            <slot name="toolbox-left" v-bind="scope" />
             <div class="left-toolbox-item hidden lg:block">
                 <p-query-search :key-items="keyItems"
                                 :value-handler-map="valueHandlerMap"
@@ -35,8 +41,8 @@
                 />
             </div>
         </template>
-        <template v-if="!$scopedSlots['toolbox-bottom']" #toolbox-bottom>
-            <div class="flex flex-col flex-1 block lg:hidden">
+        <template #toolbox-bottom="scope">
+            <div class="flex flex-col flex-1">
                 <p-query-search class="block lg:hidden mt-4"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
                                 :key-items="keyItems"
@@ -44,47 +50,19 @@
                                 @search="onSearch"
                 />
                 <div class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
-                    <p-hr v-if="tags.length > 0" style="width: 100%;" />
                     <p-query-search-tags ref="tagsRef"
-                                         style="margin-top: 0.5rem;"
                                          :tags="tags"
                                          :timezone="timezone"
                                          @init="onQueryTagsInit"
                                          @change="onQueryTagsChange"
-                    />
+                    >
+                        <template v-for="(_, slot) of tagSlots" v-slot:[slot]="scope">
+                            <slot :name="`tag-${slot}`" v-bind="scope"/>
+                        </template>
+                    </p-query-search-tags>
                 </div>
+                <slot name="toolbox-bottom" v-bind="scope" />
             </div>
-        </template>
-        <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
-            <template v-if="slot === 'toolbox-left'" >
-                <slot name="toolbox-left" />
-                <div :key="i" class="left-toolbox-item hidden lg:block">
-                    <p-query-search :key-items="keyItems"
-                                    :value-handler-map="valueHandlerMap"
-                                    @search="onSearch"
-                    />
-                </div>
-            </template>
-            <div v-else-if="slot === 'toolbox-bottom'" :key="i" class="flex flex-col flex-1">
-                <p-query-search class="block lg:hidden mt-4"
-                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
-                                :key-items="keyItems"
-                                :value-handler-map="valueHandlerMap"
-                                @search="onSearch"
-                />
-                <div class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
-                    <p-hr v-if="tags.length > 0" style="width: 100%;" />
-                    <p-query-search-tags ref="tagsRef"
-                                         style="margin-top: 0.5rem;"
-                                         :tags="tags"
-                                         :timezone="timezone"
-                                         @init="onQueryTagsInit"
-                                         @change="onQueryTagsChange"
-                    />
-                </div>
-                <slot name="toolbox-bottom" />
-            </div>
-            <slot v-else :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>
 </template>
@@ -113,7 +91,7 @@ const CHILDREN_INIT_COUNT = 1;
 export default {
     name: 'PQuerySearchTable',
     components: {
-        PQuerySearchTags, PHr, PQuerySearch, PToolboxTable,
+        PQuerySearchTags, PQuerySearch, PToolboxTable,
     },
     props: {
         fields: {
@@ -203,7 +181,15 @@ export default {
             /** search */
             tags: makeOptionalProxy('queryTags', vm),
             tagsRef: null as null|QuerySearchTagsFunctions,
+            tagSlots: computed(() => {
+                const res = {};
+                forEach(slots, (d, name) => {
+                    if (name.startsWith('tag-')) res[name.substring(4)] = d;
+                });
+                return res;
+            }),
         });
+
 
         // check if each option value is 'undefined' to escape auto type casting
         const getFullOptions = (options: Partial<Options>): Options => ({
@@ -322,9 +308,13 @@ export default {
                 flex-grow: 1;
             }
         }
-        >>> .toolbox {
-            .toolbox-bottom {
-                @apply mt-0;
+        &.p-toolbox-table {
+            .toolbox {
+                @apply pb-2;
+
+                .toolbox-bottom {
+                    @apply mt-0;
+                }
             }
         }
     }

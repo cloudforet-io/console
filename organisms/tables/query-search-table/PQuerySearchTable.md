@@ -1,4 +1,9 @@
 
+# Slots
+
+* All ToolboxTable component's slots.
+* All QuerySearchTags component's slots with prefix ```tag```. (e.g. ```tag-data-type-datetime```)
+
 # Functions
 | Name | Description |
 | ---- | ----------- |
