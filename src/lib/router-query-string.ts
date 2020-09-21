@@ -171,15 +171,15 @@ const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]):
     if (queryItem.key?.name && keyItems) {
         queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
     }
-    if (queryItem.key?.dataType === 'datetime') {
-        const time = dayjs.utc(queryItem.value.name);
-        if (time.isValid()) {
-            queryItem.value = {
-                label: dayjs.tz(time, store.state.user.timezone || 'UTC').format('YYYY-MM-DD'),
-                name: time.format('YYYY-MM-DD'),
-            };
-        }
-    }
+    // if (queryItem.key?.dataType === 'datetime') {
+    //     const time = dayjs.utc(queryItem.value.name);
+    //     if (time.isValid()) {
+    //         queryItem.value = {
+    //             label: dayjs.tz(time, store.state.user.timezone || 'UTC').format('YYYY-MM-DD'),
+    //             name: time.format('YYYY-MM-DD'),
+    //         };
+    //     }
+    // }
     return queryItem;
 };
 

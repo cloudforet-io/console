@@ -15,7 +15,6 @@
 import {
     orderBy, range, max, find,
 } from 'lodash';
-import moment from 'moment';
 import numeral from 'numeral';
 
 import {
@@ -33,6 +32,16 @@ import {
     black, red, gray, primary,
 } from '@/styles/colors';
 
+import dayjs, { Dayjs } from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import {ChartOptions} from "chart.js";
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const TICKS_COUNT = 5;
 const DEFAULT_MAX = 600;
 const DEFAULT_STEP_SIZE = 100;
@@ -42,7 +51,7 @@ const LEGEND_COLORS: {[k: string]: string} = {
 };
 
 interface ChartDataType {
-    date: string;
+    date: Dayjs;
     success: number | null;
     failure: number | null;
 }
@@ -70,10 +79,9 @@ export default {
             failureData: [] as number[],
             noData: false,
             //
-            currentDate: moment().tz(getTimezone()),
-            currentDateText: computed(() => state.currentDate.format('YYYY-MM-DD')),
-            currentMonthStart: computed(() => moment(state.currentDateText).startOf('month')),
-            currentMonthEnd: computed(() => moment(state.currentDateText).endOf('month')),
+            currentDate: dayjs().tz(getTimezone()),
+            currentMonthStart: computed(() => dayjs(state.currentDate).startOf('month')),
+            currentMonthEnd: computed(() => dayjs(state.currentDate).endOf('month')),
             dayCount: computed(() => state.currentDate.daysInMonth()),
         });
 
@@ -81,35 +89,38 @@ export default {
             state.noData = rawData.length === 0;
 
             const orderedData = orderBy(rawData, ['date'], ['asc']);
-            const dateFormattedData = orderedData.map(d => ({
-                date: moment(d.date).tz(getTimezone()).subtract(1, 'day').format('YYYY-MM-DD'),
-                success: d.success,
-                failure: d.failure,
-            }));
+            const dateFormattedData = orderedData.map((d) => {
+                return {
+                    date: dayjs(d.date).tz(getTimezone()),
+                    success: d.success,
+                    failure: d.failure,
+                };
+            });
             const chartData = [] as ChartDataType[];
-            const today = moment().tz(getTimezone());
-            const now = moment(state.currentMonthStart.format());
+            const today = dayjs().tz(getTimezone());
+            let now = state.currentMonthStart.clone();
 
-            while (now.isSameOrBefore(state.currentMonthEnd)) {
-                const nowText = now.format('YYYY-MM-DD');
-                const existData = find(dateFormattedData, { date: nowText });
+            while (now.isSameOrBefore(state.currentMonthEnd, 'day')) {
+                // eslint-disable-next-line no-loop-func
+                const existData = find(dateFormattedData, d => d.date.isSame(now, 'day'));
                 let success: number | null = 0;
                 let failure: number | null = 0;
+                const date = existData?.date || now;
 
                 if (existData) {
                     success = existData.success;
                     failure = existData.failure;
-                } else if (now.isAfter(today, 'days')) {
+                } else if (now.isAfter(today, 'day')) {
                     success = null;
                     failure = null;
                 }
                 chartData.push({
-                    date: now.format('YYYY-MM-DD'),
+                    date,
                     success,
                     failure,
                 });
 
-                now.add(1, 'days');
+                now = now.add(1, 'day');
             }
             return chartData;
         };
@@ -117,8 +128,8 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
-                    start: state.currentMonthStart.tz('UTC').format(),
-                    end: state.currentMonthEnd.tz('UTC').format(),
+                    start: state.currentMonthStart.toISOString(),
+                    end: state.currentMonthEnd.toISOString(),
                 });
                 state.chartData = initChartData(res.results);
             } catch (e) {
@@ -163,12 +174,12 @@ export default {
                 const item = event[0];
                 if (item) {
                     const clickedData = state.chartData[item._index];
-                    // const selectedDate = moment(clickedData.date).tz(getTimezone()).format('YYYY-MM-DD');
-                    // emit('update:selectedDate', selectedDate);
+                    const selectedDate = dayjs.tz(clickedData.date, getTimezone()).format('YYYY-MM-DD');
+                    emit('click-date', selectedDate);
                 }
             };
 
-            const options = {
+            const options: ChartOptions = {
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -207,11 +218,10 @@ export default {
                 onClick: pointClickEvent,
             };
 
-            const currentMonthText = state.currentDate.format('M');
             state.chart = new NSChart(canvas, {
                 type: 'line',
                 data: {
-                    labels: (range(1, state.dayCount + 1)).map(d => `${currentMonthText}/${d}`),
+                    labels: state.chartData.map(d => d.date.format('M/D')),
                     datasets,
                 },
                 options,
@@ -223,8 +233,8 @@ export default {
         };
         init();
 
-        watch(() => state.currentDate, () => {
-            getDailyJobSummary();
+        watch(() => state.currentDate, async () => {
+            await getDailyJobSummary();
         }, { immediate: false });
 
         watch([() => state.chartRef, () => state.chartData], ([ctx, chartData]) => {
