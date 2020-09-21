@@ -23,14 +23,21 @@ const booleanConverter = (query: QueryItem): QueryTag => {
     return res;
 };
 
-const datetimeRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
+const dateRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
+const datetimeRegex = RegExp(/|^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$/);
 const datetimeConverter = (query: QueryItem, timezone: string): QueryTag => {
     const res: QueryTag = { ...query };
-    if (datetimeRegex.test(query.value.name)) {
+    if (dateRegex.test(query.value.name)) {
         const time = dayjs.utc(query.value.name);
         res.value = {
-            label: dayjs.tz(time, timezone).format('YYYY-MM-DD'),
+            label: time.format('YYYY-MM-DD'),
             name: time.format('YYYY-MM-DD'),
+        };
+    } else if (datetimeRegex.test(query.value.name)) {
+        const time = dayjs.utc(query.value.name);
+        res.value = {
+            label: dayjs.tz(time, timezone).format('YYYY-MM-DD HH:mm:ss'),
+            name: time.format('YYYY-MM-DD HH:mm:ss'),
         };
     } else {
         res.invalid = true;
