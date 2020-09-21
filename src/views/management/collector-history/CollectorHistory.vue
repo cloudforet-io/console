@@ -58,7 +58,18 @@
                         <span class="float-right">{{ value }}</span>
                     </template>
                     <template #col-status-format="{ value }">
-                        <span :class="value.toLowerCase()">{{ statusFormatter(value) }}</span>
+                        <!--                        <p-lottie v-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"-->
+                        <!--                                  class="status-icon"-->
+                        <!--                                  :size="1.5" :auto="true" name="lottie_error"-->
+                        <!--                        />-->
+                        <!--                        <p-lottie v-else-if="['IN_PROGRESS'].includes(value)"-->
+                        <!--                                  class="status-icon"-->
+                        <!--                                  :size="1.5" :auto="true" name="lottie_working"-->
+                        <!--                        />-->
+                        <!--                        <p-i v-else name="ic_done"-->
+                        <!--                             width="1.5rem" height="1.5rem"-->
+                        <!--                        />-->
+                        <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
                     </template>
                     <template #col-created_at-format="{value}">
                         {{ timestampFormatter(value) }}
@@ -126,6 +137,8 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+// import PLottie from '@/components/molecules/lottie/PLottie.vue';
+// import PI from '@/components/atoms/icons/PI.vue';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 
 import { JobModel } from '@/lib/fluent-api/inventory/job';
@@ -151,6 +164,8 @@ enum JOB_STATUS {
 export default {
     name: 'PCollectorHistory',
     components: {
+        // PI,
+        // PLottie,
         PLazyImg,
         PIconTextButton,
         PButtonModal,
@@ -484,6 +499,9 @@ export default {
             .th-additional-info-text {
                 font-weight: normal;
                 font-size: 0.75rem;
+            }
+            .status-icon {
+                display: inline-flex;
             }
         }
     }

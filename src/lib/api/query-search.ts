@@ -7,6 +7,13 @@ import {
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(tz);
+
 // will be deprecated
 export interface ACHandlerMeta {
     keyItems: KeyItem[];
@@ -84,11 +91,50 @@ const dataTypeOperators: DataTypeOperators = {
     },
 };
 
+const operatorChangeableDataTypes: KeyDataType[] = ['datetime'];
+
 type SingleValueFiltersMap = Record<string, Filter[]>
 type MultiValueFiltersMap = Record<string, Filter>
 interface QueryParam extends QueryTag {
     key: KeyItem;
 }
+
+
+const setValueFiltersByDataType = (query: QueryParam, singleFiltersMap: SingleValueFiltersMap, multiFiltersMap: MultiValueFiltersMap) => {
+    if (query.key.dataType === 'datetime') {
+        if (['>', '<'].includes(query.operator)) {
+            const filterKey = `${query.key.name}/${query.operator}=`;
+            const newFilter = {
+                k: query.key.name,
+                v: dayjs.utc(query.value.name as string).toISOString(),
+                o: dataTypeOperators[query.key?.dataType || 'string'][`${query.operator}=`],
+            };
+            if (singleFiltersMap[filterKey]) singleFiltersMap[filterKey].push(newFilter);
+            else singleFiltersMap[filterKey] = [newFilter];
+        } else if (query.operator === '=') {
+            const gteFilterKey = `${query.key.name}/>=`;
+            const ltFilterKey = `${query.key.name}/<`;
+            let time = dayjs.utc(query.value.name as string);
+
+            const gteFilter = {
+                k: query.key.name,
+                v: time.toISOString(),
+                o: dataTypeOperators[query.key?.dataType || 'string']['>='],
+            };
+            if (singleFiltersMap[gteFilterKey]) singleFiltersMap[gteFilterKey].push(gteFilter);
+            else singleFiltersMap[gteFilterKey] = [gteFilter];
+
+            time = time.add(1, 'day');
+            const ltFilter = {
+                k: query.key.name,
+                v: time.toISOString(),
+                o: dataTypeOperators[query.key?.dataType || 'string']['<'],
+            };
+            if (singleFiltersMap[ltFilterKey]) singleFiltersMap[ltFilterKey].push(ltFilter);
+            else singleFiltersMap[ltFilterKey] = [ltFilter];
+        }
+    }
+};
 
 const setSingleValueFiltersMap = (query: QueryParam, filtersMap: SingleValueFiltersMap) => {
     const filterKey = `${query.key.name}/${query.operator}`;
@@ -136,7 +182,9 @@ const getFiltersFromQueryTags = (tags: QueryTag[]): {andFilters: Filter[]; orFil
     tags.forEach((q) => {
         if (!q.invalid) {
             if (q.key !== null && q.key !== undefined) {
-                if (singleOnlyOperators.includes(q.operator)) {
+                if (operatorChangeableDataTypes.includes(q.key.dataType || 'string')) {
+                    setValueFiltersByDataType(q as QueryParam, singleValueFiltersMap, multiValueFiltersMap);
+                } else if (singleOnlyOperators.includes(q.operator)) {
                     setSingleValueFiltersMap(q as QueryParam, singleValueFiltersMap);
                 } else {
                     setMultiValueFiltersMap(q as QueryParam, multiValueFiltersMap);

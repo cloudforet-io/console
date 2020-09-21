@@ -26,7 +26,7 @@
                 <template #toolbox-bottom>
                     <page-information />
                 </template>
-                <template #card="{item}">
+                <template #card="{item, index}">
                     <div class="project-description">
                         <div class="project">
                             <div class="project-group-name">
@@ -39,10 +39,10 @@
                         <div class="resources">
                             <div class="scheduled-resources">
                                 <p>Scheduled Resources</p>
-                                <span class="current-schedule-resources">{{ currentScheduleResources }}</span>
-                                <span class="max-schedule-resources">/ {{ maxScheduleResources }}</span>
+                                <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
+                                <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
                                 <p-progress-bar
-                                    :percentage="percentage"
+                                    :percentage="item.percentage"
                                     :style="'width: 160px'"
                                     class="pt-2"
                                 />
@@ -62,19 +62,29 @@
                     <div class="schedule">
                         <div>
                             <p class="mb-4">
-                                <span class="schedule-title">SCHEDULE  <span class="schedule-title-num">(2)</span></span>
+                                <span class="schedule-title">SCHEDULE
+                                    <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
+                                    <span v-else>(3+)</span>
+                                </span>
                             </p>
-                            <div>
-                                <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name">Korea_DEVScheduler</span><br>
-                                <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name">Korea_DEVScheduler</span><br>
+                            <div v-if="item.scheduler.length > 0">
+                                <div v-for="(schedule, idx) in item.scheduler" :key="idx">
+                                    <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span><br>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <p-i name="ic_plus"
+                                     width=".75rem" height=".75rem"
+                                     class="schedule-add-btn"
+                                /> <span class="schedule-add-text">Create Scheduler</span>
                             </div>
                         </div>
                         <div>
                             <span v-for="(day, index) in weekday" :key="index" class="weekday">
                                 {{ day }}
                             </span>
-                            <div class="schedule-matrix mt-4">
-                                <schedule-heatmap />
+                            <div v-if="item.scheduler.length > 0" class="schedule-matrix mt-4">
+                                <schedule-heatmap :schedule="item.scheduler" />
                             </div>
                         </div>
                     </div>
@@ -88,7 +98,6 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import router from '@/routes';
 
 /* Components */
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
@@ -105,18 +114,46 @@ import ScheduleHeatmap from '@/views/management/power-scheduler/modules/Schedule
 
 /* Utils */
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
 /* Types */
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
+import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 
-type UrlQueryString = string | (string | null)[] | null | undefined;
+// interface CardItem {
+//     // eslint-disable-next-line camelcase
+//     created_at: Timestamp;
+//     // eslint-disable-next-line camelcase
+//     created_by: string;
+//     // eslint-disable-next-line camelcase
+//     deleted_at: unknown;
+//     domain_id: string;
+//     name: string;
+//     percentage: number;
+//     // eslint-disable-next-line camelcase
+//     project_id: string;
+//     // eslint-disable-next-line camelcase
+//     project_group_info: object;
+//     scheduler: Scheduler;
+//     scheduledResources: ScheduledResource;
+//     state: string;
+//     tags: object;
+// }
+
+interface ScheduledResource {
+    // eslint-disable-next-line camelcase
+    managed_count: number;
+    // eslint-disable-next-line camelcase
+    total_count: number;
+}
+
 interface Scheduler {
     name: string;
-    heatMap: unknown;
+    rule: object;
+    // eslint-disable-next-line camelcase
+    schedule_id: string;
 }
 
 export default {
@@ -138,41 +175,46 @@ export default {
         /**
          * Handlers for query search
          * */
-        const handlers = makeQuerySearchPropsWithSearchSchema(
-            {
-                title: 'Properties',
-                items: [
-                    { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                ],
+        const handlers = {
+            keyItems: [
+                {
+                    name: 'project_id',
+                    label: 'Project',
+                },
+                {
+                    name: 'schedule_id',
+                    label: 'Schedule',
+                },
+            ],
+            valueHandlerMap: {
+                // eslint-disable-next-line camelcase
+                project_id: makeReferenceValueHandler('identity.Project'),
+                // eslint-disable-next-line camelcase
+                schedule_id: makeReferenceValueHandler('power_scheduler.Schedule'),
             },
-            'identity.Project',
-        );
+        };
 
         /** State : state for page (grid layout, query search, etc.)
          *  scheduleState: state for scheduled resources (number, progress, money, scheduler..)
          * */
         const state = reactive({
-            items: [],
+            items: [] as any,
             cardClass: () => ['card-item', 'power-scheduler-list'],
             loading: false,
             keyItems: handlers.keyItems as KeyItem[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: [],
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
+            projectIdList: [] as string[],
+            approximateCosts: 0,
         });
 
         const scheduleState = reactive({
-            currentScheduleResources: Math.floor(Math.random() * 50),
-            maxScheduleResources: 50,
-            approximateCosts: Math.floor(Math.random() * 5000),
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
         });
-
-        const percentage = computed(() => (scheduleState.currentScheduleResources / scheduleState.maxScheduleResources) * 100);
-
 
         /**
          * Page Navigation
@@ -198,11 +240,57 @@ export default {
                 query: query.data,
             };
         };
+
+        const getScheduledResources = async () => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerResources({ projects: state.items.map(d => d.project_id) },
+                    {
+                        headers: {
+                            'Mock-Mode': 'true',
+                        },
+                    });
+                for (let i = 0; i < Object.keys(state.items).length; i++) {
+                    state.items[i].scheduledResources = res.projects[state.items[i].project_id];
+                    state.items[i].percentage = (computed(() => (state.items[i].scheduledResources.managed_count / state.items[i].scheduledResources.total_count) * 100)).value;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getScheduleList = async () => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: state.items.map(d => d.project_id) },
+                    {
+                        headers: {
+                            'Mock-Mode': 'true',
+                        },
+                    });
+                for (let i = 0; i < Object.keys(state.items).length; i++) {
+                    state.items[i].scheduler = res.projects[state.items[i].project_id];
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listProjects = async () => {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.identity.project.list(getParams());
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    scheduledResources: {
+                        managed_count: 0,
+                        total_count: 0,
+                    },
+                    scheduler: {
+                        schedule_id: '',
+                        name: '',
+                        rule: [],
+                    },
+                }));
+                await Promise.all([getScheduledResources(), getScheduleList()]);
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
             } catch (e) {
@@ -213,39 +301,8 @@ export default {
         /**
          * Query String
          * */
-        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
-            if (Array.isArray(tags)) {
-                return tags.map((tag) => {
-                    let item;
-                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
-                    else item = `${tag.value?.name}`;
-                    return item;
-                });
-            }
-            return null;
-        };
-        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
-            if (!urlQueryString) return [];
-            if (Array.isArray(urlQueryString)) {
-                return urlQueryString.reduce((res, qs) => {
-                    if (qs) res.push(parseTag(qs));
-                    return res;
-                }, [] as QueryTag[]);
-            }
-            return [parseTag(urlQueryString as string)];
-        };
-        const setSearchTags = () => {
-            // @ts-ignore
-            state.tags = urlQueryStringToSearchTags(vm.$route.query.filters);
-        };
         const changeQueryString = async (options) => {
-            const urlQueryString = searchTagsToUrlQueryString(options.queryTags);
-            const newQuery = {
-                filters: urlQueryString,
-            };
-            // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, ...newQuery } }).catch(() => {
-            });
+            await replaceQuery('filters', queryTagsToQueryString(options.queryTags));
         };
 
         /**
@@ -265,7 +322,6 @@ export default {
          * Init logic
          * */
         const init = () => {
-            setSearchTags();
             listProjects();
         };
 
@@ -275,7 +331,6 @@ export default {
             ...toRefs(state),
             ...toRefs(routeState),
             ...toRefs(scheduleState),
-            percentage,
             listProjects,
             onChange,
         };
@@ -353,6 +408,18 @@ export default {
         .weekday {
             @apply text-gray-400 text-xs;
             margin-right: 0.5625rem;
+        }
+        .schedule-add-btn {
+            @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
+            &:hover {
+                @apply bg-blue-300;
+            }
+        }
+        .schedule-add-text {
+            @apply text-gray-900;
+            margin-left: 0.5rem;
+            font-size: 0.75rem;
+            line-height: 1.5;
         }
     }
 </style>

@@ -110,6 +110,7 @@
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",
     "css-loader": "^3.2.0",
+    "dayjs": "^1.8.36",
     "eslint": "^5.16.0",
     "eslint-config-stylelint": "^11.1.0",
     "eslint-import-resolver-typescript": "^2.0.0",

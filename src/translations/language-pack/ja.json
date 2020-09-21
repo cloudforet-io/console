@@ -202,6 +202,7 @@
 		"SUMMARY": "",
 		"TAG": "",
 		"TIMEZONE": "",
+		"TIME_SCHEDULE": "",
 		"TITLE": "",
 		"TR_NOTI": "",
 		"TR_NOTI_CON": "",
@@ -445,6 +446,7 @@
 		"MEMBER": "",
 		"MONITORING": "",
 		"RAW_DATA": "",
+		"REPORT": "",
 		"SECRET": "",
 		"SELECTED_DATA": "",
 		"TAG": ""

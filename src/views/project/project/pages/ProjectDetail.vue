@@ -68,6 +68,9 @@
                               class="tab-bg"
                 />
             </template>
+            <template #report>
+                <project-report-tab />
+            </template>
         </p-tab>
         <p-button-modal
             :header-title="headerTitle"
@@ -107,48 +110,43 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
+    computed, reactive, ref, toRefs, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
+
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
-
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import { makeTrItems } from '@/lib/view-helper/index';
-
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import {
-    SearchTableFluentAPI,
-} from '@/lib/api/table';
-import { DictPanelAPI } from '@/lib/api/dict';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
-import { ProjectModel } from '@/lib/fluent-api/identity/project';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import { showErrorMessage } from '@/lib/util';
-import {
-    TabBarState,
-} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import {
-    makeQueryStringComputed,
-    makeQueryStringComputeds,
-    queryStringToNumberArray,
-    selectIndexAutoReplacer,
-} from '@/lib/router-query-string';
+import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
+import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
+import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+
+import { makeTrItems } from '@/lib/view-helper';
+import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
+import { ProjectModel } from '@/lib/fluent-api/identity/project';
+import { SearchTableFluentAPI } from '@/lib/api/table';
+import { DictPanelAPI } from '@/lib/api/dict';
+import { showErrorMessage } from '@/lib/util';
+import {
+    makeQueryStringComputeds, queryStringToNumberArray, selectIndexAutoReplacer,
+} from '@/lib/router-query-string';
 
 export default {
     name: 'ProjectDetail',
     components: {
+        ProjectReportTab,
         PSearch,
         PToolboxTable,
         ProjectDashboard,
@@ -204,6 +202,7 @@ export default {
                     ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
                     ['member', 'COMMON.MEMBER'],
                     ['tag', 'TAB.TAG'],
+                    ['report', 'TAB.REPORT'],
                 ],
                 context.parent)),
             },
@@ -423,11 +422,11 @@ export default {
 
         return {
             ...toRefs(state),
+            ...toRefs(formState),
             singleItemTab,
             memberApiHandler,
             item,
             tagsApi,
-            ...toRefs(formState),
             deleteTS,
             openProjectDeleteForm,
             projectDeleteFormConfirm,

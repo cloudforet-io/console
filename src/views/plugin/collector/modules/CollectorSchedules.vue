@@ -24,24 +24,30 @@
             <template slot="toolbox-left">
                 <p-icon-text-button style-type="primary-dark"
                                     name="ic_plus_bold"
-                                    @click="openEditModal(true)"
+                                    @click="openEditModal(false)"
                 >
                     {{ $t('BTN.ADD') }}
                 </p-icon-text-button>
 
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="ml-4"
-                                     @click-update="openEditModal(false)"
+                                     @click-update="openEditModal(true)"
                                      @click-delete="deleteVisible = true"
                 >
                     {{ $t('BTN.ACTION') }}
                 </p-dropdown-menu-btn>
             </template>
             <template #col-schedule-format="{value}">
-                <span>
+                <span v-if="value.hours.length > 0">
                     <span v-for="(hour, idx) in value.hours" :key="idx">
                         {{ getUtcHour(hour) }}:00{{ value.hours.length - 1 === idx ? '' : ', ' }}
                     </span>
+                </span>
+                <span v-else>
+                    <p-lottie class="inline-block mr-1" style="display: inline-block" name="lottie_interval"
+                              auto :size="1"
+                    />
+                    <span>{{ intervalFormatter(value.interval) }}</span>
                 </span>
             </template>
             <template #col-created_at-format="{value}">
@@ -56,7 +62,7 @@
                              :visible.sync="editVisible"
                              :collector-id="collectorId"
                              :schedule-id="items[selectIndex[0]] ? items[selectIndex[0]].schedule_id : null"
-                             :add-mode="isAddMode"
+                             :edit-mode="isEditMode"
                              @success="listSchedules"
         />
 
@@ -90,10 +96,12 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { store } from '@/store';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {
     name: 'CollectorSchedules',
     components: {
+        PLottie,
         PTableCheckModal,
         PDropdownMenuBtn,
         PToolboxTable,
@@ -135,14 +143,25 @@ export default {
                 ['schedule_id', 'COMMON.ID'],
                 ['name', 'COMMON.NAME'],
             ], parent),
-            isAddMode: true,
+            isEditMode: false,
         });
 
         const timezone = store.state.user.timezone || 'UTC';
         const getUtcHour = hour => moment.tz(moment.utc({ hour }), timezone).hour();
+        const intervalFormatter = (interval) => {
+            if (interval < 60) {
+                return `${interval} sec`;
+            } if (interval >= 60 && interval < 3600) {
+                if (interval % 60 === 0) {
+                    return `${Math.trunc(interval / 60)} min`;
+                }
+                return `${interval} sec`;
+            }
+            return `${Math.trunc(interval / 3600)} hour`;
+        };
 
-        const openEditModal = (addMode: boolean) => {
-            state.isAddMode = addMode;
+        const openEditModal = (editMode: boolean) => {
+            state.isEditMode = editMode;
             state.editVisible = true;
         };
 
@@ -199,6 +218,7 @@ export default {
             openEditModal,
             listSchedules,
             onConfirmDelete,
+            intervalFormatter,
             timestampFormatter,
         };
     },
