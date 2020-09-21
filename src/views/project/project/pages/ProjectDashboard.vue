@@ -160,13 +160,13 @@ export default {
                     value: projectId.value,
                     operator: '=',
                 }).setResourceType('inventory.Server'),
-            cloudService: api => api.addGroupKey('data.region_name', 'region_name')
+            cloudService: api => api.addGroupKey('region_code', 'region_name')
                 .setFilter({
                     key: 'project_id',
                     value: projectId.value,
                     operator: '=',
                 }, {
-                    key: 'data.region_name',
+                    key: 'region_code',
                     value: [null, ''],
                     operator: FILTER_OPERATOR.notIn,
                 }).setResourceType('inventory.CloudService'),

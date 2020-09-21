@@ -303,12 +303,12 @@ export default {
             state.tags.forEach((tag: QueryTag) => {
                 if (tag.key) {
                     if (tag.key.name === 'project_id') filters.push(tag);
-                    if (tag.key.name === 'data.region_name') filters.push(tag);
+                    if (tag.key.name === 'region_code') filters.push(tag);
                     if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
                 }
             });
             filterState.regionFilter.forEach((d) => {
-                filters.push({ key: { name: 'data.region_name', label: 'region' }, value: { name: d, label: d }, operator: 'in' });
+                filters.push({ key: { name: 'region_code', label: 'region' }, value: { name: d, label: d }, operator: 'in' });
             });
             const res: Location = {
                 name: 'cloudServicePage',
@@ -333,7 +333,7 @@ export default {
                 res.filters.push({ k: 'provider', v: selectedProvider.value, o: 'eq' });
             }
             if (filterState.regionFilter.length > 0) {
-                res.filters.push({ k: 'data.region_name', v: filterState.regionFilter, o: 'in' });
+                res.filters.push({ k: 'region_code', v: filterState.regionFilter, o: 'in' });
             }
             if (filterState.serviceFilter.length > 0) {
                 res.labels = filterState.serviceFilter;
