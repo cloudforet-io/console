@@ -308,7 +308,7 @@ export default {
                 }
             });
             filterState.regionFilter.forEach((d) => {
-                filters.push({ key: { name: 'region_code', label: 'region' }, value: { name: d, label: d }, operator: 'in' });
+                filters.push({ key: { name: 'region_code', label: 'region' }, value: { name: d, label: d }, operator: '' });
             });
             const res: Location = {
                 name: 'cloudServicePage',
