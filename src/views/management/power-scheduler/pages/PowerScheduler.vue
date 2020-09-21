@@ -121,27 +121,26 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
-import { Timestamp } from '@/components/util/type';
 
-interface CardItem {
-    // eslint-disable-next-line camelcase
-    created_at: Timestamp;
-    // eslint-disable-next-line camelcase
-    created_by: string;
-    // eslint-disable-next-line camelcase
-    deleted_at: unknown;
-    domain_id: string;
-    name: string;
-    percentage: number;
-    // eslint-disable-next-line camelcase
-    project_id: string;
-    // eslint-disable-next-line camelcase
-    project_group_info: object;
-    scheduler: Scheduler;
-    scheduledResources: ScheduledResource;
-    state: string;
-    tags: object;
-}
+// interface CardItem {
+//     // eslint-disable-next-line camelcase
+//     created_at: Timestamp;
+//     // eslint-disable-next-line camelcase
+//     created_by: string;
+//     // eslint-disable-next-line camelcase
+//     deleted_at: unknown;
+//     domain_id: string;
+//     name: string;
+//     percentage: number;
+//     // eslint-disable-next-line camelcase
+//     project_id: string;
+//     // eslint-disable-next-line camelcase
+//     project_group_info: object;
+//     scheduler: Scheduler;
+//     scheduledResources: ScheduledResource;
+//     state: string;
+//     tags: object;
+// }
 
 interface ScheduledResource {
     // eslint-disable-next-line camelcase
@@ -209,12 +208,10 @@ export default {
             pageSize: 24,
             totalCount: 0,
             projectIdList: [] as string[],
+            approximateCosts: 0,
         });
 
         const scheduleState = reactive({
-            scheduledResources: [] as unknown as ScheduledResource,
-            approximateCosts: 0,
-            percentage: [] as any,
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
         });
@@ -281,7 +278,18 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.identity.project.list(getParams());
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    scheduledResources: {
+                        managed_count: 0,
+                        total_count: 0,
+                    },
+                    scheduler: {
+                        schedule_id: '',
+                        name: '',
+                        rule: [],
+                    },
+                }));
                 await Promise.all([getScheduledResources(), getScheduleList()]);
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
