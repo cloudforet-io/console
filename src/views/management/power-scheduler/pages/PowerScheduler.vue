@@ -27,67 +27,69 @@
                     <page-information />
                 </template>
                 <template #card="{item, index}">
-                    <div class="project-description">
-                        <div class="project">
-                            <div class="project-group-name">
-                                {{ item.project_group_info.name }}
-                            </div>
-                            <p id="project-name">
-                                {{ item.name }}
-                            </p>
-                        </div>
-                        <div class="resources">
-                            <div class="scheduled-resources">
-                                <p>Scheduled Resources</p>
-                                <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
-                                <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
-                                <p-progress-bar
-                                    :percentage="item.percentage"
-                                    :style="'width: 160px'"
-                                    class="pt-2"
-                                />
-                            </div>
-                            <div class="saving">
-                                <p class="saving-this-month">
-                                    Saving of This Month
+                    <router-link :to="goToDetail(item)">
+                        <div class="project-description">
+                            <div class="project">
+                                <div class="project-group-name">
+                                    {{ item.project_group_info.name }}
+                                </div>
+                                <p id="project-name">
+                                    {{ item.name }}
                                 </p>
-                                <p class="approximate">
-                                    approx.
-                                </p>
-                                <span class="costs"><span class="approx-costs">{{ approximateCosts }}</span> <span>$</span></span>
                             </div>
-                        </div>
-                    </div>
-                    <p-hr />
-                    <div class="schedule">
-                        <div>
-                            <p class="mb-4">
-                                <span class="schedule-title">SCHEDULE
-                                    <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
-                                    <span v-else>(3+)</span>
-                                </span>
-                            </p>
-                            <div v-if="item.scheduler.length > 0">
-                                <div v-for="(schedule, idx) in item.scheduler" :key="idx">
-                                    <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span><br>
+                            <div class="resources">
+                                <div class="scheduled-resources">
+                                    <p>Scheduled Resources</p>
+                                    <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
+                                    <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
+                                    <p-progress-bar
+                                        :percentage="item.percentage"
+                                        :style="'width: 160px'"
+                                        class="pt-2"
+                                    />
+                                </div>
+                                <div class="saving">
+                                    <p class="saving-this-month">
+                                        Saving of This Month
+                                    </p>
+                                    <p class="approximate">
+                                        approx.
+                                    </p>
+                                    <span class="costs"><span class="approx-costs">{{ approximateCosts }}</span> <span>$</span></span>
                                 </div>
                             </div>
-                            <div v-else>
-                                <p-i name="ic_plus"
-                                     width=".75rem" height=".75rem"
-                                     class="schedule-add-btn"
-                                /> <span class="schedule-add-text">Create Scheduler</span>
+                        </div>
+                        <p-hr />
+                        <div class="schedule">
+                            <div>
+                                <p class="mb-4">
+                                    <span class="schedule-title">SCHEDULE
+                                        <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
+                                        <span v-else>(3+)</span>
+                                    </span>
+                                </p>
+                                <div v-if="item.scheduler.length > 0">
+                                    <div v-for="(schedule, idx) in item.scheduler" :key="idx">
+                                        <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span><br>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <p-i name="ic_plus"
+                                         width=".75rem" height=".75rem"
+                                         class="schedule-add-btn"
+                                    /> <span class="schedule-add-text">Create Scheduler</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div v-if="item.scheduler.length > 0" class="schedule-matrix mt-4">
+                                    <span v-for="(day, index) in weekday" :key="index" class="weekday">
+                                        {{ day }}
+                                    </span>
+                                    <schedule-heatmap :schedule="item.scheduler" />
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <span v-for="(day, index) in weekday" :key="index" class="weekday">
-                                {{ day }}
-                            </span>
-                            <div v-if="item.scheduler.length > 0" class="schedule-matrix mt-4">
-                                <schedule-heatmap :schedule="item.scheduler" />
-                            </div>
-                        </div>
-                    </div>
+                    </router-link>
                 </template>
             </p-search-grid-layout>
         </div>
@@ -121,33 +123,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
-
-// interface CardItem {
-//     // eslint-disable-next-line camelcase
-//     created_at: Timestamp;
-//     // eslint-disable-next-line camelcase
-//     created_by: string;
-//     // eslint-disable-next-line camelcase
-//     deleted_at: unknown;
-//     domain_id: string;
-//     name: string;
-//     percentage: number;
-//     // eslint-disable-next-line camelcase
-//     project_id: string;
-//     // eslint-disable-next-line camelcase
-//     project_group_info: object;
-//     scheduler: Scheduler;
-//     scheduledResources: ScheduledResource;
-//     state: string;
-//     tags: object;
-// }
-
-interface ScheduledResource {
-    // eslint-disable-next-line camelcase
-    managed_count: number;
-    // eslint-disable-next-line camelcase
-    total_count: number;
-}
+import { Location } from 'vue-router';
 
 interface Scheduler {
     name: string;
@@ -155,7 +131,6 @@ interface Scheduler {
     // eslint-disable-next-line camelcase
     schedule_id: string;
 }
-
 export default {
     name: 'PowerScheduler',
     components: {
@@ -195,7 +170,6 @@ export default {
         };
 
         /** State : state for page (grid layout, query search, etc.)
-         *  scheduleState: state for scheduled resources (number, progress, money, scheduler..)
          * */
         const state = reactive({
             items: [] as any,
@@ -207,13 +181,10 @@ export default {
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
-            projectIdList: [] as string[],
             approximateCosts: 0,
-        });
-
-        const scheduleState = reactive({
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+            // projectIdList: [] as string[],
         });
 
         /**
@@ -281,10 +252,13 @@ export default {
                 state.items = res.results.map(d => ({
                     ...d,
                     scheduledResources: {
+                        // eslint-disable-next-line camelcase
                         managed_count: 0,
+                        // eslint-disable-next-line camelcase
                         total_count: 0,
                     },
                     scheduler: {
+                        // eslint-disable-next-line camelcase
                         schedule_id: '',
                         name: '',
                         rule: [],
@@ -318,6 +292,21 @@ export default {
             await listProjects();
         };
 
+
+        /**
+        *  Card Click Event
+        * */
+        const goToDetail = (item) => {
+            const res: Location = {
+                name: 'powerSchedulerDetail',
+                params: {
+                    id: item.project_id,
+                    item,
+                },
+            };
+            return res;
+        };
+
         /**
          * Init logic
          * */
@@ -330,9 +319,9 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(routeState),
-            ...toRefs(scheduleState),
             listProjects,
             onChange,
+            goToDetail,
         };
     },
 };

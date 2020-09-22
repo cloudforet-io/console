@@ -2,6 +2,7 @@ const Management = () => import('@/views/management/management');
 const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 const PowerScheduler = () => import('@/views/management/power-scheduler/pages/PowerScheduler.vue');
+const PowerSchedulerDetail = () => import('@/views/management/power-scheduler/pages/PowerSchedulerDetail.vue');
 
 export default {
     path: 'management',
@@ -39,9 +40,21 @@ export default {
         },
         {
             path: 'power-scheduler',
-            name: 'powerScheduler',
             meta: { label: 'Power Scheduler', breadcrumb: true },
-            component: PowerScheduler,
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'powerScheduler',
+                    component: PowerScheduler,
+                },
+                {
+                    path: ':id',
+                    name: 'powerSchedulerDetail',
+                    props: true,
+                    component: PowerSchedulerDetail,
+                },
+            ],
         },
     ],
 };
