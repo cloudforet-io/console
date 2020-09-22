@@ -37,16 +37,17 @@ jobs:
         run: |
           echo "::set-env name=SERVICE::$(echo ${{ github.repository }} | cut -c 14-)"
           echo "::set-env name=ECR_REPO::${{ secrets.AWS_ROOT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/spaceone/console"
-      - name: build "build image" for caching
+      - name: build "build image"/image & push to pyengine
         run: |
           mv Dockerfile Dockerfile2
           mv build_Dockerfile Dockerfile
+          docker pull pyengine/build:console
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
           \docker build -t pyengine/build:console -c 2048 --cache-from pyengine/build:console .
           docker push pyengine/build:console
           rm Dockerfile
           mv Dockerfile2 Dockerfile
-          \docker build -t pyengine/console:latest pyengine/console:${{ env.VERSION }} ${{ env.ECR_REPO }}:latest ${{ env.ECR_REPO }}:${{ env.VERSION }} -c 2048 .
+          \docker build -t pyengine/console:latest -t pyengine/console:${{ env.VERSION }} -t ${{ env.ECR_REPO }}:latest -t ${{ env.ECR_REPO }}:${{ env.VERSION }} -c 2048 .
           docker push pyengine/console
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
