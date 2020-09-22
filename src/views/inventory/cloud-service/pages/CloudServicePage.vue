@@ -152,7 +152,7 @@ import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';

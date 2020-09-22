@@ -114,7 +114,7 @@ import ScheduleHeatmap from '@/views/management/power-scheduler/modules/Schedule
 
 /* Utils */
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
 /* Types */

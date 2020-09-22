@@ -123,30 +123,3 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
     }
 }
 
-export interface DynamicFieldSchema<_type=string, options=any> {
-    name: string;
-    type: _type;
-    options: options;
-
-}
-export type DFSchema<_type=string, options=any> = DynamicFieldSchema<_type, options>
-
-
-export interface DynamicLayoutSchema<_type=string, options=any> {
-    name: string;
-    type: _type;
-    options: options;
-}
-
-export type DLSchema<_type=string, options=any> = DynamicLayoutSchema<_type, options>
-
-export interface DLSBaseOptions {
-    // eslint-disable-next-line camelcase
-    root_path?: string;
-}
-
-export interface DLSFieldsOptions extends DLSBaseOptions{
-    fields: DFSchema[];
-}
-
-export type DLItemType = DLSchema<'item', DLSFieldsOptions>

@@ -77,8 +77,6 @@ export interface ProjectNodeState extends BaseNodeStateType {
     loading: boolean;
 }
 
-export type ProjectNode<S extends BaseNodeStateType = BaseNodeStateType> = TreeNodeProps<ProjectItemResp, S>
-
 export class ProjectTreeFluentAPI<
     state extends ProjectNodeState = ProjectNodeState,
     initData = any, initSyncData = any,
@@ -200,26 +198,3 @@ export class ProjectTreeFluentAPI<
         this.ts.metaState.nodes = await this.getRecursiveData(res.open_path) as TreeNodeProps<ProjectItemResp, state>[];
     }
 }
-
-interface TreeQSNameType {
-    select: string;
-    search: string;
-}
-
-export enum DefaultTreeQSPropsName {
-    select = 't_se',
-    search = 't_sc',
-}
-
-export const makeTreeQSProps = (names: TreeQSNameType) => ({
-    [names.select]: {
-        type: String,
-        default: null,
-    },
-    [names.search]: {
-        type: String,
-        default: null,
-    },
-});
-
-export const DefaultQSTreeProps = makeTreeQSProps(DefaultTreeQSPropsName);

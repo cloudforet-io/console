@@ -22,10 +22,10 @@ import {
 } from '@vue/composition-api';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PDatePagination from '@/components/organisms/date-pagination/pDatePagination.vue';
+import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
-import { NSChart } from '@/lib/chart/s-chart';
+import { SpaceChart } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
 import {
@@ -73,7 +73,7 @@ export default {
         const state = reactive({
             loading: true,
             chartRef: null as HTMLCanvasElement|null,
-            chart: null as null|NSChart,
+            chart: null as null|SpaceChart,
             chartData: [] as ChartDataType[],
             successData: [] as number[],
             failureData: [] as number[],
@@ -218,7 +218,7 @@ export default {
                 onClick: pointClickEvent,
             };
 
-            state.chart = new NSChart(canvas, {
+            state.chart = new SpaceChart(canvas, {
                 type: 'line',
                 data: {
                     labels: state.chartData.map(d => d.date.format('M/D')),

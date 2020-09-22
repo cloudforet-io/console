@@ -10,7 +10,6 @@ import VueRouter from 'vue-router';
 import store from '@/store';
 import directive from '@/directives';
 import velocity from 'velocity-animate';
-import { Util } from '@/lib/global-util';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
@@ -30,7 +29,6 @@ import "@/styles/style.pcss";
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
-Vue.mixin(Util);
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'

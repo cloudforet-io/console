@@ -2,9 +2,8 @@ import axios, {
     AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import config from '@/lib/config';
-import { setMockData } from '@/lib/mock';
 import { SpaceConnector } from '@/lib/space-connector';
+// eslint-disable-next-line import/no-cycle
 import { useStore } from '@/store/toolset';
 
 class APIError extends Error {
@@ -57,10 +56,6 @@ export class API {
 
     newInstance() {
         const instance = axios.create(this.axiosOptions);
-        if (config.get('NO_SERVER_MODE')) {
-            console.warn('YOU ARE USE NO SERVER MODE!!!!!');
-            setMockData(instance);
-        }
         return instance;
     }
 

@@ -7,7 +7,7 @@ import {
 } from '@vue/composition-api';
 import { Dictionary } from 'vue-router/types/router';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { parseTag } from '@/lib/api/query-search';
+import { parseTag } from '@/lib/component-utils/query-search-tags';
 import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
 import { store } from '@/store';
 
@@ -46,22 +46,6 @@ export const replaceQuery = async (key: string, value: RouteQueryString) => {
     }
 };
 
-export const getQueryStringComputed = (
-    item: Ref<any>,
-    converter: QueryStringConverter,
-): Ref<any> => {
-    if (converter.disableSetter) {
-        return computed<RouteQueryString>(() => (converter.getter ? converter.getter(item.value) : item.value));
-    }
-    return computed<RouteQueryString>({
-        get: () => (converter.getter ? converter.getter(item.value) : item.value),
-        // eslint-disable-next-line no-empty-function
-        set: (val) => {
-            if (converter.setter) item.value = converter.setter(val);
-            else item.value = val;
-        },
-    });
-};
 
 export const setQueryStringRefWatchable = (queryRef: Ref<any>, key: string) => {
     const stop = watch(() => queryRef.value, debounce((val: string) => {
@@ -69,27 +53,6 @@ export const setQueryStringRefWatchable = (queryRef: Ref<any>, key: string) => {
     }, 100), { immediate: false });
 
     onUnmounted(() => stop());
-};
-
-
-export const makeQueryStringComputed = (
-    item: Ref<any>,
-    converter: QueryStringConverter,
-    initQuery?: RouteQuery,
-): Ref<any> => {
-    const queryRef = getQueryStringComputed(item, converter);
-
-    if (!converter.disableAutoReplace) {
-        if (converter.autoReplacer) converter.autoReplacer(queryRef, converter.key);
-        else setQueryStringRefWatchable(queryRef, converter.key);
-    }
-
-    const query = initQuery || router.currentRoute.query;
-    if (query[converter.key] && !converter.disableSetter) {
-        queryRef.value = query[converter.key];
-    }
-
-    return queryRef;
 };
 
 
@@ -148,12 +111,6 @@ export const makeQueryStringComputeds = (
 
 
 /** QueryString Converter Helpers */
-export const queryStringToNumberArray: Setter = (val: RouteQueryString): number[] => {
-    if (typeof val === 'string') return [Number(val)];
-    if (Array.isArray(val)) return val.map(d => Number(d));
-    return [];
-};
-
 export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
     if (Array.isArray(tags)) {
         return tags.reduce((results, tag) => {
@@ -192,19 +149,4 @@ export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?:
         }, [] as QueryTag[]);
     }
     return [getQueryItemFromQueryString(queryString as string, keyItems)];
-};
-
-/** QueryString replacer Helpers */
-export const selectIndexAutoReplacer: AutoReplacer = (slRef: Ref<any>, key: string) => {
-    let initValue = slRef.value;
-    const stop = watch(() => slRef.value, debounce((val: string) => {
-        if (initValue.length > 0) {
-            slRef.value = initValue;
-            initValue = [];
-        } else {
-            replaceQuery(key, val);
-        }
-    }, 100), { immediate: false });
-
-    onUnmounted(() => stop());
 };

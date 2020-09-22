@@ -104,7 +104,7 @@ import { timestampFormatter } from '@/lib/util';
 import {
     makeReferenceValueHandler, makeEnumValueHandler,
 } from '@/lib/component-utils/query-search';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { getPageStart } from '@/lib/component-utils/pagination';
 

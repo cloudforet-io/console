@@ -1,14 +1,8 @@
 /* eslint-disable import/first,import/newline-after-import */
 
 // lib
-import * as Fluent from './lib/fluent-api';
-import * as Mock from './lib/mock';
-import * as ApiToolSet from './lib/api';
 import * as Translations from './translations';
 export {
-    Fluent,
-    Mock,
-    ApiToolSet,
     Translations,
 };
 
@@ -67,10 +61,3 @@ import * as PDataTableToolSet from './components/organisms/tables/data-table/PDa
 export { default as PToolboxTable } from './components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import * as PToolboxTableToolSet from './components/organisms/tables/toolbox-table/PToolboxTable.toolset';
 
-
-// tool sets
-export {
-    PJsonSchemaFormToolSet,
-    PDataTableToolSet,
-    PToolboxTableToolSet,
-};

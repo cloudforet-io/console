@@ -128,7 +128,7 @@ import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { Options } from '@/components/organisms/tables/query-search-table/type';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { Timestamp } from '@/components/util/type';
 
 interface UserModel {

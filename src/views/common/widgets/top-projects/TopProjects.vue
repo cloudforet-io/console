@@ -156,7 +156,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import Chart, { ChartDataSets } from 'chart.js';
 
 const DATA_COUNT = 5;
@@ -235,7 +235,7 @@ export default {
                 borderColor: state.colors.cloud_services,
             }];
 
-            state.chart = new NSChart(canvas,
+            state.chart = new SpaceChart(canvas,
                 {
                     type: 'horizontalBar',
                     data: {
@@ -285,7 +285,7 @@ export default {
                         },
                     },
                     plugins: [{
-                        beforeDraw(chart: NSChart): void {
+                        beforeDraw(chart: SpaceChart): void {
                             const ctx: CanvasRenderingContext2D | null = chart.ctx;
                             if (!ctx) return;
 

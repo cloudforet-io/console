@@ -40,7 +40,7 @@ import {
     DynamicLayoutEventListeners, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';

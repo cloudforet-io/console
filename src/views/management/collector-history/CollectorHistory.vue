@@ -143,7 +143,7 @@ import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 import { makeEnumValueHandler, makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';

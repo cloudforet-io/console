@@ -1,9 +1,8 @@
-import { FilterItem } from '@/lib/fluent-api/type';
 import { get } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
     KeyDataType,
-    KeyItem, OperatorType, QueryItem, ValueHandlerMap, ValueItem,
+    KeyItem, OperatorType, QueryItem, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
@@ -15,49 +14,6 @@ import tz from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(tz);
 
-// will be deprecated
-export interface ACHandlerMeta {
-    keyItems: KeyItem[];
-    valueHandlerMap: ValueHandlerMap;
-}
-
-// will be deprecated
-export const defaultACHandler: ACHandlerMeta = {
-    keyItems: [],
-    valueHandlerMap: {},
-};
-
-// will be deprecated
-export const setFilterOrWithSuggestKeys = (query: FilterItem, keyItems: KeyItem[], filterOr: FilterItem[]): void => {
-    keyItems.forEach((keyItem) => {
-        filterOr.push({ ...query, key: keyItem.name });
-    });
-};
-
-// will be deprecated
-export const getQueryItemsToFilterItems = (tags: QueryTag[], keyItems?: KeyItem[]): {and: FilterItem[]; or: FilterItem[]} => {
-    const and: FilterItem[] = [];
-    const or: FilterItem[] = [];
-    tags.forEach((q) => {
-        if (q.key !== null && q.key !== undefined && !q.invalid) {
-            and.push({
-                key: q.key?.name as string,
-                value: String(q.value?.name || ''),
-                // @ts-ignore
-                operator: q.operator,
-            });
-        } else if (keyItems) {
-            setFilterOrWithSuggestKeys({
-                key: '',
-                value: String(q.value?.name || ''),
-                // @ts-ignore
-                operator: q.operator,
-            }, keyItems, or);
-        }
-    });
-
-    return { and, or };
-};
 
 type OperatorMap = Record<OperatorType, FilterOperator>
 type DataTypeOperators = Record<KeyDataType, OperatorMap>;
@@ -170,6 +126,7 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
     },
 };
 
+
 /**
  * @name getFiltersFromQueryTags
  * @description convert query tags to api filters and keywords.
@@ -214,6 +171,11 @@ const getFiltersFromQueryTags = (tags: QueryTag[]): {andFilters: Filter[]; orFil
 
 const tagRegex = new RegExp('^(?<key>.+?)?:(?<operator>[=|<|>|!|$]=?)?(?<value>.*)?');
 
+/**
+ * @name parseTag
+ * @description Extract query item from url query string with regular expression
+ * @param text
+ */
 const parseTag = (text: string): QueryItem => {
     const parsed = tagRegex.exec(text);
 

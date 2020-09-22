@@ -173,7 +173,7 @@ import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
 import {
     getFiltersFromQueryTags,
-} from '@/lib/api/query-search';
+} from '@/lib/component-utils/query-search-tags';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { Filter } from '@/lib/space-connector/type';

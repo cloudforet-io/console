@@ -164,8 +164,7 @@ import {
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
 import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import { makeQueryStringComputeds } from '@/lib/router-query-string';
-import { getFiltersFromQueryTags, parseTag } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags, parseTag } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import { getPageStart } from '@/lib/component-utils/pagination';
@@ -537,15 +536,6 @@ export default {
         }, {
             immediate: false,
         });
-
-        const queryRefs = {
-            ...makeQueryStringComputeds(state, {
-                pageSize: { key: 'ps', setter: Number },
-                thisPage: { key: 'p', setter: Number },
-                sortBy: { key: 'sb' },
-                sortDesc: { key: 'sd', setter: Boolean },
-            }),
-        };
 
         return {
             ...toRefs(state),

@@ -38,41 +38,6 @@ export const makeProxy = <T extends any>(name: string, props: any = null, emit: 
     });
 };
 
-export const makeVModelProxy = <T extends any>(name = 'value', event = 'input', transform: ((val: any) => any)|null = null): Ref<T> => {
-    const vm = getCurrentInstance();
-    let setter: (val: any) => void;
-    if (transform) {
-        setter = val => { vm?.$emit(event, transform(val)); };
-    } else {
-        setter = val => { vm?.$emit(event, val); };
-    }
-
-    return computed({
-        get: () => vm?.$props[name],
-        set: setter,
-    });
-};
-
-/**
- * event by pass
- * @param emit
- * @param name
- * @return {function(...[*]=)}
- */
-export const makeByPass = (emit: any, name: string) => (...event: any) => {
-    emit(name, ...event);
-};
-
-/**
- * auto mount&unmount event on bus
- * @param bus page event bus
- * @param eventName
- * @param handler
- */
-export const mountBusEvent = (bus: any, eventName: string, handler: Function) => {
-    bus.$on(eventName, handler);
-    onUnmounted(() => bus.$off(eventName, handler));
-};
 
 /**
  * 여러 엘리먼트에서 마우스 오버 여부 추적에 필요한 함수 모음
@@ -99,16 +64,6 @@ export const mouseOverState = (disabled?: boolean) => {
     };
 };
 
-/**
- * 윈도우 이벤트 등록 함수
- * 자동완성, 드롭다운 컨텍스트 메뉴 팝업을 자동으로 닫게 할때 활용
- * @param eventName
- * @param func
- */
-export const windowEventMount = (eventName: string, func: any) => {
-    onMounted(() => window.addEventListener(eventName, func));
-    onUnmounted(() => window.removeEventListener(eventName, func));
-};
 type validationFunction = (value: any, data?: any, options?: any) => boolean|Promise<boolean>;
 type message = string|VueI18n.TranslateResult;
 
@@ -195,18 +150,6 @@ export const requiredValidation = (invalidMessage?: message) => new Validation(v
 export const noEmptySpaceValidation = (invalidMessage?: message) => new Validation((value: string) => isNotEmpty(value) && value.trim().length === value.length, invalidMessage || 'You Must Remove Empty Space');
 
 
-export const jsonParseValidation = (invalidMessage: message) => new Validation((value) => {
-    try {
-        if (value[0] !== '{' && value[value.length - 1] !== '}') return false;
-        JSON.parse(value);
-    } catch (e) {
-        return false;
-    }
-    return true;
-},
-invalidMessage || 'Invalid Json string format!');
-export const numberMinValidation = (min: number, invalidMessage?: message) => new Validation(value => (value ? Number(value) >= min : true), invalidMessage || `value must bigger then ${min}`);
-export const numberMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? Number(value) <= max : true), invalidMessage || `value must smaller then ${max}`);
 export const lengthMinValidation = (min: number, invalidMessage?: message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
 export const lengthMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
 export const checkTimeZoneValidation = (invalidMessage: message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
@@ -223,7 +166,3 @@ export const userIDValidation = (parent: any, invalidMessage: message) => new Va
     return result;
 }, invalidMessage || 'same ID exists!');
 
-interface TabState {
-    activeTab: Ref<string>;
-    activeMultiTab: Ref<string>;
-}

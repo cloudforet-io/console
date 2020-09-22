@@ -71,7 +71,7 @@ import {
     ResourcesByRegionProps,
 } from '@/views/common/widgets/resources-by-region/ResourcesByRegion.toolset';
 import { store } from '@/store';
-import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 
 interface Value {
@@ -204,7 +204,7 @@ export default {
                 };
             }
 
-            state.chart = new NSChart(canvas, {
+            state.chart = new SpaceChart(canvas, {
                 type: 'pie',
                 data: {
                     labels,

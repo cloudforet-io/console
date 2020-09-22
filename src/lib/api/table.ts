@@ -5,18 +5,15 @@ import {
 } from '@vue/composition-api';
 
 import {
-    QuerySearchTableToolSet,
     SearchTableToolSet,
     ToolboxTableToolSet,
 } from '@/components/organisms/tables/toolbox-table/PToolboxTable.toolset';
 import {
     DynamicFluentAPIToolSet,
 } from '@/lib/api/toolset';
-import { forceRefArg } from '@/lib/type';
 import {
     ListType, QueryAPI,
 } from '@/lib/fluent-api';
-import { ACHandlerMeta, defaultACHandler, getQueryItemsToFilterItems } from '@/lib/api/query-search';
 
 export abstract class BaseTableFluentAPI<
     parameter = any,
@@ -136,125 +133,5 @@ export class SearchTableFluentAPI<
     resetAll = () => {
         this.defaultReset();
         this.tableTS.searchText.value = '';
-    };
-}
-
-
-export class TabSearchTableFluentAPI<
-    parameter = any,
-    resp extends ListType<any> = ListType<any>,
-    initData = any,
-    initSyncData = any,
-    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
-    action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
-    > extends SearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
-    constructor(
-        action: action,
-        protected isShow: forceRefArg<boolean>,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-    ) {
-        super(
-            action,
-            initData, // sub api can't support only query
-            initSyncData,
-        );
-        onMounted(() => {
-            watch(this.isShow, async (show, preShow) => {
-                if (show && show !== preShow) {
-                    await this.getData();
-                }
-            }, { immediate: true });
-        });
-    }
-}
-
-export const defaultAdminFields = [
-    { name: 'User ID', key: 'user_info.user_id' },
-    { name: 'Name', key: 'user_info.name' },
-    { name: 'Email', key: 'user_info.email' },
-    {
-        name: 'Labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
-    },
-];
-
-export const defaultAdminOptions = {
-    fields: defaultAdminFields,
-};
-
-export const defaultAdminLayout = {
-    type: 'table',
-    options: defaultAdminOptions,
-};
-
-export const defaultHistoryFields = [
-    { name: 'Key', key: 'key' },
-    { name: 'Job ID', key: 'job_id' },
-    { name: 'Updated By', key: 'updated_by' },
-    {
-        name: 'Updated',
-        key: 'updated_at',
-        type: 'datetime',
-        options: {
-            source_type: 'timestamp',
-            // source_format: 'seconds',
-        },
-    },
-
-];
-export const defaultHistoryOptions = {
-    fields: defaultHistoryFields,
-    root_path: 'collection_info.change_history',
-};
-
-export const defaultHistoryLayout = {
-    type: 'table',
-    options: defaultHistoryOptions,
-};
-
-
-export class QuerySearchTableFluentAPI<
-    parameter = any,
-    resp extends ListType<any> = ListType<any>,
-    initData = any,
-    initSyncData = any,
-    T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>,
-    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
-    > extends BaseTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
-    initToolset = (initData, initSyncData, acHandlerMeta: ACHandlerMeta) => {
-        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.keyItems, acHandlerMeta.valueHandlerMap, initData, initSyncData) as T;
-        watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
-            if (tags !== preTags && this.action) {
-                await this.getData(true);
-            }
-        }, { immediate: false });
-    }
-
-    constructor(
-        action: action,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-        acHandlerMeta: ACHandlerMeta = defaultACHandler,
-        initLazy = false,
-    ) {
-        super(action);
-        if (!initLazy) {
-            this.initToolset(initData, initSyncData, acHandlerMeta);
-        }
-    }
-
-    getAction = () => {
-        if (Array.isArray(this.tableTS.querySearch.tags.value)) {
-            const items = getQueryItemsToFilterItems(this.tableTS.querySearch.tags.value, this.tableTS.querySearch.state.keyItems);
-            return this.getDefaultAction()
-                .setFilter(...items.and)
-                .setFilterOr(...items.or);
-        }
-        return this.getDefaultAction();
-    }
-
-    resetAll = () => {
-        this.defaultReset();
-        this.tableTS.querySearch.syncState.value = '';
     };
 }
