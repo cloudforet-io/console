@@ -425,6 +425,8 @@
 		"MONTH": "월",
 		"SAVE": "저장",
 		"SCHED_TIME": "스케줄러 적용 시간",
+		"SET_NAME": "이름 설정",
+		"SET_NAME_DESC": "스케줄러 이름을 설정합니다. (영문, 띄워쓰기 불가)",
 		"THIS_WEEK": "이번주",
 		"TIME": "시간",
 		"TIMER": "타이머",

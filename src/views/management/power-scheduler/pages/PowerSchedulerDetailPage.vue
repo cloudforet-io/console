@@ -7,7 +7,9 @@
                           child
                           @goBack="$router.push('/management/power-scheduler')"
             />
-            <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm">
+            <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm"
+                                @click="onClickCreate"
+            >
                 {{ $t('PWR_SCHED.CREATE') }}
             </p-icon-text-button>
         </header>
@@ -19,8 +21,10 @@
                           :auto="true" class="loading"
                 />
             </div>
-            <div v-else-if="isNoData" class="no-data">
-                No Schedule List
+            <div v-else-if="!scheduleList.length" class="no-data">
+                <p-empty>
+                    No Schedule
+                </p-empty>
             </div>
             <table v-else>
                 <thead>
@@ -39,21 +43,21 @@
                 <tbody>
                     <tr v-for="(schedule, index) in scheduleList" :key="index"
                         class="list-item"
-                        :class="{ active: selectedSchedule.schedule_id === schedule.schedule_id,
+                        :class="{ active: isActiveItem(schedule),
                                   'edit-mode': mode !== 'READ'
                         }"
                     >
                         <td class="name" @click="showDetail(schedule)">
-                            <p-i v-if="selectedSchedule.schedule_id === schedule.schedule_id"
+                            <p-i v-if="isActiveItem(schedule)"
                                  name="ic_check" height="1rem" width="1rem"
                                  color="transparent inherit"
                             /> {{ schedule.name }}
                         </td>
                         <td class="edit">
-                            <span v-if="mode === 'UPDATE' && selectedSchedule.schedule_id === schedule.schedule_id"
+                            <span v-if="mode === 'UPDATE' && isActiveItem(schedule)"
                                   class="tag"
                             >{{ $t('PWR_SCHED.EDITING') }}</span>
-                            <span v-else-if="mode === 'CREATE'"
+                            <span v-else-if="mode === 'CREATE' && isActiveItem(schedule)"
                                   class="tag"
                             >{{ $t('PWR_SCHED.CREATING') }}</span>
                             <p-icon-button v-else class="edit" name="ic_edit"
@@ -68,7 +72,11 @@
             </table>
         </section>
 
-        <schedule-detail :schedule-id="selectedSchedule.schedule_id" :mode.sync="mode" :name.sync="selectedSchedule.name" />
+        <schedule-detail v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id"
+                         :mode.sync="mode"
+                         :name.sync="selectedSchedule.name"
+                         @cancel="onCancel"
+        />
     </general-page-layout>
 </template>
 
@@ -89,24 +97,24 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import ScheduleDetail from '@/views/management/power-scheduler/modules/ScheduleDetail.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
     schedule_id: string;
     name: string;
-    // eslint-disable-next-line camelcase
-    'project_id': string;
 }
 
 export const modes = ['READ', 'CREATE', 'UPDATE'];
 export type Mode = typeof modes[number];
 
 // eslint-disable-next-line camelcase
-const defaultSchedule: Partial<Schedule> = { name: '', schedule_id: '' };
+const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        PEmpty,
         ScheduleDetail,
         PLottie,
         PIconButton,
@@ -140,10 +148,9 @@ export default {
         const state = reactive({
             scheduleList: [] as Schedule[],
             totalCount: 0,
-            loading: false,
-            selectedSchedule: defaultSchedule as Schedule,
+            loading: true,
+            selectedSchedule: null as null|Schedule,
             // eslint-disable-next-line camelcase
-            isNoData: computed(() => state.scheduleList.length === 0),
             mode: 'READ' as Mode,
         });
 
@@ -164,7 +171,7 @@ export default {
                 if (state.totalCount === 0) {
                     state.mode = 'CREATE';
                     // eslint-disable-next-line camelcase
-                    state.scheduleList = [defaultSchedule];
+                    state.scheduleList = [{ ...defaultSchedule }];
                 }
 
                 state.selectedSchedule = state.scheduleList[0];
@@ -174,6 +181,9 @@ export default {
                 state.loading = false;
             }
         };
+
+        // eslint-disable-next-line camelcase
+        const isActiveItem = (schedule: Schedule) => state.selectedSchedule?.schedule_id === schedule.schedule_id;
 
         const showDetail = async (schedule: Schedule) => {
             state.selectedSchedule = schedule;
@@ -188,6 +198,20 @@ export default {
 
         };
 
+        const onClickCreate = () => {
+            state.selectedSchedule = { ...defaultSchedule };
+            state.scheduleList.push(state.selectedSchedule);
+            state.mode = 'CREATE';
+        };
+
+        const onCancel = () => {
+            if (state.mode === 'CREATE') {
+                state.scheduleList.pop();
+                state.selectedSchedule = state.scheduleList[0];
+            }
+            state.mode = 'READ';
+        };
+
         const init = async () => {
             await store.dispatch('resource/project/load');
             await listSchedule();
@@ -199,9 +223,12 @@ export default {
             projectName,
             routeState,
             ...toRefs(state),
+            isActiveItem,
             showDetail,
             onClickEdit,
             onClickDelete,
+            onClickCreate,
+            onCancel,
         };
     },
 };
