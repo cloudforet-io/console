@@ -58,7 +58,7 @@ import {
     QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
-import { getPageStart } from '@/lib/component-utils/pagination';
+import { getPageStart } from '@/components/util/helpers';
 import { Options } from '@/components/organisms/tables/query-search-table/type';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;

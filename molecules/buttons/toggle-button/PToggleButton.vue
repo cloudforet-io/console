@@ -10,7 +10,7 @@
 import { ToggleButton } from 'vue-js-toggle-button';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { ToggleButtonProps } from '@/components/molecules/buttons/toggle-button/type';
-import color from '@/styles/colors';
+import color from '@/components/styles/colors';
 
 enum TOGGLE_BUTTON_THEME {
     secondary = 'secondary',

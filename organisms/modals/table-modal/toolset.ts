@@ -1,10 +1,9 @@
 import {
-    HelperToolSet, initReactive, StateToolSet, SyncStateToolSet,
-} from '@/lib/toolset';
+    initReactive, StateToolSet, SyncStateToolSet,
+} from '@/components/util/toolset-helpers';
 import {
-    ModalState, ModalStateType, ModalSyncStateType, ModalToolSet,
+    ModalState, ModalStateType, ModalSyncStateType,
 } from '@/components/molecules/modals/PModal.toolset';
-import { MultiItemAction } from '@/lib/fluent-api';
 
 
 export type TableCheckModalSyncStateType = ModalSyncStateType
@@ -32,7 +31,7 @@ export class TableCheckModalState<
             mode: '',
             items: [],
             fields: [],
-            action: null as unknown as MultiItemAction<any, any>,
+            action: null as any,
             headerTitle: '',
             subTitle: '',
             themeColor: '',

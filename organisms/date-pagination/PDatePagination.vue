@@ -27,15 +27,13 @@ import {
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 
-import { getTimezone } from '@/lib/util';
-
 export default {
     name: 'PDatePagination',
     components: { PIconButton },
     props: {
         date: {
             type: Object,
-            default: moment().tz(getTimezone()),
+            default: moment(),
         },
     },
     setup(props, { emit }) {

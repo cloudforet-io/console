@@ -9,9 +9,6 @@ import {
     GridLayoutStateType, GridLayoutSyncStateType,
 } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import { getAllPage } from '@/components/organisms/pagination/PTextPagination.toolset';
-import { ChangeTagCallBack } from '@/components/molecules/tags/PTag.toolset';
-import { QuerySearchToolSet } from '@/lib/component-utils/query-search';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 
 export interface ToolBoxGridLayoutStateType extends GridLayoutStateType{
     paginationVisible: boolean;
@@ -96,29 +93,3 @@ export class SearchGridLayoutToolSet<initData=any, initSyncData=any> extends Too
     }
 }
 
-@HelperToolSet()
-export class QuerySearchGridLayoutToolSet<initData, initSyncData> extends ToolboxGridLayoutToolSet<initData, initSyncData> {
-    querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
-
-    static initToolSet(_this: any,
-        keyItems: KeyItem[],
-        valueHandlerMap: ValueHandlerMap,
-        changeTagCallBack?: ChangeTagCallBack) {
-        ToolboxGridLayoutToolSet.initToolSet(_this);
-        _this.querySearch = new QuerySearchToolSet(keyItems, valueHandlerMap, undefined, undefined, changeTagCallBack);
-    }
-
-    constructor(
-        keyItems: KeyItem[],
-        valueHandlerMap: ValueHandlerMap,
-        initData: initData = {} as initData,
-        initSyncData: initSyncData = {} as initSyncData,
-        lazy = false,
-        changeTagCallBack?: ChangeTagCallBack,
-    ) {
-        super(initData, initSyncData, true);
-        if (!lazy) {
-            QuerySearchGridLayoutToolSet.initToolSet(this, keyItems, valueHandlerMap, changeTagCallBack);
-        }
-    }
-}

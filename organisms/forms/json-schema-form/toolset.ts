@@ -1,11 +1,11 @@
 import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
-} from '@/lib/toolset';
+} from '@/components/util/toolset-helpers';
 import { computed, reactive, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import Ajv, { KeywordDefinition, SchemaValidateFunction } from 'ajv';
-import { JsonSchemaObjectType } from '@/lib/type';
+import { JsonSchemaObjectType } from '@/components/util/type';
 
 export class JsonSchemaProperty {
     constructor(

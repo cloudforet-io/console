@@ -40,3 +40,5 @@ export const getColor = (col?: string|null) => {
     if (col.startsWith('#')) return col;
     return get(colors, col);
 };
+
+export const getPageStart = (thisPage: number, pageSize: number) => ((thisPage - 1) * pageSize) + 1;

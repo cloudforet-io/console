@@ -27,12 +27,11 @@ import {
     reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { colorset } from '@/lib/util';
 
 
 export const setTooltips = () => {
     const generateTooltipTitle = (data, idx, color) => {
-        const colorStyle = color || colorset[idx];
+        const colorStyle = color;
 
         const title = document.createElement('div');
         title.classList.add('tooltip-title');

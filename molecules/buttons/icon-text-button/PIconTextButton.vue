@@ -35,7 +35,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { IconTextButtonProps } from '@/components/molecules/buttons/icon-text-button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/components/atoms/buttons/type';
 
-import color from '@/styles/colors';
+import color from '@/components/styles/colors';
 
 export default {
     name: 'PIconTextButton',

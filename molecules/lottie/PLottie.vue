@@ -48,7 +48,7 @@ export default {
     methods: {
         async create() {
             const animationDT = await import(`@/assets/lottiefiles/${this.name}.json`);
-            if (!this.isEmpty(animationDT)) {
+            if (animationDT) {
                 await lottie.loadAnimation({
                     name: this.name,
                     container: this.$refs.loading,
