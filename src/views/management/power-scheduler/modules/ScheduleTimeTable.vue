@@ -110,9 +110,9 @@ export default {
             type: String,
             required: true,
         },
-        editMode: {
-            type: Boolean,
-            default: false,
+        mode: {
+            type: String,
+            default: 'READ',
         },
     },
     setup(props) {

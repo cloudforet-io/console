@@ -404,7 +404,10 @@
 		}
 	},
 	"PWR_SCHED": {
+		"CANCEL": "취소",
 		"CREATE": "새 스케줄러 만들기",
+		"CREATE_MODE": "스케줄러 생성",
+		"CREATING": "생성중",
 		"DAY_FRI": "금",
 		"DAY_MON": "월",
 		"DAY_SAT": "토",
@@ -420,6 +423,7 @@
 		"LIST": "스케줄러 목록",
 		"LOCAL_TIME": "현지시간 (기본값)",
 		"MONTH": "월",
+		"SAVE": "저장",
 		"SCHED_TIME": "스케줄러 적용 시간",
 		"THIS_WEEK": "이번주",
 		"TIME": "시간",

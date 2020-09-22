@@ -39,20 +39,23 @@
                 <tbody>
                     <tr v-for="(schedule, index) in scheduleList" :key="index"
                         class="list-item"
-                        :class="{ active: selectedScheduleId === schedule.schedule_id,
-                                  'edit-mode': isEditMode
+                        :class="{ active: selectedSchedule.schedule_id === schedule.schedule_id,
+                                  'edit-mode': mode !== 'READ'
                         }"
                     >
                         <td class="name" @click="showDetail(schedule)">
-                            <p-i v-if="selectedScheduleId === schedule.schedule_id"
+                            <p-i v-if="selectedSchedule.schedule_id === schedule.schedule_id"
                                  name="ic_check" height="1rem" width="1rem"
                                  color="transparent inherit"
                             /> {{ schedule.name }}
                         </td>
                         <td class="edit">
-                            <span v-if="isEditMode && selectedScheduleId === schedule.schedule_id"
-                                  class="edit-tag"
+                            <span v-if="mode === 'UPDATE' && selectedSchedule.schedule_id === schedule.schedule_id"
+                                  class="tag"
                             >{{ $t('PWR_SCHED.EDITING') }}</span>
+                            <span v-else-if="mode === 'CREATE'"
+                                  class="tag"
+                            >{{ $t('PWR_SCHED.CREATING') }}</span>
                             <p-icon-button v-else class="edit" name="ic_edit"
                                            @click="onClickEdit(schedule)"
                             />
@@ -65,19 +68,7 @@
             </table>
         </section>
 
-        <section v-if="selectedSchedule" :class="{'edit-mode': isEditMode}" class="detail-section">
-            <p class="title">
-                {{ isEditMode ? $t('PWR_SCHED.EDIT_MODE') : $t('PWR_SCHED.DETAILS') }}
-            </p>
-            <div class="detail-box">
-                <div class="scroll-contents">
-                    <schedule-time-table :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
-                </div>
-                <div class="scroll-contents">
-                    <schedule-kanban class="kanban" :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
-                </div>
-            </div>
-        </section>
+        <schedule-detail :schedule-id="selectedSchedule.schedule_id" :mode.sync="mode" :name.sync="selectedSchedule.name" />
     </general-page-layout>
 </template>
 
@@ -88,10 +79,7 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import { Timestamp } from '@/components/util/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import ScheduleKanban from '@/views/management/power-scheduler/modules/ScheduleKanban.vue';
-import ScheduleTimeTable from '@/views/management/power-scheduler/modules/ScheduleTimeTable.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
@@ -100,40 +88,33 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import ScheduleDetail from '@/views/management/power-scheduler/modules/ScheduleDetail.vue';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
     schedule_id: string;
     name: string;
-    tags: object;
-    // eslint-disable-next-line camelcase
-    created_at: Timestamp;
-    // eslint-disable-next-line camelcase
-    resource_groups: ResourceGroup[];
     // eslint-disable-next-line camelcase
     'project_id': string;
-    // eslint-disable-next-line camelcase
-    'created_by': string;
 }
 
-interface ResourceGroup {
-    priority: number;
-    // eslint-disable-next-line camelcase
-    resource_group_id: string;
-}
+export const modes = ['READ', 'CREATE', 'UPDATE'];
+export type Mode = typeof modes[number];
+
+// eslint-disable-next-line camelcase
+const defaultSchedule: Partial<Schedule> = { name: '', schedule_id: '' };
 
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        ScheduleDetail,
         PLottie,
         PIconButton,
-        ScheduleTimeTable,
         PI,
         PIconTextButton,
         PPageTitle,
         PPageNavigation,
         GeneralPageLayout,
-        ScheduleKanban,
     },
     props: {
         projectId: {
@@ -159,14 +140,11 @@ export default {
         const state = reactive({
             scheduleList: [] as Schedule[],
             totalCount: 0,
-            resourceGroup: [] as unknown as ResourceGroup,
-            resourceGroupId: [] as string [],
             loading: false,
-            selectedSchedule: null as null|Schedule,
+            selectedSchedule: defaultSchedule as Schedule,
             // eslint-disable-next-line camelcase
-            selectedScheduleId: computed(() => state.selectedSchedule?.schedule_id || ''),
             isNoData: computed(() => state.scheduleList.length === 0),
-            isEditMode: false,
+            mode: 'READ' as Mode,
         });
 
         const listSchedule = async () => {
@@ -180,10 +158,15 @@ export default {
                         },
                     });
 
-                console.debug('res', res);
-
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
+
+                if (state.totalCount === 0) {
+                    state.mode = 'CREATE';
+                    // eslint-disable-next-line camelcase
+                    state.scheduleList = [defaultSchedule];
+                }
+
                 state.selectedSchedule = state.scheduleList[0];
             } catch (e) {
                 console.error(e);
@@ -198,7 +181,7 @@ export default {
 
         const onClickEdit = (schedule: Schedule) => {
             state.selectedSchedule = schedule;
-            state.isEditMode = true;
+            state.mode = 'UPDATE';
         };
 
         const onClickDelete = (schedule: Schedule) => {
@@ -245,7 +228,7 @@ export default {
             }
             &.edit {
                 @apply text-center pr-4;
-                width: 2rem;
+                width: 4.2rem;
             }
             &.delete {
                 @apply text-center pr-6;
@@ -278,7 +261,7 @@ export default {
                 @apply bg-secondary2;
             }
         }
-        .edit-tag {
+        .tag {
             @apply bg-blue-200 text-secondary py-1 px-2 text-xs;
             border-radius: 2px;
         }
@@ -306,34 +289,6 @@ export default {
         }
         .fade-in-leave, .fade-in-enter-to {
             opacity: 0.5;
-        }
-    }
-    .detail-section {
-        margin-top: 3rem;
-        .title {
-            @apply text-xs text-gray-500;
-        }
-        .detail-box {
-            @apply mt-2 border border-gray-200;
-            padding: 3.25rem 3rem;
-            box-shadow: inset 0 0 1.25rem rgba(theme('colors.primary4'), 0.08);
-            background-color: rgba(theme('colors.primary4'), 0.5);
-        }
-        &.edit-mode {
-            .title {
-                @apply text-secondary;
-            }
-            .detail-box {
-                @apply border-secondary;
-                box-shadow: inset 0 0 1.25rem rgba(theme('colors.secondary2'), 0.08);
-                background-color: rgba(theme('colors.secondary2'), 0.5);
-            }
-        }
-        .scroll-contents {
-            @apply overflow-x-auto;
-        }
-        .kanban {
-            margin-top: 2.875rem;
         }
     }
 </style>

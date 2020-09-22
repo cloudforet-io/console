@@ -2,7 +2,7 @@ const Management = () => import('@/views/management/management');
 const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 const PowerScheduler = () => import('@/views/management/power-scheduler/pages/PowerScheduler.vue');
-const PowerSchedulerDetail = () => import('@/views/management/power-scheduler/pages/PowerSchedulerDetail.vue');
+const PowerSchedulerDetail = () => import('@/views/management/power-scheduler/pages/PowerSchedulerDetailPage.vue');
 
 export default {
     path: 'management',
