@@ -403,6 +403,13 @@
 			"PLUGIN": ""
 		}
 	},
+	"PWR_SCHED": {
+		"CREATE": "",
+		"DELETE": "",
+		"DETAILS": "",
+		"EDIT": "",
+		"LIST": ""
+	},
 	"SECRET": {
 		"BTN": {
 			"None": ""

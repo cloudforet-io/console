@@ -403,6 +403,13 @@
 			"PLUGIN": "플러그인"
 		}
 	},
+	"PWR_SCHED": {
+		"CREATE": "새 스케줄러 만들기",
+		"DELETE": "삭제",
+		"DETAILS": "세부 내용",
+		"EDIT": "편집",
+		"LIST": "스케줄러 목록"
+	},
 	"SECRET": {
 		"BTN": {
 			"None": "폴더 유지를 위한 폴더"

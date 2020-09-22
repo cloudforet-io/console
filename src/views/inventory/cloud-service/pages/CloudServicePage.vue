@@ -3,7 +3,7 @@
         <div class="page-navigation">
             <p-page-navigation :routes="routeState.route" />
         </div>
-        <p-page-title :title="$route.params.name"
+        <p-page-title :title="name"
                       child
                       use-total-count
                       use-selected-count
