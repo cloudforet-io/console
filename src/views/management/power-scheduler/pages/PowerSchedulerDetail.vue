@@ -67,11 +67,15 @@
 
         <section v-if="selectedSchedule" :class="{'edit-mode': isEditMode}" class="detail-section">
             <p class="title">
-                {{ $t('PWR_SCHED.EDIT_MODE') }}
+                {{ isEditMode ? $t('PWR_SCHED.EDIT_MODE') : $t('PWR_SCHED.DETAILS') }}
             </p>
             <div class="detail-box">
-                <schedule-time-table :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
-                <schedule-kanban class="kanban" :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
+                <div class="scroll-contents">
+                    <schedule-time-table :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
+                </div>
+                <div class="scroll-contents">
+                    <schedule-kanban class="kanban" :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
+                </div>
             </div>
         </section>
     </general-page-layout>
@@ -324,6 +328,9 @@ export default {
                 box-shadow: inset 0 0 1.25rem rgba(theme('colors.secondary2'), 0.08);
                 background-color: rgba(theme('colors.secondary2'), 0.5);
             }
+        }
+        .scroll-contents {
+            @apply overflow-x-auto;
         }
         .kanban {
             margin-top: 2.875rem;
