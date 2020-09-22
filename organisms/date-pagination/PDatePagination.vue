@@ -1,15 +1,14 @@
 <template>
     <nav class="p-date-pagination">
-        <p-icon-button class="text"
-                       name="ic_arrow_left"
-                       @click="onClickPrev"
-        />
         <div class="date-text-lap">
             <div class="date-text">
                 {{ dateText }}
             </div>
         </div>
-
+        <p-icon-button class="text"
+                       name="ic_arrow_left"
+                       @click="onClickPrev"
+        />
         <p-icon-button class="text"
                        name="ic_arrow_right"
                        :disabled="nextButtonDisabled"
@@ -23,7 +22,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
@@ -47,8 +46,19 @@ export default {
         },
     },
     setup(props: DatePaginationProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            dateText: computed(() => props.date.format('YYYY-MM')),
+            dateText: computed(() => {
+                const weekStart = props.date.startOf('week').format('M');
+                const weekEnd = props.date.endOf('week').format('M');
+                if (props.type === 'week') {
+                    if (weekStart !== weekEnd) {
+                        return `${weekStart + vm.$t('PWR_SCHED.MONTH')} - ${weekEnd + vm.$t('PWR_SCHED.MONTH')} ${props.date.format('YYYY') + vm.$t('PWR_SCHED.YEAR')}`;
+                    }
+                    return `${props.date.format('M') + vm.$t('PWR_SCHED.MONTH')} ${props.date.format('YYYY') + vm.$t('PWR_SCHED.YEAR')}`;
+                }
+                return props.date.format('YYYY-MM');
+            }),
             nextButtonDisabled: computed(() => {
                 const now = dayjs().tz(getTimezone());
                 if (props.type === 'month') {
