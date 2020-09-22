@@ -38,6 +38,7 @@
             </section>
         </div>
 
+        <schedule-time-table v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" />
         <schedule-kanban v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" />
     </general-page-layout>
 </template>
@@ -51,6 +52,7 @@ import {
 import { Timestamp } from '@/components/util/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import ScheduleKanban from '@/views/management/power-scheduler/modules/ScheduleKanban.vue';
+import ScheduleTimeTable from '@/views/management/power-scheduler/modules/ScheduleTimeTable.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
@@ -83,6 +85,7 @@ interface ResourceGroup {
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        ScheduleTimeTable,
         PI,
         PIconTextButton,
         PPageTitle,
