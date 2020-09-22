@@ -49,16 +49,8 @@ jobs:
         id: job1
         run: |
           if [ "$(cat src/VERSION)" == "${{ env.TAG }}" ]
-            then
-              echo "::set-output name=not_first_tag::true"
-              echo $(cat src/VERSION)
-              echo ${{ env.TAG }}
-              echo true
-            else
-              echo "::set-output name=not_first_tag::false"
-              echo false
-              echo $(cat src/VERSION)
-              echo ${{ env.TAG }}
+            then echo "::set-output name=not_first_tag::true"
+            else echo "::set-output name=not_first_tag::false"
           fi
 
   update_master_branch_version_file:
