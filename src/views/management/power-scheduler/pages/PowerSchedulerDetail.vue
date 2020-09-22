@@ -7,49 +7,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="!loading && showDetailPanel" class="flex">
-            <div class="mr-2 border border-gray first">
-                1
-                <div v-for="(resource, index) in resourceGroup" :key="index">
-                    <div v-if="resource.priority === 1">
-                        {{ resource.name }} {{ resource.count }}
-                    </div>
-                </div>
-            </div>
-            <div class="mr-2 border border-gray second">
-                2
-                <div v-for="(resource, index) in resourceGroup" :key="index">
-                    <div v-if="resource.priority === 2">
-                        {{ resource.name }} {{ resource.count }}
-                    </div>
-                </div>
-            </div>
-            <div class="mr-2 border border-gray third">
-                3
-                <div v-for="(resource, index) in resourceGroup" :key="index">
-                    <div v-if="resource.priority === 3">
-                        {{ resource.name }} {{ resource.count }}
-                    </div>
-                </div>
-            </div>
-            <div class="mr-2 border border-gray fourth">
-                4
-                <div v-for="(resource, index) in resourceGroup" :key="index">
-                    <div v-if="resource.priority === 4">
-                        {{ resource.name }} {{ resource.count }}
-                    </div>
-                </div>
-            </div>
-            <div class="mr-2 border border-gray fifth">
-                5
-                <div v-for="(resource, index) in resourceGroup" :key="index">
-                    <div v-if="resource.priority === 5">
-                        {{ resource.name }} {{ resource.count }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <schedule-kanban v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id"/>
     </div>
 </template>
 
@@ -62,6 +20,7 @@ import {
 
 import { Timestamp } from '@/components/util/type';
 import { SpaceConnector } from '@/lib/space-connector';
+import ScheduleKanban from "@/views/management/power-scheduler/modules/ScheduleKanban.vue";
 
 interface ScheduledResource {
     // eslint-disable-next-line camelcase
@@ -104,35 +63,35 @@ interface ResourceGroup {
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        ScheduleKanban
 
     },
     props: {
-        item: {
-            type: Object,
+        projectId: {
+            type: String,
+            default: undefined
         },
     },
-
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             scheduleList: [] as unknown as CardItem,
             resourceGroup: [] as unknown as ResourceGroup,
             resourceGroupId: [] as string [],
             loading: false,
             showDetailPanel: false,
+            selectedSchedule: null,
         });
 
         const getScheduleList = async () => {
-            const projectId = vm.$route.params.id;
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: [projectId] },
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: [props.projectId] },
                     {
                         headers: {
                             'Mock-Mode': 'true',
                         },
                     });
-                state.scheduleList.scheduler = res.projects[projectId];
+                state.scheduleList.scheduler = res.projects[props.projectId];
                 state.loading = false;
             } catch (e) {
                 console.error(e);
@@ -144,6 +103,7 @@ export default {
                 state.resourceGroupId[i] = state.resourceGroup[i].resource_group_id;
             }
             const res = await SpaceConnector.client.statistics.topic.powerSchedulerResourceGroups({
+                // eslint-disable-next-line camelcase
                 resource_groups: state.resourceGroupId,
             }, {
                 headers: {
@@ -168,6 +128,7 @@ export default {
                     },
                 });
                 state.resourceGroup = res.resource_groups.map(d => ({
+                    // eslint-disable-next-line camelcase
                     resource_group_id: d.resource_group_id,
                     priority: d.priority,
                 }));
@@ -179,8 +140,7 @@ export default {
         };
 
         const showDetail = async (schedule) => {
-            await getResourceGroup(schedule.schedule_id);
-            state.showDetailPanel = true;
+            state.selectedSchedule = schedule;
         };
 
         const init = () => {

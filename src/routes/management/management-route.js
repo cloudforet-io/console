@@ -8,7 +8,7 @@ export default {
     path: 'management',
     name: 'management',
     redirect: '/management/supervisor/plugins',
-    meta: { label: 'Management', breadcrumb: true },
+    meta: { label: 'Management' },
     components: {
         main: Management,
     },
@@ -16,7 +16,7 @@ export default {
         {
             path: 'supervisor',
             name: 'supervisor',
-            meta: { label: 'Supervisor', breadcrumb: true },
+            meta: { label: 'Supervisor' },
             redirect: '/management/supervisor/plugins',
             component: { template: '<router-view />' },
             children: [
@@ -25,7 +25,6 @@ export default {
                     name: 'supervisorPlugins',
                     meta: {
                         label: 'Plugins',
-                        breadcrumb: true,
                         isDomainOwnerOnly: true,
                     },
                     component: SupervisorPlugins,
@@ -35,12 +34,12 @@ export default {
         {
             path: 'collector-history',
             name: 'collectorHistory',
-            meta: { label: 'Collector History', breadcrumb: true },
+            meta: { label: 'Collector History' },
             component: CollectorHistory,
         },
         {
             path: 'power-scheduler',
-            meta: { label: 'Power Scheduler', breadcrumb: true },
+            meta: { label: 'Power Scheduler' },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -49,7 +48,7 @@ export default {
                     component: PowerScheduler,
                 },
                 {
-                    path: ':id',
+                    path: ':projectId',
                     name: 'powerSchedulerDetail',
                     props: true,
                     component: PowerSchedulerDetail,
