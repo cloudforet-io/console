@@ -64,21 +64,19 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-    .p-page-title{
+<style lang="postcss">
+    .p-page-title {
         @apply mb-6 inline-flex content-start items-center;
-        .title{
+        .title {
             @apply font-bold;
             font-size: 1.5rem;
             line-height: 120%;
-            &.child{
+            &.child {
                 font-size: 1.5rem;
             }
         }
-        .extra{
+        .extra {
             @apply font-normal text-lg;
         }
-
     }
-
 </style>
