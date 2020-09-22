@@ -405,10 +405,28 @@
 	},
 	"PWR_SCHED": {
 		"CREATE": "",
+		"DAY_FRI": "",
+		"DAY_MON": "",
+		"DAY_SAT": "",
+		"DAY_SUN": "",
+		"DAY_THU": "",
+		"DAY_TUE": "",
+		"DAY_WED": "",
 		"DELETE": "",
 		"DETAILS": "",
 		"EDIT": "",
-		"LIST": ""
+		"LIST": "",
+		"LOCAL_TIME": "",
+		"MONTH": "",
+		"SCHED_TIME": "",
+		"THIS_WEEK": "",
+		"TIME": "",
+		"TIMER": "",
+		"TIMER_OFF": "",
+		"TIMER_ON": "",
+		"TIMER_REPEAT": "",
+		"TIMEZONE": "",
+		"YEAR": ""
 	},
 	"SECRET": {
 		"BTN": {

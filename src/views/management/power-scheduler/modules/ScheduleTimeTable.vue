@@ -1,8 +1,8 @@
 <template>
     <div class="schedule-time-table-container">
         <div class="title-lap">
-            <span class="title">시간</span>
-            <span class="sub-title">스케줄러 적용 시</span>
+            <span class="title">{{ $t('PWR_SCHED.TIME') }}</span>
+            <span class="sub-title">{{ $t('PWR_SCHED.SCHED_TIME') }}</span>
         </div>
         <div class="button-lap">
             <p-button
@@ -12,7 +12,7 @@
                 block
                 @click="onClickCurrentWeek"
             >
-                이번주
+                {{ $t('PWR_SCHED.THIS_WEEK') }}
             </p-button>
             <p-date-pagination :date.sync="currentDate" type="week" />
         </div>
@@ -59,13 +59,13 @@
         <div class="right">
             <div class="timezone-lap">
                 <div class="title">
-                    시간대
+                    {{ $t('PWR_SCHED.TIMEZONE') }}
                 </div>
-                <div>현지시간 (기본값)</div>
+                <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
             </div>
             <div class="timer-lap">
                 <div class="title">
-                    타이머
+                    {{ $t('PWR_SCHED.TIMER') }}
                 </div>
                 <div v-for="timer in timers" :key="timer.text"
                      class="legend-lap" :class="timer.class"
@@ -85,7 +85,9 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
 
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -110,10 +112,19 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
             currentDate: dayjs().tz(getTimezone()),
-            weekdayTexts: ['일', '월', '화', '수', '목', '금', '토'],
+            weekdayTexts: [
+                vm.$t('PWR_SCHED.DAY_SUN'),
+                vm.$t('PWR_SCHED.DAY_MON'),
+                vm.$t('PWR_SCHED.DAY_TUE'),
+                vm.$t('PWR_SCHED.DAY_WED'),
+                vm.$t('PWR_SCHED.DAY_THU'),
+                vm.$t('PWR_SCHED.DAY_FRI'),
+                vm.$t('PWR_SCHED.DAY_SAT'),
+            ],
             currentWeekStart: computed(() => state.currentDate.startOf('week')),
             currentWeekEnd: computed(() => state.currentDate.endOf('week')),
             currentWeekList: computed(() => {
@@ -127,9 +138,9 @@ export default {
             }),
             //
             timers: [
-                { class: 'repeat', text: '반복 타이머' },
-                { class: 'ticket-on', text: '티켓: 켜기' },
-                { class: 'ticket-off', text: '티켓: 끄기' },
+                { class: 'repeat', text: vm.$t('PWR_SCHED.TIMER_REPEAT') },
+                { class: 'ticket-on', text: vm.$t('PWR_SCHED.TIMER_ON') },
+                { class: 'ticket-off', text: vm.$t('PWR_SCHED.TIMER_OFF') },
             ],
         });
 
