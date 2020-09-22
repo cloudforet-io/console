@@ -1,11 +1,9 @@
 <template>
     <div>
-        <p-button-tab :tabs="tabs" :active-tab="activeTab" keep-alive-all
+        <p-button-tab v-if="tabs.length > 0" :tabs="tabs" :active-tab="activeTab"
+                      keep-alive-all
                       @update:activeTab="onChangeTab"
         >
-            <template slot="Base Information">
-                <cloud-service-base-info :data="data" :loading="loading" />
-            </template>
             <template v-for="(layout, idx) in layouts" :slot="layout.name">
                 <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
                                   :fetch-options="fetchOptionsMap[layout.name]"
@@ -22,12 +20,6 @@
                                   v-on="getLayoutListeners(layout)"
                 />
             </template>
-            <template slot="Raw Data">
-                <div class="raw-data">
-                    <p-panel-top title="Raw Data" />
-                    <p-raw-data :item="data" />
-                </div>
-            </template>
         </p-button-tab>
     </div>
 </template>
@@ -39,18 +31,14 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import CloudServiceBaseInfo from '@/views/inventory/cloud-service/modules/CloudServiceBaseInfo.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PRawData from '@/components/organisms/text-editor/raw-data/PRawData_new.vue';
 
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { DynamicLayoutEventListeners, DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { SearchSchema } from '@/lib/component-utils/query-search/type';
 import { getFiltersFromQueryTags } from '@/lib/api/query-search';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
@@ -62,10 +50,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 export default {
     name: 'CloudServiceDetail',
     components: {
-        CloudServiceBaseInfo,
         PDynamicLayout,
-        PRawData,
-        PPanelTop,
         PButtonTab,
     },
     props: {
@@ -88,7 +73,6 @@ export default {
     },
     setup(props) {
         const layoutSchemaCacheMap = {};
-        const searchSchemaCacheMap = {};
         const fetchOptionsMap = {};
 
         const state = reactive({
@@ -102,44 +86,38 @@ export default {
             language: computed(() => store.state.user.language),
 
             // button tab
-            tabs: computed<string[]>(() => {
-                const res: string[] = [];
-                res.push('Base Information');
-                if (state.layouts) res.push(...state.layouts.map(d => d.name));
-                res.push('Raw Data');
-                return res;
-            }),
-            activeTab: 'Base Information',
+            tabs: computed<string[]>(() => state.layouts.map(d => d.name)),
+            activeTab: '',
 
             // schema
             layouts: [] as DynamicLayout[],
             currentLayout: computed<undefined|DynamicLayout>(() => find(state.layouts, { name: state.activeTab })),
-            searches: [] as SearchSchema[],
         });
 
-        const schemaQuery = new QueryHelper().setOnly('metadata.view.sub_data.layouts', 'metadata.view.search');
         const getSchema = async () => {
             let layouts = layoutSchemaCacheMap[props.cloudServiceId];
-            let searches = searchSchemaCacheMap[props.cloudServiceId];
 
-            if (!layouts || !searches) {
+            if (!layouts) {
                 try {
-                    const res = await SpaceConnector.client.inventory.cloudService.get({
+                    const res = await SpaceConnector.client.addOns.pageSchema.get({
                         // eslint-disable-next-line camelcase
-                        cloud_service_id: props.cloudServiceId,
-                        query: schemaQuery.data,
+                        resource_type: 'inventory.CloudService',
+                        schema: 'details',
+                        options: {
+                            // eslint-disable-next-line camelcase
+                            cloud_service_id: props.cloudServiceId,
+                        },
                     });
-                    layouts = get(res, 'metadata.view.sub_data.layouts', null);
-                    searches = get(res, 'metadata.view.search', null);
+                    layouts = res.details;
                 } catch (e) {
                     console.error(e);
                 }
 
                 layoutSchemaCacheMap[props.cloudServiceId] = layouts;
-                searchSchemaCacheMap[props.cloudServiceId] = searches;
 
                 state.layouts = layouts || [];
-                state.searches = searches || [];
+
+                if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
             }
         };
         //
@@ -215,9 +193,9 @@ export default {
         const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
             init(options) {
                 if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
-                if (searchSchemaCacheMap[props.cloudServiceId]) {
+                if (layout?.options?.search) {
                     const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                        searchSchemaCacheMap[props.cloudServiceId],
+                        layout.options.search,
                         'inventory.CloudService',
                     );
                     state.keyItems = keyItems;
@@ -270,7 +248,15 @@ export default {
                 await getSchema();
                 await getData();
             }
-        }, { immediate: true });
+        }, { immediate: false });
+
+        const init = async () => {
+            await store.dispatch('resource/loadAll');
+            await getSchema();
+            await getData();
+        };
+
+        init();
 
         return {
             ...toRefs(state),
