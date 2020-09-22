@@ -4,6 +4,7 @@
 
         <div class="title-box">
             <p-page-title :title="projectName"
+                          child
                           @goBack="$router.go(-1)"
             />
             <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm">

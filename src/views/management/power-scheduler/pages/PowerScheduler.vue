@@ -300,8 +300,7 @@ export default {
             const res: Location = {
                 name: 'powerSchedulerDetail',
                 params: {
-                    id: item.project_id,
-                    item,
+                    projectId: item.project_id,
                 },
             };
             return res;
