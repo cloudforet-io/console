@@ -15,9 +15,9 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { CopyButtonProps } from '@/components/molecules/buttons/copy-button/type';
 
-import { copyAnyData, isNotEmpty } from '@/lib/util';
-import { mouseOverState } from '@/lib/compostion-util';
-import color from '@/styles/colors';
+import { copyAnyData, isNotEmpty } from '@/components/util/helpers';
+import { mouseOverState } from '@/components/util/composition-helpers';
+import color from '@/components/styles/colors';
 
 export default {
     name: 'PCopyButton',

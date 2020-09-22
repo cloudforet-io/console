@@ -58,30 +58,3 @@ export function initReactive<T>(lazy: boolean, ...args: any[]): T {
     }
     return reactive(assign({}, ...args));
 }
-// EXAMPLE
-// @StateToolSet<string>() // fail
-// class Foo { }
-//
-// interface tempStateType {
-//     a:string
-//     b:number
-//
-// }
-// @StateToolSet<tempStateType>() // ok
-// class Boo<initData> {
-//     public state:optionalType<tempStateType, initData>
-//
-//     static initState() {
-//         return {
-//             a: 'a',
-//             b: 1,
-//         };
-//     }
-//
-//     constructor(initData:initData) {
-//         this.state = reactive({
-//             ...Boo.initState(),
-//             ...initData,
-//         });
-//     }
-// }

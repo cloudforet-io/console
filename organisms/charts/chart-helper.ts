@@ -1,9 +1,7 @@
 import {
     Chart, ChartConfiguration, ChartDataSets, ChartPoint, ChartTooltipOptions,
 } from 'chart.js';
-import { gray } from '@/styles/colors';
-import moment from 'moment';
-import { getTimezone } from '@/lib/util';
+import { gray } from '@/components/styles/colors';
 
 export class PChart extends Chart {
     globalDatasets: ChartDataSets = {};

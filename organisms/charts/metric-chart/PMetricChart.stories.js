@@ -6,7 +6,6 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { metricChartProps } from '@/components/organisms/charts/metric-chart/PMetricChart.toolset';
 import casual, { arrayOf } from '@/components/util/casual';
 import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChart.vue';
 
@@ -37,7 +36,43 @@ const getState = (props, context) => {
 
 export const defaultCase = () => ({
     components: { PMetricChart },
-    props: getKnobProps(metricChartProps, {
+    props: getKnobProps({
+        loading: {
+            type: Boolean,
+            default: true,
+        },
+        dataset: {
+            type: Object,
+            default: () => ({}),
+        },
+        labels: {
+            type: Array,
+            default: () => [],
+        },
+        colors: {
+            type: Array,
+            default: () => [],
+        },
+        unit: {
+            type: Object,
+            default: () => ({ x: 'Timestamp', y: 'Count' }),
+            validator(unit) {
+                return typeof unit.x === 'string' && typeof unit.y === 'string';
+            },
+        },
+        timezone: {
+            type: String,
+            default: 'UTC',
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        error: {
+            type: Boolean,
+            default: false,
+        },
+    }, {
         dataset: {
             a: arrayOf(7, () => casual.integer(0, 100)),
             b: arrayOf(7, () => casual.integer(0, 100)),

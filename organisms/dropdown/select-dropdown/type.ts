@@ -1,4 +1,4 @@
-import { MenuItem } from '@/lib/util';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 
 export interface SelectDropdownStateType {
     items: MenuItem[];

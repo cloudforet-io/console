@@ -1,7 +1,7 @@
 import { select, text, color } from '@storybook/addon-knobs/vue';
 import { autoProps } from '@sb/storybook-util';
 import PStatus from '@/components/molecules/status/PStatus.vue';
-import { safe } from '@/styles/colors';
+import { safe } from '@/components/styles/colors';
 
 export default {
     title: 'molecules/status',

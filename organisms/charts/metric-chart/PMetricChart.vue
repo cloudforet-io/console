@@ -25,14 +25,14 @@
 import {
     reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import { MetricChartProps, metricChartProps } from '@/components/organisms/charts/metric-chart/PMetricChart.toolset';
+import { MetricChartProps } from '@/components/organisms/charts/metric-chart/type';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import { map, forEach } from 'lodash';
-import { gray } from '@/styles/colors';
+import { gray } from '@/components/styles/colors';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { ChartColor, ChartDataSets } from 'chart.js';
-import { PChart, tooltips } from '@/components/organisms/charts/PChart.toolset';
+import { PChart, tooltips } from '@/components/organisms/charts/chart-helper';
 import moment from 'moment';
 
 const chartTimestampFormatter = (value, timezone) => moment.tz(moment.unix(value.seconds), timezone).format('M/DD[\n]HH:mm');
@@ -45,7 +45,43 @@ export default {
         },
     },
     components: { PLottie, PSkeleton, PChartLoader },
-    props: metricChartProps,
+    props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
+        dataset: {
+            type: Object,
+            default: () => ({}),
+        },
+        labels: {
+            type: Array,
+            default: () => [],
+        },
+        colors: {
+            type: Array,
+            default: () => [],
+        },
+        unit: {
+            type: Object,
+            default: () => ({ x: 'Timestamp', y: 'Count' }),
+            validator(unit) {
+                return typeof unit.x === 'string' && typeof unit.y === 'string';
+            },
+        },
+        timezone: {
+            type: String,
+            default: 'UTC',
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        error: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props: MetricChartProps) {
         const getLabels = () => {
             if (props.unit.x === 'Timestamp') {

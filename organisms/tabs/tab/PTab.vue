@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import PTabBar from '@/components/molecules/tabs/tab-bar/PTabBar.vue';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/components/util/composition-helpers';
 import {
     computed, defineComponent,
 } from '@vue/composition-api';
@@ -35,9 +35,9 @@ export default defineComponent({
     name: 'PTab',
     components: { PTabBar },
     mixins: [tabBarProps],
-    setup(props: TabBarProps) {
+    setup(props: TabBarProps, { emit }) {
         return {
-            proxyActiveTab: makeProxy('activeTab'),
+            proxyActiveTab: makeProxy('activeTab', props, emit),
             isOne: isOne(props),
             nonKeepTabs: computed(() => props.tabs.reduce<TabItem[]>((results, current, idx) => {
                 if (typeof current === 'string') results.push({ name: current, label: current, keepAlive: false });
