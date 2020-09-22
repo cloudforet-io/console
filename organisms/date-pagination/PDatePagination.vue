@@ -2,7 +2,7 @@
     <nav class="p-date-pagination">
         <p-icon-button class="text"
                        name="ic_arrow_left"
-                       @click="onClickPrevMonth"
+                       @click="onClickPrev"
         />
         <div class="date-text-lap">
             <div class="date-text">
@@ -13,19 +13,25 @@
         <p-icon-button class="text"
                        name="ic_arrow_right"
                        :disabled="nextButtonDisabled"
-                       @click="onClickNextMonth"
+                       @click="onClickNext"
         />
     </nav>
 </template>
 
 <script lang="ts">
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import { DatePaginationProps } from '@/components/organisms/date-pagination/type';
+
+import { getTimezone } from '@/lib/util';
+
+dayjs.extend(isSameOrAfter);
 
 export default {
     name: 'PDatePagination',
@@ -33,31 +39,49 @@ export default {
     props: {
         date: {
             type: Object,
-            default: moment(),
+            default: dayjs(),
+        },
+        type: {
+            type: String,
+            default: 'month',
         },
     },
-    setup(props, { emit }) {
+    setup(props: DatePaginationProps, { emit }) {
         const state = reactive({
             dateText: computed(() => props.date.format('YYYY-MM')),
             nextButtonDisabled: computed(() => {
-                const currentMonth = moment().format('YYYY-MM');
-                return currentMonth === state.dateText;
+                const now = dayjs().tz(getTimezone());
+                if (props.type === 'month') {
+                    return now.format('YYYY-MM') === state.dateText;
+                }
+                const weekStart = now.startOf('week');
+                return props.date.isSameOrAfter(weekStart, 'day');
             }),
         });
 
-        const onClickPrevMonth = () => {
-            const prevMonthMoment = moment(props.date.format()).subtract(1, 'months').endOf('month');
-            emit('update:date', prevMonthMoment);
+        const onClickPrev = () => {
+            let prevDate: Dayjs;
+            if (props.type === 'month') {
+                prevDate = props.date.subtract(1, 'month').endOf('month');
+            } else {
+                prevDate = props.date.subtract(1, 'week').endOf('week');
+            }
+            emit('update:date', prevDate);
         };
-        const onClickNextMonth = () => {
-            const nextMonthMoment = moment(props.date.format()).add(1, 'months').endOf('month');
-            emit('update:date', nextMonthMoment);
+        const onClickNext = () => {
+            let nextDate: Dayjs;
+            if (props.type === 'month') {
+                nextDate = props.date.add(1, 'month').endOf('month');
+            } else {
+                nextDate = props.date.add(1, 'week').endOf('week');
+            }
+            emit('update:date', nextDate);
         };
 
         return {
             ...toRefs(state),
-            onClickPrevMonth,
-            onClickNextMonth,
+            onClickPrev,
+            onClickNext,
         };
     },
 };
