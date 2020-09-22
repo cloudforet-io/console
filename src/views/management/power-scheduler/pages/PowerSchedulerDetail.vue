@@ -5,47 +5,75 @@
         <div class="title-box">
             <p-page-title :title="projectName"
                           child
-                          @goBack="$router.go(-1)"
+                          @goBack="$router.push('/management/power-scheduler')"
             />
             <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm">
                 {{ $t('PWR_SCHED.CREATE') }}
             </p-icon-text-button>
         </div>
 
-        <div class="list-box">
-            <section v-if="isNoData">
+        <section class="list-box">
+            <div v-if="loading">
+                <div class="loading-backdrop fade-in" />
+                <p-lottie name="thin-spinner" :size="2.5"
+                          :auto="true" class="loading"
+                />
+            </div>
+            <div v-else-if="isNoData" class="no-data">
                 No Schedule List
-            </section>
-            <section v-else>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>{{ $t('PWR_SCHED.LIST') }} ({{ totalCount }})</th>
-                            <th>{{ $t('PWR_SCHED.EDIT') }}</th>
-                            <th>{{ $t('PWR_SCHED.DELETE') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(schedule, index) in scheduleList" :key="index">
-                            <td class="scheduler-name" @click="showDetail(schedule)">
-                                {{ schedule.name }}
-                            </td>
-                            <td><p-i name="ic_edit" height="1rem" width="1rem" /></td>
-                            <td><p-i name="ic_transhcan" height="1rem" width="1rem" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-        </div>
+            </div>
+            <table v-else>
+                <thead>
+                    <tr>
+                        <th class="name">
+                            <strong>{{ $t('PWR_SCHED.LIST') }}</strong>&nbsp;({{ totalCount }})
+                        </th>
+                        <th class="edit">
+                            {{ $t('PWR_SCHED.EDIT') }}
+                        </th>
+                        <th class="delete">
+                            {{ $t('PWR_SCHED.DELETE') }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(schedule, index) in scheduleList" :key="index"
+                        class="list-item"
+                        :class="{ active: selectedScheduleId === schedule.schedule_id,
+                                  'edit-mode': isEditMode
+                        }"
+                    >
+                        <td class="name" @click="showDetail(schedule)">
+                            <p-i v-if="selectedScheduleId === schedule.schedule_id"
+                                 name="ic_check" height="1rem" width="1rem"
+                                 color="transparent inherit"
+                            /> {{ schedule.name }}
+                        </td>
+                        <td class="edit">
+                            <span v-if="isEditMode && selectedScheduleId === schedule.schedule_id"
+                                  class="edit-tag"
+                            >{{ $t('PWR_SCHED.EDITING') }}</span>
+                            <p-icon-button v-else class="edit" name="ic_edit"
+                                           @click="onClickEdit(schedule)"
+                            />
+                        </td>
+                        <td class="delete">
+                            <p-icon-button class="delete" name="ic_trashcan" @click="onClickDelete(schedule)" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
         <schedule-time-table v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" />
-        <schedule-kanban v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" />
+        <schedule-kanban v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" :edit-mode="isEditMode" />
     </general-page-layout>
 </template>
 
 <script lang="ts">
 import {
-    computed,
+    ComponentRenderProxy,
+    computed, getCurrentInstance,
     reactive, toRefs,
 } from '@vue/composition-api';
 
@@ -57,9 +85,10 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { store } from '@/store';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
@@ -85,6 +114,8 @@ interface ResourceGroup {
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        PLottie,
+        PIconButton,
         ScheduleTimeTable,
         PI,
         PIconTextButton,
@@ -100,6 +131,9 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        if (!props.projectId) vm.$router.push('/error-page');
+
         const projectName = computed(() => store.state.resource.project.items[props.projectId]?.label || props.projectId);
 
         /** Breadcrumb */
@@ -117,8 +151,11 @@ export default {
             resourceGroup: [] as unknown as ResourceGroup,
             resourceGroupId: [] as string [],
             loading: false,
-            selectedSchedule: null,
+            selectedSchedule: null as null|Schedule,
+            // eslint-disable-next-line camelcase
+            selectedScheduleId: computed(() => state.selectedSchedule?.schedule_id || ''),
             isNoData: computed(() => state.scheduleList.length === 0),
+            isEditMode: false,
         });
 
         const listSchedule = async () => {
@@ -136,6 +173,7 @@ export default {
 
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
+                state.selectedSchedule = state.scheduleList[0];
             } catch (e) {
                 console.error(e);
             } finally {
@@ -143,9 +181,17 @@ export default {
             }
         };
 
-
-        const showDetail = async (schedule) => {
+        const showDetail = async (schedule: Schedule) => {
             state.selectedSchedule = schedule;
+        };
+
+        const onClickEdit = (schedule: Schedule) => {
+            state.selectedSchedule = schedule;
+            state.isEditMode = true;
+        };
+
+        const onClickDelete = (schedule: Schedule) => {
+
         };
 
         const init = async () => {
@@ -160,6 +206,8 @@ export default {
             routeState,
             ...toRefs(state),
             showDetail,
+            onClickEdit,
+            onClickDelete,
         };
     },
 };
@@ -170,15 +218,83 @@ export default {
         @apply flex justify-between;
     }
     .list-box {
-        margin-top: 2.25rem;
+        @apply relative;
+        min-height: 8rem;
     }
     table {
         width: 100%;
-        th, td {
-            text-align: center;
-            &:first-child {
-                text-align: left;
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+    }
+    th {
+        @apply font-normal text-xs text-gray-500;
+    }
+    th, td {
+        &.name {
+            @apply text-left;
+        }
+        &.edit {
+            @apply text-center pr-4;
+            width: 2rem;
+        }
+        &.delete {
+            @apply text-center pr-6;
+            width: 2rem;
+        }
+    }
+    .list-item {
+        @apply cursor-pointer bg-white;
+        td {
+            @apply border-t border-b border-gray-200;
+            height: 3.5rem;
+        }
+        td:first-child {
+            @apply border-l pl-6 rounded-l;
+        }
+        td:last-child {
+            @apply border-r rounded-r;
+        }
+        &.active {
+            td {
+                @apply border-primary text-primary;
+            }
+            &.edit-mode {
+                td {
+                    @apply border-secondary text-secondary;
+                }
             }
         }
+        &:hover {
+            @apply bg-secondary2;
+        }
+    }
+    .edit-tag {
+        @apply bg-blue-200 text-secondary py-1 px-2 text-xs;
+        border-radius: 2px;
+    }
+
+    .loading-backdrop {
+        @apply absolute w-full h-full overflow-hidden;
+        background-color: white;
+        opacity: 0.5;
+        top: 0;
+        z-index: 1;
+    }
+    .loading {
+        @apply absolute flex w-full h-full justify-center items-center;
+        top: 0;
+        max-height: 16.875rem;
+    }
+    .fade-in-enter-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-enter, .fade-in-leave-to {
+        opacity: 0;
+    }
+    .fade-in-leave, .fade-in-enter-to {
+        opacity: 0.5;
     }
 </style>
