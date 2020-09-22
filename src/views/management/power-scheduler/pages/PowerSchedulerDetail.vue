@@ -2,7 +2,7 @@
     <general-page-layout>
         <p-page-navigation :routes="routeState.route" />
 
-        <div class="title-box">
+        <header>
             <p-page-title :title="projectName"
                           child
                           @goBack="$router.push('/management/power-scheduler')"
@@ -10,9 +10,9 @@
             <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm">
                 {{ $t('PWR_SCHED.CREATE') }}
             </p-icon-text-button>
-        </div>
+        </header>
 
-        <section class="list-box">
+        <section class="list-section">
             <div v-if="loading">
                 <div class="loading-backdrop fade-in" />
                 <p-lottie name="thin-spinner" :size="2.5"
@@ -65,8 +65,15 @@
             </table>
         </section>
 
-        <schedule-time-table v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" />
-        <schedule-kanban v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id" :edit-mode="isEditMode" />
+        <section v-if="selectedSchedule" :class="{'edit-mode': isEditMode}" class="detail-section">
+            <p class="title">
+                {{ $t('PWR_SCHED.EDIT_MODE') }}
+            </p>
+            <div class="detail-box">
+                <schedule-time-table :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
+                <schedule-kanban class="kanban" :schedule-id="selectedSchedule.schedule_id" :edit-mode.sync="isEditMode" />
+            </div>
+        </section>
     </general-page-layout>
 </template>
 
@@ -138,11 +145,11 @@ export default {
 
         /** Breadcrumb */
         const routeState = reactive({
-            route: [
+            route: computed(() => [
                 { name: 'Management', path: '/management' },
                 { name: 'Power Scheduler', path: '/management/power-scheduler' },
                 { name: `${projectName.value}`, path: `/management/power-scheduler/${props.projectId}` },
-            ],
+            ]),
         });
 
         const state = reactive({
@@ -214,87 +221,112 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .title-box {
+    header {
         @apply flex justify-between;
     }
-    .list-box {
+    .list-section {
         @apply relative;
         min-height: 8rem;
-    }
-    table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 0.5rem;
-    }
-    th {
-        @apply font-normal text-xs text-gray-500;
-    }
-    th, td {
-        &.name {
-            @apply text-left;
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
         }
-        &.edit {
-            @apply text-center pr-4;
-            width: 2rem;
+        th {
+            @apply font-normal text-xs text-gray-500;
         }
-        &.delete {
-            @apply text-center pr-6;
-            width: 2rem;
-        }
-    }
-    .list-item {
-        @apply cursor-pointer bg-white;
-        td {
-            @apply border-t border-b border-gray-200;
-            height: 3.5rem;
-        }
-        td:first-child {
-            @apply border-l pl-6 rounded-l;
-        }
-        td:last-child {
-            @apply border-r rounded-r;
-        }
-        &.active {
-            td {
-                @apply border-primary text-primary;
+        th, td {
+            &.name {
+                @apply text-left;
             }
-            &.edit-mode {
+            &.edit {
+                @apply text-center pr-4;
+                width: 2rem;
+            }
+            &.delete {
+                @apply text-center pr-6;
+                width: 2rem;
+            }
+        }
+        .list-item {
+            @apply cursor-pointer bg-white;
+            td {
+                @apply border-t border-b border-gray-200;
+                height: 3.5rem;
+            }
+            td:first-child {
+                @apply border-l pl-6 rounded-l;
+            }
+            td:last-child {
+                @apply border-r rounded-r;
+            }
+            &.active {
                 td {
-                    @apply border-secondary text-secondary;
+                    @apply border-primary text-primary;
+                }
+                &.edit-mode {
+                    td {
+                        @apply border-secondary text-secondary;
+                    }
                 }
             }
+            &:hover {
+                @apply bg-secondary2;
+            }
         }
-        &:hover {
-            @apply bg-secondary2;
+        .edit-tag {
+            @apply bg-blue-200 text-secondary py-1 px-2 text-xs;
+            border-radius: 2px;
         }
-    }
-    .edit-tag {
-        @apply bg-blue-200 text-secondary py-1 px-2 text-xs;
-        border-radius: 2px;
-    }
 
-    .loading-backdrop {
-        @apply absolute w-full h-full overflow-hidden;
-        background-color: white;
-        opacity: 0.5;
-        top: 0;
-        z-index: 1;
+        .loading-backdrop {
+            @apply absolute w-full h-full overflow-hidden;
+            background-color: white;
+            opacity: 0.5;
+            top: 0;
+            z-index: 1;
+        }
+        .loading {
+            @apply absolute flex w-full h-full justify-center items-center;
+            top: 0;
+            max-height: 16.875rem;
+        }
+        .fade-in-enter-active {
+            transition: opacity 0.2s;
+        }
+        .fade-in-leave-active {
+            transition: opacity 0.2s;
+        }
+        .fade-in-enter, .fade-in-leave-to {
+            opacity: 0;
+        }
+        .fade-in-leave, .fade-in-enter-to {
+            opacity: 0.5;
+        }
     }
-    .loading {
-        @apply absolute flex w-full h-full justify-center items-center;
-        top: 0;
-        max-height: 16.875rem;
-    }
-    .fade-in-enter-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-leave-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-enter, .fade-in-leave-to {
-        opacity: 0;
-    }
-    .fade-in-leave, .fade-in-enter-to {
-        opacity: 0.5;
+    .detail-section {
+        margin-top: 3rem;
+        .title {
+            @apply text-xs text-gray-500;
+        }
+        .detail-box {
+            @apply mt-2 border border-gray-200;
+            padding: 3.25rem 3rem;
+            box-shadow: inset 0 0 1.25rem rgba(theme('colors.primary4'), 0.08);
+            background-color: rgba(theme('colors.primary4'), 0.5);
+        }
+        &.edit-mode {
+            .title {
+                @apply text-secondary;
+            }
+            .detail-box {
+                @apply border-secondary;
+                box-shadow: inset 0 0 1.25rem rgba(theme('colors.secondary2'), 0.08);
+                background-color: rgba(theme('colors.secondary2'), 0.5);
+            }
+        }
+        .kanban {
+            margin-top: 2.875rem;
+        }
     }
 </style>

@@ -110,6 +110,10 @@ export default {
             type: String,
             required: true,
         },
+        editMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
