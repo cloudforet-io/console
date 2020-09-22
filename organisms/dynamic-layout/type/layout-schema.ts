@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
+import {SearchSchema} from "@/lib/component-utils/query-search/type";
 
 /** Metadata schema types for Dynamic layout */
 export const dynamicLayoutTypes = ['item', 'simple-table', 'table', 'query-search-table',
@@ -25,6 +26,7 @@ export interface TableOptions extends CommonOptions {
 
 export interface QuerySearchTableOptions extends CommonOptions {
     fields: DynamicField[];
+    search: SearchSchema;
 }
 
 export type RawOptions = CommonOptions
