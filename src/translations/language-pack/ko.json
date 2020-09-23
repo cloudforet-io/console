@@ -287,7 +287,7 @@
 		},
 		"CHECK_HASH": "해시태그 형식을 확인해주세요.",
 		"CRT_FAIL_ARG": "{0} 생성이 실패했습니다.",
-		"CRT_GRP": "그룹 생",
+		"CRT_GRP": "그룹 생성",
 		"CRT_PROJ": "프로젝트 생성",
 		"CRT_PROJ_GRP": "프로젝트 그룹 생성  ",
 		"CRT_SUCC_ARG": "{0}이/가 생성됐습니다.",

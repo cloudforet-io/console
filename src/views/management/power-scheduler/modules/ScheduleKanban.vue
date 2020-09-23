@@ -111,6 +111,7 @@ export default {
             for (let i = 0; i < Object.keys(state.resourceGroup).length; i++) {
                 state.resourceGroup[i].name = res.resource_groups[state.resourceGroupId[i]].name;
                 state.resourceGroup[i].count = res.resource_groups[state.resourceGroupId[i]].count;
+                state.resourceGroup[i].icon = res.resource_groups[state.resourceGroupId[i]].icon;
             }
         };
 

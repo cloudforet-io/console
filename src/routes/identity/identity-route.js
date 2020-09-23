@@ -6,6 +6,7 @@ const User = () => import('@/views/identity/user/User');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage');
 const ServiceAccountSearch = () => import('@/views/identity/service-account/pages/ServiceAccountSearch');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
+const NoResource = () => import('@/views/common/error/NoResource.vue');
 
 export default {
     path: 'identity',
@@ -29,13 +30,6 @@ export default {
                     props: true,
                     component: ServiceAccount,
                 },
-                // {
-                //     path: ':resourceId/tags',
-                //     name: 'serviceAccountTags',
-                //     meta: { label: 'tags' },
-                //     props: true,
-                //     component: TagsPage,
-                // },
                 {
                     path: 'search/:id',
                     name: 'serviceAccountSearch',
@@ -51,6 +45,11 @@ export default {
                     meta: { label: 'Add Service Account' },
                     props: true,
                     component: AddServiceAccount,
+                },
+                {
+                    path: 'no-resource',
+                    name: 'noServiceAccount',
+                    component: NoResource,
                 },
             ],
         },

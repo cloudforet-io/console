@@ -7,6 +7,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage } from '@/lib/util';
 
 const DEFAULT_URL = '/inventory/cloud-service';
+const ERROR_URL = '/inventory/cloud-service/no-resource';
 
 export default {
     name: 'CloudServiceSearch',
@@ -30,12 +31,16 @@ export default {
                     search_key: vm.$props.searchKey,
                 });
                 if (result.url === DEFAULT_URL) {
-                    showErrorMessage('No Resource', 'There are no matching resources. It will redirect to Cloud Service main page.', vm.$root);
-                } else link = `${result.url}?filters=${vm.$props.searchKey}:${vm.$props.id}`;
+                    // showErrorMessage('No Resource', 'There are no matching resources. It will redirect to Cloud Service main page.', vm.$root);
+                    vm.$router.push(ERROR_URL);
+                } else {
+                    link = `${result.url}?filters=${vm.$props.searchKey}:${vm.$props.id}`;
+                    vm.$router.push(link);
+                }
             } catch (e) {
-                showErrorMessage('No Resource', 'There are no matching resources. It will redirect to Cloud Service main page.', vm.$root);
+                // showErrorMessage('No Resource', 'There are no matching resources. It will redirect to Cloud Service main page.', vm.$root);
+                vm.$router.push(ERROR_URL);
             }
-            vm.$router.push(link);
         });
     },
 };
