@@ -22,6 +22,7 @@ interface State {
     component: any;
     loader: () => Promise<any>;
 }
+const RECURSIVE_TYPE = ['list', 'enum'];
 
 export default {
     name: 'PDynamicField',
@@ -87,7 +88,11 @@ export default {
                 beforeCreate: props.beforeCreate,
                 handler: props.handler,
             };
-            if (props.handler) {
+
+            /**
+             * For types that recursively use dynamic fields, do not run handler
+             * */
+            if (props.handler && !RECURSIVE_TYPE.includes(res.type)) {
                 const handlerRes = props.handler(Object.freeze(props));
                 if (handlerRes.type) res.type = handlerRes.type;
                 if (handlerRes.data) res.data = handlerRes.data;
@@ -97,8 +102,12 @@ export default {
                 if (res.typeOptions) res.typeOptions = { ...res.typeOptions, ...handlerRes.typeOptions };
                 if (res.extraData) res.extraData = { ...res.extraData, ...handlerRes.extraData };
 
+                /**
+                 * Load component(=Dynamic Field) again if type change occurs through Handler.
+                 * For types that recursively use dynamic fields, do not inherit handler.
+                 */
                 if (res.type !== props.type) {
-                    if (['list', 'enum'].includes(res.type)) state.nextHandler = undefined;
+                    if (RECURSIVE_TYPE.includes(res.type)) state.nextHandler = undefined;
                     loadComponent(res);
                 }
             }
