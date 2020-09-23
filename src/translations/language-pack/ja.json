@@ -430,9 +430,9 @@
 		"THIS_WEEK": "",
 		"TIME": "",
 		"TIMER": "",
-		"TIMER_OFF": "",
-		"TIMER_ON": "",
-		"TIMER_REPEAT": "",
+		"TIMER_ROUTINE": "",
+		"TIMER_RUNNING": "",
+		"TIMER_STOPPED": "",
 		"TIMEZONE": "",
 		"YEAR": ""
 	},

@@ -43,13 +43,14 @@
                             </div>
                         </div>
                     </div>
-                    <div v-for="itemRow in range(0, 24)"
-                         :key="itemRow"
+                    <div v-for="time in range(0, 24)"
+                         :key="time"
                          class="item-row"
                     >
                         <div
-                            v-for="item in range(0, 7)"
-                            :key="item"
+                            v-for="week in currentWeekList"
+                            :key="week.format('YYYY-MM-DD')"
+                            :class="getClass(week.format('YYYY-MM-DD'), time)"
                             class="item"
                         />
                     </div>
@@ -79,14 +80,14 @@
 </template>
 
 <script lang="ts">
-import { range } from 'lodash';
+import { get, range } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
 import {
-    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
@@ -98,6 +99,18 @@ import { SpaceConnector } from '@/lib/space-connector';
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+interface ScheduleRule {
+    [key: string]: number[];
+}
+enum SCHEDULE_RULE_TYPE {
+    routine = 'ROUTINE',
+    ticket = 'TICKET',
+}
+enum RULE_STATE {
+    running = 'RUNNING',
+    stopped = 'STOPPED',
+}
 
 export default {
     name: 'ScheduleTimeTable',
@@ -118,8 +131,6 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
-            currentDate: dayjs().tz(getTimezone()),
             weekdayTexts: [
                 vm.$t('PWR_SCHED.DAY_SUN'),
                 vm.$t('PWR_SCHED.DAY_MON'),
@@ -129,25 +140,96 @@ export default {
                 vm.$t('PWR_SCHED.DAY_FRI'),
                 vm.$t('PWR_SCHED.DAY_SAT'),
             ],
-            currentWeekStart: computed(() => state.currentDate.startOf('week')),
-            currentWeekEnd: computed(() => state.currentDate.endOf('week')),
+            timers: [
+                { class: 'routine', text: vm.$t('PWR_SCHED.TIMER_ROUTINE') },
+                { class: 'ticket-running', text: vm.$t('PWR_SCHED.TIMER_RUNNING') },
+                { class: 'ticket-stopped', text: vm.$t('PWR_SCHED.TIMER_STOPPED') },
+            ],
+            today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
+            currentDate: dayjs().tz(getTimezone()),
             currentWeekList: computed(() => {
-                let now = state.currentWeekStart.clone();
+                let weekStart = state.currentDate.startOf('week');
+                const weekEnd = state.currentDate.endOf('week');
                 const weekList: Dayjs[] = [];
-                while (now.isSameOrBefore(state.currentWeekEnd, 'day')) {
-                    weekList.push(now);
-                    now = now.add(1, 'day');
+                while (weekStart.isSameOrBefore(weekEnd, 'day')) {
+                    weekList.push(weekStart);
+                    weekStart = weekStart.add(1, 'day');
                 }
                 return weekList;
             }),
             //
-            timers: [
-                { class: 'repeat', text: vm.$t('PWR_SCHED.TIMER_REPEAT') },
-                { class: 'ticket-on', text: vm.$t('PWR_SCHED.TIMER_ON') },
-                { class: 'ticket-off', text: vm.$t('PWR_SCHED.TIMER_OFF') },
-            ],
+            scheduleRule: {
+                routine: {} as ScheduleRule,
+                ticketRunning: {} as ScheduleRule,
+                ticketStopped: {} as ScheduleRule,
+            },
         });
 
+        const getClass = (date, time) => {
+            // ticket running
+            let rules = get(state.scheduleRule.ticketRunning, date);
+            if (rules && rules.includes(time)) return 'ticket-running';
+
+            rules = get(state.scheduleRule.ticketStopped, date);
+            if (rules && rules.includes(time)) return 'ticket-stopped';
+            // routine
+            const weekdayName = dayjs(date).tz(getTimezone()).format('ddd').toUpperCase();
+            rules = get(state.scheduleRule.routine, weekdayName);
+            if (rules && rules.includes(time)) return 'routine';
+
+            return '';
+        };
+
+        const getScheduleRuleWithTimezone = (scheduleRule) => {
+            const rule: ScheduleRule = scheduleRule.rule;
+            const ruleType = scheduleRule.rule_type;
+            const ruleState = scheduleRule.state;
+            if (ruleType === SCHEDULE_RULE_TYPE.routine) {
+                const newRule: ScheduleRule = {
+                    SUN: [],
+                    MON: [],
+                    TUE: [],
+                    WED: [],
+                    THU: [],
+                    FRI: [],
+                    SAT: [],
+                };
+                const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+                const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
+                weekdays.forEach((weekday, index) => {
+                    rule[weekday].forEach((time) => {
+                        let newTime = time + offsetHours;
+                        if (newTime < 24) {
+                            newRule[weekday].push(newTime);
+                        } else {
+                            newTime -= 24;
+                            if (index === 6) {
+                                newRule[weekdays[0]].push(newTime);
+                            } else {
+                                newRule[weekdays[index + 1]].push(newTime);
+                            }
+                        }
+                    });
+                });
+                state.scheduleRule.routine = newRule;
+            } else {
+                const newRule: ScheduleRule = {};
+                Object.entries(rule).forEach(([date, times]) => {
+                    times.forEach((time) => {
+                        const utcDate = dayjs.utc(`${date} ${time}:00`);
+                        const timezoneDate = utcDate.tz(getTimezone()).format('YYYY-MM-DD');
+                        const timezoneHour = Number(utcDate.tz(getTimezone()).format('H'));
+                        if (timezoneDate in newRule) {
+                            newRule[timezoneDate].push(timezoneHour);
+                        } else {
+                            newRule[timezoneDate] = [timezoneHour];
+                        }
+                    });
+                });
+                if (ruleState === RULE_STATE.running) state.scheduleRule.ticketRunning = newRule;
+                else if (ruleState === RULE_STATE.stopped) state.scheduleRule.ticketStopped = newRule;
+            }
+        };
         const getScheduleRule = async () => {
             const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
                 // eslint-disable-next-line camelcase
@@ -157,19 +239,21 @@ export default {
                     'Mock-Mode': 'true',
                 },
             });
-            console.log(res);
+            res.results.forEach(result => getScheduleRuleWithTimezone(result));
         };
         const onClickCurrentWeek = () => {
             state.currentDate = dayjs().tz(getTimezone());
         };
 
-        const init = async () => {
-            await getScheduleRule();
-        };
-        init();
+        watch(() => props.scheduleId, async (after, before) => {
+            if (after !== before) {
+                await getScheduleRule();
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
+            getClass,
             onClickCurrentWeek,
             range,
         };
@@ -268,8 +352,20 @@ export default {
                         &:first-child {
                             @apply border-l-0;
                         }
-                        &.active {
-                            /*@apply bg-black;*/
+                        &.routine {
+                            @apply bg-point-violet;
+                            height: 0.7rem;
+                            border-radius: 0.125rem;
+                        }
+                        &.ticket-running {
+                            @apply bg-peacock-300;
+                            height: 0.7rem;
+                            border-radius: 0.125rem;
+                        }
+                        &.ticket-stopped {
+                            @apply bg-red-400;
+                            height: 0.7rem;
+                            border-radius: 0.125rem;
                         }
                     }
                 }
@@ -293,19 +389,19 @@ export default {
         }
         .legend-lap {
             padding-bottom: 0.5rem;
-            &.repeat {
+            &.routine {
                 @apply text-point-violet;
                 .legend-icon {
                     @apply bg-point-violet;
                 }
             }
-            &.ticket-on {
+            &.ticket-running {
                 @apply text-peacock-300;
                 .legend-icon {
                     @apply bg-peacock-300;
                 }
             }
-            &.ticket-off {
+            &.ticket-stopped {
                 @apply text-red-500;
                 .legend-icon {
                     @apply bg-red-400;
