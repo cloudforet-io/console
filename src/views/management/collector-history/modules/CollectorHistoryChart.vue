@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import {
-    orderBy, range, max, find,
+    orderBy, max, find,
 } from 'lodash';
 import numeral from 'numeral';
 
@@ -36,7 +36,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import {ChartOptions} from "chart.js";
+import { ChartOptions } from 'chart.js';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
@@ -89,13 +89,11 @@ export default {
             state.noData = rawData.length === 0;
 
             const orderedData = orderBy(rawData, ['date'], ['asc']);
-            const dateFormattedData = orderedData.map((d) => {
-                return {
-                    date: dayjs(d.date).tz(getTimezone()),
-                    success: d.success,
-                    failure: d.failure,
-                };
-            });
+            const dateFormattedData = orderedData.map(d => ({
+                date: dayjs(d.date).tz(getTimezone()),
+                success: d.success,
+                failure: d.failure,
+            }));
             const chartData = [] as ChartDataType[];
             const today = dayjs().tz(getTimezone());
             let now = state.currentMonthStart.clone();

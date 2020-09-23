@@ -1,6 +1,6 @@
 <template>
     <div class="page-information">
-        <span>UPDATED 2020-08-10</span> <span class="divider" />
+        <span>UPDATED {{ currentDate }} (Local Time) </span> <span class="divider" />
         <span class="text-gray-400">LESS</span>
         <span id="circle1" />
         <span id="circle2" />
@@ -12,8 +12,21 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
+import { getTimezone } from '@/lib/util';
+import { reactive, toRefs } from '@vue/composition-api';
+
 export default {
     name: 'PageInformation',
+
+    setup(props, context) {
+        const state = reactive({
+            currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD')
+        })
+        return {
+            ...toRefs(state),
+        }
+    }
 };
 </script>
 
@@ -23,7 +36,7 @@ export default {
         margin-top: -1rem;
         margin-bottom: 0.625rem;
         font-size: 0.75rem;
-        line-height: 120%;
+        line-height: 0.8;
         .divider {
             @apply my-0 text-gray-200;
             height: 0.875rem;

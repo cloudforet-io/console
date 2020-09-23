@@ -1,11 +1,9 @@
 <template>
-    <div class="flex flex-col">
+    <div class="mt-4">
         <div v-for="(color, index) in scheduleHeatMapColor" :key="index">
-            <div>
-                <span v-for="(num, index) in 7">
-                    <span class="circle inline-block" :class="`${color[index]}`" />
-                </span>
-            </div>
+            <span v-for="(num, index) in 7">
+                <span class="circle inline-block" :class="`${color[index]}`" />
+            </span>
         </div>
     </div>
 </template>
@@ -80,9 +78,10 @@ export default {
 
 <style lang="postcss" scoped>
     .circle {
-        width: 0.625rem;
-        height: 0.625rem;
+        width: 0.5rem;
+        height: 0.5rem;
         border-radius: 50%;
-        margin-right: 0.63em;
+        margin-left: 0.5rem;
+        margin-top: 0.5rem;
     }
 </style>

@@ -32,19 +32,22 @@ import Chart from 'chart.js';
 import moment from 'moment';
 import _, { orderBy, chain, range } from 'lodash';
 import numeral from 'numeral';
+import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, watch, UnwrapRef,
+    computed, reactive, toRefs, watch, UnwrapRef, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
+import { queryTagsToQueryString } from '@/lib/router-query-string';
 import {
     coral, gray, primary2, black,
 } from '@/styles/colors';
@@ -74,6 +77,7 @@ export default {
         PSkeleton,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const LEGEND_COLORS: {[k: string]: string} = {
             failure: coral.default,
             success: primary2,
@@ -86,27 +90,20 @@ export default {
             loading: true,
         });
 
-        // const onClickChart = (point, event) => {
-        //     const item = event[0];
-        //     if (item) {
-        //         const clickedData = state.data[item._index];
-        //         const queryTags: QueryTag[] = [];
-        //
-        //         const selectedDate = moment(clickedData.date).format('YYYY-MM-DD');
-        //         const nextDate = moment(selectedDate).add(1, 'day').format('YYYY-MM-DD');
-        //         queryTags.push({
-        //             key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
-        //             operator: '>=',
-        //             value: { label: selectedDate, name: selectedDate },
-        //         });
-        //         queryTags.push({
-        //             key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
-        //             operator: '<',
-        //             value: { label: nextDate, name: nextDate },
-        //         });
-        //         vm.$router.push({ name: 'collectorHistory', query: { filter: queryTagsToQueryString(queryTags) } });
-        //     }
-        // };
+        const onClickChart = (point, event) => {
+            const item = event[0];
+            if (item) {
+                const clickedData = state.data[item._index];
+                const queryTags: QueryTag[] = [];
+                const selectedDate = moment(clickedData.date).format('YYYY-MM-DD');
+                queryTags.push({
+                    key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+                    value: { label: selectedDate, name: selectedDate },
+                    operator: '=',
+                });
+                vm.$router.push({ name: 'collectorHistory', query: { filters: queryTagsToQueryString(queryTags) } });
+            }
+        };
         const drawChart = (canvas) => {
             let data;
             if (state.data.length > 0) {
@@ -200,7 +197,7 @@ export default {
                             },
                         }],
                     },
-                    // onClick: onClickChart,
+                    onClick: onClickChart,
                 },
                 plugins: [{
                     beforeDraw(chart): void {
@@ -243,7 +240,11 @@ export default {
             state.loading = true;
             state.data = [];
             try {
-                const res = await SpaceConnector.client.statistics.topic.dailyJobSummary();
+                const today = dayjs().tz(getTimezone());
+                const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
+                    start: today.subtract(6, 'day').toISOString(),
+                    end: today.toISOString(),
+                });
                 const orderedData = orderBy(res.results, ['date'], ['asc']);
                 state.data = orderedData.map(d => ({
                     date: moment(d.date).tz(getTimezone()).subtract(1, 'day').format('YYYY-MM-DD'),
