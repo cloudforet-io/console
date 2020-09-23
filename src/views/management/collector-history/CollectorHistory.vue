@@ -12,15 +12,15 @@
                     :class="items.length === 0 ? 'no-data' : ''"
                     :fields="fields"
                     :items="items"
+                    :query-tags="tags"
+                    :key-items="handlers.keyItems"
+                    :value-handler-map="handlers.valueHandlerMap"
                     :loading="loading"
-                    :query-tags="searchTags"
-                    :key-items="querySearchHandlers.keyItems"
-                    :value-handler-map="querySearchHandlers.valueHandlerMap"
+                    :total-count="totalCount"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     :this-page.sync="thisPage"
                     :page-size.sync="pageSize"
-                    :total-count="totalCount"
                     :style="{height: '100%', border: 'none'}"
                     :selectable="false"
                     :row-cursor-pointer="rowCursorPointer"
@@ -138,6 +138,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 // import PLottie from '@/components/molecules/lottie/PLottie.vue';
 // import PI from '@/components/atoms/icons/PI.vue';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
+import { KeyItem } from '@/components/organisms/search/query-search/type';
 
 import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
@@ -185,6 +186,28 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const handlers = {
+            keyItems: [
+                {
+                    name: 'job_id',
+                    label: 'Job ID',
+                },
+                {
+                    name: 'status',
+                    label: 'Status',
+                },
+                {
+                    dataType: 'datetime',
+                    name: 'created_at',
+                    label: 'Start Time',
+                },
+            ],
+            valueHandlerMap: {
+                // eslint-disable-next-line camelcase
+                job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
+                status: makeEnumValueHandler(JOB_STATUS),
+            },
+        };
         const state = reactive({
             loading: false,
             providers: [] as ProviderModel[],
@@ -220,31 +243,8 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
-            searchTags: [],
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems as KeyItem[]),
             querySearchRef: null as null|QuerySearchTableFunctions,
-            querySearchHandlers: {
-                keyItems: [
-                    {
-                        name: 'job_id',
-                        label: 'Job ID',
-                    },
-                    {
-                        name: 'status',
-                        label: 'Status',
-                    },
-                    // {
-                    //     dataType: 'datetime',
-                    //     name: 'created_at',
-                    //     label: 'Start Time',
-                    // },
-                ],
-                valueHandlerMap: {
-                    // eslint-disable-next-line camelcase
-                    job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-                    status: makeEnumValueHandler(JOB_STATUS),
-                },
-            },
-            //
             modalHeaderTitle: 'Need to Set a Collector',
             modalVisible: false,
             modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
@@ -299,7 +299,7 @@ export default {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
 
             const query = new QueryHelper()
                 .setSort(state.sortBy, state.sortDesc)
@@ -349,10 +349,10 @@ export default {
             vm.$router.replace({ query: { ...router.currentRoute.query }, hash: item.job_id }).catch(() => {});
         };
         const onChange = async (item) => {
-            state.searchTags = item.queryTags;
+            state.tags = item.queryTags;
             const urlQueryString = queryTagsToQueryString(item.queryTags);
             // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, filter: urlQueryString } }).catch(() => {});
+            await vm.$router.replace({ query: { ...router.currentRoute.query, filters: urlQueryString } }).catch(() => {});
             try {
                 await getJobs();
             } catch (e) {
@@ -390,7 +390,6 @@ export default {
             if (hash) {
                 state.selectedJobId = hash.replace('#', '');
             }
-            state.searchTags = queryStringToQueryTags(vm.$route.query.filter);
 
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;
@@ -416,6 +415,7 @@ export default {
             ...toRefs(state),
             ...toRefs(routeState),
             ...toRefs(subRouteState),
+            handlers,
             onSelect,
             onChange,
             onClickPageNumber,
