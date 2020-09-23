@@ -1,6 +1,6 @@
 <template>
     <p-text-editor ref="editor" class="p-raw-data" :code="code"
-                   mode="readOnly"
+                   mode="readOnly" :loading="loading"
     />
 </template>
 
@@ -23,6 +23,10 @@ export default {
         raw: {
             type: String,
             default: undefined,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

@@ -6,7 +6,7 @@ import {
 import { RawOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 export type RawFetchOptions = Pick<DynamicLayoutFetchOptions, never>;
-export type RawTypeOptions = Pick<DynamicLayoutTypeOptions, never>;
+export type RawTypeOptions = Pick<DynamicLayoutTypeOptions, 'loading'>;
 
 export type RawDynamicLayoutProps = DynamicLayoutProps<
     RawOptions,

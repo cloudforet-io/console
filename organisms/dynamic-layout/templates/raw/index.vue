@@ -3,7 +3,7 @@
         <p-panel-top v-if="name">
             {{ name }}
         </p-panel-top>
-        <p-raw-data class="mx-4" :item="rootData" />
+        <p-raw-data :item="rootData" :loading="loading" />
     </div>
 </template>
 
@@ -50,6 +50,7 @@ export default {
                 return props.data;
             }),
             fetchOptionsParam: computed<RawFetchOptions>(() => ({})),
+            loading: computed(() => (props.typeOptions?.loading || false)),
         });
 
         emit('init', state.fetchOptionsParam);

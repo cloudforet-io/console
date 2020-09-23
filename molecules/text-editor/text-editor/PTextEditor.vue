@@ -1,11 +1,24 @@
 <template>
-    <codemirror
-        ref="editor"
-        v-model="proxyCode"
-        class="p-text-editor"
-        :options="options"
-        :mode="mode"
-    />
+    <div class="p-text-editor">
+        <transition name="fade-in">
+            <div v-if="loading" class="loader w-full h-full">
+                <slot name="loader" :loading="loading">
+                    <p-lottie name="thin-spinner"
+                              auto
+                              :size="2.5"
+                    />
+                </slot>
+            </div>
+        </transition>
+        <div v-if="!loading">
+            <codemirror
+                ref="editor"
+                v-model="proxyCode"
+                :options="options"
+                :mode="mode"
+            />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -31,9 +44,11 @@ import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/closetag';
 
 import { makeProxy } from '@/components/util/composition-helpers';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {
     name: 'PTextEditor',
+    components: { PLottie },
     props: {
         code: {
             type: String,
@@ -61,6 +76,10 @@ export default {
             type: String,
             default: 'edit',
             required: true,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
@@ -95,12 +114,28 @@ export default {
     @import 'codemirror/lib/codemirror.css';
     @import 'codemirror/addon/fold/foldgutter.css';
     .p-text-editor {
+        height: 100%;
+        min-height: 5rem;
         .CodeMirror {
             font-family: Inconsolata, monospace;
             line-height: 1.5;
             height: fit-content;
             margin: 1rem;
             padding: 1rem;
+        }
+        position: relative;
+        .loader {
+            position: absolute;
+            padding-top: 2rem;
+        }
+        .fade-in-leave-active, .fade-in-enter-active {
+            transition: opacity 0.5s;
+        }
+        .fade-in-leave-to, .fade-in-enter {
+            opacity: 0;
+        }
+        .fade-in-enter-to, .fade-in-leave {
+            opacity: 1;
         }
     }
 </style>
