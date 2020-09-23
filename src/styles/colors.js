@@ -137,6 +137,7 @@ const semanticColors = {
     secondary2: palette.blue[100],
     alert: palette.red[500],
     safe: palette.green[500],
+    'point-violet': '#8F7CFF',
 };
 
 module.exports = {

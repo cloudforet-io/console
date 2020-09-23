@@ -139,9 +139,6 @@ import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import { SearchTableFluentAPI } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
 import { showErrorMessage } from '@/lib/util';
-import {
-    makeQueryStringComputeds, queryStringToNumberArray, selectIndexAutoReplacer,
-} from '@/lib/router-query-string';
 
 export default {
     name: 'ProjectDetail',
@@ -368,22 +365,6 @@ export default {
             if (tab === 'member') memberApiHandler.getData();
         }, { immediate: true });
 
-        /** Query String */
-        const queryRefs = {
-            ...makeQueryStringComputeds(singleItemTab.syncState, {
-                activeTab: { key: 'tab' },
-            }),
-            ...makeQueryStringComputeds(memberApiHandler.tableTS.syncState, {
-                selectIndex: {
-                    key: 'member_sl',
-                    setter: queryStringToNumberArray,
-                    autoReplacer: selectIndexAutoReplacer,
-                },
-            }),
-            // eslint-disable-next-line camelcase
-            // member_search: makeQueryStringComputed(ref(undefined),
-            //     { key: 'member_search' }),
-        };
 
         // apply search keyword to query string only when search event occurred
         const onSearch = async (e) => {

@@ -3,7 +3,7 @@
         <div class="page-navigation">
             <p-page-navigation :routes="routeState.route" />
         </div>
-        <p-page-title :title="$route.params.name"
+        <p-page-title :title="name"
                       child
                       use-total-count
                       use-selected-count
@@ -152,7 +152,7 @@ import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';

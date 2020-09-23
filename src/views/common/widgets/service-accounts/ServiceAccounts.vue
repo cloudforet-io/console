@@ -63,7 +63,7 @@ import {
 } from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
 import { store } from '@/store';
 import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
-import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 
 const DEFAULT_COUNT = 4;
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
@@ -202,7 +202,7 @@ export default {
                 };
             }
 
-            state.chart = new NSChart(canvas, {
+            state.chart = new SpaceChart(canvas, {
                 type: 'pie',
                 data: {
                     labels,

@@ -1,8 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 
 
 class Config {
+    config: any;
+
+    axiosInstance: AxiosInstance = null as unknown as AxiosInstance;
+
     constructor() {
         this.config = null;
     }

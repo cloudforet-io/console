@@ -403,6 +403,39 @@
 			"PLUGIN": "플러그인"
 		}
 	},
+	"PWR_SCHED": {
+		"CANCEL": "취소",
+		"CREATE": "새 스케줄러 만들기",
+		"CREATE_MODE": "스케줄러 생성",
+		"CREATING": "생성중",
+		"DAY_FRI": "금",
+		"DAY_MON": "월",
+		"DAY_SAT": "토",
+		"DAY_SUN": "일",
+		"DAY_THU": "목",
+		"DAY_TUE": "화",
+		"DAY_WED": "수",
+		"DELETE": "삭제",
+		"DETAILS": "세부 내용",
+		"EDIT": "편집",
+		"EDITING": "편집중",
+		"EDIT_MODE": "편집 모드",
+		"LIST": "스케줄러 목록",
+		"LOCAL_TIME": "현지시간 (기본값)",
+		"MONTH": "월",
+		"SAVE": "저장",
+		"SCHED_TIME": "스케줄러 적용 시간",
+		"SET_NAME": "이름 설정",
+		"SET_NAME_DESC": "스케줄러 이름을 설정합니다. (영문, 띄워쓰기 불가)",
+		"THIS_WEEK": "이번주",
+		"TIME": "시간",
+		"TIMER": "타이머",
+		"TIMER_OFF": "티켓: 끄기",
+		"TIMER_ON": "티켓: 켜기",
+		"TIMER_REPEAT": "반복 타이머",
+		"TIMEZONE": "시간대",
+		"YEAR": "년"
+	},
 	"SECRET": {
 		"BTN": {
 			"None": "폴더 유지를 위한 폴더"

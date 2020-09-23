@@ -160,7 +160,6 @@ import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 
 /* types */
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { SearchKeyGroup } from '@/lib/component-utils/query-search/type';
 import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
@@ -179,7 +178,7 @@ import {
 import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import config from '@/lib/config';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';

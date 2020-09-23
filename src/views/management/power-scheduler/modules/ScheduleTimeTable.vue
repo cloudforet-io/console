@@ -1,0 +1,325 @@
+<template>
+    <div class="schedule-time-table-container">
+        <div class="title-lap">
+            <span class="title">{{ $t('PWR_SCHED.TIME') }}</span>
+            <span class="sub-title">{{ $t('PWR_SCHED.SCHED_TIME') }}</span>
+        </div>
+        <div class="button-lap">
+            <p-button
+                class="current-week-button"
+                style-type="gray200"
+                :outline="true"
+                block
+                @click="onClickCurrentWeek"
+            >
+                {{ $t('PWR_SCHED.THIS_WEEK') }}
+            </p-button>
+            <p-date-pagination :date.sync="currentDate" type="week" />
+        </div>
+        <div class="left">
+            <div class="table-lap">
+                <div class="time-section">
+                    <div class="icon-item" />
+                    <div v-for="time in range(0, 24)"
+                         :key="time"
+                         class="time"
+                    >
+                        {{ time % 2 !== 0 ? ('0' + time).slice(-2) : '' }}
+                    </div>
+                </div>
+                <div class="data-section">
+                    <div class="weekday-row">
+                        <div
+                            v-for="(weekday, index) in currentWeekList"
+                            :key="index"
+                            class="weekday-item"
+                            :class="[weekday.format('YYYY-MM-DD') === today ? 'today' : '' ]"
+                        >
+                            <div class="weekday-text">
+                                {{ weekdayTexts[weekday.day()] }}
+                            </div>
+                            <div class="weekday-number-text">
+                                {{ weekday.format('D') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div v-for="itemRow in range(0, 24)"
+                         :key="itemRow"
+                         class="item-row"
+                    >
+                        <div
+                            v-for="item in range(0, 7)"
+                            :key="item"
+                            class="item"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="timezone-lap">
+                <div class="title">
+                    {{ $t('PWR_SCHED.TIMEZONE') }}
+                </div>
+                <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
+            </div>
+            <div class="timer-lap">
+                <div class="title">
+                    {{ $t('PWR_SCHED.TIMER') }}
+                </div>
+                <div v-for="timer in timers" :key="timer.text"
+                     class="legend-lap" :class="timer.class"
+                >
+                    <span class="legend-icon" />
+                    <span>{{ timer.text }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import { range } from 'lodash';
+import dayjs, { Dayjs } from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+import {
+    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
+
+import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+
+import { getTimezone } from '@/lib/util';
+import { SpaceConnector } from '@/lib/space-connector';
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+export default {
+    name: 'ScheduleTimeTable',
+    components: {
+        PButton,
+        PDatePagination,
+    },
+    props: {
+        scheduleId: {
+            type: String,
+            required: true,
+        },
+        mode: {
+            type: String,
+            default: 'READ',
+        },
+    },
+    setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
+            currentDate: dayjs().tz(getTimezone()),
+            weekdayTexts: [
+                vm.$t('PWR_SCHED.DAY_SUN'),
+                vm.$t('PWR_SCHED.DAY_MON'),
+                vm.$t('PWR_SCHED.DAY_TUE'),
+                vm.$t('PWR_SCHED.DAY_WED'),
+                vm.$t('PWR_SCHED.DAY_THU'),
+                vm.$t('PWR_SCHED.DAY_FRI'),
+                vm.$t('PWR_SCHED.DAY_SAT'),
+            ],
+            currentWeekStart: computed(() => state.currentDate.startOf('week')),
+            currentWeekEnd: computed(() => state.currentDate.endOf('week')),
+            currentWeekList: computed(() => {
+                let now = state.currentWeekStart.clone();
+                const weekList: Dayjs[] = [];
+                while (now.isSameOrBefore(state.currentWeekEnd, 'day')) {
+                    weekList.push(now);
+                    now = now.add(1, 'day');
+                }
+                return weekList;
+            }),
+            //
+            timers: [
+                { class: 'repeat', text: vm.$t('PWR_SCHED.TIMER_REPEAT') },
+                { class: 'ticket-on', text: vm.$t('PWR_SCHED.TIMER_ON') },
+                { class: 'ticket-off', text: vm.$t('PWR_SCHED.TIMER_OFF') },
+            ],
+        });
+
+        const getScheduleRule = async () => {
+            const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
+                // eslint-disable-next-line camelcase
+                schedule_id: props.scheduleId,
+            }, {
+                headers: {
+                    'Mock-Mode': 'true',
+                },
+            });
+            console.log(res);
+        };
+        const onClickCurrentWeek = () => {
+            state.currentDate = dayjs().tz(getTimezone());
+        };
+
+        const init = async () => {
+            await getScheduleRule();
+        };
+        init();
+
+        return {
+            ...toRefs(state),
+            onClickCurrentWeek,
+            range,
+        };
+    },
+};
+</script>
+
+<style lang="postcss">
+.schedule-time-table-container {
+    width: 100%;
+    .title-lap {
+        display: block;
+        .title {
+            @apply text-gray-900;
+            font-size: 1rem;
+            font-weight: bold;
+            padding-right: 0.5rem;
+        }
+        .sub-title {
+            @apply text-gray-400;
+            font-size: 0.75rem;
+        }
+    }
+    .button-lap {
+        position: relative;
+        width: 75%;
+        padding-top: 1.5rem;
+        padding-bottom: 0.5rem;
+        .current-week-button {
+            @apply text-gray-900;
+            font-weight: normal;
+        }
+        .p-date-pagination {
+            position: absolute;
+            right: 0;
+        }
+    }
+    .left {
+        display: inline-block;
+        width: 75%;
+        .table-lap {
+            display: flex;
+            width: 100%;
+            .time-section {
+                @apply bg-primary4 border border-primary3 border-r-0;
+                width: 3rem;
+                .icon-item {
+                    @apply border-b border-primary3;
+                    height: 3.125rem;
+                }
+                .time {
+                    @apply text-gray-500;
+                    height: 0.75rem;
+                    font-size: 0.625rem;
+                    text-align: center;
+                    line-height: 0.625rem;
+                }
+            }
+            .data-section {
+                @apply border border-primary3;
+                width: calc(100% - 3rem);
+                .weekday-row {
+                    @apply bg-primary4 border-b border-primary3;
+                    width: 100%;
+                    height: 3.125rem;
+                    .weekday-item {
+                        @apply text-gray-500;
+                        display: inline-block;
+                        width: calc(100% / 7);
+                        font-size: 0.75rem;
+                        text-align: center;
+                        padding: 0.625rem;
+                        .weekday-text {
+                            font-weight: bold;
+                        }
+                        &.today {
+                            @apply text-gray-900;
+                            font-weight: bold;
+                        }
+                    }
+                }
+                .item-row {
+                    @apply border-b border-primary4;
+                    display: flex;
+                    width: 100%;
+                    height: 0.75rem;
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                    .item {
+                        @apply border-l border-primary4;
+                        display: inline-flex;
+                        width: calc(100% / 7);
+                        height: 0.75rem;
+                        margin: 0;
+                        &:first-child {
+                            @apply border-l-0;
+                        }
+                        &.active {
+                            /*@apply bg-black;*/
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .right {
+        display: inline-block;
+        width: 25%;
+        vertical-align: top;
+        font-size: 0.875rem;
+        padding: 0 3.5rem;
+        .title {
+            @apply text-gray-400;
+            font-weight: bold;
+            padding-bottom: 0.5rem;
+        }
+        .timezone-lap {
+            @apply text-gray-900;
+            padding-bottom: 3rem;
+        }
+        .legend-lap {
+            padding-bottom: 0.5rem;
+            &.repeat {
+                @apply text-point-violet;
+                .legend-icon {
+                    @apply bg-point-violet;
+                }
+            }
+            &.ticket-on {
+                @apply text-peacock-300;
+                .legend-icon {
+                    @apply bg-peacock-300;
+                }
+            }
+            &.ticket-off {
+                @apply text-red-500;
+                .legend-icon {
+                    @apply bg-red-400;
+                }
+            }
+            .legend-icon {
+                display: inline-block;
+                width: 0.75rem;
+                height: 0.75rem;
+                vertical-align: baseline;
+                border-radius: 2px;
+                margin-right: 0.5rem;
+            }
+        }
+    }
+}
+</style>

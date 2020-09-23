@@ -43,8 +43,7 @@
         <daily-updates class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
-                       :get-cloud-service-action="dailyUpdates.cloudService"
-                       :get-server-action="dailyUpdates.server"
+                       :project-id="projectId"
                        :project-filter="projectFilter"
         />
         <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13

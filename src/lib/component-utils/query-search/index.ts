@@ -1,25 +1,13 @@
 import {
     KeyDataType,
     KeyItem,
-    QueryItem,
-    QuerySearchState,
-    QuerySearchSyncState,
     ValueHandler,
     ValueHandlerMap,
     ValueItem,
 } from '@/components/organisms/search/query-search/type';
-import {
-    forEach, map, size,
-} from 'lodash';
-import { ChangeTagCallBack, TagToolSet } from '@/components/molecules/tags/PTag.toolset';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { reactive, ref, Ref } from '@vue/composition-api';
-import {
-    SearchEnumItem,
-    SearchEnums,
-} from '@/lib/component-utils/query-search/type';
+import { map, size } from 'lodash';
 import { fluentApi } from '@/lib/fluent-api';
-import { AutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
+import { SearchEnumItem, SearchEnums } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItem>
@@ -35,27 +23,6 @@ export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
     return d;
 });
 
-// Do not use except in case of using PAutoCompleteSearch component
-export function makeAutocompleteHandlerWithReference(resourceType: string, distinct?: string, limit?: number): AutocompleteHandler {
-    let api = fluentApi.addons().autocomplete().get()
-        .setResourceType(resourceType)
-        .setLimit(limit || 10);
-    if (distinct) api = api.setDistinct(distinct);
-    return async (inputText: string) => {
-        try {
-            const res = await api.setSearch(inputText).execute();
-            return {
-                results: res.data.results.map(d => ({ label: d.name, name: d.key, type: 'item' })),
-                totalCount: res.data.total_count,
-            };
-        } catch (e) {
-            return {
-                results: [],
-                totalCount: 0,
-            };
-        }
-    };
-}
 
 /**
  * @name makeDistinctValueHandler
@@ -166,53 +133,4 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
         else res[k.name] = makeDistinctValueHandler(resourceType, k.name, k.dataType);
     });
     return res;
-}
-
-// will be deprecated
-export class QuerySearchToolSet extends TagToolSet<QueryTag> {
-    state: QuerySearchState = reactive({
-        keyItems: [],
-        placeholder: 'Search',
-        focused: false,
-        valueHandlerMap: {},
-    });
-
-    syncState: QuerySearchSyncState = reactive({
-        value: '',
-    }) as unknown as QuerySearchSyncState
-
-    valueHandlerMap: ValueHandlerMap;
-
-    onSearch = async (query: QueryItem) => {
-        this.addTag(query);
-    }
-
-    constructor(
-        keyItems: KeyItem[],
-        valueHandlerMap: ValueHandlerMap,
-        tags: Ref<QueryTag[]> = ref([]),
-        checkDuplicate = true,
-        changeTagCallBack?: ChangeTagCallBack,
-    ) {
-        super(tags, checkDuplicate, changeTagCallBack);
-        this.state.keyItems = keyItems;
-        this.valueHandlerMap = valueHandlerMap;
-    }
-
-    addTag = (val: QueryItem) => {
-        if (this.checkDuplicate && !this.validation(val)) return;
-        this.tags.value = [...this.tags.value, val];
-    };
-
-    validation = (query: QueryItem): boolean => this.tags.value.every((tag) => {
-        if (tag.key && query.key) {
-            return (query.key.name !== tag.key.name
-                || query.operator !== tag.operator
-                || query.value !== tag.value);
-        }
-        if (!tag.key && !query.key) {
-            return query.value.name !== tag.value.name;
-        }
-        return true;
-    });
 }

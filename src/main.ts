@@ -5,10 +5,9 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 import LiquorTree from 'liquor-tree';
 import router from '@/routes/index';
-import store from '@/store';
+import { store } from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
-import { Util } from '@/lib/global-util';
 import setStore from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
@@ -21,7 +20,6 @@ import '@/styles/style.scss';
 import '@/styles/style.pcss';
 
 
-Vue.mixin(Util);
 Vue.use(VueCompositionApi);
 Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {

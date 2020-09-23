@@ -42,8 +42,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { SBarChart } from '@/lib/chart/bar-chart';
-import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
 import {
@@ -145,7 +144,7 @@ export default {
                 : max / (TICKS_COUNT || 1);
 
 
-            state.chart = new NSChart(canvas, {
+            state.chart = new SpaceChart(canvas, {
                 type: 'bar',
                 data: {
                     labels: data.map(d => moment(d.date).format('MM/DD')),
@@ -204,7 +203,7 @@ export default {
                     // onClick: onClickChart,
                 },
                 plugins: [{
-                    beforeDraw(chart: SBarChart): void {
+                    beforeDraw(chart): void {
                         const ctx: CanvasRenderingContext2D | null = chart.ctx;
                         if (!ctx) return;
 

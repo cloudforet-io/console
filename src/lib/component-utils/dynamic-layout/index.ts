@@ -1,10 +1,10 @@
-import { SearchKeyGroup } from '@/lib/component-utils/query-search/type';
 import { QuerySearchProps } from '@/components/organisms/search/query-search/type';
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
     makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
+import {SearchKeyGroup} from "@/components/organisms/dynamic-layout/type/layout-schema";
 
 /**
  * @name makeQuerySearchPropsWithSearchSchema

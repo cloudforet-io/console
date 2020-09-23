@@ -403,6 +403,39 @@
 			"PLUGIN": ""
 		}
 	},
+	"PWR_SCHED": {
+		"CANCEL": "",
+		"CREATE": "",
+		"CREATE_MODE": "",
+		"CREATING": "",
+		"DAY_FRI": "",
+		"DAY_MON": "",
+		"DAY_SAT": "",
+		"DAY_SUN": "",
+		"DAY_THU": "",
+		"DAY_TUE": "",
+		"DAY_WED": "",
+		"DELETE": "",
+		"DETAILS": "",
+		"EDIT": "",
+		"EDITING": "",
+		"EDIT_MODE": "",
+		"LIST": "",
+		"LOCAL_TIME": "",
+		"MONTH": "",
+		"SAVE": "",
+		"SCHED_TIME": "",
+		"SET_NAME": "",
+		"SET_NAME_DESC": "",
+		"THIS_WEEK": "",
+		"TIME": "",
+		"TIMER": "",
+		"TIMER_OFF": "",
+		"TIMER_ON": "",
+		"TIMER_REPEAT": "",
+		"TIMEZONE": "",
+		"YEAR": ""
+	},
 	"SECRET": {
 		"BTN": {
 			"None": ""

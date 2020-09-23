@@ -39,7 +39,7 @@ import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { maxBy, minBy, chain } from 'lodash';
 import moment from 'moment';
 import Chart, { ChartColor } from 'chart.js';
-import { NSChart, tooltips } from '@/lib/chart/s-chart';
+import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import Color from 'color';
 
 
@@ -82,7 +82,7 @@ export default {
             const min = minItem ? minItem.count : 0;
             const diff = Math.abs(max - min);
 
-            state.chart = new NSChart(canvas,
+            state.chart = new SpaceChart(canvas,
                 {
                     type: 'line',
                     data: {
@@ -152,7 +152,7 @@ export default {
                         tooltips,
                     },
                     plugins: [{
-                        beforeDraw(chart: NSChart): void {
+                        beforeDraw(chart: SpaceChart): void {
                             if (state.noChange) return;
                             const ctx = chart.ctx;
                             if (!ctx) return;

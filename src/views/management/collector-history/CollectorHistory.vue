@@ -4,9 +4,8 @@
             <p-page-navigation :routes="route" />
             <p-page-title :title="pageTitle" />
             <p-pane-layout class="collector-history-wrapper">
-                <p-collector-history-chart
-                    class="history-chart"
-                    :selected-date.sync="selectedDateFromChart"
+                <p-collector-history-chart class="history-chart"
+                                           @click-date="onClickDate"
                 />
                 <p-query-search-table
                     ref="querySearchRef"
@@ -120,7 +119,6 @@
 
 <script lang="ts">
 import { capitalize } from 'lodash';
-import moment from 'moment';
 
 import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
@@ -145,12 +143,19 @@ import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { getFiltersFromQueryTags } from '@/lib/api/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 import { makeEnumValueHandler, makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import router from '@/routes';
+
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 enum JOB_STATUS {
     created = 'CREATED',
@@ -215,7 +220,6 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
-            selectedDateFromChart: '',
             searchTags: [],
             querySearchRef: null as null|QuerySearchTableFunctions,
             querySearchHandlers: {
@@ -265,9 +269,9 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtMoment = moment(timestampFormatter(createdAt));
-                const finishedAtMoment = moment(timestampFormatter(finishedAt));
-                const duration = finishedAtMoment.diff(createdAtMoment, 'minutes');
+                const createdAtMoment = dayjs(timestampFormatter(createdAt));
+                const finishedAtMoment = dayjs(timestampFormatter(finishedAt));
+                const duration = finishedAtMoment.diff(createdAtMoment, 'minute');
                 return `${duration.toString()} min`;
             }
             return null;
@@ -397,23 +401,16 @@ export default {
             if (after === '') onClickGoBack();
         });
 
-        // watch(() => state.selectedDateFromChart, (after) => {
-        //     if (after) {
-        //         const nextDate = moment(state.selectedDateFromChart).add(1, 'day').format('YYYY-MM-DD');
-        //         state.querySearchRef.addTag(
-        //             {
-        //                 key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
-        //                 value: { label: state.selectedDateFromChart, name: state.selectedDateFromChart },
-        //                 operator: '>=',
-        //             },
-        //             {
-        //                 key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
-        //                 value: { label: nextDate, name: nextDate },
-        //                 operator: '<',
-        //             },
-        //         );
-        //     }
-        // }, { immediate: true });
+        const onClickDate = (date) => {
+            const selectedDate = dayjs(date).format('YYYY-MM-DD');
+            state.querySearchRef.addTag(
+                {
+                    key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+                    value: { label: selectedDate, name: selectedDate },
+                    operator: '=',
+                },
+            );
+        };
 
         return {
             ...toRefs(state),
@@ -428,6 +425,7 @@ export default {
             onClickStatus,
             statusFormatter,
             timestampFormatter,
+            onClickDate,
         };
     },
 };

@@ -43,12 +43,16 @@
                                     <span v-tooltip.bottom="{content: item.type, delay: {show: 500}}" class="type">{{ item.type }}</span>
                                 </div>
                                 <p v-if="item.created_count && item.deleted_count" class="state">
-                                    Created <span class="created-count">{{ item.created_count || 0 }}</span>
+                                    <router-link :to="item.createdHref">
+                                        Created <span class="created-count">{{ item.created_count || 0 }}</span>
+                                    </router-link>
                                     <span class="divider">|</span>
                                     Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
                                 </p>
                                 <p v-else-if="item.created_count && !item.deleted_count" class="state">
-                                    Created <span class="created-count">{{ item.created_count || 0 }}</span>
+                                    <router-link :to="item.createdHref">
+                                        Created <span class="created-count">{{ item.created_count || 0 }}</span>
+                                    </router-link>
                                 </p>
                                 <p v-else class="state">
                                     Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
@@ -69,53 +73,62 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import { store } from '@/store';
+import { getTimezone } from '@/lib/util';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { SpaceConnector } from '@/lib/space-connector';
 
-    interface CloudService {
-        // eslint-disable-next-line camelcase
-        cloud_service_group: string;
-        // eslint-disable-next-line camelcase
-        cloud_service_type: string;
-        // eslint-disable-next-line camelcase
-        total_count: number;
-        provider: string;
-        icon: string;
-        // eslint-disable-next-line camelcase
-        created_count: number;
-        // eslint-disable-next-line camelcase
-        deleted_count: number;
-    }
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-    interface Server {
-        // eslint-disable-next-line camelcase
-        server_type: string;
-        // eslint-disable-next-line camelcase
-        total_count: number;
-        // eslint-disable-next-line camelcase
-        created_count: number;
-        // eslint-disable-next-line camelcase
-        deleted_count: number;
-    }
+interface CloudService {
+    // eslint-disable-next-line camelcase
+    cloud_service_group: string;
+    // eslint-disable-next-line camelcase
+    cloud_service_type: string;
+    // eslint-disable-next-line camelcase
+    total_count: number;
+    provider: string;
+    icon: string;
+    // eslint-disable-next-line camelcase
+    created_count: number;
+    // eslint-disable-next-line camelcase
+    deleted_count: number;
+}
 
-    interface Data {
-        group: string;
-        type: string;
-        isServer?: boolean;
-        count: number;
-        icon?: string;
-        provider?: string;
-        defaultIcon?: string;
-    }
+interface Server {
+    // eslint-disable-next-line camelcase
+    server_type: string;
+    // eslint-disable-next-line camelcase
+    total_count: number;
+    // eslint-disable-next-line camelcase
+    created_count: number;
+    // eslint-disable-next-line camelcase
+    deleted_count: number;
+}
 
-    interface State {
-        serverData: Server[];
-        cloudServiceData: CloudService[];
-        data: Data[];
-        loading: boolean;
-        widgetRef: any;
-        dailyUpdates: boolean;
-    }
+interface Data {
+    group: string;
+    type: string;
+    isServer?: boolean;
+    count: number;
+    icon?: string;
+    provider?: string;
+    defaultIcon?: string;
+}
+
+interface State {
+    serverData: Server[];
+    cloudServiceData: CloudService[];
+    data: Data[];
+    loading: boolean;
+    widgetRef: any;
+    dailyUpdates: boolean;
+}
+
+const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
 
 export default {
     name: 'DailyUpdates',
@@ -127,17 +140,13 @@ export default {
         PSkeleton,
     },
     props: {
-        getServerAction: {
-            type: Function,
-            default: api => api,
-        },
-        getCloudServiceAction: {
-            type: Function,
-            default: api => api,
-        },
         projectFilter: {
             type: String,
             default: '',
+        },
+        projectId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {
@@ -150,23 +159,33 @@ export default {
             dailyUpdates: false,
         });
 
-        const serverAPI = fluentApi.statisticsTest().topic().dailyUpdateServer();
+        const serverAPI = SpaceConnector.client.statistics.topic.dailyUpdateServer;
 
         const getServerData = async (): Promise<void> => {
             try {
-                const res = await props.getServerAction(serverAPI).execute();
-                state.serverData = res.data.results;
+                const params: any = {
+                    timezone: getTimezone(),
+                };
+                // eslint-disable-next-line camelcase
+                if (props.projectId) params.project_id = props.projectId;
+                const res = await serverAPI(params);
+                state.serverData = res.results;
             } catch (e) {
                 console.error(e);
             }
         };
 
-        const cloudServiceAPI = fluentApi.statisticsTest().topic().dailyUpdateCloudService();
+        const cloudServiceAPI = SpaceConnector.client.statistics.topic.dailyUpdateCloudService;
 
         const getCloudServiceData = async (): Promise<void> => {
             try {
-                const res = await props.getCloudServiceAction(cloudServiceAPI).execute();
-                state.cloudServiceData = res.data.results;
+                const params: any = {
+                    timezone: getTimezone(),
+                };
+                // eslint-disable-next-line camelcase
+                if (props.projectId) params.project_id = props.projectId;
+                const res = await cloudServiceAPI(params);
+                state.cloudServiceData = res.results;
             } catch (e) {
                 console.error(e);
             }
@@ -188,6 +207,7 @@ export default {
                         // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
+                        createdHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getCreatedAtFilters()}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,
@@ -200,6 +220,7 @@ export default {
                         deleted_count: d.deleted_count,
                         icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
+                        createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getCreatedAtFilters()}`,
                     })),
                 ];
             } else {
@@ -214,6 +235,7 @@ export default {
                         // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
+                        createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,
@@ -226,6 +248,7 @@ export default {
                         provider: d.provider,
                         icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
+                        createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getCreatedAtFilters()}`,
                     })),
                 ];
             }
@@ -238,6 +261,7 @@ export default {
         return {
             ...toRefs(state),
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
+            getCreatedAtFilters,
         };
     },
 };

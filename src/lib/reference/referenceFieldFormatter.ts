@@ -46,6 +46,9 @@ const formatterMap: FormatterMap = {
             link: referenceRouter(data, reference),
         },
     }),
+    'secret.Secret': (data, reference) => ({
+        data: store.state.resource.secret.items[data]?.label || data,
+    }),
 };
 
 export const referenceFieldFormatter = (
