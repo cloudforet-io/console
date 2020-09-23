@@ -55,7 +55,7 @@
                                     <p class="approximate">
                                         approx.
                                     </p>
-                                    <span class="costs"><span class="approx-costs">{{ approximateCosts }}</span> <span>$</span></span>
+                                    <span class="costs"><span>$ </span><span class="approx-costs">{{ approximateCosts }}</span></span>
                                 </div>
                             </div>
                         </div>
@@ -69,9 +69,9 @@
                                     </span>
                                 </p>
                                 <div v-if="item.scheduler.length > 0">
-                                    <div v-for="(schedule, idx) in item.scheduler" :key="idx">
-                                        <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span><br>
-                                    </div>
+                                    <p v-for="(schedule, idx) in item.scheduler" :key="idx">
+                                        <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span>
+                                    </p>
                                 </div>
                                 <div v-else>
                                     <p-i name="ic_plus"
@@ -80,13 +80,13 @@
                                     /> <span class="schedule-add-text">Create Scheduler</span>
                                 </div>
                             </div>
-                            <div>
-                                <div v-if="item.scheduler.length > 0" class="schedule-matrix mt-4">
-                                    <span v-for="(day, index) in weekday" :key="index" class="weekday">
-                                        {{ day }}
+                            <div v-if="item.scheduler.length > 0" class="schedule-matrix">
+                                <div class="pl-1">
+                                    <span v-for="(day, index) in weekday" :key="index">
+                                        <p class="weekday">{{ day }}</p>
                                     </span>
-                                    <schedule-heatmap :schedule="item.scheduler" />
                                 </div>
+                                <schedule-heatmap :schedule="item.scheduler" />
                             </div>
                         </div>
                     </router-link>
@@ -341,7 +341,6 @@ export default {
         }
     }
 
-
     .project-description {
         @apply mx-6 mt-6 mb-6;
         .project {
@@ -383,7 +382,7 @@ export default {
         }
     }
     .schedule {
-        @apply mx-6 mt-6 mb-6 flex justify-between;
+        @apply ml-6 mr-5 mt-6 mb-6 flex justify-between;
         .schedule-title {
             @apply font-bold text-gray-400 text-xs;
             .schedule-title-num {
@@ -391,11 +390,15 @@ export default {
             }
         }
         .scheduler-name {
-            @apply ml-1 text-xs;
+            @apply ml-1;
+            font-size: 0.75rem;
         }
         .weekday {
-            @apply text-gray-400 text-xs;
-            margin-right: 0.5625rem;
+            @apply text-gray-400 inline-block;
+            font-size: 0.625rem;
+            width: 1rem;
+            height: 1rem;
+            text-align: center;
         }
         .schedule-add-btn {
             @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;

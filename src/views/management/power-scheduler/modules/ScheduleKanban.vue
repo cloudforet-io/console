@@ -194,6 +194,7 @@ export default {
             @apply border border-dashed border-primary2 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
             width: 11.75rem;
             height: 3.25rem;
+            margin-bottom: 0.5rem;
             .resource-description {
                 font-size: 0.75rem;
             }
