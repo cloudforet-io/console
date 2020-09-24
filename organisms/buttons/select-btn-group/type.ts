@@ -4,8 +4,9 @@ export interface SelectBtnType extends Button {
     label: string;
     name: string;
 }
-export interface Props {
+
+export interface SelectBtnGroupProps {
     buttons: Array<string|SelectBtnType>;
-    selected: string;
-    space?: boolean;
+    selected: string | number;
+    styleType: string;
 }

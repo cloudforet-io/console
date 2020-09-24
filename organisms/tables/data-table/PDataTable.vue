@@ -41,8 +41,8 @@
                                             >
                                                 {{ field.label ? field.label : field.name }}
                                             </slot>
-                                            <p-copy-button v-if="colCopy"
-                                                           class="ml-2"
+                                            <p-copy-button v-if="colCopy" class="ml-2"
+                                                           width="0.875rem" height="0.875rem"
                                                            @copy="clickColCopy(index)"
                                             />
                                         </span>
