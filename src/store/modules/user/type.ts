@@ -5,6 +5,7 @@ export interface UserState {
     userType?: UserType;
     language?: string;
     timezone?: string;
+    reportState?: boolean;
 }
 
 export interface SignInRequest {
