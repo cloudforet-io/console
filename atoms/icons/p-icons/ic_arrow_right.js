@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'ic_arrow_right': {
-    width: 16,
-    height: 16,
+    width: 24,
+    height: 24,
     viewBox: '0 0 24 24',
-    data: '<path pid="0" _fill="none" d="M0 0h24v24H0z"/><path pid="1" d="M16 12l-6.4 6L8 16.4l4.7-4.4L8 7.6 9.6 6l6.4 6z" _fill="#222532"/>'
+    data: '<g clip-path="url(#clip0)"><path pid="0" d="M9.45 15.467l3.5-3.472-3.5-3.472a.892.892 0 01-.194-.972.892.892 0 01.486-.483.905.905 0 01.98.193l4.14 4.108a.891.891 0 01.194.972.891.891 0 01-.195.29l-4.139 4.107a.898.898 0 01-.98.194.898.898 0 01-.291-.194.905.905 0 010-1.27z" _fill="#222532"/></g><defs><clipPath id="clip0"><path pid="1" _fill="#fff" transform="rotate(-90 12 5)" d="M0 0h10v10H0z"/></clipPath></defs>'
   }
 })
