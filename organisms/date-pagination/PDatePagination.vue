@@ -38,7 +38,7 @@ export default {
     props: {
         date: {
             type: Object,
-            default: dayjs(),
+            default: () => dayjs(),
         },
         type: {
             type: String,
