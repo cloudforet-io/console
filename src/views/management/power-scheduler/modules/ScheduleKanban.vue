@@ -8,7 +8,7 @@
                         높음
                     </div>
                     <span v-if="num === 1" id="header-priority">우선순</span>
-                    <div v-if="num ===5" class="header-decorator">
+                    <div v-if="num === maxPriority" class="header-decorator">
                         낮음
                     </div>
                 </div>

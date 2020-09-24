@@ -115,6 +115,9 @@ export default defineComponent({
                         user_id: state.userId,
                         password: state.password,
                     },
+                }).catch(() => {
+                    state.loginFail = true;
+                    state.password = '';
                 });
 
                 const response = await vm.$http.post('/identity/token/issue', {

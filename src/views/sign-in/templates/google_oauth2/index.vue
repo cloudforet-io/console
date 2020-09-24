@@ -1,7 +1,10 @@
 <template>
     <div>
-        <p class="subtitle">
+        <p v-if="!loginFail" class="subtitle">
             Multicloud Managed Service
+        </p>
+        <p v-else-if="loginFail" id="errorMsg" class="subtitle">
+            Please Confirm your ID or Password.
         </p>
         <div class="user-info">
             <div class="g-signin2">
@@ -25,9 +28,9 @@
 </template>
 
 <script lang="ts">
-import {
-    defineComponent, getCurrentInstance, onMounted,
-} from '@vue/composition-api';
+    import {
+        defineComponent, getCurrentInstance, onMounted, reactive, toRefs,
+    } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { useStore } from '@/store/toolset';
 
@@ -41,11 +44,17 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as any;
+        const state = reactive({
+            loginFail: false,
+        });
         const store = useStore();
         const login = async (userId, param) => {
+            state.loginFail = false;
             await vm.$store.dispatch('user/signIn', {
                 domain_id: vm.$store.state.domain.domainId,
                 credentials: param,
+            }).catch(() => {
+                state.loginFail = true;
             });
 
             // console.debug('start oauth login');
@@ -96,6 +105,7 @@ export default defineComponent({
         return {
             goToAdmin,
             onLogIn,
+            ...toRefs(state),
         };
     },
 });
