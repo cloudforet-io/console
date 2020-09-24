@@ -14,7 +14,7 @@
             >
                 {{ $t('PWR_SCHED.THIS_WEEK') }}
             </p-button>
-            <p-date-pagination :date.sync="currentDate" type="week" />
+            <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week" />
         </div>
         <div class="left">
             <div class="table-lap">
