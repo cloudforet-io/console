@@ -44,6 +44,10 @@ export default {
             type: String,
             default: 'month',
         },
+        allowFuture: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: DatePaginationProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -60,6 +64,9 @@ export default {
                 return props.date.format('YYYY-MM');
             }),
             nextButtonDisabled: computed(() => {
+                if (props.allowFuture) {
+                    return false;
+                }
                 const now = dayjs().tz(getTimezone());
                 if (props.type === 'month') {
                     return now.format('YYYY-MM') === state.dateText;
