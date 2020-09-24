@@ -81,9 +81,9 @@
 </template>
 
 <script lang="ts">
-    import {
-        toRefs, reactive, computed, SetupContext, watch, UnwrapRef,
-    } from '@vue/composition-api';
+import {
+    toRefs, reactive, computed, SetupContext, watch, UnwrapRef,
+} from '@vue/composition-api';
 import { get } from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
@@ -93,12 +93,85 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import { fluentApi } from '@/lib/fluent-api';
-import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { showErrorMessage } from '@/lib/util';
 import { formValidation, requiredValidation } from '@/components/util/composition-helpers';
+import { SpaceConnector } from '@/lib/space-connector';
+import { TimeStamp } from '@/models';
+
+interface SecretModel {
+    // eslint-disable-next-line camelcase
+    secret_id: string;
+    name: string;
+    // eslint-disable-next-line camelcase
+    secret_type: 'CREDENTIALS'|'CONFIG'|string;
+    'secret_groups': string[];
+    'schema': string ;
+    'provider': string;
+    'service_account_id': string;
+    'project_id': string;
+    'domain_id': string;
+    // eslint-disable-next-line camelcase
+    created_at: TimeStamp;
+    tags: object;
+}
+
+enum COLLECT_MODE {
+    all = 'ALL',
+    create = 'CREATE',
+    update = 'UPDATE'
+}
+
+enum COLLECTOR_STATE {
+    enabled = 'ENABLED',
+    disabled = 'DISABLED'
+}
+
+interface PluginOptions {
+    // eslint-disable-next-line camelcase
+    supported_resource_type: string[];
+    // eslint-disable-next-line camelcase
+    filter_format: FilterFormat[];
+    // eslint-disable-next-line
+    [key: string]: any;
+}
+
+interface CollectorPluginModel {
+    plugin_id: string;
+    version: string;
+    options: PluginOptions;
+    // eslint-disable-next-line camelcase
+    secret_id?: string;
+    // eslint-disable-next-line camelcase
+    secret_group_id?: string;
+    provider?: string;
+}
+
+interface FilterFormat {
+    name: string;
+    type: string;
+    // eslint-disable-next-line camelcase
+    change_key: string[];
+    // eslint-disable-next-line camelcase
+    resource_type: string;
+    // eslint-disable-next-line camelcase
+    object_key?: string;
+}
+
+interface CollectorModel {
+    collector_id: string;
+    name: string;
+    state: COLLECTOR_STATE;
+    provider: string;
+    capability: object;
+    plugin_info: CollectorPluginModel;
+    priority: number;
+    // eslint-disable-next-line camelcase
+    created_at: TimeStamp;
+    // eslint-disable-next-line camelcase
+    last_collected_at: TimeStamp | null;
+    tags: object;
+}
 
 interface State {
     loading: boolean;
@@ -222,21 +295,24 @@ export default {
             vdApi = setValidation(state.filterFormats, state.filters);
         };
 
-        const collectorApi = fluentApi.inventory().collector();
 
-        const collectApi = computed(() => {
-            const api = collectorApi.collect()
-                .setId(props.collectorId)
-                .setCollectMode(state.selectedCollectMode as COLLECT_MODE);
-            if (props.credentialId) api.setSecretId(props.credentialId);
-            return api;
-        });
+        const getCollectParams = () => {
+            const params: any = {
+                collector_id: props.collectorId,
+                // eslint-disable-next-line camelcase
+                collect_mode: state.selectedCollectMode,
+            };
+            // eslint-disable-next-line camelcase
+            if (props.credentialId) params.secret_id = props.credentialId;
+            return params;
+        };
 
+        const collectorApi = SpaceConnector.client.inventory.collector.collect;
         const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
             state.showValidation = true;
             try {
-                await collectApi.value.execute();
+                await collectorApi(getCollectParams());
                 context.root.$notify({
                     group: 'noticeTopRight',
                     type: 'success',
@@ -259,9 +335,10 @@ export default {
         const getCollector = async (): Promise<void> => {
             state.loading = true;
             try {
-                const res = await collectorApi.get().setId(props.collectorId)
-                    .execute();
-                state.collector = res.data;
+                const res = await SpaceConnector.client.inventory.collector.get({
+                    collector_id: props.collectorId,
+                });
+                state.collector = res;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -269,15 +346,16 @@ export default {
             }
         };
 
-        const secretManagerApi = fluentApi.secret().secret().get();
-
+        const secretManagerApi = SpaceConnector.client.secret.secret.get;
         const getCredential = async (): Promise<void> => {
             state.loading = true;
             state.credential = null;
             try {
-                const res = await secretManagerApi.setId(props.credentialId as string)
-                    .execute();
-                state.credential = res.data;
+                const res = await secretManagerApi({
+                    // eslint-disable-next-line camelcase
+                    secret_id: props.credentialId,
+                });
+                state.credential = res;
             } catch (e) {
                 console.error(e);
             } finally {

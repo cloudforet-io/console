@@ -121,9 +121,63 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import { RepositoryModel } from '@/lib/fluent-api/repository/repository';
-import { PluginModel } from '@/lib/fluent-api/repository/plugin';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import {TimeStamp} from "@/lib/fluent-api";
+
+enum REPOSITORY_TYPE {
+    remote = 'remote',
+    local = 'local'
+}
+
+enum PLUGIN_STATE {
+    enabled = 'ENABLED',
+    disabled = 'DISABLED'
+}
+
+enum MONITORING_TYPE {
+    metric = 'METRIC',
+    log = 'LOG',
+}
+
+interface PluginCapabilityModel {
+    supported_schema: string[];
+    use_resource_secret: boolean;
+    monitoring_type: MONITORING_TYPE;
+}
+
+interface PluginTemplateModel {
+    [key: string]: {
+        schema: object;
+    };
+}
+
+interface PluginModel {
+    plugin_id: string;
+    name: string;
+    state: PLUGIN_STATE;
+    image: string;
+    registry_url: string;
+    service_type: string;
+    provider: string;
+    capability: PluginCapabilityModel;
+    template: PluginTemplateModel;
+    repository_info: any;
+    project_id: string;
+    labels: string[];
+    created_at: TimeStamp;
+    tags: object
+}
+
+interface RepositoryModel {
+    repository_id: string;
+    name: string;
+    repository_type: REPOSITORY_TYPE;
+    endpoint: string;
+    version: string;
+    secret_id: string;
+    created_at: TimeStamp;
+}
 
 export default {
     name: 'CollectorPlugins',
@@ -172,17 +226,29 @@ export default {
         const getPlugins = async () => {
             state.loading = true;
             try {
-                let api = fluentApi.repository().plugin().list().setServiceType('inventory.Collector')
-                    .setRepositoryId(state.selectedRepositoryId)
-                    .setSortBy(state.sortBy)
-                    .setSortDesc(state.sortBy !== 'name')
+                const query = new QueryHelper()
+                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                    .setSort(state.sortBy, state.sortBy !== 'name')
                     .setKeyword(state.keyword);
+
+
                 if (state.resourceTypeSearchTags.length) {
-                    api = api.setFilter({ key: 'labels', value: state.resourceTypeSearchTags, operator: FILTER_OPERATOR.in });
+                    query.setFilter({
+                        k: 'labels',
+                        v: state.resourceTypeSearchTags,
+                        o: 'in',
+                    });
                 }
-                const res = await api.execute();
-                state.plugins = res.data.results;
-                state.totalCount = res.data.total_count;
+                const params = {
+                    // eslint-disable-next-line camelcase
+                    service_type: 'inventory.Collector',
+                    // eslint-disable-next-line camelcase
+                    repository_id: state.selectedRepositoryId,
+                    query: query.data,
+                };
+                const res = await SpaceConnector.client.repository.plugin.list(params);
+                state.plugins = res.results;
+                state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -191,11 +257,12 @@ export default {
         };
         const getRepositories = async () => {
             try {
-                const res = await fluentApi.repository().repository().list()
-                    .setSortBy('repository_type')
-                    .execute();
-                state.repositories = res.data.results;
-                state.selectedRepositoryId = res.data.results[0].repository_id;
+                const query = new QueryHelper().setSort('repository_type', true);
+                const res = await SpaceConnector.client.repository.repository.list({
+                    query: query.data,
+                });
+                state.repositories = res.results;
+                state.selectedRepositoryId = res.results[0].repository_id;
             } catch (e) {
                 console.error(e);
             }

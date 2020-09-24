@@ -626,12 +626,6 @@ export abstract class SubMultiItemAddAction<parameter, resp> extends SubMultiIte
     protected path = 'add'
 }
 
-export abstract class SubMultiItemRemoveAction<parameter, resp> extends SubMultiItemAction<parameter, resp> {
-    isMutationApi = true;
-
-    protected path = 'remove'
-}
-
 
 export abstract class MultiItemAction<parameter, resp> extends RawParameterAction<parameter, resp> {
     protected abstract idsField: string;
@@ -715,7 +709,6 @@ export abstract class CollectAction<parameter, resp> extends RawParameterAction<
 }
 
 export type ResourceActions<actions extends string, parameter=any, resp=any> = { [key in actions]: (...args: any[]) => ActionAPI<parameter, resp> };
-export type OptionalResourceActions<actions extends string, parameter=any, resp=any> = { [key in actions]?: (...args: any[]) => ActionAPI<parameter, resp> };
 
 export abstract class Resource {
     protected abstract name: string;

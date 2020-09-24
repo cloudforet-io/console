@@ -80,6 +80,8 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
+
 import {
     computed, onMounted, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
@@ -92,19 +94,58 @@ import {
     some, debounce, find, capitalize, chain, range, sortBy,
 } from 'lodash';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import { fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { SelectBtnType } from '@/components/organisms/buttons/select-btn-group/type';
-import {
-    MetricListResp, MetricResp, MONITORING_TYPE, STATISTICS_TYPE,
-} from '@/lib/fluent-api/monitoring/type';
-import { GetMetricData, MetricList } from '@/lib/fluent-api/monitoring/metric';
 import moment, { Moment } from 'moment';
 import { getTimestamp, getTimezone } from '@/lib/util';
 import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChart.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
+import { MonitoringProps } from '@/views/common/monitoring/type';
+import { SpaceConnector } from '@/lib/space-connector';
+import { TimeStamp } from '@/models';
+
+
+export enum DataSourceState {
+    enabled = 'ENABLED',
+    disabled = 'DISABLED'
+}
+
+export enum MONITORING_TYPE {
+    metric = 'METRIC',
+    log = 'LOG',
+}
+
+
+enum STATISTICS_TYPE {
+    average = 'AVERAGE',
+    maximum = 'MAXIMUM',
+    minimum = 'MINIMUM'
+}
+
+
+interface MetricParameter {
+    data_source_id: string;
+    resource_type: string;
+    resources: string[];
+}
+
+interface MetricResp {
+    key: string;
+    name: string;
+    unit: {
+        x: string;
+        y: string;
+    };
+    chart_type: string;
+    chart_options: any;
+}
+
+interface MetricListResp {
+    metrics: MetricResp[];
+    available_resources: {
+        [key: string]: boolean;
+    };
+}
 
 interface ChartMetric {
     loading: boolean;
@@ -120,23 +161,6 @@ interface DataToolType {
     statisticsTypes: STATISTICS_TYPE[];
 }
 
-interface State {
-    timezone: string;
-    dataTools: DataToolType[];
-    tools: readonly SelectBtnType[];
-    selectedToolId: string;
-    selectedTimeRange: string;
-    statisticsTypes: readonly STATISTICS_TYPE[];
-    statItems: readonly {type: string; label: string; name: string}[];
-    selectedStat: STATISTICS_TYPE;
-    metricsLoading: boolean;
-    metrics: MetricResp[];
-    chartMetrics: ChartMetric[];
-    availableResources: MonitoringResourceType[];
-    noData: boolean;
-    metricListApi: MetricList;
-    chartMetricApi: GetMetricData;
-}
 
 const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
 const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
@@ -167,14 +191,13 @@ export default {
         },
     },
     setup(props: MonitoringProps) {
-        const state: UnwrapRef<State> = reactive({
+        const state = reactive({
             timezone: getTimezone(),
             dataTools: [],
             selectedToolId: '',
-            tools: computed(() => state.dataTools.map(d => ({
+            tools: computed<DataToolType[]>(() => state.dataTools.map(d => ({
                 name: d.id,
                 label: d.name,
-                // vbind: { styleType: 'black', outline: state.selectedToolId !== d.id },
             }))),
             selectedTimeRange: '1h',
             statisticsTypes: computed(() => {
@@ -193,22 +216,13 @@ export default {
             chartMetrics: [],
             availableResources: [],
             noData: false,
-            metricListApi: computed(() => fluentApi.monitoring().metric().list()
-                .setResourceType(props.resourceType)
-                .setId(state.selectedToolId)
-                .setResources(...props.resources.map(d => d.id))),
-            chartMetricApi: computed(() => fluentApi.monitoring().metric().getData()
-                .setId(state.selectedToolId)
-                .setResourceType(props.resourceType)
-                .setStat(state.selectedStat)),
         });
 
-        const dataSourceApi = fluentApi.monitoring().dataSource().list().setMonitoringType(MONITORING_TYPE.metric);
-
+        const dataSourceApi = SpaceConnector.client.monitoring.dataSource.list;
         const listDataSources = async () => {
             try {
-                const res = await dataSourceApi.execute();
-                state.dataTools = chain(res.data.results)
+                const res = await dataSourceApi({ monitoring_type: MONITORING_TYPE.metric });
+                state.dataTools = chain(res.results)
                     .map((d) => {
                         if (d.plugin_info.options.supported_resource_type.some(t => props.resourceType === t)) {
                             return {
@@ -226,12 +240,17 @@ export default {
             }
         };
 
+        const metricListApi = SpaceConnector.client.monitoring.metric.list;
         const listMetrics = async (): Promise<MetricListResp> => {
             state.metricsLoading = true;
             try {
                 if (state.dataTools.length === 0) await listDataSources();
-                const res = await state.metricListApi.execute();
-                return res.data;
+                const res = await metricListApi({
+                    resource_type: props.resourceType,
+                    data_source_id: state.selectedToolId,
+                    resources: props.resources.map(d => d.id),
+                });
+                return res;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -253,12 +272,14 @@ export default {
         };
 
 
-        const getChartMetric = async (api: GetMetricData, chart: ChartMetric): Promise<void> => {
+        const chartMetricApi = SpaceConnector.client.monitoring.metric.getData;
+        const getChartMetric = async (params: any, chart: ChartMetric): Promise<void> => {
             chart.loading = true;
             try {
-                const res = await api.setMetricKey(chart.metric.key).execute();
-                chart.labels = res.data.labels;
-                chart.dataset = res.data.resource_values;
+                params.metric = chart.metric.key;
+                const res = await chartMetricApi(params);
+                chart.labels = res.labels;
+                chart.dataset = res.resource_values;
                 chart.error = false;
             } catch (e) {
                 console.error(e);
@@ -268,22 +289,26 @@ export default {
             }
         };
 
-        const getChartMetricApi = (): GetMetricData => {
+        const getChartMetricParam = () => {
             const now = moment();
-            return state.chartMetricApi.setEnd(getTimestamp(now))
-                .setStart(getStartTimestamp(now))
-                .setResources(...state.availableResources.map(d => d.id));
+            return {
+                data_source_id: state.selectedToolId,
+                resource_type: props.resourceType,
+                stat: state.selectedStat,
+                end: getTimestamp(now),
+                start: getStartTimestamp(now),
+                resources: state.availableResources.map(d => d.id),
+            };
         };
 
         const listChartMetrics = debounce(async (start = 0): Promise<void> => {
             if (state.availableResources.length === 0) return;
             try {
-                const api = getChartMetricApi();
-
+                const params = getChartMetricParam();
                 await Promise.all(
                     range(start, state.chartMetrics.length)
                         .map(i => getChartMetric(
-                            api.clone(),
+                            { ...params },
                             state.chartMetrics[i],
                         )),
                 );

@@ -242,7 +242,6 @@ import {
 import { ProjectItemResp, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
-import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
 import { SearchGridFluentAPI } from '@/lib/api/grid';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
@@ -262,6 +261,13 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { Location } from 'vue-router';
+
+interface ProjectSummaryResp {
+    member: number;
+    server: number;
+    cloud_service: number;
+    subnet: number;
+}
 
     interface ProjectCardData{
         projectGroupName: string;

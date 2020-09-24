@@ -199,8 +199,7 @@ export default {
          * */
         const getParams = () => {
             const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
-            const query = new QueryHelper();
-            query
+            const query = new QueryHelper()
                 .setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize)
                 .setKeyword(...keywords)

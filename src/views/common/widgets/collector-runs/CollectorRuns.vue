@@ -56,10 +56,38 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { JOB_STATE, JobModel } from '@/lib/fluent-api/inventory/job';
 import { getTimezone } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
+import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { TimeStamp } from '@/lib/fluent-api';
+
+
+enum JOB_STATE {
+    created = 'CREATED',
+    progress = 'IN_PROGRESS',
+    failure = 'FAILURE',
+    timeout = 'TIMEOUT',
+    canceled = 'CANCELED',
+    success = 'SUCCESS'
+}
+
+
+export interface JobModel {
+    job_id: string;
+    state: JOB_STATE;
+    collect_mode: COLLECT_MODE;
+    collector_info: CollectorModel;
+    secret_id: string;
+    filter: any;
+    errors: {
+        code: string;
+        message: string;
+        secret_id?: string;
+    }[];
+    created_at: TimeStamp;
+    finished_at: TimeStamp;
+}
 
 export default {
     name: 'CollectorRuns',

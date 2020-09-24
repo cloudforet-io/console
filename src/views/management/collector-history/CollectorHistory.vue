@@ -140,7 +140,6 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 
-import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
@@ -154,6 +153,8 @@ import router from '@/routes';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { TimeStamp } from '@/lib/fluent-api';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -165,6 +166,23 @@ enum JOB_STATUS {
     success = 'SUCCESS',
     error = 'ERROR',
     timeout = 'TIMEOUT',
+}
+
+
+interface JobModel {
+    job_id: string;
+    state: JOB_STATUS;
+    collect_mode: COLLECT_MODE;
+    collector_info: CollectorModel;
+    secret_id: string;
+    filter: any;
+    errors: {
+        code: string;
+        message: string;
+        secret_id?: string;
+    }[];
+    created_at: TimeStamp;
+    finished_at: TimeStamp;
 }
 
 export default {

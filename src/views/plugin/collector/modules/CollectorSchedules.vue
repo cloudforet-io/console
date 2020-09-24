@@ -94,9 +94,10 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxT
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import { store } from '@/store';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 export default {
     name: 'CollectorSchedules',
@@ -170,11 +171,16 @@ export default {
             state.selectIndex = [];
             state.totalCount = 0;
             try {
-                const res = await fluentApi.inventory().collector().schedule().list()
-                    .setCollectorId(props.collectorId)
-                    .execute();
-                state.items = res.data.results;
-                state.totalCount = res.data.total_count;
+                const query = new QueryHelper()
+                    .setSort(state.sortBy, state.sortDesc)
+                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+
+                const res = await SpaceConnector.client.inventory.collector.schedule.list({
+                    collector_id: props.collectorId,
+                    query: query.data,
+                });
+                state.items = res.results;
+                state.totalCount = res.total_count;
             } catch (e) {
                 state.items = [];
                 console.error(e);
@@ -185,10 +191,10 @@ export default {
 
         const onConfirmDelete = async () => {
             try {
-                await fluentApi.inventory().collector().schedule().delete()
-                    .setCollectorId(props.collectorId)
-                    .setId(state.items[state.selectIndex[0]].schedule_id)
-                    .execute();
+                await SpaceConnector.client.inventory.collector.schedule.delete({
+                    collector_id: props.collectorId,
+                    schedule_id: state.items[state.selectIndex[0]].schedule_id,
+                });
 
                 root.$notify({
                     group: 'noticeTopRight',

@@ -161,7 +161,6 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { RegionModel } from '@/lib/fluent-api/inventory/region';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
@@ -177,7 +176,19 @@ import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import {Tags, TimeStamp} from "@/lib/fluent-api";
 
+interface RegionModel extends Tags {
+    region_id: string;
+    state: string;
+    name: string;
+    created_at: TimeStamp;
+    domain_id: string;
+    deleted_at: TimeStamp;
+    region_code: string;
+    region_type: string;
+    collection_info: object;
+}
 
 export default {
     name: 'CloudServiceType',

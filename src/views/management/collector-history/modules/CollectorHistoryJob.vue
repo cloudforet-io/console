@@ -105,14 +105,40 @@ import {
     makeReferenceValueHandler, makeEnumValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-import { JobModel } from '@/lib/fluent-api/inventory/job';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { TimeStamp } from '@/lib/fluent-api';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
     progress = 'IN_PROGRESS',
     success = 'SUCCESS',
     failure = 'FAILURE',
+}
+
+enum JOB_STATUS {
+    created = 'CREATED',
+    canceled = 'CANCELED',
+    progress = 'IN_PROGRESS',
+    success = 'SUCCESS',
+    error = 'ERROR',
+    timeout = 'TIMEOUT',
+}
+
+interface JobModel {
+    job_id: string;
+    state: JOB_STATUS;
+    collect_mode: COLLECT_MODE;
+    collector_info: CollectorModel;
+    secret_id: string;
+    filter: any;
+    errors: {
+        code: string;
+        message: string;
+        secret_id?: string;
+    }[];
+    created_at: TimeStamp;
+    finished_at: TimeStamp;
 }
 
 export default {

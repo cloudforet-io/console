@@ -59,13 +59,30 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxT
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import { SecretModel } from '@/lib/fluent-api/secret/secret';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { TimeStamp } from '@/models';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 const CredentialVerifyModal = () => import('@/views/plugin/collector/modules/CredentialVerifyModal.vue');
+interface SecretModel {
+    // eslint-disable-next-line camelcase
+    secret_id: string;
+    name: string;
+    // eslint-disable-next-line camelcase
+    secret_type: 'CREDENTIALS'|'CONFIG'|string;
+    'secret_groups': string[];
+    'schema': string ;
+    'provider': string;
+    'service_account_id': string;
+    'project_id': string;
+    'domain_id': string;
+    // eslint-disable-next-line camelcase
+    created_at: TimeStamp;
+    tags: object;
+}
 
 export default {
     name: 'CollectorCredentials',
@@ -110,19 +127,18 @@ export default {
             targetCredentialId: null,
         });
 
-        const listApi = computed(() => fluentApi.secret().secret().list()
-            .setFilter({ key: 'provider', value: props.provider, operator: FILTER_OPERATOR.in })
-            .setPageSize(state.pageSize)
-            .setThisPage(state.thisPage)
-            .setSortBy(state.sortBy)
-            .setSortDesc(state.sortDesc));
-
         const listCredentials = async (): Promise<void> => {
             state.loading = true;
             try {
-                const res = await listApi.value.execute();
-                state.items = res.data.results;
-                state.totalCount = res.data.total_count;
+                const query = new QueryHelper()
+                    .setFilter({ k: 'provider', v: props.provider, o: 'eq' })
+                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                    .setSort(state.sortBy, state.sortDesc);
+                const res = await SpaceConnector.client.secret.secret.list({
+                    query: query.data,
+                });
+                state.items = res.results;
+                state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
             } finally {

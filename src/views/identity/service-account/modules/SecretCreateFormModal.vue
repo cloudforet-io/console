@@ -9,9 +9,9 @@
         @confirm="confirm"
     >
         <template #body>
-            <PJsonSchemaForm v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
-            <PJsonSchemaForm v-bind="jscTS.state" :item.sync="jscTS.syncState.item" />
-            <PFieldGroup
+            <p-json-schema-form v-bind="fixFormTS.state" :item.sync="fixFormTS.syncState.item" />
+            <p-json-schema-form v-bind="jscTS.state" :item.sync="jscTS.syncState.item" />
+            <p-field-group
                 label="Tags"
             >
                 <p-dict-input-group
@@ -20,7 +20,7 @@
                     :items.sync="tagsTS.syncState.items"
                     v-on="tagsTS.events"
                 />
-            </PFieldGroup>
+            </p-field-group>
         </template>
     </p-button-modal>
 </template>
@@ -40,9 +40,8 @@ import {
 } from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
-import { fluentApi } from '@/lib/fluent-api';
 import { watch } from '@vue/composition-api';
-import { AxiosResponse } from 'axios';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'SSecretCreateFormModal',
@@ -85,11 +84,14 @@ export default {
         });
         const fixFormTS = new JsonSchemaFormToolSet();
 
-        const checkNameUnique = (...args: any[]) => fluentApi.secret().secret().list()
-            .setFilter({ key: 'name', operator: '=', value: args[1] })
-            .setCountOnly()
-            .execute()
-            .then(resp => resp.data.total_count === 0);
+        const checkNameUnique = async (...args: any[]) => {
+            const query = new QueryHelper()
+                .setFilter({ k: 'name', v: args[1], o: 'eq' })
+                .setCountOnly();
+            return SpaceConnector.client.secret.secret.list({
+                query: query.data,
+            }).then(res => res.total_count === 0);
+        };
 
         const validation: CustomKeywords = {
             uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
@@ -112,9 +114,11 @@ export default {
         const jscTS = new JsonSchemaFormToolSet();
         const getSchema = async (name) => {
             if (name) {
-                const resp: AxiosResponse<any> = await fluentApi.repository().schema().getByName().setId(name)
-                    .execute();
-                jscTS.setProperty(resp.data.schema);
+                const resp = await SpaceConnector.client.repository.schema.getByName({
+                    // eslint-disable-next-line camelcase
+                    schema_id: name,
+                });
+                jscTS.setProperty(resp.schema);
             }
         };
         getSchema(props.schemaNames[0]);

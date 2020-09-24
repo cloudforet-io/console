@@ -109,38 +109,6 @@ export interface DataSourceItem {
     options?: any;
 }
 
-export interface DynamicFormItem {
-    type: string;
-    is_required: boolean;
-    name: string;
-    key: string;
-}
-
-
-export interface DynamicViewMetaData {
-    name: string;
-    data_source: DataSourceItem[];
-}
-
-export interface DefaultMetaData{
-    details?: DynamicViewMetaData;
-    sub_data?: DynamicViewMetaData;
-}
-
-export interface HistoryItem {
-    update_at: number;
-    key: string;
-    update_by: string;
-}
-
-export interface CollectionInfo {
-    update_history: HistoryItem[];
-    state: string;
-    collectors: string[];
-    pinned_keys: string[];
-
-}
-
 
 export interface TimeStamp {
     seconds: string;
@@ -156,10 +124,6 @@ export interface LogListType<T> {
     logs: T[];
 }
 
-export interface ReferenceInfo {
-    resource_id?: string;
-    external_link?: string;
-}
 
 export interface Tags {
     tags?: {

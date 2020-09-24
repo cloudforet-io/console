@@ -8,7 +8,6 @@ import {
     COLLECT_MODE, CollectorModel, CollectorUpdateParameter,
     CollectorCollectParameter, CollectorCreateParameter, CollectorListResp,
 } from '@/lib/fluent-api/inventory/collector.type';
-import CollectorSchedule from '@/lib/fluent-api/inventory/collector-schedule';
 
 const idField = 'collector_id';
 
@@ -88,8 +87,7 @@ class Disable extends MultiDisableAction<IdParameter, CollectorModel> {
 }
 
 export default class Collector extends Resource implements
-    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'|'enable'|'disable'>,
-    ServiceResources<'schedule'> {
+    ResourceActions<'create'|'update'|'delete'|'get'|'list'|'collect'|'enable'|'disable'> {
     protected name = 'collector';
 
     create(): Create { return new Create(this.api, this.baseUrl); }
@@ -107,9 +105,4 @@ export default class Collector extends Resource implements
     enable(): Enable { return new Enable(this.api, this.baseUrl); }
 
     disable(): Disable { return new Disable(this.api, this.baseUrl); }
-
-    schedule(): CollectorSchedule {
-        const baseUrl = this.baseUrl.substring(1, this.baseUrl.length - 1);
-        return new CollectorSchedule(this.api, baseUrl);
-    }
 }
