@@ -1,4 +1,4 @@
-<babeledit_project version="1.2" be_version="2.6.1">
+<babeledit_project version="1.2" be_version="2.7.1">
     <!--
 
     BabelEdit project file
@@ -8124,7 +8124,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>TIMER_OFF</name>
+                        <name>TIMER_ROUTINE</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -8145,7 +8145,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>TIMER_ON</name>
+                        <name>TIMER_RUNNING</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -8166,7 +8166,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>TIMER_REPEAT</name>
+                        <name>TIMER_STOPPED</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>

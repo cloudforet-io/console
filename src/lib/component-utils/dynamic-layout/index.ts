@@ -4,7 +4,7 @@ import {
     makeEnumValueHandler,
     makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
-import {SearchKeyGroup} from "@/components/organisms/dynamic-layout/type/layout-schema";
+import { DynamicLayoutType, SearchKeyGroup } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 /**
  * @name makeQuerySearchPropsWithSearchSchema
@@ -12,7 +12,7 @@ import {SearchKeyGroup} from "@/components/organisms/dynamic-layout/type/layout-
  * @param schema
  * @param resourceType
  */
-export function makeQuerySearchPropsWithSearchSchema(schema: SearchKeyGroup, resourceType: string): Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> {
+export const makeQuerySearchPropsWithSearchSchema = (schema: SearchKeyGroup, resourceType: string): Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> => {
     const res: Pick<QuerySearchProps, 'keyItems'|'valueHandlerMap'> = { keyItems: [], valueHandlerMap: {} };
 
     res.keyItems = schema.items.map(d => ({ label: d.name, name: d.key, dataType: d.data_type }));
@@ -35,4 +35,14 @@ export function makeQuerySearchPropsWithSearchSchema(schema: SearchKeyGroup, res
     });
 
     return res;
-}
+};
+
+/**
+ * @name getApiActionByLayoutType
+ * @description returns action name that match with dynamic layout type with camelcase.
+ * @param type
+ */
+export const getApiActionByLayoutType = (type: DynamicLayoutType): string => {
+    if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
+    return 'get';
+};

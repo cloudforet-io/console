@@ -150,3 +150,12 @@ export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?:
     }
     return [getQueryItemFromQueryString(queryString as string, keyItems)];
 };
+
+export const queryStringToStringArray = (queryString: RouteQueryString): string[] => {
+    if (queryString === undefined || queryString === null) return [];
+    if (typeof queryString === 'string') return [queryString];
+    return queryString.reduce((res, d) => {
+        if (d !== null) res.push(d);
+        return res;
+    }, [] as string[]);
+};

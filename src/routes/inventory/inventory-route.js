@@ -4,7 +4,7 @@ const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/C
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
-const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
+const NoResource = () => import('@/views/common/error/NoResource.vue');
 
 export default {
     path: 'inventory',
@@ -27,13 +27,6 @@ export default {
                     name: 'server',
                     component: Server,
                 },
-                // {
-                //     path: ':resourceId/tags',
-                //     name: 'serverTags',
-                //     meta: { label: 'tags' },
-                //     props: true,
-                //     component: TagsPage,
-                // },
             ],
         },
         {
@@ -58,6 +51,11 @@ export default {
                     component: CloudServiceSearch,
                 },
                 {
+                    path: 'no-resource',
+                    name: 'noCloudService',
+                    component: NoResource,
+                },
+                {
                     path: ':provider/:group/:name',
                     props: true,
                     meta: {
@@ -71,13 +69,6 @@ export default {
                             props: true,
                             component: CloudServicePage,
                         },
-                        // {
-                        //     path: ':resourceId/tags',
-                        //     name: 'cloudServicePageTags',
-                        //     meta: { label: 'tags' },
-                        //     props: true,
-                        //     component: TagsPage,
-                        // },
                     ],
                 },
             ],

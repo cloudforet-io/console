@@ -17,7 +17,7 @@
                                       language,
                                   }"
                                   :field-handler="fieldHandler"
-                                  v-on="getLayoutListeners(layout)"
+                                  v-on="dynamicLayoutListeners"
                 />
             </template>
         </p-button-tab>
@@ -38,7 +38,7 @@ import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { DynamicLayoutEventListeners, DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
@@ -76,7 +76,7 @@ export default {
         const fetchOptionsMap = {};
 
         const state = reactive({
-            data: {} as any,
+            data: undefined as any,
             loading: true,
             totalCount: 0,
             timezone: computed(() => getTimezone()),
@@ -91,7 +91,8 @@ export default {
 
             // schema
             layouts: [] as DynamicLayout[],
-            currentLayout: computed<undefined|DynamicLayout>(() => find(state.layouts, { name: state.activeTab })),
+            currentLayout: computed<DynamicLayout>(() => find(state.layouts, { name: state.activeTab }) || {}),
+            fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
 
         const getSchema = async () => {
@@ -108,6 +109,7 @@ export default {
                             cloud_service_id: props.cloudServiceId,
                         },
                     });
+
                     layouts = res.details;
                 } catch (e) {
                     console.error(e);
@@ -120,19 +122,17 @@ export default {
                 if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
             }
         };
-        //
-        const getQuery = (): undefined|any => {
-            if (!state.currentLayout) return undefined;
 
+        const getQuery = (): undefined|any => {
             const query = new QueryHelper();
 
-            if (fetchOptionsMap[state.currentLayout.name]) {
-                const options = fetchOptionsMap[state.currentLayout.name];
-                if (options.sortBy) query.setSort(options.sortBy, options.sortDesc);
-                if (options.pageLimit) query.setPageLimit(options.pageLimit);
-                if (options.pageStart) query.setPageStart(options.pageStart);
-                if (options.searchText) query.setKeyword(options.searchText);
-                if (options.queryTags) {
+            if (fetchOptionsMap[state.fetchOptionKey]) {
+                const options = fetchOptionsMap[state.fetchOptionKey];
+                if (options.sortBy !== undefined) query.setSort(options.sortBy, options.sortDesc);
+                if (options.pageLimit !== undefined) query.setPageLimit(options.pageLimit);
+                if (options.pageStart !== undefined) query.setPageStart(options.pageStart);
+                if (options.searchText !== undefined) query.setKeyword(options.searchText);
+                if (options.queryTags !== undefined) {
                     const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(options.queryTags);
                     query.setFilter(...andFilters)
                         .setFilterOr(...orFilters)
@@ -140,48 +140,32 @@ export default {
                 }
             }
 
-            if (state.currentLayout.options?.fields) {
-                query.setOnly(...state.currentLayout.options.fields.map(d => d.name));
-            }
-
             return query.data;
         };
+
         const getParams = () => {
             // eslint-disable-next-line camelcase
             const params: any = { cloud_service_id: props.cloudServiceId };
             const query = getQuery();
             if (query) params.query = query;
             // eslint-disable-next-line camelcase
-            const keyPath = state.currentLayout?.options?.root_path;
+            const keyPath = state.currentLayout.options?.root_path;
             // eslint-disable-next-line camelcase
             if (keyPath) params.key_path = keyPath;
             return params;
         };
-        const getApi = (): Promise<any> => {
-            // eslint-disable-next-line camelcase
-            if (state.currentLayout?.options?.root_path) {
-                return SpaceConnector.client.inventory.cloudService.getData(getParams());
-            }
-            return SpaceConnector.client.inventory.cloudService.get(getParams());
-        };
+
+
         const getData = async () => {
             state.loading = true;
-
             try {
-                const res = await getApi();
+                const api = SpaceConnector.client.inventory.cloudService[getApiActionByLayoutType(state.currentLayout.type)];
+                const res = await api(getParams());
 
                 if (res.total_count !== undefined) state.totalCount = res.total_count;
-
-                const data = res.results || res;
-                // eslint-disable-next-line camelcase
-                const keyPath = state.currentLayout?.options?.root_path;
-                if (keyPath) {
-                    set(state.data, keyPath, data);
-                    if (Array.isArray(state.data)) state.data = [...state.data];
-                    else state.data = { ...state.data };
-                } else state.data = data;
+                state.data = res.results || res;
             } catch (e) {
-                state.data = {};
+                state.data = undefined;
                 state.totalCount = 0;
                 console.error(e);
             } finally {
@@ -190,20 +174,21 @@ export default {
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
-        const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
-            init(options) {
-                if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
-                if (layout?.options?.search) {
+        const dynamicLayoutListeners: DynamicLayoutEventListeners = {
+            async init(options) {
+                fetchOptionsMap[state.fetchOptionKey] = options;
+                if (state.currentLayout?.options?.search) {
                     const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                        layout.options.search,
+                        state.currentLayout.options.search,
                         'inventory.CloudService',
                     );
                     state.keyItems = keyItems;
                     state.valueHandlerMap = valueHandlerMap;
                 }
+                await getData();
             },
             fetch(options) {
-                fetchOptionsMap[layout.name] = options;
+                fetchOptionsMap[state.fetchOptionKey] = options;
                 getData();
             },
             select(selectIndex) {
@@ -230,7 +215,8 @@ export default {
                     console.error(e);
                 }
             },
-        });
+        };
+
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
                 return referenceFieldFormatter(field.extraData.reference, field.data);
@@ -240,20 +226,18 @@ export default {
 
         const onChangeTab = async (tab) => {
             state.activeTab = tab;
-            await getData();
         };
 
         watch(() => props.cloudServiceId, async (after, before) => {
             if (after && after !== before) {
                 await getSchema();
-                await getData();
+                dynamicLayoutListeners.init(fetchOptionsMap[state.fetchOptionKey]);
             }
         }, { immediate: false });
 
         const init = async () => {
             await store.dispatch('resource/loadAll');
             await getSchema();
-            await getData();
         };
 
         init();
@@ -261,7 +245,7 @@ export default {
         return {
             ...toRefs(state),
             onChangeTab,
-            getLayoutListeners,
+            dynamicLayoutListeners,
             fetchOptionsMap,
             fieldHandler,
         };

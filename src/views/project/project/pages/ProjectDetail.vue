@@ -199,7 +199,7 @@ export default {
                     ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
                     ['member', 'COMMON.MEMBER'],
                     ['tag', 'TAB.TAG'],
-                    ['report', 'TAB.REPORT'],
+                    ['report', 'TAB.REPORT', { beta: true }],
                 ],
                 context.parent)),
             },
