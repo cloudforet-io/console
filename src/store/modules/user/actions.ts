@@ -27,6 +27,15 @@ const getUser = async (userId: string): Promise<UserState> => {
     };
 };
 
+const getReportState = async (): Promise<boolean> => {
+    try {
+        await SpaceConnector.client.report.domain.get();
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
 const updateUser = async (userId: string, userType: string, userRequest: UpdateUserRequest): Promise<void> => {
     const request: any = {};
 
@@ -69,6 +78,9 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
         const userInfo = await getUser(userId);
         commit('setUser', userInfo);
     }
+
+    const reportState = await getReportState();
+    commit('setReportState', reportState);
 };
 
 export const signOut = (): void => {

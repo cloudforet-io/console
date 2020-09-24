@@ -14,3 +14,7 @@ export const setLanguage = (state: UserState, language: string): void => {
 export const setTimezone = (state: UserState, timezone: string): void => {
     state.timezone = timezone;
 };
+
+export const setReportState = (state: UserState, reportState: boolean): void => {
+    state.reportState = reportState;
+};

@@ -18,6 +18,7 @@ const state: UserState = {
     userType: storedUserState.userType,
     language: storedUserState.language,
     timezone: storedUserState.timezone,
+    reportState: storedUserState.reportState,
 };
 
 export default {
