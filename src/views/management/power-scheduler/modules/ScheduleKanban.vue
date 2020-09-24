@@ -14,7 +14,7 @@
                 </div>
                 <div v-for="(resource, idx) in resourceGroup" :key="idx" class="resource-group-item">
                     <div v-if=" resource.priority === num" class="resource">
-                        <p-lazy-img :img-url="iconUrl(resource)"
+                        <p-lazy-img :src="iconUrl(resource)"
                                     width="2rem" height="2rem"
                                     class="mr-2"
                         />

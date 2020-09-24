@@ -2,20 +2,19 @@ import Vue from 'vue';
 import VueGtag from 'vue-gtag';
 import Hashids from 'hashids';
 import config from '@/lib/config';
-import { useStore } from '@/store/toolset';
+import { store } from '@/store';
 
 export const setGtagUserID = (vm: any) => {
-    const store = useStore();
-    if (store && vm.$gtag) {
+    if (vm.$gtag) {
         try {
-            if (store.domain?.state?.domainId && store.user?.state?.userId) {
-                const hashids = new Hashids(store.user.state.userId);
+            if (store.state.domain.domainId && store.state.user.userId) {
+                const hashids = new Hashids(store.state.user.userId);
 
                 // eslint-disable-next-line camelcase
                 vm.$gtag.set({
                     // eslint-disable-next-line camelcase
-                    user_id: `${store.domain.state.domainId}:${hashids.encode(1)}`,
-                    domain_id: store.domain.state.domainId,
+                    user_id: `${store.state.domain.domainId}:${hashids.encode(1)}`,
+                    domain_id: store.state.domain.domainId,
                 });
             }
         } catch (e) {

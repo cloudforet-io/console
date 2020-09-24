@@ -5,7 +5,7 @@
                             :skeleton-rows="7" v-on="$listeners"
         >
             <template #data-name>
-                <p-lazy-img :img-url="baseState.data.tags.icon" width="1rem" height="1rem" />
+                <p-lazy-img :src="baseState.data.tags.icon" width="1rem" height="1rem" />
                 <span class="ml-2 leading-none">{{ baseState.data.name }}</span>
             </template>
             <template #data-plugin_info.options.supported_resource_type="{data}">

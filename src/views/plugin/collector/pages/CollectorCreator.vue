@@ -21,7 +21,8 @@
             <template #contents-conf="{tab}">
                 <div class="collector-input-lap">
                     <p-lazy-img class="flex-shrink-0 mr-8"
-                                :img-url="imageUrl"
+                                :loading="!imageUrl"
+                                :src="imageUrl"
                                 width="5.5rem" height="5.5rem"
                     />
                     <div class="flex-grow">

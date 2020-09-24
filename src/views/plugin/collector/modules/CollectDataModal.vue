@@ -17,7 +17,7 @@
             <div class="w-full">
                 <!--                <div class="left-container">-->
                 <div class="flex w-full">
-                    <p-lazy-img :img-url="image"
+                    <p-lazy-img :src="image" :loading="!image"
                                 width="5.5rem" height="5.5rem"
                                 class="mr-10 flex-grow-0"
                     />

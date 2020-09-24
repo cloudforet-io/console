@@ -25,7 +25,7 @@
                         <hr v-if="item.created_count || item.deleted_count" style="width: 100%;">
                         <div v-if="item.created_count || item.deleted_count" class="card-contents">
                             <div v-if="!item.isServer">
-                                <p-lazy-img :img-url="iconUrl(item)"
+                                <p-lazy-img :src="iconUrl(item)"
                                             width="2rem" height="2rem"
                                             class="mr-2"
                                 />

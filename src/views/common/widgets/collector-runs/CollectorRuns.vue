@@ -29,7 +29,7 @@
                           :size="2" :auto="true" name="lottie_working"
                 />
                 <p-lazy-img
-                    :img-url="providers.find(d => d.provider === value.provider).tags.icon"
+                    :src="providers.find(d => d.provider === value.provider).tags.icon"
                     width="1rem" height="1rem"
                     class="ml-3"
                 />

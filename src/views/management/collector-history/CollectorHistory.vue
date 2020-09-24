@@ -48,7 +48,7 @@
                     </template>
                     <template #col-collector_info-format="{ value }">
                         <p-lazy-img
-                            :img-url="providers.find(d => d.provider === value.provider).tags.icon"
+                            :src="providers.find(d => d.provider === value.provider).tags.icon"
                             width="1rem" height="1rem"
                         />
                         <span class="pl-2">{{ value.name }}</span>

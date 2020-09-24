@@ -26,10 +26,8 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
     defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
-import { CombinedVueInstance } from 'vue/types/vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { useStore } from '@/store/toolset';
 
@@ -110,7 +108,7 @@ export default defineComponent({
     }
 
     .btn.btn-outline-gray {
-        font-size:.875rem;
+        font-size: 0.875rem;
         font-weight: normal;
     }
 
@@ -120,26 +118,26 @@ export default defineComponent({
     }
 
     .btn-divider {
+        @apply text-gray-200;
       display: flex;
       flex-basis: 100%;
       align-items: center;
-      color:#DCDDE2;
       font-style: normal;
       font-weight: bold;
       font-size: 0.875rem;
-      margin-bottom:1em;
+      margin-bottom: 1em;
     }
     .btn-divider > span {
-        margin:.5rem;
+        margin: 0.5rem;
     }
     .btn-divider::before,
     .btn-divider::after {
+        @apply bg-gray-200;
         content: "";
         flex-grow: 1;
-        background: #DCDDE2;
         height: 1px;
-        font-size: 0px;
+        font-size: 0;
         line-height: 0px;
-        margin: 0px 8px;
+        margin: 0 8px;
     }
 </style>

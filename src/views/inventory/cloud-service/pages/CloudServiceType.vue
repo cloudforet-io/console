@@ -17,7 +17,7 @@
                         <p-i v-else name="ic_provider_other"
                              class="provider-icon"
                         />
-                        <span class="provider-name">{{ provider.name }}</span>
+                        <span class="provider-name">{{ provider.label }}</span>
                     </template>
                     <template #icon="{ iconName }">
                         <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
@@ -86,24 +86,11 @@
                     <template #card="{item}">
                         <router-link :to="getToCloudService(item)">
                             <div class="left">
-                                <div class="w-12 h-12">
-                                    <img v-if="item.icon"
-                                         width="48px" height="48px"
-                                         :src="item.icon"
-                                         :alt="item.name"
-                                    >
-                                    <p-i v-else-if="providerStore.state.providers[item.provider] && item.icon === 0" name="ic_provider_other" width="48px"
-                                         height="48px"
-                                    />
-                                    <img v-else-if="providerStore.state.providers[item.provider]"
-                                         width="48px" height="48px"
-                                         :src="providerStore.state.providers[item.provider].icon"
-                                         :alt="item.provider"
-                                    >
-                                    <p-i v-else name="ic_provider_other" width="48px"
-                                         height="48px"
-                                    />
-                                </div>
+                                <p-lazy-img width="3rem" height="3rem"
+                                            :src="item.icon || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                            error-icon="ic_provider_other"
+                                            :alt="item.name"
+                                />
                                 <div class="text-content">
                                     <div class="title">
                                         {{ item.cloud_service_group }}
@@ -158,7 +145,6 @@ import {
     computed, getCurrentInstance, reactive, Ref, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
-import { ProviderStoreType, useStore } from '@/store/toolset';
 import { zipObject, debounce, range } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import {
@@ -186,15 +172,17 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { Filter } from '@/lib/space-connector/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import axios, { AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios';
-import { APIError } from '@/lib/space-connector/api';
+import axios, { CancelTokenSource } from 'axios';
 import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { store } from '@/store';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 
 export default {
     name: 'CloudServiceType',
     components: {
+        PLazyImg,
         PPagination,
         PHr,
         PSearchGridLayout,
@@ -207,34 +195,17 @@ export default {
         PCheckBox,
     },
     setup(props, context) {
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const selectedProvider: Ref<string> = ref('all');
 
         const providerState = reactive({
-            items: computed(() => {
-                const result = [{
-                    provider: 'all', icon: '', color: '', name: 'All',
-                }];
-                if (providerStore.state.providers) {
-                    result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
-                }
-                return result;
-            }),
+            items: computed(() => Object.keys(store.state.resource.provider.items).map(k => ({
+                provider: k,
+                ...store.state.resource.provider.items[k],
+            }))),
         });
-        const selectedProviderName = computed(() => {
-            let name = '';
-            providerState.items.forEach((d) => {
-                if (d.provider === selectedProvider.value) {
-                    name = d.name;
-                }
-            });
-            return name;
-        });
+        const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.label || selectedProvider.value);
         const filterState = reactive({
             serviceCategories: zipObject([
                 'Compute', 'Container', 'Database', 'Networking', 'Storage', 'Security', 'Analytics', 'Application Integration', 'Management',
@@ -269,6 +240,7 @@ export default {
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
+            providers: computed(() => store.state.resource.provider.items),
         });
 
         const getRegionQuery = (value) => {
@@ -444,7 +416,7 @@ export default {
 
         const checkProvider = async (queryStringForCheck) => {
             let providerQueryString = queryStringForCheck;
-            const providerList = Object.keys(providerStore.state.providers);
+            const providerList = Object.keys(store.state.resource.provider.items);
             if (!providerList.includes(queryStringForCheck)) {
                 providerQueryString = 'all';
             }
@@ -465,7 +437,7 @@ export default {
         };
 
         const init = async () => {
-            await provider.getProvider();
+            await store.dispatch('resource/provider/load');
             const providerQueryString = await initProvider();
             if (providerQueryString) {
                 selectedProvider.value = providerQueryString.toString();
@@ -492,7 +464,6 @@ export default {
             ...toRefs(routeState),
             ...toRefs(state),
             selectedProvider,
-            providerStore,
             providerState,
             getToCloudService,
             skeletons: range(5),

@@ -131,7 +131,6 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
-import { useStore } from '@/store/toolset';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -139,7 +138,7 @@ import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
 
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { get, forEach } from 'lodash';
+import { get } from 'lodash';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
     queryStringToQueryTags,

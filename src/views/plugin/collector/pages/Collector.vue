@@ -45,7 +45,7 @@
                         </p-dropdown-menu-btn>
                     </template>
                     <template #col-name-format="data">
-                        <p-lazy-img :img-url="getIcon(data)"
+                        <p-lazy-img :src="getIcon(data)"
                                     width="1.5rem" height="1.5rem" class="mr-2"
                         />
                         {{ data.value }}

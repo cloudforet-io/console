@@ -88,7 +88,7 @@ import {
     formValidation,
     requiredValidation,
 } from '@/lib/compostion-util';
-import { useStore } from '@/store/toolset';
+import { store } from '@/store';
 
 export default defineComponent({
     name: 'Local',
@@ -99,7 +99,6 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as any;
-        const store = useStore();
         const state = reactive({
             userId: '',
             password: '',
@@ -124,8 +123,8 @@ export default defineComponent({
             const data = {};
             const result = await validateAPI.allValidation();
             if (result) {
-                await vm.$store.dispatch('user/signIn', {
-                    domain_id: vm.$store.state.domain.domainId,
+                await store.dispatch('user/signIn', {
+                    domain_id: store.state.domain.domainId,
                     credentials: {
                         // eslint-disable-next-line camelcase
                         user_id: state.userId,
@@ -141,7 +140,7 @@ export default defineComponent({
                         user_id: state.userId,
                         password: state.password,
                     },
-                    domain_id: store.domain.state.domainId,
+                    domain_id: store.state.domain.domainId,
                 }, { skipAuthRefresh: true }).catch(() => {
                     state.loginFail = true;
                     state.password = '';
@@ -171,8 +170,8 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .p-button.outline {
-        font-size:.875rem;
-        font-weight:normal;
+        font-size: 0.875rem;
+        font-weight: normal;
     }
 
     .input-title {
@@ -189,27 +188,27 @@ export default defineComponent({
     }
 
     #errorMsg {
-        color: red;
+        @apply text-alert;
     }
 
     .btn-divider {
-      display: flex;
-      flex-basis: 100%;
-      align-items: center;
-      color: #dcdde2;
-      font-style: normal;
-      font-weight: bold;
-      font-size: 0.875rem;
-      margin-bottom:1em;
+        @apply text-gray-200;
+        display: flex;
+        flex-basis: 100%;
+        align-items: center;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 0.875rem;
+        margin-bottom: 1em;
     }
     .btn-divider > span {
-        margin:.5rem;
+        margin: 0.5rem;
     }
     .btn-divider::before,
     .btn-divider::after {
-      content: "";
-      flex-grow: 1;
-      background: #dcdde2;
-      height: 1px;
+        @apply bg-gray-200;
+        content: "";
+        flex-grow: 1;
+        height: 1px;
     }
 </style>
