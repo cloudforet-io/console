@@ -114,7 +114,7 @@ export default {
     }
     .detail-box {
         @apply mt-2 border border-gray-200;
-        padding: 3.25rem 3rem;
+        padding: 3.25rem 3rem 2.75rem;
         box-shadow: inset 0 0 1.25rem rgba(theme('colors.primary4'), 0.08);
         background-color: rgba(theme('colors.primary4'), 0.5);
     }
