@@ -156,7 +156,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import {
     queryStringToQueryTags,
     queryTagsToQueryString,
-    replaceQuery, RouteQueryString,
+    replaceQuery, RouteQueryString, queryStringToStringArray,
 } from '@/lib/router-query-string';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
@@ -307,9 +307,9 @@ export default {
                     if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
                 }
             });
-            filterState.regionFilter.forEach((d) => {
-                filters.push({ key: { name: 'region_code', label: 'region' }, value: { name: d, label: d }, operator: '' });
-            });
+            // filterState.regionFilter.forEach((d) => {
+            //     filters.push({ key: { name: 'region_code', label: 'region' }, value: { name: d, label: d }, operator: '' });
+            // });
             const res: Location = {
                 name: 'cloudServicePage',
                 params: {
@@ -434,17 +434,7 @@ export default {
             route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' }],
         });
 
-        const queryStringToStringArray = (queryString: RouteQueryString): string[] => {
-            if (queryString === undefined || queryString === null) return [];
-            if (typeof queryString === 'string') return [queryString];
-            return queryString.reduce((res, d) => {
-                if (d !== null) res.push(d);
-                return res;
-            }, [] as string[]);
-        };
-
         const checkProvider = async (queryStringForCheck) => {
-            // console.debug(providerState.items.map(d => d.provider));
             let providerQueryString = queryStringForCheck;
             const providerList = Object.keys(providerStore.state.providers);
             if (!providerList.includes(queryStringForCheck)) {
