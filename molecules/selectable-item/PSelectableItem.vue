@@ -9,7 +9,7 @@
         </slot>
         <div class="contents">
             <slot name="side">
-                <p-lazy-img :img-url="iconUrl"
+                <p-lazy-img :src="iconUrl"
                             :error-icon="defaultIcon"
                             width="2rem" height="2rem"
                             class="flex-shrink-0 mr-2"
