@@ -1,9 +1,9 @@
 <template>
     <div class="project-report-tab-container">
+        <p><b>SpaceONE</b> offers Monthly Report based on this project. We will provide more options soon.</p>
         <div class="input-lap">
-            <p><b>SpaceONE</b> offers Monthly Report based on this project. We will provide more options soon.</p>
             <p-field-group label="Company Name on the Report Cover"
-                           :invalid="inputModel.companyName && !isValid"
+                           :invalid="typeof inputModel.companyName === 'string' && !isValid"
                            :invalid-text="invalidText"
                            :required="true"
             >
@@ -12,13 +12,16 @@
                 </template>
             </p-field-group>
             <p-field-group label="Period(Last one month)" class="absolute pl-12" :required="true">
-                <p-select-dropdown v-model="inputModel.period" :items="periodItems" auto-height />
+                <p-select-dropdown v-model="inputModel.period" :items="periodItems"
+                                   disabled auto-height
+                />
             </p-field-group>
         </div>
         <div class="button-lap">
-            <p-button class="txt-btn"
+            <p-button class="text-button"
                       style-type="gray900" :outline="true" size="lg"
                       :disabled="!isValid"
+                      @click="onClickDownload"
             >
                 Download file
             </p-button>
@@ -61,6 +64,19 @@ export default {
                 companyName: undefined,
                 period: '',
             },
+            invalidText: computed(() => {
+                if (typeof state.inputModel.companyName === 'string') {
+                    if (state.inputModel.companyName.length === 0) return 'Should have required property \'name\'';
+                    if (state.inputModel.companyName.length > 60) return 'Should not be longer than 60 characters';
+                }
+                return '';
+            }),
+            isValid: computed(() => {
+                if (state.inputModel.companyName) {
+                    return !(state.inputModel.companyName.length === 0 || state.inputModel.companyName.length > 60);
+                }
+                return false;
+            }),
             periodItems: computed(() => {
                 const sixMonthAgo = moment().tz(getTimezone()).subtract(6, 'months');
                 const now = moment().tz(getTimezone()).subtract(1, 'month');
@@ -75,20 +91,11 @@ export default {
                 }
                 return periods;
             }),
-            invalidText: computed(() => {
-                if (typeof state.inputModel.companyName === 'string') {
-                    if (state.inputModel.companyName.length === 0) return 'Should have required property \'name\'';
-                    if (state.inputModel.companyName.length > 60) return 'Should not be longer than 60 characters';
-                }
-                return '';
-            }),
-            isValid: computed(() => {
-                if (state.inputModel.companyName) {
-                    return !(state.inputModel.companyName.length === 0 || state.inputModel.companyName.length > 60);
-                }
-                return false;
-            }),
         });
+
+        const onClickDownload = () => {
+
+        };
 
         const init = () => {
             state.inputModel.period = state.periodItems[0].name;
@@ -97,6 +104,7 @@ export default {
 
         return {
             ...toRefs(state),
+            onClickDownload,
         };
     },
 };
@@ -121,7 +129,7 @@ export default {
     .button-lap {
         text-align: right;
         padding-bottom: 1.75rem;
-        .txt-btn {
+        .text-button {
             width: 12.5rem;
         }
         .help-text {
