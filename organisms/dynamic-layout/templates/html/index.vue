@@ -1,9 +1,9 @@
 <template>
-    <div class="p-dynamic-layout-raw">
+    <div class="p-dynamic-layout-html">
         <p-panel-top v-if="name">
             {{ name }}
         </p-panel-top>
-        <p-raw-data :item="rootData" :loading="loading" />
+        <div v-html="iframeData" />
     </div>
 </template>
 
@@ -12,13 +12,12 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
-import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import { HtmlDynamicLayoutProps, HtmlFetchOptions } from '@/components/organisms/dynamic-layout/templates/html/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import { RawDynamicLayoutProps, RawFetchOptions } from '@/components/organisms/dynamic-layout/templates/raw/type';
 
 export default {
-    name: 'PDynamicLayoutRaw',
-    components: { PRawData, PPanelTop },
+    name: 'PDynamicLayoutHtml',
+    components: { PPanelTop },
     props: {
         name: {
             type: String,
@@ -41,18 +40,24 @@ export default {
             default: undefined,
         },
     },
-    setup(props: RawDynamicLayoutProps, { emit }) {
+    setup(props: HtmlDynamicLayoutProps, { emit }) {
         const state = reactive({
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                    return get(props.data, props.options.root_path, '');
                 }
-                if (typeof props.data !== 'object') return {};
+                if (typeof props.data !== 'string') return '';
                 return props.data;
             }),
-            fetchOptionsParam: computed<RawFetchOptions>(() => ({})),
-            loading: computed(() => (props.typeOptions?.loading || false)),
+            fetchOptionsParam: computed<HtmlFetchOptions>(() => ({})),
+            iframeData: computed(() => `
+                <iframe title="${props.name}"
+                        style="width: 100%;"
+                        srcdoc="${state.rootData}"
+                />
+            `),
         });
+
 
         emit('init', state.fetchOptionsParam);
 
@@ -64,7 +69,7 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-dynamic-layout-raw {
-        @apply w-full;
+    .p-dynamic-layout-html {
+
     }
 </style>

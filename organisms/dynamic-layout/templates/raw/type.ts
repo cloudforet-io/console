@@ -14,5 +14,5 @@ export type RawDynamicLayoutProps = DynamicLayoutProps<
     RawTypeOptions
     >
 
-export type RawDynamicLayoutEventListeners
+export type RawEventListeners
     = Pick<DynamicLayoutEventListeners<RawFetchOptions>, 'init'>;

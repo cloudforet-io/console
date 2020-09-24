@@ -16,5 +16,5 @@ export type SimpleTableDynamicLayoutProps = DynamicLayoutProps<
     SimpleTableTypeOptions
     >
 
-export type SimpleTableDynamicLayoutEventListeners
+export type SimpleTableEventListeners
     = Pick<DynamicLayoutEventListeners<SimpleTableFetchOptions>, 'init'>;

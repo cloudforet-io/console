@@ -50,7 +50,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [Object, Array],
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -99,7 +99,7 @@ export default {
                 if (props.options.root_path) {
                     return get(props.data, props.options.root_path, {});
                 }
-                if (Array.isArray(props.data)) return {};
+                if (Array.isArray(props.data) || typeof props.data === 'string') return {};
                 return props.data;
             }),
             loading: computed(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),

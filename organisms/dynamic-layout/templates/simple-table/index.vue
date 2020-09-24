@@ -57,7 +57,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [Array, Object],
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -92,9 +92,11 @@ export default {
                 }));
             }),
             rootData: computed<any[]>(() => {
-                if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                if (Array.isArray(props.data)) return props.data;
+                if (typeof props.data === 'object' && props.options.root_path) {
+                    return get(props.data, props.options.root_path, []);
                 }
+                if (!Array.isArray(props.data)) return [];
                 return props.data;
             }),
             loading: computed(() => (props.typeOptions?.loading || false)),

@@ -1,15 +1,14 @@
 <template>
-    <component
-        :is="component"
-        :name="name"
-        :options="options"
-        :data="data"
-        :fetch-options="fetchOptions"
-        :type-options="typeOptions"
-        :before-create="beforeCreate"
-        :before-create-field="beforeCreateField"
-        :field-handler="fieldHandler"
-        v-on="$listeners"
+    <component :is="component"
+               :name="name"
+               :options="options"
+               :data="data"
+               :fetch-options="fetchOptions"
+               :type-options="typeOptions"
+               :before-create="beforeCreate"
+               :before-create-field="beforeCreateField"
+               :field-handler="fieldHandler"
+               v-on="$listeners"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -46,7 +45,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [Object, Array],
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -82,7 +81,7 @@ export default {
                 await state.loader();
                 if (props.beforeCreate) await props.beforeCreate(props);
 
-                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicLayoutTypes}. ${props.type} is not acceptable.`)
+                if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicLayoutTypes}. ${props.type} is not acceptable.`);
                 state.component = async () => state.loader();
             } catch (e) {
                 state.component = () => import('./templates/item/index.vue');
