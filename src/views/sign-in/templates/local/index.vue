@@ -88,7 +88,6 @@ import {
     formValidation,
     requiredValidation,
 } from '@/lib/compostion-util';
-import { store } from '@/store';
 
 export default defineComponent({
     name: 'Local',
@@ -123,8 +122,8 @@ export default defineComponent({
             const data = {};
             const result = await validateAPI.allValidation();
             if (result) {
-                await store.dispatch('user/signIn', {
-                    domain_id: store.state.domain.domainId,
+                await vm.$store.dispatch('user/signIn', {
+                    domain_id: vm.$store.state.domain.domainId,
                     credentials: {
                         // eslint-disable-next-line camelcase
                         user_id: state.userId,
@@ -140,7 +139,7 @@ export default defineComponent({
                         user_id: state.userId,
                         password: state.password,
                     },
-                    domain_id: store.state.domain.domainId,
+                    domain_id: vm.$store.state.domain.domainId,
                 }, { skipAuthRefresh: true }).catch(() => {
                     state.loginFail = true;
                     state.password = '';

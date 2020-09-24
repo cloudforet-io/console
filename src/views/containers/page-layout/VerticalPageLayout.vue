@@ -52,13 +52,12 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: stretch;
+        overflow-y: auto;
 
         .page-contents {
             width: 100%;
             flex-grow: 1;
-            /*padding: 1.5rem 1.5rem 2rem;*/
             padding: 2rem 1.5rem;
-            overflow-y: scroll;
         }
 
         .fnb {
