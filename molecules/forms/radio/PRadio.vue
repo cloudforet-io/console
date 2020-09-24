@@ -10,8 +10,9 @@
           @click.stop.prevent="onClick"
           v-on="$listeners"
     >
+        <slot name="radio-left" />
         <input type="radio">
-        <slot :slot-scope="$props" name="icon">
+        <slot :slot-scope="$props" name="icon" :icon-name="iconName">
             <p-i class="radio-icon" width="1.25rem" height="1.25rem"
                  :name="iconName"
             />
