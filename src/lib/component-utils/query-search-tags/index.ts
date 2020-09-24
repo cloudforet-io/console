@@ -109,9 +109,11 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
         } else if (dateRegex.test(query.value.name as string)) {
             const time = dayjs.tz(query.value.name as string, getTimezone()).utc();
             if (['>', '<'].includes(query.operator)) {
-                query.value.name = time.toISOString();
-                query.operator = `${query.operator}=`;
-                setSingleValueFiltersMap(query, singleFiltersMap);
+                setSingleValueFiltersMap({
+                    ...query,
+                    value: { ...query.value, name: time.toISOString() },
+                    operator: `${query.operator}=`,
+                }, singleFiltersMap);
             } else if (query.operator === '=') {
                 const gteQuery: QueryParam = {
                     ...query, value: { ...query.value, name: time.toISOString() }, operator: '>=',
