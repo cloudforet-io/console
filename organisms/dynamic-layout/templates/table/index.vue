@@ -56,7 +56,7 @@ import { forEach, get } from 'lodash';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
-import { getPageStart } from '@/components/util/helpers';
+import { getPageStart, getThisPage } from '@/components/util/helpers';
 import { Options } from '@/components/organisms/tables/query-search-table/type';
 
 const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
@@ -66,7 +66,7 @@ const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
     return init;
 };
 
-const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
+
 export default {
     name: 'PDynamicLayoutTable',
     components: {
@@ -84,7 +84,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [Array, Object],
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -140,18 +140,14 @@ export default {
             /** others */
             pageStart: computed(() => getPageStart(state.thisPage, state.pageSize)),
             rootData: computed<any[]>(() => {
-                if (props.options.root_path) {
+                if (Array.isArray(props.data)) return props.data;
+                if (typeof props.data === 'object' && props.options.root_path) {
                     return get(props.data, props.options.root_path, []);
                 }
+                if (!Array.isArray(props.data)) return [];
                 return props.data;
             }),
         });
-
-        // watch(() => props.fetchOptions, (options) => {
-        //     forEach(options, (d, k) => {
-        //         state[k] = d;
-        //     });
-        // });
 
         const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
             const res = {};

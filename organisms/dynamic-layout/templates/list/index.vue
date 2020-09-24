@@ -45,7 +45,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: [Array, Object],
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {

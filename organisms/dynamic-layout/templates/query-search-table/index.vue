@@ -80,7 +80,7 @@ export default {
             default: () => ({}),
         },
         data: {
-            type: Array,
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -147,9 +147,11 @@ export default {
                 queryTags: state.queryTags,
             } as QuerySearchTableFetchOptions)),
             rootData: computed<any[]>(() => {
-                if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                if (Array.isArray(props.data)) return props.data;
+                if (typeof props.data === 'object' && props.options.root_path) {
+                    return get(props.data, props.options.root_path, []);
                 }
+                if (!Array.isArray(props.data)) return [];
                 return props.data;
             }),
         });

@@ -188,7 +188,7 @@ export const defaultCase = () => ({
             </pre>
         </div>
         `,
-    setup() {
+    setup(props) {
         const state = reactive({
             data: [],
             typeOptions: {

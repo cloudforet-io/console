@@ -33,8 +33,10 @@ export interface SearchKeyGroup {
 export type SearchSchema = SearchKeyGroup;
 
 /** Metadata schema types for Dynamic layout */
-export const dynamicLayoutTypes = ['item', 'simple-table', 'table', 'query-search-table',
-    'raw', 'markdown', 'list'];
+export const dynamicLayoutTypes = [
+    'item', 'simple-table', 'table', 'query-search-table',
+    'raw', 'markdown', 'list', 'raw-table', 'html'
+];
 export type DynamicLayoutType = typeof dynamicLayoutTypes[number];
 
 export interface CommonOptions {
@@ -60,6 +62,10 @@ export interface QuerySearchTableOptions extends CommonOptions {
 
 export type RawOptions = CommonOptions
 
+export type RawTableOptions = CommonOptions
+
+export type HtmlOptions = CommonOptions
+
 export interface MarkdownOptions extends CommonOptions {
     markdown: string|{
         en: string;
@@ -74,7 +80,7 @@ export interface ListOptions extends CommonOptions {
 export interface DynamicLayoutOptions extends
     ItemOptions, SimpleTableOptions, TableOptions,
     QuerySearchTableOptions, RawOptions, MarkdownOptions,
-    ListOptions {}
+    RawTableOptions, HtmlOptions, ListOptions {}
 
 
 export interface DynamicLayout {
