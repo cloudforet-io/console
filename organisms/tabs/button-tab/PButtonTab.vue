@@ -1,7 +1,9 @@
 <template>
     <div class="p-button-tab">
         <transition name="fade" mode="out-in">
-            <p-select-btn-group class="px-4" :buttons="buttons" :selected.sync="proxyActiveTab" />
+            <p-select-btn-group class="px-4" :buttons="buttons" :selected.sync="proxyActiveTab"
+                                @clickButton="onChange"
+            />
         </transition>
         <div class="tab-pane">
             <keep-alive>
@@ -11,11 +13,9 @@
                 />
             </keep-alive>
             <template v-for="tab in nonKeepTabs">
-                <div v-if="proxyActiveTab === tab.name" :key="tab.name">
-                    <slot :name="tab.name" :tabName="tab.name"
-                          :label="tab.label"
-                    />
-                </div>
+                <slot v-if="proxyActiveTab === tab.name" :name="tab.name" :tabName="tab.name"
+                      :label="tab.label"
+                />
             </template>
         </div>
     </div>
@@ -73,6 +73,9 @@ export default {
                 }
                 return { name: d.name, label: d.label };
             })),
+            onChange(...args) {
+                emit('change', ...args);
+            },
         };
     },
 };

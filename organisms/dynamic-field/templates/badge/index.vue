@@ -58,7 +58,8 @@ export default {
             badge.link = link;
             badge.target = '_blank';
         }
-        return h(PBadge, { props: badge }, props.data === undefined || props.data === null ? '' : props.data);
+        if (props.data === undefined || props.data === null) return undefined;
+        return h(PBadge, { props: badge }, props.data);
     },
 };
 </script>
