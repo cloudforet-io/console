@@ -25,8 +25,11 @@
             <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="i"
-                                     v-bind="item"
+                                     :type="item.type"
+                                     :options="item.options"
                                      :data="data.value"
+                                     :type-options="item.typeOptions"
+                                     :extra-data="item.extraData"
                                      :before-create="beforeCreateField"
                                      :handler="fieldHandler"
                     />
@@ -144,8 +147,7 @@ export default {
                 if (typeof props.data === 'object' && props.options.root_path) {
                     return get(props.data, props.options.root_path, []);
                 }
-                if (!Array.isArray(props.data)) return [];
-                return props.data;
+                return [];
             }),
         });
 

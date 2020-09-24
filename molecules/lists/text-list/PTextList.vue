@@ -1,12 +1,30 @@
+<template>
+    <div class="p-text-list">
+        <component :is="component" v-for="(item, i) in displayItems"
+                   :key="i" class="list-item"
+                   :href="getHref(item, i)"
+                   :target="target || undefined"
+        >
+            <slot name="default" v-bind="{...$props, index: i, item, value: item || ''}">
+                {{ item || '' }}
+            </slot>
+            <slot v-if="i < displayItems.length - 1" name="delimiter" v-bind="{...$props, index: i, item, value: item || ''}">
+                <span class="delimiter" v-html="delimiter" />
+            </slot>
+        </component>
+    </div>
+</template>
+
 <script lang="ts">
-import { getBindClass } from '@/components/util/functional-helpers';
 import { get } from 'lodash';
-import { CreateElement, VNodeChildren, VNodeData } from 'vue';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
+import { TextListItem, TextListProps } from '@/components/molecules/lists/text-list/type';
 import { isNotEmpty } from '@/components/util/helpers';
 
 export default {
     name: 'PTextList',
-    functional: true,
+    components: { PAnchor },
     props: {
         items: {
             type: [Array],
@@ -37,78 +55,31 @@ export default {
             default: undefined,
         },
     },
-    render(h: CreateElement, { props, data, scopedSlots }) {
-        const delimiter = props.delimiter;
-        const delimiterEl = h('span', {
-            domProps: { innerHTML: delimiter },
-            class: 'delimiter',
+    setup(props: TextListProps) {
+        const state = reactive({
+            component: computed(() => (props.link ? PAnchor : (props.tag || 'span'))),
+            displayItems: computed(() => props.items.reduce((res, item, i) => {
+                let data;
+                if (typeof item === 'object' && props.subKey) {
+                    data = get(item, props.subKey, '');
+                } else data = item;
+
+                if (isNotEmpty(data)) res.push(data);
+                return res;
+            }, [] as string[])),
         });
-        const children: VNodeChildren = props.items.reduce((res, d, i) => {
-            let tag = props.tag;
-            const childOptions: Pick<Required<VNodeData>, 'attrs'|'domProps'|'class'> = {
-                attrs: {} as any,
-                domProps: {
-                    innerHTML: d,
-                },
-                class: 'list-item',
-            };
 
-            // insert link
-            if (props.link) {
-                tag = 'a';
-                childOptions.attrs.href = props.link;
-                if (props.target) childOptions.attrs.target = props.target;
-            } else if (props.linkFormatter) {
-                tag = 'a';
-                childOptions.attrs.href = props.linkFormatter(d, i);
-                if (props.target) childOptions.attrs.target = props.target;
-            }
-
-            // set data by sub key
-            if (props.subKey) {
-                childOptions.domProps.innerHTML = get(d, props.subKey, '');
-            }
+        const getHref = (item: TextListItem, idx: number) => {
+            if (props.link) return props.link;
+            if (props.linkFormatter) return props.linkFormatter(item, idx);
+            return undefined;
+        };
 
 
-            // create child element
-            let childEl;
-            if (scopedSlots.default) {
-                childEl = scopedSlots.default({
-                    ...props,
-                    data: d,
-                    index: i,
-                    value: childOptions.domProps.innerHTML,
-                });
-            } else if (isNotEmpty(childOptions.domProps.innerHTML)) {
-                childEl = h(tag, childOptions);
-            }
-
-
-            // create delimiter element
-            if (childEl && res.length > 0 && i > 0) {
-                if (scopedSlots.delimiter) {
-                    res.push(scopedSlots.delimiter({
-                        ...props,
-                        data: d,
-                        index: i,
-                        value: childOptions.domProps.innerHTML,
-                    }));
-                } else res.push(delimiterEl);
-            }
-
-            if (childEl) res.push(childEl);
-
-
-            return res;
-        }, [] as VNodeChildren);
-
-        return h('span', {
-            ...data,
-            class: {
-                ...getBindClass(data.class),
-                'p-text-list': true,
-            },
-        }, children);
+        return {
+            ...toRefs(state),
+            getHref,
+        };
     },
 };
 </script>
@@ -116,7 +87,7 @@ export default {
 <style lang="postcss">
 .p-text-list {
     line-height: 1.8;
-    a.list-item:hover {
+    .list-item.p-anchor:hover {
         @apply underline text-secondary cursor-pointer;
     }
 }

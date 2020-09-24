@@ -151,8 +151,7 @@ export default {
                 if (typeof props.data === 'object' && props.options.root_path) {
                     return get(props.data, props.options.root_path, []);
                 }
-                if (!Array.isArray(props.data)) return [];
-                return props.data;
+                return [];
             }),
         });
 

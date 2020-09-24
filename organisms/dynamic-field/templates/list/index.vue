@@ -5,8 +5,7 @@
                  :link="options.link"
     >
         <template #default="{value, data}">
-            <p-dynamic-field v-if="isNotEmpty(value)"
-                             :type="options.item ? options.item.type : 'text'"
+            <p-dynamic-field :type="options.item ? options.item.type : 'text'"
                              :options="options.item ? options.item.options : undefined"
                              :data="value"
                              :type-options="typeOptions"
