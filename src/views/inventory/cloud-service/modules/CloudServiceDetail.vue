@@ -1,12 +1,10 @@
 <template>
     <div>
         <p-button-tab v-if="tabs.length > 0" :tabs="tabs" :active-tab="activeTab"
-                      keep-alive-all
-                      @update:activeTab="onChangeTab"
+                      @change="onChangeTab"
         >
-            <template v-for="(layout, idx) in layouts" :slot="layout.name">
-                <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
-                                  :fetch-options="fetchOptionsMap[layout.name]"
+            <template v-for="(layout, i) in layouts" :slot="layout.name">
+                <p-dynamic-layout :key="`${cloudServiceId}-${layout.name}-${i}`" v-bind="layout" :data="data"
                                   :type-options="{
                                       loading,
                                       totalCount,
@@ -91,7 +89,14 @@ export default {
 
             // schema
             layouts: [] as DynamicLayout[],
-            currentLayout: computed<DynamicLayout>(() => find(state.layouts, { name: state.activeTab }) || {}),
+            layoutMap: computed(() => {
+                const res = {};
+                state.layouts.forEach((d) => {
+                    res[d.name] = d;
+                });
+                return res;
+            }),
+            currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
             fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
 
@@ -117,7 +122,7 @@ export default {
 
                 layoutSchemaCacheMap[props.cloudServiceId] = layouts;
 
-                state.layouts = layouts || [];
+                state.layouts = layouts ? [...layouts] : [];
 
                 if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
             }
@@ -173,18 +178,22 @@ export default {
             }
         };
 
+        const setSearchOptions = () => {
+            if (state.currentLayout.options?.search) {
+                const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
+                    state.currentLayout.options.search,
+                    'inventory.Server',
+                );
+                state.keyItems = keyItems;
+                state.valueHandlerMap = valueHandlerMap;
+            }
+        };
+
         const exportApi = SpaceConnector.client.addOns.excel.export;
         const dynamicLayoutListeners: DynamicLayoutEventListeners = {
             async init(options) {
                 fetchOptionsMap[state.fetchOptionKey] = options;
-                if (state.currentLayout?.options?.search) {
-                    const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                        state.currentLayout.options.search,
-                        'inventory.CloudService',
-                    );
-                    state.keyItems = keyItems;
-                    state.valueHandlerMap = valueHandlerMap;
-                }
+                setSearchOptions();
                 await getData();
             },
             fetch(options) {
@@ -231,7 +240,6 @@ export default {
         watch(() => props.cloudServiceId, async (after, before) => {
             if (after && after !== before) {
                 await getSchema();
-                dynamicLayoutListeners.init(fetchOptionsMap[state.fetchOptionKey]);
             }
         }, { immediate: false });
 

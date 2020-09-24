@@ -1,11 +1,10 @@
 <template>
     <div>
         <p-button-tab v-if="tabs.length > 0" :tabs="tabs" :active-tab="activeTab"
-                      keep-alive-all
-                      @update:activeTab="onChangeTab"
+                      @change="onChangeTab"
         >
-            <template v-for="(layout, idx) in layouts" :slot="layout.name">
-                <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
+            <template v-for="(layout, i) in layouts" :slot="layout.name">
+                <p-dynamic-layout :key="`${serverId}-${layout.name}-${i}`" v-bind="layout" :data="data"
                                   :type-options="{
                                       loading,
                                       totalCount,
@@ -43,6 +42,8 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { TabItem } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import { find } from 'lodash';
 
 export default {
     name: 'PServerDetail',
@@ -71,6 +72,10 @@ export default {
             language: computed(() => store.state.user.language),
 
             // button tab
+            // tabs: computed<TabItem[]>(() => state.layouts.map(d => ({
+            //     label: d.name, name: `${props.serverId}/${d.name}`,
+            // }))),
+            // activeTab: { name: '', label: '' } as TabItem,
             tabs: computed<string[]>(() => state.layouts.map(d => d.name)),
             activeTab: '',
 
@@ -83,6 +88,7 @@ export default {
                 });
                 return res;
             }),
+            // currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab.label] || {}),
             currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
             fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
@@ -110,8 +116,11 @@ export default {
 
             layoutSchemaCacheMap[props.serverId] = layouts;
 
-            state.layouts = layouts || [];
+            state.layouts = layouts ? [...layouts] : [];
 
+            // const sameLabelTab = find(state.tabs, tab => tab.label === state.activeTab.label);
+            // if (sameLabelTab) state.activeTab = sameLabelTab;
+            // else state.activeTab = state.tabs[0];
             if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
         };
 
@@ -165,18 +174,22 @@ export default {
             }
         };
 
+        const setSearchOptions = () => {
+            if (state.currentLayout.options?.search) {
+                const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
+                    state.currentLayout.options.search,
+                    'inventory.Server',
+                );
+                state.keyItems = keyItems;
+                state.valueHandlerMap = valueHandlerMap;
+            }
+        };
+
         const exportApi = SpaceConnector.client.addOns.excel.export;
         const dynamicLayoutListeners: DynamicLayoutEventListeners = {
             async init(options) {
                 fetchOptionsMap[state.fetchOptionKey] = options;
-                if (state.currentLayout?.options?.search) {
-                    const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                        state.currentLayout.options.search,
-                        'inventory.Server',
-                    );
-                    state.keyItems = keyItems;
-                    state.valueHandlerMap = valueHandlerMap;
-                }
+                setSearchOptions();
                 await getData();
             },
             fetch(options) {
@@ -216,14 +229,14 @@ export default {
             return {};
         };
 
-        const onChangeTab = async (tab) => {
+        const onChangeTab = async (tab, idx) => {
+            // state.activeTab = state.tabs[idx] || { label: '', name: '' };
             state.activeTab = tab;
         };
 
         watch(() => props.serverId, async (after, before) => {
             if (after !== before) {
                 await getSchema();
-                dynamicLayoutListeners.init(fetchOptionsMap[state.fetchOptionKey]);
             }
         }, { immediate: false });
 
