@@ -1,6 +1,6 @@
 <template>
     <div v-if="!loading" class="kanban">
-        <div v-for="(num, priority) in maxPriorityObject.priority" :key="priority">
+        <div v-for="(num, priority) in maxPriority" :key="priority">
             <div class="resource-group-box">
                 <div class="resource-group-header">
                     <span id="header-number">{{ num }}</span>
@@ -8,7 +8,7 @@
                         높음
                     </div>
                     <span v-if="num === 1" id="header-priority">우선순</span>
-                    <div v-if="num === maxPriorityObject.priority" class="header-decorator">
+                    <div v-if="num ===5" class="header-decorator">
                         낮음
                     </div>
                 </div>
@@ -29,14 +29,11 @@
 </template>
 
 <script lang="ts">
-
-
-import { Timestamp } from '@/components/util/type';
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import { maxBy, valuesIn } from 'lodash';
+
 
     interface ResourceGroup {
         priority: number;
@@ -49,6 +46,7 @@ import { maxBy, valuesIn } from 'lodash';
         icon: string;
         priority: number;
         name: string;
+        // eslint-disable-next-line camelcase
         resource_group_id: string;
     }
 
@@ -70,9 +68,8 @@ export default {
             resourceGroup: [] as unknown as ResourceGroup,
             resourceGroupId: [] as string [],
             loading: false,
-            maxPriorityObject: [] as unknown as CardItem,
+            maxPriority: 0,
         });
-
 
         const getResourceGroupName = async () => {
             for (let i = 0; i < Object.keys(state.resourceGroup).length; i++) {
@@ -94,14 +91,17 @@ export default {
         };
 
         const getPriority = async () => {
-            const resourceGroupList = valuesIn(state.resourceGroup);
-            state.maxPriorityObject = maxBy(resourceGroupList, 'priority') as unknown as CardItem;
-            if (state.maxPriorityObject.priority < 5) state.maxPriorityObject.priority = 5;
-
+            const priorityList = [] as any;
+            for (let i = 0; i < Object.keys(state.resourceGroup).length; i++) {
+                priorityList[i] = state.resourceGroup[i].priority;
+            }
+            state.maxPriority = Math.max(...priorityList);
+            if (state.maxPriority < 5) state.maxPriority = 5;
         };
 
         const getResourceGroup = async (scheduleId) => {
             state.loading = true;
+            state.resourceGroupId = [];
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.get({
                     // eslint-disable-next-line camelcase
@@ -116,21 +116,21 @@ export default {
                     resource_group_id: d.resource_group_id,
                     priority: d.priority,
                 }));
+
                 await getPriority();
                 await getResourceGroupName();
+
                 state.loading = false;
             } catch (e) {
                 console.error(e);
             }
         };
 
-
         watch(() => props.scheduleId, async (after, before) => {
             if (after !== before) {
                 await getResourceGroup(props.scheduleId);
             }
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),
