@@ -1,12 +1,12 @@
 <template>
     <div ref="btnGroup" class="p-select-btn-group">
         <div class="button-lap">
-            <p-button v-for="button in formattedButtons"
+            <p-button v-for="(button, idx) in formattedButtons"
                       :key="button.name"
                       :class="{ active:selected === button.name }"
                       :outline="selected !== button.name"
                       :style-type="styleType"
-                      @click="onClickButton(button.name)"
+                      @click="onClickButton(button.name, idx)"
             >
                 {{ button.label }}
             </p-button>
@@ -54,11 +54,11 @@ export default {
             }),
         });
 
-        const onClickButton = (name) => {
+        const onClickButton = (name, idx) => {
             if (props.selected !== name) {
                 context.emit('update:selected', name);
-                context.emit('clickButton', name);
-                context.emit(`click-${name}`, name);
+                context.emit('clickButton', name, idx);
+                context.emit(`click-${name}`, name, idx);
             }
         };
         return {
