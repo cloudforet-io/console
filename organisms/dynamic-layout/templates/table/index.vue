@@ -24,7 +24,7 @@
         >
             <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
-                    <p-dynamic-field :key="i"
+                    <p-dynamic-field :key="`${item.type}-${i}`"
                                      :type="item.type"
                                      :options="item.options"
                                      :data="data.value"
