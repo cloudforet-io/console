@@ -300,7 +300,7 @@ export default {
         font-weight: bold;
     }
     .legends {
-        @apply w-full flex-grow justify-center items-center m-auto;
+        @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
     }
     .chart-container {
         @apply flex justify-center items-center mb-4;

@@ -6,7 +6,7 @@
         >
             <template #left-extra>
                 <p-i name="ic_tree_all-projects" width="1rem" height="1rem"
-                     class="mr-1"
+                     class="all-project-button" color="inherit"
                 />
             </template>
         </p-tree-node>
@@ -196,6 +196,9 @@ export default {
 <style lang="postcss" scoped>
     ::v-deep .basic {
         @apply mx-3 mt-1;
+    }
+    .all-project-button {
+        @apply mr-1;
     }
     .project-group-icon {
         @apply mx-1;
