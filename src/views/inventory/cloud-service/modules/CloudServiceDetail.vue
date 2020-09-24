@@ -119,13 +119,13 @@ export default {
                 } catch (e) {
                     console.error(e);
                 }
-
-                layoutSchemaCacheMap[props.cloudServiceId] = layouts;
-
-                state.layouts = layouts ? [...layouts] : [];
-
-                if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
             }
+
+            layoutSchemaCacheMap[props.cloudServiceId] = layouts;
+
+            state.layouts = layouts || [];
+
+            if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
         };
 
         const getQuery = (): undefined|any => {

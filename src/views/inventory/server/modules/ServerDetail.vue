@@ -71,11 +71,6 @@ export default {
             valueHandlerMap: {} as ValueHandlerMap,
             language: computed(() => store.state.user.language),
 
-            // button tab
-            // tabs: computed<TabItem[]>(() => state.layouts.map(d => ({
-            //     label: d.name, name: `${props.serverId}/${d.name}`,
-            // }))),
-            // activeTab: { name: '', label: '' } as TabItem,
             tabs: computed<string[]>(() => state.layouts.map(d => d.name)),
             activeTab: '',
 
@@ -88,7 +83,6 @@ export default {
                 });
                 return res;
             }),
-            // currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab.label] || {}),
             currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
             fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
@@ -116,11 +110,8 @@ export default {
 
             layoutSchemaCacheMap[props.serverId] = layouts;
 
-            state.layouts = layouts ? [...layouts] : [];
+            state.layouts = layouts || [];
 
-            // const sameLabelTab = find(state.tabs, tab => tab.label === state.activeTab.label);
-            // if (sameLabelTab) state.activeTab = sameLabelTab;
-            // else state.activeTab = state.tabs[0];
             if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
         };
 
@@ -230,7 +221,6 @@ export default {
         };
 
         const onChangeTab = async (tab, idx) => {
-            // state.activeTab = state.tabs[idx] || { label: '', name: '' };
             state.activeTab = tab;
         };
 
