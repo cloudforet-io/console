@@ -372,7 +372,7 @@ export default {
                 }
             } else if (!['Backspace', 'Enter'].includes(e.key)) {
                 const checker = operatorCheckerMap[state.selectedKey.dataType];
-                if (!checker(e.key)) e.preventDefault();
+                if (checker && !checker(e.key)) e.preventDefault();
             }
         };
 
