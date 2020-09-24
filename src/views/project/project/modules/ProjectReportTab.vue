@@ -39,7 +39,9 @@
 <script lang="ts">
 import moment from 'moment';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
 
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
@@ -47,7 +49,9 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
-import { getTimezone, MenuItem } from '@/lib/util';
+import {
+    getTimezone, MenuItem, showErrorMessage, showSuccessMessage,
+} from '@/lib/util';
 
 export default {
     name: 'ProjectReportTab',
@@ -59,6 +63,7 @@ export default {
         PFieldGroup,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             inputModel: {
                 companyName: undefined,
@@ -94,7 +99,8 @@ export default {
         });
 
         const onClickDownload = () => {
-
+            if (!state.isValid) return;
+            //
         };
 
         const init = () => {
