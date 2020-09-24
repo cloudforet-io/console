@@ -2,7 +2,7 @@
     <div ref="btnGroup" class="p-select-btn-group">
         <div class="button-lap">
             <p-button v-for="(button, idx) in formattedButtons"
-                      :key="button.name"
+                      :key="`${button.name}-${idx}`"
                       :class="{ active:selected === button.name }"
                       :outline="selected !== button.name"
                       :style-type="styleType"

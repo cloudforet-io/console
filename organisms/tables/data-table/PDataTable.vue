@@ -21,7 +21,7 @@
                             </th>
                             <th
                                 v-for="(field, index) in fieldsData"
-                                :key="index"
+                                :key="`${field.name}-${index}`"
                                 :style="{
                                     minWidth: field.width || undefined,
                                     width: field.width || undefined,
@@ -61,6 +61,9 @@
                                     </span>
                                 </slot>
                             </th>
+                        </tr>
+                        <tr v-else>
+                            <th :colspan="selectable ? fieldsData.length +1 : fieldsData.length" />
                         </tr>
                     </slot>
                 </thead>
@@ -119,7 +122,7 @@
                                           :index="index"
                                           :field="field"
                                     >
-                                        <td :key="i"
+                                        <td :key="`${field.name}-${i}`"
                                             v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
                                         >
                                             <slot
@@ -490,11 +493,12 @@ export default {
             if (value) {
                 showLoading.value = true;
             } else {
-                if (!showHeader.value) showHeader.value = true;
+                if (!showHeader.value) {
+                    showHeader.value = true;
+                }
                 showLoading.value = false;
             }
         }, { immediate: true });
-
 
         const getValueFunc = computed(() => {
             if (every(fieldsName.value, field => !field.includes('.'))) {
@@ -694,6 +698,7 @@ export default {
             @apply absolute flex w-full h-full justify-center items-center;
             top: 0;
             max-height: 16.875rem;
+            z-index: 1;
         }
 
         .fake-row {
