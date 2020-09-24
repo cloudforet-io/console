@@ -69,7 +69,7 @@
                 />
             </template>
             <template #report>
-                <project-report-tab />
+                <project-report-tab :project-id="projectId" :project-name="projectName" />
             </template>
         </p-tab>
         <p-button-modal
@@ -139,6 +139,7 @@ import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import { SearchTableFluentAPI } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
 import { showErrorMessage } from '@/lib/util';
+import { store } from '@/store';
 
 export default {
     name: 'ProjectDetail',
@@ -170,6 +171,7 @@ export default {
             projectGroupId: '',
             projectId,
             pageNavigation: [],
+            reportState: store.state.user.reportState,
         });
 
         const getProject = async (id) => {
@@ -193,15 +195,20 @@ export default {
             }
         }, { immediate: true });
 
+        const trItems = computed(() => {
+            const items: any[] = [
+                ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
+                ['member', 'COMMON.MEMBER'],
+                ['tag', 'TAB.TAG'],
+            ];
+            if (state.reportState) {
+                items.push(['report', 'TAB.REPORT', { beta: true }]);
+            }
+            return items;
+        });
         const singleItemTab = new TabBarState(
             {
-                tabs: computed(() => makeTrItems([
-                    ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
-                    ['member', 'COMMON.MEMBER'],
-                    ['tag', 'TAB.TAG'],
-                    ['report', 'TAB.REPORT', { beta: true }],
-                ],
-                context.parent)),
+                tabs: computed(() => makeTrItems(trItems.value, context.parent)),
             },
             {
                 activeTab: 'summary',
