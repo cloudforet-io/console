@@ -624,7 +624,8 @@ export default {
             position: sticky;
             z-index: 1;
             top: 0;
-            line-height: 2;
+            vertical-align: bottom;
+            line-height: 1.25rem;
             font-size: 0.875rem;
             text-align: left;
             letter-spacing: 0;
@@ -632,7 +633,8 @@ export default {
             border-top: 1px solid black;
             border-bottom: 1px solid black;
             .th-contents {
-                @apply flex justify-between pl-4 py-1;
+                @apply flex justify-between pl-4;
+                line-height: 2;
             }
             .sort-icon {
                 @apply text-gray-500 float-right my-px;

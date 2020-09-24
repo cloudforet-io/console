@@ -68,13 +68,27 @@ export default {
 <style lang="postcss" scoped>
 .p-nav-tabs {
     @apply flex flex-wrap pl-0 mb-0 ;
-    > li {
+    .nav-item {
         cursor: pointer;
     }
     .p-nav-link {
-        @apply flex no-underline text-sm min-h-9;
+        @apply text-gray-400;
+        display: flex;
+        min-height: 2.25rem;
+        font-weight: bold;
+        font-size: 0.875rem;
+        text-decoration: none;
         text-align: center;
         margin-bottom: -4px;
+        &:hover {
+            @apply text-gray-900;
+        }
+        &.active {
+            @apply text-primary;
+            &:not(.single-tab) {
+                @apply border-b-4 border-primary;
+            }
+        }
         .label {
             @apply px-4 w-full;
             display: flex;
@@ -88,19 +102,6 @@ export default {
                 padding-left: 0.25rem;
                 margin-top: -0.25rem;
             }
-        }
-        &:hover {
-            @apply text-secondary;
-        }
-        &.active {
-            @apply text-primary font-bold;
-            font-weight: bold;
-            &:not(.single-tab) {
-                @apply border-b-4 border-primary;
-            }
-        }
-        &:not(.active) {
-            @apply text-gray-500;
         }
     }
 }
