@@ -93,7 +93,7 @@ import {
 } from 'lodash';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
-import { SelectBtnType } from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.toolset';
+import { SelectBtnType } from '@/components/organisms/buttons/select-btn-group/type';
 import {
     MetricListResp, MetricResp, MONITORING_TYPE, STATISTICS_TYPE,
 } from '@/lib/fluent-api/monitoring/type';
