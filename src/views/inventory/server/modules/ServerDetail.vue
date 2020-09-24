@@ -6,7 +6,6 @@
         >
             <template v-for="(layout, idx) in layouts" :slot="layout.name">
                 <p-dynamic-layout :key="idx" v-bind="layout" :data="data"
-                                  :fetch-options="fetchOptionsMap[layout.name]"
                                   :type-options="{
                                       loading,
                                       totalCount,
@@ -17,7 +16,7 @@
                                       language,
                                   }"
                                   :field-handler="fieldHandler"
-                                  v-on="getLayoutListeners(layout)"
+                                  v-on="dynamicLayoutListeners"
                 />
             </template>
         </p-button-tab>
@@ -29,10 +28,6 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import {
-    get, set, find,
-} from 'lodash';
-import baseInfoSchema from '@/views/inventory/server/default-schema/base-info.json';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
@@ -42,7 +37,7 @@ import {
 import { getTimezone } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
 import { store } from '@/store';
@@ -65,9 +60,8 @@ export default {
         const layoutSchemaCacheMap = {};
         const fetchOptionsMap = {};
 
-
         const state = reactive({
-            data: {} as any,
+            data: undefined as any,
             loading: true,
             totalCount: 0,
             timezone: computed(() => getTimezone()),
@@ -82,7 +76,15 @@ export default {
 
             // schema
             layouts: [] as DynamicLayout[],
-            currentLayout: computed<undefined|DynamicLayout>(() => find(state.layouts, { name: state.activeTab })),
+            layoutMap: computed(() => {
+                const res = {};
+                state.layouts.forEach((d) => {
+                    res[d.name] = d;
+                });
+                return res;
+            }),
+            currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
+            fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
 
         const getSchema = async () => {
@@ -114,26 +116,20 @@ export default {
         };
 
         const getQuery = (): undefined|any => {
-            if (!state.currentLayout) return undefined;
-
             const query = new QueryHelper();
 
-            if (fetchOptionsMap[state.currentLayout.name]) {
-                const options = fetchOptionsMap[state.currentLayout.name];
-                if (options.sortBy) query.setSort(options.sortBy, options.sortDesc);
-                if (options.pageLimit) query.setPageLimit(options.pageLimit);
-                if (options.pageStart) query.setPageStart(options.pageStart);
-                if (options.searchText) query.setKeyword(options.searchText);
-                if (options.queryTags) {
+            if (fetchOptionsMap[state.fetchOptionKey]) {
+                const options = fetchOptionsMap[state.fetchOptionKey];
+                if (options.sortBy !== undefined) query.setSort(options.sortBy, options.sortDesc);
+                if (options.pageLimit !== undefined) query.setPageLimit(options.pageLimit);
+                if (options.pageStart !== undefined) query.setPageStart(options.pageStart);
+                if (options.searchText !== undefined) query.setKeyword(options.searchText);
+                if (options.queryTags !== undefined) {
                     const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(options.queryTags);
                     query.setFilter(...andFilters)
                         .setFilterOr(...orFilters)
                         .setKeyword(...keywords);
                 }
-            }
-
-            if (state.currentLayout.options?.fields) {
-                query.setOnly(...state.currentLayout.options.fields.map(d => d.name));
             }
 
             return query.data;
@@ -145,38 +141,23 @@ export default {
             const query = getQuery();
             if (query) params.query = query;
             // eslint-disable-next-line camelcase
-            const keyPath = state.currentLayout?.options?.root_path;
+            const keyPath = state.currentLayout.options?.root_path;
             // eslint-disable-next-line camelcase
             if (keyPath) params.key_path = keyPath;
             return params;
         };
 
-        const getApi = (): Promise<any> => {
-            // eslint-disable-next-line camelcase
-            if (state.currentLayout?.options?.root_path) {
-                return SpaceConnector.client.inventory.server.getData(getParams());
-            }
-            return SpaceConnector.client.inventory.server.get(getParams());
-        };
 
         const getData = async () => {
             state.loading = true;
-
             try {
-                const res = await getApi();
+                const api = SpaceConnector.client.inventory.server[getApiActionByLayoutType(state.currentLayout.type)];
+                const res = await api(getParams());
 
                 if (res.total_count !== undefined) state.totalCount = res.total_count;
-
-                const data = res.results || res;
-                // eslint-disable-next-line camelcase
-                const keyPath = state.currentLayout?.options?.root_path;
-                if (keyPath) {
-                    set(state.data, keyPath, data);
-                    if (Array.isArray(state.data)) state.data = [...state.data];
-                    else state.data = { ...state.data };
-                } else state.data = data;
+                state.data = res.results || res;
             } catch (e) {
-                state.data = {};
+                state.data = undefined;
                 state.totalCount = 0;
                 console.error(e);
             } finally {
@@ -185,20 +166,21 @@ export default {
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
-        const getLayoutListeners = (layout: DynamicLayout): Partial<DynamicLayoutEventListeners> => ({
-            init(options) {
-                if (fetchOptionsMap[layout.name]) fetchOptionsMap[layout.name] = options;
-                if (layout?.options?.search) {
+        const dynamicLayoutListeners: DynamicLayoutEventListeners = {
+            async init(options) {
+                fetchOptionsMap[state.fetchOptionKey] = options;
+                if (state.currentLayout?.options?.search) {
                     const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                        layout.options.search,
+                        state.currentLayout.options.search,
                         'inventory.Server',
                     );
                     state.keyItems = keyItems;
                     state.valueHandlerMap = valueHandlerMap;
                 }
+                await getData();
             },
             fetch(options) {
-                fetchOptionsMap[layout.name] = options;
+                fetchOptionsMap[state.fetchOptionKey] = options;
                 getData();
             },
             select(selectIndex) {
@@ -225,7 +207,7 @@ export default {
                     console.error(e);
                 }
             },
-        });
+        };
 
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
@@ -236,29 +218,25 @@ export default {
 
         const onChangeTab = async (tab) => {
             state.activeTab = tab;
-            await getData();
         };
 
         watch(() => props.serverId, async (after, before) => {
             if (after !== before) {
                 await getSchema();
-                await getData();
+                dynamicLayoutListeners.init(fetchOptionsMap[state.fetchOptionKey]);
             }
         }, { immediate: false });
 
         const init = async () => {
             await store.dispatch('resource/loadAll');
             await getSchema();
-            await getData();
         };
 
         init();
 
         return {
             ...toRefs(state),
-            baseInfoSchema,
-            getLayoutListeners,
-            fetchOptionsMap,
+            dynamicLayoutListeners,
             fieldHandler,
             onChangeTab,
         };

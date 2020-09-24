@@ -31,7 +31,7 @@ export default {
     props: {
         serviceAccounts: {
             type: Array,
-            default: '',
+            default: undefined,
         },
     },
     setup(props) {
@@ -63,6 +63,7 @@ export default {
             state.loading = true;
             try {
                 const res = await api({
+                    // eslint-disable-next-line camelcase
                     service_accounts: props.serviceAccounts,
                     query: getQuery(),
                 });

@@ -21,11 +21,6 @@
                           :auto="true" class="loading"
                 />
             </div>
-            <div v-else-if="!scheduleList.length" class="no-data">
-                <p-empty>
-                    No Schedule
-                </p-empty>
-            </div>
             <table v-else>
                 <thead>
                     <tr>
@@ -111,10 +106,10 @@ export type Mode = typeof modes[number];
 // eslint-disable-next-line camelcase
 const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
+
 export default {
     name: 'PowerSchedulerDetail',
     components: {
-        PEmpty,
         ScheduleDetail,
         PLottie,
         PIconButton,
@@ -207,7 +202,8 @@ export default {
         const onCancel = () => {
             if (state.mode === 'CREATE') {
                 state.scheduleList.pop();
-                state.selectedSchedule = state.scheduleList[0];
+                if (state.scheduleList.length === 0) vm.$router.push('/management/power-scheduler');
+                else state.selectedSchedule = state.scheduleList[0];
             }
             state.mode = 'READ';
         };

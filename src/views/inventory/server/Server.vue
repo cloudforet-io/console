@@ -389,20 +389,6 @@ export default {
                     schema: 'table',
                 });
 
-                // TODO: remove it after api bug fixed
-                res.options.fields.forEach((d, i) => {
-                    if (d.key === 'provider') {
-                        res.options.search.items[i] = {
-                            key: 'provider',
-                            name: 'Provider',
-                            reference: {
-                                resource_type: 'identity.Provider',
-                                reference_key: 'provider',
-                            },
-                        };
-                    }
-                });
-
                 // declare keyItems and valueHandlerMap with search schema
                 if (res?.options?.search) {
                     const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search, 'inventory.Server');
