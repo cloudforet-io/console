@@ -54,12 +54,6 @@ export default {
             default: 'bottom right',
         },
     },
-    data() {
-        return {
-        };
-    },
-    methods: {
-    },
 };
 </script>
 
@@ -69,48 +63,58 @@ export default {
         margin: 0 2rem;
     }
     .vue-notification-wrapper {
-        margin: 1rem 0rem;
+        margin: 1rem 0;
         overflow: visible;
     }
 </style>
 
 <style lang="postcss" scoped>
-    @define-mixin notice-color $theme, $color {
-        &.$(theme) {
-            border: 1px solid $color;
-            .title {
-                color: $color;
-            }
-        }
+@define-mixin notice-color, $color {
+    border-left: 0.25rem solid $color;
+}
+
+.p-notice-alert {
+    @apply bg-white shadow-2xl box-border border border-gray-200;
+    min-height: 10rem;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+    border-radius: 0.1875rem;
+    padding: 1.5rem;
+    .title {
+        @apply text-gray-900;
+        font-size: 1rem;
+        font-weight: bold;
+        line-height: 1.375;
+        text-transform: capitalize;
+    }
+    .contents {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    .timestamp {
+        @apply text-gray-400;
+        font-size: 0.75rem;
+        padding-top: 0.5rem;
+    }
+    &:hover {
+        opacity: .6;
+        cursor: pointer;
     }
 
-    .p-notice-alert {
-        @apply bg-white shadow-2xl rounded-sm box-border p-6 border border-gray-200;
-        min-height:160px;
-        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.08);
-        .title {
-            @apply text-gray-900;
-            font-size: 1.125rem;
-            line-height: 1.375;
-            font-weight: bold;
-            text-transform: capitalize;
-        }
-        .contents {
-            margin-top: 1rem;
-            font-size: .875rem;
-            text-transform: capitalize;
-        }
-        &:hover {
-            opacity: .6;
-            cursor: pointer;
-        }
-
-        @mixin notice-color alert, theme('colors.alert');
-        @mixin notice-color warning, theme('colors.coral.default');
-        @mixin notice-color success, theme('colors.safe');
+    &.info {
+        @mixin notice-color, theme('colors.primary');
     }
-    .item-type-icon {
-        float: left;
-        padding-right: 0.5rem;
+    &.alert {
+        @mixin notice-color, theme('colors.alert');
     }
+    &.warning {
+        @mixin notice-color, theme('colors.yellow.500');
+    }
+    &.success {
+        @mixin notice-color, theme('colors.safe');
+    }
+}
+.item-type-icon {
+    float: left;
+    padding-right: 0.5rem;
+}
 </style>

@@ -34,7 +34,7 @@ export const noticeAlert = () => ({
             default: select('Position', ['noticeBottomLeft', 'noticeBottomRight', 'noticeTopLeft', 'noticeTopRight'], 'noticeBottomLeft'),
         },
         alertType: {
-            default: select('Alert Type', ['alert', 'success', 'warning'], 'alert'),
+            default: select('Alert Type', ['alert', 'success', 'warning', 'info'], 'alert'),
         },
         contents: {
             default: text('text', 'This is Contents.'),
