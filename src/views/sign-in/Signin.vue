@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="p-4 flex items-center text-center h-screen w-full wrapper default-theme">
-            <div id="login-container" class="m-auto justify-center bg-white lg rounded-lg p-8 md:p-16 ">
+            <div id="login-container" class="m-auto justify-center bg-primary4 lg rounded-lg p-8 md:p-16 ">
                 <img id="logo" src="@/assets/images/brand/brand_logo.png">
                 <div class="header">
                     <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
@@ -128,6 +128,8 @@ export default {
         /* margin: 1rem; */
 
         /* padding: 1.5rem 1rem 0.62rem; */
+        width: 26.5rem;
+        height: calc(100vh - 30%);
     }
 
     #logo {

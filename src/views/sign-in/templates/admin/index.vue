@@ -50,11 +50,11 @@
                 </div>
             </form>
         </div>
-        <div class="flex flex-col mb-10 md:w-full">
+        <div class="flex flex-col mb-4 md:w-full">
             <p-button style-type="primary" type="submit" size="lg"
                       @click="login"
             >
-                Admin Sign in
+                <span id="button-msg">Admin Sign in</span>
             </p-button>
         </div>
     </div>
@@ -71,7 +71,7 @@ import {
     formValidation,
     requiredValidation,
 } from '@/lib/compostion-util';
-import {useStore} from "@/store/toolset";
+import { useStore } from '@/store/toolset';
 
 export default defineComponent({
     name: 'Admin',
@@ -82,7 +82,7 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as any;
-        const store = useStore()
+        const store = useStore();
         const state = reactive({
             userId: '',
             password: '',
@@ -177,6 +177,10 @@ export default defineComponent({
         @screen md {
             min-width: 18rem;
         }
+    }
+
+    #button-msg {
+        font-size: 0.875rem;
     }
 
 </style>
