@@ -2,7 +2,7 @@
     <p-pane-layout class="p-card-item" v-on="$listeners">
         <div>
             <slot name="side">
-                <p-lazy-img :img-url="icon"
+                <p-lazy-img :src="icon"
                             :error-icon="defaultIcon"
                             width="4.5rem" height="4.5rem"
                 />

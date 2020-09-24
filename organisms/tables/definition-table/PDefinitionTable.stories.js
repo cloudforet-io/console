@@ -123,7 +123,7 @@ export const slotCase = () => ({
             
             <p-definition-table v-bind="$props">
                 <template #data-name>
-                    <p-lazy-img :img-url="data.tags.icon" width="1rem" height="1rem" />
+                    <p-lazy-img :src="data.tags.icon" width="1rem" height="1rem" />
                     <span class="ml-2 leading-none">{{ data.name }}</span>
                 </template>
                 <template #data-test="{data}">
