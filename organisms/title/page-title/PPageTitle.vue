@@ -1,6 +1,6 @@
 <template>
     <div class="p-page-title">
-        <p-icon-button v-if="child" width="2rem" height="2rem"
+        <p-icon-button v-if="child" width="1.5rem" height="1.5rem"
                        name="ic_back"
                        @click="$emit('goBack',$event)"
                        class="mr-1"

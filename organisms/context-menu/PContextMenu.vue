@@ -205,6 +205,7 @@ export default {
     }
     &.disabled {
         color: $disabled-color !important;
+        cursor: not-allowed;
         &:hover, &:focus {
             background-color: transparent;
             color: $disabled-color !important;
