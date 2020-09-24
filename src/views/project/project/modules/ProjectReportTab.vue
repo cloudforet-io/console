@@ -38,6 +38,7 @@
 
 <script lang="ts">
 import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -50,8 +51,10 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
 import {
-    getTimezone, MenuItem, showErrorMessage, showSuccessMessage,
+    getTimezone, MenuItem, showErrorMessage, downloadURI
 } from '@/lib/util';
+import { SpaceConnector } from '@/lib/space-connector';
+import config from "@/lib/config";
 
 export default {
     name: 'ProjectReportTab',
@@ -62,8 +65,9 @@ export default {
         PTextInput,
         PFieldGroup,
     },
-    setup() {
+    setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const projectId = context.root.$route.params.id;
         const state = reactive({
             inputModel: {
                 companyName: undefined,
@@ -84,7 +88,7 @@ export default {
             }),
             periodItems: computed(() => {
                 const sixMonthAgo = moment().tz(getTimezone()).subtract(6, 'months');
-                const now = moment().tz(getTimezone()).subtract(1, 'month');
+                const now = moment().tz(getTimezone());
                 const periods = [] as MenuItem[];
                 while (now.isAfter(sixMonthAgo)) {
                     periods.push({
@@ -98,9 +102,25 @@ export default {
             }),
         });
 
-        const onClickDownload = () => {
+        const onClickDownload = async () => {
             if (!state.isValid) return;
-            //
+            /* eslint-disable camelcase */
+            try {
+                const response = await SpaceConnector.client.report.report.create({
+                    template_id: 'template_2',
+                    name: uuidv4(),
+                    template_options: {
+                        project_id: projectId,
+                        company_name: state.inputModel.companyName,
+                    },
+                });
+                const downloadResponse = await SpaceConnector.client.report.report.getDownloadUrl({
+                    report_id: response.report_id,
+                });
+                downloadURI(downloadResponse.download_url);
+            } catch (e) {
+                showErrorMessage('Fail to download report', e, vm);
+            }
         };
 
         const init = () => {
