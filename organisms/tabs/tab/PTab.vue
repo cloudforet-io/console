@@ -31,7 +31,7 @@ import {
     isOne, tabBarProps, TabBarProps, TabItem,
 } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 
-export default defineComponent({
+export default {
     name: 'PTab',
     components: { PTabBar },
     mixins: [tabBarProps],
@@ -47,7 +47,7 @@ export default defineComponent({
             keepTabs: computed(() => props.tabs.filter(tab => (typeof tab === 'string' ? false : tab.keepAlive))),
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">

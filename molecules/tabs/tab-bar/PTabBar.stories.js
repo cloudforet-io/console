@@ -18,7 +18,7 @@ const data = {
     tabs: [
         { name: 'detail', label: '디테일' },
         { name: 'info', label: '정보' },
-        { name: 'tags', label: '태그' },
+        { name: 'tags', label: '태그', beta: true },
     ],
     activeTab: 'detail',
 };
