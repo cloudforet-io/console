@@ -7,16 +7,24 @@
             <p-hr class="sidebar-divider" />
             <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
                 <p-hr v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
-                <img v-if="provider.icon"
-                     :src="provider.icon"
-                     :alt="provider.provider"
-                     class="provider-icon"
-                >
-                <p-i v-else name="ic_provider_other"
-                     class="provider-icon"
-                />
-                <span class="provider-name">{{ provider.name }}</span>
-                <p-radio v-model="selectedProvider" :value="provider.provider" class="provider-radio-btn" />
+                <p-radio v-model="selectedProvider" :value="provider.provider">
+                    <template #radio-left>
+                        <img v-if="provider.icon"
+                             :src="provider.icon"
+                             :alt="provider.provider"
+                             class="provider-icon"
+                        >
+                        <p-i v-else name="ic_provider_other"
+                             class="provider-icon"
+                        />
+                        <span class="provider-name">{{ provider.name }}</span>
+                    </template>
+                    <template #icon="{ iconName }">
+                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
+                             :name="iconName"
+                        />
+                    </template>
+                </p-radio>
             </div>
             <p class="sidebar-title">
                 Service Categories
@@ -529,11 +537,13 @@ export default {
         }
         .provider-name {
             display: inline-block;
+            cursor: pointer;
         }
         .provider-icon {
             @apply inline justify-start;
             width: 1.5rem;
             height: 1.5rem;
+            cursor: pointer;
             margin-right: 0.5625rem;
         }
         .provider-radio-btn {
