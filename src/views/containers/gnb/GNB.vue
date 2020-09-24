@@ -24,14 +24,15 @@
                      @click.stop="toggleMenu(dItem.key)"
                 >
                     <span v-if="dItem.menu.length > 0">
-                        {{ dItem.key }}
+                        <span>{{ dItem.key }}</span>
                         <p-i class="arrow-button"
-                             :name="openedMenu === dItem.key ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                             width="1rem" height="1rem"
+                             :name="openedMenu === dItem.key ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
+                             width="0.5rem" height="0.5rem"
+                             color="inherit transparent"
                         />
                     </span>
                     <router-link v-else :to="dItem.link">
-                        {{ dItem.key }}
+                        <span>{{ dItem.key }}</span>
                     </router-link>
                 </div>
                 <p-context-menu
@@ -45,7 +46,7 @@
                     <template #item--format="{item}">
                         <router-link :to="item.link" @click.native="hideMenu">
                             <div>
-                                {{ item.label }}
+                                <span>{{ item.label }}</span>
                                 <span v-if="item.isNew" class="new-text">new</span>
                             </div>
                         </router-link>
@@ -421,6 +422,9 @@ export default {
 
             .menu-icon {
                 border-radius: 0.625rem;
+            }
+            .arrow-button {
+                margin-left: 0.5rem;
             }
         }
         .p-context-menu {
