@@ -176,7 +176,7 @@ import PPagination from '@/components/organisms/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import {Tags, TimeStamp} from "@/lib/fluent-api";
+import { Tags, TimeStamp } from '@/lib/fluent-api';
 
 interface RegionModel extends Tags {
     region_id: string;
@@ -211,10 +211,15 @@ export default {
         const selectedProvider: Ref<string> = ref('all');
 
         const providerState = reactive({
-            items: computed(() => Object.keys(store.state.resource.provider.items).map(k => ({
-                provider: k,
-                ...store.state.resource.provider.items[k],
-            }))),
+            items: computed(() => [
+                {
+                    provider: 'all', icon: '', color: '', label: 'All',
+                },
+                ...Object.keys(store.state.resource.provider.items).map(k => ({
+                    provider: k,
+                    ...store.state.resource.provider.items[k],
+                })),
+            ]),
         });
         const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.label || selectedProvider.value);
         const filterState = reactive({
