@@ -4,6 +4,7 @@
                   :disabled="disabled"
                   class="menu-btn"
                   :class="{active: popup, hovered: mouseover}"
+                  :style-type="buttonStyleType"
                   @click="onClick"
                   @mouseover="onMouseOver"
                   @mouseout="onMouseOut"
@@ -56,7 +57,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-dropdown-btn {
     display: inline-flex;
     min-width: 6.5rem;
@@ -66,37 +67,44 @@ export default {
     &.block {
         display: flex;
     }
-}
 
-.menu-btn.p-button {
-    @apply border-gray-300 text-gray-900 px-2 justify-start text-left flex-grow font-normal;
-    width: auto;
-    min-width: unset;
-    margin-right: -1px;
-    border-radius: 2px 0 0 2px;
-    &:not(.active).hovered {
-        @apply border-gray-900;
-    }
-    &.active {
-        @apply border-secondary text-secondary;
-    }
-}
-
-.p-icon-button.p-button.outline {
-    @apply flex-shrink-0;
-    &:not(.active).hovered {
-        @apply border-gray-900;
-    }
-    &:not(.disabled):hover {
-        border-color: unset;
-        background-color: unset;
-        color: unset;
-    }
-    &.active {
-        @apply border-secondary text-secondary;
-        &:hover {
+    .menu-btn.p-button {
+        @apply border-gray-300 text-gray-900 px-2 justify-start text-left flex-grow font-normal;
+        width: auto;
+        min-width: unset;
+        margin-right: -1px;
+        border-radius: 2px 0 0 2px;
+        &:not(.active).hovered {
+            @apply border-gray-900;
+        }
+        &.active {
             @apply border-secondary text-secondary;
+        }
+        &.disabled {
+            @apply bg-gray-100 text-gray-300;
+        }
+    }
+
+    .p-icon-button.p-button.outline {
+        @apply flex-shrink-0 border-gray-300;
+        &:not(.active).hovered {
+            @apply border-gray-900;
+        }
+        &:not(.disabled):hover {
+            border-color: unset;
+            background-color: unset;
+            color: unset;
+        }
+        &.disabled {
+            @apply text-gray-300;
+        }
+        &.active {
+            @apply border-secondary text-secondary;
+            &:hover {
+                @apply border-secondary text-secondary;
+            }
         }
     }
 }
+
 </style>

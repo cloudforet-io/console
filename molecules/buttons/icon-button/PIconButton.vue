@@ -107,26 +107,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-    @define-mixin button-style
-    $solid-bg-color, $solid-text-color, $outline-border-color, $outline-text-color {
-        color: $outline-text-color;
-
-        &.solid {
-            border-radius: 2px;
-            background-color: $solid-bg-color;
-            border-color: transparent;
-            color: $solid-text-color;
-        }
-
-        &.outline {
-            border-radius: 2px;
-            background-color: transparent;
-            border-color: $outline-border-color;
-            color: $outline-text-color;
-        }
-    }
-
+<style lang="postcss">
 .p-icon-button {
     @apply rounded-sm p-0 inline-flex justify-center items-center;
     min-width: 2rem;
@@ -167,6 +148,24 @@ export default {
             }
         }
 
+        @define-mixin button-style
+        $solid-bg-color, $solid-text-color, $outline-border-color, $outline-text-color {
+            color: $outline-text-color;
+
+            &.solid {
+                border-radius: 2px;
+                background-color: $solid-bg-color;
+                border-color: transparent;
+                color: $solid-text-color;
+            }
+
+            &.outline {
+                border-radius: 2px;
+                background-color: transparent;
+                border-color: $outline-border-color;
+                color: $outline-text-color;
+            }
+        }
 
         /* default */
         @mixin button-style
