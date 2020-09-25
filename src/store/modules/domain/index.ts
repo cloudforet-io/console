@@ -7,6 +7,7 @@ const state: DomainState = {
     domainId: undefined,
     name: undefined,
     authType: undefined,
+    authOptions: undefined,
 };
 
 export default {

@@ -4,4 +4,5 @@ export interface DomainState {
     domainId?: string;
     name?: string;
     authType?: AuthType;
+    authOptions?: Record<string, any>;
 }
