@@ -15,6 +15,15 @@ const getAuthType = (authType): AuthType => {
     return 'ID_PW';
 };
 
+const getAuthOptions = (pluginInfo): any => {
+    const pluginOptions = pluginInfo?.options || {};
+    const pluginMetadata = pluginInfo?.metadata || {};
+    return {
+        ...pluginOptions,
+        ...pluginMetadata,
+    };
+};
+
 export const load = async ({ commit, state }, name: string): Promise<void|Error> => {
     const response = await SpaceConnector.client.identity.domain.list({ name });
 
@@ -24,6 +33,7 @@ export const load = async ({ commit, state }, name: string): Promise<void|Error>
             domainId: domainResponse.domain_id,
             name: domainResponse.name,
             authType: getAuthType(domainResponse.plugin_info?.options?.auth_type),
+            authOptions: getAuthOptions(domainResponse.plugin_info),
         });
     } else {
         throw new Error(`Can not found '${name}' domain.`);
