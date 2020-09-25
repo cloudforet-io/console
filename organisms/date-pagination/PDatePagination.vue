@@ -7,10 +7,12 @@
         </div>
         <p-icon-button class="text"
                        name="ic_arrow_left"
+                       color="inherit transparent"
                        @click="onClickPrev"
         />
         <p-icon-button class="text"
                        name="ic_arrow_right"
+                       color="inherit transparent"
                        :disabled="nextButtonDisabled"
                        @click="onClickNext"
         />

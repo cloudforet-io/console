@@ -2,6 +2,7 @@
     <nav class="pagination">
         <p-icon-button class="text"
                        name="ic_arrow_left"
+                       color="inherit transparent"
                        :disabled="thisPage === 1"
                        @click="prevPage(thisPage)"
         />
@@ -17,6 +18,7 @@
         </div>
         <p-icon-button class="text"
                        name="ic_arrow_right"
+                       color="inherit transparent"
                        :disabled="thisPage === pageList.totalPages"
                        @click="nextPage(thisPage)"
         />

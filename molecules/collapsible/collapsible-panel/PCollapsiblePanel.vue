@@ -6,13 +6,13 @@
         >
             {{ text }}
             <p-i class="hide-icon" name="ic_arrow_bottom" height="1rem"
-                 width="1rem" color="transparent inherit"
+                 width="1rem" color="inherit transparent"
             />
         </summary>
         <summary v-if="!isActive" @click="toggleSummary">
             {{ text }}
             <p-i class="show-icon" name="ic_arrow_bottom" height="1rem"
-                 width="1rem" color="transparent inherit"
+                 width="1rem" color="inherit transparent"
             />
         </summary>
         <p-pane-layout class="help-panel">

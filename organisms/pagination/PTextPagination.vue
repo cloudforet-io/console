@@ -2,6 +2,7 @@
     <nav class="text-pagination">
         <p-icon-button class="text"
                        name="ic_arrow_left"
+                       color="inherit transparent"
                        :disabled="thisPage === 1"
                        @click="update(thisPage-1)"
         />
@@ -13,6 +14,7 @@
 
         <p-icon-button class="text"
                        name="ic_arrow_right"
+                       color="inherit transparent"
                        :disabled="thisPage === allPage"
                        @click="update(thisPage+1)"
         />
