@@ -1,6 +1,6 @@
 <template>
     <div class="project-report-tab-container">
-        <p><b>SpaceONE</b> offers Monthly Report based on this project. We will provide more content soon.</p>
+        <p>SpaceONE offers Monthly Report based on this project. We will provide more content soon.</p>
         <div class="input-lap">
             <p-field-group label="Company Name on the Report Cover"
                            :invalid="!isValid"
@@ -18,13 +18,16 @@
             </p-field-group>
         </div>
         <div class="button-lap">
-            <p-button class="text-button"
-                      style-type="gray900" :outline="true" size="lg"
-                      :disabled="!isValid"
-                      @click="onClickDownload"
+            <p-icon-text-button
+                class="text-button"
+                name="ic_download"
+                style-type="gray900" :outline="true" size="lg"
+                icon-color="inherit inherit"
+                :disabled="!isValid"
+                @click="onClickDownload"
             >
                 Download file
-            </p-button>
+            </p-icon-text-button>
             <p class="help-text">
                 *We provide file formats (including PDF, PPTX, CSV)
             </p>
@@ -86,6 +89,7 @@
 import { range } from 'lodash';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
+import axios, { CancelTokenSource } from 'axios';
 
 import {
     computed, reactive, toRefs,
@@ -93,6 +97,9 @@ import {
 
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PModal from '@/components/molecules/modals/PModal.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
@@ -101,14 +108,12 @@ import {
     getTimezone, MenuItem, showErrorMessage, downloadURI,
 } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import PModal from '@/components/molecules/modals/PModal.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import axios, { CancelTokenSource } from 'axios';
 import config from '@/lib/config';
 
 export default {
     name: 'ProjectReportTab',
     components: {
+        PIconTextButton,
         PLottie,
         PModal,
         PHr,
@@ -231,6 +236,11 @@ export default {
         padding-bottom: 1.75rem;
         .text-button {
             width: 12.5rem;
+            &.outline {
+                &:not(.disabled):hover {
+                    @apply border-secondary bg-blue-200 text-secondary;
+                }
+            }
         }
         .help-text {
             @apply text-gray-400;

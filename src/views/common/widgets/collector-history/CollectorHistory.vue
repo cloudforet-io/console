@@ -278,7 +278,7 @@ export default {
         margin-left: 1.5rem;
         font-size: 0.875rem;
         &:hover {
-            @apply text-blue-600;
+            @apply text-secondary underline;
         }
     }
 
