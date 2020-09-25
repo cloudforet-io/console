@@ -769,7 +769,6 @@ export default {
     .parents-info {
         @apply flex items-center text-gray-900;
         height: 1rem;
-        margin-bottom: 0.5rem;
         .group-name {
             @apply inline-flex items-center text-xs;
         }
@@ -825,7 +824,7 @@ export default {
             @apply mb-4;
             .project-group-name {
                 @apply text-gray-500 text-xs;
-                margin-bottom: 0.125rem;
+                margin-bottom: 0.25rem;
             }
             #project-name {
                 @apply text-lg font-bold truncate pb-6 overflow-hidden;

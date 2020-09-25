@@ -153,10 +153,10 @@ export default defineComponent({
     .admin-btn {
         @apply border border-gray-300;
         &:hover {
-            @apply bg-blue-100 text-blue-500;
+            @apply bg-blue-100 text-blue-500 border-blue-500;
         }
         &:active {
-            @apply bg-blue-200 text-blue-500;
+            @apply bg-blue-200 text-blue-500 border-blue-500;
         }
     }
     .user-info {
