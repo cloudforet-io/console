@@ -236,6 +236,11 @@ export default {
         padding-bottom: 1.75rem;
         .text-button {
             width: 12.5rem;
+            &.outline {
+                &:not(.disabled):hover {
+                    @apply border-secondary bg-blue-200 text-secondary;
+                }
+            }
         }
         .help-text {
             @apply text-gray-400;
