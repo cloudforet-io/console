@@ -27,11 +27,11 @@
                            :invalid-text="invalidText"
             >
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
-                     class="schedule-lap"
+                     class="schedule-lap block lg:flex h-48 lg:h-40"
                      :class="scheduleType === type ? 'selected' : ''"
                      @click="scheduleType = type"
                 >
-                    <div class="w-1/3">
+                    <div class="w-full lg:w-1/3 pb-4 lg:pb-0">
                         <p-radio
                             v-model="scheduleType"
                             :value="type"
@@ -46,7 +46,7 @@
                             {{ scheduleTypes[type] }}
                         </span>
                     </div>
-                    <div class="w-2/3">
+                    <div class="w-full lg:w-2/3">
                         <div v-if="type === 'hourly'" class="hourly-schedule-lap">
                             <span v-for="(hour) in hoursMatrix" :key="hour"
                                   class="time-block"
@@ -65,7 +65,8 @@
                         </div>
                         <div v-else class="interval-lap">
                             <p-field-group label="Every" class="w-1/2">
-                                <p-text-input v-model="intervalTime" type="number" />
+                                <template #label />
+                                <p-text-input v-model="intervalTime" class="w-3/4" type="number" />
                             </p-field-group>
                             <div class="w-1/2">
                                 <p-select-dropdown v-model="intervalTimeType" :items="intervalTimeTypes" auto-height />
@@ -349,8 +350,6 @@ export default {
 
     .schedule-lap {
         @apply border border-gray-200;
-        display: flex;
-        height: 10rem;
         cursor: pointer;
         padding: 1.75rem;
         &:first-child {
@@ -411,6 +410,9 @@ export default {
         .interval-lap {
             display: inline-flex;
             width: 100%;
+            .form-label {
+                font-weight: normal;
+            }
             .p-select-dropdown {
                 @apply bg-white;
             }
