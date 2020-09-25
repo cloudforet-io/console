@@ -26,7 +26,8 @@
             </template>
             <template #col-collector_info-format="{value}">
                 <p-lottie class="status-icon"
-                          :size="2" :auto="true" name="lottie_working"
+                          width="1.5rem" heigh="1.5rem"
+                          :auto="true" name="lottie_working"
                 />
                 <p-lazy-img
                     :src="providers.find(d => d.provider === value.provider).tags.icon"
