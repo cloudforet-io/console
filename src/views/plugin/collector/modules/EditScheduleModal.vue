@@ -55,8 +55,9 @@
                             >
                                 {{ hour }}
                             </span>
-                            <p-button :outline="!isAllHours"
-                                      class="all-button"
+                            <p-button class="all-button"
+                                      :class="[isAllHours ? 'all-selected' : '']"
+                                      style-type="secondary"
                                       @click="onClickAllHours"
                             >
                                 {{ $t('COMMON.ALL') }}
@@ -159,13 +160,15 @@ export default {
             isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
             showValidation: false,
             invalidText: computed(() => {
-                if (state.scheduleType === 'hourly' && state.selectedUTCHoursList.length) {
+                if (state.scheduleType === 'hourly' && state.selectedUTCHoursList.length === 0) {
                     return 'Please select time';
                 } if (state.scheduleType === 'interval') {
-                    if (state.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
-                        return 'should be >= 30 seconds';
+                    if (!state.intervalTimeInSeconds) {
+                        return 'Please enter interval time';
+                    } if (state.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
+                        return 'Should be at least 30 seconds';
                     } if (state.intervalTimeInSeconds > INTERVAL_MAX_SECONDS) {
-                        return 'should be <= 1 hour';
+                        return 'Should be less than 1 hour';
                     }
                 }
                 return '';
@@ -186,7 +189,7 @@ export default {
             intervalTimeTypes: [
                 { label: 'seconds', name: 'seconds', type: 'item' },
                 { label: 'minutes', name: 'minutes', type: 'item' },
-                { label: 'hours', name: 'hours', type: 'item' },
+                { label: 'hour', name: 'hours', type: 'item' },
             ],
             intervalTimeType: 'minutes',
         });
@@ -358,6 +361,10 @@ export default {
         }
         &.selected {
             @apply border-blue-500;
+            &:hover {
+                @apply bg-white;
+                cursor: default;
+            }
         }
 
         .schedule-type-text {
@@ -381,7 +388,7 @@ export default {
                 font-size: 0.875rem;
                 cursor: pointer;
                 &:hover {
-                    @apply bg-green-600 text-white;
+                    @apply bg-secondary2 border-secondary text-secondary;
                 }
                 &.active {
                     @apply bg-safe text-white;
@@ -393,7 +400,11 @@ export default {
                 margin-bottom: 0.5rem;
                 vertical-align: unset;
                 &:hover {
-                    @apply bg-black text-white;
+                    @apply bg-secondary2 border-secondary text-secondary;
+                }
+                &.all-selected {
+                    @apply bg-gray-900 text-white;
+                    border: none;
                 }
             }
         }
