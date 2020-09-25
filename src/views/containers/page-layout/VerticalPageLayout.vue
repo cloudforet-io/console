@@ -52,7 +52,7 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: stretch;
-        overflow-y: auto;
+        overflow-y: scroll;
 
         .page-contents {
             width: 100%;
