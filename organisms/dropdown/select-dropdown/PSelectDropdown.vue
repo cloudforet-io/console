@@ -74,8 +74,8 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-.p-select-dropdown::v-deep {
+<style lang="postcss">
+.p-select-dropdown {
     div {
         width: 100%;
         .dropdown-btn {
