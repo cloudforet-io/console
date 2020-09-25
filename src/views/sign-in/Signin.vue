@@ -129,7 +129,7 @@ export default {
 
         /* padding: 1.5rem 1rem 0.62rem; */
         width: 26.5rem;
-        height: calc(100vh - 30%);
+        /*height: calc(100vh - 30%);*/
     }
 
     #logo {
