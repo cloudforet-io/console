@@ -104,6 +104,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import PModal from '@/components/molecules/modals/PModal.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import axios, { CancelTokenSource } from 'axios';
+import config from '@/lib/config';
 
 export default {
     name: 'ProjectReportTab',
@@ -164,7 +165,7 @@ export default {
             try {
                 const response = await SpaceConnector.client.report.report.create(
                     {
-                        template_id: 'template_2',
+                        template_id: config.get('REPORT.DEFAULT_TEMPLATE_ID'),
                         name: uuidv4(),
                         template_options: {
                             project_id: props.projectId,

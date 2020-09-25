@@ -66,7 +66,7 @@ const getUserInfoFromToken = (token: string): [string, string] => {
 };
 
 export const signIn = async ({ commit, state }, signInRequest: SignInRequest): Promise<void> => {
-    const response = await SpaceConnector.client.identity.token.issue(signInRequest);
+    const response = await SpaceConnector.client.identity.token.issue(signInRequest, { skipAuthRefresh: true });
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 
     const [userType, userId] = getUserInfoFromToken(response.access_token);
