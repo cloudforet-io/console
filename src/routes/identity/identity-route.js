@@ -1,4 +1,4 @@
-const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount.vue');
+const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount_new.vue');
 
 const Identity = () => import('@/views/identity/Identity');
 
