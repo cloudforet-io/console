@@ -18,7 +18,7 @@
                            :value="projectId"
             />
         </p>
-        <p-tab :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab"
+        <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
                class="tab-content"
         >
             <template #summary>
@@ -40,7 +40,7 @@
                                  @changeSort="memberApiHandler.getData"
                 >
                     <template #toolbox-top>
-                        <p-page-title :title="'Member'" use-total-count :total-count="memberApiHandler.totalCount.value" />
+                        <p-panel-top :title="'Member'" use-total-count :total-count="memberApiHandler.totalCount" />
                     </template>
                     <template #toolbox-left>
                         <div class="toolbox-left">
@@ -140,10 +140,12 @@ import { SearchTableFluentAPI } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
 import { showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 
 export default {
     name: 'ProjectDetail',
     components: {
+        PPanelTop,
         ProjectReportTab,
         PSearch,
         PToolboxTable,
@@ -195,25 +197,22 @@ export default {
             }
         }, { immediate: true });
 
-        const trItems = computed(() => {
-            const items: any[] = [
-                ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
-                ['member', 'COMMON.MEMBER'],
-                ['tag', 'TAB.TAG'],
-            ];
-            if (state.reportState) {
-                items.push(['report', 'TAB.REPORT', { beta: true }]);
-            }
-            return items;
+
+        /** Tabs */
+        const singleItemTabState = reactive({
+            tabs: computed(() => {
+                const items: any[] = [
+                    ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
+                    ['member', 'COMMON.MEMBER'],
+                    ['tag', 'TAB.TAG'],
+                ];
+                if (state.reportState) {
+                    items.push(['report', 'TAB.REPORT', { beta: true }]);
+                }
+                return makeTrItems(items, context.parent);
+            }),
+            activeTab: 'summary',
         });
-        const singleItemTab = new TabBarState(
-            {
-                tabs: computed(() => makeTrItems(trItems.value, context.parent)),
-            },
-            {
-                activeTab: 'summary',
-            },
-        );
 
         // List api Handler for query search table
         const MemberListAction = fluentApi.identity().project().memberList().setId(projectId.value);
@@ -368,7 +367,7 @@ export default {
             }
         };
 
-        watch(() => singleItemTab.syncState.activeTab, (tab) => {
+        watch(() => singleItemTabState.activeTab, (tab) => {
             if (tab === 'member') memberApiHandler.getData();
         }, { immediate: true });
 
@@ -411,7 +410,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            singleItemTab,
+            singleItemTabState,
             memberApiHandler,
             item,
             tagsApi,
@@ -470,13 +469,20 @@ export default {
 
     .member-tab {
         @apply border border-gray-200;
+        >>> &.p-toolbox-table .toolbox {
+            @apply pt-0;
+        }
+        .p-panel-top {
+            @apply ml-0;
+        }
     }
 
     .toolbox-left {
         @apply w-full flex pr-4 ;
         .p-search {
             @apply w-full;
-            /*max-width: 23.125rem;*/
+
+            /* max-width: 23.125rem; */
         }
     }
 </style>
