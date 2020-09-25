@@ -52,7 +52,7 @@
                 <router-link to="/inventory/cloud-service" class="more">
                     see more
                     <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                         color="transparent currentColor"
+                         color="inherit transparent"
                     />
                 </router-link>
             </div>
