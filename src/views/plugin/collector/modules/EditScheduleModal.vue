@@ -41,10 +41,13 @@
                                      :name="scheduleType === type ? 'ic_checkbox_circle--checked' : 'ic_radio'"
                                 />
                             </template>
-                        </p-radio> <span class="schedule-type-text">{{ scheduleTypes[type] }}</span>
+                        </p-radio>
+                        <span class="schedule-type-text">
+                            {{ scheduleTypes[type] }}
+                        </span>
                     </div>
                     <div class="w-2/3">
-                        <div v-if="type === 'custom'" class="custom-schedule-lap">
+                        <div v-if="type === 'hourly'" class="hourly-schedule-lap">
                             <span v-for="(hour) in hoursMatrix" :key="hour"
                                   class="time-block"
                                   :class="{active: selectedHours[hour] }"
@@ -81,7 +84,7 @@ import {
 import moment from 'moment';
 
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
@@ -143,6 +146,7 @@ export default {
         },
     },
     setup(props, { emit, root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             schedule: null,
@@ -155,7 +159,7 @@ export default {
             isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
             showValidation: false,
             invalidText: computed(() => {
-                if (state.scheduleType === 'custom' && state.selectedUTCHoursList.length) {
+                if (state.scheduleType === 'hourly' && state.selectedUTCHoursList.length) {
                     return 'Please select time';
                 } if (state.scheduleType === 'interval') {
                     if (state.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
@@ -167,12 +171,12 @@ export default {
                 return '';
             }),
             isValid: computed(() => {
-                if (state.scheduleType === 'custom') return state.selectedUTCHoursList.length !== 0;
+                if (state.scheduleType === 'hourly') return state.selectedUTCHoursList.length !== 0;
                 return state.intervalTimeInSeconds >= INTERVAL_MIN_SECONDS && state.intervalTimeInSeconds <= INTERVAL_MAX_SECONDS;
             }),
             //
-            scheduleTypes: { custom: 'Custom Schedule', interval: 'Interval' },
-            scheduleType: 'custom',
+            scheduleTypes: { hourly: vm.$t('COMMON.HOURLY'), interval: vm.$t('COMMON.INTERVAL') },
+            scheduleType: 'hourly',
             intervalTime: undefined as undefined | number,
             intervalTimeInSeconds: computed(() => {
                 if (state.intervalTimeType === 'minutes') return state.intervalTime * 60;
@@ -223,7 +227,7 @@ export default {
                 state.schedule = res;
                 state.name = res.name;
                 if (res.schedule.hours.length > 0) {
-                    state.scheduleType = 'custom';
+                    state.scheduleType = 'hourly';
                     initSelectedHours();
                 } else {
                     state.scheduleType = 'interval';
@@ -253,7 +257,7 @@ export default {
                     name: state.name,
                     schedule: {},
                 };
-                if (state.scheduleType === 'custom') params.schedule = { hours: state.selectedUTCHoursList };
+                if (state.scheduleType === 'hourly') params.schedule = { hours: state.selectedUTCHoursList };
                 else params.schedule = { interval: state.intervalTimeInSeconds };
 
                 await SpaceConnector.client.inventory.collector.schedule.add(params);
@@ -275,7 +279,7 @@ export default {
                     name: state.name,
                     schedule: {},
                 };
-                if (state.scheduleType === 'custom') params.schedule = { hours: state.selectedUTCHoursList };
+                if (state.scheduleType === 'hourly') params.schedule = { hours: state.selectedUTCHoursList };
                 else params.schedule = { interval: state.intervalTimeInSeconds };
 
                 await SpaceConnector.client.inventory.collector.schedule.update(params);
@@ -343,6 +347,7 @@ export default {
     .schedule-lap {
         @apply border border-gray-200;
         display: flex;
+        height: 10rem;
         cursor: pointer;
         padding: 1.75rem;
         &:first-child {
@@ -360,7 +365,7 @@ export default {
             font-size: 0.75rem;
             padding-left: 0.5rem;
         }
-        .custom-schedule-lap {
+        .hourly-schedule-lap {
             display: grid;
             gap: 0.5rem;
             grid-template-columns: repeat(12, 2rem);

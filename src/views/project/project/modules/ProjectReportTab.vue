@@ -1,6 +1,6 @@
 <template>
     <div class="project-report-tab-container">
-        <p><b>SpaceONE</b> offers Monthly Report based on this project. We will provide more options soon.</p>
+        <p><b>SpaceONE</b> offers Monthly Report based on this project. We will provide more content soon.</p>
         <div class="input-lap">
             <p-field-group label="Company Name on the Report Cover"
                            :invalid="!isValid"
