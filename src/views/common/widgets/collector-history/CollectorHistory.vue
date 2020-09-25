@@ -5,7 +5,7 @@
             <router-link to="/management/collector-history" class="see-more-text">
                 <span>see more</span>
                 <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                     color="transparent currentColor"
+                     color="inherit transparent"
                 />
             </router-link>
         </template>
