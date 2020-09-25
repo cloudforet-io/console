@@ -8,5 +8,8 @@
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": null,
   "DOMAIN_NAME_REF": "hostname",
-  "NO_SERVER_MODE": false
+  "NO_SERVER_MODE": false,
+  "REPORT": {
+    "DEFAULT_TEMPLATE_ID": "template_2"
+  }
 }
