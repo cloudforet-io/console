@@ -46,7 +46,7 @@
                             {{ scheduleTypes[type] }}
                         </span>
                     </div>
-                    <div class="w-full lg:w-2/3">
+                    <div class="w-full lg:w-2/3 m-auto">
                         <div v-if="type === 'hourly'" class="hourly-schedule-lap">
                             <span v-for="(hour) in hoursMatrix" :key="hour"
                                   class="time-block"
@@ -65,8 +65,7 @@
                         </div>
                         <div v-else class="interval-lap">
                             <p-field-group label="Every" class="w-1/2">
-                                <template #label />
-                                <p-text-input v-model="intervalTime" class="w-3/4" type="number" />
+                                <p-text-input v-model="intervalTime" type="number" />
                             </p-field-group>
                             <div class="w-1/2">
                                 <p-select-dropdown v-model="intervalTimeType" :items="intervalTimeTypes" auto-height />
@@ -351,7 +350,7 @@ export default {
     .schedule-lap {
         @apply border border-gray-200;
         cursor: pointer;
-        padding: 1.75rem;
+        padding: 1.5rem;
         &:first-child {
             border-bottom: none;
         }
@@ -413,8 +412,12 @@ export default {
             .form-label {
                 font-weight: normal;
             }
+            .p-text-input {
+                @apply w-4/5;
+            }
             .p-select-dropdown {
                 @apply bg-white;
+                margin-left: 1rem;
             }
         }
     }
