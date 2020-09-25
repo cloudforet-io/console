@@ -12,6 +12,7 @@
         </p-button>
         <slot name="icon">
             <p-icon-button :name="buttonIcon || (popup ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                           color="inherit transparent"
                            :class="{active: popup, hovered: mouseover}"
                            :style-type="buttonStyleType"
                            :disabled="disabled"
