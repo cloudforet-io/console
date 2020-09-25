@@ -1,7 +1,28 @@
 /* eslint-disable camelcase */
 import { AxiosInstance, AxiosResponse } from 'axios';
-import { OPERATOR_MAP } from '@/lib/fluent-api/toolset';
 
+const OPERATOR_MAP = Object.freeze({
+    '': 'contain_in', // merge operator
+    '!': 'not_contain', // merge operator
+    '>': 'gt',
+    '>=': 'gte',
+    '<': 'lt',
+    '<=': 'lte',
+    '=': 'in', // merge operator
+    '!=': 'not_in', // merge operator
+    $: 'regex',
+    td_lt: 'timediff_lt',
+    td_gt: 'timediff_gt',
+    td_lte: 'timediff_lte',
+    td_gte: 'timediff_gte',
+    in: 'in', // merge operator
+    not_in: 'not_in', // merge operator
+    contain_in: 'contain_in', // merge operator
+    not_contain: 'not_contain', // merge operator
+    eq: 'in', // merge operator
+    not_eq: 'not_in', // merge operator
+    sum: 'sum',
+});
 export type ApiMethods = 'post' | 'get' | 'delete' | 'put';
 
 export interface LongFilterType {

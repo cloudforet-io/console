@@ -118,6 +118,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { useStore } from '@/store/toolset';
+import { store } from '@/store';
 
 export default {
     name: 'ProfileModalTemplate',
@@ -174,7 +175,7 @@ export default {
             showValidation: false,
             ...formValidation(userState, updateUserValidations),
             isLocalType: computed(() => domain.state.isLocalType),
-            isDomainOwner: computed(() => user.state.isDomainOwner),
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
 
         const params: any = {};
@@ -210,6 +211,8 @@ export default {
         };
 
         const syncStore = () => {
+            // store.dispatch('user/setLanguage', {language: state.userState.language || 'en'})
+            // store.dispatch('user/setTimezone', {timezone: state.userState.timezone || 'UTC'})
             user.state.language = state.userState.language || 'en';
             user.state.timezone = state.userState.timezone || 'UTC';
             localStorage.setItem('user/language', user.state.language as string);

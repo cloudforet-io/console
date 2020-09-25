@@ -8,6 +8,7 @@ import Notifications from 'vue-notification';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '@/store';
+import setStore from '@/store/toolset';
 import directive from '@/directives';
 import velocity from 'velocity-animate';
 import { withKnobs } from '@storybook/addon-knobs';
@@ -26,6 +27,7 @@ import VTooltip from 'v-tooltip';
 import "@/styles/style.scss";
 import "@/styles/style.pcss";
 
+
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
@@ -38,6 +40,7 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
 Vue.use(Codemirror);
 
+Vue.prototype.$ls = setStore();
 Vue.prototype.$velocity = velocity;
 webFontLoader.load({
     google: {

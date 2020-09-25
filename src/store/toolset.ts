@@ -4,10 +4,10 @@ import {
 import Lockr from 'lockr';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
-import { fluentApi } from '@/lib/fluent-api';
 import config from '@/lib/config';
 import router from '@/routes';
 import Vue from 'vue';
+import { SpaceConnector } from '@/lib/space-connector';
 
 let ls: any;
 
@@ -163,7 +163,7 @@ class DomainStore extends Store<DomainState> {
             }
         } else {
             // console.debug('no domain');
-            await router.push({ name: 'error' })
+            await router.push({ name: 'error' });
         }
     }
 }
@@ -191,38 +191,6 @@ class ProjectStore extends Store<ProjectState> {
             result = this.state.ttl < DateTime.local();
         }
         return result;
-    }
-
-    getProject= async (force = false) => {
-        const projectAPI = fluentApi.identity().project();
-        if (this.isExpiration() || force) {
-            const result = {};
-            try {
-                const res = await projectAPI.list().setOnly('project_id', 'name', 'project_group').execute();
-                res.data.results.forEach((project) => {
-                    result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
-                });
-                this.state.ttl = DateTime.local().plus({ hours: 1 });
-            } catch (e) {
-                console.error(e);
-            }
-            this.state.projects = result;
-        }
-    }
-
-    Projects= async () => {
-        const projectAPI = fluentApi.identity().project();
-        const result = {};
-        try {
-            const res = await projectAPI.list().setOnly('project_id', 'name', 'project_group').execute();
-            res.data.results.forEach((project) => {
-                result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
-            });
-            this.state.ttl = DateTime.local().plus({ hours: 1 });
-        } catch (e) {
-            console.error(e);
-        }
-        this.state.projects = result;
     }
 }
 export interface ProviderInfo {
@@ -258,15 +226,12 @@ class ProviderStore extends Store<ProviderState> {
     }
 
     getProvider = async (force = false) => {
-        // console.debug('isEXP?', this.isExpiration());
-        const providerAPI = fluentApi.identity().provider();
         if (this.isExpiration() || force) {
             const result = {};
             try {
-                // console.debug('request provider');
-                const res = await providerAPI.list().execute();
+                const res = await SpaceConnector.client.identity.provider.list();
 
-                res.data.results.forEach((provider) => {
+                res.results.forEach((provider) => {
                     result[provider.provider] = {
                         name: provider.name,
                         icon: provider.tags?.icon,
@@ -298,32 +263,6 @@ class ServiceAccountStore extends Store<ServiceAccountState> {
             ...initState(this.prefix, this.names, this.data),
         });
     }
-
-    isExpiration = (): boolean => {
-        let result = true;
-        if (this.state.ttl) {
-            result = this.state.ttl < DateTime.local();
-        }
-        return result;
-    }
-
-    getServiceAccounts = async (force = false) => {
-        if (this.isExpiration() || force) {
-            const result = {};
-            try {
-                const res = await fluentApi.addons().autocomplete().get()
-                    .setResourceType('identity.ServiceAccount')
-                    .execute();
-                res.data.results.forEach((d) => {
-                    result[d.key] = d.name;
-                });
-                this.state.ttl = DateTime.local().plus({ hours: 1 });
-            } catch (e) {
-                console.error(e);
-            }
-            this.state.serviceAccounts = result;
-        }
-    }
 }
 
 interface SecretState {
@@ -341,32 +280,6 @@ class SecretStore extends Store<SecretState> {
             ...initState(this.prefix, this.names, this.data),
         });
     }
-
-    isExpiration= (): boolean => {
-        let result = true;
-        if (this.state.ttl) {
-            result = this.state.ttl < DateTime.local();
-        }
-        return result;
-    }
-
-    getSecrets = async (force = false) => {
-        if (this.isExpiration() || force) {
-            const result = {};
-            try {
-                const res = await fluentApi.addons().autocomplete().get()
-                    .setResourceType('secret.Secret')
-                    .execute();
-                res.data.results.forEach((d) => {
-                    result[d.key] = d.name;
-                });
-                this.state.ttl = DateTime.local().plus({ hours: 1 });
-            } catch (e) {
-                console.error(e);
-            }
-            this.state.secrets = result;
-        }
-    }
 }
 
 interface CollectorState {
@@ -383,32 +296,6 @@ class CollectorStore extends Store<CollectorState> {
         this.state = reactive({
             ...initState(this.prefix, this.names, this.data),
         });
-    }
-
-    isExpiration = (): boolean => {
-        let result = true;
-        if (this.state.ttl) {
-            result = this.state.ttl < DateTime.local();
-        }
-        return result;
-    }
-
-    getCollectors = async (force = false) => {
-        if (this.isExpiration() || force) {
-            const result = {};
-            try {
-                const res = await fluentApi.addons().autocomplete().get()
-                    .setResourceType('inventory.Collector')
-                    .execute();
-                res.data.results.forEach((d) => {
-                    result[d.key] = d.name;
-                });
-                this.state.ttl = DateTime.local().plus({ hours: 1 });
-            } catch (e) {
-                console.error(e);
-            }
-            this.state.collectors = result;
-        }
     }
 }
 

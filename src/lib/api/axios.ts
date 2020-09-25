@@ -3,7 +3,6 @@ import axios, {
 } from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import { SpaceConnector } from '@/lib/space-connector';
-// eslint-disable-next-line import/no-cycle
 import { useStore } from '@/store/toolset';
 
 class APIError extends Error {

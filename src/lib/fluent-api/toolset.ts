@@ -1,5 +1,5 @@
 /* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
-import { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import _ from 'lodash';
 import {
     ApiMethods,
