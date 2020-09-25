@@ -230,6 +230,7 @@
 	"DASHBOARD": {
 		"ACTION": {
 			"CLOUD_SERVICES": "Major services under management",
+			"COLLECTORS": "Manage resources by custom plugins",
 			"CRT_DBD": "create your dashboard!",
 			"CRT_GUIDE": "Create Project Group first & Register Service Account",
 			"DAILY_UPDATES": "Check your resource updates on daily usage.",

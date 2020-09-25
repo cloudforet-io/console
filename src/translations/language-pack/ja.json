@@ -230,6 +230,7 @@
 	"DASHBOARD": {
 		"ACTION": {
 			"CLOUD_SERVICES": "",
+			"COLLECTORS": "",
 			"CRT_DBD": "",
 			"CRT_GUIDE": "",
 			"DAILY_UPDATES": "",

@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Collectors" help="Manage resources by custom plugins">
+    <p-widget-layout title="Collectors" :help="$t('DASHBOARD.ACTION.COLLECTORS')">
         <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
             <collector-history class="widget" />
             <collector-runs class="widget" />
