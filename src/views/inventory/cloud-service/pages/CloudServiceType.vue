@@ -110,7 +110,7 @@
                         </router-link>
                     </template>
                 </p-search-grid-layout>
-                <div v-if="!loading && items.length === 0" class="text-center empty-cloud-service">
+                <div v-if="!loading && !items && items.length === 0" class="text-center empty-cloud-service">
                     <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
                     <p class="text-primary2 mb-12">
                         We need your registration for monitoring cloud resources.
@@ -303,9 +303,6 @@ export default {
                     if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
                 }
             });
-            // filterState.regionFilter.forEach((d) => {
-            //     filters.push({ key: { name: 'region_code', label: 'region' }, value: { name: d, label: d }, operator: '' });
-            // });
             const res: Location = {
                 name: 'cloudServicePage',
                 params: {
@@ -369,7 +366,6 @@ export default {
             }
             // create a new token for upcoming request (overwrite the previous one)
             listCloudServiceRequest = axios.CancelToken.source();
-
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage(
@@ -572,51 +568,65 @@ export default {
         margin-top: 1.5rem;
         margin-bottom: 1.5rem;
     }
-    >>> .cloud-service-type-list {
-        @apply border border-gray-200 rounded overflow-visible;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-        a {
-            @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center rounded overflow-hidden;
+    .cloud-services {
+        >>> .cloud-service-type-list {
+            @apply border border-gray-200 rounded overflow-visible;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+            a {
+                @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center rounded overflow-hidden;
+
+                &:hover {
+                    @apply bg-blue-100;
+                    cursor: pointer;
+                }
+            }
+
+            .left {
+                @apply inline-flex items-center;
+
+                img {
+                    @apply rounded-sm overflow-hidden;
+                }
+
+                .text-content {
+                    @apply ml-4;
+
+                    .title {
+                        padding-bottom: 0.3rem;
+                        font-size: 1rem;
+                        line-height: 120%;
+                    }
+
+                    .sub-title {
+                        @apply text-gray-500;
+                        font-size: 0.875rem;
+                        line-height: 150%;
+
+                        .sub-title-provider {
+                            @apply text-gray-300;
+                        }
+
+                        .sub-title-divider {
+                            @apply text-gray-200;
+                        }
+
+                        .sub-title-name {
+                            @apply text-gray-500;
+                        }
+
+                        .sub-title-count {
+                            @apply font-bold text-base;
+                            line-height: 150%;
+                        }
+                    }
+                }
+            }
+
             &:hover {
-                @apply bg-blue-100;
+                @apply border-gray-200 bg-blue-100;
                 cursor: pointer;
             }
-        }
-        .left {
-            @apply inline-flex items-center;
-            img {
-                @apply rounded-sm overflow-hidden;
-            }
-            .text-content {
-                @apply ml-4;
-                .title {
-                    padding-bottom: 0.3rem;
-                    font-size: 1rem;
-                    line-height: 120%;
-                }
-                .sub-title {
-                    @apply text-gray-500;
-                    font-size: 0.875rem;
-                    line-height: 150%;
-                    .sub-title-provider {
-                        @apply text-gray-300;
-                    }
-                    .sub-title-divider {
-                        @apply text-gray-200;
-                    }
-                    .sub-title-name {
-                        @apply text-gray-500;
-                    }
-                    .sub-title-count {
-                        @apply font-bold text-base;
-                        line-height: 150%;
-                    }
-                }
-            }
-        }
-        &:hover {
-            @apply border-gray-200 bg-blue-100;
-            cursor: pointer;
         }
     }
     .page-title {
