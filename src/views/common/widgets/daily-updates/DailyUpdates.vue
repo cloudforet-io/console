@@ -47,7 +47,9 @@
                                         Created <span class="created-count">{{ item.created_count || 0 }}</span>
                                     </router-link>
                                     <span class="divider">|</span>
-                                    Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
+                                    <router-link :to="item.deletedHref">
+                                        Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
+                                    </router-link>
                                 </p>
                                 <p v-else-if="item.created_count && !item.deleted_count" class="state">
                                     <router-link :to="item.createdHref">
@@ -55,7 +57,9 @@
                                     </router-link>
                                 </p>
                                 <p v-else class="state">
-                                    Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
+                                    <router-link :to="item.deletedHref">
+                                        Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
+                                    </router-link>
                                 </p>
                             </div>
                         </div>
@@ -83,52 +87,53 @@ import { SpaceConnector } from '@/lib/space-connector';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-interface CloudService {
-    // eslint-disable-next-line camelcase
-    cloud_service_group: string;
-    // eslint-disable-next-line camelcase
-    cloud_service_type: string;
-    // eslint-disable-next-line camelcase
-    total_count: number;
-    provider: string;
-    icon: string;
-    // eslint-disable-next-line camelcase
-    created_count: number;
-    // eslint-disable-next-line camelcase
-    deleted_count: number;
-}
+    interface CloudService {
+        // eslint-disable-next-line camelcase
+        cloud_service_group: string;
+        // eslint-disable-next-line camelcase
+        cloud_service_type: string;
+        // eslint-disable-next-line camelcase
+        total_count: number;
+        provider: string;
+        icon: string;
+        // eslint-disable-next-line camelcase
+        created_count: number;
+        // eslint-disable-next-line camelcase
+        deleted_count: number;
+    }
 
-interface Server {
-    // eslint-disable-next-line camelcase
-    server_type: string;
-    // eslint-disable-next-line camelcase
-    total_count: number;
-    // eslint-disable-next-line camelcase
-    created_count: number;
-    // eslint-disable-next-line camelcase
-    deleted_count: number;
-}
+    interface Server {
+        // eslint-disable-next-line camelcase
+        server_type: string;
+        // eslint-disable-next-line camelcase
+        total_count: number;
+        // eslint-disable-next-line camelcase
+        created_count: number;
+        // eslint-disable-next-line camelcase
+        deleted_count: number;
+    }
 
-interface Data {
-    group: string;
-    type: string;
-    isServer?: boolean;
-    count: number;
-    icon?: string;
-    provider?: string;
-    defaultIcon?: string;
-}
+    interface Data {
+        group: string;
+        type: string;
+        isServer?: boolean;
+        count: number;
+        icon?: string;
+        provider?: string;
+        defaultIcon?: string;
+    }
 
-interface State {
-    serverData: Server[];
-    cloudServiceData: CloudService[];
-    data: Data[];
-    loading: boolean;
-    widgetRef: any;
-    dailyUpdates: boolean;
-}
+    interface State {
+        serverData: Server[];
+        cloudServiceData: CloudService[];
+        data: Data[];
+        loading: boolean;
+        widgetRef: any;
+        dailyUpdates: boolean;
+    }
 
 const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
+const getDeletedAtFilters = () => `filters=deleted_at:=${dayjs().format('YYYY-MM-DD')}&filters=state:=DELETED`;
 
 export default {
     name: 'DailyUpdates',
@@ -166,7 +171,7 @@ export default {
                 const params: any = {
                     timezone: getTimezone(),
                 };
-                // eslint-disable-next-line camelcase
+                    // eslint-disable-next-line camelcase
                 if (props.projectId) params.project_id = props.projectId;
                 const res = await serverAPI(params);
                 state.serverData = res.results;
@@ -182,7 +187,7 @@ export default {
                 const params: any = {
                     timezone: getTimezone(),
                 };
-                // eslint-disable-next-line camelcase
+                    // eslint-disable-next-line camelcase
                 if (props.projectId) params.project_id = props.projectId;
                 const res = await cloudServiceAPI(params);
                 state.cloudServiceData = res.results;
@@ -208,6 +213,7 @@ export default {
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
                         createdHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getCreatedAtFilters()}`,
+                        deletedHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getDeletedAtFilters()}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,
@@ -221,6 +227,7 @@ export default {
                         icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
                         createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getCreatedAtFilters()}`,
+                        deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getDeletedAtFilters()}`,
                     })),
                 ];
             } else {
@@ -236,6 +243,7 @@ export default {
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
                         createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
+                        deletedHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,
@@ -249,6 +257,7 @@ export default {
                         icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
                         createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getCreatedAtFilters()}`,
+                        deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getDeletedAtFilters()}`,
                     })),
                 ];
             }
@@ -262,6 +271,7 @@ export default {
             ...toRefs(state),
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
             getCreatedAtFilters,
+            getDeletedAtFilters,
         };
     },
 };
@@ -301,8 +311,8 @@ export default {
     .card-contents {
         @apply flex items-center w-full content-between p-4 overflow-hidden;
         &:hover {
-             background-color: rgba(theme('colors.blue.200'), 0.8);
-         }
+            background-color: rgba(theme('colors.blue.200'), 0.8);
+        }
         .daily-update-contents {
             @apply overflow-hidden text-sm whitespace-no-wrap;
             line-height: 150%;
