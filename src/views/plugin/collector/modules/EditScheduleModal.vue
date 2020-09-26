@@ -13,7 +13,7 @@
         <template #body>
             <p-field-group :label="$t('COMMON.NAME')">
                 <br>
-                <p-text-input v-model="name" class="name" />
+                <p-text-input v-model="name" class="name" placeholder="Schedule Name" />
             </p-field-group>
             <p-field-group :label="$t('COMMON.TIMEZONE')">
                 <p-select-dropdown v-model="timezone" :items="timezones"
@@ -26,6 +26,7 @@
                            :invalid="showValidation && !isValid"
                            :invalid-text="invalidText"
             >
+                <span class="label-help-text">Select Hourly or Interval.</span>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
                      class="schedule-lap block lg:flex h-48 lg:h-40"
                      :class="scheduleType === type ? 'selected' : ''"
@@ -65,7 +66,7 @@
                         </div>
                         <div v-else class="interval-lap">
                             <p-field-group label="Every" class="w-1/2">
-                                <p-text-input v-model="intervalTime" type="number" />
+                                <p-text-input v-model="intervalTime" type="number" placeholder="Time" />
                             </p-field-group>
                             <div class="w-1/2">
                                 <p-select-dropdown v-model="intervalTimeType" :items="intervalTimeTypes" auto-height />
@@ -347,13 +348,24 @@ export default {
         width: 60%;
     }
 
+    .p-field-group {
+        .label-help-text {
+            @apply text-gray-400;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+    }
+
     .schedule-lap {
         @apply border border-gray-200;
         cursor: pointer;
+        /*border-top-left-radius: 0.25rem;*/
+        /*border-top-right-radius: 0.25rem;*/
         padding: 1.5rem;
-        &:first-child {
-            border-bottom: none;
-        }
+        /*&:last-child {*/
+        /*    border-bottom-left-radius: 0.25rem;*/
+        /*    border-bottom-right-radius: 0.25rem;*/
+        /*}*/
         &:hover {
             @apply bg-secondary2;
         }
