@@ -314,7 +314,7 @@ export default {
             background-color: rgba(theme('colors.blue.200'), 0.8);
         }
         .daily-update-contents {
-            @apply overflow-hidden text-sm whitespace-no-wrap;
+            @apply overflow-hidden text-sm whitespace-no-wrap w-full;
             line-height: 150%;
             .top {
                 width: 100%;
@@ -327,8 +327,7 @@ export default {
                 @apply font-bold;
             }
             .type {
-                @apply truncate text-xs font-light text-gray-500 pl-2;
-                max-width: 80px;
+                @apply truncate text-xs font-light text-gray-500 pl-2 w-full;
             }
             .state {
                 @apply text-xs;
