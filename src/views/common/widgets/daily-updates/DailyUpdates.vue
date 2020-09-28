@@ -243,7 +243,7 @@ export default {
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
                         createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
-                        deletedHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
+                        deletedHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getDeletedAtFilters()}`,
                     })),
                     ...state.cloudServiceData.map(d => ({
                         group: d.cloud_service_group,
