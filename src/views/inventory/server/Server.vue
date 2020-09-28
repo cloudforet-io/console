@@ -103,7 +103,7 @@
         <div v-else class="empty-space">
             Select a Server above for details.
         </div>
-        <p-table-check-modal v-if="!!checkTableModalState.mode"
+        <p-table-check-modal v-if="!!checkTableModalState.visible"
                              :visible.sync="checkTableModalState.visible"
                              :header-title="checkTableModalState.title"
                              :sub-title="checkTableModalState.subTitle"
@@ -113,7 +113,6 @@
                              :centered="true"
                              :selectable="false"
                              :items="tableState.selectedItems"
-
                              @confirm="checkModalConfirm"
         />
         <s-project-tree-modal :visible.sync="changeProjectState.visible"
@@ -286,17 +285,9 @@ export default {
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            consoleLink: computed(() => {
-                const res = get(tableState.selectedItems[0], 'data.reference.link')
-                    || get(tableState.selectedItems[0], 'reference.external_link');
-                return res;
-            }),
+            consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed(() => makeTrItems([
                 ['delete', 'BTN.DELETE'],
-                [null, null, { type: 'divider' }],
-                ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
-                ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
-                ['closed', 'INVENTORY.BTN.SET_CLOSE'],
                 [null, null, { type: 'divider' }],
                 ['project', 'COMMON.CHG_PRO'],
                 [null, null, { type: 'divider' }],
@@ -339,7 +330,7 @@ export default {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
-                }), 'server_id');
+                }), 'reference', 'server_id');
             }
 
             return query.data;
@@ -568,7 +559,7 @@ export default {
         const checkModalConfirm = async (items: ServerModel[]) => {
             try {
                 await checkTableModalState.api({
-                    ...checkTableModalState,
+                    ...checkTableModalState.params,
                     servers: items.map(item => item.server_id),
                 });
                 showSuccessMessage('Success', '', context.root);

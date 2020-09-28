@@ -282,18 +282,11 @@ export default {
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            consoleLink: computed(() => {
-                const res = get(tableState.selectedItems[0], 'data.reference.link')
-                    || get(tableState.selectedItems[0], 'reference.external_link');
-                return res;
-            }),
+            consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed(() => makeTrItems([
-                ['add', 'BTN.CREATE'],
-                ['update', 'BTN.UPDATE'],
                 ['delete', 'BTN.DELETE'],
                 [null, null, { type: 'divider' }],
                 ['project', 'COMMON.CHG_PRO', { disabled: tableState.selectedItems.length === 0 }],
-                ['region', 'BTN.CHG_REGION'],
                 [null, null, { type: 'divider' }],
                 ['link', null, {
                     label: 'Console',
@@ -310,7 +303,6 @@ export default {
         });
 
         const onTableHeightChange = (height) => {
-            console.debug('height changed', height);
             tableState.tableHeight = height;
             cloudServiceStore.setItem('tableHeight', height, 'number');
         };
@@ -373,7 +365,7 @@ export default {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
-                }), 'cloud_service_id');
+                }), 'reference', 'cloud_service_id');
             }
 
             return query.data;
