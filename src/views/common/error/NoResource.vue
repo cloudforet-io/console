@@ -15,7 +15,7 @@
                 </p>
                 <router-link :to="serviceRoute.path">
                     <p-button style-type="primary" class="redirect-button">
-                        `Go To {{ serviceRoute.meta.label }} Main`
+                        Go To {{ serviceRoute.meta.label }} Main
                     </p-button>
                 </router-link>
             </div>
