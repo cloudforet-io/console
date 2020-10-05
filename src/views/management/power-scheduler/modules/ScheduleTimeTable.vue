@@ -100,9 +100,18 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+interface RoutineRule {
+    day: string;
+    times: number[];
+}
+interface TicketRule {
+    date: string;
+    times: number[];
+}
 interface ScheduleRule {
     [key: string]: number[];
 }
+
 enum SCHEDULE_RULE_TYPE {
     routine = 'ROUTINE',
     ticket = 'TICKET',
@@ -172,8 +181,9 @@ export default {
 
             rules = get(state.scheduleRule.ticketStopped, date);
             if (rules && rules.includes(time)) return 'ticket-stopped';
+
             // routine
-            const weekdayName = dayjs(date).tz(getTimezone()).format('ddd').toUpperCase();
+            const weekdayName = dayjs(date).tz(getTimezone()).format('ddd').toLowerCase();
             rules = get(state.scheduleRule.routine, weekdayName);
             if (rules && rules.includes(time)) return 'routine';
 
@@ -181,29 +191,31 @@ export default {
         };
 
         const getScheduleRuleWithTimezone = (scheduleRule) => {
-            const rule: ScheduleRule = scheduleRule.rule;
+            const rules: RoutineRule[] | TicketRule[] = scheduleRule.rule;
             const ruleType = scheduleRule.rule_type;
             const ruleState = scheduleRule.state;
             if (ruleType === SCHEDULE_RULE_TYPE.routine) {
-                const newRule: ScheduleRule = {
-                    SUN: [],
-                    MON: [],
-                    TUE: [],
-                    WED: [],
-                    THU: [],
-                    FRI: [],
-                    SAT: [],
+                const newRule = {
+                    sun: [],
+                    mon: [],
+                    tue: [],
+                    wed: [],
+                    thu: [],
+                    fri: [],
+                    sat: [],
                 };
-                const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+                const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
                 const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
-                weekdays.forEach((weekday, index) => {
-                    rule[weekday].forEach((time) => {
+                rules.forEach((rule, index) => {
+                    const weekday = rule.day;
+                    rule.times.forEach((time) => {
                         let newTime = time + offsetHours;
                         if (newTime < 24) {
                             newRule[weekday].push(newTime);
                         } else {
                             newTime -= 24;
                             if (index === 6) {
+                                console.log('sat');
                                 newRule[weekdays[0]].push(newTime);
                             } else {
                                 newRule[weekdays[index + 1]].push(newTime);
@@ -213,8 +225,10 @@ export default {
                 });
                 state.scheduleRule.routine = newRule;
             } else {
-                const newRule: ScheduleRule = {};
-                Object.entries(rule).forEach(([date, times]) => {
+                const newRule = {};
+                rules.forEach((rule) => {
+                    const date = rule.date;
+                    const times = rule.times;
                     times.forEach((time) => {
                         const utcDate = dayjs.utc(`${date} ${time}:00`);
                         const timezoneDate = utcDate.tz(getTimezone()).format('YYYY-MM-DD');
