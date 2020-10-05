@@ -278,7 +278,7 @@ export default {
         opacity: 0.9;
         border-radius: 1rem;
         padding: 3.75rem;
-        margin-top: 50%;
+        margin-top: calc(50% - 1rem);
         .text-lap {
             padding-top: 1.5rem;
             padding-bottom: 1.5rem;

@@ -359,13 +359,12 @@ export default {
     .schedule-lap {
         @apply border border-gray-200;
         cursor: pointer;
-        /*border-top-left-radius: 0.25rem;*/
-        /*border-top-right-radius: 0.25rem;*/
+        border-bottom-left-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
         padding: 1.5rem;
-        /*&:last-child {*/
-        /*    border-bottom-left-radius: 0.25rem;*/
-        /*    border-bottom-right-radius: 0.25rem;*/
-        /*}*/
+        &:first-of-type {
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
         &:hover {
             @apply bg-secondary2;
         }
