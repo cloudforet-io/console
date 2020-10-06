@@ -7,8 +7,6 @@ import Notifications from 'vue-notification';
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import store from '@/store';
-import setStore from '@/store/toolset';
 import directive from '@/directives';
 import velocity from 'velocity-animate';
 import { withKnobs } from '@storybook/addon-knobs';
@@ -40,7 +38,6 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
 Vue.use(Codemirror);
 
-Vue.prototype.$ls = setStore();
 Vue.prototype.$velocity = velocity;
 webFontLoader.load({
     google: {
@@ -83,7 +80,6 @@ addDecorator(withKnobs);
 addDecorator(centered);
 addDecorator(() => ({
     i18n,
-    store,
     router: new VueRouter(),
     template: '<story/>',
 }));

@@ -14,7 +14,9 @@
             >
                 {{ $t('PWR_SCHED.THIS_WEEK') }}
             </p-button>
-            <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week" />
+            <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week"
+                               :timezone="timezone"
+            />
         </div>
         <div class="left">
             <div class="table-lap">
@@ -156,6 +158,7 @@ export default {
             ],
             today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
             currentDate: dayjs().tz(getTimezone()),
+            timezone: getTimezone(),
             currentWeekList: computed(() => {
                 let weekStart = state.currentDate.startOf('week');
                 const weekEnd = state.currentDate.endOf('week');

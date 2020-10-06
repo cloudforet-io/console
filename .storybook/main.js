@@ -30,6 +30,9 @@ module.exports = {
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
       loader: 'ts-loader',
+    include: [
+        path.resolve(__dirname, '../src/components'),
+    ],
       exclude: /node_modules/,
       options: {
         appendTsSuffixTo: [/\.vue$/],

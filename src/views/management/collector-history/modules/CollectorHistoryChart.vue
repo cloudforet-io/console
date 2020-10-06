@@ -4,7 +4,7 @@
             <p-skeleton width="100%" height="16rem" />
         </template>
         <div class="top-lap">
-            <p-date-pagination :date.sync="currentDate" />
+            <p-date-pagination :date.sync="currentDate" :timezone="timezone" />
         </div>
         <span class="y-label-text">Job Count</span>
         <canvas ref="chartRef" />
@@ -83,6 +83,7 @@ export default {
             currentMonthStart: computed(() => dayjs(state.currentDate).startOf('month')),
             currentMonthEnd: computed(() => dayjs(state.currentDate).endOf('month')),
             dayCount: computed(() => state.currentDate.daysInMonth()),
+            timezone: getTimezone(),
         });
 
         const initChartData = (rawData) => {
