@@ -110,28 +110,28 @@
                         </router-link>
                     </template>
                 </p-search-grid-layout>
-                <div v-if="!loading && !items && items.length === 0" class="text-center empty-cloud-service">
-                    <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
-                    <p class="text-primary2 mb-12">
-                        We need your registration for monitoring cloud resources.
-                    </p>
-                    <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
-                        <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                            class="mx-auto text-center"
-                        >
-                            {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
-                        </p-icon-text-button>
-                    </router-link>
-                </div>
-                <div v-if="!loading && items.length > 0" class="pagination">
-                    <p-pagination :total-count="totalCount"
-                                  :this-page.sync="thisPage"
-                                  :page-size.sync="pageSize"
-                                  @prevPage="prevPage"
-                                  @nextPage="nextPage"
-                                  @clickPage="clickPage"
-                    />
-                </div>
+            </div>
+            <div v-if="!loading && totalCount === 0" class="text-center empty-cloud-service">
+                <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
+                <p class="text-primary2 mb-12">
+                    We need your registration for monitoring cloud resources.
+                </p>
+                <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
+                    <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                        class="mx-auto text-center"
+                    >
+                        {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                    </p-icon-text-button>
+                </router-link>
+            </div>
+            <div v-if="!loading && items.length > 0" class="pagination">
+                <p-pagination :total-count="totalCount"
+                              :this-page.sync="thisPage"
+                              :page-size.sync="pageSize"
+                              @prevPage="prevPage"
+                              @nextPage="nextPage"
+                              @clickPage="clickPage"
+                />
             </div>
         </template>
     </p-vertical-page-layout>
@@ -249,7 +249,7 @@ export default {
             items: [] as any,
             providerName: 'All',
             cardClass: () => ['card-item', 'cloud-service-type-list'],
-            loading: false,
+            loading: true,
             keyItems: handlers.keyItems as KeyItem[],
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
@@ -633,6 +633,7 @@ export default {
         margin-bottom: 0;
     }
     .empty-cloud-service {
+        @apply w-full h-full;
         .empty-cloud-service-img {
             @apply w-48 mx-auto pt-19 mb-8;
         }
