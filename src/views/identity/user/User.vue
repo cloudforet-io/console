@@ -259,7 +259,7 @@ export default {
             visible: false,
             updateMode: false,
             headerTitle: '',
-            item: null,
+            item: undefined,
         });
         const routeState = reactive({
             routes: [{ name: 'Identity', path: '/identity' }, { name: 'User', path: '/identity/user' }],
@@ -333,7 +333,7 @@ export default {
             userFormState.visible = true;
             userFormState.updateMode = false;
             userFormState.headerTitle = 'Add User';
-            userFormState.item = null;
+            userFormState.item = undefined;
         };
         const clickUpdate = () => {
             userFormState.visible = true;
