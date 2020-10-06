@@ -78,7 +78,7 @@ jobs:
         with:
           ref: ${{ env.BRANCH }}
       - name: task
-        if: needs.condition_check.outputs.NOT_FIRST_TAG == false && (github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch')
+        if: needs.condition_check.outputs.NOT_FIRST_TAG == 'false' && (github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch')
         run: |
           git config user.email github-actions@github.com
           git config user.name github-actions
@@ -89,7 +89,7 @@ jobs:
           git tag ${{ env.VERSION }} 
           git push --atomic origin ${{ env.BRANCH }} ${{ env.VERSION }}
       - name: task
-        if: needs.condition_check.outputs.NOT_FIRST_TAG == false && (github.event_name == 'push')
+        if: needs.condition_check.outputs.NOT_FIRST_TAG == 'false' && (github.event_name == 'push')
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
@@ -155,7 +155,7 @@ jobs:
           submodules: true
       - name: versioning,determine repo
         run: |
-          if [[ ${{ env.VERSION }} =~ ^v[0-9]\.[0-9]\.[0-9]rc(.*)$ ]];
+          if [[ ${{ env.VERSION }} =~ v[0-9]\.[0-9]\.[0-9](.*)rc([0-9]|[1-9][0-9]) ]];
             then echo "::set-env name=REPO::pyengine"
             else echo "::set-env name=REPO::spaceone"
           fi
