@@ -330,7 +330,7 @@ export default {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
-                }), 'reference', 'server_id');
+                }), 'reference', 'server_id', 'primary_ip_address');
             }
 
             return query.data;
