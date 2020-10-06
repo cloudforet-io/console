@@ -30,8 +30,6 @@ import {
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { DatePaginationProps } from '@/components/organisms/date-pagination/type';
 
-import { getTimezone } from '@/lib/util';
-
 dayjs.extend(isSameOrAfter);
 
 export default {
@@ -49,6 +47,10 @@ export default {
         allowFuture: {
             type: Boolean,
             default: false,
+        },
+        timezone: {
+            type: String,
+            default: 'UTC',
         },
     },
     setup(props: DatePaginationProps, { emit }) {
@@ -69,7 +71,7 @@ export default {
                 if (props.allowFuture) {
                     return false;
                 }
-                const now = dayjs().tz(getTimezone());
+                const now = dayjs().tz(props.timezone);
                 if (props.type === 'month') {
                     return now.format('YYYY-MM') === state.dateText;
                 }
