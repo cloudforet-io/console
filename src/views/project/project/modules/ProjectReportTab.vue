@@ -60,28 +60,14 @@
                 </div>
             </div>
         </div>
-        <p-modal
-            :visible="loading"
-            :backdrop="true"
-        >
-            <div class="report-loading-lap">
-                <p-lottie class="block" name="lottie_interval"
-                          auto :size="5"
-                />
-                <div class="text-lap">
-                    <p class="big-text">
-                        Loading...
-                    </p>
-                    <span class="small-text">Please wait around 10 seconds!</span>
-                </div>
-                <p-button
-                    style-type="gray900" :outline="true"
-                    @click="onClickCancel"
-                >
-                    {{ $t('BTN.CANCEL') }}
-                </p-button>
-            </div>
-        </p-modal>
+        <p-icon-modal
+            :visible.sync="loading"
+            lottie-name="lottie_interval"
+            header-title="Loading..."
+            body-text="Please wait around 10 seconds!"
+            :button-text="$t('BTN.CANCEL')"
+            @clickButton="onClickCancel"
+        />
     </div>
 </template>
 
@@ -96,12 +82,10 @@ import {
 } from '@vue/composition-api';
 
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PModal from '@/components/molecules/modals/PModal.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
 import {
@@ -113,12 +97,10 @@ import config from '@/lib/config';
 export default {
     name: 'ProjectReportTab',
     components: {
+        PIconModal,
         PIconTextButton,
-        PLottie,
-        PModal,
         PHr,
         PSelectDropdown,
-        PButton,
         PTextInput,
         PFieldGroup,
     },
@@ -269,24 +251,6 @@ export default {
                 .image {
                     @apply border border-gray-200;
                 }
-            }
-        }
-    }
-    .report-loading-lap {
-        @apply bg-white;
-        text-align: center;
-        opacity: 0.9;
-        border-radius: 1rem;
-        padding: 3.75rem;
-        margin-top: calc(50% - 1rem);
-        .text-lap {
-            padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
-            .big-text {
-                @apply text-primary-dark;
-                font-size: 1.375rem;
-                font-weight: bold;
-                padding-bottom: 0.5rem;
             }
         }
     }
