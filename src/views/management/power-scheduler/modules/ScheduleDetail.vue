@@ -26,14 +26,14 @@
                 <schedule-time-table :schedule-id="scheduleId" :mode="mode" />
             </div>
             <div class="scroll-contents">
-                <schedule-kanban class="kanban" :schedule-id="scheduleId" :mode="mode" />
+                <schedule-kanban :schedule-id="scheduleId" :mode="mode" />
             </div>
 
             <div v-if="mode !== 'READ'" class="actions">
                 <p-button style-type="gray900" :outline="true" @click="onClickCancel">
                     {{ $t('PWR_SCHED.CANCEL') }}
                 </p-button>
-                <p-button class="ml-4" style-type="secondary" :disabled="showValidation && !isAllValid"
+                <p-button class="ml-4" style-type=" secondary" :disabled="showValidation && !isAllValid"
                           @click="onClickSave"
                 >
                     {{ $t('PWR_SCHED.SAVE') }}
@@ -44,13 +44,13 @@
 </template>
 
 <script lang="ts">
-import ScheduleKanban from '@/views/management/power-scheduler/modules/ScheduleKanban.vue';
 import ScheduleTimeTable from '@/views/management/power-scheduler/modules/ScheduleTimeTable.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
+import ScheduleKanban from '@/views/management/power-scheduler/modules/ScheduleKanban.vue';
 
 export default {
     name: 'ScheduleDetail',

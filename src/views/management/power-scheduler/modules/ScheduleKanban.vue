@@ -1,58 +1,77 @@
 <template>
-    <div v-if="!loading" class="kanban">
-        <div v-for="(num, priority) in maxPriority" :key="priority">
-            <div class="resource-group-box">
+    <div class="kanban">
+        <div class="title-lap">
+            <span class="title">리소스 그룹</span>
+            <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
+        </div>
+        <p-icon-text-button v-if="mode === 'UPDATE'" style-type="primary-dark" outline name="ic_plus_bold"
+                            @click="addColumn" class="add-column-btn float-right"
+        >
+            우선순위 추가
+        </p-icon-text-button>
+        <transition-group class="container">
+            <div
+                v-for="column in columns"
+                :key="column.title"
+                class="resource-group-box"
+            >
                 <div class="resource-group-header">
-                    <span id="header-number">{{ num }}</span>
-                    <div v-if="num === 1" class="header-decorator">
+                    <span id="header-number">{{ column.title }}</span>
+
+                    <div v-if="column.title === '1'" class="header-decorator">
                         높음
                     </div>
-                    <span v-if="num === 1" id="header-priority">우선순</span>
-                    <div v-if="num === maxPriority" class="header-decorator">
-                        낮음
-                    </div>
+                    <span v-if="column.title === '1'" id="header-priority">우선순</span>
+                    <p-i v-if="column.title > 5" name="ic_delete" width="1.5rem"
+                         color="transparent inherit"
+                         class="header-button"
+                         @click="deleteColumn(column.title, column)"
+                    />
                 </div>
-                <div v-for="(resource, idx) in resourceGroup" :key="idx" class="resource-group-item">
-                    <div v-if=" resource.priority === num" class="resource">
-                        <p-lazy-img :src="iconUrl(resource)"
-                                    width="2rem" height="2rem"
-                                    class="mr-2"
-                        />
-                        <span class="resource-description">
-                            {{ resource.name }} <br> ({{ resource.count }})
-                        </span>
-                    </div>
+                <div class="resource-item-wrapper">
+                    <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
+                               group="tasks"
+                               :empty-insert-threshold="100"
+                    >
+                        <div
+                            v-for="(item) in column.items"
+                            :key="item.resource_group_id"
+                            class="resource-group-item"
+                        >
+                            <div class="resource">
+                                <p-lazy-img :src="iconUrl(item)"
+                                            width="2rem" height="2rem"
+                                            class="mr-2"
+                                />
+                                <span class="resource-description">
+                                    {{ item.name }} <br> ({{ item.count }})
+                                </span>
+                            </div>
+                        </div>
+                    </draggable>
                 </div>
             </div>
-        </div>
+        </transition-group>
     </div>
 </template>
 
 <script lang="ts">
+import draggable from 'vuedraggable';
 import { reactive, toRefs, watch } from '@vue/composition-api';
+import PI from '@/components/atoms/icons/PI.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
-
-    interface ResourceGroup {
-        priority: number;
-        // eslint-disable-next-line camelcase
-        resource_group_id: string;
-    }
-
-    interface CardItem {
-        count: number;
-        icon: string;
-        priority: number;
-        name: string;
-        // eslint-disable-next-line camelcase
-        resource_group_id: string;
-    }
-
 export default {
-    name: 'ScheduleKanban',
-    components: { PLazyImg },
+    name: 'App',
+    components: {
+        PIconTextButton,
+        PI,
+        PLazyImg,
+        draggable,
+    },
     props: {
         scheduleId: {
             type: String,
@@ -65,45 +84,32 @@ export default {
     },
     setup(props, context) {
         const state = reactive({
-            resourceGroup: [] as unknown as ResourceGroup,
-            resourceGroupId: [] as string [],
+            columns: [] as any,
             loading: false,
-            maxPriority: 0,
         });
 
-        const getResourceGroupName = async () => {
-            for (let i = 0; i < Object.keys(state.resourceGroup).length; i++) {
-                state.resourceGroupId[i] = state.resourceGroup[i].resource_group_id;
-            }
-            const res = await SpaceConnector.client.statistics.topic.powerSchedulerResourceGroups({
-                // eslint-disable-next-line camelcase
-                resource_groups: state.resourceGroupId,
-            }, {
-                headers: {
-                    'Mock-Mode': 'true',
-                },
+        const addColumn = () => {
+            state.columns.push({
+                title: `${state.columns.length + 1}`,
+                items: [],
             });
-            for (let i = 0; i < Object.keys(state.resourceGroup).length; i++) {
-                state.resourceGroup[i].name = res.resource_groups[state.resourceGroupId[i]].name;
-                state.resourceGroup[i].count = res.resource_groups[state.resourceGroupId[i]].count;
-                state.resourceGroup[i].icon = res.resource_groups[state.resourceGroupId[i]].icon;
-            }
         };
 
-        const getPriority = async () => {
-            const priorityList = [] as any;
-            for (let i = 0; i < Object.keys(state.resourceGroup).length; i++) {
-                priorityList[i] = state.resourceGroup[i].priority;
-            }
-            state.maxPriority = Math.max(...priorityList);
-            if (state.maxPriority < 5) state.maxPriority = 5;
+        const deleteColumn = (index, item) => {
+            const deleteIndex = parseInt(index);
+            if (state.columns[deleteIndex - 1] === undefined) state.columns.pop();
+            state.columns.splice(deleteIndex - 1, 1);
+            setTimeout(() => {
+                for (let i = deleteIndex - 1; i < state.columns.length; i++) {
+                    state.columns[i].title = `${parseInt(state.columns[i].title) - 1}`;
+                }
+            }, 100);
         };
 
         const getResourceGroup = async (scheduleId) => {
             state.loading = true;
-            state.resourceGroupId = [];
             try {
-                const res = await SpaceConnector.client.powerScheduler.schedule.get({
+                const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleResourceGroups({
                     // eslint-disable-next-line camelcase
                     schedule_id: scheduleId,
                 }, {
@@ -111,15 +117,17 @@ export default {
                         'Mock-Mode': 'true',
                     },
                 });
-                state.resourceGroup = res.resource_groups.map(d => ({
-                    // eslint-disable-next-line camelcase
-                    resource_group_id: d.resource_group_id,
-                    priority: d.priority,
-                }));
-
-                await getPriority();
-                await getResourceGroupName();
-
+                if (res.columns.length < 5) {
+                    while (res.columns.length < 5) {
+                        res.columns.push({
+                            title: `${res.columns.length + 1}`,
+                            items: [],
+                        });
+                    }
+                    state.columns = res.columns;
+                } else {
+                    state.columns = res.columns;
+                }
                 state.loading = false;
             } catch (e) {
                 console.error(e);
@@ -134,6 +142,8 @@ export default {
 
         return {
             ...toRefs(state),
+            addColumn,
+            deleteColumn,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
         };
     },
@@ -141,58 +151,103 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    .title-lap {
+        @apply w-full;
+        margin-bottom: 1.5rem;
+        .title {
+            @apply text-gray-900;
+            font-size: 1rem;
+            font-weight: bold;
+            padding-right: 0.5rem;
+        }
+        .sub-title {
+            @apply text-gray-400;
+            font-size: 0.75rem;
+        }
+    }
+    .v-enter-active, .v-move {
+        transition: all ease 0.5s;
+    }
+    .v-leave-active {
+        position: relative;
+    }
+    .v-enter, .v-leave-to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
     .kanban {
-        @apply flex flex-wrap;
         width: 100%;
-        .resource-group-box {
-            @apply border border-violet-200 bg-white;
-            border-radius: 2px;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-            width: 13.75rem;
-            height: 20.75rem;
-            .resource-group-header {
-                @apply bg-violet-100;
-                height: 2.5rem;
-                padding-top: 0.75rem;
-                padding-bottom: 0.625rem;
-                margin-bottom: 1rem;
+        .container {
+            @apply flex flex-wrap w-full h-full;
+            .resource-group-box {
+                @apply border border-violet-200 bg-white;
+                border-radius: 2px;
+                margin-right: 0.5rem;
+                margin-bottom: 0.5rem;
+                .resource-group-header {
+                    @apply bg-violet-100;
+                    height: 2.5rem;
+                    padding-top: 0.75rem;
+                    padding-bottom: 0.625rem;
+                    margin-bottom: 1rem;
 
-                #header-number {
-                    @apply text-gray-700 font-bold;
-                    padding-left: 1rem;
-                    font-size: 0.875rem;
-                }
+                    #header-number {
+                        @apply text-gray-700 font-bold;
+                        padding-left: 1rem;
+                        font-size: 0.875rem;
+                    }
 
-                .header-decorator {
-                    @apply inline-block bg-primary3 text-primary;
-                    border-radius: 2px;
-                    width: 2.4375rem;
-                    height: 1.25rem;
-                    margin-left: 0.5rem;
-                    font-size: 0.75rem;
-                    line-height: 1.5;
-                    text-align: center;
-                }
-
-                #header-priority {
-                    @apply float-right text-gray-700;
-                    padding-right: 1rem;
-                    font-size: 0.75rem;
-                    line-height: 1.5;
-                }
-            }
-
-            .resource-group-item {
-                @apply px-4 overflow-auto;
-                .resource {
-                    @apply border border-dashed border-primary2 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
-                    width: 11.75rem;
-                    height: 3.25rem;
-                    margin-bottom: 0.5rem;
-
-                    .resource-description {
+                    .header-decorator {
+                        @apply inline-block bg-primary3 text-primary;
+                        border-radius: 2px;
+                        width: 2.4375rem;
+                        height: 1.25rem;
+                        margin-left: 0.5rem;
                         font-size: 0.75rem;
+                        line-height: 1.5;
+                        text-align: center;
+                    }
+
+                    #header-priority {
+                        @apply float-right text-gray-700;
+                        padding-right: 1rem;
+                        font-size: 0.75rem;
+                        line-height: 1.5;
+                    }
+
+                    .header-button {
+                        @apply float-right text-gray-300;
+                        margin-right: 0.5rem;
+                        margin-top: -0.2rem;
+                    }
+                }
+
+                .resource-item-wrapper {
+                    @apply overflow-y-auto overflow-x-hidden;
+                    height: 20.75rem;
+                    width: 13.8rem;
+                }
+
+                .resource-group-item {
+                    @apply mx-4;
+                    .resource {
+                        @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
+                        width: 11.75rem;
+                        height: 3.25rem;
+                        border-radius: 0.25rem;
+                        margin-bottom: 0.5rem;
+
+                        .resource-description {
+                            font-size: 0.75rem;
+                        }
+
+                        &:hover {
+                            @apply border-blue-500 border border-solid bg-blue-100;
+                        }
+
+                        &:active {
+                            @apply cursor-move bg-blue-200;
+                        }
                     }
                 }
             }
