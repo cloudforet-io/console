@@ -325,12 +325,12 @@ export default {
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
 
-            query.setOnly(...typeOptionState.keyItems.map(d => d.name), 'server_id');
+            query.setOnly(...typeOptionState.keyItems.map(d => d.name), 'server_id', 'collection_info.collectors');
             if (tableState.schema?.options?.fields) {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
-                }), 'reference', 'server_id', 'primary_ip_address');
+                }), 'reference', 'server_id', 'primary_ip_address', 'collection_info.collectors');
             }
 
             return query.data;

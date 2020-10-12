@@ -77,8 +77,8 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { CollectModalPropsType } from '@/views/common/collect-modal/CollectModal.toolset';
-import { showErrorMessage } from '@/lib/util';
-
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'CollectModal',
@@ -158,14 +158,10 @@ export default {
             state.loading = true;
 
             try {
-                const res = await collectorApi.list().setFilter({
-                    key: 'collector_id',
-                    value: state.mergedCollectorIds,
-                    operator: '',
-                }).execute();
-
-                // @ts-ignore
-                state.collectors = res.data.results;
+                const query = new QueryHelper()
+                    .setFilter({ k: 'collector_id', v: state.mergedCollectorIds, o: 'in' });
+                const res = await SpaceConnector.client.inventory.collector.list({ query: query.data });
+                state.collectors = res.results;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -179,14 +175,7 @@ export default {
                     .setId(id)
                     .setFilters({ [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) })
                     .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Collect Data',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Collect Data', context.root);
             } catch (e) {
                 showErrorMessage('Fail to Collect Data', e, context.root);
             } finally {
