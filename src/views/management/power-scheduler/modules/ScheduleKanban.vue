@@ -4,8 +4,9 @@
             <span class="title">리소스 그룹</span>
             <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
         </div>
-        <p-icon-text-button v-if="mode === 'UPDATE'" style-type="primary-dark" outline name="ic_plus_bold"
-                            @click="addColumn" class="add-column-btn float-right"
+        <p-icon-text-button v-if="mode === 'UPDATE'" style-type="primary-dark" outline
+                            name="ic_plus_bold"
+                            class="add-column-btn float-right" @click="addColumn"
         >
             우선순위 추가
         </p-icon-text-button>
@@ -22,7 +23,7 @@
                         높음
                     </div>
                     <span v-if="column.title === '1'" id="header-priority">우선순</span>
-                    <p-i v-if="column.title > 5" name="ic_delete" width="1.5rem"
+                    <p-i v-if="column.title > 5 && editable" name="ic_delete" width="1.5rem"
                          color="transparent inherit"
                          class="header-button"
                          @click="deleteColumn(column.title, column)"
@@ -32,6 +33,7 @@
                     <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
                                group="tasks"
                                :empty-insert-threshold="100"
+                               :disabled="!editable"
                     >
                         <div
                             v-for="(item) in column.items"
@@ -64,6 +66,22 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
+interface ItemType {
+    // eslint-disable-next-line camelcase
+    resource_group_id?: string;
+    name?: string;
+    count?: number;
+    icon?: string;
+}
+
+interface ColumnType {
+    title: string;
+    items: ItemType[];
+    options?: {
+        priority: number;
+        badge: string;
+    };
+}
 export default {
     name: 'App',
     components: {
@@ -84,8 +102,9 @@ export default {
     },
     setup(props, context) {
         const state = reactive({
-            columns: [] as any,
+            columns: [] as unknown as ColumnType[],
             loading: false,
+            editable: false,
         });
 
         const addColumn = () => {
@@ -134,9 +153,18 @@ export default {
             }
         };
 
-        watch(() => props.scheduleId, async (after, before) => {
+        const checkMode = () => {
+            if (props.mode === 'READ') {
+                state.editable = false;
+            } else {
+                state.editable = true;
+            }
+        };
+
+        watch([() => props.scheduleId, () => props.mode], async (after, before) => {
             if (after !== before) {
                 await getResourceGroup(props.scheduleId);
+                await checkMode();
             }
         }, { immediate: true });
 
@@ -165,7 +193,7 @@ export default {
             font-size: 0.75rem;
         }
     }
-    .v-enter-active, .v-move {
+    .v-enter-active, .v-leave-active, .v-move {
         transition: all ease 0.5s;
     }
     .v-leave-active {
