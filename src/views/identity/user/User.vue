@@ -401,9 +401,7 @@ export default {
         };
         const deleteUser = async (items) => {
             try {
-                await SpaceConnector.client.identity.user.delete({
-                    users: getUsersParam(items),
-                });
+                await SpaceConnector.client.identity.user.delete(getUsersParam(items));
                 showSuccessMessage('Success', 'Success to Delete Users', root);
             } catch (e) {
                 showErrorMessage('Fail to Delete User', e, root);
