@@ -1,15 +1,15 @@
 <template>
-    <div class="kanban">
+    <div :class="{'edit-mode': mode === 'UPDATE'}" class="kanban">
         <div class="title-lap">
             <span class="title">리소스 그룹</span>
             <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
+            <p-icon-text-button v-if="mode === 'UPDATE'" style-type="gray900" outline
+                                name="ic_plus_bold"
+                                class="add-column-btn float-right" @click="addColumn"
+            >
+                우선순위 추가
+            </p-icon-text-button>
         </div>
-        <p-icon-text-button v-if="mode === 'UPDATE'" style-type="primary-dark" outline
-                            name="ic_plus_bold"
-                            class="add-column-btn float-right" @click="addColumn"
-        >
-            우선순위 추가
-        </p-icon-text-button>
         <transition-group class="container">
             <div
                 v-for="column in columns"
@@ -18,11 +18,13 @@
             >
                 <div class="resource-group-header">
                     <span id="header-number">{{ column.title }}</span>
-
                     <div v-if="column.title === '1'" class="header-decorator">
                         높음
                     </div>
-                    <span v-if="column.title === '1'" id="header-priority">우선순</span>
+                    <div v-if="column.title === maxPriority.length.toString()" class="header-decorator">
+                        낮음
+                    </div>
+                    <span v-if="column.title === '1'" id="header-priority">우선순위</span>
                     <p-i v-if="column.title > 5 && editable" name="ic_delete" width="1.5rem"
                          color="transparent inherit"
                          class="header-button"
@@ -30,15 +32,31 @@
                     />
                 </div>
                 <div class="resource-item-wrapper">
+                    <div v-if="editable && column.title === '1'" class="resource-group-item">
+                        <div class="justify-center text-xs add-resource-group" @click="createResourceGroup">
+                            <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
+                        </div>
+                    </div>
+                    <div v-if="editable && column.title === '3' && !isDragging && column.items.length === 0" class="kanban-landing-wrapper">
+                        <div id="kanban-landing-card" />
+                        <div id="kanban-landing-square" />
+                        <div id="kanban-landing-text" />
+                        <p-i id="kanban-landing-icon" name="cursor_drag-arrow--blue" width="1.375rem" />
+                        <p class="kanban-landing-text">
+                            마우스로 리소스 그룹의 위치를 바꾸고<br> 우선 순위를 정하세요
+                        </p>
+                    </div>
                     <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
                                group="tasks"
                                :empty-insert-threshold="100"
                                :disabled="!editable"
+                               @start="onStart"
+                               @end="onEnd"
                     >
-                        <div
-                            v-for="(item) in column.items"
-                            :key="item.resource_group_id"
-                            class="resource-group-item"
+                        <div v-for="(item) in column.items"
+                             :key="item.resource_group_id"
+                             class="resource-group-item"
+                             @click="updateResourceGroup(item)"
                         >
                             <div class="resource">
                                 <p-lazy-img :src="iconUrl(item)"
@@ -59,29 +77,31 @@
 
 <script lang="ts">
 import draggable from 'vuedraggable';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
-interface ItemType {
-    // eslint-disable-next-line camelcase
-    resource_group_id?: string;
-    name?: string;
-    count?: number;
-    icon?: string;
-}
+    interface ItemType {
+        // eslint-disable-next-line camelcase
+        resource_group_id?: string;
+        name?: string;
+        count?: number;
+        icon?: string;
+    }
 
-interface ColumnType {
-    title: string;
-    items: ItemType[];
-    options?: {
-        priority: number;
-        badge: string;
-    };
-}
+    interface ColumnType {
+        title: string;
+        items: ItemType[];
+        options: {
+            priority: number;
+            badge?: string;
+        };
+    }
 export default {
     name: 'App',
     components: {
@@ -103,14 +123,20 @@ export default {
     setup(props, context) {
         const state = reactive({
             columns: [] as unknown as ColumnType[],
+            maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
             loading: false,
             editable: false,
+            isDragging: false,
         });
 
         const addColumn = () => {
             state.columns.push({
                 title: `${state.columns.length + 1}`,
                 items: [],
+                options: {
+                    priority: state.columns.length + 1,
+                    badge: 'Low',
+                },
             });
         };
 
@@ -154,11 +180,24 @@ export default {
         };
 
         const checkMode = () => {
-            if (props.mode === 'READ') {
-                state.editable = false;
-            } else {
-                state.editable = true;
-            }
+            if (props.mode === 'UPDATE') state.editable = true;
+            else state.editable = false;
+        };
+
+        const createResourceGroup = () => {
+            console.log('create resource group!');
+        };
+
+        const updateResourceGroup = (item) => {
+            console.log('update resource group!', item);
+        };
+
+        const onStart = () => {
+            state.isDragging = true;
+        };
+
+        const onEnd = () => {
+            state.isDragging = false;
         };
 
         watch([() => props.scheduleId, () => props.mode], async (after, before) => {
@@ -172,6 +211,10 @@ export default {
             ...toRefs(state),
             addColumn,
             deleteColumn,
+            createResourceGroup,
+            updateResourceGroup,
+            onStart,
+            onEnd,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
         };
     },
@@ -203,6 +246,15 @@ export default {
         opacity: 0;
         transform: translateY(20px);
     }
+    .edit-mode {
+        .kanban .container .resource-group-box .resource-group-header {
+            @apply bg-blue-100;
+        }
+        .kanban .container .resource-group-box .resource-group-header .header-decorator {
+            @apply bg-blue-200 text-blue-500;
+        }
+    }
+
     .kanban {
         width: 100%;
         .container {
@@ -212,19 +264,18 @@ export default {
                 border-radius: 2px;
                 margin-right: 0.5rem;
                 margin-bottom: 0.5rem;
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
                 .resource-group-header {
                     @apply bg-violet-100;
                     height: 2.5rem;
                     padding-top: 0.75rem;
                     padding-bottom: 0.625rem;
                     margin-bottom: 1rem;
-
                     #header-number {
                         @apply text-gray-700 font-bold;
                         padding-left: 1rem;
                         font-size: 0.875rem;
                     }
-
                     .header-decorator {
                         @apply inline-block bg-primary3 text-primary;
                         border-radius: 2px;
@@ -235,14 +286,12 @@ export default {
                         line-height: 1.5;
                         text-align: center;
                     }
-
                     #header-priority {
                         @apply float-right text-gray-700;
                         padding-right: 1rem;
                         font-size: 0.75rem;
                         line-height: 1.5;
                     }
-
                     .header-button {
                         @apply float-right text-gray-300;
                         margin-right: 0.5rem;
@@ -254,31 +303,73 @@ export default {
                     @apply overflow-y-auto overflow-x-hidden;
                     height: 20.75rem;
                     width: 13.8rem;
-                }
-
-                .resource-group-item {
-                    @apply mx-4;
-                    .resource {
-                        @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
-                        width: 11.75rem;
-                        height: 3.25rem;
-                        border-radius: 0.25rem;
-                        margin-bottom: 0.5rem;
-
-                        .resource-description {
-                            font-size: 0.75rem;
+                    .kanban-landing-wrapper {
+                        @apply flex-col;
+                        #kanban-landing-card {
+                            @apply bg-blue-500 m-auto;
+                            width: 11.75rem;
+                            height: 3.25rem;
+                            opacity: 0.1;
+                            margin-top: 40%;
+                            border-radius: 0.25rem;
+                            z-index: 1;
                         }
-
-                        &:hover {
-                            @apply border-blue-500 border border-solid bg-blue-100;
+                        #kanban-landing-square {
+                            @apply bg-blue-500;
+                            opacity: 0.25;
+                            border-radius: 0.25rem;
+                            width: 2rem;
+                            height: 2rem;
+                            z-index: 2;
+                            margin-top: -2.625rem;
+                            margin-left: 1.625rem;
                         }
-
-                        &:active {
-                            @apply cursor-move bg-blue-200;
+                        #kanban-landing-icon {
+                            float: right;
+                            z-index: 2;
+                            margin-right: 1.25rem;
+                            margin-top: -1.15rem;
+                        }
+                        .kanban-landing-text {
+                            @apply text-center text-xs text-blue-500;
+                            padding-top: 1rem;
+                        }
+                    }
+                    .resource-group-item {
+                        @apply mx-4;
+                        .add-resource-group {
+                            @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
+                            width: 11.75rem;
+                            height: 3.25rem;
+                            border-radius: 0.25rem;
+                            margin-bottom: 0.5rem;
+                            &:hover {
+                                @apply border-blue-500 border border-solid bg-blue-100;
+                            }
+                            &:active {
+                                @apply cursor-default bg-blue-200;
+                            }
+                        }
+                        .resource {
+                            @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
+                            width: 11.75rem;
+                            height: 3.25rem;
+                            border-radius: 0.25rem;
+                            margin-bottom: 0.5rem;
+                            .resource-description {
+                                font-size: 0.75rem;
+                            }
+                            &:hover {
+                                @apply border-blue-500 border border-solid bg-blue-100;
+                            }
+                            &:active {
+                                @apply cursor-move bg-blue-200;
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 </style>
