@@ -5,12 +5,9 @@
             <span class="sub-title">{{ $t('PWR_SCHED.SCHED_TIME') }}</span>
         </div>
         <div class="button-lap">
-            <p-button
-                class="current-week-button"
-                style-type="gray200"
-                :outline="true"
-                block
-                @click="onClickCurrentWeek"
+            <p-button class="gray900 this-week-button" block
+                      :outline="true"
+                      @click="onClickCurrentWeek"
             >
                 {{ $t('PWR_SCHED.THIS_WEEK') }}
             </p-button>
@@ -29,7 +26,7 @@
                         {{ time % 2 !== 0 ? ('0' + time).slice(-2) : '' }}
                     </div>
                 </div>
-                <div class="data-section">
+                <div ref="draggableSection" class="data-section">
                     <div class="weekday-row">
                         <div
                             v-for="(weekday, index) in currentWeekList"
@@ -45,6 +42,17 @@
                             </div>
                         </div>
                     </div>
+                    <vue-selecto
+                        v-if="editMode"
+                        :drag-container="dragContainer"
+                        :selectable-targets="['.item']"
+                        :hit-rate="1"
+                        :select-by-click="true"
+                        :select-from-inside="true"
+                        :continue-select="true"
+                        :toggle-continue-select="'shift'"
+                        @select="onDragSelect"
+                    />
                     <div v-for="time in range(0, 24)"
                          :key="time"
                          class="item-row"
@@ -52,7 +60,8 @@
                         <div
                             v-for="week in currentWeekList"
                             :key="week.format('YYYY-MM-DD')"
-                            :class="getClass(week.format('YYYY-MM-DD'), time)"
+                            ref="item"
+                            :class="[week.format('YYYY-MM-DD'), `${week.format('ddd')}-${time}`]"
                             class="item"
                         />
                     </div>
@@ -60,21 +69,70 @@
             </div>
         </div>
         <div class="right">
-            <div class="timezone-lap">
+            <div class="content-lap" :class="editMode ? 'opacity-25' : ''">
                 <div class="title">
                     {{ $t('PWR_SCHED.TIMEZONE') }}
                 </div>
                 <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
             </div>
-            <div class="timer-lap">
+            <!--routine-->
+            <div class="content-lap" :class="oneTimeEditMode ? 'opacity-25' : ''">
                 <div class="title">
-                    {{ $t('PWR_SCHED.TIMER') }}
+                    {{ $t('PWR_SCHED.SCHED_ROUTINE') }}
                 </div>
-                <div v-for="timer in timers" :key="timer.text"
-                     class="legend-lap" :class="timer.class"
-                >
+                <div class="legend-lap routine">
                     <span class="legend-icon" />
-                    <span>{{ timer.text }}</span>
+                    <span>{{ $t('PWR_SCHED.ROUTINE_TIMER') }}</span>
+                    <p-button v-if="mode !== 'READ'"
+                              class="gray900 sm" :outline="true"
+                              @click="onDeleteAllRoutine"
+                    >
+                        {{ $t('PWR_SCHED.DELETE_ALL') }}
+                    </p-button>
+                </div>
+            </div>
+            <!--one time ticket-->
+            <div class="content-lap" :class="mode !== 'READ' ? 'opacity-25' : ''">
+                <div class="title" :class="oneTimeEditMode ? 'activated' : ''">
+                    {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
+                    <p-button v-if="oneTimeEditMode"
+                              class="gray900 sm ml-4 mr-1" :outline="true"
+                              @click="onClickSaveOneTimeSchedule"
+                    >
+                        저장
+                    </p-button>
+                    <p-button v-if="oneTimeEditMode"
+                              class="gray900 sm" :outline="true"
+                              @click="onClickCancelOneTimeSchedule"
+                    >
+                        취소
+                    </p-button>
+                </div>
+                <div class="legend-lap one-time-run pb-2">
+                    <span class="legend-icon" />
+                    <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
+                    <p-button v-if="!editMode"
+                              class="gray900 sm" :outline="true"
+                              @click="onClickStartOneTimeEditMode('RUN')"
+                    >
+                        {{ $t('PWR_SCHED.EDIT') }}
+                    </p-button>
+                    <span v-if="oneTimeEditMode === 'RUN'" class="making-ticket-text">
+                        {{ $t('PWR_SCHED.MAKING_TICKET') }}
+                    </span>
+                </div>
+                <div class="legend-lap one-time-stop">
+                    <span class="legend-icon" />
+                    <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
+                    <p-button v-if="!editMode"
+                              class="gray900 sm" :outline="true"
+                              @click="onClickStartOneTimeEditMode('STOP')"
+                    >
+                        {{ $t('PWR_SCHED.EDIT') }}
+                    </p-button>
+                    <span v-if="oneTimeEditMode === 'STOP'" class="making-ticket-text">
+                        {{ $t('PWR_SCHED.MAKING_TICKET') }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -82,14 +140,16 @@
 </template>
 
 <script lang="ts">
-import { get, range } from 'lodash';
+/* eslint-disable camelcase */
+import { get, range, has } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { VueSelecto } from 'vue-selecto';
 
 import {
-    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch,
+    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch, onMounted,
 } from '@vue/composition-api';
 
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
@@ -128,6 +188,7 @@ export default {
     components: {
         PButton,
         PDatePagination,
+        VueSelecto,
     },
     props: {
         scheduleId: {
@@ -139,7 +200,7 @@ export default {
             default: 'READ',
         },
     },
-    setup(props) {
+    setup(props, { refs }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             weekdayTexts: [
@@ -151,14 +212,9 @@ export default {
                 vm.$t('PWR_SCHED.DAY_FRI'),
                 vm.$t('PWR_SCHED.DAY_SAT'),
             ],
-            timers: [
-                { class: 'routine', text: vm.$t('PWR_SCHED.TIMER_ROUTINE') },
-                { class: 'ticket-running', text: vm.$t('PWR_SCHED.TIMER_RUNNING') },
-                { class: 'ticket-stopped', text: vm.$t('PWR_SCHED.TIMER_STOPPED') },
-            ],
+            timezone: getTimezone(),
             today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
             currentDate: dayjs().tz(getTimezone()),
-            timezone: getTimezone(),
             currentWeekList: computed(() => {
                 let weekStart = state.currentDate.startOf('week');
                 const weekEnd = state.currentDate.endOf('week');
@@ -169,30 +225,57 @@ export default {
                 }
                 return weekList;
             }),
-            //
+            // schedule
+            editMode: computed(() => props.mode !== 'READ' || state.oneTimeEditMode),
+            oneTimeEditMode: false as boolean | string,
+            dragContainer: undefined,
             scheduleRule: {
                 routine: {} as ScheduleRule,
-                ticketRunning: {} as ScheduleRule,
-                ticketStopped: {} as ScheduleRule,
+                oneTimeRun: {} as ScheduleRule,
+                oneTimeStop: {} as ScheduleRule,
             },
         });
 
-        const getClass = (date, time) => {
-            // ticket running
-            let rules = get(state.scheduleRule.ticketRunning, date);
-            if (rules && rules.includes(time)) return 'ticket-running';
+        const setStyleClass = () => {
+            refs.item.forEach((item) => {
+                const classes = item.classList;
+                const date = classes[1];
+                const weekday = classes[2].split('-')[0].toLowerCase();
+                const time = Number(classes[2].split('-')[1]);
 
-            rules = get(state.scheduleRule.ticketStopped, date);
-            if (rules && rules.includes(time)) return 'ticket-stopped';
+                // init
+                item.classList.remove('routine');
+                item.classList.remove('one-time-run');
+                item.classList.remove('one-time-stop');
+                item.classList.remove('opacity-25');
 
-            // routine
-            const weekdayName = dayjs(date).tz(getTimezone()).format('ddd').toLowerCase();
-            rules = get(state.scheduleRule.routine, weekdayName);
-            if (rules && rules.includes(time)) return 'routine';
+                // routine
+                let rules = get(state.scheduleRule.routine, weekday);
+                if (rules && rules.includes(time)) {
+                    item.classList.add('routine');
+                    if (state.oneTimeEditMode) item.classList.add('opacity-25');
+                }
 
-            return '';
+                // one time run
+                if (props.mode === 'READ') {
+                    if (state.oneTimeEditMode !== 'STOP') {
+                        rules = get(state.scheduleRule.oneTimeRun, date);
+                        if (rules && rules.includes(time)) {
+                            item.classList.add('one-time-run');
+                        }
+                    }
+
+                    // one time stop
+                    if (state.oneTimeEditMode !== 'RUN') {
+                        rules = get(state.scheduleRule.oneTimeStop, date);
+                        if (rules && rules.includes(time)) {
+                            item.classList.add('one-time-stop');
+                            item.classList.remove('opacity-25');
+                        }
+                    }
+                }
+            });
         };
-
         const getScheduleRuleWithTimezone = (scheduleRule) => {
             const rules: RoutineRule[] | TicketRule[] = scheduleRule.rule;
             const ruleType = scheduleRule.rule_type;
@@ -218,7 +301,6 @@ export default {
                         } else {
                             newTime -= 24;
                             if (index === 6) {
-                                console.log('sat');
                                 newRule[weekdays[0]].push(newTime);
                             } else {
                                 newRule[weekdays[index + 1]].push(newTime);
@@ -243,35 +325,172 @@ export default {
                         }
                     });
                 });
-                if (ruleState === RULE_STATE.running) state.scheduleRule.ticketRunning = newRule;
-                else if (ruleState === RULE_STATE.stopped) state.scheduleRule.ticketStopped = newRule;
+                if (ruleState === RULE_STATE.running) state.scheduleRule.oneTimeRun = newRule;
+                else if (ruleState === RULE_STATE.stopped) state.scheduleRule.oneTimeStop = newRule;
             }
         };
         const getScheduleRule = async () => {
             const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
-                // eslint-disable-next-line camelcase
                 schedule_id: props.scheduleId,
-            }, {
-                headers: {
-                    'Mock-Mode': 'true',
-                },
             });
             res.results.forEach(result => getScheduleRuleWithTimezone(result));
         };
+
         const onClickCurrentWeek = () => {
             state.currentDate = dayjs().tz(getTimezone());
+        };
+        const onClickTime = (e) => {
+            if (!state.editMode) return;
+
+            const classList = e.target.classList;
+            const date = classList[1];
+            const week = classList[2].split('-')[0].toLowerCase();
+            const time = Number(classList[2].split('-')[1]);
+            let rules = [] as number[];
+            if (props.mode !== 'READ') { // routine
+                rules = get(state.scheduleRule.routine, week);
+                if (rules && rules.includes(time)) {
+                    const idx = rules.indexOf(time);
+                    state.scheduleRule.routine[week].splice(idx, 1);
+                    classList.remove('routine');
+                } else {
+                    state.scheduleRule.routine[week].push(time);
+                    classList.add('routine');
+                }
+            } else {
+                let editMode = '';
+                let className = '';
+                if (state.oneTimeEditMode === 'RUN') {
+                    editMode = 'oneTimeRun';
+                    className = 'one-time-run';
+                } else {
+                    editMode = 'oneTimeStop';
+                    className = 'one-time-stop';
+                }
+                rules = get(state.scheduleRule[editMode], date);
+                if (rules && rules.includes(time)) {
+                    const idx = rules.indexOf(time);
+                    state.scheduleRule[editMode][date].splice(idx, 1);
+                    classList.remove(className);
+                } else {
+                    if (state.scheduleRule[editMode][date]) state.scheduleRule[editMode][date].push(time);
+                    else state.scheduleRule[editMode][date] = [time];
+                    classList.add(className);
+                }
+            }
+            setStyleClass();
+        };
+        const onDragSelect = (e) => {
+            const setClass = (el) => {
+                const classList = el.classList;
+                const date = classList[1];
+                const week = classList[2].split('-')[0].toLowerCase();
+                const time = Number(classList[2].split('-')[1]);
+
+                const routineTimes = get(state.scheduleRule.routine, week);
+                let oneTimeTimes = [] as number[];
+
+                if (props.mode !== 'READ') { // toggle routine rule
+                    if (routineTimes && routineTimes.includes(time)) {
+                        const idx = routineTimes.indexOf(time);
+                        state.scheduleRule.routine[week].splice(idx, 1);
+                        classList.remove('routine');
+                    } else {
+                        state.scheduleRule.routine[week].push(time);
+                        classList.add('routine');
+                    }
+                } else { // one time
+                    // prevent adding run(stop) tickets when the rule is (not) routine
+                    const isRoutineTime = routineTimes.includes(time);
+                    if (state.oneTimeEditMode === 'RUN' && isRoutineTime) return;
+                    if (state.oneTimeEditMode === 'STOP' && !isRoutineTime) return;
+
+                    let editMode;
+                    let className;
+                    if (state.oneTimeEditMode === 'RUN') {
+                        editMode = 'oneTimeRun';
+                        className = 'one-time-run';
+                    } else {
+                        editMode = 'oneTimeStop';
+                        className = 'one-time-stop';
+                    }
+
+                    // toggle one time rule
+                    oneTimeTimes = get(state.scheduleRule[editMode], date);
+                    if (oneTimeTimes && oneTimeTimes.includes(time)) {
+                        const idx = oneTimeTimes.indexOf(time);
+                        state.scheduleRule[editMode][date].splice(idx, 1);
+                        classList.remove(className);
+                    } else {
+                        if (state.scheduleRule[editMode][date]) state.scheduleRule[editMode][date].push(time);
+                        else state.scheduleRule[editMode][date] = [time];
+                        classList.add(className);
+                    }
+                }
+            };
+            e.added.forEach((el) => {
+                setClass(el);
+            });
+            e.removed.forEach((el) => {
+                setClass(el);
+            });
+            setStyleClass();
+        };
+        const onDeleteAllRoutine = () => {
+            state.scheduleRule.routine = {
+                sun: [],
+                mon: [],
+                tue: [],
+                wed: [],
+                thu: [],
+                fri: [],
+                sat: [],
+            };
+            setStyleClass();
+        };
+        const onClickStartOneTimeEditMode = (type) => {
+            state.oneTimeEditMode = type;
+            setStyleClass();
+        };
+        const onClickSaveOneTimeSchedule = () => {
+            // save logic
+        };
+        const onClickCancelOneTimeSchedule = async () => {
+            state.oneTimeEditMode = false;
+            await getScheduleRule();
+            setStyleClass();
         };
 
         watch(() => props.scheduleId, async (after, before) => {
             if (after !== before) {
                 await getScheduleRule();
+                setStyleClass();
             }
         }, { immediate: true });
+        watch(() => props.mode, async (after) => {
+            if (after !== 'READ') {
+                state.oneTimeEditMode = false;
+                await getScheduleRule();
+                setStyleClass();
+            }
+        }, { immediate: true });
+        watch(() => state.currentDate, () => {
+            setStyleClass();
+        });
+
+        onMounted(() => {
+            state.dragContainer = refs.draggableSection;
+        });
 
         return {
             ...toRefs(state),
-            getClass,
             onClickCurrentWeek,
+            onClickTime,
+            onDragSelect,
+            onDeleteAllRoutine,
+            onClickStartOneTimeEditMode,
+            onClickSaveOneTimeSchedule,
+            onClickCancelOneTimeSchedule,
             range,
         };
     },
@@ -299,9 +518,8 @@ export default {
         width: 75%;
         padding-top: 1.5rem;
         padding-bottom: 0.5rem;
-        .current-week-button {
-            @apply text-gray-900;
-            font-weight: normal;
+        .this-week-button {
+            @apply border-gray-300;
         }
         .p-date-pagination {
             position: absolute;
@@ -369,17 +587,20 @@ export default {
                         &:first-child {
                             @apply border-l-0;
                         }
+                        &.selected {
+                            @apply border border-gray-900 border-dashed;
+                        }
                         &.routine {
                             @apply bg-point-violet;
                             height: 0.7rem;
                             border-radius: 0.125rem;
                         }
-                        &.ticket-running {
+                        &.one-time-run {
                             @apply bg-peacock-300;
                             height: 0.7rem;
                             border-radius: 0.125rem;
                         }
-                        &.ticket-stopped {
+                        &.one-time-stop {
                             @apply bg-red-400;
                             height: 0.7rem;
                             border-radius: 0.125rem;
@@ -394,31 +615,34 @@ export default {
         width: 25%;
         vertical-align: top;
         font-size: 0.875rem;
-        padding: 0 3.5rem;
+        padding-left: 3.5rem;
+        .content-lap {
+            padding-bottom: 2rem;
+        }
         .title {
             @apply text-gray-400;
             font-weight: bold;
+            line-height: 1.5rem;
             padding-bottom: 0.5rem;
-        }
-        .timezone-lap {
-            @apply text-gray-900;
-            padding-bottom: 3rem;
+            &.activated {
+                @apply text-secondary;
+            }
         }
         .legend-lap {
-            padding-bottom: 0.5rem;
+            line-height: 1.25rem;
             &.routine {
                 @apply text-point-violet;
                 .legend-icon {
                     @apply bg-point-violet;
                 }
             }
-            &.ticket-running {
+            &.one-time-run {
                 @apply text-peacock-300;
                 .legend-icon {
                     @apply bg-peacock-300;
                 }
             }
-            &.ticket-stopped {
+            &.one-time-stop {
                 @apply text-red-500;
                 .legend-icon {
                     @apply bg-red-400;
@@ -431,6 +655,18 @@ export default {
                 vertical-align: baseline;
                 border-radius: 2px;
                 margin-right: 0.5rem;
+            }
+            .making-ticket-text {
+                @apply bg-blue-200 text-secondary;
+                font-size: 0.75rem;
+                margin-left: 1rem;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            .p-button {
+                @apply border-gray-300;
+                height: 1.25rem;
+                margin-left: 1rem;
             }
         }
     }
