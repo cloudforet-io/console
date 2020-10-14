@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, forEach, groupBy } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
     KeyDataType,
@@ -196,7 +196,55 @@ const parseTag = (text: string): QueryItem => {
     };
 };
 
+type QueryFilters = Record<string|'keywords', Array<string|number|boolean>>
+
+const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[] = []): QueryTag[] => {
+    const res: QueryTag[] = [];
+
+    const keyMap = {};
+    forEach(keyItems, (d) => {
+        keyMap[d.name] = d;
+    });
+
+    forEach(queryFilters, (values, k) => {
+        if (k === 'keywords') {
+            values.forEach((d) => {
+                res.push({ value: { label: d as string, name: d }, operator: '' });
+            });
+        } else {
+            const filterKey = k.split('/');
+            const key = filterKey[0];
+            values.forEach((d) => {
+                res.push({
+                    key: keyMap[key] || { label: key, name: key },
+                    value: { label: d as string, name: d },
+                    operator: filterKey[1],
+                });
+            });
+        }
+    });
+    return res;
+};
+
+const queryTagsToQueryFilters = (queryTags: QueryTag[]): QueryFilters => {
+    const res: QueryFilters = {
+        keywords: [],
+    };
+    queryTags.forEach((tag) => {
+        if (tag.key) {
+            const filterKey = `${tag.key.name}/${tag.operator}`;
+            if (!res[filterKey]) res[filterKey] = [];
+            res[filterKey].push(tag.value.name);
+        } else {
+            res.keywords.push(tag.value.name);
+        }
+    });
+    return res;
+};
+
 export {
     getFiltersFromQueryTags,
     parseTag,
+    queryFiltersToQueryTags,
+    queryTagsToQueryFilters,
 };

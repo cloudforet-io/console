@@ -61,7 +61,7 @@
                              class="resource-group-item"
                              @click="updateResourceGroup(item)"
                         >
-                            <div class="resource">
+                            <div class="resource" @click="onClickResourceGroup(item)">
                                 <p-lazy-img :src="iconUrl(item)"
                                             width="2rem" height="2rem"
                                             class="mr-2"
@@ -75,6 +75,9 @@
                 </div>
             </div>
         </transition-group>
+        <resource-group-page :visible.sync="resourceGroupVisible"
+                             :resource-group="selectedResourceGroup"
+        />
     </div>
 </template>
 
@@ -89,6 +92,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import ResourceGroupPage from '@/views/management/power-scheduler/pages/ResourceGroupPage.vue';
 
     interface ItemType {
         // eslint-disable-next-line camelcase
@@ -109,6 +113,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 export default {
     name: 'App',
     components: {
+        ResourceGroupPage,
         PSkeleton,
         PIconTextButton,
         PI,
@@ -132,6 +137,8 @@ export default {
             loading: false,
             editable: false,
             isDragging: false,
+            resourceGroupVisible: false,
+            selectedResourceGroup: null as any,
         });
 
         const addColumn = () => {
@@ -212,6 +219,11 @@ export default {
             }
         }, { immediate: true });
 
+        const onClickResourceGroup = (item) => {
+            state.selectedResourceGroup = item || null;
+            state.resourceGroupVisible = true;
+        };
+
         return {
             ...toRefs(state),
             addColumn,
@@ -221,6 +233,7 @@ export default {
             onStart,
             onEnd,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
+            onClickResourceGroup,
         };
     },
 };

@@ -14,6 +14,7 @@ import { store } from '@/store';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
+import { Filter } from '@/lib/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
