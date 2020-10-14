@@ -50,7 +50,7 @@
                         </p>
                     </div>
                     <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
-                               group="tasks"
+                               group="items"
                                :empty-insert-threshold="100"
                                :disabled="!editable"
                                @start="onStart"

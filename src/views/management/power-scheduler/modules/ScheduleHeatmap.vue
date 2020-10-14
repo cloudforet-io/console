@@ -62,7 +62,7 @@ export default {
 
         if (props.schedule.length > 0) {
             map(props.schedule, (sd) => {
-                const dailyHeatMapColor: string[] = map(sd.rule, (day: number[]) => getHeatMapColor(day.length));
+                const dailyHeatMapColor: string[] = map(sd.rule, d => getHeatMapColor(d.times.length));
                 scheduleHeatMapColor.push(dailyHeatMapColor);
             });
         } else {

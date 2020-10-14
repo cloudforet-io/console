@@ -1,13 +1,14 @@
 <template>
-    <general-page-layout>
+    <general-page-layout class="power-scheduler">
         <div class="page-navigation">
             <p-page-navigation :routes="route" />
         </div>
-        <p-page-title :title="'Power Scheduler'" use-total-count :total-count="totalCount"
-                      class="page-title"
-        />
+        <div class="page-title">
+            <p-page-title :title="'Power Scheduler'" use-total-count :total-count="totalCount" />
+        </div>
+        <cost-doughnut-chart class="cost-doughnut-chart mb-8" />
         <p-hr class="cloud-service-divider" />
-        <div class="power-scheduler">
+        <div class="power-scheduler-project">
             <p-search-grid-layout
                 :items="items"
                 :card-class="cardClass"
@@ -125,6 +126,7 @@ import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
+import CostDoughnutChart from '@/views/management/power-scheduler/modules/CostDoughnutChart.vue';
 
 interface Scheduler {
     name: string;
@@ -135,6 +137,7 @@ interface Scheduler {
 export default {
     name: 'PowerScheduler',
     components: {
+        CostDoughnutChart,
         ScheduleHeatmap,
         PI,
         PageInformation,
@@ -323,89 +326,111 @@ export default {
 
 <style lang="postcss" scoped>
     .power-scheduler {
-        margin-top: 1.5rem;
-    }
-
-    >>> .power-scheduler-list {
-        @apply border border-gray-200 rounded overflow-visible;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-
-        &:hover {
-            @apply border-gray-200 bg-blue-100;
-            cursor: pointer;
+        .cost-doughnut-chart {
+            width: 30%;
         }
-    }
+        .power-scheduler-project {
+            margin-top: 1.5rem;
+        }
 
-    .project-description {
-        @apply mx-6 mt-6 mb-6;
-        .project {
-            .project-group-name {
-                @apply text-gray-500 text-xs;
-            }
-            #project-name {
-                @apply text-lg font-bold truncate pb-6 overflow-hidden;
+        >>> .power-scheduler-list {
+            @apply border border-gray-200 rounded overflow-visible;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+            &:hover {
+                @apply border-gray-200 bg-blue-100;
+                cursor: pointer;
             }
         }
-    }
 
-    .resources {
-        @apply flex justify-between;
-        .scheduled-resources {
-            p {
-                @apply mb-1 text-xs;
-            }
-            .current-schedule-resources {
-                @apply font-bold text-primary text-xs;
-            }
-            .max-schedule-resources {
-                @apply text-gray-400 text-xs;
-            }
-        }
-        .saving {
-            .saving-this-month {
-                @apply mb-1 text-xs;
-            }
-            .approximate {
-                @apply text-gray-400 text-xs;
-            }
-            .costs {
-                @apply float-right;
-                .approx-costs {
-                    @apply text-primary font-bold;
+        .project-description {
+            @apply mx-6 mt-6 mb-6;
+
+            .project {
+                .project-group-name {
+                    @apply text-gray-500 text-xs;
+                }
+
+                #project-name {
+                    @apply text-lg font-bold truncate pb-6 overflow-hidden;
                 }
             }
         }
-    }
-    .schedule {
-        @apply ml-6 mr-5 mt-6 mb-6 flex justify-between;
-        .schedule-title {
-            @apply font-bold text-gray-400 text-xs;
-            .schedule-title-num {
-                @apply font-normal;
+
+        .resources {
+            @apply flex justify-between;
+
+            .scheduled-resources {
+                p {
+                    @apply mb-1 text-xs;
+                }
+
+                .current-schedule-resources {
+                    @apply font-bold text-primary text-xs;
+                }
+
+                .max-schedule-resources {
+                    @apply text-gray-400 text-xs;
+                }
+            }
+
+            .saving {
+                .saving-this-month {
+                    @apply mb-1 text-xs;
+                }
+
+                .approximate {
+                    @apply text-gray-400 text-xs;
+                }
+
+                .costs {
+                    @apply float-right;
+
+                    .approx-costs {
+                        @apply text-primary font-bold;
+                    }
+                }
             }
         }
-        .scheduler-name {
-            @apply ml-1;
-            font-size: 0.75rem;
-        }
-        .weekday {
-            @apply text-gray-400 inline-block;
-            font-size: 0.625rem;
-            width: 1rem;
-            height: 1rem;
-            text-align: center;
-        }
-        .schedule-add-btn {
-            @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
-            &:hover {
-                @apply bg-blue-300;
+
+        .schedule {
+            @apply ml-6 mr-5 mt-6 mb-6 flex justify-between;
+
+            .schedule-title {
+                @apply font-bold text-gray-400 text-xs;
+
+                .schedule-title-num {
+                    @apply font-normal;
+                }
             }
-        }
-        .schedule-add-text {
-            @apply text-gray-900;
-            margin-left: 0.5rem;
-            font-size: 0.75rem;
-            line-height: 1.5;
+
+            .scheduler-name {
+                @apply ml-1;
+                font-size: 0.75rem;
+            }
+
+            .weekday {
+                @apply text-gray-400 inline-block;
+                font-size: 0.625rem;
+                width: 1rem;
+                height: 1rem;
+                text-align: center;
+            }
+
+            .schedule-add-btn {
+                @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
+
+                &:hover {
+                    @apply bg-blue-300;
+                }
+            }
+
+            .schedule-add-text {
+                @apply text-gray-900;
+                margin-left: 0.5rem;
+                font-size: 0.75rem;
+                line-height: 1.5;
+            }
         }
     }
 </style>
