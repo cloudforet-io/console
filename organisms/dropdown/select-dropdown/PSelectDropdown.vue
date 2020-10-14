@@ -50,19 +50,35 @@ export default {
             type: Boolean,
             default: false,
         },
+        indexMode: {
+            type: Boolean,
+            default: false,
+        },
+        placeholder: {
+            type: String,
+            default: '',
+        },
     },
     setup(props: SelectDropdownProps, { emit }) {
-        const items = computed(() => groupBy(props.items, 'name'));
         const selectItemLabel = computed(() => {
-            const data = items.value[props.selectItem];
-            if (data && data[0].label) {
-                return data[0].label;
+            if (props.indexMode) {
+                if (props.items[props.selectItem]) return props.items[props.selectItem].label || props.items[props.selectItem].name || '';
+                return props.placeholder;
             }
-            return '';
+            const data = groupBy(props.items, 'name')[props.selectItem];
+            if (data[0]) {
+                return data[0].label || data[0].name || '';
+            }
+            return props.placeholder;
         });
-        const changSelectItem = (value) => {
-            emit('input', value);
-            emit('onSelected', value);
+        const changSelectItem = (value, index) => {
+            if (props.indexMode) {
+                emit('input', index);
+                emit('onSelected', index);
+            } else {
+                emit('input', value);
+                emit('onSelected', value);
+            }
         };
         const invalidClass = computed(() => ({ 'is-invalid-btn': props.invalid }));
         return {
@@ -88,6 +104,9 @@ export default {
                 @apply border border-alert;
             }
         }
+    }
+    .p-dropdown-btn .menu-btn.p-button.active {
+        @apply text-gray-900;
     }
 }
 </style>

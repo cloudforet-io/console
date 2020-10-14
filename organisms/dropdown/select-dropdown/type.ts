@@ -6,6 +6,8 @@ export interface SelectDropdownStateType {
     autoHeight: boolean;
     disabled: boolean;
     loading: boolean;
+    indexMode: boolean;
+    placeholder: string;
 }
 
 export interface SelectDropdownSyncStateType {
