@@ -18,6 +18,7 @@
                 :query-tags="tags"
                 :key-items="keyItems"
                 :value-handler-map="valueHandlerMap"
+                :pagination-values="[12, 24, 36]"
                 card-height="18.25rem"
                 card-min-width="25rem"
                 @change="onChange"
@@ -156,16 +157,11 @@ export default {
                     name: 'project_id',
                     label: 'Project',
                 },
-                {
-                    name: 'schedule_id',
-                    label: 'Schedule',
-                },
             ],
             valueHandlerMap: {
                 // eslint-disable-next-line camelcase
                 project_id: makeReferenceValueHandler('identity.Project'),
                 // eslint-disable-next-line camelcase
-                schedule_id: makeReferenceValueHandler('power_scheduler.Schedule'),
             },
         };
 
@@ -179,7 +175,7 @@ export default {
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
             thisPage: 1,
-            pageSize: 24,
+            pageSize: 12,
             totalCount: 0,
             approximateCosts: 0,
             scheduler: [] as unknown as Scheduler,

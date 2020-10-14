@@ -10,7 +10,10 @@
                 우선순위 추가
             </p-icon-text-button>
         </div>
-        <transition-group class="container">
+        <div v-if="loading">
+            <p-skeleton class="skeleton-container"/>
+        </div>
+        <transition-group v-if="!loading" class="container">
             <div
                 v-for="column in columns"
                 :key="column.title"
@@ -85,6 +88,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
     interface ItemType {
         // eslint-disable-next-line camelcase
@@ -105,6 +109,7 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 export default {
     name: 'App',
     components: {
+        PSkeleton,
         PIconTextButton,
         PI,
         PLazyImg,
@@ -256,7 +261,12 @@ export default {
     }
 
     .kanban {
+        max-width: calc(100vw - 4.5rem);
         width: 100%;
+        .skeleton-container {
+            max-width: calc(100vw - 4.5rem);
+            height: 20rem;
+        }
         .container {
             @apply flex flex-wrap w-full h-full;
             .resource-group-box {
