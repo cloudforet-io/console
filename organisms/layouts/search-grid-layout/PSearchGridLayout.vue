@@ -4,6 +4,7 @@
                            :card-class="cardClass"
                            :card-min-width="cardMinWidth"
                            :card-height="cardHeight"
+                           :pagination-values="paginationValues"
                            :excel-visible="false"
                            :loading="loading"
                            :all-page="allPage"
@@ -117,6 +118,10 @@ export default {
         queryTags: {
             type: Array,
             default: () => [],
+        },
+        paginationValues: {
+            type: Array,
+            default: () => [24, 36, 48],
         },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {

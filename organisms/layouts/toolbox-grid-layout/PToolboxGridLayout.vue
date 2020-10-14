@@ -126,7 +126,7 @@ export default {
             type: Number,
             default: 24,
         },
-        pageNationValues: {
+        paginationValues: {
             type: Array,
             default: () => [24, 36, 48],
         },
@@ -144,7 +144,7 @@ export default {
         const state = reactive({
             proxyThisPage: makeOptionalProxy('thisPage', vm),
             proxyPageSize: makeOptionalProxy('pageSize', vm),
-            pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
+            pageSizeOptions: computed(() => (flatMap(props.paginationValues, size => ({ type: 'item', label: size, name: size })))),
         });
         const changePageNumber = (page) => {
             state.proxyThisPage = page;

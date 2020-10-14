@@ -450,7 +450,7 @@ export default {
                 children.forEach((td, colIdx) => {
                     if (colIdx === idx) {
                         // @ts-ignore
-                        result += `${td.innerText}\t`;
+                        result += `${td.innerText}\n`;
                     }
                 });
             });
