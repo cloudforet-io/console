@@ -65,6 +65,15 @@
                             class="item"
                         />
                     </div>
+                    <div v-if="showHelpBlock" class="help-block">
+                        <p class="help-text">
+                            날짜와 시간을 클릭/드래그하여 타이머를 적용하세요.<br>재 클릭시 해제할 수 있습니다.
+                        </p>
+                        <p-i name="cursor_pointer--blue" class="cursor-icon"
+                             width="2rem" height="2rem"
+                             color="white inherit"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,13 +108,13 @@
                               class="gray900 sm ml-4 mr-1" :outline="true"
                               @click="onClickSaveOneTimeSchedule"
                     >
-                        저장
+                        {{ $t('PWR_SCHED.SAVE') }}
                     </p-button>
                     <p-button v-if="oneTimeEditMode"
                               class="gray900 sm" :outline="true"
                               @click="onClickCancelOneTimeSchedule"
                     >
-                        취소
+                        {{ $t('PWR_SCHED.CANCEL') }}
                     </p-button>
                 </div>
                 <div class="legend-lap one-time-run pb-2">
@@ -141,7 +150,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, range, has } from 'lodash';
+import { get, range } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
@@ -154,6 +163,7 @@ import {
 
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -162,30 +172,31 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-interface RoutineRule {
-    day: string;
-    times: number[];
-}
-interface TicketRule {
-    date: string;
-    times: number[];
-}
-interface ScheduleRule {
-    [key: string]: number[];
-}
+    interface RoutineRule {
+        day: string;
+        times: number[];
+    }
+    interface TicketRule {
+        date: string;
+        times: number[];
+    }
+    interface ScheduleRule {
+        [key: string]: number[];
+    }
 
-enum SCHEDULE_RULE_TYPE {
-    routine = 'ROUTINE',
-    ticket = 'TICKET',
-}
-enum RULE_STATE {
-    running = 'RUNNING',
-    stopped = 'STOPPED',
-}
+    enum SCHEDULE_RULE_TYPE {
+        routine = 'ROUTINE',
+        ticket = 'TICKET',
+    }
+    enum RULE_STATE {
+        running = 'RUNNING',
+        stopped = 'STOPPED',
+    }
 
 export default {
     name: 'ScheduleTimeTable',
     components: {
+        PI,
         PButton,
         PDatePagination,
         VueSelecto,
@@ -193,7 +204,7 @@ export default {
     props: {
         scheduleId: {
             type: String,
-            required: true,
+            default: undefined,
         },
         mode: {
             type: String,
@@ -230,12 +241,29 @@ export default {
             oneTimeEditMode: false as boolean | string,
             dragContainer: undefined,
             scheduleRule: {
-                routine: {} as ScheduleRule,
+                routine: {
+                    sun: [],
+                    mon: [],
+                    tue: [],
+                    wed: [],
+                    thu: [],
+                    fri: [],
+                    sat: [],
+                } as ScheduleRule,
                 oneTimeRun: {} as ScheduleRule,
                 oneTimeStop: {} as ScheduleRule,
             },
+            showHelpBlock: computed(() => {
+                if (!state.editMode) return false;
+                return !state.isRoutineDataExists && !state.isOneTimeRunDataExists && !state.isOneTimeStopDataExists;
+            }),
+            // check api data
+            isRoutineDataExists: false,
+            isOneTimeRunDataExists: false,
+            isOneTimeStopDataExists: false,
         });
 
+        // api
         const setStyleClass = () => {
             refs.item.forEach((item) => {
                 const classes = item.classList;
@@ -244,10 +272,7 @@ export default {
                 const time = Number(classes[2].split('-')[1]);
 
                 // init
-                item.classList.remove('routine');
-                item.classList.remove('one-time-run');
-                item.classList.remove('one-time-stop');
-                item.classList.remove('opacity-25');
+                item.classList.remove('routine', 'one-time-run', 'one-time-stop', 'opacity-25');
 
                 // routine
                 let rules = get(state.scheduleRule.routine, weekday);
@@ -256,8 +281,9 @@ export default {
                     if (state.oneTimeEditMode) item.classList.add('opacity-25');
                 }
 
-                // one time run
+                // one time
                 if (props.mode === 'READ') {
+                    // run
                     if (state.oneTimeEditMode !== 'STOP') {
                         rules = get(state.scheduleRule.oneTimeRun, date);
                         if (rules && rules.includes(time)) {
@@ -265,7 +291,7 @@ export default {
                         }
                     }
 
-                    // one time stop
+                    // stop
                     if (state.oneTimeEditMode !== 'RUN') {
                         rules = get(state.scheduleRule.oneTimeStop, date);
                         if (rules && rules.includes(time)) {
@@ -281,17 +307,10 @@ export default {
             const ruleType = scheduleRule.rule_type;
             const ruleState = scheduleRule.state;
             if (ruleType === SCHEDULE_RULE_TYPE.routine) {
-                const newRule = {
-                    sun: [],
-                    mon: [],
-                    tue: [],
-                    wed: [],
-                    thu: [],
-                    fri: [],
-                    sat: [],
-                };
+                const newRule = state.scheduleRule.routine;
                 const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
                 const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
+
                 rules.forEach((rule, index) => {
                     const weekday = rule.day;
                     rule.times.forEach((time) => {
@@ -309,6 +328,7 @@ export default {
                     });
                 });
                 state.scheduleRule.routine = newRule;
+                state.isRoutineDataExists = true;
             } else {
                 const newRule = {};
                 rules.forEach((rule) => {
@@ -325,8 +345,13 @@ export default {
                         }
                     });
                 });
-                if (ruleState === RULE_STATE.running) state.scheduleRule.oneTimeRun = newRule;
-                else if (ruleState === RULE_STATE.stopped) state.scheduleRule.oneTimeStop = newRule;
+                if (ruleState === RULE_STATE.running) {
+                    state.scheduleRule.oneTimeRun = newRule;
+                    state.isOneTimeRunDataExists = true;
+                } else if (ruleState === RULE_STATE.stopped) {
+                    state.scheduleRule.oneTimeStop = newRule;
+                    state.isOneTimeStopDataExists = true;
+                }
             }
         };
         const getScheduleRule = async () => {
@@ -335,50 +360,20 @@ export default {
             });
             res.results.forEach(result => getScheduleRuleWithTimezone(result));
         };
+        const createSchedule = async () => {
+            const res = await SpaceConnector.client.powerScheduler.schedule.create({
+                // schedule_id: props.scheduleId,
+                // 'project_id':
+            });
+        };
+        const createOrUpdateScheduleRule = async () => {
+            if (!props.scheduleId) await createSchedule();
+            // const res = await SpaceConnector.client.powerScheduler.
+        };
 
+        // events
         const onClickCurrentWeek = () => {
             state.currentDate = dayjs().tz(getTimezone());
-        };
-        const onClickTime = (e) => {
-            if (!state.editMode) return;
-
-            const classList = e.target.classList;
-            const date = classList[1];
-            const week = classList[2].split('-')[0].toLowerCase();
-            const time = Number(classList[2].split('-')[1]);
-            let rules = [] as number[];
-            if (props.mode !== 'READ') { // routine
-                rules = get(state.scheduleRule.routine, week);
-                if (rules && rules.includes(time)) {
-                    const idx = rules.indexOf(time);
-                    state.scheduleRule.routine[week].splice(idx, 1);
-                    classList.remove('routine');
-                } else {
-                    state.scheduleRule.routine[week].push(time);
-                    classList.add('routine');
-                }
-            } else {
-                let editMode = '';
-                let className = '';
-                if (state.oneTimeEditMode === 'RUN') {
-                    editMode = 'oneTimeRun';
-                    className = 'one-time-run';
-                } else {
-                    editMode = 'oneTimeStop';
-                    className = 'one-time-stop';
-                }
-                rules = get(state.scheduleRule[editMode], date);
-                if (rules && rules.includes(time)) {
-                    const idx = rules.indexOf(time);
-                    state.scheduleRule[editMode][date].splice(idx, 1);
-                    classList.remove(className);
-                } else {
-                    if (state.scheduleRule[editMode][date]) state.scheduleRule[editMode][date].push(time);
-                    else state.scheduleRule[editMode][date] = [time];
-                    classList.add(className);
-                }
-            }
-            setStyleClass();
         };
         const onDragSelect = (e) => {
             const setClass = (el) => {
@@ -461,6 +456,14 @@ export default {
             setStyleClass();
         };
 
+        //
+        const create = async () => {
+            //
+        };
+        const update = async () => {
+            //
+        };
+
         watch(() => props.scheduleId, async (after, before) => {
             if (after !== before) {
                 await getScheduleRule();
@@ -485,7 +488,6 @@ export default {
         return {
             ...toRefs(state),
             onClickCurrentWeek,
-            onClickTime,
             onDragSelect,
             onDeleteAllRoutine,
             onClickStartOneTimeEditMode,
@@ -498,177 +500,203 @@ export default {
 </script>
 
 <style lang="postcss">
-.schedule-time-table-container {
-    width: 100%;
-    .title-lap {
-        display: block;
-        .title {
-            @apply text-gray-900;
-            font-size: 1rem;
-            font-weight: bold;
-            padding-right: 0.5rem;
-        }
-        .sub-title {
-            @apply text-gray-400;
-            font-size: 0.75rem;
-        }
-    }
-    .button-lap {
-        position: relative;
-        width: 75%;
-        padding-top: 1.5rem;
-        padding-bottom: 0.5rem;
-        .this-week-button {
-            @apply border-gray-300;
-        }
-        .p-date-pagination {
-            position: absolute;
-            right: 0;
-        }
-    }
-    .left {
-        display: inline-block;
-        width: 75%;
-        .table-lap {
-            display: flex;
-            width: 100%;
-            .time-section {
-                @apply bg-primary4 border border-primary3 border-r-0;
-                width: 3rem;
-                .icon-item {
-                    @apply border-b border-primary3;
-                    height: 3.125rem;
-                }
-                .time {
-                    @apply text-gray-500;
-                    height: 0.75rem;
-                    font-size: 0.625rem;
-                    text-align: center;
-                    line-height: 0.625rem;
-                }
-            }
-            .data-section {
-                @apply border border-primary3;
-                width: calc(100% - 3rem);
-                .weekday-row {
-                    @apply bg-primary4 border-b border-primary3;
-                    width: 100%;
-                    height: 3.125rem;
-                    .weekday-item {
-                        @apply text-gray-500;
-                        display: inline-block;
-                        width: calc(100% / 7);
-                        font-size: 0.75rem;
-                        text-align: center;
-                        padding: 0.625rem;
-                        .weekday-text {
-                            font-weight: bold;
-                        }
-                        &.today {
-                            @apply text-gray-900;
-                            font-weight: bold;
-                        }
-                    }
-                }
-                .item-row {
-                    @apply border-b border-primary4;
-                    display: flex;
-                    width: 100%;
-                    height: 0.75rem;
-                    &:last-child {
-                        border-bottom: none;
-                    }
-                    .item {
-                        @apply border-l border-primary4;
-                        display: inline-flex;
-                        width: calc(100% / 7);
-                        height: 0.75rem;
-                        margin: 0;
-                        &:first-child {
-                            @apply border-l-0;
-                        }
-                        &.selected {
-                            @apply border border-gray-900 border-dashed;
-                        }
-                        &.routine {
-                            @apply bg-point-violet;
-                            height: 0.7rem;
-                            border-radius: 0.125rem;
-                        }
-                        &.one-time-run {
-                            @apply bg-peacock-300;
-                            height: 0.7rem;
-                            border-radius: 0.125rem;
-                        }
-                        &.one-time-stop {
-                            @apply bg-red-400;
-                            height: 0.7rem;
-                            border-radius: 0.125rem;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    .right {
-        display: inline-block;
-        width: 25%;
-        vertical-align: top;
-        font-size: 0.875rem;
-        padding-left: 3.5rem;
-        .content-lap {
-            padding-bottom: 2rem;
-        }
-        .title {
-            @apply text-gray-400;
-            font-weight: bold;
-            line-height: 1.5rem;
-            padding-bottom: 0.5rem;
-            &.activated {
-                @apply text-secondary;
-            }
-        }
-        .legend-lap {
-            line-height: 1.25rem;
-            &.routine {
-                @apply text-point-violet;
-                .legend-icon {
-                    @apply bg-point-violet;
-                }
-            }
-            &.one-time-run {
-                @apply text-peacock-300;
-                .legend-icon {
-                    @apply bg-peacock-300;
-                }
-            }
-            &.one-time-stop {
-                @apply text-red-500;
-                .legend-icon {
-                    @apply bg-red-400;
-                }
-            }
-            .legend-icon {
-                display: inline-block;
-                width: 0.75rem;
-                height: 0.75rem;
-                vertical-align: baseline;
-                border-radius: 2px;
-                margin-right: 0.5rem;
-            }
-            .making-ticket-text {
-                @apply bg-blue-200 text-secondary;
-                font-size: 0.75rem;
-                margin-left: 1rem;
-                padding-left: 0.5rem;
+    .schedule-time-table-container {
+        width: 100%;
+        .title-lap {
+            display: block;
+            .title {
+                @apply text-gray-900;
+                font-size: 1rem;
+                font-weight: bold;
                 padding-right: 0.5rem;
             }
-            .p-button {
+            .sub-title {
+                @apply text-gray-400;
+                font-size: 0.75rem;
+            }
+        }
+        .button-lap {
+            position: relative;
+            width: 75%;
+            padding-top: 1.5rem;
+            padding-bottom: 0.5rem;
+            .this-week-button {
                 @apply border-gray-300;
-                height: 1.25rem;
-                margin-left: 1rem;
+            }
+            .p-date-pagination {
+                position: absolute;
+                right: 0;
+            }
+        }
+        .left {
+            display: inline-block;
+            width: 75%;
+            .table-lap {
+                display: flex;
+                width: 100%;
+                .time-section {
+                    @apply bg-primary4 border border-primary3 border-r-0;
+                    width: 3rem;
+                    .icon-item {
+                        @apply border-b border-primary3;
+                        height: 3.125rem;
+                    }
+                    .time {
+                        @apply text-gray-500;
+                        height: 0.75rem;
+                        font-size: 0.625rem;
+                        text-align: center;
+                        line-height: 0.625rem;
+                    }
+                }
+                .data-section {
+                    @apply border border-primary3;
+                    position: relative;
+                    width: calc(100% - 3rem);
+                    .weekday-row {
+                        @apply bg-primary4 border-b border-primary3;
+                        width: 100%;
+                        height: 3.125rem;
+                        .weekday-item {
+                            @apply text-gray-500;
+                            display: inline-block;
+                            width: calc(100% / 7);
+                            font-size: 0.75rem;
+                            text-align: center;
+                            padding: 0.625rem;
+                            .weekday-text {
+                                font-weight: bold;
+                            }
+                            &.today {
+                                @apply text-gray-900;
+                                font-weight: bold;
+                            }
+                        }
+                    }
+                    .item-row {
+                        @apply border-b border-primary4;
+                        display: flex;
+                        width: 100%;
+                        height: 0.75rem;
+                        &:last-child {
+                            border-bottom: none;
+                        }
+                        .item {
+                            @apply border-l border-primary4;
+                            display: inline-flex;
+                            width: calc(100% / 7);
+                            height: 0.75rem;
+                            margin: 0;
+                            &:first-child {
+                                @apply border-l-0;
+                            }
+                            &.selected {
+                                @apply border border-gray-900 border-dashed;
+                            }
+                            &.routine {
+                                @apply bg-point-violet;
+                                height: 0.7rem;
+                                border-radius: 0.125rem;
+                            }
+                            &.one-time-run {
+                                @apply bg-peacock-300;
+                                height: 0.7rem;
+                                border-radius: 0.125rem;
+                            }
+                            &.one-time-stop {
+                                @apply bg-red-400;
+                                height: 0.7rem;
+                                border-radius: 0.125rem;
+                            }
+                        }
+                    }
+                    .help-block {
+                        @apply border-dashed border-secondary text-secondary;
+                        position: absolute;
+                        display: table;
+                        width: calc(100% / 7 * 3);
+                        height: 3.75rem;
+                        top: 9rem;
+                        left: calc(100% / 7 * 2);
+                        border-width: 2px;
+                        border-radius: 2px;
+                        opacity: 0.75;
+                        .help-text {
+                            display: table-cell;
+                            height: 100%;
+                            vertical-align: middle;
+                            font-size: 0.75rem;
+                            line-height: 120%;
+                            text-align: center;
+                        }
+                        .cursor-icon {
+                            position: absolute;
+                            bottom: -1.4rem;
+                            right: -0.9rem;
+                        }
+                    }
+                }
+            }
+        }
+        .right {
+            display: inline-block;
+            width: 25%;
+            vertical-align: top;
+            font-size: 0.875rem;
+            padding-left: 3.5rem;
+            .content-lap {
+                padding-bottom: 2rem;
+            }
+            .title {
+                @apply text-gray-400;
+                font-weight: bold;
+                line-height: 1.5rem;
+                padding-bottom: 0.5rem;
+                &.activated {
+                    @apply text-secondary;
+                }
+            }
+            .legend-lap {
+                line-height: 1.25rem;
+                &.routine {
+                    @apply text-point-violet;
+                    .legend-icon {
+                        @apply bg-point-violet;
+                    }
+                }
+                &.one-time-run {
+                    @apply text-peacock-300;
+                    .legend-icon {
+                        @apply bg-peacock-300;
+                    }
+                }
+                &.one-time-stop {
+                    @apply text-red-500;
+                    .legend-icon {
+                        @apply bg-red-400;
+                    }
+                }
+                .legend-icon {
+                    display: inline-block;
+                    width: 0.75rem;
+                    height: 0.75rem;
+                    vertical-align: baseline;
+                    border-radius: 2px;
+                    margin-right: 0.5rem;
+                }
+                .making-ticket-text {
+                    @apply bg-blue-200 text-secondary;
+                    font-size: 0.75rem;
+                    margin-left: 1rem;
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                }
+                .p-button {
+                    @apply border-gray-300;
+                    height: 1.25rem;
+                    margin-left: 1rem;
+                }
             }
         }
     }
-}
 </style>
