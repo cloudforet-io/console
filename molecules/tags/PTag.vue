@@ -1,6 +1,6 @@
 <template>
     <p-badge class="p-tag" :class="{deletable: deletable}"
-             style-type="gray200" v-on="$listeners"
+             :style-type="styleType" v-on="$listeners"
     >
         <slot />
         <p-i v-if="deletable" name="ic_delete" width="1rem"
@@ -25,6 +25,10 @@ export default {
         deletable: {
             type: Boolean,
             default: true,
+        },
+        styleType: {
+            type: String,
+            default: 'gray200',
         },
     },
     setup() {
