@@ -66,7 +66,7 @@ export default {
                 return props.placeholder;
             }
             const data = groupBy(props.items, 'name')[props.selectItem];
-            if (data[0]) {
+            if (Array.isArray(data)) {
                 return data[0].label || data[0].name || '';
             }
             return props.placeholder;
