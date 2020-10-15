@@ -46,11 +46,10 @@
                         v-if="editMode"
                         :drag-container="dragContainer"
                         :selectable-targets="['.item']"
-                        :hit-rate="1"
-                        :select-by-click="true"
-                        :select-from-inside="true"
+                        :hit-rate="5"
+                        :select-by-click="false"
+                        :select-from-inside="false"
                         :continue-select="true"
-                        :toggle-continue-select="'shift'"
                         @select="onDragSelect"
                     />
                     <div v-for="time in range(0, 24)"
@@ -63,6 +62,7 @@
                             ref="item"
                             :class="[week.format('YYYY-MM-DD'), `${week.format('ddd')}-${time}`]"
                             class="item"
+                            @click="onClickTimeBlock"
                         />
                     </div>
                     <div v-if="showHelpBlock" class="help-block">
@@ -272,7 +272,7 @@ export default {
                 // routine
                 let rules = get(state.rule.routine, weekday);
                 if (rules && rules.includes(time)) {
-                    item.classList.add('routine');
+                    if (!item.classList.contains('routine')) item.classList.add('routine');
                     if (state.oneTimeEditMode) item.classList.add('opacity-25');
                 }
 
@@ -282,7 +282,7 @@ export default {
                     if (state.oneTimeEditMode !== 'STOP') {
                         rules = get(state.rule.oneTimeRun, date);
                         if (rules && rules.includes(time)) {
-                            item.classList.add('one-time-run');
+                            if (!item.classList.contains('one-time-run')) item.classList.add('one-time-run');
                         }
                     }
 
@@ -290,7 +290,7 @@ export default {
                     if (state.oneTimeEditMode !== 'RUN') {
                         rules = get(state.rule.oneTimeStop, date);
                         if (rules && rules.includes(time)) {
-                            item.classList.add('one-time-stop');
+                            if (!item.classList.contains('one-time-stop')) item.classList.add('one-time-stop');
                             item.classList.remove('opacity-25');
                         }
                     }
@@ -517,44 +517,26 @@ export default {
                 const time = Number(classList[2].split('-')[1]);
 
                 const routineTimes = get(state.rule.routine, week);
-                let oneTimeTimes = [] as number[];
 
                 if (props.mode !== 'READ') {
-                    if (routineTimes && routineTimes.includes(time)) {
-                        const idx = routineTimes.indexOf(time);
-                        state.rule.routine[week].splice(idx, 1);
-                        classList.remove('routine');
-                    } else {
-                        if (state.rule.routine[week]) state.rule.routine[week].push(time);
-                        else state.rule.routine[week] = [time];
-                        classList.add('routine');
-                    }
+                    if (routineTimes && routineTimes.includes(time)) return;
+                    if (state.rule.routine[week]) state.rule.routine[week].push(time);
+                    else state.rule.routine[week] = [time];
                 } else {
                     // prevent adding run(stop) tickets when the rule is (not) routine
                     const isRoutineTime = routineTimes && routineTimes.includes(time);
-                    if (state.oneTimeEditMode === 'RUN' && isRoutineTime) return;
-                    if (state.oneTimeEditMode === 'STOP' && !isRoutineTime) return;
-
-                    let editMode;
-                    let className;
                     if (state.oneTimeEditMode === 'RUN') {
-                        editMode = 'oneTimeRun';
-                        className = 'one-time-run';
-                    } else {
-                        editMode = 'oneTimeStop';
-                        className = 'one-time-stop';
-                    }
-
-                    // toggle one time rule
-                    oneTimeTimes = get(state.rule[editMode], date);
-                    if (oneTimeTimes && oneTimeTimes.includes(time)) {
-                        const idx = oneTimeTimes.indexOf(time);
-                        state.rule[editMode][date].splice(idx, 1);
-                        classList.remove(className);
-                    } else {
-                        if (state.rule[editMode][date]) state.rule[editMode][date].push(time);
-                        else state.rule[editMode][date] = [time];
-                        classList.add(className);
+                        const oneTimeTimes = get(state.rule.oneTimeRun, date);
+                        if (isRoutineTime) return;
+                        if (oneTimeTimes && oneTimeTimes.includes(time)) return;
+                        if (state.rule.oneTimeRun[date]) state.rule.oneTimeRun[date].push(time);
+                        else state.rule.oneTimeRun[date] = [time];
+                    } else if (state.oneTimeEditMode === 'STOP') {
+                        const oneTimeTimes = get(state.rule.oneTimeStop, date);
+                        if (!isRoutineTime) return;
+                        if (oneTimeTimes && oneTimeTimes.includes(time)) return;
+                        if (state.rule.oneTimeStop[date]) state.rule.oneTimeStop[date].push(time);
+                        else state.rule.oneTimeStop[date] = [time];
                     }
                 }
             };
@@ -564,6 +546,47 @@ export default {
             e.removed.forEach((el) => {
                 setClass(el);
             });
+            setStyleClass();
+        };
+        const onClickTimeBlock = (e) => {
+            if (!state.editMode) return;
+
+            const classList = e.target.classList;
+            const date = classList[1];
+            const week = classList[2].split('-')[0].toLowerCase();
+            const time = Number(classList[2].split('-')[1]);
+
+            const routineTimes = get(state.rule.routine, week);
+            const isRoutineTime = routineTimes && routineTimes.includes(time);
+
+            if (props.mode !== 'READ') {
+                if (routineTimes && routineTimes.includes(time)) { // already exists
+                    const idx = routineTimes.indexOf(time);
+                    state.rule.routine[week].splice(idx, 1);
+                } else if (state.rule.routine[week]) {
+                    state.rule.routine[week].push(time);
+                } else {
+                    state.rule.routine[week] = [time];
+                }
+            } else {
+                if (state.oneTimeEditMode === 'RUN' && isRoutineTime) return;
+                if (state.oneTimeEditMode === 'STOP' && !isRoutineTime) return;
+
+                let editMode: string;
+                if (state.oneTimeEditMode === 'RUN') editMode = 'oneTimeRun';
+                else editMode = 'oneTimeStop';
+
+                const oneTimeTimes = get(state.rule[editMode], date);
+                if (oneTimeTimes && oneTimeTimes.includes(time)) { // already exists
+                    const idx = oneTimeTimes.indexOf(time);
+                    state.rule[editMode][date].splice(idx, 1);
+                } else if (state.rule[editMode][date]) {
+                    state.rule[editMode][date].push(time);
+                } else {
+                    state.rule[editMode][date] = [time];
+                }
+            }
+
             setStyleClass();
         };
         const onDeleteAllRoutine = () => {
@@ -624,6 +647,7 @@ export default {
             onClickStartOneTimeEditMode,
             onClickSaveOneTimeSchedule,
             onClickCancelOneTimeSchedule,
+            onClickTimeBlock,
             range,
             createOrUpdate,
         };
