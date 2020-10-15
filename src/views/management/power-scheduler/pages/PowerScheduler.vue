@@ -75,7 +75,7 @@
                                     </span>
                                 </p>
                                 <div v-if="item.scheduler.length > 0">
-                                    <p v-for="(schedule, idx) in item.scheduler" :key="idx">
+                                    <p v-for="(schedule, idx) in item.scheduler.slice(0, 3)" :key="idx">
                                         <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span>
                                     </p>
                                 </div>
@@ -92,7 +92,7 @@
                                         <p class="weekday">{{ day }}</p>
                                     </span>
                                 </div>
-                                <schedule-heatmap :schedule="item.scheduler" />
+                                <schedule-heatmap :schedule="item.scheduler.slice(0, 3)" />
                             </div>
                         </div>
                     </router-link>
@@ -216,12 +216,7 @@ export default {
 
         const getScheduledResources = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.powerSchedulerResources({ projects: state.items.map(d => d.project_id) },
-                    {
-                        headers: {
-                            'Mock-Mode': 'true',
-                        },
-                    });
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerResources({ projects: state.items.map(d => d.project_id) });
                 for (let i = 0; i < Object.keys(state.items).length; i++) {
                     state.items[i].scheduledResources = res.projects[state.items[i].project_id];
                     state.items[i].percentage = (computed(() => (state.items[i].scheduledResources.managed_count / state.items[i].scheduledResources.total_count) * 100)).value;
@@ -233,12 +228,7 @@ export default {
 
         const getScheduleList = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: state.items.map(d => d.project_id) },
-                    {
-                        headers: {
-                            'Mock-Mode': 'true',
-                        },
-                    });
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSchedules({ projects: state.items.map(d => d.project_id) });
                 for (let i = 0; i < Object.keys(state.items).length; i++) {
                     state.items[i].scheduler = res.projects[state.items[i].project_id];
                 }
