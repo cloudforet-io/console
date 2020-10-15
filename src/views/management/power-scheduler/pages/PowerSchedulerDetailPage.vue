@@ -333,8 +333,8 @@ export default {
                 }
             }
             &.disabled {
-                @apply bg-gray-200;
-                opacity: 0.5;
+                @apply bg-gray-200 text-gray-400;
+                opacity: 0.8;
                 cursor: default;
                 &:hover {
                     @apply bg-gray-200;

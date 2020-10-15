@@ -252,10 +252,7 @@ export default {
                 oneTimeRun: {} as Rule,
                 oneTimeStop: {} as Rule,
             },
-            showHelpBlock: computed(() => {
-                if (!state.editMode) return false;
-                return false;
-            }),
+            showHelpBlock: false,
         });
 
         // util
@@ -433,7 +430,7 @@ export default {
             let ruleType = '';
             let ruleState = '';
             let ruleWithUTC: Rule = {};
-            const ruleForApi: RoutineRule[] | TicketRule[] = [];
+            const ruleForApi = [] as object[];
 
             if (props.mode !== 'READ') {
                 ruleType = RULE_TYPE.routine;
@@ -441,7 +438,7 @@ export default {
                 ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
                 Object.entries(ruleWithUTC).forEach(([k, v]) => {
                     if (v.length > 0) {
-                        ruleForApi.push({ day: k, times: v, date: '' });
+                        ruleForApi.push({ day: k, times: v });
                     }
                 });
             } else if (state.oneTimeEditMode) {
@@ -455,7 +452,7 @@ export default {
                 }
                 Object.entries(ruleWithUTC).forEach(([k, v]) => {
                     if (v.length > 0) {
-                        ruleForApi.push({ date: k, times: v, day: '' });
+                        ruleForApi.push({ date: k, times: v });
                     }
                 });
             } else {
@@ -551,6 +548,7 @@ export default {
                 setClass(el);
             });
             setStyleClass();
+            state.showHelpBlock = false;
         };
         const onClickTimeBlock = (e) => {
             if (!state.editMode) return;
@@ -592,6 +590,7 @@ export default {
             }
 
             setStyleClass();
+            state.showHelpBlock = false;
         };
         const onDeleteAllRoutine = () => {
             state.rule.routine = {
@@ -604,6 +603,7 @@ export default {
                 sat: [],
             };
             setStyleClass();
+            state.showHelpBlock = true;
         };
         const onClickStartOneTimeEditMode = (type) => {
             state.oneTimeEditMode = type;
@@ -629,6 +629,7 @@ export default {
             }
         }, { immediate: true });
         watch(() => props.mode, async (after) => {
+            if (after === 'CREATE') state.showHelpBlock = true;
             if (after !== 'READ') {
                 state.oneTimeEditMode = false;
                 await getScheduleRule();
