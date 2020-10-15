@@ -4,7 +4,12 @@
             <p-page-navigation :routes="route" />
         </div>
         <div class="page-title">
-            <p-page-title :title="'Power Scheduler'" use-total-count :total-count="totalCount" />
+            <p-page-title :title="'Power Scheduler'" :total-count="totalCount">
+                <template #extra>
+                    <p class="h-1"></p>
+                    <span id="current-date">업데이트 {{ currentDate }} (Local Time) </span>
+                </template>
+            </p-page-title>
         </div>
         <p-hr class="cloud-service-divider" />
         <div class="power-scheduler-project">
@@ -119,6 +124,8 @@ import ScheduleHeatmap from '@/views/management/power-scheduler/modules/Schedule
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import dayjs from 'dayjs';
+import { getTimezone } from '@/lib/util';
 
 /* Types */
 import { KeyItem } from '@/components/organisms/search/query-search/type';
@@ -180,7 +187,7 @@ export default {
             approximateCosts: 0,
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-            // projectIdList: [] as string[],
+            currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
         });
 
         /**
@@ -325,6 +332,11 @@ export default {
     .power-scheduler {
         .power-scheduler-project {
             margin-top: 1.5rem;
+        }
+
+        #current-date {
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
         }
 
         >>> .power-scheduler-list {

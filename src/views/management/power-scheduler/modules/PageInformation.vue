@@ -1,32 +1,28 @@
 <template>
     <div class="page-information">
-        <span>UPDATED {{ currentDate }} (Local Time) </span> <span class="divider" />
-        <span class="text-gray-400">LESS</span>
+        <!--        <span>UPDATED {{ currentDate }} (Local Time) </span>-->
+        <span>사용 비율</span>
+
         <span id="circle1" />
+        <span class="text-gray-400 text">10%</span>
+
         <span id="circle2" />
+        <span class="text-primary2 text">20%</span>
+
         <span id="circle3" />
+        <span class="text-primary1 text">30%</span>
+
         <span id="circle4" />
+        <span class="text-primary text">80%</span>
+
         <span id="circle5" />
-        <span class="text-primary">MORE</span>
+        <span class="text-primary-dark text">100%</span>
     </div>
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import { getTimezone } from '@/lib/util';
-import { reactive, toRefs } from '@vue/composition-api';
-
 export default {
     name: 'PageInformation',
-
-    setup(props, context) {
-        const state = reactive({
-            currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD')
-        })
-        return {
-            ...toRefs(state),
-        }
-    }
 };
 </script>
 
@@ -37,16 +33,9 @@ export default {
         margin-bottom: 0.625rem;
         font-size: 0.75rem;
         line-height: 0.8;
-        .divider {
-            @apply my-0 text-gray-200;
-            height: 0.875rem;
-            border-left-width: 1px;
-            margin-left: 0.5rem;
-            margin-right: 0.5rem;
-        }
         #circle1 {
-            @apply bg-gray-100;
-            margin-left: 0.25rem;
+            @apply bg-gray-200;
+            margin-left: 1rem;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 50%;
@@ -54,7 +43,6 @@ export default {
         }
         #circle2 {
             @apply bg-primary2;
-            margin-left: -0.125rem;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 50%;
@@ -62,25 +50,26 @@ export default {
         }
         #circle3 {
             @apply bg-primary1;
-            margin-left: -0.125rem;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 50%;
         }
         #circle4 {
             @apply bg-primary;
-            margin-left: -0.125rem;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 50%;
         }
         #circle5 {
             @apply bg-primary-dark;
-            margin-left: -0.125rem;
-            margin-right: 0.25rem;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 50%;
+        }
+        .text {
+            margin-left: 0.125rem;
+            margin-right: 0.5rem;
+            font-size: 0.625rem;
         }
     }
 
