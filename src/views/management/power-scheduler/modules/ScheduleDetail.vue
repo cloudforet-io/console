@@ -149,7 +149,7 @@ export default {
                 scheduleId = await updateSchedule();
             }
             if (props.mode === 'CREATE' || props.mode === 'UPDATE') {
-                // await state.timeTable.createOrUpdate(scheduleId);
+                await state.timeTable.createOrUpdate(scheduleId);
                 await state.kanban.onSave(scheduleId);
             }
             emit('update:mode', 'READ');

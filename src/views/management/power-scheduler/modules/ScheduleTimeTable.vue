@@ -404,6 +404,9 @@ export default {
             state.rule.routine = {};
             state.rule.oneTimeRun = {};
             state.rule.oneTimeStop = {};
+
+            if (!props.scheduleId) return;
+
             const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
                 schedule_id: props.scheduleId,
             });
@@ -426,7 +429,7 @@ export default {
                 }
             });
         };
-        const createOrUpdate = async () => {
+        const createOrUpdate = async (scheduleId) => {
             let ruleType = '';
             let ruleState = '';
             let ruleWithUTC: Rule = {};
@@ -474,7 +477,7 @@ export default {
                 },
             );
             const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
-                schedule_id: props.scheduleId,
+                schedule_id: scheduleId,
                 query: query.data,
             });
 
@@ -494,9 +497,10 @@ export default {
                     });
                 }
             } else {
+                if (ruleForApi.length === 0) return;
                 await SpaceConnector.client.powerScheduler.scheduleRule.create({
                     user_id: store.state.user.userId,
-                    schedule_id: props.scheduleId,
+                    schedule_id: scheduleId,
                     rule_type: ruleType,
                     name: `${ruleType} - ${ruleState}`,
                     state: ruleState,
@@ -606,7 +610,7 @@ export default {
             setStyleClass();
         };
         const onClickSaveOneTimeSchedule = async () => {
-            await createOrUpdate();
+            await createOrUpdate(props.scheduleId);
             await getScheduleRule();
 
             state.oneTimeEditMode = false;
