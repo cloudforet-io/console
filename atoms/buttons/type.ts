@@ -25,10 +25,13 @@ export enum BUTTON_SIZE {
     lg = 'lg'
 }
 
+export type ButtonStyle = keyof BUTTON_STYLE;
+export type ButtonSize = keyof BUTTON_SIZE;
+
 export interface Button {
     link?: string;
     disabled?: boolean;
     outline?: boolean;
-    styleType?: keyof BUTTON_STYLE;
-    size?: keyof BUTTON_SIZE;
+    styleType?: ButtonStyle;
+    size?: ButtonSize;
 }

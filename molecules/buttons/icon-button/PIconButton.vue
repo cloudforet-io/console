@@ -4,6 +4,7 @@
         :class="{solid, [`icon-btn-${styleType}`]: !!styleType}"
         :outline="outline"
         :disabled="disabled"
+        :size="size"
         v-on="$listeners"
         @mouseenter="onHover(true)"
         @mouseleave="onHover(false)"
@@ -91,6 +92,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        size: {
+            type: String,
+            default: undefined
+        }
     },
     setup(props: IconButtonProps) {
         const state = reactive({

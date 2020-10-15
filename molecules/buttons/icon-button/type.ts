@@ -1,3 +1,5 @@
+import { ButtonSize } from '@/components/atoms/buttons/type';
+
 export enum BUTTON_STYLE_TYPE {
     'primary-dark' = 'primary-dark'
 }
@@ -16,4 +18,5 @@ export interface IconButtonProps {
     disabled: boolean;
     outline: boolean;
     solid: boolean;
+    size?: ButtonSize;
 }
