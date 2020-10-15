@@ -11,7 +11,7 @@
             </p-icon-text-button>
         </div>
         <div v-if="loading">
-            <p-skeleton class="skeleton-container"/>
+            <p-skeleton class="skeleton-container" />
         </div>
         <transition-group v-if="!loading" class="container">
             <div
@@ -56,7 +56,7 @@
                                @start="onStart"
                                @end="onEnd"
                     >
-                        <div v-for="(item) in column.items"
+                        <div v-for="(item, index) in column.items"
                              :key="item.resource_group_id"
                              class="resource-group-item"
                              @click="updateResourceGroup(item)"
@@ -69,6 +69,10 @@
                                 <span class="resource-description">
                                     {{ item.name }} <br> ({{ item.count }})
                                 </span>
+                                <p-i v-if="editable" name="ic_delete" width="1rem"
+                                     color="transparent inherit" class="float-right"
+                                     @click.stop="deleteResourceGroup(column, item, index)"
+                                />
                             </div>
                         </div>
                     </draggable>
@@ -192,7 +196,7 @@ export default {
         };
 
         const checkMode = () => {
-            if (props.mode === 'UPDATE') state.editable = true;
+            if (props.mode === 'UPDATE' || props.mode === 'CREATE') state.editable = true;
             else state.editable = false;
         };
 
@@ -202,6 +206,11 @@ export default {
 
         const updateResourceGroup = (item) => {
             console.log('update resource group!', item);
+        };
+
+        const deleteResourceGroup = (column, item, itemIndex) => {
+            const columnIndex = parseInt(column.title) - 1;
+            state.columns[columnIndex].items.splice(itemIndex, 1);
         };
 
         const onStart = () => {
@@ -230,6 +239,7 @@ export default {
             deleteColumn,
             createResourceGroup,
             updateResourceGroup,
+            deleteResourceGroup,
             onStart,
             onEnd,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
@@ -380,6 +390,7 @@ export default {
                             border-radius: 0.25rem;
                             margin-bottom: 0.5rem;
                             .resource-description {
+                                flex-grow: 1;
                                 font-size: 0.75rem;
                             }
                             &:hover {
