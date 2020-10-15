@@ -8,7 +8,7 @@
                 </div>
                 <div class="form">
                     <p-field-group v-if="isReadMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
-                        <span>test</span>
+                        <span class="read-value">test</span>
                     </p-field-group>
                     <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')">
                         <template #help>
@@ -20,14 +20,21 @@
                         />
                     </p-field-group>
 
+                    <div v-if="isReadMode" class="separator read-mode" />
 
-                    <p-field-group :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
+                    <p-field-group v-if="isReadMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
+                        <p-tag v-for="(v, k) in tags" :key="k" :deletable="false">
+                            {{ k }}:{{ v }}
+                        </p-tag>
+                    </p-field-group>
+                    <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
                         <template #help>
                             {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC') }}
                             <br>
                             {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC2') }}
                         </template>
-                        <p-dict-input-group :items.sync="tags"
+                        <p-dict-input-group ref="dictRef"
+                                            :dict="tags"
                                             :show-validation="showValidation"
                         >
                             <template #addButton="scope">
@@ -115,6 +122,7 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { QueryFilters } from '@/lib/type';
+import PTag from '@/components/molecules/tags/PTag.vue';
 
 interface Resource {
     resource_type: string;
@@ -157,6 +165,7 @@ const RESOURCE_GROUP_TYPES = [
 export default {
     name: 'ResourceGroupPage',
     components: {
+        PTag,
         PDynamicLayout,
         PSelectDropdown,
         PIconTextButton,
@@ -209,12 +218,13 @@ export default {
                 return vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME');
             }),
             selectedTypeIndex: -1,
-            tags: [],
+            tags: {},
             showValidation: false,
             schema: null as any,
             data: null as any,
             currentResourceType: '',
             fixedFilters: [] as Filter[],
+            dictRef: null as any,
         });
 
         const getPageSchema = async () => {
@@ -334,9 +344,15 @@ export default {
             return {};
         };
 
-        watch([() => props.resourceGroup, () => state.selectedTypeIndex], async (after, before) => {
-            if (after[0] || RESOURCE_GROUP_TYPES[after[1]]) {
+        watch([() => props.resourceGroup, () => state.selectedTypeIndex], async () => {
+            if (props.resourceGroup || RESOURCE_GROUP_TYPES[state.selectedTypeIndex]) {
                 await getPageSchema();
+            }
+            if (props.resourceGroup) {
+                state.isReadMode = true;
+                state.tags = props.resourceGroup.tags;
+            } else {
+                state.isReadMode = false;
             }
         }, { immediate: true });
 
@@ -390,19 +406,28 @@ section {
 }
 .p-field-group {
     width: 100%;
-    &.read-mode {
-        @apply flex;
+    &.read-mode::v-deep {
+        @apply flex items-center;
         .form-label {
+            @apply mb-0;
             width: 6.5rem;
+            line-height: 1.3125rem;
         }
+    }
+    .read-value {
+        font-size: 0.875rem;
+        line-height: 1.3125rem;
     }
 }
 .p-dict-input-group::v-deep {
     .dict-group {
-     @apply mt-6;
+        @apply mt-6;
     }
 }
 .separator {
     @apply mt-4 mb-8 w-full border-b border-gray-200;
+    &.read-mode {
+        @apply my-6;
+    }
 }
 </style>

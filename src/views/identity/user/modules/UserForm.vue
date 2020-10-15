@@ -96,9 +96,10 @@
                         </p-field-group>
 
                         <p-field-group :label="$t('WORD.TAGS')">
-                            <p-dict-input-group
-                                :items.sync="formState.tagItems"
-                                class="tag-input"
+                            <p-dict-input-group ref="dictRef"
+                                                :dict="formState.tags"
+                                                show-validation
+                                                class="tag-input"
                             />
                         </p-field-group>
                     </div>
@@ -110,7 +111,7 @@
 
 <script>
 /* eslint-disable camelcase */
-import { reactive, computed } from '@vue/composition-api';
+import { reactive, computed, ref } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
@@ -183,6 +184,7 @@ export default {
     setup(props, context) {
         const state = contentModalSetup(props, context);
         const { domain } = useStore();
+        const dictRef = ref(null);
         const formState = reactive({
             user_id: '',
             password1: '',
@@ -194,7 +196,6 @@ export default {
             language: 'en',
             timezone: 'UTC',
             tags: {},
-            tagItems: Object.entries(props.item.tags).map(([k, v]) => ({ key: k, value: v })),
             isLastCheck: false,
             is_local_auth: computed(() => domain.state.isLocalType),
             ...props.item,
@@ -278,15 +279,15 @@ export default {
                         data[key] = formState[key];
                     }
                 });
-                const tagDict = {};
-                formState.tagItems.forEach((d) => { tagDict[d.key] = d.value; });
-                data.tags = tagDict;
+                dictRef.value.allValidation();
+                data.tags = dictRef.value.getDict();
                 context.emit('confirm', data);
             }
         };
 
         return {
             ...state,
+            dictRef,
             formState,
             languageSelectItems,
             timezoneSelectItems,

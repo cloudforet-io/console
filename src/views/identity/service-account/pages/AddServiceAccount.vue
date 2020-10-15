@@ -59,11 +59,10 @@
                 <br>
                 {{ $t('ACTION.DICT.HELPMSG') }}
             </div>
-            <p-dict-input-group
-                v-bind="tagsTS.state"
-                :items.sync="tagsTS.syncState.items"
-                :show-header="true"
-                v-on="tagsTS.events"
+            <p-dict-input-group ref="dictRef"
+                                :dict="tags"
+                                show-validation
+                                show-header
             >
                 <template #addButton="scope">
                     <p-icon-text-button
@@ -81,7 +80,6 @@
             <div class="title">
                 Credentials
             </div>
-            <p-select-btn-group :buttons="credentialInputOptionButton" :selected.sync="selectedCredentialInputOption" class="pt-20 float-right" />
             <p-field-group label="name"
                            :invalid-text="credentialNameInvalidText"
                            :invalid="credentialName && !isCredentialNameValid"
@@ -102,12 +100,16 @@
                     </span>
                 </div>
             </p-field-group>
-            <div v-if="selectedCredentialInputOption === 'Input Form'" class="custom-schema-box">
-                <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid" />
-            </div>
-            <div v-if="selectedCredentialInputOption === 'Json Code'">
-                <p-text-editor :code.sync="jsonForCredential" mode="edit"/>
-            </div>
+            <p-tab :tabs="tabs" :active-tab.sync="activeTab">
+                <template #input>
+                    <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid"
+                                        class="custom-schema-box"
+                    />
+                </template>
+                <template #json>
+                    <p-text-editor :code.sync="jsonForCredential" mode="edit" />
+                </template>
+            </p-tab>
         </p-pane-layout>
 
         <s-project-tree-panel ref="projectRef" class="tree-panel"
@@ -142,7 +144,6 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
@@ -154,22 +155,21 @@ import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { SpaceConnector } from '@/lib/space-connector';
 import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
-
-const credentialInputOptionButton = ['Input Form', 'Json Code'];
+import { makeTrItems } from '@/lib/view-helper';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 
 export default {
     name: 'AddServiceAccount',
     components: {
+        PTab,
         PTextInput,
         PJsonSchemaForm,
         PTextEditor,
-        PSelectBtnGroup,
         PMarkdown,
         PCollapsiblePanel,
         PPageTitle,
@@ -201,9 +201,19 @@ export default {
             serviceAccountNames: [] as string[],
             credentialNames: [] as string[],
             secretTypes: computed(() => get(state.providerObj, 'capability.supported_schema', [])),
-            // TODO: tagsTS should be deprecated
-            tagsTS: new DictIGToolSet({ showValidation: true }),
+            tags: {},
+            dictRef: null as any,
         });
+
+
+        const tabState = reactive({
+            tabs: computed(() => makeTrItems([
+                ['input', 'Input Form', { keepAlive: true }],
+                ['json', 'Json Code', { keepAlive: true }],
+            ], context.parent)),
+            activeTab: 'input',
+        });
+
         const formState = reactive({
             /* static input */
             accountName: undefined as undefined | string,
@@ -252,16 +262,16 @@ export default {
             credentialSchema: {},
             isCredentialModelValid: false,
             //
-            selectedCredentialInputOption: 'Input Form',
             jsonForCredential: '',
             //
             isValid: computed(() => {
-                if (formState.selectedCredentialInputOption === 'Json Code') {
+                if (tabState.activeTab === 'json') {
                     return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid;
                 }
                 return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid && formState.isCredentialModelValid;
             }),
         });
+
         const routeState = reactive({
             route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
                 { name: 'Add Account', path: `/identity/service-account/add/${props.provider}` }],
@@ -310,7 +320,7 @@ export default {
                 name: formState.accountName,
                 provider: props.provider,
                 data: formState.accountModel,
-                tags: state.tagsTS.vdState.newDict,
+                tags: state.dictRef.getDict(),
             };
 
             if (projectRef.value.selectNode) {
@@ -351,7 +361,7 @@ export default {
         };
         const createSecret = async () => {
             try {
-                if (formState.selectedCredentialInputOption === 'Json Code') {
+                if (tabState.activeTab === 'json') {
                     try {
                         const json = JSON.parse(formState.jsonForCredential);
                         await createSecretWithJson(json);
@@ -362,7 +372,7 @@ export default {
                         return;
                     }
                 }
-                if (formState.selectedCredentialInputOption === 'Input Form') await createSecretWithForm();
+                if (tabState.activeTab === 'input') await createSecretWithForm();
                 vm.$router.back();
                 showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
             } catch (e) {
@@ -376,7 +386,7 @@ export default {
                 showErrorMessage('Fail to Add Account', 'Please check all input forms.', context.root);
                 return;
             }
-            if (state.tagsTS.allValidation() && !projectRef.value.error) {
+            if (state.dictRef.allValidation() && !projectRef.value.error) {
                 await createServiceAccount();
                 if (state.serviceAccountId) {
                     if (formState.credentialModel.private_key) {
@@ -409,10 +419,10 @@ export default {
         }, { immediate: true });
 
         return {
-            credentialInputOptionButton,
             ...toRefs(state),
             ...toRefs(formState),
             ...toRefs(routeState),
+            ...toRefs(tabState),
             projectRef,
             onClickSave,
             onClickGoBack,
@@ -422,83 +432,89 @@ export default {
 </script>
 
 <style lang="postcss">
-.add-service-account-container {
-    .p-page-title {
-        .icon {
-            display: inline-block;
-            margin-left: 0.5rem;
-            margin-right: 0.5rem;
-            margin-top: -0.25rem;
+    .add-service-account-container {
+        .p-page-title {
+            .icon {
+                display: inline-block;
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+                margin-top: -0.25rem;
+            }
         }
-    }
-    .p-pane-layout {
-        width: 100%;
-        padding: 2rem 1rem;
-        margin-bottom: 1rem;
-        &:nth-last-child(1) {
-            @apply mb-0;
-        }
-        .title {
-            font-size: 1.5rem;
-            line-height: 120%;
-            margin-bottom: 2rem;
-        }
-        .tag-title {
-            font-size: 0.875rem;
-            font-weight: bold;
-            line-height: 120%;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        .tag-help-msg {
-            font-size: 0.875rem;
-            line-height: 150%;
-            margin-bottom: 1.5rem;
-        }
-        .p-field-group {
-            .p-text-input {
-                width: 100%;
-                @screen lg {
-                    max-width: 50%;
+        .p-pane-layout {
+            width: 100%;
+            padding: 2rem 1rem;
+            margin-bottom: 1rem;
+            &:nth-last-child(1) {
+                @apply mb-0;
+            }
+            .title {
+                font-size: 1.5rem;
+                line-height: 120%;
+                margin-bottom: 2rem;
+            }
+            .tag-title {
+                font-size: 0.875rem;
+                font-weight: bold;
+                line-height: 120%;
+                margin-top: 1rem;
+                margin-bottom: 0.5rem;
+            }
+            .tag-help-msg {
+                font-size: 0.875rem;
+                line-height: 150%;
+                margin-bottom: 1.5rem;
+            }
+            .p-field-group {
+                .p-text-input {
+                    width: 100%;
+                    @screen lg {
+                        max-width: 50%;
+                    }
+                }
+            }
+            .secret-type-text {
+                margin-right: 4.375rem;
+            }
+            .custom-schema-box {
+                @apply border border-gray-200;
+                border-radius: 0.125rem;
+                border-left-width: 0.25rem;
+                padding-left: 2rem;
+                padding-right: 2rem;
+                padding-bottom: 2rem;
+                margin-bottom: -2rem;
+                .form-label {
+                    margin-top: 1.5rem;
+                }
+            }
+            .p-text-editor {
+                .CodeMirror {
+                    font-family: Inconsolata, monospace;
+                    line-height: 1.5;
+                    height: 14.375rem;
+                    padding: 1rem;
+                    margin: 0 0 -2rem;
                 }
             }
         }
-        .secret-type-text {
-            margin-right: 4.375rem;
+
+        .tree-panel {
+            width: 100%;
+            padding: 2rem 1rem;
+            margin-bottom: 1rem;
+            &:nth-last-child(1) {
+                margin-bottom: 0;
+            }
         }
-        .custom-schema-box {
-            @apply border border-gray-200;
-            border-radius: 0.125rem;
-            border-left-width: 0.25rem;
-            padding: 1.25rem 2rem;
-        }
-        .p-text-editor {
-            .CodeMirror {
-                font-family: Inconsolata, monospace;
-                line-height: 1.5;
-                height: 30rem;
-                margin: 1rem;
-                padding: 1rem;
+
+        .button-lap {
+            display: flex;
+            flex-direction: row-reverse;
+            margin-top: 1rem;
+            .text-button {
+                margin-left: 1rem;
             }
         }
     }
-
-    .tree-panel {
-        width: 100%;
-        padding: 2rem 1rem;
-        margin-bottom: 1rem;
-        &:nth-last-child(1) {
-            margin-bottom: 0;
-        }
-    }
-
-    .button-lap {
-        display: flex;
-        flex-direction: row-reverse;
-        margin-top: 1rem;
-        .text-button {
-            margin-left: 1rem;
-        }
-    }
-}
 </style>

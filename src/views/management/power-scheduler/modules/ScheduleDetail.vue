@@ -30,7 +30,9 @@
                 />
             </div>
             <div class="scroll-contents">
-                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId" :mode="mode" />
+                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
+                                 :mode="mode"
+                />
             </div>
 
             <div v-if="mode !== 'READ'" class="actions">
@@ -60,6 +62,15 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { makeProxy } from '@/components/util/composition-helpers';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ViewMode } from '@/views/management/power-scheduler/type';
+
+
+interface Props {
+    scheduleId?: string;
+    mode: ViewMode;
+    projectId: string;
+    name: string;
+}
 
 export default {
     name: 'ScheduleDetail',
@@ -94,12 +105,8 @@ export default {
             type: String,
             default: '',
         },
-        projectId: {
-            type: String,
-            required: true,
-        },
     },
-    setup(props, { emit, refs }) {
+    setup(props: Props, { emit, refs }) {
         const state = reactive({
             showValidation: false,
             isNameValid: computed(() => !!state.proxyName),

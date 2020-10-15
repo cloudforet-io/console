@@ -45,14 +45,59 @@ import {
     makeProxy,
 } from '@/lib/compostion-util';
 import PTag from '@/components/molecules/tags/PTag.vue';
-import { tagList } from '@/components/molecules/tags/PTag.toolset';
 import { fluentApi } from '@/lib/fluent-api';
-import { reactive, toRefs } from '@vue/composition-api';
+import {
+    reactive, ref, Ref, toRefs,
+} from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
 import { showErrorMessage } from '@/lib/util';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
-import PSearch from '@/components/molecules/search/PSearch.vue';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+import { isEqual } from 'lodash';
+
+const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus?: any, eventName?: string, addTagCallBack?: any) => {
+    const tags: Ref<any[]> = proxyTags || ref([]);
+    if (!tags.value) tags.value = [];
+
+    /**
+     * @param idx {Number}
+     */
+    const deleteTag = (idx: number) => {
+        const updatedTags = [...tags.value];
+        updatedTags.splice(idx, 1);
+        tags.value = updatedTags;
+        if (eventBus) { eventBus.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
+    };
+
+    const deleteAllTags = () => {
+        tags.value = [];
+        if (eventBus) { eventBus.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
+    };
+
+    const validation = value => tags.value.every(tag => !isEqual(tag, value));
+
+    /**
+     * @param value {String}
+     */
+    const addTag = (value) => {
+        const val = (typeof value === 'string') ? value.trim() : value;
+        if (!val || val === '') return;
+        if (checkDuplicate && !validation(val)) return;
+        const updatedTags = [...tags.value];
+        updatedTags.push(val);
+        tags.value = updatedTags;
+        if (eventBus) { eventBus.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
+    };
+
+    return reactive({
+        tags,
+        deleteTag,
+        addTag,
+        deleteAllTags,
+    });
+};
 
 export default {
     name: 'ProjectMemberAddModal',
@@ -137,7 +182,7 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-        }
+        };
 
         const confirm = async () => {
             const users = formState.tagTools.tags;

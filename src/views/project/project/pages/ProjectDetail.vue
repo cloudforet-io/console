@@ -131,13 +131,11 @@ import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 
 import { makeTrItems } from '@/lib/view-helper';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import { SearchTableFluentAPI } from '@/lib/api/table';
-import { DictPanelAPI } from '@/lib/api/dict';
 import { showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
@@ -233,15 +231,6 @@ export default {
             ],
         }, undefined);
 
-        // Tag
-
-        const tagsApi = new DictPanelAPI(fluentApi.identity().project());
-        const loadTag = async () => {
-            tagsApi.setId(projectId.value);
-            tagsApi.ts.toReadMode();
-            await tagsApi.getData();
-        };
-        loadTag();
 
         // Member modal
         const formState = reactive({
@@ -413,7 +402,6 @@ export default {
             singleItemTabState,
             memberApiHandler,
             item,
-            tagsApi,
             deleteTS,
             openProjectDeleteForm,
             projectDeleteFormConfirm,

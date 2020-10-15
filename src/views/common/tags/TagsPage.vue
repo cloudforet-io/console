@@ -14,7 +14,7 @@
                 <div class="right" />
             </div>
             <p-pane-layout class="tag-panel">
-                <div v-if="items.length == 0" class="comment">
+                <div v-if="noItem" class="comment">
                     <span class="highlight">{{ $t('ACTION.DICT.NO_TAG') }}</span><br>
                     {{ $t('ACTION.DICT.CLICK_ADD_BTN_MSG') }}
                 </div>
@@ -22,13 +22,11 @@
                     <span class="highlight">{{ $t('ACTION.DICT.ADD_TAG') }}</span><br>
                     {{ $t('ACTION.DICT.HELPMSG') }}
                 </div>
-                <p-dict-input-group
-                    :items.sync="items"
-                    :disabled="loading"
-                    :invalid-messages="invalidMessages"
-                    :show-validation="showValidation"
-                    :show-header="true"
-                    v-on="dictIGListeners"
+                <p-dict-input-group ref="dictRef"
+                                    :dict="tags"
+                                    :disabled="loading"
+                                    :show-validation="showValidation"
+                                    :show-header="true"
                 >
                     <template #addButton="scope">
                         <p-icon-text-button
@@ -58,27 +56,19 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ref, ComponentRenderProxy,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import { DictPanelAPI } from '@/lib/api/dict';
 import {
-    DictItem,
-    dictValidation,
-    getNewDict,
-    toDictItems,
-} from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
-import {
-    camelCase, debounce, get, map,
+    camelCase, isEmpty, get,
 } from 'lodash';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import FNB from '@/views/containers/fnb/FNB.vue';
 import { SpaceConnector } from '@/lib/space-connector';
-import { makeTrItems } from '@/lib/view-helper';
 import { showErrorMessage } from '@/lib/util';
 
 export default {
@@ -113,27 +103,21 @@ export default {
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
-            showValidation: true,
+            showValidation: false,
             loading: true,
-            items: [] as DictItem[],
+            tags: {},
+            dictRef: null as any,
+            noItem: computed(() => isEmpty(state.tags)),
         });
 
         const goBack = () => {
             context.emit('close');
         };
 
-        const { invalidMessages, allValidation, itemValidation } = dictValidation(computed(() => state.items as unknown as DictItem[]));
-
-        const dictIGListeners = {
-            'change:value': debounce((idx) => { itemValidation(idx, 'value'); }, 100),
-            'change:key': debounce(() => { allValidation('key', false); }, 100),
-            'change:add': (idx) => { itemValidation(idx); },
-            'change:delete': () => { allValidation(); },
-        };
 
         const getTags = async () => {
             if (!api.value) {
-                state.items = [];
+                state.tags = {};
                 state.loading = false;
             }
 
@@ -142,9 +126,9 @@ export default {
                     [props.resourceKey]: props.resourceId,
                     query: { only: ['tags'] },
                 });
-                state.items = toDictItems(res.tags);
+                state.tags = res.tags;
             } catch (e) {
-                state.items = [];
+                state.tags = {};
                 console.error(e);
             } finally {
                 state.loading = false;
@@ -154,7 +138,7 @@ export default {
 
         const onSave = async () => {
             if (!state.showValidation) state.showValidation = true;
-            if (!allValidation()) return;
+            if (!state.dictRef.allValidation()) return;
             if (!api.value) {
                 showErrorMessage('Tags Update Failed', new Error());
                 return;
@@ -163,7 +147,7 @@ export default {
             try {
                 await api.value.update({
                     [props.resourceKey]: props.resourceId,
-                    tags: getNewDict(state.items, invalidMessages.value),
+                    tags: state.dictRef.getDict(),
                 });
             } catch (e) {
                 console.error(e);
@@ -179,10 +163,8 @@ export default {
 
         return {
             ...toRefs(state),
-            invalidMessages,
             goBack,
             onSave,
-            dictIGListeners,
 
         };
     },

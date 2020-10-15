@@ -17,6 +17,7 @@
                            :disabled="tabState.disabled"
                            @cancel="onClickCancel"
                            @confirm="onClickConfirm"
+                           @changeStep="onChangeStep"
         >
             <template #contents-conf="{tab}">
                 <div class="collector-input-lap">
@@ -52,10 +53,11 @@
                 <confirm-credentials :provider="provider" :supported-schema="supportedSchema" class="mt-8" />
             </template>
             <template #contents-tags>
-                <p-dict-input-group
-                    :items.sync="tags"
-                    :show-empty-input="true"
-                    class="mt-8"
+                <p-dict-input-group ref="dictRef"
+                                    :dict="tags"
+                                    show-validation
+                                    class="mt-8"
+                                    @change="onChangeTags"
                 />
             </template>
         </p-progress-wizard>
@@ -104,11 +106,12 @@ export default {
             imageUrl: computed(() => get(state.plugin, 'tags.icon', '')),
             provider: computed(() => get(state.plugin, 'provider', '')),
             pluginId: get(root, '$route.params.pluginId', ''),
-            tags: [],
+            tags: {},
             supportedSchema: [],
             //
             collectorNames: [],
             versions: [],
+            dictRef: null as any,
         });
         const formState = reactive({
             inputModel: {
@@ -141,6 +144,7 @@ export default {
                 return '';
             }),
             isVersionValid: computed(() => !(formState.inputModel.version.length === 0)),
+            isTagsValid: true,
             isValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
         });
         const routeState = reactive({
@@ -168,7 +172,7 @@ export default {
             invalidState: computed(() => ({
                 conf: !formState.isValid,
                 credentials: false,
-                tags: false,
+                tags: !formState.isTagsValid,
             })),
             disabled: computed(() => some(tabState.invalidState, v => v === true)),
         });
@@ -181,7 +185,7 @@ export default {
                 state.plugin = res;
                 state.supportedSchema = res.capability.supported_schema;
                 if (res.tags?.icon) {
-                    state.tags.push({ key: 'icon', value: res.tags.icon });
+                    state.tags.icon = res.tags.icon;
                 }
             } catch (e) {
                 console.error(e);
@@ -222,20 +226,34 @@ export default {
         const onClickCancel = () => {
             root.$router.go(-1);
         };
+
+        const onChangeStep = () => {
+            // set tags only when the current tab is tags (when dictRef exist)
+            if (state.dictRef) {
+                formState.isTagsValid = state.dictRef.allValidation();
+                state.tags = state.dictRef.getDict();
+            }
+        };
+
+        const onChangeTags = () => {
+            formState.isTagsValid = state.dictRef.isAllValid;
+        };
+
         const onClickConfirm = async () => {
-            if (!formState.isValid) {
+            if (!formState.isValid && formState.isTagsValid) {
                 return;
             }
 
+            // set tags only when the current tab is tags (when dictRef exist)
+            if (state.dictRef) {
+                state.tags = state.dictRef.getDict();
+            }
+
             tabState.loading = true;
-            const tagDict = {};
-            state.tags.forEach((d) => {
-                tagDict[d.key] = d.value;
-            });
             const params = {
                 name: formState.inputModel.name,
                 priority: formState.inputModel.priority,
-                tags: tagDict,
+                tags: state.tags,
                 plugin_info: {
                     plugin_id: state.pluginId,
                     version: formState.inputModel.version,
@@ -268,6 +286,8 @@ export default {
             tabState,
             onClickCancel,
             onClickConfirm,
+            onChangeStep,
+            onChangeTags,
             onClickBackButton,
         };
     },

@@ -36,7 +36,7 @@
                 </div>
                 <div class="resource-item-wrapper">
                     <div v-if="editable && column.title === '1'" class="resource-group-item">
-                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup">
+                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup()">
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
                     </div>
@@ -121,6 +121,7 @@ import { ViewMode } from '@/views/management/power-scheduler/type';
         mode: ViewMode;
         projectId: string;
     }
+
 export default {
     name: 'App',
     components: {
@@ -250,7 +251,7 @@ export default {
             }
         };
 
-        const onClickResourceGroup = (item) => {
+        const onClickResourceGroup = (item?) => {
             state.selectedResourceGroup = item || null;
             state.resourceGroupVisible = true;
         };

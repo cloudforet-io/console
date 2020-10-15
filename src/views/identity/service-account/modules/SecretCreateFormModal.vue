@@ -14,11 +14,10 @@
             <p-field-group
                 label="Tags"
             >
-                <p-dict-input-group
-                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"
-                    v-bind="tagsTS.state"
-                    :items.sync="tagsTS.syncState.items"
-                    v-on="tagsTS.events"
+                <p-dict-input-group ref="dictRef"
+                                    class="w-full bg-primary4 border-gray-200 border-gray-200 p-2"
+                                    :dict="tags"
+                                    show-validation
                 />
             </p-field-group>
         </template>
@@ -32,7 +31,6 @@ import {
     makeProxy,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/PDictInputGroup.toolset';
 import {
     CustomKeywords,
     JsonSchemaFormToolSet,
@@ -40,7 +38,7 @@ import {
 } from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
-import { watch } from '@vue/composition-api';
+import {reactive, toRefs, watch} from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
@@ -79,8 +77,9 @@ export default {
         },
     },
     setup(props, context) {
-        const tagsTS = new DictIGToolSet({
-            showValidation: true,
+        const state = reactive({
+            tags: {},
+            dictRef: null as any,
         });
         const fixFormTS = new JsonSchemaFormToolSet();
 
@@ -133,12 +132,12 @@ export default {
         const confirm = async () => {
             const fixFormValid = await fixFormTS.formState.validator();
             const jscFormValid = await jscTS.formState.validator();
-            if (tagsTS.allValidation() && fixFormValid && jscFormValid) {
+            if (state.dictRef.allValidation() && fixFormValid && jscFormValid) {
                 const item = {
                     name: fixFormTS.syncState.item.name,
                     data: jscTS.syncState.item,
                     schema: fixFormTS.syncState.item.schemaName,
-                    tags: tagsTS.vdState.newDict,
+                    tags: state.dictRef.getDict(),
 
                 };
                 context.emit('confirm', item);
@@ -146,8 +145,8 @@ export default {
         };
 
         return {
+            ...toRefs(state),
             proxyVisible: makeProxy('visible', props, context.emit),
-            tagsTS,
             jscTS,
             fixFormTS,
             confirm,
