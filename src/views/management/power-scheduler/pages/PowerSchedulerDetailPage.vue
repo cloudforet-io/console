@@ -181,6 +181,7 @@ export default {
             headerTitle: '',
             themeColor: '',
             modalContent: '',
+            schedule_id: '',
         });
 
         const listSchedule = async () => {
@@ -220,17 +221,18 @@ export default {
             state.mode = 'UPDATE';
         };
 
-        const onClickDelete = () => {
+        const onClickDelete = (schedule) => {
             formState.visible = true;
             formState.themeColor = 'alert';
-            formState.headerTitle = '스케줄그룹 삭제';
+            formState.headerTitle = '스케줄 그룹 삭제';
             formState.modalContent = '스케줄 그룹을 삭제하시겠습니까?';
+            formState.schedule_id = schedule.schedule_id;
         };
 
         const scheduleDeleteConfirm = async () => {
             try {
                 await SpaceConnector.client.powerScheduler.schedule.delete({
-                    schedule_id: state.selectedSchedule?.schedule_id,
+                    schedule_id: formState.schedule_id,
                 });
                 showSuccessMessage('성공', formState.headerTitle, root);
             } catch (e) {

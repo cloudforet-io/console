@@ -10,9 +10,9 @@
                 우선순위 추가
             </p-icon-text-button>
         </div>
-        <div v-if="loading">
-            <p-skeleton class="skeleton-container" />
-        </div>
+        <!--        <div v-if="loading">-->
+        <!--            <p-skeleton class="skeleton-container" />-->
+        <!--        </div>-->
         <transition-group v-if="!loading" class="kanban-container">
             <div
                 v-for="column in columns"
@@ -95,7 +95,6 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import ResourceGroupPage from '@/views/management/power-scheduler/pages/ResourceGroupPage.vue';
 import { ViewMode } from '@/views/management/power-scheduler/type';
 
@@ -126,7 +125,6 @@ export default {
     name: 'App',
     components: {
         ResourceGroupPage,
-        PSkeleton,
         PIconTextButton,
         PI,
         PLazyImg,
@@ -246,8 +244,6 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-            } finally {
-                await getResourceGroup(scheduleId);
             }
         };
 
@@ -257,13 +253,17 @@ export default {
         };
 
 
-        watch([() => props.scheduleId, () => props.mode], async (after, before) => {
+        watch([() => props.scheduleId], async (after, before) => {
             if (props.scheduleId && (after !== before)) {
                 await getResourceGroup(props.scheduleId);
-                await checkMode();
             }
             if (!props.scheduleId && (after !== before)) {
                 await getInitResourceGroup();
+            }
+        }, { immediate: true });
+
+        watch(() => props.mode, async (after, before) => {
+            if (after !== before) {
                 await checkMode();
             }
         }, { immediate: true });
@@ -374,16 +374,14 @@ export default {
                     .kanban-landing-wrapper {
                         @apply flex-col;
                         #kanban-landing-card {
-                            @apply bg-blue-500 m-auto;
+                            @apply bg-blue-100 m-auto;
                             height: 3.25rem;
-                            opacity: 0.1;
-                            margin-top: 30%;
                             border-radius: 0.25rem;
                             z-index: 1;
                         }
                         #kanban-landing-square {
-                            @apply bg-blue-500;
-                            opacity: 0.25;
+                            @apply bg-blue-300;
+                            opacity: 0.4;
                             border-radius: 0.25rem;
                             width: 2rem;
                             height: 2rem;
