@@ -153,12 +153,7 @@ export default {
             state.loading = true;
             try {
                 const query = new QueryHelper().setFilter({ k: 'project_id', v: props.projectId, o: 'contain' });
-                const res = await SpaceConnector.client.powerScheduler.schedule.list({ query: query.data },
-                    {
-                        headers: {
-                            'Mock-Mode': 'true',
-                        },
-                    });
+                const res = await SpaceConnector.client.powerScheduler.schedule.list({ query: query.data });
 
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;

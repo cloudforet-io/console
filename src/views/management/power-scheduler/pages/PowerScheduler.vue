@@ -6,7 +6,6 @@
         <div class="page-title">
             <p-page-title :title="'Power Scheduler'" use-total-count :total-count="totalCount" />
         </div>
-        <cost-doughnut-chart class="cost-doughnut-chart mb-8" />
         <p-hr class="cloud-service-divider" />
         <div class="power-scheduler-project">
             <p-search-grid-layout
@@ -126,7 +125,6 @@ import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
-import CostDoughnutChart from '@/views/management/power-scheduler/modules/CostDoughnutChart.vue';
 
 interface Scheduler {
     name: string;
@@ -137,7 +135,6 @@ interface Scheduler {
 export default {
     name: 'PowerScheduler',
     components: {
-        CostDoughnutChart,
         ScheduleHeatmap,
         PI,
         PageInformation,
@@ -326,9 +323,6 @@ export default {
 
 <style lang="postcss" scoped>
     .power-scheduler {
-        .cost-doughnut-chart {
-            width: 30%;
-        }
         .power-scheduler-project {
             margin-top: 1.5rem;
         }

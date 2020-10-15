@@ -5,7 +5,7 @@
             <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
             <p-icon-text-button v-if="mode === 'UPDATE'" style-type="gray900" outline
                                 name="ic_plus_bold"
-                                class="add-column-btn float-right" @click="addColumn"
+                                class="add-column-btn mr-2 float-right" @click="addColumn"
             >
                 우선순위 추가
             </p-icon-text-button>
@@ -13,7 +13,7 @@
         <div v-if="loading">
             <p-skeleton class="skeleton-container" />
         </div>
-        <transition-group v-if="!loading" class="container">
+        <transition-group v-if="!loading" class="kanban-container">
             <div
                 v-for="column in columns"
                 :key="column.title"
@@ -173,10 +173,6 @@ export default {
                 const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleResourceGroups({
                     // eslint-disable-next-line camelcase
                     schedule_id: scheduleId,
-                }, {
-                    headers: {
-                        'Mock-Mode': 'true',
-                    },
                 });
                 if (res.columns.length < 5) {
                     while (res.columns.length < 5) {
@@ -222,6 +218,7 @@ export default {
         };
 
         watch([() => props.scheduleId, () => props.mode], async (after, before) => {
+            console.log(props.scheduleId)
             if (after !== before) {
                 await getResourceGroup(props.scheduleId);
                 await checkMode();
@@ -284,18 +281,16 @@ export default {
     }
 
     .kanban {
-        max-width: calc(100vw - 4.5rem);
-        width: 100%;
         .skeleton-container {
             max-width: calc(100vw - 4.5rem);
             height: 20rem;
         }
-        .container {
+        .kanban-container {
             @apply flex flex-wrap w-full h-full;
             .resource-group-box {
-                @apply border border-violet-200 bg-white;
+                @apply border border-violet-200 bg-white box-border;
+                width: calc(20% - 0.5rem);
                 border-radius: 2px;
-                margin-right: 0.5rem;
                 margin-bottom: 0.5rem;
                 box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
                 .resource-group-header {
@@ -333,14 +328,12 @@ export default {
                 }
 
                 .resource-item-wrapper {
-                    @apply overflow-y-auto overflow-x-hidden;
+                    @apply overflow-y-auto overflow-x-hidden px-4 pb-4;
                     height: 20.75rem;
-                    width: 13.8rem;
                     .kanban-landing-wrapper {
                         @apply flex-col;
                         #kanban-landing-card {
                             @apply bg-blue-500 m-auto;
-                            width: 11.75rem;
                             height: 3.25rem;
                             opacity: 0.1;
                             margin-top: 40%;
@@ -355,12 +348,12 @@ export default {
                             height: 2rem;
                             z-index: 2;
                             margin-top: -2.625rem;
-                            margin-left: 1.625rem;
+                            margin-left: 0.625rem;
                         }
                         #kanban-landing-icon {
                             float: right;
                             z-index: 2;
-                            margin-right: 1.25rem;
+                            margin-right: 0.25rem;
                             margin-top: -1.15rem;
                         }
                         .kanban-landing-text {
@@ -369,10 +362,9 @@ export default {
                         }
                     }
                     .resource-group-item {
-                        @apply mx-4;
+                        @apply w-full;
                         .add-resource-group {
                             @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
-                            width: 11.75rem;
                             height: 3.25rem;
                             border-radius: 0.25rem;
                             margin-bottom: 0.5rem;
@@ -385,7 +377,6 @@ export default {
                         }
                         .resource {
                             @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
-                            width: 11.75rem;
                             height: 3.25rem;
                             border-radius: 0.25rem;
                             margin-bottom: 0.5rem;
@@ -402,6 +393,12 @@ export default {
                         }
                     }
                 }
+            }
+            .resource-group-box + .resource-group-box {
+                margin-right: 0.5rem;
+            }
+            .resource-group-box:nth-child(1) {
+                margin-right: 0.5rem;
             }
         }
     }
