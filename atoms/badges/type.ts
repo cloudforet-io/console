@@ -23,8 +23,11 @@ export enum BADGE_STYLE {
     gray900 = 'gray900',
 }
 
+export type BadgeStyleType = keyof BADGE_STYLE
+export type BadgeShape = keyof typeof BADGE_SHAPE
+
 export interface Badge {
-    styleType: keyof BADGE_STYLE;
+    styleType: BadgeStyleType;
     textColor?: string;
     backgroundColor?: string;
     shape: keyof typeof BADGE_SHAPE;

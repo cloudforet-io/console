@@ -18,6 +18,7 @@
                         :search-text.sync="searchText"
                         :selectable="selectable"
                         :col-copy="colCopy"
+                        :searchable="searchable"
                         @select="onSelect"
                         @change="onChange"
                         @export="onExport"
@@ -132,6 +133,7 @@ export default {
             selectIndex: bindExtra(props, 'selectIndex', []),
             selectable: computed(() => (props.typeOptions?.selectable || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
+            searchable: computed(() => (props.typeOptions?.searchable || true)),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',

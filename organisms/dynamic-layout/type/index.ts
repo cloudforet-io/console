@@ -26,6 +26,7 @@ export interface DynamicLayoutTypeOptions {
     selectIndex: number[];
     selectable: boolean;
     colCopy: boolean;
+    searchable: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     language: string;

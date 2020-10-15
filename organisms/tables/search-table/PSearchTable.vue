@@ -27,7 +27,7 @@
                      @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
-        <template v-if="!$scopedSlots['toolbox-left']" #toolbox-left="scope">
+        <template v-if="searchable && !$scopedSlots['toolbox-left']" #toolbox-left="scope">
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
                 <p-search v-model="proxySearchText"
                           @search="onSearch"
@@ -35,7 +35,7 @@
                 />
             </div>
         </template>
-        <template v-if="!$scopedSlots['toolbox-bottom']" #toolbox-bottom="scope">
+        <template v-if="searchable && !$scopedSlots['toolbox-bottom']" #toolbox-bottom="scope">
             <div class="flex-1 2xs:block lg:hidden mt-4"
                  :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
             >
@@ -49,7 +49,7 @@
         <template v-for="(_, slot, i) of $scopedSlots" v-slot:[slot]="scope">
             <template v-if="slot === 'toolbox-left'">
                 <slot name="toolbox-left" v-bind="scope" />
-                <div :key="i" class="left-toolbox-item w-1/2 2xs:hidden lg:block">
+                <div v-if="searchable" :key="i" class="left-toolbox-item w-1/2 2xs:hidden lg:block">
                     <p-search v-model="proxySearchText"
                               @search="onSearch"
                               @delete="onSearch()"
@@ -59,7 +59,7 @@
             <div v-else-if="slot === 'toolbox-bottom'" :key="i" class="flex-1 2xs:block lg:hidden mt-4"
                  :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
             >
-                <p-search v-model="proxySearchText"
+                <p-search v-if="searchable" v-model="proxySearchText"
                           @search="onSearch"
                           @delete="onSearch()"
                 />
@@ -140,6 +140,10 @@ export default {
         colCopy: {
             type: Boolean,
             default: false,
+        },
+        searchable: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: SearchTableProps, { emit }) {

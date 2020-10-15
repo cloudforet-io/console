@@ -11,7 +11,7 @@ export type TableFetchOptions = Pick<DynamicLayoutFetchOptions,
     >
 
 export type TableTypeOptions = Pick<DynamicLayoutTypeOptions,
-    'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'|'colCopy'
+    'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'|'colCopy'|'searchable'
     >
 
 export type TableDynamicLayoutProps = DynamicLayoutProps <

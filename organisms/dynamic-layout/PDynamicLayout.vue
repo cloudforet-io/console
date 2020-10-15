@@ -88,7 +88,7 @@ export default {
             }
         };
 
-        watch(() => [props.type, props.name], (aft, bef) => {
+        watch([() => props.type, () => props.name], (aft, bef) => {
             if (!isEqual(aft, bef)) {
                 getComponent();
             }
