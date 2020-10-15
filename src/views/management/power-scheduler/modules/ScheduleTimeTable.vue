@@ -150,7 +150,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, range } from 'lodash';
+import { get, range, isEmpty } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
@@ -161,43 +161,44 @@ import {
     computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch, onMounted,
 } from '@vue/composition-api';
 
+import { ViewMode } from '@/views/management/power-scheduler/type';
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { getTimezone } from '@/lib/util';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ViewMode } from '@/views/management/power-scheduler/type';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-    interface RoutineRule {
-        day: string;
-        times: number[];
-    }
-    interface TicketRule {
-        date: string;
-        times: number[];
-    }
-    interface ScheduleRule {
-        [key: string]: number[];
-    }
+interface RoutineRule {
+    day: string;
+    times: number[];
+}
+interface TicketRule {
+    date: string;
+    times: number[];
+}
+interface Rule {
+    [key: string]: number[];
+}
 
-    enum SCHEDULE_RULE_TYPE {
-        routine = 'ROUTINE',
-        ticket = 'TICKET',
-    }
-    enum RULE_STATE {
-        running = 'RUNNING',
-        stopped = 'STOPPED',
-    }
+enum RULE_TYPE {
+    routine = 'ROUTINE',
+    ticket = 'TICKET',
+}
+enum RULE_STATE {
+    running = 'RUNNING',
+    stopped = 'STOPPED',
+}
 
-    interface Props {
-        scheduleId?: string;
-        mode: ViewMode;
-    }
+interface Props {
+    scheduleId?: string;
+    mode: ViewMode;
+}
 
 export default {
     name: 'ScheduleTimeTable',
@@ -246,30 +247,18 @@ export default {
             editMode: computed(() => props.mode !== 'READ' || state.oneTimeEditMode),
             oneTimeEditMode: false as boolean | string,
             dragContainer: undefined,
-            scheduleRule: {
-                routine: {
-                    sun: [],
-                    mon: [],
-                    tue: [],
-                    wed: [],
-                    thu: [],
-                    fri: [],
-                    sat: [],
-                } as ScheduleRule,
-                oneTimeRun: {} as ScheduleRule,
-                oneTimeStop: {} as ScheduleRule,
+            rule: {
+                routine: {} as Rule,
+                oneTimeRun: {} as Rule,
+                oneTimeStop: {} as Rule,
             },
             showHelpBlock: computed(() => {
                 if (!state.editMode) return false;
-                return !state.isRoutineDataExists && !state.isOneTimeRunDataExists && !state.isOneTimeStopDataExists;
+                return false;
             }),
-            // check api data
-            isRoutineDataExists: false,
-            isOneTimeRunDataExists: false,
-            isOneTimeStopDataExists: false,
         });
 
-        // api
+        // util
         const setStyleClass = () => {
             refs.item.forEach((item) => {
                 const classes = item.classList;
@@ -281,7 +270,7 @@ export default {
                 item.classList.remove('routine', 'one-time-run', 'one-time-stop', 'opacity-25');
 
                 // routine
-                let rules = get(state.scheduleRule.routine, weekday);
+                let rules = get(state.rule.routine, weekday);
                 if (rules && rules.includes(time)) {
                     item.classList.add('routine');
                     if (state.oneTimeEditMode) item.classList.add('opacity-25');
@@ -291,7 +280,7 @@ export default {
                 if (props.mode === 'READ') {
                     // run
                     if (state.oneTimeEditMode !== 'STOP') {
-                        rules = get(state.scheduleRule.oneTimeRun, date);
+                        rules = get(state.rule.oneTimeRun, date);
                         if (rules && rules.includes(time)) {
                             item.classList.add('one-time-run');
                         }
@@ -299,7 +288,7 @@ export default {
 
                     // stop
                     if (state.oneTimeEditMode !== 'RUN') {
-                        rules = get(state.scheduleRule.oneTimeStop, date);
+                        rules = get(state.rule.oneTimeStop, date);
                         if (rules && rules.includes(time)) {
                             item.classList.add('one-time-stop');
                             item.classList.remove('opacity-25');
@@ -308,73 +297,212 @@ export default {
                 }
             });
         };
-        const getScheduleRuleWithTimezone = (scheduleRule) => {
-            const rules: RoutineRule[] | TicketRule[] = scheduleRule.rule;
-            const ruleType = scheduleRule.rule_type;
-            const ruleState = scheduleRule.state;
-            if (ruleType === SCHEDULE_RULE_TYPE.routine) {
-                const newRule = state.scheduleRule.routine;
+        const changeTimezoneToUTC = (rule: Rule, ruleType) => {
+            if (state.timezone === 'UTC') return rule;
+
+            // routine
+            if (ruleType === RULE_TYPE.routine) {
+                const newRule = {
+                    sun: [],
+                    mon: [],
+                    tue: [],
+                    wed: [],
+                    thu: [],
+                    fri: [],
+                    sat: [],
+                };
                 const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
                 const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
+                Object.entries(rule).forEach(([weekday, times]) => {
+                    times.forEach((time) => {
+                        let newTime = time - offsetHours;
+                        if (newTime > 0) {
+                            newRule[weekday].push(newTime);
+                        } else {
+                            newTime += 24;
+                            const weekIdx = weekdays.indexOf(weekday);
+                            if (weekIdx === 0) {
+                                newRule[weekdays[6]].push(newTime);
+                            } else {
+                                newRule[weekdays[weekIdx - 1]].push(newTime);
+                            }
+                        }
+                    });
+                });
+                return newRule;
+            }
 
-                rules.forEach((rule, index) => {
-                    const weekday = rule.day;
-                    rule.times.forEach((time) => {
+            // one time
+            const newRule = {};
+            Object.entries(rule).forEach(([date, times]) => {
+                times.forEach((time) => {
+                    const utcRawDate = dayjs(`${date} ${time}:00`).utc();
+                    const utcDate = utcRawDate.format('YYYY-MM-DD');
+                    const utcHour = Number(utcRawDate.format('H'));
+                    if (utcDate in newRule) {
+                        newRule[utcDate].push(utcHour);
+                    } else {
+                        newRule[utcDate] = [utcHour];
+                    }
+                });
+            });
+            return newRule;
+        };
+        const changeTimezoneToLocal = (rule: Rule, ruleType) => {
+            // routine
+            if (ruleType === RULE_TYPE.routine) {
+                const newRule = {
+                    sun: [],
+                    mon: [],
+                    tue: [],
+                    wed: [],
+                    thu: [],
+                    fri: [],
+                    sat: [],
+                };
+                const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+                const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
+                Object.entries(rule).forEach(([weekday, times]) => {
+                    times.forEach((time) => {
                         let newTime = time + offsetHours;
                         if (newTime < 24) {
                             newRule[weekday].push(newTime);
                         } else {
                             newTime -= 24;
-                            if (index === 6) {
+                            const weekIdx = weekdays.indexOf(weekday);
+                            if (weekIdx === 6) {
                                 newRule[weekdays[0]].push(newTime);
                             } else {
-                                newRule[weekdays[index + 1]].push(newTime);
+                                newRule[weekdays[weekIdx + 1]].push(newTime);
                             }
                         }
                     });
                 });
-                state.scheduleRule.routine = newRule;
-                state.isRoutineDataExists = true;
-            } else {
-                const newRule = {};
-                rules.forEach((rule) => {
-                    const date = rule.date;
-                    const times = rule.times;
-                    times.forEach((time) => {
-                        const utcDate = dayjs.utc(`${date} ${time}:00`);
-                        const timezoneDate = utcDate.tz(getTimezone()).format('YYYY-MM-DD');
-                        const timezoneHour = Number(utcDate.tz(getTimezone()).format('H'));
-                        if (timezoneDate in newRule) {
-                            newRule[timezoneDate].push(timezoneHour);
-                        } else {
-                            newRule[timezoneDate] = [timezoneHour];
-                        }
-                    });
-                });
-                if (ruleState === RULE_STATE.running) {
-                    state.scheduleRule.oneTimeRun = newRule;
-                    state.isOneTimeRunDataExists = true;
-                } else if (ruleState === RULE_STATE.stopped) {
-                    state.scheduleRule.oneTimeStop = newRule;
-                    state.isOneTimeStopDataExists = true;
-                }
+                return newRule;
             }
+
+            // one time
+            const newRule = {};
+            Object.entries(rule).forEach(([date, times]) => {
+                times.forEach((time) => {
+                    const utcDate = dayjs.utc(`${date} ${time}:00`);
+                    const localDate = utcDate.tz(getTimezone()).format('YYYY-MM-DD');
+                    const localHour = Number(utcDate.tz(getTimezone()).format('H'));
+                    if (localDate in newRule) {
+                        newRule[localDate].push(localHour);
+                    } else {
+                        newRule[localDate] = [localHour];
+                    }
+                });
+            });
+            return newRule;
         };
+
+        // api
         const getScheduleRule = async () => {
+            // init schedule Rule state
+            state.rule.routine = {};
+            state.rule.oneTimeRun = {};
+            state.rule.oneTimeStop = {};
             const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
                 schedule_id: props.scheduleId,
             });
-            res.results.forEach(result => getScheduleRuleWithTimezone(result));
-        };
-        const createSchedule = async () => {
-            const res = await SpaceConnector.client.powerScheduler.schedule.create({
-                // schedule_id: props.scheduleId,
-                // 'project_id':
+            res.results.forEach((scheduleRule) => {
+                const rule: Rule = {};
+                if (scheduleRule.rule_type === RULE_TYPE.routine) {
+                    scheduleRule.rule.forEach((r) => {
+                        rule[r.day] = r.times;
+                    });
+                    state.rule.routine = changeTimezoneToLocal(rule, scheduleRule.rule_type);
+                } else {
+                    scheduleRule.rule.forEach((r) => {
+                        rule[r.date] = r.times;
+                    });
+                    if (scheduleRule.state === RULE_STATE.running) {
+                        state.rule.oneTimeRun = changeTimezoneToLocal(rule, scheduleRule.rule_type);
+                    } else if (scheduleRule.state === RULE_STATE.stopped) {
+                        state.rule.oneTimeStop = changeTimezoneToLocal(rule, scheduleRule.rule_type);
+                    }
+                }
             });
         };
-        const createOrUpdateScheduleRule = async () => {
-            if (!props.scheduleId) await createSchedule();
-            // const res = await SpaceConnector.client.powerScheduler.
+        const createOrUpdate = async () => {
+            let ruleType = '';
+            let ruleState = '';
+            let ruleWithUTC: Rule = {};
+            const ruleForApi: RoutineRule[] | TicketRule[] = [];
+
+            if (props.mode !== 'READ') {
+                ruleType = RULE_TYPE.routine;
+                ruleState = RULE_STATE.running;
+                ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
+                Object.entries(ruleWithUTC).forEach(([k, v]) => {
+                    if (v.length > 0) {
+                        ruleForApi.push({ day: k, times: v, date: '' });
+                    }
+                });
+            } else if (state.oneTimeEditMode) {
+                ruleType = RULE_TYPE.ticket;
+                if (state.oneTimeEditMode === 'RUN') {
+                    ruleState = RULE_STATE.running;
+                    ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeRun, RULE_TYPE.ticket);
+                } else if (state.oneTimeEditMode === 'STOP') {
+                    ruleState = RULE_STATE.stopped;
+                    ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeStop, RULE_TYPE.ticket);
+                }
+                Object.entries(ruleWithUTC).forEach(([k, v]) => {
+                    if (v.length > 0) {
+                        ruleForApi.push({ date: k, times: v, day: '' });
+                    }
+                });
+            } else {
+                return;
+            }
+
+            // check scheduleRule exists
+            let scheduleRuleId = '';
+            const query = new QueryHelper().setFilter(
+                {
+                    k: 'rule_type',
+                    v: ruleType,
+                    o: 'eq',
+                },
+                {
+                    k: 'state',
+                    v: ruleState,
+                    o: 'eq',
+                },
+            );
+            const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
+                schedule_id: props.scheduleId,
+                query: query.data,
+            });
+
+            // create or update schedule rule
+            if (res.results.length > 0) {
+                scheduleRuleId = res.results[0].schedule_rule_id;
+
+                // update or delete
+                if (ruleForApi.length === 0) {
+                    await SpaceConnector.client.powerScheduler.scheduleRule.delete({
+                        schedule_rule_id: scheduleRuleId,
+                    });
+                } else {
+                    await SpaceConnector.client.powerScheduler.scheduleRule.update({
+                        schedule_rule_id: scheduleRuleId,
+                        rule: ruleForApi,
+                    });
+                }
+            } else {
+                await SpaceConnector.client.powerScheduler.scheduleRule.create({
+                    user_id: store.state.user.userId,
+                    schedule_id: props.scheduleId,
+                    rule_type: ruleType,
+                    name: `${ruleType} - ${ruleState}`,
+                    state: ruleState,
+                    rule: ruleForApi,
+                });
+            }
         };
 
         // events
@@ -388,21 +516,22 @@ export default {
                 const week = classList[2].split('-')[0].toLowerCase();
                 const time = Number(classList[2].split('-')[1]);
 
-                const routineTimes = get(state.scheduleRule.routine, week);
+                const routineTimes = get(state.rule.routine, week);
                 let oneTimeTimes = [] as number[];
 
-                if (props.mode !== 'READ') { // toggle routine rule
+                if (props.mode !== 'READ') {
                     if (routineTimes && routineTimes.includes(time)) {
                         const idx = routineTimes.indexOf(time);
-                        state.scheduleRule.routine[week].splice(idx, 1);
+                        state.rule.routine[week].splice(idx, 1);
                         classList.remove('routine');
                     } else {
-                        state.scheduleRule.routine[week].push(time);
+                        if (state.rule.routine[week]) state.rule.routine[week].push(time);
+                        else state.rule.routine[week] = [time];
                         classList.add('routine');
                     }
-                } else { // one time
+                } else {
                     // prevent adding run(stop) tickets when the rule is (not) routine
-                    const isRoutineTime = routineTimes.includes(time);
+                    const isRoutineTime = routineTimes && routineTimes.includes(time);
                     if (state.oneTimeEditMode === 'RUN' && isRoutineTime) return;
                     if (state.oneTimeEditMode === 'STOP' && !isRoutineTime) return;
 
@@ -417,14 +546,14 @@ export default {
                     }
 
                     // toggle one time rule
-                    oneTimeTimes = get(state.scheduleRule[editMode], date);
+                    oneTimeTimes = get(state.rule[editMode], date);
                     if (oneTimeTimes && oneTimeTimes.includes(time)) {
                         const idx = oneTimeTimes.indexOf(time);
-                        state.scheduleRule[editMode][date].splice(idx, 1);
+                        state.rule[editMode][date].splice(idx, 1);
                         classList.remove(className);
                     } else {
-                        if (state.scheduleRule[editMode][date]) state.scheduleRule[editMode][date].push(time);
-                        else state.scheduleRule[editMode][date] = [time];
+                        if (state.rule[editMode][date]) state.rule[editMode][date].push(time);
+                        else state.rule[editMode][date] = [time];
                         classList.add(className);
                     }
                 }
@@ -438,7 +567,7 @@ export default {
             setStyleClass();
         };
         const onDeleteAllRoutine = () => {
-            state.scheduleRule.routine = {
+            state.rule.routine = {
                 sun: [],
                 mon: [],
                 tue: [],
@@ -453,21 +582,17 @@ export default {
             state.oneTimeEditMode = type;
             setStyleClass();
         };
-        const onClickSaveOneTimeSchedule = () => {
-            // save logic
+        const onClickSaveOneTimeSchedule = async () => {
+            await createOrUpdate();
+            await getScheduleRule();
+
+            state.oneTimeEditMode = false;
+            setStyleClass();
         };
         const onClickCancelOneTimeSchedule = async () => {
             state.oneTimeEditMode = false;
             await getScheduleRule();
             setStyleClass();
-        };
-
-        //
-        const create = async () => {
-            //
-        };
-        const update = async () => {
-            //
         };
 
         watch(() => props.scheduleId, async (after, before) => {
@@ -500,6 +625,7 @@ export default {
             onClickSaveOneTimeSchedule,
             onClickCancelOneTimeSchedule,
             range,
+            createOrUpdate,
         };
     },
 };

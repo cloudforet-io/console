@@ -23,7 +23,11 @@
             </p-field-group>
 
             <div class="scroll-contents">
-                <schedule-time-table :schedule-id="scheduleId" :mode="mode" />
+                <schedule-time-table
+                    ref="timeTable"
+                    :schedule-id="proxyScheduleId"
+                    :mode="mode"
+                />
             </div>
             <div class="scroll-contents">
                 <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId" :mode="mode" />
@@ -44,18 +48,27 @@
 </template>
 
 <script lang="ts">
-import ScheduleTimeTable from '@/views/management/power-scheduler/modules/ScheduleTimeTable.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
+/* eslint-disable camelcase */
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { makeProxy } from '@/components/util/composition-helpers';
+
+import ScheduleTimeTable from '@/views/management/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/management/power-scheduler/modules/ScheduleKanban.vue';
+
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+
+import { makeProxy } from '@/components/util/composition-helpers';
+import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'ScheduleDetail',
     components: {
-        PTextInput, PFieldGroup, PButton, ScheduleTimeTable, ScheduleKanban,
+        PTextInput,
+        PFieldGroup,
+        PButton,
+        ScheduleTimeTable,
+        ScheduleKanban,
     },
     directives: {
         focus: {
@@ -66,6 +79,10 @@ export default {
     },
     props: {
         scheduleId: {
+            type: String,
+            default: undefined,
+        },
+        projectId: {
             type: String,
             required: true,
         },
@@ -82,23 +99,39 @@ export default {
             required: true,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, refs }) {
         const state = reactive({
             showValidation: false,
             isNameValid: computed(() => !!state.proxyName),
             isAllValid: computed(() => state.isNameValid),
             proxyName: makeProxy('name', props, emit),
+            proxyScheduleId: makeProxy('scheduleId', props, emit),
             kanban: null,
+            timeTable: null,
         });
+
+        const createSchedule = async () => {
+            const res = await SpaceConnector.client.powerScheduler.schedule.create({
+                name: props.name,
+                project_id: props.projectId,
+            });
+            state.proxyScheduleId = res.results.schedule_id;
+        };
 
         const onClickCancel = () => {
             emit('cancel');
         };
 
-        const onClickSave = () => {
+        const onClickSave = async () => {
             state.showValidation = true;
             if (!state.isAllValid) return;
-            state.kanban.onSave();
+            if (props.mode === 'CREATE') {
+                await createSchedule();
+            }
+            if (props.mode === 'CREATE' || props.mode === 'UPDATE') {
+                await state.timeTable.createOrUpdate();
+                state.kanban.onSave();
+            }
             emit('update:mode', 'READ');
         };
 
