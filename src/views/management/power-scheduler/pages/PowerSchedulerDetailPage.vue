@@ -7,7 +7,7 @@
                           child
                           @goBack="$router.push('/management/power-scheduler')"
             />
-            <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm"
+            <p-icon-text-button name="ic_plus_bold" style-type="primary-dark"
                                 :disabled="mode === 'CREATE'"
                                 @click="onClickCreate"
             >
@@ -65,7 +65,8 @@
                         <td class="delete">
                             <p-icon-button class="delete" name="ic_trashcan"
                                            :disabled="mode !== 'READ' && !isActiveItem(schedule)"
-                                           @click="onClickDelete(schedule)" />
+                                           @click="onClickDelete(schedule)"
+                            />
                         </td>
                     </tr>
                 </tbody>

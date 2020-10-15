@@ -234,7 +234,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             isReadMode: true,
-            isCreateMode: computed(() => !props.resourceGroup ),
+            isCreateMode: computed(() => !props.resourceGroup),
             title: computed(() => {
                 if (props.resourceGroup) return props.resourceGroup.name;
                 return vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME');
@@ -283,6 +283,13 @@ export default {
 
         const getPageSchema = async () => {
             state.schema = null;
+
+            fetchOptionState.pageStart = 1;
+            fetchOptionState.pageLimit = 15;
+            fetchOptionState.sortDesc = true;
+            fetchOptionState.sortBy = 'created_at';
+            fetchOptionState.queryTags = [];
+
             const resourceTypeSplit = state.selectedTypeName.split('?');
             state.currentApiResourceType = resourceTypeSplit[0];
 
