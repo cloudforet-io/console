@@ -66,13 +66,32 @@
                 </tbody>
             </table>
         </section>
-
         <schedule-detail v-if="selectedSchedule" :schedule-id.sync="selectedSchedule.schedule_id"
                          :project-id="projectId"
                          :mode.sync="mode"
                          :name.sync="selectedSchedule.name"
                          @cancel="onCancel"
         />
+        <p-button-modal
+            :header-title="headerTitle"
+            :centered="true"
+            :scrollable="false"
+            size="md"
+            :fade="true"
+            :backdrop="true"
+            :visible.sync="visible"
+            :theme-color="themeColor"
+            :footer-confirm-button-bind="{
+                styleType: 'alert',
+            }"
+            @confirm="scheduleDeleteConfirm"
+        >
+            <template #body>
+                <p class="delete-modal-content">
+                    {{ modalContent }}
+                </p>
+            </template>
+        </p-button-modal>
     </general-page-layout>
 </template>
 
@@ -93,7 +112,8 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import ScheduleDetail from '@/views/management/power-scheduler/modules/ScheduleDetail.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
@@ -111,6 +131,7 @@ const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        PButtonModal,
         ScheduleDetail,
         PLottie,
         PIconButton,
@@ -126,7 +147,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         if (!props.projectId) vm.$router.push('/error-page');
 
@@ -148,6 +169,13 @@ export default {
             selectedSchedule: null as null|Schedule,
             // eslint-disable-next-line camelcase
             mode: 'READ' as Mode,
+        });
+
+        const formState = reactive({
+            visible: false,
+            headerTitle: '',
+            themeColor: '',
+            modalContent: '',
         });
 
         const listSchedule = async () => {
@@ -185,8 +213,26 @@ export default {
             state.mode = 'UPDATE';
         };
 
-        const onClickDelete = (schedule: Schedule) => {
+        const onClickDelete = () => {
+            formState.visible = true;
+            formState.themeColor = 'alert';
+            formState.headerTitle = '스케줄그룹 삭제';
+            formState.modalContent = '스케줄 그룹을 삭제하시겠습니까?';
+        };
 
+        const scheduleDeleteConfirm = async () => {
+            try {
+                await SpaceConnector.client.powerScheduler.schedule.delete({
+                    schedule_id: state.selectedSchedule?.schedule_id,
+                });
+                showSuccessMessage('성공', formState.headerTitle, root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(`${formState.headerTitle} 실패`, e, root);
+            } finally {
+                formState.visible = false;
+                await listSchedule();
+            }
         };
 
         const onClickCreate = () => {
@@ -215,10 +261,12 @@ export default {
             projectName,
             routeState,
             ...toRefs(state),
+            ...toRefs(formState),
             isActiveItem,
             showDetail,
             onClickEdit,
             onClickDelete,
+            scheduleDeleteConfirm,
             onClickCreate,
             onCancel,
         };
