@@ -117,7 +117,7 @@ export default {
 
         const setSearchOptions = () => {
             const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                state.currentLayout.options.search,
+                state.currentLayout.options.search[0],
                 'inventory.CloudService',
             );
             state.keyItems = keyItems;

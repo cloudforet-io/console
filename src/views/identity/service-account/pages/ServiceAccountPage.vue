@@ -240,6 +240,7 @@ export default {
             selectIndex: [],
             selectable: true,
             colCopy: false,
+            searchable: true,
         });
 
         const tableState = reactive({

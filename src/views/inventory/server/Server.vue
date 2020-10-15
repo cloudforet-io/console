@@ -382,7 +382,7 @@ export default {
 
                 // declare keyItems and valueHandlerMap with search schema
                 if (res?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search, 'inventory.Server');
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search[0], 'inventory.Server');
                     typeOptionState.keyItems = searchProps.keyItems;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
 

@@ -104,7 +104,7 @@ export default {
 
         const setSearchOptions = () => {
             const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                state.currentLayout.options.search,
+                state.currentLayout.options.search[0],
                 'inventory.Server',
             );
             state.keyItems = keyItems;

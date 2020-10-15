@@ -81,6 +81,7 @@
         </transition-group>
         <resource-group-page :visible.sync="resourceGroupVisible"
                              :resource-group="selectedResourceGroup"
+                             @confirm="onResourceGroupConfirm"
         />
     </div>
 </template>
@@ -252,6 +253,10 @@ export default {
             state.resourceGroupVisible = true;
         };
 
+        const onResourceGroupConfirm = (resourceGroup) => {
+            console.debug('onResourceGroupConfirm', resourceGroup);
+        };
+
 
         watch([() => props.scheduleId], async (after, before) => {
             if (props.scheduleId && (after !== before)) {
@@ -279,6 +284,7 @@ export default {
             onSave,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
             onClickResourceGroup,
+            onResourceGroupConfirm,
         };
     },
 };
