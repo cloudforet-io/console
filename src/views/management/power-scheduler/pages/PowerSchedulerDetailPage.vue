@@ -68,6 +68,7 @@
         </section>
 
         <schedule-detail v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id"
+                         :project-id="projectId"
                          :mode.sync="mode"
                          :name.sync="selectedSchedule.name"
                          @cancel="onCancel"

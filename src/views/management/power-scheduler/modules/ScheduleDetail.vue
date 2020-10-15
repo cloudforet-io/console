@@ -26,7 +26,7 @@
                 <schedule-time-table :schedule-id="scheduleId" :mode="mode" />
             </div>
             <div class="scroll-contents">
-                <schedule-kanban ref="kanban" :schedule-id="scheduleId" :mode="mode" />
+                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId" :mode="mode" />
             </div>
 
             <div v-if="mode !== 'READ'" class="actions">
@@ -76,6 +76,10 @@ export default {
         name: {
             type: String,
             default: '',
+        },
+        projectId: {
+            type: String,
+            required: true,
         },
     },
     setup(props, { emit }) {

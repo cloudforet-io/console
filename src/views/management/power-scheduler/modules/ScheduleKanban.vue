@@ -57,7 +57,7 @@
                                @end="onDraggingEnd"
                     >
                         <div v-for="(item, index) in column.items"
-                             :key="item.resource_group_id"
+                             :key="`${item}-${index}`"
                              class="resource-group-item"
                              @click="onClickResourceGroup(item.resource_group)"
                         >
@@ -119,6 +119,7 @@ import { ViewMode } from '@/views/management/power-scheduler/type';
     interface Props {
         scheduleId: string;
         mode: ViewMode;
+        projectId: string;
     }
 export default {
     name: 'App',
@@ -139,11 +140,14 @@ export default {
             type: String,
             default: 'READ',
         },
+        projectId: {
+            type: String,
+            required: true,
+        },
     },
     setup(props: Props) {
         const state = reactive({
             columns: [] as unknown as ColumnType[],
-            options: [] as any,
             maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
             loading: false,
             editable: false,
@@ -172,6 +176,20 @@ export default {
                     state.columns[i].title = `${parseInt(state.columns[i].title) - 1}`;
                 }
             }, 100);
+        };
+
+        const getInitResourceGroup = async () => {
+            state.loading = true;
+            try {
+                const res = await SpaceConnector.client.powerScheduler.schedule.getCreateScheduleResourceGroups({
+                    // eslint-disable-next-line camelcase
+                    project_id: props.projectId,
+                });
+                state.columns = res.columns;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const getResourceGroup = async (scheduleId) => {
@@ -227,23 +245,28 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-            }
-            finally {
+            } finally {
                 await getResourceGroup(props.scheduleId);
             }
         };
+
+        const onClickResourceGroup = (item) => {
+            state.selectedResourceGroup = item || null;
+            state.resourceGroupVisible = true;
+        };
+
 
         watch([() => props.scheduleId, () => props.mode], async (after, before) => {
             if (props.scheduleId && (after !== before)) {
                 await getResourceGroup(props.scheduleId);
                 await checkMode();
             }
+            if (!props.scheduleId && (after !== before)) {
+                await getInitResourceGroup();
+                await checkMode();
+            }
         }, { immediate: true });
 
-        const onClickResourceGroup = (item) => {
-            state.selectedResourceGroup = item || null;
-            state.resourceGroupVisible = true;
-        };
 
         return {
             ...toRefs(state),
@@ -286,11 +309,14 @@ export default {
         transform: translateY(20px);
     }
     .edit-mode {
-        .kanban .container .resource-group-box .resource-group-header {
+        .kanban .kanban-container .resource-group-box .resource-group-header {
             @apply bg-blue-100;
         }
-        .kanban .container .resource-group-box .resource-group-header .header-decorator {
+        .kanban .kanban-container .resource-group-box .resource-group-header .header-decorator {
             @apply bg-blue-200 text-blue-500;
+        }
+        .kanban .kanban-container .resource-group-box .resource-item-wrapper {
+            height: 17rem;
         }
     }
 
@@ -343,14 +369,14 @@ export default {
 
                 .resource-item-wrapper {
                     @apply overflow-y-auto overflow-x-hidden px-4 pb-4;
-                    height: 20.75rem;
+                    height: 13rem;
                     .kanban-landing-wrapper {
                         @apply flex-col;
                         #kanban-landing-card {
                             @apply bg-blue-500 m-auto;
                             height: 3.25rem;
                             opacity: 0.1;
-                            margin-top: 40%;
+                            margin-top: 30%;
                             border-radius: 0.25rem;
                             z-index: 1;
                         }
