@@ -67,7 +67,7 @@
             </table>
         </section>
 
-        <schedule-detail v-if="selectedSchedule" :schedule-id="selectedSchedule.schedule_id"
+        <schedule-detail v-if="selectedSchedule" :schedule-id.sync="selectedSchedule.schedule_id"
                          :project-id="projectId"
                          :mode.sync="mode"
                          :name.sync="selectedSchedule.name"

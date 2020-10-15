@@ -238,16 +238,16 @@ export default {
             state.isDragging = false;
         };
 
-        const onSave = async () => {
+        const onSave = async (scheduleId) => {
             try {
                 await SpaceConnector.client.powerScheduler.schedule.setScheduleResourceGroups({
-                    schedule_id: props.scheduleId,
+                    schedule_id: scheduleId,
                     columns: state.columns,
                 });
             } catch (e) {
                 console.error(e);
             } finally {
-                await getResourceGroup(props.scheduleId);
+                await getResourceGroup(scheduleId);
             }
         };
 

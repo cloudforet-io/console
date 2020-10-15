@@ -30,7 +30,7 @@
                 />
             </div>
             <div class="scroll-contents">
-                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
+                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="proxyScheduleId"
                                  :mode="mode"
                 />
             </div>
@@ -122,7 +122,16 @@ export default {
                 name: props.name,
                 project_id: props.projectId,
             });
-            state.proxyScheduleId = res.results.schedule_id;
+            state.proxyScheduleId = res.schedule_id;
+            return res.schedule_id;
+        };
+
+        const updateSchedule = async () => {
+            const res = await SpaceConnector.client.powerScheduler.schedule.update({
+                schedule_id: state.proxyScheduleId,
+                name: props.name,
+            });
+            return res.schedule_id;
         };
 
         const onClickCancel = () => {
@@ -130,14 +139,18 @@ export default {
         };
 
         const onClickSave = async () => {
+            let scheduleId = state.proxyScheduleId;
             state.showValidation = true;
             if (!state.isAllValid) return;
             if (props.mode === 'CREATE') {
-                await createSchedule();
+                scheduleId = await createSchedule();
+            }
+            if (props.mode === 'UPDATE') {
+                scheduleId = await updateSchedule();
             }
             if (props.mode === 'CREATE' || props.mode === 'UPDATE') {
-                await state.timeTable.createOrUpdate();
-                state.kanban.onSave();
+                // await state.timeTable.createOrUpdate(scheduleId);
+                await state.kanban.onSave(scheduleId);
             }
             emit('update:mode', 'READ');
         };
