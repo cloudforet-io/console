@@ -1,8 +1,6 @@
 import { Ref } from '@vue/composition-api';
 
-export type Computed<T> = Readonly<Ref<Readonly<T>>>
 export type RefArgs<T> = Ref<T> | Ref<Readonly<T>>
-export type ComputedOrRef<T> = Computed<T>|RefArgs<T>
 export type cnaRefArgs<T> = T | RefArgs<T>
 export type readonlyArgs<T> = T | Readonly<T>
 export type readonlyRefArg<T> = readonlyArgs<cnaRefArgs<T>>
@@ -123,3 +121,5 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
     }
 }
 
+
+export type QueryFilters = Record<string|'keywords', Array<string|number|boolean>>

@@ -36,7 +36,7 @@
                 </div>
                 <div class="resource-item-wrapper">
                     <div v-if="editable && column.title === '1'" class="resource-group-item">
-                        <div class="justify-center text-xs add-resource-group" @click="createResourceGroup">
+                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup">
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
                     </div>
@@ -59,9 +59,9 @@
                         <div v-for="(item, index) in column.items"
                              :key="item.resource_group_id"
                              class="resource-group-item"
-                             @click="updateResourceGroup(item)"
+                             @click="onClickResourceGroup(item.resource_group)"
                         >
-                            <div class="resource" @click="onClickResourceGroup(item)">
+                            <div class="resource">
                                 <p-lazy-img :src="iconUrl(item)"
                                             width="2rem" height="2rem"
                                             class="mr-2"
@@ -97,6 +97,7 @@ import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import ResourceGroupPage from '@/views/management/power-scheduler/pages/ResourceGroupPage.vue';
+import { ViewMode } from '@/views/management/power-scheduler/type';
 
     interface ItemType {
         // eslint-disable-next-line camelcase
@@ -113,6 +114,11 @@ import ResourceGroupPage from '@/views/management/power-scheduler/pages/Resource
             priority: number;
             badge?: string;
         };
+    }
+
+    interface Props {
+        scheduleId: string;
+        mode: ViewMode;
     }
 export default {
     name: 'App',
@@ -134,7 +140,7 @@ export default {
             default: 'READ',
         },
     },
-    setup(props, context) {
+    setup(props: Props) {
         const state = reactive({
             columns: [] as unknown as ColumnType[],
             maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
@@ -196,14 +202,6 @@ export default {
             else state.editable = false;
         };
 
-        const createResourceGroup = () => {
-            console.log('create resource group!');
-        };
-
-        const updateResourceGroup = (item) => {
-            console.log('update resource group!', item);
-        };
-
         const deleteResourceGroup = (column, item, itemIndex) => {
             const columnIndex = parseInt(column.title) - 1;
             state.columns[columnIndex].items.splice(itemIndex, 1);
@@ -234,8 +232,6 @@ export default {
             ...toRefs(state),
             addColumn,
             deleteColumn,
-            createResourceGroup,
-            updateResourceGroup,
             deleteResourceGroup,
             onStart,
             onEnd,

@@ -7,13 +7,19 @@
                     {{ $t('PWR_SCHED.RESRC_GRP.BASE_INFO') }}
                 </div>
                 <div class="form">
-                    <p-field-group required :label="$t('PWR_SCHED.RESRC_GRP.NAME')">
+                    <p-field-group v-if="isReadMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
+                        <span>test</span>
+                    </p-field-group>
+                    <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')">
                         <template #help>
                             {{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC') }}
                             <span class="text-gray-500">{{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC2') }}</span>
                         </template>
-                        <p-text-input class="w-full" block :placeholder="$t('PWR_SCHED.RESRC_GRP.NAME')" />
+                        <p-text-input class="w-full" block
+                                      :placeholder="$t('PWR_SCHED.RESRC_GRP.NAME')"
+                        />
                     </p-field-group>
+
 
                     <p-field-group :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
                         <template #help>
@@ -101,41 +107,34 @@ import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { forEach, camelCase } from 'lodash';
 import { store } from '@/store';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { QueryFilters } from '@/lib/type';
 
 interface Resource {
     resource_type: string;
     filter: Filter[];
 }
 
-interface CreateModel {
+interface ResourceGroup {
+    resource_group_id?: string;
     name: string;
     resources: Resource;
     options: {
-        raw_filter: any;
+        raw_filter: QueryFilters;
     };
     tags: object;
 }
 
-interface UpdateModel {
-    resource_group_id: string;
-    name: string;
-    resources: Resource;
-    tags: object;
+interface Props {
+    resourceGroup: null|ResourceGroup;
+    visible: boolean;
 }
-const resourceTypeInfo = {
-    '[ALL] Server': 'inventory.Server',
-    '[AWS] RDS': 'inventory.CloudService?provider=aws&cloud_service_group=RDS&cloud_service_type=Database',
-    '[AWS] Auto Scaling Group': 'inventory.CloudService?provider=aws&cloud_service_group=AutoScaling&cloud_service_type=AutoScalingGroup',
-};
 const RESOURCE_GROUP_TYPES = [
     {
         label: '[ALL] Server',
@@ -148,7 +147,7 @@ const RESOURCE_GROUP_TYPES = [
         type: 'item',
     },
     {
-        label: '[AWS] Auto Scaling Group',
+        label: '[AWS] Auto ScaliResourceGroupng Group',
         name: 'inventory.CloudService?provider=aws&cloud_service_group=AutoScaling&cloud_service_type=AutoScalingGroup',
         type: 'item',
     },
@@ -179,7 +178,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
@@ -204,7 +203,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             isReadMode: true,
-            isCreateMode: computed(() => props.resourceGroup === null),
+            isCreateMode: computed(() => !props.resourceGroup || !props.resourceGroup.resource_group_id),
             title: computed(() => {
                 if (props.resourceGroup) return props.resourceGroup.name;
                 return vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME');
@@ -220,10 +219,6 @@ export default {
 
         const getPageSchema = async () => {
             state.schema = null;
-            // TODO: remove it
-            props.resourceGroup.resources = {
-                resource_type: 'inventory.CloudService?provider=aws&cloud_service_group=AutoScaling&cloud_service_type=AutoScalingGroup',
-            };
             if (props.resourceGroup?.resources?.resource_type) {
                 const resourceTypeSplit = props.resourceGroup.resources.resource_type?.split('?');
                 state.currentResourceType = resourceTypeSplit[0];
@@ -395,6 +390,12 @@ section {
 }
 .p-field-group {
     width: 100%;
+    &.read-mode {
+        @apply flex;
+        .form-label {
+            width: 6.5rem;
+        }
+    }
 }
 .p-dict-input-group::v-deep {
     .dict-group {

@@ -167,6 +167,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ViewMode } from '@/views/management/power-scheduler/type';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
@@ -193,6 +194,11 @@ dayjs.extend(timezone);
         stopped = 'STOPPED',
     }
 
+    interface Props {
+        scheduleId?: string;
+        mode: ViewMode;
+    }
+
 export default {
     name: 'ScheduleTimeTable',
     components: {
@@ -211,7 +217,7 @@ export default {
             default: 'READ',
         },
     },
-    setup(props, { refs }) {
+    setup(props: Props, { refs }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             weekdayTexts: [

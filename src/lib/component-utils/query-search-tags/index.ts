@@ -10,6 +10,7 @@ import { getTimezone } from '@/lib/util';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
+import {QueryFilters} from "@/lib/type";
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -195,8 +196,6 @@ const parseTag = (text: string): QueryItem => {
         value: valueItem,
     };
 };
-
-type QueryFilters = Record<string|'keywords', Array<string|number|boolean>>
 
 const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[] = []): QueryTag[] => {
     const res: QueryTag[] = [];
