@@ -98,11 +98,12 @@ export default {
             width: 100%;
         }
     }
-    &.is-invalid-btn {
-        div {
-            .dropdown-btn {
-                @apply border border-alert;
-            }
+    &.is-invalid-btn .p-dropdown-btn {
+        .menu-btn.p-button {
+            @apply border border-alert;
+        }
+        .p-icon-button.p-button, .p-icon-button.p-button.active, .p-icon-button.p-button.hovered {
+            @apply border border-alert;
         }
     }
     .p-dropdown-btn .menu-btn.p-button.active {
