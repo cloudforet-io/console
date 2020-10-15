@@ -53,8 +53,8 @@
                                group="items"
                                :empty-insert-threshold="100"
                                :disabled="!editable"
-                               @start="onStart"
-                               @end="onEnd"
+                               @start="onDraggingStart"
+                               @end="onDraggingEnd"
                     >
                         <div v-for="(item, index) in column.items"
                              :key="item.resource_group_id"
@@ -143,6 +143,7 @@ export default {
     setup(props: Props) {
         const state = reactive({
             columns: [] as unknown as ColumnType[],
+            options: [] as any,
             maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
             loading: false,
             editable: false,
@@ -185,6 +186,9 @@ export default {
                         res.columns.push({
                             title: `${res.columns.length + 1}`,
                             items: [],
+                            options: {
+                                priority: res.columns.length + 1,
+                            },
                         });
                     }
                     state.columns = res.columns;
@@ -207,17 +211,30 @@ export default {
             state.columns[columnIndex].items.splice(itemIndex, 1);
         };
 
-        const onStart = () => {
+        const onDraggingStart = () => {
             state.isDragging = true;
         };
 
-        const onEnd = () => {
+        const onDraggingEnd = () => {
             state.isDragging = false;
         };
 
+        const onSave = async () => {
+            try {
+                await SpaceConnector.client.powerScheduler.schedule.setScheduleResourceGroups({
+                    schedule_id: props.scheduleId,
+                    columns: state.columns,
+                });
+            } catch (e) {
+                console.error(e);
+            }
+            finally {
+                await getResourceGroup(props.scheduleId);
+            }
+        };
+
         watch([() => props.scheduleId, () => props.mode], async (after, before) => {
-            console.log(props.scheduleId)
-            if (after !== before) {
+            if (props.scheduleId && (after !== before)) {
                 await getResourceGroup(props.scheduleId);
                 await checkMode();
             }
@@ -233,8 +250,9 @@ export default {
             addColumn,
             deleteColumn,
             deleteResourceGroup,
-            onStart,
-            onEnd,
+            onDraggingStart,
+            onDraggingEnd,
+            onSave,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
             onClickResourceGroup,
         };

@@ -26,7 +26,7 @@
                 <schedule-time-table :schedule-id="scheduleId" :mode="mode" />
             </div>
             <div class="scroll-contents">
-                <schedule-kanban :schedule-id="scheduleId" :mode="mode" />
+                <schedule-kanban ref="kanban" :schedule-id="scheduleId" :mode="mode" />
             </div>
 
             <div v-if="mode !== 'READ'" class="actions">
@@ -84,6 +84,7 @@ export default {
             isNameValid: computed(() => !!state.proxyName),
             isAllValid: computed(() => state.isNameValid),
             proxyName: makeProxy('name', props, emit),
+            kanban: null,
         });
 
         const onClickCancel = () => {
@@ -93,6 +94,7 @@ export default {
         const onClickSave = () => {
             state.showValidation = true;
             if (!state.isAllValid) return;
+            state.kanban.onSave();
             emit('update:mode', 'READ');
         };
 
