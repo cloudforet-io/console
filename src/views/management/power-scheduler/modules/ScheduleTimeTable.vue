@@ -734,7 +734,7 @@ export default {
                         }
                     }
                     .item-row {
-                        @apply border-b border-primary4;
+                        @apply bg-white border-b border-primary4;
                         display: flex;
                         width: 100%;
                         height: 0.75rem;

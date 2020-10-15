@@ -8,6 +8,7 @@
                           @goBack="$router.push('/management/power-scheduler')"
             />
             <p-icon-text-button name="ic_plus_bold" style-type="primary-dark" size="sm"
+                                :disabled="mode === 'CREATE'"
                                 @click="onClickCreate"
             >
                 {{ $t('PWR_SCHED.CREATE') }}
@@ -39,7 +40,8 @@
                     <tr v-for="(schedule, index) in scheduleList" :key="index"
                         class="list-item"
                         :class="{ active: isActiveItem(schedule),
-                                  'edit-mode': mode !== 'READ'
+                                  'edit-mode': mode !== 'READ',
+                                  disabled: mode !== 'READ' && !isActiveItem(schedule)
                         }"
                     >
                         <td class="name" @click="showDetail(schedule)">
@@ -56,11 +58,14 @@
                                   class="tag"
                             >{{ $t('PWR_SCHED.CREATING') }}</span>
                             <p-icon-button v-else class="edit" name="ic_edit"
+                                           :disabled="mode !== 'READ' && !isActiveItem(schedule)"
                                            @click="onClickEdit(schedule)"
                             />
                         </td>
                         <td class="delete">
-                            <p-icon-button class="delete" name="ic_trashcan" @click="onClickDelete(schedule)" />
+                            <p-icon-button class="delete" name="ic_trashcan"
+                                           :disabled="mode !== 'READ' && !isActiveItem(schedule)"
+                                           @click="onClickDelete(schedule)" />
                         </td>
                     </tr>
                 </tbody>
@@ -205,7 +210,9 @@ export default {
         const isActiveItem = (schedule: Schedule) => state.selectedSchedule?.schedule_id === schedule.schedule_id;
 
         const showDetail = async (schedule: Schedule) => {
-            state.selectedSchedule = schedule;
+            if (state.mode === 'READ') {
+                state.selectedSchedule = schedule;
+            }
         };
 
         const onClickEdit = (schedule: Schedule) => {
@@ -231,6 +238,7 @@ export default {
                 showErrorMessage(`${formState.headerTitle} 실패`, e, root);
             } finally {
                 formState.visible = false;
+                state.mode = 'READ';
                 await listSchedule();
             }
         };
@@ -322,6 +330,14 @@ export default {
                     td {
                         @apply border-secondary text-secondary;
                     }
+                }
+            }
+            &.disabled {
+                @apply bg-gray-200;
+                opacity: 0.5;
+                cursor: default;
+                &:hover {
+                    @apply bg-gray-200;
                 }
             }
             &:hover {
