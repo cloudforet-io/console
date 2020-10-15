@@ -234,7 +234,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             isReadMode: true,
-            isCreateMode: computed(() => !props.resourceGroup || !props.resourceGroup.resource_group_id),
+            isCreateMode: computed(() => !props.resourceGroup ),
             title: computed(() => {
                 if (props.resourceGroup) return props.resourceGroup.name;
                 return vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME');
@@ -454,10 +454,12 @@ export default {
                 tags: state.tags,
             };
 
-            if (!state.isCreateMode) params.resource_group_id = props.resourceGroup?.resource_group_id;
+            if (props.resourceGroup?.resource_group_id) params.resource_group_id = props.resourceGroup.resource_group_id;
 
             emit('confirm', params);
             state.proxyVisible = false;
+            state.isReadMode = true;
+            reset();
         };
 
         watch([() => props.resourceGroup, () => props.visible], async ([group, visible]) => {

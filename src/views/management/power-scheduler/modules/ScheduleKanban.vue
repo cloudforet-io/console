@@ -15,7 +15,7 @@
         <!--        </div>-->
         <transition-group v-if="!loading" class="kanban-container">
             <div
-                v-for="column in columns"
+                v-for="(column, columnIdx) in columns"
                 :key="column.title"
                 class="resource-group-box"
             >
@@ -36,7 +36,7 @@
                 </div>
                 <div class="resource-item-wrapper">
                     <div v-if="editable && column.title === '1'" class="resource-group-item">
-                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup()">
+                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup(-1)">
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                         <div v-for="(item, index) in column.items"
                              :key="`${item}-${index}`"
                              class="resource-group-item"
-                             @click="onClickResourceGroup(item.resource_group)"
+                             @click="onClickResourceGroup(index, columnIdx)"
                         >
                             <div class="resource">
                                 <p-lazy-img :src="iconUrl(item)"
@@ -153,7 +153,9 @@ export default {
             editable: false,
             isDragging: false,
             resourceGroupVisible: false,
-            selectedResourceGroup: null as any,
+            selectedResourceGroupIndex: -1,
+            selectedResourceGroup: computed(() => state.columns[state.selectedColumnIndex]?.items[state.selectedResourceGroupIndex]?.resource_group || null),
+            selectedColumnIndex: 0,
         });
 
         const addColumn = () => {
@@ -248,15 +250,32 @@ export default {
             }
         };
 
-        const onClickResourceGroup = (item?) => {
-            state.selectedResourceGroup = item || null;
+        const onClickResourceGroup = (index, columnIdx = 0) => {
+            state.selectedResourceGroupIndex = index;
+            state.selectedColumnIndex = columnIdx;
             state.resourceGroupVisible = true;
         };
 
         const onResourceGroupConfirm = (resourceGroup) => {
-            console.debug('onResourceGroupConfirm', resourceGroup);
+            if (resourceGroup.resource_group_id) {
+                const item = state.columns[state.selectedColumnIndex].items[state.selectedResourceGroupIndex];
+                state.columns[state.selectedColumnIndex].items[state.selectedResourceGroupIndex] = {
+                    ...item,
+                    // eslint-disable-next-line camelcase
+                    resource_group: resourceGroup,
+                };
+                state.columns = [...state.columns];
+            } else {
+                state.columns[0].items.push({
+                    name: resourceGroup.name,
+                    // eslint-disable-next-line camelcase
+                    resource_group: resourceGroup,
+                    count: 0,
+                    icon: '',
+                });
+                state.columns = [...state.columns];
+            }
         };
-
 
         watch([() => props.scheduleId], async (after, before) => {
             if (props.scheduleId && (after !== before)) {
