@@ -1,6 +1,5 @@
 <template>
     <div class="page-information">
-        <!--        <span>UPDATED {{ currentDate }} (Local Time) </span>-->
         <span>사용 비율</span>
 
         <span id="circle1" />
@@ -34,37 +33,36 @@ export default {
         font-size: 0.75rem;
         line-height: 0.8;
         #circle1 {
-            @apply bg-gray-200;
+            @apply bg-primary2;
             margin-left: 1rem;
             width: 0.625rem;
             height: 0.625rem;
-            border-radius: 50%;
+            border-radius: 0.125rem;
             opacity: 0.5;
         }
         #circle2 {
             @apply bg-primary2;
             width: 0.625rem;
             height: 0.625rem;
-            border-radius: 50%;
-            opacity: 0.5;
+            border-radius: 0.125rem;
         }
         #circle3 {
             @apply bg-primary1;
             width: 0.625rem;
             height: 0.625rem;
-            border-radius: 50%;
+            border-radius: 0.125rem;
         }
         #circle4 {
             @apply bg-primary;
             width: 0.625rem;
             height: 0.625rem;
-            border-radius: 50%;
+            border-radius: 0.125rem;
         }
         #circle5 {
             @apply bg-primary-dark;
             width: 0.625rem;
             height: 0.625rem;
-            border-radius: 50%;
+            border-radius: 0.125rem;
         }
         .text {
             margin-left: 0.125rem;

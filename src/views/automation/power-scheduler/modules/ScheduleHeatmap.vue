@@ -24,10 +24,10 @@ export default {
             let color = '';
             switch (true) {
             case (length === 0):
-                color = 'bg-white';
+                color = 'bg-gray-200';
                 break;
             case (length < 7):
-                color = 'bg-gray-100';
+                color = 'bg-primary2 opacity-50';
                 break;
             case (length < 13):
                 color = 'bg-primary2';
@@ -42,7 +42,7 @@ export default {
                 color = 'bg-primary-dark';
                 break;
             default:
-                color = 'bg-white';
+                color = 'bg-gray-200';
                 break;
             }
             return color;
@@ -70,7 +70,7 @@ export default {
     .circle {
         width: 0.5rem;
         height: 0.5rem;
-        border-radius: 50%;
+        border-radius: 0.125rem;
         margin-left: 0.5rem;
         margin-top: 0.5rem;
     }

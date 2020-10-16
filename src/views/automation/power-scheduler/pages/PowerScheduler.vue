@@ -71,7 +71,7 @@
                                 <p class="mb-4">
                                     <span class="schedule-title">SCHEDULE
                                         <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
-                                        <span v-else>(3+)</span>
+                                        <span v-else class="schedule-title-num">(+3)</span>
                                     </span>
                                 </p>
                                 <div v-if="item.scheduler.length > 0">
@@ -337,6 +337,10 @@ export default {
                 @apply border-gray-200 bg-blue-100;
                 cursor: pointer;
             }
+        }
+
+        >>> .loading-spinner {
+            width: 100%;
         }
 
         .project-description {
