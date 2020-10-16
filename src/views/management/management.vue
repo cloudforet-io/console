@@ -7,7 +7,3 @@ export default {
     name: 'Management',
 };
 </script>
-
-<style lang="postcss" scoped>
-
-</style>
