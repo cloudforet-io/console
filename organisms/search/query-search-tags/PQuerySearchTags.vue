@@ -2,19 +2,20 @@
     <div v-if="_tags.length > 0" class="p-query-search-tags">
         <div class="left">
             <span class="filter">Filter: </span>
-            <div class="delete-btn">
+            <div v-if="!readOnly" class="delete-btn">
                 <p-badge class="tag" outline style-type="gray900"
                          @click="deleteAllTags"
                 >
                     Clear all
                 </p-badge>
             </div>
-            <div class="divider" />
+            <div v-if="!readOnly" class="divider" />
         </div>
         <div class="tags">
             <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                    class="tag"
                    :class="{invalid: tag.invalid}"
+                   :deletable="!readOnly"
                    @delete="deleteTag(idx)"
             >
                 <p-i v-if="tag.invalid"
@@ -74,6 +75,10 @@ export default {
         converter: {
             type: Function,
             default: undefined,
+        },
+        readOnly: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: QuerySearchTagsProps, { emit }) {

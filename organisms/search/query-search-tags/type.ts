@@ -19,6 +19,7 @@ export interface QuerySearchTagsProps {
     timezone: string;
     validator?: QueryTagValidator;
     converter?: QueryTagConverter;
+    readOnly: boolean;
 }
 
 
