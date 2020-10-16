@@ -70,7 +70,7 @@
                 <tbody>
                     <slot v-if="showNoData" name="no-data" :fields="fieldsData">
                         <div class="no-data">
-                            No Items
+                            <slot name="no-data-format" :fields="fieldsData">No Items</slot>
                         </div>
                         <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
                     </slot>
@@ -681,7 +681,7 @@ export default {
         .no-data {
             @apply absolute justify-center items-center flex w-full h-full text-gray-300 text-center;
             line-height: 120%;
-            font-size: 1.125rem;
+            font-size: 1rem;
             max-height: 16.875rem;
             top: 0;
         }
