@@ -83,6 +83,17 @@
                     {{ $t('PWR_SCHED.TIMEZONE') }}
                 </div>
                 <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
+                <!--                <div class="content">-->
+                <!--                    <div v-if="mode === 'READ'">-->
+                <!--                        {{ timezone }}-->
+                <!--                    </div>-->
+                <!--                    <div v-else>-->
+                <!--                        <p-select-dropdown v-model="timezone"-->
+                <!--                                           :items="timezones"-->
+                <!--                                           auto-height-->
+                <!--                        />-->
+                <!--                    </div>-->
+                <!--                </div>-->
             </div>
             <!--routine-->
             <div class="content-lap" :class="oneTimeEditMode ? 'opacity-25' : ''">
@@ -101,21 +112,9 @@
                 </div>
             </div>
             <!--one time ticket-->
-            <div class="content-lap" :class="mode !== 'READ' ? 'opacity-25' : ''">
+            <div class="content-lap" :class="[mode !== 'READ' ? 'opacity-25' : '', oneTimeEditMode ? 'activated' : '']">
                 <div class="title" :class="oneTimeEditMode ? 'activated' : ''">
                     {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
-                    <p-button v-if="oneTimeEditMode"
-                              class="gray900 sm ml-4 mr-1" :outline="true"
-                              @click="onClickSaveOneTimeSchedule"
-                    >
-                        {{ $t('PWR_SCHED.SAVE') }}
-                    </p-button>
-                    <p-button v-if="oneTimeEditMode"
-                              class="gray900 sm" :outline="true"
-                              @click="onClickCancelOneTimeSchedule"
-                    >
-                        {{ $t('PWR_SCHED.CANCEL') }}
-                    </p-button>
                 </div>
                 <div class="legend-lap one-time-run pb-2">
                     <span class="legend-icon" />
@@ -143,6 +142,20 @@
                         {{ $t('PWR_SCHED.MAKING_TICKET') }}
                     </span>
                 </div>
+                <div class="one-time-button-lap">
+                    <p-button v-if="oneTimeEditMode"
+                              class="gray900 sm mr-1" :outline="true"
+                              @click="onClickCancelOneTimeSchedule"
+                    >
+                        {{ $t('PWR_SCHED.CANCEL') }}
+                    </p-button>
+                    <p-button v-if="oneTimeEditMode"
+                              class="secondary sm"
+                              @click="onClickSaveOneTimeSchedule"
+                    >
+                        {{ $t('PWR_SCHED.SAVE') }}
+                    </p-button>
+                </div>
             </div>
         </div>
     </div>
@@ -150,7 +163,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, range, isEmpty } from 'lodash';
+import { get, range } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
@@ -161,8 +174,9 @@ import {
     computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch, onMounted,
 } from '@vue/composition-api';
 
-import { ViewMode } from '@/views/management/power-scheduler/type';
+import { ViewMode } from '@/views/automation/power-scheduler/type';
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
@@ -230,9 +244,13 @@ export default {
                 vm.$t('PWR_SCHED.DAY_FRI'),
                 vm.$t('PWR_SCHED.DAY_SAT'),
             ],
-            timezone: getTimezone(),
-            today: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
-            currentDate: dayjs().tz(getTimezone()),
+            timezones: [
+                { type: 'item', label: 'UTC (default)', name: 'UTC' },
+                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
+            ],
+            timezone: computed(() => store.state.user.timezone),
+            today: computed(() => dayjs().tz(state.timezone).format('YYYY-MM-DD')),
+            currentDate: computed(() => dayjs().tz(state.timezone)),
             currentWeekList: computed(() => {
                 let weekStart = state.currentDate.startOf('week');
                 const weekEnd = state.currentDate.endOf('week');
@@ -309,7 +327,7 @@ export default {
                     sat: [],
                 };
                 const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-                const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
+                const offsetHours = (dayjs().tz(state.timezone).utcOffset()) / 60;
                 Object.entries(rule).forEach(([weekday, times]) => {
                     times.forEach((time) => {
                         let newTime = time - offsetHours;
@@ -358,7 +376,7 @@ export default {
                     sat: [],
                 };
                 const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-                const offsetHours = (dayjs().tz(getTimezone()).utcOffset()) / 60;
+                const offsetHours = (dayjs().tz(state.timezone).utcOffset()) / 60;
                 Object.entries(rule).forEach(([weekday, times]) => {
                     times.forEach((time) => {
                         let newTime = time + offsetHours;
@@ -383,8 +401,8 @@ export default {
             Object.entries(rule).forEach(([date, times]) => {
                 times.forEach((time) => {
                     const utcDate = dayjs.utc(`${date} ${time}:00`);
-                    const localDate = utcDate.tz(getTimezone()).format('YYYY-MM-DD');
-                    const localHour = Number(utcDate.tz(getTimezone()).format('H'));
+                    const localDate = utcDate.tz(state.timezone).format('YYYY-MM-DD');
+                    const localHour = Number(utcDate.tz(state.timezone).format('H'));
                     if (localDate in newRule) {
                         newRule[localDate].push(localHour);
                     } else {
@@ -508,7 +526,7 @@ export default {
 
         // events
         const onClickCurrentWeek = () => {
-            state.currentDate = dayjs().tz(getTimezone());
+            state.currentDate = dayjs().tz(state.timezone);
         };
         const onDragSelect = (e) => {
             const setClass = (el) => {
@@ -624,6 +642,7 @@ export default {
 
         watch(() => props.scheduleId, async (after, before) => {
             if (after !== before) {
+                state.oneTimeEditMode = false;
                 await getScheduleRule();
                 setStyleClass();
             }
@@ -804,9 +823,22 @@ export default {
             width: 25%;
             vertical-align: top;
             font-size: 0.875rem;
-            padding-left: 3.5rem;
+            padding-left: 1.5rem;
             .content-lap {
-                padding-bottom: 2rem;
+                padding: 1rem;
+                &.activated {
+                    @apply border border-blue-200;
+                    background-color: white;
+                    box-sizing: border-box;
+                    border-radius: 2px;
+                }
+                .p-select-dropdown {
+                    @apply bg-white;
+                }
+                .one-time-button-lap {
+                    text-align: right;
+                    margin-top: 2rem;
+                }
             }
             .title {
                 @apply text-gray-400;

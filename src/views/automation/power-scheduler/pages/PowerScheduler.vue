@@ -117,8 +117,8 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 /* Page Modules */
-import PageInformation from '@/views/management/power-scheduler/modules/PageInformation.vue';
-import ScheduleHeatmap from '@/views/management/power-scheduler/modules/ScheduleHeatmap.vue';
+import PageInformation from '@/views/automation/power-scheduler/modules/PageInformation.vue';
+import ScheduleHeatmap from '@/views/automation/power-scheduler/modules/ScheduleHeatmap.vue';
 
 /* Utils */
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -194,7 +194,7 @@ export default {
          * Page Navigation
          * */
         const routeState = reactive({
-            route: [{ name: 'Management', path: '/management' }, { name: 'Power Scheduler', path: '/management/power-scheduler' }],
+            route: [{ name: 'Automation', path: '/automation' }, { name: 'Power Scheduler', path: '/automation/power-scheduler' }],
         });
 
         /**

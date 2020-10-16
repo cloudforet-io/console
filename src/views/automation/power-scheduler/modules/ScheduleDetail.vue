@@ -53,8 +53,8 @@
 /* eslint-disable camelcase */
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
-import ScheduleTimeTable from '@/views/management/power-scheduler/modules/ScheduleTimeTable.vue';
-import ScheduleKanban from '@/views/management/power-scheduler/modules/ScheduleKanban.vue';
+import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
+import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
 
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -62,7 +62,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { makeProxy } from '@/components/util/composition-helpers';
 import { SpaceConnector } from '@/lib/space-connector';
-import { ViewMode } from '@/views/management/power-scheduler/type';
+import { ViewMode } from '@/views/automation/power-scheduler/type';
 
 
 interface Props {

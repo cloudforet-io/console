@@ -102,7 +102,14 @@ export default {
                     subMenus: [
                         { label: 'Plugin (admin)', link: '/management/supervisor/plugins', isAdminMenu: true },
                         { label: 'Collector History', link: '/management/collector-history', isNew: true },
-                        { label: 'Power Scheduler', link: '/management/power-scheduler', isNew: true },
+                    ],
+                },
+                {
+                    label: 'Automation',
+                    link: '/automation',
+                    icon: 'ic_automation',
+                    subMenus: [
+                        { label: 'Power Scheduler', link: '/automation/power-scheduler', isNew: true },
                     ],
                 },
             ],

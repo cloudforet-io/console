@@ -96,8 +96,8 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import ResourceGroupPage from '@/views/management/power-scheduler/pages/ResourceGroupPage.vue';
-import { ViewMode } from '@/views/management/power-scheduler/type';
+import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
+import { ViewMode } from '@/views/automation/power-scheduler/type';
 
     interface ItemType {
         // eslint-disable-next-line camelcase

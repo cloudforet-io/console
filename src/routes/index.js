@@ -12,6 +12,7 @@ import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 import pluginRoute from '@/routes/plugin/plugin-route';
 import projectRoute from '@/routes/project/project-route';
 import managementRoute from '@/routes/management/management-route';
+import automationRoute from '@/routes/automation/automation-route';
 
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
@@ -81,6 +82,7 @@ const router = new VueRouter({
                 pluginRoute,
                 projectRoute,
                 managementRoute,
+                automationRoute,
             ],
         },
         { path: '*', component: ErrorPage },

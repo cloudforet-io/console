@@ -5,7 +5,7 @@
         <header>
             <p-page-title :title="projectName"
                           child
-                          @goBack="$router.push('/management/power-scheduler')"
+                          @goBack="$router.push('/automation/power-scheduler')"
             />
             <p-icon-text-button name="ic_plus_bold" style-type="primary-dark"
                                 :disabled="mode === 'CREATE'"
@@ -117,7 +117,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import ScheduleDetail from '@/views/management/power-scheduler/modules/ScheduleDetail.vue';
+import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
@@ -162,9 +162,9 @@ export default {
         /** Breadcrumb */
         const routeState = reactive({
             route: computed(() => [
-                { name: 'Management', path: '/management' },
-                { name: 'Power Scheduler', path: '/management/power-scheduler' },
-                { name: `${projectName.value}`, path: `/management/power-scheduler/${props.projectId}` },
+                { name: 'Automation', path: '/automation' },
+                { name: 'Power Scheduler', path: '/automation/power-scheduler' },
+                { name: `${projectName.value}`, path: `/automation/power-scheduler/${props.projectId}` },
             ]),
         });
 
@@ -255,7 +255,7 @@ export default {
         const onCancel = () => {
             if (state.mode === 'CREATE') {
                 state.scheduleList.pop();
-                if (state.scheduleList.length === 0) vm.$router.push('/management/power-scheduler');
+                if (state.scheduleList.length === 0) vm.$router.push('/automation/power-scheduler');
                 else state.selectedSchedule = state.scheduleList[0];
             }
             state.mode = 'READ';
