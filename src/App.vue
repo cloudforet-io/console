@@ -4,6 +4,7 @@
         <p-notice-alert group="noticeTopRight" position="top right" />
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
         <p-notice-alert group="noticeBottomRight" position="bottom right" />
+        <p-toast-alert group="toastTopCenter" position="top center" />
         <router-view />
     </div>
 </template>
@@ -13,11 +14,14 @@ import Vue from 'vue';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { api } from '@/lib/api/axios';
-import { SpaceConnector } from '@/lib/space-connector';
-import config from '@/lib/config';
+
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
+import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
+
+import config from '@/lib/config';
+import { api } from '@/lib/api/axios';
+import { SpaceConnector } from '@/lib/space-connector';
 import { GTag, setGtagUserID } from '@/lib/gtag';
 import { useStore } from '@/store/toolset';
 
@@ -26,6 +30,7 @@ export default defineComponent({
     components: {
         PLottie,
         PNoticeAlert,
+        PToastAlert,
     },
     props: {
         processEnv: {

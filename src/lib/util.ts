@@ -145,7 +145,7 @@ export const showErrorMessage = (errorTitle, error, root?) => {
     if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
     if (vmRoot) {
         vmRoot.$notify({
-            group: 'noticeTopRight',
+            group: 'toastTopCenter',
             type: 'alert',
             title: errorTitle,
             text: errorMsg,
@@ -166,7 +166,7 @@ export const showSuccessMessage = (successTitle, successMessage, root) => {
     const vmRoot = root || vm;
     if (vmRoot) {
         vmRoot.$notify({
-            group: 'noticeTopRight',
+            group: 'toastTopCenter',
             type: 'success',
             title: successTitle,
             text: successMessage,
