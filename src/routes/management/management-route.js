@@ -1,4 +1,4 @@
-const Management = () => import('@/views/management/Management');
+const Management = () => import('@/views/management/Management.vue');
 const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 
