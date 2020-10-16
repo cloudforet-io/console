@@ -10,4 +10,5 @@ export interface DictInputGroupProps {
     disabled: boolean;
     showEmptyInput: boolean;
     showValidation: boolean;
+    focused: boolean;
 }

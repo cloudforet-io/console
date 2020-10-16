@@ -14,4 +14,6 @@ interface DictInputType {
     disabled?: boolean;
 }
 
-export interface DictInputProps extends DictInputType, DictInputSyncType {}
+export interface DictInputProps extends DictInputType, DictInputSyncType {
+    focused: boolean;
+}

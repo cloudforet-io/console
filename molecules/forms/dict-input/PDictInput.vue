@@ -4,7 +4,7 @@
                        :invalid="keyInvalid"
                        class="input-box key"
         >
-            <p-input-text v-focus
+            <p-input-text v-focus="focused"
                           :class="{invalid: keyInvalid}"
                           :value="name"
                           :placeholder="$t('WORD.KEY')"
@@ -42,8 +42,8 @@ export default defineComponent({
     components: { PInputText, PFieldGroup },
     directives: {
         focus: {
-            inserted(el) {
-                el.focus();
+            inserted(el, binding) {
+                if (binding.value) el.focus();
             },
         },
     },
@@ -77,6 +77,10 @@ export default defineComponent({
         disabled: {
             type: Boolean,
             default: false,
+        },
+        focused: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: DictInputProps, { emit }) {

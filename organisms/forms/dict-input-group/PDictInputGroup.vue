@@ -23,6 +23,7 @@
                           :key-invalid-text="invalidMessages[idx] && invalidMessages[idx].key"
                           :value-invalid-text="invalidMessages[idx] && invalidMessages[idx].value"
                           :disabled="disabled"
+                          :focused="focused"
                           @change:key="onChangeKey(idx, d, $event)"
                           @change:value="onChangeValue(idx, d, $event)"
             />
@@ -107,6 +108,10 @@ export default {
         showHeader: {
             type: Boolean,
             default: false,
+        },
+        focused: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: DictInputGroupProps, { emit }) {
