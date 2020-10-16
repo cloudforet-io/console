@@ -6,7 +6,7 @@
             </slot>
             <span v-if="required" class="required-mark">*</span>
         </div>
-        <small v-if="($scopedSlots.help||helpText)&&!invalid&&!valid" class="block mb-2 text-grey">
+        <small v-if="$scopedSlots.help || helpText" class="block mb-2 text-grey">
             <slot name="help">{{ helpText }}</slot>
         </small>
         <slot :invalid="invalid" />
