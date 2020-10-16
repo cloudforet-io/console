@@ -37,7 +37,7 @@
                 </div>
                 <div class="resource-item-wrapper">
                     <div v-if="editable && column.title === '1'" class="resource-group-item">
-                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup(-1)">
+                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup()">
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
                     </div>
@@ -80,7 +80,9 @@
             </div>
         </transition-group>
         <resource-group-page :visible.sync="resourceGroupVisible"
-                             :resource-group="selectedResourceGroup"
+                             :resource-group="selectedItem ? selectedItem.resource_group : null"
+                             :project-id="projectId"
+                             :read-mode="mode === 'READ'"
                              @confirm="onResourceGroupConfirm"
         />
     </div>
@@ -97,19 +99,12 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
-import { ViewMode } from '@/views/automation/power-scheduler/type';
+import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
 
-    interface ItemType {
-        // eslint-disable-next-line camelcase
-        resource_group_id?: string;
-        name?: string;
-        count?: number;
-        icon?: string;
-    }
 
     interface ColumnType {
         title: string;
-        items: ItemType[];
+        items: KanbanItem[];
         options: {
             priority: number;
             badge?: string;
@@ -154,7 +149,7 @@ export default {
             showGuide: false,
             resourceGroupVisible: false,
             selectedResourceGroupIndex: -1,
-            selectedResourceGroup: computed(() => state.columns[state.selectedColumnIndex]?.items[state.selectedResourceGroupIndex]?.resource_group || null),
+            selectedItem: computed(() => state.columns[state.selectedColumnIndex]?.items[state.selectedResourceGroupIndex] || null),
             selectedColumnIndex: 0,
         });
 
@@ -244,28 +239,24 @@ export default {
             }
         };
 
-        const onClickResourceGroup = (index, columnIdx = 0) => {
+        const onClickResourceGroup = (index = -1, columnIdx = 0) => {
             state.selectedResourceGroupIndex = index;
             state.selectedColumnIndex = columnIdx;
             state.resourceGroupVisible = true;
         };
 
-        const onResourceGroupConfirm = (resourceGroup) => {
-            if (resourceGroup.resource_group_id) {
-                const item = state.columns[state.selectedColumnIndex].items[state.selectedResourceGroupIndex];
+        const onResourceGroupConfirm = (resourceGroupItem: ResourceGroupItem) => {
+            // update case
+            if (state.selectedItem) {
                 state.columns[state.selectedColumnIndex].items[state.selectedResourceGroupIndex] = {
-                    ...item,
-                    // eslint-disable-next-line camelcase
-                    resource_group: resourceGroup,
+                    icon: state.selectedItem.icon,
+                    ...resourceGroupItem,
                 };
                 state.columns = [...state.columns];
             } else {
                 state.columns[0].items.push({
-                    name: resourceGroup.name,
-                    // eslint-disable-next-line camelcase
-                    resource_group: resourceGroup,
-                    count: 0,
                     icon: '',
+                    ...resourceGroupItem,
                 });
                 state.columns = [...state.columns];
             }

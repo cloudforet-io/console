@@ -270,7 +270,7 @@ export default {
             queryTags: [],
         });
 
-        const typeOptionState: QuerySearchTableTypeOptions = reactive({
+        const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'> = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),

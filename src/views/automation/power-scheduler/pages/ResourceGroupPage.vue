@@ -1,38 +1,34 @@
 <template>
     <general-page-layout v-if="visible" class="resource-group-page">
-        <p-page-title :title="title" child @goBack="proxyVisible = false">
-            <template #extra>
-                <!--                <p-icon-button class="ml-4 mr-2" name="ic_trashcan"></p-icon-button>-->
-                <p-icon-button v-if="isReadMode" class="ml-4" name="ic_edit"
-                               @click="isReadMode = false"
-                />
-            </template>
-        </p-page-title>
+        <p-page-title :title="title" child @goBack="proxyVisible = false" />
         <p-pane-layout>
             <section>
                 <div class="label">
                     {{ $t('PWR_SCHED.RESRC_GRP.BASE_INFO') }}
                 </div>
                 <div class="form">
-                    <p-field-group v-if="isReadMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
+                    <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
                         <span class="read-value">{{ name }}</span>
                     </p-field-group>
-                    <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')">
+                    <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')"
+                                   :invalid="validState.showValidation && !validState.name"
+                                   :invalid-text="validState.nameInvalidMsg"
+                    >
                         <template #help>
                             {{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC') }}
                             <span class="text-gray-500">{{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC2') }}</span>
                         </template>
                         <p-text-input v-model="name" class="w-full"
                                       block
-                                      :class="{'is-invalid': showValidation && !validState.name}"
+                                      :invalid="validState.showValidation && !validState.name"
                                       :placeholder="$t('PWR_SCHED.RESRC_GRP.NAME')"
                                       @input="validateName"
                         />
                     </p-field-group>
 
-                    <div v-if="isReadMode" class="separator read-mode" />
+                    <div v-if="readMode" class="separator read-mode" />
 
-                    <p-field-group v-if="isReadMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">
+                    <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">
                         <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"
                                style-type="primary" outline
                         >
@@ -47,7 +43,9 @@
                         </template>
                         <p-dict-input-group ref="dictRef"
                                             :dict="tags"
-                                            :show-validation="showValidation"
+                                            :show-validation="validState.showValidation"
+                                            :focused="false"
+                                            @change="onChangeTags"
                         >
                             <template #addButton="scope">
                                 <p-icon-text-button class="mt-4"
@@ -68,7 +66,7 @@
                     {{ $t('PWR_SCHED.RESRC_GRP.STANDARD') }}
                 </div>
                 <div class="form">
-                    <p-field-group v-if="isReadMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE')" class="read-mode">
+                    <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE')" class="read-mode">
                         <span class="read-value">{{ RESOURCE_GROUP_TYPES[selectedTypeIndex] ? RESOURCE_GROUP_TYPES[selectedTypeIndex].label : '' }}</span>
                     </p-field-group>
                     <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_SELECT')">
@@ -77,8 +75,8 @@
                                            class="w-1/2"
                                            :items="RESOURCE_GROUP_TYPES"
                                            :placeholder="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_DESC')"
-                                           :disabled="!isCreateMode"
-                                           :invalid="showValidation && !validState.resourceType"
+                                           :disabled="resourceTypeReadOnly"
+                                           :invalid="validState.showValidation && !validState.resourceType"
                                            @input="onSelectedTypeIndexChange"
                         />
                     </p-field-group>
@@ -93,17 +91,27 @@
                         <span class="text-gray-500">({{ typeOptionState.totalCount }})</span>
                     </div>
                     <div class="table-form">
-                        <p-field-group v-if="!isReadMode" required :label="$t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH')" />
-                        <p-dynamic-layout :type="isReadMode ? 'table' : 'query-search-table'"
+                        <p-field-group v-if="!readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH')" />
+                        <p-query-search-tags v-if="readMode" read-only :tags="fetchOptionState.queryTags"
+                                             :timezone="typeOptionState.timezone"
+                        />
+                        <p-dynamic-layout type="query-search-table"
                                           class="resource-table"
                                           :options="schema.options"
                                           :data="data"
                                           :type-options="typeOptionState"
                                           :fetch-options="fetchOptionState"
                                           :field-handler="fieldHandler"
-                                          @init="listResources"
-                                          @fetch="fetchTableData"
-                        />
+                                          @init="onFetchTable"
+                                          @fetch="onFetchTable"
+                        >
+                            <template #no-data-format>
+                                <span :class="{
+                                    'text-alert': validState.showValidation
+                                }"
+                                >{{ $t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH_INVALID') }}</span>
+                            </template>
+                        </p-dynamic-layout>
                     </div>
                 </section>
             </template>
@@ -113,8 +121,8 @@
             <p-button style-type="gray900" :outline="true" @click="onClickCancel">
                 {{ $t('PWR_SCHED.CANCEL') }}
             </p-button>
-            <p-button v-if="!isReadMode" class="ml-4" style-type="secondary"
-                      :disabled="showValidation && !validState.all"
+            <p-button v-if="!readMode" class="ml-4" style-type="secondary"
+                      :disabled="validState.showValidation && !validState.all"
                       @click="onClickSave"
             >
                 {{ $t('PWR_SCHED.SAVE') }}
@@ -149,36 +157,28 @@ import {
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { forEach, camelCase, findIndex } from 'lodash';
 import { store } from '@/store';
-import { getFiltersFromQueryTags, queryTagsToQueryFilters } from '@/lib/component-utils/query-search-tags';
+import {
+    getFiltersFromQueryTags,
+    queryFiltersToQueryTags,
+    queryTagsToQueryFilters,
+} from '@/lib/component-utils/query-search-tags';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { QueryFilters } from '@/lib/type';
 import PTag from '@/components/molecules/tags/PTag.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { TableTypeOptions } from '@/components/organisms/dynamic-layout/templates/table/type';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
+import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
-interface Resource {
-    resource_type: string;
-    filter: Filter[];
-}
-
-interface ResourceGroup {
-    resource_group_id?: string;
-    name: string;
-    resources: Resource[];
-    options: {
-        raw_filter: QueryFilters;
-    };
-    tags: object;
-}
 
 interface Props {
+    projectId: string;
     resourceGroup: null|ResourceGroup;
     visible: boolean;
+    readMode: boolean;
 }
+
 const RESOURCE_GROUP_TYPES = [
     {
         label: '[ALL] Server',
@@ -191,20 +191,20 @@ const RESOURCE_GROUP_TYPES = [
         type: 'item',
     },
     {
-        label: '[AWS] Auto ScaliResourceGroupng Group',
+        label: '[AWS] Auto Scaling Group',
         name: 'inventory.CloudService?provider=aws&cloud_service_group=AutoScaling&cloud_service_type=AutoScalingGroup',
         type: 'item',
     },
 ];
 
 // eslint-disable-next-line no-useless-escape
-const nameRegex = new RegExp(/^[^\s\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"][^\{\}\[\]\/?.,;:|\)*~`!^\_+<>@\#$%&\\\=\(\'\"]{0,127}$/);
+const nameRegex = new RegExp(/^[^\s\d\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"][^\{\}\[\]\/?.,;:|\)*~`!^\_+<>@\#$%&\\\=\(\'\"]{0,127}$/);
 
 
 export default {
     name: 'ResourceGroupPage',
     components: {
-        PIconButton,
+        PQuerySearchTags,
         PButton,
         PTag,
         PDynamicLayout,
@@ -227,31 +227,35 @@ export default {
             type: Boolean,
             default: false,
         },
+        projectId: {
+            type: String,
+            required: true,
+        },
+        readMode: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper() as QueryHelper;
 
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            isReadMode: true,
-            isCreateMode: computed(() => !props.resourceGroup),
-            title: computed(() => {
-                if (props.resourceGroup) return props.resourceGroup.name;
-                return vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME');
-            }),
-            name: props.resourceGroup?.name || '',
+            resourceTypeReadOnly: computed(() => !!props.resourceGroup),
+            title: computed(() => props.resourceGroup?.name || vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME')),
+
+            name: '',
             selectedTypeIndex: -1,
-            selectedTypeName: computed(() => props.resourceGroup?.resources[0]?.resource_type
-                || RESOURCE_GROUP_TYPES[state.selectedTypeIndex]?.name || ''),
             tags: {},
-            showValidation: false,
+            resource: { filter: [], keyword: '', resource_type: '' } as Resource,
+
             schema: null as any,
             data: null as any,
-            currentApiResourceType: '',
-            fixedFilters: [] as Filter[],
+
+            hiddenFilters: [] as Filter[],
             dictRef: null as any,
         });
-
 
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
             pageStart: 1,
@@ -261,7 +265,7 @@ export default {
             queryTags: [],
         });
 
-        const typeOptionState: QuerySearchTableTypeOptions&TableTypeOptions = reactive({
+        const typeOptionState: QuerySearchTableTypeOptions = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
@@ -270,31 +274,54 @@ export default {
             keyItems: [],
             valueHandlerMap: {},
             colCopy: false,
-            searchable: computed(() => !state.isReadMode),
+            searchable: computed(() => !props.readMode),
+            excelVisible: false,
         });
 
+
+        /* validations */
         const validState = reactive({
+            showValidation: false,
             name: false,
             tags: false,
             resourceType: false,
-            search: false,
-            all: computed(() => validState.name && validState.tags && validState.resourceType && validState.search),
+            resources: false,
+            all: computed(() => validState.name && validState.tags && validState.resourceType && validState.resources),
+            nameInvalidMsg: '',
         });
 
-        const getPageSchema = async () => {
-            state.schema = null;
+        const validateName = (val) => {
+            validState.name = nameRegex.test(val);
+            if (validState.name) validState.nameInvalidMsg = '';
+            else if (state.name.trim().length === 0) validState.nameInvalidMsg = vm.$t('PWR_SCHED.RESRC_GRP.NAME_REQUIRED');
+            else validState.nameInvalidMsg = vm.$t('PWR_SCHED.RESRC_GRP.NAME_INVALID');
+        };
 
-            fetchOptionState.pageStart = 1;
-            fetchOptionState.pageLimit = 15;
-            fetchOptionState.sortDesc = true;
-            fetchOptionState.sortBy = 'created_at';
-            fetchOptionState.queryTags = [];
+        const validateTags = () => {
+            validState.tags = state.dictRef.allValidation();
+        };
 
-            const resourceTypeSplit = state.selectedTypeName.split('?');
-            state.currentApiResourceType = resourceTypeSplit[0];
+        const validateResourceType = () => {
+            validState.resourceType = !!RESOURCE_GROUP_TYPES[state.selectedTypeIndex];
+        };
 
+        const validateResources = () => {
+            validState.resources = typeOptionState.totalCount !== 0;
+            validState.resources = true;
+        };
+
+        const validate = () => {
+            validateName(state.name);
+            validateTags();
+            validateResourceType();
+            validateResources();
+            return validState.all;
+        };
+
+
+        const getSchemaOptions = () => {
+            const queryString = state.resource.resource_type.split('?')[1] || '';
             const options = {};
-            const queryString = resourceTypeSplit[1];
             if (queryString) {
                 const optionsSplit = queryString?.split('&');
                 optionsSplit.forEach((d) => {
@@ -305,90 +332,92 @@ export default {
                 });
             }
 
+            state.hiddenFilters = [{ k: 'project_id', v: props.projectId, o: 'contain' }];
+            forEach(options, (d, k) => {
+                state.hiddenFilters.push({
+                    k, v: d, o: 'contain',
+                });
+            });
+
+            return options;
+        };
+
+        const getPageSchema = async () => {
+            const resourceType = state.resource.resource_type.split('?')[0];
             try {
                 state.schema = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: state.currentApiResourceType,
+                    resource_type: resourceType,
                     schema: 'table',
-                    options,
+                    options: getSchemaOptions(),
                 });
 
                 const querySearchProps = makeQuerySearchPropsWithSearchSchema(
                     state.schema.options.search[0],
-                    state.currentApiResourceType,
+                    resourceType,
                 );
                 typeOptionState.keyItems = querySearchProps.keyItems;
                 typeOptionState.valueHandlerMap = querySearchProps.valueHandlerMap;
 
-                state.fixedFilters = [];
-                forEach(options, (d, k) => {
-                    state.fixedFilters.push({
-                        k, v: d, o: 'contain',
-                    });
-                });
+                if (state.schema.options?.fields) {
+                    queryHelper.setOnly(...state.schema.options.fields.map((d) => {
+                        if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
+                        if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
+                        return d.key;
+                    }));
+                }
             } catch (e) {
                 console.error(e);
             }
-        };
-
-        const getQuery = () => {
-            const { keywords, orFilters, andFilters } = getFiltersFromQueryTags(fetchOptionState.queryTags);
-
-            const query = new QueryHelper();
-            query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
-                .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...andFilters)
-                .setFilterOr(...orFilters)
-                .setKeyword(...keywords);
-
-            if (state.schema.options?.fields) {
-                query.setOnly(...state.schema.options.fields.map((d) => {
-                    if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
-                    if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
-                    return d.key;
-                }));
-            }
-
-            return query.data;
         };
 
         const listResources = async () => {
             typeOptionState.loading = true;
             try {
                 let api = SpaceConnector.client;
-                state.currentApiResourceType.split('.').forEach((d) => {
+                const resourceType = state.resource.resource_type.split('?')[0] || '';
+                resourceType.split('.').forEach((d) => {
                     api = api[camelCase(d)];
                 });
 
                 const res = await api.list({
-                    query: getQuery(),
+                    query: queryHelper.data,
                 });
 
                 state.data = res.results;
                 typeOptionState.totalCount = res.total_count;
-                validState.search = true;
+                validateResources();
             } catch (e) {
                 console.error(e);
                 state.data = null;
                 typeOptionState.totalCount = 0;
-                validState.search = false;
+                validateResources();
             } finally {
                 typeOptionState.loading = false;
             }
         };
 
-        const fetchTableData: QuerySearchTableListeners['fetch'] = async (options, changed) => {
+        const onFetchTable: QuerySearchTableListeners['init'|'fetch'] = async (options, _changed?) => {
+            const changed = _changed || options;
+
             if (changed.sortBy !== undefined) {
                 fetchOptionState.sortBy = changed.sortBy;
                 fetchOptionState.sortDesc = !!changed.sortDesc;
+                queryHelper.setSort(changed.sortBy, changed.sortDesc);
             }
             if (changed.pageLimit !== undefined) {
                 fetchOptionState.pageLimit = changed.pageLimit;
+                queryHelper.setPageLimit(changed.pageLimit);
             }
             if (changed.pageStart !== undefined) {
                 fetchOptionState.pageStart = changed.pageStart;
+                queryHelper.setPageStart(changed.pageStart);
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
+                const { keywords, orFilters, andFilters } = getFiltersFromQueryTags(changed.queryTags);
+                queryHelper.setFilter(...state.hiddenFilters, ...andFilters)
+                    .setFilterOr(...orFilters)
+                    .setKeyword(...keywords);
             }
 
             await listResources();
@@ -401,83 +430,88 @@ export default {
             return {};
         };
 
-        const reset = async () => {
-            state.showValidation = false;
-            state.tags = props.resourceGroup?.tags || {};
-            state.selectedTypeIndex = findIndex(RESOURCE_GROUP_TYPES, { name: props.resourceGroup?.resources[0]?.resource_type });
+        const resetTable = async () => {
+            // reset table schema and data
+            state.schema = null;
             state.data = null;
-            state.name = props.resourceGroup?.name || '';
 
+            // reset table api query
+            fetchOptionState.pageStart = 1;
+            fetchOptionState.pageLimit = 15;
+            fetchOptionState.sortDesc = true;
+            fetchOptionState.sortBy = 'created_at';
+
+            if (props.resourceGroup?.options.raw_filter) {
+                fetchOptionState.queryTags = queryFiltersToQueryTags(props.resourceGroup.options.raw_filter);
+            } else fetchOptionState.queryTags = [];
+
+            // set table schema
+            if (state.selectedTypeIndex !== -1) await getPageSchema();
+        };
+
+        const resetAll = async () => {
+            // reset validations
+            validState.showValidation = false;
             validState.name = false;
             validState.tags = false;
             validState.resourceType = false;
-            validState.search = false;
+            validState.resources = false;
 
-            if (state.selectedTypeIndex === -1) state.schema = null;
-            else await getPageSchema();
+            // reset forms
+            state.name = props.resourceGroup?.name || '';
+            state.tags = props.resourceGroup?.tags || {};
+            state.selectedTypeIndex = findIndex(props.resourceGroup?.resources[0]?.resource_type);
+
+            // reset resource
+            state.resource = props.resourceGroup?.resources[0] || { filter: [], keyword: '', resource_type: '' };
+
+            await resetTable();
         };
 
         const onSelectedTypeIndexChange = async (idx) => {
             state.selectedTypeIndex = idx;
-            validState.resourceType = idx !== -1;
-            if (idx !== -1) await getPageSchema();
+            state.resource.resource_type = RESOURCE_GROUP_TYPES[idx]?.name || '';
+            validateResourceType();
+            if (idx !== -1) await resetTable();
+        };
+
+        const onChangeTags = () => {
+            validState.tags = state.dictRef.isAllValid;
         };
 
         const onClickCancel = async () => {
-            if (state.isReadMode || state.isCreateMode) state.proxyVisible = false;
-            else {
-                state.isReadMode = true;
-                await reset();
-            }
+            state.proxyVisible = false;
         };
-
-        const validateName = (val) => {
-            validState.name = nameRegex.test(val);
-        };
-
-        const validate = () => {
-            validateName(state.name);
-            validState.tags = state.dictRef.allValidation();
-            validState.resourceType = !!RESOURCE_GROUP_TYPES[state.selectedTypeIndex];
-            validState.search = state.data !== null;
-            return validState.all;
-        };
-
 
         const onClickSave = () => {
-            state.showValidation = true;
+            validState.showValidation = true;
             if (!validate()) return;
 
-            const resource: Resource = {
-                resource_type: state.selectedTypeName,
-                filter: props.resourceGroup?.resources[0]?.filter || [],
-            };
-            const params: ResourceGroup = {
+            const query = queryHelper.data;
+            state.resource.filter = query.filter || [];
+            state.resource.keyword = query.keyword || '';
+
+            const params: ResourceGroupItem = {
                 name: state.name,
-                resources: [resource],
-                options: {
-                    raw_filter: queryTagsToQueryFilters(fetchOptionState.queryTags),
+                count: typeOptionState.totalCount,
+                resource_group: {
+                    name: state.name,
+                    resources: [{ ...state.resource }],
+                    options: {
+                        raw_filter: queryTagsToQueryFilters(fetchOptionState.queryTags),
+                    },
+                    tags: state.dictRef.getDict(),
                 },
-                tags: state.tags,
             };
 
-            if (props.resourceGroup?.resource_group_id) params.resource_group_id = props.resourceGroup.resource_group_id;
+            if (props.resourceGroup?.resource_group_id) params.resource_group.resource_group_id = props.resourceGroup.resource_group_id;
 
             emit('confirm', params);
             state.proxyVisible = false;
-            state.isReadMode = true;
-            reset();
         };
 
-        watch([() => props.resourceGroup, () => props.visible], async ([group, visible]) => {
-            if (!visible) return;
-
-            if (group) {
-                state.isReadMode = true;
-            } else {
-                state.isReadMode = false;
-            }
-            await reset();
+        watch(() => props.visible, async (aft, bef) => {
+            if (aft && !bef) await resetAll();
         }, { immediate: true });
 
 
@@ -489,11 +523,12 @@ export default {
             validateName,
             RESOURCE_GROUP_TYPES,
             listResources,
-            fetchTableData,
+            onFetchTable,
             fieldHandler,
             onClickCancel,
             onClickSave,
             onSelectedTypeIndexChange,
+            onChangeTags,
         };
     },
 };

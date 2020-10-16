@@ -233,14 +233,13 @@ export default {
             searchText: vm.$route.query.filters?.toString(),
         });
 
-        const typeOptionState: TableTypeOptions = reactive({
+        const typeOptionState: Omit<TableTypeOptions, 'searchable'|'excelVisible'> = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
             colCopy: false,
-            searchable: true,
         });
 
         const tableState = reactive({

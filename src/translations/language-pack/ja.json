@@ -439,6 +439,8 @@
 			"NAME": "",
 			"NAME_DESC": "",
 			"NAME_DESC2": "",
+			"NAME_INVALID": "",
+			"NAME_REQUIRED": "",
 			"RESRC_FILTERING": "",
 			"RESRC_LIST": "",
 			"RESRC_SEARCH": "",

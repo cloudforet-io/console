@@ -206,7 +206,7 @@ const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[]
     });
 
     forEach(queryFilters, (values, k) => {
-        if (k === 'keywords') {
+        if (k === 'keyword') {
             values.forEach((d) => {
                 res.push({ value: { label: d as string, name: d }, operator: '' });
             });

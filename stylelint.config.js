@@ -9,5 +9,6 @@ module.exports = {
         'rule-empty-line-before': false,
         'selector-list-comma-newline-after': false,
         'function-calc-no-invalid': 'off',
+        'no-descending-specificity': false,
     },
 };
