@@ -18,6 +18,7 @@
                 v-for="(column, columnIdx) in columns"
                 :key="column.title"
                 class="resource-group-box"
+                @click="hideGuide"
             >
                 <div class="resource-group-header">
                     <span id="header-number">{{ column.title }}</span>
@@ -40,24 +41,23 @@
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
                     </div>
-                    <div v-if="editable && column.title === '3' && !isDragging && column.items.length === 0" class="kanban-landing-wrapper">
-                        <div id="kanban-landing-card" />
-                        <div id="kanban-landing-square" />
-                        <div id="kanban-landing-text" />
-                        <p-i id="kanban-landing-icon" name="cursor_drag-arrow--blue" width="1.375rem" />
-                        <p class="kanban-landing-text">
+                    <div v-if="column.title === '3' && showGuide" class="kanban-guide-wrapper">
+                        <div id="kanban-guide-card" />
+                        <div id="kanban-guide-square" />
+                        <div id="kanban-guide-text" />
+                        <p-i id="kanban-guide-icon" name="cursor_drag-arrow--blue" width="1.375rem" />
+                        <p class="kanban-guide-text">
                             마우스로 리소스 그룹의 위치를 바꾸고<br> 우선 순위를 정하세요
                         </p>
                     </div>
                     <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
                                group="items"
-                               :empty-insert-threshold="100"
+                               :empty-insert-threshold="30"
                                :disabled="!editable"
-                               @start="onDraggingStart"
-                               @end="onDraggingEnd"
+                               class="list-group"
                     >
                         <div v-for="(item, index) in column.items"
-                             :key="`${item}-${index}`"
+                             :key="`${columnIdx}-${index}`"
                              class="resource-group-item"
                              @click="onClickResourceGroup(index, columnIdx)"
                         >
@@ -151,7 +151,7 @@ export default {
             maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
             loading: false,
             editable: false,
-            isDragging: false,
+            showGuide: false,
             resourceGroupVisible: false,
             selectedResourceGroupIndex: -1,
             selectedResourceGroup: computed(() => state.columns[state.selectedColumnIndex]?.items[state.selectedResourceGroupIndex]?.resource_group || null),
@@ -182,6 +182,7 @@ export default {
 
         const getInitResourceGroup = async () => {
             state.loading = true;
+            state.showGuide = true;
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.getCreateScheduleResourceGroups({
                     // eslint-disable-next-line camelcase
@@ -196,6 +197,7 @@ export default {
 
         const getResourceGroup = async (scheduleId) => {
             state.loading = true;
+            state.showGuide = false;
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleResourceGroups({
                     // eslint-disable-next-line camelcase
@@ -229,14 +231,6 @@ export default {
         const deleteResourceGroup = (column, item, itemIndex) => {
             const columnIndex = parseInt(column.title) - 1;
             state.columns[columnIndex].items.splice(itemIndex, 1);
-        };
-
-        const onDraggingStart = () => {
-            state.isDragging = true;
-        };
-
-        const onDraggingEnd = () => {
-            state.isDragging = false;
         };
 
         const onSave = async (scheduleId) => {
@@ -277,6 +271,10 @@ export default {
             }
         };
 
+        const hideGuide = () => {
+            state.showGuide = false;
+        };
+
         watch([() => props.scheduleId], async (after, before) => {
             if (props.scheduleId && (after !== before)) {
                 await getResourceGroup(props.scheduleId);
@@ -298,12 +296,11 @@ export default {
             addColumn,
             deleteColumn,
             deleteResourceGroup,
-            onDraggingStart,
-            onDraggingEnd,
             onSave,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
             onClickResourceGroup,
             onResourceGroupConfirm,
+            hideGuide,
         };
     },
 };
@@ -356,6 +353,7 @@ export default {
             .resource-group-box {
                 @apply border border-violet-200 bg-white box-border;
                 width: calc(20% - 0.5rem);
+                min-width: calc(20% - 0.5rem);
                 border-radius: 2px;
                 margin-bottom: 0.5rem;
                 box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
@@ -396,15 +394,18 @@ export default {
                 .resource-item-wrapper {
                     @apply overflow-y-auto overflow-x-hidden px-4 pb-4;
                     height: 13rem;
-                    .kanban-landing-wrapper {
+                    .list-group {
+                        height: calc(100% - 5.7rem);
+                    }
+                    .kanban-guide-wrapper {
                         @apply flex-col;
-                        #kanban-landing-card {
+                        #kanban-guide-card {
                             @apply bg-blue-100 m-auto;
                             height: 3.25rem;
                             border-radius: 0.25rem;
                             z-index: 1;
                         }
-                        #kanban-landing-square {
+                        #kanban-guide-square {
                             @apply bg-blue-300;
                             opacity: 0.4;
                             border-radius: 0.25rem;
@@ -414,19 +415,19 @@ export default {
                             margin-top: -2.625rem;
                             margin-left: 0.625rem;
                         }
-                        #kanban-landing-icon {
+                        #kanban-guide-icon {
                             float: right;
                             z-index: 2;
                             margin-right: 0.25rem;
                             margin-top: -1.15rem;
                         }
-                        .kanban-landing-text {
+                        .kanban-guide-text {
                             @apply text-center text-xs text-blue-500;
                             padding-top: 1rem;
                         }
                     }
                     .resource-group-item {
-                        @apply w-full;
+                        @apply w-full block;
                         .add-resource-group {
                             @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
                             height: 3.25rem;
