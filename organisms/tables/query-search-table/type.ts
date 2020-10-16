@@ -1,5 +1,5 @@
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
-import {KeyItem, QueryItem, ValueHandlerMap} from '@/components/organisms/search/query-search/type';
+import { KeyItem, QueryItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 export interface QuerySearchTableProps {
@@ -21,6 +21,7 @@ export interface QuerySearchTableProps {
     excelVisible: boolean;
     rowCursorPointer: boolean;
     timezone: string;
+    searchable: boolean;
 }
 
 export interface Options {

@@ -28,11 +28,14 @@
                      @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-            <slot v-if="!['toolbox-bottom', 'toolbox-left'].includes(slot) && !slot.startsWith('tag-')"
-                  :name="slot" v-bind="scope"
-            />
+            <template v-if="searchable">
+                <slot v-if="!['toolbox-bottom', 'toolbox-left'].includes(slot) && !slot.startsWith('tag-')"
+                      :name="slot" v-bind="scope"
+                />
+            </template>
+            <slot v-else :name="slot" v-bind="scope" />
         </template>
-        <template #toolbox-left="scope">
+        <template v-if="searchable" #toolbox-left="scope">
             <slot name="toolbox-left" v-bind="scope" />
             <div class="left-toolbox-item hidden lg:block">
                 <p-query-search :key-items="keyItems"
@@ -41,7 +44,7 @@
                 />
             </div>
         </template>
-        <template #toolbox-bottom="scope">
+        <template v-if="searchable" #toolbox-bottom="scope">
             <div class="flex flex-col flex-1">
                 <p-query-search class="block lg:hidden mt-4"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
@@ -57,7 +60,7 @@
                                          @change="onQueryTagsChange"
                     >
                         <template v-for="(_, slot) of tagSlots" v-slot:[slot]="scope">
-                            <slot :name="`tag-${slot}`" v-bind="scope"/>
+                            <slot :name="`tag-${slot}`" v-bind="scope" />
                         </template>
                     </p-query-search-tags>
                 </div>
@@ -165,6 +168,10 @@ export default {
         colCopy: {
             type: Boolean,
             default: false,
+        },
+        searchable: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
