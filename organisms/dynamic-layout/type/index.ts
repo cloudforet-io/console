@@ -27,6 +27,7 @@ export interface DynamicLayoutTypeOptions {
     selectable: boolean;
     colCopy: boolean;
     searchable: boolean;
+    excelVisible: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
     language: string;

@@ -19,6 +19,7 @@
                         :selectable="selectable"
                         :col-copy="colCopy"
                         :searchable="searchable"
+                        :excel-visible="excelVisible"
                         @select="onSelect"
                         @change="onChange"
                         @export="onExport"
@@ -133,7 +134,8 @@ export default {
             selectIndex: bindExtra(props, 'selectIndex', []),
             selectable: computed(() => (props.typeOptions?.selectable || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
-            searchable: computed(() => (props.typeOptions?.searchable || true)),
+            searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
+            excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',

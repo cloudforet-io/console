@@ -20,6 +20,8 @@
                               :query-tags.sync="queryTags"
                               :selectable="selectable"
                               :col-copy="colCopy"
+                              :searchable="searchable"
+                              :excel-visible="excelVisible"
                               :timezone="timezone"
                               @init="onInit"
                               @change="onChange"
@@ -129,6 +131,8 @@ export default {
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
+            searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
+            excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
