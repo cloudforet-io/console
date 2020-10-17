@@ -544,7 +544,7 @@ $height: calc(100vh - ($gnb-height));
     transition: all 0.3s ease;
 }
 .slide-fade-leave-active {
-    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+    transition: all 0.3s ease-out;
 }
 .slide-fade-enter, .slide-fade-leave-to {
     transform: translateY(100px);
