@@ -1,134 +1,136 @@
 <template>
-    <general-page-layout v-if="visible" class="resource-group-page">
-        <p-page-title :title="title" child @goBack="proxyVisible = false" />
-        <p-pane-layout>
-            <section>
-                <div class="label">
-                    {{ $t('PWR_SCHED.RESRC_GRP.BASE_INFO') }}
-                </div>
-                <div class="form">
-                    <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
-                        <span class="read-value">{{ name }}</span>
-                    </p-field-group>
-                    <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')"
-                                   :invalid="validState.showValidation && !validState.name"
-                                   :invalid-text="validState.nameInvalidMsg"
-                    >
-                        <template #help>
-                            {{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC') }}
-                            <span class="text-gray-500">{{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC2') }}</span>
-                        </template>
-                        <p-text-input v-model="name" class="w-full"
-                                      block
-                                      :invalid="validState.showValidation && !validState.name"
-                                      :placeholder="$t('PWR_SCHED.RESRC_GRP.NAME')"
-                                      @input="validateName"
-                        />
-                    </p-field-group>
-
-                    <div v-if="readMode" class="separator read-mode" />
-
-                    <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">
-                        <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"
-                               style-type="primary" outline
+    <transition name="slide-fade">
+        <general-page-layout v-show="visible">
+            <p-page-title :title="title" child @goBack="proxyVisible = false" />
+            <p-pane-layout>
+                <section>
+                    <div class="label">
+                        {{ $t('PWR_SCHED.RESRC_GRP.BASE_INFO') }}
+                    </div>
+                    <div class="form">
+                        <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
+                            <span class="read-value">{{ name }}</span>
+                        </p-field-group>
+                        <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')"
+                                       :invalid="validState.showValidation && !validState.name"
+                                       :invalid-text="validState.nameInvalidMsg"
                         >
-                            <strong>{{ k }}:</strong>&nbsp;{{ v }}
-                        </p-tag>
-                    </p-field-group>
-                    <p-field-group v-else :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
-                        <template #help>
-                            {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC') }}
-                            <br>
-                            {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC2') }}
-                        </template>
-                        <p-dict-input-group ref="dictRef"
-                                            :dict="tags"
-                                            :show-validation="validState.showValidation"
-                                            :focused="false"
-                                            @change="onChangeTags"
-                        >
-                            <template #addButton="scope">
-                                <p-icon-text-button class="mt-4"
-                                                    outline style-type="primary-dark" :disabled="scope.disabled"
-                                                    name="ic_plus_bold"
-                                                    @click="scope.addPair($event)"
-                                >
-                                    {{ $t('PWR_SCHED.RESRC_GRP.ADD_TAG') }}
-                                </p-icon-text-button>
+                            <template #help>
+                                {{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC') }}
+                                <span class="text-gray-500">{{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC2') }}</span>
                             </template>
-                        </p-dict-input-group>
-                    </p-field-group>
-                </div>
-            </section>
-            <div class="separator" />
-            <section>
-                <div class="label">
-                    {{ $t('PWR_SCHED.RESRC_GRP.STANDARD') }}
-                </div>
-                <div class="form">
-                    <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE')" class="read-mode">
-                        <span class="read-value">{{ RESOURCE_GROUP_TYPES[selectedTypeIndex] ? RESOURCE_GROUP_TYPES[selectedTypeIndex].label : '' }}</span>
-                    </p-field-group>
-                    <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_SELECT')">
-                        <p-select-dropdown :select-item="selectedTypeIndex"
-                                           index-mode
-                                           class="w-1/2"
-                                           :items="RESOURCE_GROUP_TYPES"
-                                           :placeholder="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_DESC')"
-                                           :disabled="resourceTypeReadOnly"
-                                           :invalid="validState.showValidation && !validState.resourceType"
-                                           @input="onSelectedTypeIndexChange"
-                        />
-                    </p-field-group>
-                </div>
-            </section>
+                            <p-text-input v-model="name" class="w-full"
+                                          block
+                                          :invalid="validState.showValidation && !validState.name"
+                                          :placeholder="$t('PWR_SCHED.RESRC_GRP.NAME')"
+                                          @input="validateName"
+                            />
+                        </p-field-group>
 
-            <template v-if="schema">
+                        <div v-if="readMode" class="separator read-mode" />
+
+                        <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">
+                            <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"
+                                   style-type="primary" outline
+                            >
+                                <strong>{{ k }}:</strong>&nbsp;{{ v }}
+                            </p-tag>
+                        </p-field-group>
+                        <p-field-group v-else :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
+                            <template #help>
+                                {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC') }}
+                                <br>
+                                {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC2') }}
+                            </template>
+                            <p-dict-input-group ref="dictRef"
+                                                :dict="tags"
+                                                :show-validation="validState.showValidation"
+                                                :focused="false"
+                                                @change="onChangeTags"
+                            >
+                                <template #addButton="scope">
+                                    <p-icon-text-button class="mt-4"
+                                                        outline style-type="primary-dark" :disabled="scope.disabled"
+                                                        name="ic_plus_bold"
+                                                        @click="scope.addPair($event)"
+                                    >
+                                        {{ $t('PWR_SCHED.RESRC_GRP.ADD_TAG') }}
+                                    </p-icon-text-button>
+                                </template>
+                            </p-dict-input-group>
+                        </p-field-group>
+                    </div>
+                </section>
                 <div class="separator" />
                 <section>
                     <div class="label">
-                        {{ $t('PWR_SCHED.RESRC_GRP.RESRC_LIST') }}
-                        <span class="text-gray-500">({{ typeOptionState.totalCount }})</span>
+                        {{ $t('PWR_SCHED.RESRC_GRP.STANDARD') }}
                     </div>
-                    <div class="table-form">
-                        <p-field-group v-if="!readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH')" />
-                        <p-query-search-tags v-if="readMode" read-only :tags="fetchOptionState.queryTags"
-                                             :timezone="typeOptionState.timezone"
-                        />
-                        <p-dynamic-layout type="query-search-table"
-                                          class="resource-table"
-                                          :options="schema.options"
-                                          :data="data"
-                                          :type-options="typeOptionState"
-                                          :fetch-options="fetchOptionState"
-                                          :field-handler="fieldHandler"
-                                          @init="onFetchTable"
-                                          @fetch="onFetchTable"
-                        >
-                            <template #no-data-format>
-                                <span :class="{
-                                    'text-alert': validState.showValidation
-                                }"
-                                >{{ $t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH_INVALID') }}</span>
-                            </template>
-                        </p-dynamic-layout>
+                    <div class="form">
+                        <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE')" class="read-mode">
+                            <span class="read-value">{{ RESOURCE_GROUP_TYPES[selectedTypeIndex] ? RESOURCE_GROUP_TYPES[selectedTypeIndex].label : '' }}</span>
+                        </p-field-group>
+                        <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_SELECT')">
+                            <p-select-dropdown :select-item="selectedTypeIndex"
+                                               index-mode
+                                               class="w-1/2"
+                                               :items="RESOURCE_GROUP_TYPES"
+                                               :placeholder="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_DESC')"
+                                               :disabled="resourceTypeReadOnly"
+                                               :invalid="validState.showValidation && !validState.resourceType"
+                                               @input="onSelectedTypeIndexChange"
+                            />
+                        </p-field-group>
                     </div>
                 </section>
-            </template>
-        </p-pane-layout>
 
-        <div class="actions">
-            <p-button style-type="gray900" :outline="true" @click="onClickCancel">
-                {{ $t('PWR_SCHED.CANCEL') }}
-            </p-button>
-            <p-button v-if="!readMode" class="ml-4" style-type="secondary"
-                      :disabled="validState.showValidation && !validState.all"
-                      @click="onClickSave"
-            >
-                {{ $t('PWR_SCHED.SAVE') }}
-            </p-button>
-        </div>
-    </general-page-layout>
+                <template v-if="schema">
+                    <div class="separator" />
+                    <section>
+                        <div class="label">
+                            {{ $t('PWR_SCHED.RESRC_GRP.RESRC_LIST') }}
+                            <span class="text-gray-500">({{ typeOptionState.totalCount }})</span>
+                        </div>
+                        <div class="table-form">
+                            <p-field-group v-if="!readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH')" />
+                            <p-query-search-tags v-if="readMode" read-only :tags="fetchOptionState.queryTags"
+                                                 :timezone="typeOptionState.timezone"
+                            />
+                            <p-dynamic-layout type="query-search-table"
+                                              class="resource-table"
+                                              :options="schema.options"
+                                              :data="data"
+                                              :type-options="typeOptionState"
+                                              :fetch-options="fetchOptionState"
+                                              :field-handler="fieldHandler"
+                                              @init="onFetchTable"
+                                              @fetch="onFetchTable"
+                            >
+                                <template #no-data-format>
+                                    <span :class="{
+                                        'text-alert': validState.showValidation
+                                    }"
+                                    >{{ $t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH_INVALID') }}</span>
+                                </template>
+                            </p-dynamic-layout>
+                        </div>
+                    </section>
+                </template>
+            </p-pane-layout>
+
+            <div class="actions">
+                <p-button style-type="gray900" :outline="true" @click="onClickCancel">
+                    {{ $t('PWR_SCHED.CANCEL') }}
+                </p-button>
+                <p-button v-if="!readMode" class="ml-4" style-type="secondary"
+                          :disabled="validState.showValidation && !validState.all"
+                          @click="onClickSave"
+                >
+                    {{ $t('PWR_SCHED.SAVE') }}
+                </p-button>
+            </div>
+        </general-page-layout>
+    </transition>
 </template>
 
 <script lang="ts">
@@ -535,12 +537,26 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.resource-group-page {
+$height: calc(100vh - ($gnb-height));
+
+/* transition */
+.slide-fade-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-fade-leave-active {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
+}
+
+.general-page-layout {
     @apply bg-white fixed;
     z-index: 2;
     top: $gnb-height;
     left: 0;
-    height: calc(100vh - ($gnb-height));
+    height: $height;
     width: 100vw;
 }
 .p-pane-layout {

@@ -7,6 +7,7 @@
             <p-field-group v-if="mode !== 'READ'"
                            class="name-field"
                            :required="true"
+                           :invalid="showValidation && !isNameValid"
             >
                 <template #label>
                     <div class="name-field-label">
@@ -16,7 +17,7 @@
                 </template>
                 <template #default="{invalid}">
                     <p-text-input v-model="proxyName" v-focus
-                                  :class="{'is-invalid': showValidation && !isNameValid}"
+                                  :invalid="invalid"
                                   class="name-input"
                     />
                 </template>
@@ -51,7 +52,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {computed, reactive, toRefs, watch} from '@vue/composition-api';
 
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
@@ -167,6 +168,11 @@ export default {
             }
             emit('update:mode', 'READ');
         };
+
+        watch(() => props.scheduleId, () => {
+            state.showValidation = false;
+            state.isNameValid = false;
+        })
 
         return {
             ...toRefs(state),
