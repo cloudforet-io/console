@@ -195,7 +195,7 @@ export default {
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
-            z-index: 99;
+            z-index: 1;
             cursor: col-resize;
             > span {
                 margin-right: 0.65rem;
