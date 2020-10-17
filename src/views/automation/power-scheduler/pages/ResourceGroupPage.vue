@@ -309,7 +309,6 @@ export default {
 
         const validateResources = () => {
             validState.resources = typeOptionState.totalCount !== 0;
-            validState.resources = true;
         };
 
         const validate = () => {
