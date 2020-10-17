@@ -34,4 +34,5 @@ export interface Button {
     outline?: boolean;
     styleType?: ButtonStyle;
     size?: ButtonSize;
+    block?: boolean;
 }

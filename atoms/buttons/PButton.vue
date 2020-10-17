@@ -14,6 +14,7 @@ export default {
                 disabled: !!attrs.disabled,
                 outline: !!attrs.outline,
                 link: !!attrs.link,
+                block: !!attrs.block,
             };
             if (attrs.size) {
                 cls[attrs.size] = true;

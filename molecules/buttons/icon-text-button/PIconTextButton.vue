@@ -6,6 +6,7 @@
         :size="size"
         :outline="outline"
         :link="link"
+        :block="block"
         v-on="$listeners"
         @mouseenter="onHover(true)"
         @mouseleave="onHover(false)"
@@ -104,6 +105,10 @@ export default {
             default: false,
         },
         outline: {
+            type: Boolean,
+            default: false,
+        },
+        block: {
             type: Boolean,
             default: false,
         },

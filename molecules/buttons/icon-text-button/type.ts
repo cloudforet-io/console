@@ -13,4 +13,5 @@ export interface IconTextButtonProps {
     styleType?: string;
     disabled: boolean;
     outline: boolean;
+    block: boolean;
 }
