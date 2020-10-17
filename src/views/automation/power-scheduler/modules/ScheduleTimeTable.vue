@@ -209,6 +209,13 @@ enum RULE_STATE {
     stopped = 'STOPPED',
 }
 
+interface RuleSettings {
+    ruleType: RULE_TYPE;
+    ruleState: RULE_STATE;
+    ruleWithUTC: Rule;
+    ruleForApi: object[];
+}
+
 interface Props {
     scheduleId?: string;
     mode: ViewMode;
@@ -444,83 +451,110 @@ export default {
                 }
             });
         };
-        const createOrUpdate = async (scheduleId) => {
-            let ruleType = '';
-            let ruleState = '';
-            let ruleWithUTC: Rule = {};
-            const ruleForApi = [] as object[];
 
-            if (props.mode !== 'READ') {
-                ruleType = RULE_TYPE.routine;
-                ruleState = RULE_STATE.running;
-                ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
-                Object.entries(ruleWithUTC).forEach(([k, v]) => {
-                    if (v.length > 0) {
-                        ruleForApi.push({ day: k, times: v });
-                    }
-                });
-            } else if (state.oneTimeEditMode) {
-                ruleType = RULE_TYPE.ticket;
-                if (state.oneTimeEditMode === 'RUN') {
-                    ruleState = RULE_STATE.running;
-                    ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeRun, RULE_TYPE.ticket);
-                } else if (state.oneTimeEditMode === 'STOP') {
-                    ruleState = RULE_STATE.stopped;
-                    ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeStop, RULE_TYPE.ticket);
-                }
-                Object.entries(ruleWithUTC).forEach(([k, v]) => {
-                    if (v.length > 0) {
-                        ruleForApi.push({ date: k, times: v });
-                    }
-                });
-            } else {
-                return;
-            }
-
-            // check scheduleRule exists
-            let scheduleRuleId = '';
+        const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
             const query = new QueryHelper().setFilter(
                 {
                     k: 'rule_type',
-                    v: ruleType,
+                    v: settings.ruleType,
                     o: 'eq',
                 },
                 {
                     k: 'state',
-                    v: ruleState,
+                    v: settings.ruleState,
                     o: 'eq',
                 },
             );
-            const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
-                schedule_id: scheduleId,
-                query: query.data,
-            });
+            try {
+                const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
+                    schedule_id: scheduleId,
+                    query: query.data,
+                });
+                return res.results[0]?.schedule_rule_id || '';
+            } catch (e) {
+                console.error(e);
+            }
+            return '';
+        };
 
-            // create or update schedule rule
-            if (res.results.length > 0) {
-                scheduleRuleId = res.results[0].schedule_rule_id;
+        const getRuleSettings = (): RuleSettings|null => {
+            const settings: RuleSettings = {
+                ruleType: RULE_TYPE.routine,
+                ruleState: RULE_STATE.running,
+                ruleWithUTC: {},
+                ruleForApi: [],
+            };
 
-                // update or delete
-                if (ruleForApi.length === 0) {
+            if (props.mode !== 'READ') {
+                settings.ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
+                Object.entries(settings.ruleWithUTC).forEach(([k, v]) => {
+                    if (v.length > 0) {
+                        settings.ruleForApi.push({ day: k, times: v });
+                    }
+                });
+                return settings;
+            } if (state.oneTimeEditMode) {
+                settings.ruleType = RULE_TYPE.ticket;
+                if (state.oneTimeEditMode === 'RUN') {
+                    settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeRun, RULE_TYPE.ticket);
+                } else if (state.oneTimeEditMode === 'STOP') {
+                    settings.ruleState = RULE_STATE.stopped;
+                    settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeStop, RULE_TYPE.ticket);
+                }
+                Object.entries(settings.ruleWithUTC).forEach(([k, v]) => {
+                    if (v.length > 0) {
+                        settings.ruleForApi.push({ date: k, times: v });
+                    }
+                });
+                return settings;
+            }
+            return null;
+        };
+
+        const updateOrDelete = async (settings: RuleSettings, scheduleRuleId: string) => {
+            try {
+                if (settings.ruleForApi.length === 0) {
                     await SpaceConnector.client.powerScheduler.scheduleRule.delete({
                         schedule_rule_id: scheduleRuleId,
                     });
                 } else {
                     await SpaceConnector.client.powerScheduler.scheduleRule.update({
                         schedule_rule_id: scheduleRuleId,
-                        rule: ruleForApi,
+                        rule: settings.ruleForApi,
                     });
                 }
-            } else {
-                if (ruleForApi.length === 0) return;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const create = async (settings: RuleSettings, scheduleId: string) => {
+            if (settings.ruleForApi.length === 0) return;
+            try {
                 await SpaceConnector.client.powerScheduler.scheduleRule.create({
                     user_id: store.state.user.userId,
                     schedule_id: scheduleId,
-                    rule_type: ruleType,
-                    name: `${ruleType} - ${ruleState}`,
-                    state: ruleState,
-                    rule: ruleForApi,
+                    rule_type: settings.ruleType,
+                    name: `${settings.ruleType} - ${settings.ruleState}`,
+                    state: settings.ruleState,
+                    rule: settings.ruleForApi,
                 });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const createOrUpdate = async (scheduleId) => {
+            const settings = getRuleSettings();
+            if (!settings) return;
+
+            // check scheduleRule exists
+            const scheduleRuleId = await checkScheduleRuleExist(settings, scheduleId);
+
+            // create or update schedule rule
+            if (scheduleRuleId) {
+                await updateOrDelete(settings, scheduleRuleId);
+            } else {
+                await create(settings, scheduleId);
             }
         };
 

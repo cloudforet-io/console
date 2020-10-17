@@ -260,13 +260,14 @@ export default {
                 });
                 state.columns = [...state.columns];
             }
+            console.debug('resource group confirmed', state.columns);
         };
 
         const hideGuide = () => {
             state.showGuide = false;
         };
 
-        watch([() => props.scheduleId], async (after, before) => {
+        watch(() => props.scheduleId, async (after, before) => {
             if (props.scheduleId && (after !== before)) {
                 await getResourceGroup(props.scheduleId);
             }

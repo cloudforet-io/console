@@ -118,20 +118,29 @@ export default {
         });
 
         const createSchedule = async () => {
-            const res = await SpaceConnector.client.powerScheduler.schedule.create({
-                name: props.name,
-                project_id: props.projectId,
-            });
-            state.proxyScheduleId = res.schedule_id;
-            return res.schedule_id;
+            try {
+                const res = await SpaceConnector.client.powerScheduler.schedule.create({
+                    name: props.name,
+                    project_id: props.projectId,
+                });
+                return res.schedule_id;
+            } catch (e) {
+                console.error(e);
+                return '';
+            }
         };
 
         const updateSchedule = async () => {
-            const res = await SpaceConnector.client.powerScheduler.schedule.update({
-                schedule_id: state.proxyScheduleId,
-                name: props.name,
-            });
-            return res.schedule_id;
+            try {
+                const res = await SpaceConnector.client.powerScheduler.schedule.update({
+                    schedule_id: state.proxyScheduleId,
+                    name: props.name,
+                });
+                return res.schedule_id;
+            } catch (e) {
+                console.error(e);
+                return '';
+            }
         };
 
         const onClickCancel = () => {
@@ -139,18 +148,22 @@ export default {
         };
 
         const onClickSave = async () => {
-            let scheduleId = state.proxyScheduleId;
             state.showValidation = true;
             if (!state.isAllValid) return;
-            if (props.mode === 'CREATE') {
-                scheduleId = await createSchedule();
-            }
-            if (props.mode === 'UPDATE') {
-                scheduleId = await updateSchedule();
-            }
-            if (props.mode === 'CREATE' || props.mode === 'UPDATE') {
+
+            if (props.mode !== 'READ') {
+                let scheduleId = state.proxyScheduleId;
+                if (props.mode === 'CREATE') {
+                    scheduleId = await createSchedule();
+                } else if (props.mode === 'UPDATE') {
+                    scheduleId = await updateSchedule();
+                }
+
                 await state.timeTable.createOrUpdate(scheduleId);
                 await state.kanban.onSave(scheduleId);
+
+                // must change scheduleId after all process end
+                state.proxyScheduleId = scheduleId;
             }
             emit('update:mode', 'READ');
         };
