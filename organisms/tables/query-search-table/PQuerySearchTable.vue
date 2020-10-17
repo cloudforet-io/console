@@ -287,6 +287,8 @@ export default {
             emitChange({ queryTags: tags });
         };
 
+        if (!props.searchable) emitInit({});
+
         return {
             ...toRefs(state),
             emitChange,
