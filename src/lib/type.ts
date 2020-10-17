@@ -122,4 +122,4 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
 }
 
 
-export type QueryFilters = Record<string|'keyword', Array<string|number|boolean>>
+export type QueryFilters = Record<string|'keywords', Array<string|number|boolean>>

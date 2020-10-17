@@ -10,7 +10,7 @@ import { getTimezone } from '@/lib/util';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import {QueryFilters} from "@/lib/type";
+import { QueryFilters } from '@/lib/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -206,7 +206,7 @@ const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[]
     });
 
     forEach(queryFilters, (values, k) => {
-        if (k === 'keyword') {
+        if (k === 'keywords') {
             values.forEach((d) => {
                 res.push({ value: { label: d as string, name: d }, operator: '' });
             });
