@@ -38,7 +38,7 @@
             <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
                               : 'All Project'"
                           use-total-count
-                          :total-count="apiHandler.totalCount"
+                          :total-count="listState.totalCount"
             >
                 <template #extra-area>
                     <div class="btns">
@@ -69,16 +69,17 @@
                 </template>
             </p-page-title>
             <div class="pb-8">
-                <p-toolbox-grid-layout
-                    v-bind="apiHandler.gridTS.state"
-                    card-height="11.25rem"
-                    :this-page.sync="apiHandler.gridTS.syncState.thisPage"
-                    :page-size.sync="apiHandler.gridTS.syncState.pageSize"
-                    :loading.sync="apiHandler.gridTS.syncState.loading"
-                    @changePageNumber="apiHandler.getData()"
-                    @changePageSize="apiHandler.getData()"
-                    @clickRefresh="apiHandler.getData()"
-                    @card:click.self="goToProjectDetail"
+                <p-toolbox-grid-layout card-height="11.25rem"
+                                       card-min-width="18.75rem"
+                                       :items="listState.items"
+                                       :all-page="listState.allPage"
+                                       :loading="listState.loading"
+                                       :this-page.sync="listState.thisPage"
+                                       :page-size.sync="listState.pageSize"
+                                       @changePageNumber="getData()"
+                                       @changePageSize="getData()"
+                                       @clickRefresh="getData()"
+                                       @card:click.self="goToProjectDetail"
                 >
                     <template #toolbox-left>
                         <div class="flex items-center">
@@ -114,7 +115,7 @@
                                     Create Project Group
                                 </p-button>
                             </div>
-                            <div v-if="!noProjectGroup && noProject" class="empty-project">
+                            <div v-if="!noProjectGroup && listState.totalCount === 0" class="empty-project">
                                 <p class="text-primary2">
                                     Looks like you don't have any Project.
                                 </p>
@@ -220,7 +221,7 @@
 /* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, UnwrapRef, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 
@@ -230,7 +231,6 @@ import {
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
@@ -239,10 +239,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import {
     FILTER_OPERATOR, fluentApi,
 } from '@/lib/fluent-api';
-import { ProjectItemResp, ProjectListResp } from '@/lib/fluent-api/identity/project';
-import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
-import { SearchGridFluentAPI } from '@/lib/api/grid';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
@@ -261,6 +258,42 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { Location } from 'vue-router';
+import { getAllPage } from '@/components/organisms/pagination/PTextPagination.toolset';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { ListType, TimeStamp } from '@/models';
+
+interface ProjectGroupInfo {
+    project_group_id: string;
+    name: string;
+    parent_project_group_info: null | ProjectGroupInfo;
+    domain_id: string;
+    created_by: string;
+    created_at: TimeStamp;
+    deleted_at: TimeStamp;
+    tags: object;
+}
+
+interface ProjectModel {
+    project_id: string;
+    name: string;
+    state: string;
+    project_group_info: ProjectGroupInfo;
+    providers?: string[];
+    created_by: string;
+    created_at: TimeStamp;
+    deleted_at: TimeStamp;
+    tags: object;
+}
+
+type ProjectListResp = ListType<ProjectModel>
+
+interface ProjectItemResp {
+    id: string;
+    name: string;
+    has_child: boolean;
+    item_type: 'PROJECT_GROUP'|'PROJECT';
+}
 
 interface ProjectSummaryResp {
     member: number;
@@ -278,19 +311,6 @@ interface ProjectSummaryResp {
         summary?: ProjectSummaryResp;
     }
 
-    interface State {
-        searchText: string;
-        items: ProjectCardData[];
-        settingMenu: MenuItem[];
-        showAllProjects: boolean;
-        searchedProjectGroup: ProjectGroup|null;
-        selectedTreeItem: ProjectTreeItem|null;
-        parentGroups: Readonly<ProjectGroup[]>;
-        projectGroupNavigation: any; // TODO: routeNavigation type
-        treeRef: any;
-        noProjectGroup: boolean;
-        noProject: boolean;
-    }
 
 const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): ProjectGroup[] => {
     if (item) {
@@ -311,7 +331,6 @@ export default {
         ProjectSearch,
         PVerticalPageLayout,
         PI,
-        PLottie,
         PPageTitle,
         PCheckBox,
         PSkeleton,
@@ -324,23 +343,23 @@ export default {
     setup(props, context) {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
-        const state: UnwrapRef<State> = reactive({
+        const state = reactive({
             searchText: '',
-            items: [],
+            items: [] as ProjectCardData[],
             settingMenu: [
                 { name: 'edit', label: 'Edit Group Name', type: 'item' },
                 { name: 'delete', label: 'Delete This Group', type: 'item' },
-            ],
-            showAllProjects: ref(false),
-            searchedProjectGroup: null,
-            selectedTreeItem: null,
-            parentGroups: computed(() => {
+            ] as MenuItem[],
+            showAllProjects: false,
+            searchedProjectGroup: null as ProjectGroup|null,
+            selectedTreeItem: null as ProjectTreeItem|null,
+            parentGroups: computed<ProjectGroup[]>(() => {
                 if (state.selectedTreeItem && state.selectedTreeItem.parent) {
                     return reverse(getParentGroup(state.selectedTreeItem.parent));
                 } return [];
             }),
-            treeRef: null,
-            projectGroupNavigation: computed(() => {
+            treeRef: null as any,
+            projectGroupNavigation: computed<any>(() => {
                 const result = state.parentGroups.map(d => ({
                     name: d.name,
                     data: d,
@@ -360,7 +379,6 @@ export default {
                 ];
             }),
             noProjectGroup: false,
-            noProject: false,
         });
 
         const formState = reactive({
@@ -377,8 +395,6 @@ export default {
         const { provider } = useStore();
         provider.getProvider();
 
-        const projectAPI = fluentApi.identity().project();
-        const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statisticsTest().resource().stat()
             .setResourceType('identity.Project')
             .addGroupKey('project_id', 'project_id')
@@ -406,7 +422,7 @@ export default {
         const projectSummary = ref(createdData);
 
         const setProvider = (resp) => {
-            const temp = resp.data.results.map((it) => {
+            const temp = resp.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => get(provider.state.providers, [name, 'icon']));
                 const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
                 return {
@@ -431,9 +447,9 @@ export default {
             }
         };
 
-        const getCard = (resp: AxiosResponse<ProjectListResp>) => {
-            if (resp.data.results.length !== 0) {
-                const ids = resp.data.results.map(item => item.project_id);
+        const getCard = (resp: ProjectListResp) => {
+            if (resp.results.length !== 0) {
+                const ids = resp.results.map(item => item.project_id);
                 cardSummary.value = reactive(zipObject(ids));
                 statisticsAPI.setFilter({
                     key: 'project_id',
@@ -445,35 +461,84 @@ export default {
                     }
                 });
             }
-            resp.data.results = setProvider(resp);
-            projectSummary.value = resp.data.results;
+            resp.results = setProvider(resp);
+            projectSummary.value = resp.results;
             return resp;
         };
 
-        /**
-             * QuerySearch Grid Fluent API Declaration
-             * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
-             */
-        const listAction = projectGroupAPI.listProjects().setTransformer(getCard).setIncludeProvider();
-        const listAllAction = projectAPI.list().setIncludeProvider().setTransformer(getCard);
+        /** List Grid Items */
+        const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
+        const listAllProjectApi = SpaceConnector.client.identity.project.list;
+        const listQuery = new QueryHelper();
+        const listState = reactive({
+            items: [],
+            totalCount: 0,
+            loading: false,
+            thisPage: 1,
+            pageSize: 24,
+            allPage: computed(() => getAllPage(listState.totalCount, (listState.pageSize))),
+        });
 
 
-        const apiHandler = new SearchGridFluentAPI(
-            listAction,
-            {
-                cardClass: () => ['card-item', 'project-card-item'],
-                cardMinWidth: '18.75rem',
-                cardMaxHeight: '18.75rem',
-                cardHeight: '15rem',
-            },
-        );
+        const resetAll = () => {
+            listState.items = [];
+            listState.totalCount = 0;
+            listState.thisPage = 1;
+            listState.pageSize = 24;
+        };
+
+        const getParams = () => {
+            listQuery.setPageStart(getPageStart(listState.thisPage, listState.pageSize))
+                .setPageLimit(listState.pageSize);
+
+            if (state.searchText) listQuery.setFilter({ k: 'name', v: state.searchText, o: 'in' });
+
+            let params: any;
+            if (state.searchedProjectGroup) {
+                params = {
+                    project_group_id: state.searchedProjectGroup.id,
+                    include_provider: true,
+                };
+            } else {
+                params = {
+                    include_provider: true,
+                };
+            }
+
+            if (state.showAllProjects) params.recursive = true;
+
+
+            return {
+                ...params,
+                query: listQuery.data,
+            };
+        };
+
+
+        const getData = async (resetThisPage = false) => {
+            if (resetThisPage) {
+                listState.thisPage = 1;
+            }
+            listState.loading = true;
+            try {
+                const api = state.searchedProjectGroup ? listProjectApi : listAllProjectApi;
+                const resp = await api(getParams());
+
+                const res = getCard(resp);
+                listState.items = res.results;
+                listState.totalCount = res.total_count;
+            } catch (e) {
+                listState.items = [];
+                listState.totalCount = 0;
+            } finally {
+                listState.loading = false;
+            }
+        };
 
         watch<boolean, boolean>(() => state.showAllProjects, async (after, before) => {
             if (after !== before) {
-                // @ts-ignore
-                apiHandler.action = apiHandler.action.setRecursive(after);
-                apiHandler.resetAll();
-                await apiHandler.getData();
+                resetAll();
+                await getData();
             }
         }, { immediate: false });
 
@@ -507,10 +572,11 @@ export default {
         };
 
         const projectGroupDeleteFormConfirm = async () => {
+            if (!state.searchedProjectGroup) return;
             try {
-                await fluentApi.identity().projectGroup().delete()
-                    .setId(state.searchedProjectGroup?.id as string)
-                    .execute();
+                await SpaceConnector.client.identity.projectGroup.delete({
+                    project_group_id: state.searchedProjectGroup.id,
+                });
                 context.root.$notify({
                     group: 'noticeTopRight',
                     type: 'success',
@@ -571,11 +637,10 @@ export default {
 
         const projectFormConfirm = async (item) => {
             try {
-                await fluentApi.identity().project().create().setParameter({
+                await SpaceConnector.client.identity.project.create({
                     project_group_id: state.searchedProjectGroup?.id,
                     ...item,
-                })
-                    .execute();
+                });
                 context.root.$notify({
                     group: 'noticeTopRight',
                     type: 'success',
@@ -588,25 +653,14 @@ export default {
                 showErrorMessage('Fail to Create a Project', e, context.root);
             } finally {
                 formState.projectFormVisible = false;
-                await apiHandler.getData();
+                await getData();
             }
         };
 
 
-        const listProjects = async (value: string|null, group: ProjectGroup|null = null) => {
-            let api;
-
-            if (group) {
-                api = listAction.setId(group.id);
-            } else {
-                api = listAllAction;
-            }
-            if (value) api = api.setFixFilter({ key: 'name', value, operator: '' });
-
-            apiHandler.action = api;
-            apiHandler.resetAll();
-            await apiHandler.getData();
-            if (apiHandler.gridTS.state.items.length === 0) state.noProject = true;
+        const listProjects = async () => {
+            resetAll();
+            await getData();
         };
 
         /** Query String */
@@ -628,7 +682,7 @@ export default {
 
         /** Search */
         const onSearch = async (res: SearchResult) => {
-            apiHandler.gridTS.syncState.loading = true;
+            listState.loading = true;
 
             if ((res.projectGroup && !state.searchedProjectGroup)
                 || (res.projectGroup && state.searchedProjectGroup && res.projectGroup.id !== state.searchedProjectGroup.id)) {
@@ -637,7 +691,9 @@ export default {
                 await state.treeRef.listNodes();
             }
             state.searchedProjectGroup = res.projectGroup;
-            await listProjects(res.value, res.projectGroup);
+            state.searchText = res.value;
+            state.searchedProjectGroup = res.projectGroup;
+            await listProjects();
 
             // queryRefs.search.value = res.value;
         };
@@ -649,10 +705,10 @@ export default {
                     id: e.node.data.id,
                     name: e.node.data.name,
                 };
-                await listProjects(state.searchText, state.searchedProjectGroup);
+                await listProjects();
             } else {
                 state.searchedProjectGroup = null;
-                await listProjects(state.searchText as string, null);
+                await listProjects();
             }
         };
 
@@ -665,13 +721,13 @@ export default {
             const pgId = vm.$route.query.select_pg as string|null;
             let projectGroup: ProjectGroup|null = null;
             if (pgId) {
-                const res = await fluentApi.identity().projectGroup().get()
-                    .setId(pgId)
-                    .execute();
+                const res = await SpaceConnector.client.identity.projectGroup.get({
+                    project_group_id: pgId,
+                });
 
                 projectGroup = {
                     id: pgId,
-                    name: res.data.name,
+                    name: res.name,
                 };
             }
             state.searchedProjectGroup = projectGroup;
@@ -681,18 +737,19 @@ export default {
             else await state.treeRef.listNodes();
 
             // init project data
-            await listProjects(state.searchText, projectGroup);
+            state.searchedProjectGroup = projectGroup;
+            await listProjects();
         };
 
         const onProjectGroupList = async (items: ProjectTreeItem[]) => {
             if (items.length === 0) {
-                apiHandler.gridTS.syncState.loading = true;
+                listState.loading = true;
                 state.noProjectGroup = true;
             } else {
                 state.noProjectGroup = false;
             }
-            apiHandler.gridTS.syncState.loading = false;
-            await listProjects(state.searchText, state.searchedProjectGroup);
+            listState.loading = false;
+            await listProjects();
         };
 
         onMounted(async () => {
@@ -700,6 +757,8 @@ export default {
         });
 
         return {
+            listState,
+            getData,
             ...toRefs(state),
             ...toRefs(formState),
             skeletons: range(1),
@@ -708,7 +767,6 @@ export default {
             cardSummary,
             projectSummary,
             openProjectForm,
-            apiHandler,
             openProjectGroupDeleteForm,
             projectGroupDeleteFormConfirm,
             openProjectGroupEditForm,

@@ -25,7 +25,8 @@ interface IdParameter {
     [idField]: string;
 }
 
-export interface ProjectModel extends IdParameter, Tags{
+export interface ProjectModel {
+    project_id: string;
     name: string;
     state: string;
     project_group_info: ProjectGroupInfo;
@@ -33,6 +34,7 @@ export interface ProjectModel extends IdParameter, Tags{
     created_by: string;
     created_at: TimeStamp;
     deleted_at: TimeStamp;
+    tags: object;
 }
 
 export type ProjectListResp = ListType<ProjectModel>

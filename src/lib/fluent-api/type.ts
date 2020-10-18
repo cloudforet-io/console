@@ -152,7 +152,7 @@ export interface Tags {
     };
 }
 
-export interface ProjectGroupInfo extends Tags {
+export interface ProjectGroupInfo {
     project_group_id: string;
     name: string;
     parent_project_group_info: null | ProjectGroupInfo;
@@ -160,6 +160,7 @@ export interface ProjectGroupInfo extends Tags {
     created_by: string;
     created_at: TimeStamp;
     deleted_at: TimeStamp;
+    tags: object;
 }
 
 export interface ApiType {

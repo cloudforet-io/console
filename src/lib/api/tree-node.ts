@@ -1,6 +1,5 @@
 /* eslint-disable camelcase,@typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios';
-import { DynamicAPI } from '@/lib/api/toolset';
 import { TreeAction } from '@/lib/fluent-api/toolset';
 import {
     TreeNodeToolSet,
@@ -27,7 +26,7 @@ export abstract class BaseTreeFluentAPI<
     treeAction extends TreeAction<parameter, TreeResp<resp>> = TreeAction<parameter, TreeResp<resp>>,
     treeSearch extends TreeSearchAction<parameter, TreeSearchResp> = TreeSearchAction<parameter, TreeSearchResp>,
     T extends TreeNodeToolSet<resp, state, initData, initSyncData> = TreeNodeToolSet<resp, state, initData, initSyncData>
-    > extends DynamicAPI {
+    > {
     ts: T;
 
     treeAction: treeAction;
@@ -35,7 +34,6 @@ export abstract class BaseTreeFluentAPI<
     treeSearchAction: treeSearch;
 
     constructor(actions: TreeApiActions<treeAction, treeSearch>, initData?: initData, initSyncData?: initSyncData, isMultiSelect = false) {
-        super();
         this.treeAction = actions.treeAction;
         this.treeSearchAction = actions.treeSearchAction;
         this.ts = new TreeNodeToolSet(initData, initSyncData, isMultiSelect) as T;

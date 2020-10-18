@@ -7,3 +7,8 @@ export interface TimeStamp {
     seconds: string;
     nanos?: number;
 }
+
+export interface ListType<T> {
+    results: T[];
+    total_count: number;
+}
