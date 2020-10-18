@@ -1,6 +1,6 @@
 import { select } from '@storybook/addon-knobs/vue';
 import Tooltip from '@/components/molecules/tooltips/PTooltip.vue';
-import { PLACEMENTS } from '@/components/molecules/tooltips/PTooltip.toolset';
+import { PLACEMENTS } from '@/components/molecules/tooltips/type';
 import { autoProps } from '@sb/storybook-util';
 
 export default {

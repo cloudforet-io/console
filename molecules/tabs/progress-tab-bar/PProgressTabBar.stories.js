@@ -1,8 +1,7 @@
 import { withKnobs, object, text } from '@storybook/addon-knobs/vue';
 import { ref, toRefs, reactive } from '@vue/composition-api';
-import { autoProps, getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
-import { progressTabBarProps } from '@/components/molecules/tabs/progress-tab-bar/PProgressTabBar.toolset';
 import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/PProgressTabBar.vue';
 import md from '@/components/molecules/tabs/progress-tab-bar/PProgresTabBar.md';
 
@@ -50,7 +49,21 @@ const getData = (props, context) => {
 export const defaultCase = () => ({
     components: { PProgressTabBar },
     props: getKnobProps(
-        progressTabBarProps, {
+        {
+            tabs: {
+                type: Array,
+                default: () => [],
+            },
+            /** sync */
+            activeIdx: {
+                type: Number,
+                default: 0,
+            },
+            invalidState: {
+                type: Object,
+                default: () => ({}),
+            },
+        }, {
             invalidState: {
                 conf: true,
                 credentials: true,

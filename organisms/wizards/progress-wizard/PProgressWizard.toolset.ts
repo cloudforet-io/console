@@ -1,10 +1,21 @@
 import {
-    progressTabBarProps,
     ProgressTabBarProps,
-} from '@/components/molecules/tabs/progress-tab-bar/PProgressTabBar.toolset';
+} from '@/components/molecules/tabs/progress-tab-bar/type';
 
 export const progressWizardProps = {
-    ...progressTabBarProps,
+    tabs: {
+        type: Array,
+        default: () => [],
+    },
+    /** sync */
+    activeIdx: {
+        type: Number,
+        default: 0,
+    },
+    invalidState: {
+        type: Object,
+        default: () => ({}),
+    },
     cancelBtnBind: {
         type: Object,
         default: () => ({}),

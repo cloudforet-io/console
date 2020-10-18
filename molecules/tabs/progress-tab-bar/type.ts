@@ -1,19 +1,3 @@
-export const progressTabBarProps = {
-    tabs: {
-        type: Array,
-        default: () => [],
-    },
-    /** sync */
-    activeIdx: {
-        type: Number,
-        default: 0,
-    },
-    invalidState: {
-        type: Object,
-        default: () => ({}),
-    },
-};
-
 export interface ProgressTab {
     name: string;
     label?: string;

@@ -41,8 +41,7 @@ import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PToolt
 import PI from '@/components/atoms/icons/PI.vue';
 import {
     ProgressTabBarProps,
-    progressTabBarProps,
-} from '@/components/molecules/tabs/progress-tab-bar/PProgressTabBar.toolset';
+} from '@/components/molecules/tabs/progress-tab-bar/type';
 import { makeProxy } from '@/components/util/composition-helpers';
 
 export default {
@@ -51,7 +50,21 @@ export default {
         PTooltipButton,
         PI,
     },
-    props: progressTabBarProps,
+    props: {
+        tabs: {
+            type: Array,
+            default: () => [],
+        },
+        /** sync */
+        activeIdx: {
+            type: Number,
+            default: 0,
+        },
+        invalidState: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup(props: ProgressTabBarProps, { emit }) {
         const tabWidth = computed(() => `${100 / size(props.tabs)}%`);
         const proxyActiveIdx = makeProxy('activeIdx', props, emit);

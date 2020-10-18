@@ -5,18 +5,6 @@ import {
     computed, ref, Ref, watch,
 } from '@vue/composition-api';
 
-export const tabBarProps = {
-    props: {
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-        },
-    },
-};
-
 export const isActive = props => name => props.activeTab === name;
 
 export const tabData = props => computed<TabItem[]>(() => props.tabs.map((value: string|TabItem) => {

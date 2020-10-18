@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { selectableItemProps, SelectableItemPropsType } from '@/components/molecules/selectable-item/PSelectableItem.toolset';
+import { SelectableItemPropsType } from '@/components/molecules/selectable-item/type';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default {
@@ -39,7 +39,39 @@ export default {
     components: {
         PLazyImg,
     },
-    props: selectableItemProps,
+    props: {
+        iconUrl: {
+            type: String,
+            default: '',
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        active: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        defaultIcon: {
+            type: String,
+            default: '',
+        },
+        color: {
+            type: String,
+            default: '',
+        },
+        theme: {
+            type: String,
+            default: 'default',
+            validator(theme) {
+                return ['default', 'card'].includes(theme);
+            },
+        },
+    },
     setup(props: SelectableItemPropsType) {
         return {
         };

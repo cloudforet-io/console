@@ -1,4 +1,4 @@
-import { ThemeType } from '@/components/molecules/selectable-item/PSelectableItem.toolset';
+import { ThemeType } from '@/components/molecules/selectable-item/type';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/components/util/toolset-helpers';

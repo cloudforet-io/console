@@ -28,13 +28,21 @@ import {
     computed, defineComponent,
 } from '@vue/composition-api';
 import {
-    isOne, tabBarProps, TabBarProps, TabItem,
+    isOne, TabBarProps, TabItem,
 } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
 
 export default {
     name: 'PTab',
     components: { PTabBar },
-    mixins: [tabBarProps],
+    props: {
+        tabs: {
+            type: Array,
+            default: () => [],
+        },
+        activeTab: {
+            type: String,
+        },
+    },
     setup(props: TabBarProps, { emit }) {
         return {
             proxyActiveTab: makeProxy('activeTab', props, emit),

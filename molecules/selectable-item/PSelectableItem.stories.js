@@ -6,9 +6,41 @@ import {
     text, number, select, object, boolean, color,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { selectableItemProps } from '@/components/molecules/selectable-item/PSelectableItem.toolset';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 
+const selectableItemProps = {
+    iconUrl: {
+        type: String,
+        default: '',
+    },
+    title: {
+        type: String,
+        default: '',
+    },
+    active: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    defaultIcon: {
+        type: String,
+        default: '',
+    },
+    color: {
+        type: String,
+        default: '',
+    },
+    theme: {
+        type: String,
+        default: 'default',
+        validator(theme) {
+            return ['default', 'card'].includes(theme);
+        },
+    },
+}
 export default {
     title: 'molecules/SelectableItem',
     component: PSelectableItem,
