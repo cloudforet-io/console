@@ -1,20 +1,18 @@
 <template>
-    <p-button-modal
-        ref="modal"
-        :header-title="headerTitle"
-        :scrollable="scrollable"
-        :centered="centered"
-        :size="size"
-        :fade="fade"
-        :backdrop="backdrop"
-        :visible.sync="proxyVisible"
-        :theme-color="themeColor"
-        :footer-cancel-button-bind="footerCancelButtonBind"
-        :footer-confirm-button-bind="footerConfirmButtonBind"
+    <p-button-modal :header-title="headerTitle"
+                    :scrollable="scrollable"
+                    :centered="centered"
+                    :size="size"
+                    :fade="fade"
+                    :backdrop="backdrop"
+                    :visible.sync="proxyVisible"
+                    :theme-color="themeColor"
+                    :footer-cancel-button-bind="footerCancelButtonBind"
+                    :footer-confirm-button-bind="footerConfirmButtonBind"
 
-        @cancel="cancel"
-        @close="close"
-        @confirm="confirm"
+                    @cancel="cancel"
+                    @close="close"
+                    @confirm="confirm"
     >
         <template #body>
             <div>
@@ -22,64 +20,53 @@
                     {{ subTitle }}
                 </h4>
                 <div class="overflow-auto" :style="{'max-height': '300px'}">
-                    <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
-                                  :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                    />
+                    <slot v-bind="$props">
+                        <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
+                                      :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+                        />
+                    </slot>
                 </div>
-                <slot />
             </div>
         </template>
     </p-button-modal>
 </template>
-<script>
+<script lang="ts">
 import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { propsMixin } from '@/components/molecules/modals/PModal.vue';
 import { makeByEvent, makeProxy } from '@/components/util/composition-helpers';
-import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
-
-const setup = (props, context) => {
-    const state = contentModalSetup(props, context);
-    const sortState = reactive({
-        sortBy: '',
-        sortDesc: true,
-    });
-    const footerCancelButtonBind = reactive({
-        styleType: 'gray900',
-        outline: true,
-    });
-    const footerConfirmButtonBind = computed(() => ({
-        styleType: props.themeColor === 'primary' ? 'primary-dark' : props.themeColor,
-    }));
-    const confirm = () => {
-        context.emit('confirm', props.items);
-    };
-
-    return {
-        ...state,
-        ...toRefs(sortState),
-        footerCancelButtonBind,
-        footerConfirmButtonBind,
-        sortedItems: computed(() => {
-        // todo: move this feather to p-data-table
-            if (sortState.sortBy) {
-                return _.orderBy(props.items, sortState.sortBy, sortState.sortDesc ? 'desc' : 'asc');
-            }
-            return props.items;
-        }),
-        proxyVisible: makeProxy('visible', props, context.emit),
-        cancel: makeByEvent(context.emit, 'cancel'),
-        close: makeByEvent(context.emit, 'close'),
-        confirm,
-    };
-};
+import { sizeMapping } from '@/components/molecules/modals/type';
+import { orderBy } from 'lodash';
 
 export default {
     name: 'PTableCheckModal',
     components: { PButtonModal, PDataTable },
-    mixins: [propsMixin],
     props: {
+        fade: {
+            type: Boolean,
+            default: false,
+        },
+        scrollable: {
+            type: Boolean,
+            default: false,
+        },
+        size: {
+            type: String,
+            default: 'md',
+            validator: value => Object.keys(sizeMapping).includes(value),
+        },
+        centered: {
+            type: Boolean,
+            default: false,
+        },
+        backdrop: {
+            type: Boolean,
+            default: true,
+        },
+        visible: { // sync
+            type: Boolean,
+            default: false,
+        },
         themeColor: {
             type: String,
             default: 'primary',
@@ -94,7 +81,40 @@ export default {
         items: Array,
     },
     setup(props, context) {
-        return setup(props, context);
+        const state = reactive({
+            proxyVisible: makeProxy('visible', props, context.emit),
+        });
+        const sortState = reactive({
+            sortBy: '',
+            sortDesc: true,
+        });
+        const footerCancelButtonBind = reactive({
+            styleType: 'gray900',
+            outline: true,
+        });
+        const footerConfirmButtonBind = computed(() => ({
+            styleType: props.themeColor === 'primary' ? 'primary-dark' : props.themeColor,
+        }));
+        const confirm = () => {
+            context.emit('confirm', props.items);
+        };
+
+        return {
+            ...toRefs(state),
+            ...toRefs(sortState),
+            footerCancelButtonBind,
+            footerConfirmButtonBind,
+            sortedItems: computed(() => {
+                // todo: move this feather to p-data-table
+                if (sortState.sortBy) {
+                    return orderBy(props.items, sortState.sortBy, sortState.sortDesc ? 'desc' : 'asc');
+                }
+                return props.items;
+            }),
+            cancel: makeByEvent(context.emit, 'cancel'),
+            close: makeByEvent(context.emit, 'close'),
+            confirm,
+        };
     },
 
 

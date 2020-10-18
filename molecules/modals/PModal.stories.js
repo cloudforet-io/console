@@ -2,7 +2,7 @@ import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import { sizeMapping } from '@/components/molecules/modals/PModal.toolset';
+import { sizeMapping } from '@/components/molecules/modals/type';
 import PModal from '@/components/molecules/modals/PModal.vue';
 
 export default {

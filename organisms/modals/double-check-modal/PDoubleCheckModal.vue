@@ -1,20 +1,18 @@
 <template>
-    <p-button-modal
-        ref="modal"
-        :header-title="headerTitle"
-        :scrollable="scrollable"
-        :centered="centered"
-        :size="size"
-        :fade="fade"
-        :backdrop="backdrop"
-        :visible.sync="proxyVisible"
-        :theme-color="themeColor"
-        :footer-cancel-button-bind="footerCancelButtonBind"
-        :footer-confirm-button-bind="footerConfirmButtonBind"
+    <p-button-modal :header-title="headerTitle"
+                    :scrollable="scrollable"
+                    :centered="centered"
+                    :size="size"
+                    :fade="fade"
+                    :backdrop="backdrop"
+                    :visible.sync="proxyVisible"
+                    :theme-color="themeColor"
+                    :footer-cancel-button-bind="footerCancelButtonBind"
+                    :footer-confirm-button-bind="footerConfirmButtonBind"
 
-        @cancel="cancel"
-        @close="close"
-        @confirm="confirm"
+                    @cancel="cancel"
+                    @close="close"
+                    @confirm="confirm"
     >
         <template #body>
             <div>
@@ -43,68 +41,44 @@
         </template>
     </p-button-modal>
 </template>
-<script>
+<script lang="ts">
 import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import { propsMixin } from '@/components/molecules/modals/PModal.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
-import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
+import { sizeMapping } from '@/components/molecules/modals/type';
 
-const setup = (props, context) => {
-    const state = contentModalSetup(props, context);
-    const footerCancelButtonBind = reactive({
-        styleType: 'black',
-        outline: true,
-    });
-    const footerConfirmButtonBind = computed(() => ({
-        styleType: props.themeColor === 'primary' ? 'primary-dark' : props.themeColor,
-    }));
-
-    const checkState = reactive({
-        inputText: '',
-        invalid: false,
-    });
-    const reset = () => {
-        checkState.inputText = '';
-        checkState.invalid = false;
-    };
-    const cancel = (...event) => {
-        reset();
-        context.emit('cancel', ...event);
-    };
-    const close = (...event) => {
-        reset();
-        context.emit('close', ...event);
-    };
-    const confirm = () => {
-        if (checkState.inputText === props.verificationText) {
-            reset();
-            context.emit('confirm');
-        } else {
-            checkState.invalid = true;
-        }
-    };
-
-
-    return {
-        ...state,
-        ...toRefs(checkState),
-        footerCancelButtonBind,
-        footerConfirmButtonBind,
-        proxyVisible: makeProxy('visible', props, context.emit),
-        cancel,
-        close,
-        confirm,
-    };
-};
 
 export default {
     name: 'PDoubleCheckModal',
     components: { PButtonModal, PTextInput, PFieldGroup },
-    mixins: [propsMixin],
     props: {
+        fade: {
+            type: Boolean,
+            default: false,
+        },
+        scrollable: {
+            type: Boolean,
+            default: false,
+        },
+        size: {
+            type: String,
+            default: 'md',
+            validator: value => Object.keys(sizeMapping).includes(value),
+        },
+        centered: {
+            type: Boolean,
+            default: false,
+        },
+        backdrop: {
+            type: Boolean,
+            default: true,
+        },
+        visible: { // sync
+            type: Boolean,
+            default: false,
+        },
         themeColor: {
             type: String,
             default: 'alert',
@@ -121,7 +95,52 @@ export default {
         },
     },
     setup(props, context) {
-        return setup(props, context);
+        const state = reactive({
+            proxyVisible: makeProxy('visible', props, context.emit),
+        });
+        const footerCancelButtonBind = reactive({
+            styleType: 'black',
+            outline: true,
+        });
+        const footerConfirmButtonBind = computed(() => ({
+            styleType: props.themeColor === 'primary' ? 'primary-dark' : props.themeColor,
+        }));
+
+        const checkState = reactive({
+            inputText: '',
+            invalid: false,
+        });
+        const reset = () => {
+            checkState.inputText = '';
+            checkState.invalid = false;
+        };
+        const cancel = (...event) => {
+            reset();
+            context.emit('cancel', ...event);
+        };
+        const close = (...event) => {
+            reset();
+            context.emit('close', ...event);
+        };
+        const confirm = () => {
+            if (checkState.inputText === props.verificationText) {
+                reset();
+                context.emit('confirm');
+            } else {
+                checkState.invalid = true;
+            }
+        };
+
+
+        return {
+            ...toRefs(state),
+            ...toRefs(checkState),
+            footerCancelButtonBind,
+            footerConfirmButtonBind,
+            cancel,
+            close,
+            confirm,
+        };
     },
 
 

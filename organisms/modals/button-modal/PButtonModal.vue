@@ -1,19 +1,17 @@
 <template>
-    <p-content-modal
-        ref="modal"
-        :fade="fade"
-        :scrollable="scrollable"
-        :size="size"
-        :centered="centered"
-        :backdrop="backdrop"
-        :visible.sync="proxyVisible"
-        :theme-color="themeColor"
-        :header-class="headerClass"
-        :body-class="bodyClass"
-        :footer-class="footerClass"
-        :header-visible="headerVisible"
-        :body-visible="bodyVisible"
-        :footer-visible="footerVisible"
+    <p-content-modal :fade="fade"
+                     :scrollable="scrollable"
+                     :size="size"
+                     :centered="centered"
+                     :backdrop="backdrop"
+                     :visible.sync="proxyVisible"
+                     :theme-color="themeColor"
+                     :header-class="headerClass"
+                     :body-class="bodyClass"
+                     :footer-class="footerClass"
+                     :header-visible="headerVisible"
+                     :body-visible="bodyVisible"
+                     :footer-visible="footerVisible"
     >
         <template #header>
             <div class="header">
@@ -65,47 +63,75 @@
 
 <script lang="ts">
 // @ts-ignore
-import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
+import PContentModal from '@/components/organisms/modals/content-modal/PContentModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { sizeMapping } from '@/components/molecules/modals/type';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { makeProxy } from '@/components/util/composition-helpers';
+import { ButtonModalProps } from '@/components/organisms/modals/button-modal/type';
 
-export const setup = (props, context) => {
-    const state = contentModalSetup(props, context);
-    const onCloseClick = () => {
-        if (props.loading) return;
-        context.emit('close');
-        state.proxyVisible.value = false;
-    };
-    const onCancelClick = () => {
-        if (props.loading) return;
-        context.emit('cancel');
-        if (props.hideOnCancel) {
-            state.proxyVisible.value = false;
-        }
-    };
-    const onConfirmClick = () => {
-        context.emit('confirm');
-    };
-    return {
-        ...state,
-        onCloseClick,
-        onCancelClick,
-        onConfirmClick,
-    };
-};
 
 export default {
     name: 'PButtonModal',
     components: {
         PI, PContentModal, PButton, PLoadingButton,
     },
-    mixins: [PContentModal],
-    // events: ['close', 'cancel', 'confirm'],
-    setup(props, context) {
-        return setup(props, context);
-    },
     props: {
+        fade: {
+            type: Boolean,
+            default: false,
+        },
+        scrollable: {
+            type: Boolean,
+            default: false,
+        },
+        size: {
+            type: String,
+            default: 'md',
+            validator: value => Object.keys(sizeMapping).includes(value),
+        },
+        centered: {
+            type: Boolean,
+            default: false,
+        },
+        backdrop: {
+            type: Boolean,
+            default: true,
+        },
+        visible: { // sync
+            type: Boolean,
+            default: false,
+        },
+        themeColor: {
+            type: String,
+            default: 'primary',
+        },
+        headerClass: {
+            type: Array,
+            default: null,
+        },
+        bodyClass: {
+            type: Array,
+            default: null,
+        },
+        footerClass: {
+            type: Array,
+            default: null,
+        },
+        headerVisible: {
+            type: Boolean,
+            default: true,
+        },
+        bodyVisible: {
+            type: Boolean,
+            default: true,
+        },
+        footerVisible: {
+            type: Boolean,
+            default: true,
+        },
         headerTitle: {
             type: String,
             default: '',
@@ -148,7 +174,32 @@ export default {
             default: false,
         },
     },
-
+    setup(props: ButtonModalProps, context) {
+        const state = reactive({
+            proxyVisible: makeProxy('visible', props, context.emit),
+        });
+        const onCloseClick = () => {
+            if (props.loading) return;
+            context.emit('close');
+            state.proxyVisible = false;
+        };
+        const onCancelClick = () => {
+            if (props.loading) return;
+            context.emit('cancel');
+            if (props.hideOnCancel) {
+                state.proxyVisible = false;
+            }
+        };
+        const onConfirmClick = () => {
+            context.emit('confirm');
+        };
+        return {
+            ...toRefs(state),
+            onCloseClick,
+            onCancelClick,
+            onConfirmClick,
+        };
+    },
 };
 
 </script>

@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { computed } from '@vue/composition-api';
-import { sizeMapping } from '@/components/molecules/modals/PModal.toolset';
+import {ModalProps, sizeMapping} from '@/components/molecules/modals/type';
 
 
 const setup = (props, { emit }) => {
@@ -34,37 +34,6 @@ const setup = (props, { emit }) => {
         },
     };
 };
-
-export const propsMixin = {
-    props: {
-        fade: {
-            type: Boolean,
-            default: false,
-        },
-        scrollable: {
-            type: Boolean,
-            default: false,
-        },
-        size: {
-            type: String,
-            default: 'md',
-            validator: value => Object.keys(sizeMapping).includes(value),
-        },
-        centered: {
-            type: Boolean,
-            default: false,
-        },
-        backdrop: {
-            type: Boolean,
-            default: true,
-        },
-        visible: { // sync
-            type: Boolean,
-            default: false,
-        },
-    },
-};
-
 
 export default {
     name: 'PModal',
@@ -95,7 +64,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: ModalProps, { emit }) {
         const dialogClassObject = computed(() => [
             { scrollable: props.scrollable },
             { centered: props.centered },

@@ -1,6 +1,5 @@
 <template>
-    <p-modal ref="modal"
-             :fade="fade"
+    <p-modal :fade="fade"
              :size="size"
              :centered="centered"
              :backdrop="backdrop"
@@ -24,52 +23,45 @@
 </template>
 
 <script lang="ts">
-    import {
-        reactive, toRefs, computed, UnwrapRef,
-    } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed,
+} from '@vue/composition-api';
 // @ts-ignore
-import PModal, { propsMixin } from '@/components/molecules/modals/PModal.vue';
+import PModal from '@/components/molecules/modals/PModal.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
+import { sizeMapping } from '@/components/molecules/modals/type';
+import { ContentModalProps } from '@/components/organisms/modals/content-modal/type';
 
-export const setup = (props, context) => {
-    interface StateType {
-        proxyVisible: boolean;
-        modal: any;
-        allBodyClass: Readonly<any[]>;
-    }
-
-    const state: UnwrapRef<StateType> = reactive({
-        proxyVisible: makeProxy('visible', props, context.emit),
-        modal: null,
-        allBodyClass: computed(() => {
-            const res = props.bodyClass ? [...props.bodyClass] : [];
-            if (props.size) res.push(props.size);
-            if (props.scrollable) res.push('scrollable');
-            return res;
-        }),
-    });
-    return {
-        ...toRefs(state),
-        show() {
-            state.modal.show();
-        },
-        hide() {
-            state.modal.hide();
-        },
-        toggle() {
-            state.modal.toggle();
-        },
-    };
-};
 
 export default {
     name: 'PContentModal',
     components: { PModal },
-    mixins: [propsMixin],
-    setup(props, context) {
-        return setup(props, context);
-    },
     props: {
+        fade: {
+            type: Boolean,
+            default: false,
+        },
+        scrollable: {
+            type: Boolean,
+            default: true,
+        },
+        size: {
+            type: String,
+            default: 'md',
+            validator: value => Object.keys(sizeMapping).includes(value),
+        },
+        centered: {
+            type: Boolean,
+            default: false,
+        },
+        backdrop: {
+            type: Boolean,
+            default: true,
+        },
+        visible: { // sync
+            type: Boolean,
+            default: false,
+        },
         themeColor: {
             type: String,
             default: 'primary',
@@ -98,12 +90,21 @@ export default {
             type: Boolean,
             default: true,
         },
-        scrollable: {
-            type: Boolean,
-            default: true,
-        },
     },
-
+    setup(props: ContentModalProps, context) {
+        const state = reactive({
+            proxyVisible: makeProxy('visible', props, context.emit),
+            allBodyClass: computed(() => {
+                const res = props.bodyClass ? [...props.bodyClass] : [];
+                if (props.size) res.push(props.size);
+                if (props.scrollable) res.push('scrollable');
+                return res;
+            }),
+        });
+        return {
+            ...toRefs(state),
+        };
+    },
 };
 </script>
 

@@ -1,8 +1,7 @@
 <template>
-    <p-modal
-        :visible.sync="proxyVisible"
-        :backdrop="true"
-        class="p-icon-modal-container"
+    <p-modal :visible.sync="proxyVisible"
+             :backdrop="true"
+             class="p-icon-modal-container"
     >
         <div class="content-lap">
             <p-lottie v-if="lottieName"

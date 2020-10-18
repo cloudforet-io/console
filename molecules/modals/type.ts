@@ -1,18 +1,14 @@
 import {
-    HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/components/util/toolset-helpers';
 
 export enum sizeMapping {
-    sm='modal-sm',
-    md= '',
-    lg= 'modal-lg',
-    xl= 'modal-xl',
+    sm = 'modal-sm',
+    md = '',
+    lg = 'modal-lg',
+    xl = 'modal-xl',
 }
-
-export const modalSizeValidator = value => Object.keys(sizeMapping).includes(value);
-
-export type ModalSizeType = 'sm'|'md'|'lg'|'xl';
+export type ModalSizeType = keyof typeof sizeMapping;
 export interface ModalStateType {
     fade: boolean;
     scrollable: boolean;
@@ -21,6 +17,15 @@ export interface ModalStateType {
 
 export interface ModalSyncStateType {
     visible: boolean;
+}
+
+export interface ModalProps {
+    fade: boolean;
+    scrollable: boolean;
+    size: ModalSizeType;
+    visible: boolean; // sync
+    centered: boolean;
+    backdrop: boolean;
 }
 
 @StateToolSet<ModalStateType>()
@@ -51,33 +56,4 @@ export class ModalState<
          this.state = initReactive(lazy, ModalState.initState(), initData);
          this.syncState = initReactive(lazy, ModalState.initSyncState(), initSyncData);
      }
-}
-
-@HelperToolSet()
-export class ModalToolSet<initData=any, initSyncData=any> extends ModalState<initData, initSyncData> {
-    // eslint-disable-next-line no-empty-function
-    close: () => void=() => {};
-
-    // eslint-disable-next-line no-empty-function
-    open: () => void=() => {};
-
-    static initToolSet(_this: ModalToolSet) {
-        _this.close = () => {
-            if (_this.syncState.visible) {
-                _this.syncState.visible = false;
-            }
-        };
-        _this.open = () => {
-            if (!_this.syncState.visible) {
-                _this.syncState.visible = true;
-            }
-        };
-    }
-
-    constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
-        super(initData, initSyncData);
-        if (!lazy) {
-            ModalToolSet.initToolSet(this);
-        }
-    }
 }
