@@ -83,7 +83,7 @@ import {
 
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';

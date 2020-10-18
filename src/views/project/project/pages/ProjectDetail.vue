@@ -25,43 +25,38 @@
                 <project-dashboard ref="ProjectDashboard" />
             </template>
             <template #member>
-                <p-toolbox-table class="member-tab"
-                                 v-bind="memberApiHandler.tableTS.state"
-                                 :sort-by.sync="memberApiHandler.tableTS.syncState.sortBy"
-                                 :sort-desc.sync="memberApiHandler.tableTS.syncState.sortDesc"
-                                 :select-index.sync="memberApiHandler.tableTS.syncState.selectIndex"
-                                 :loading.sync="memberApiHandler.tableTS.syncState.loading"
-                                 :this-page.sync="memberApiHandler.tableTS.syncState.thisPage"
-                                 :page-size.sync="memberApiHandler.tableTS.syncState.pageSize"
-                                 :style="{height: '30rem', padding: 0}"
-                                 @changePageSize="memberApiHandler.getData"
-                                 @changePageNumber="memberApiHandler.getData"
-                                 @clickRefresh="memberApiHandler.getData"
-                                 @changeSort="memberApiHandler.getData"
+                <p-search-table class="member-tab"
+                                :shadow="false"
+                                :border="false"
+                                selectable
+                                :fields="memberTableState.fields"
+                                :items="memberTableState.items"
+                                :select-index.sync="memberTableState.selectIndex"
+                                :loading="memberTableState.loading"
+                                :style="{height: '30rem', padding: 0}"
+                                @init="onChangeMemberTable"
+                                @change="onChangeMemberTable"
                 >
                     <template #toolbox-top>
-                        <p-panel-top :title="'Member'" use-total-count :total-count="memberApiHandler.totalCount" />
+                        <p-panel-top :title="'Member'" use-total-count :total-count="memberTableState.totalCount" />
                     </template>
                     <template #toolbox-left>
-                        <div class="toolbox-left">
-                            <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
-                                                name="ic_plus_bold"
-                                                @click="openMemberAddForm()"
-                            >
-                                {{ $t('BTN.ADD') }}
-                            </p-icon-text-button>
-                            <p-button class="mr-4"
-                                      :outline="true"
-                                      style-type="alert"
-                                      :disabled="memberApiHandler.tableTS.selectState.isNotSelected"
-                                      @click="memberDeleteClick"
-                            >
-                                Delete
-                            </p-button>
-                            <p-search v-model="memberApiHandler.tableTS.searchText" @search="onSearch" @delete="onDelete" />
-                        </div>
+                        <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
+                                            name="ic_plus_bold"
+                                            @click="openMemberAddForm()"
+                        >
+                            {{ $t('BTN.ADD') }}
+                        </p-icon-text-button>
+                        <p-button class="mr-4"
+                                  :outline="true"
+                                  style-type="alert"
+                                  :disabled="!memberTableState.selectedItems.length"
+                                  @click="memberDeleteClick"
+                        >
+                            Delete
+                        </p-button>
                     </template>
-                </p-toolbox-table>
+                </p-search-table>
             </template>
             <template #tag>
                 <s-tags-panel :resource-id="projectId" resource-key="project_id" resource-type="identity.Project"
@@ -72,19 +67,18 @@
                 <project-report-tab :project-id="projectId" :project-name="projectName" />
             </template>
         </p-tab>
-        <p-button-modal
-            :header-title="headerTitle"
-            :centered="true"
-            :scrollable="false"
-            size="md"
-            :fade="true"
-            :backdrop="true"
-            :visible.sync="projectDeleteFormVisible"
-            :theme-color="themeColor"
-            :footer-confirm-button-bind="{
-                styleType: 'alert',
-            }"
-            @confirm="projectDeleteFormConfirm"
+        <p-button-modal :header-title="headerTitle"
+                        :centered="true"
+                        :scrollable="false"
+                        size="md"
+                        :fade="true"
+                        :backdrop="true"
+                        :visible.sync="projectDeleteFormVisible"
+                        :theme-color="themeColor"
+                        :footer-confirm-button-bind="{
+                            styleType: 'alert',
+                        }"
+                        @confirm="projectDeleteFormConfirm"
         >
             <template #body>
                 <p class="delete-modal-content">
@@ -97,12 +91,16 @@
                                      :current-project="projectName"
                                      @confirm="projectEditFormConfirm($event)"
         />
-        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="addMember()" />
-        <p-table-check-modal
-            v-bind="deleteTS.state"
-            :size="'lg'"
-            :visible.sync="deleteTS.syncState.visible"
-            @confirm="memberDeleteConfirm"
+        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="onAddMemberConfirm()" />
+        <p-table-check-modal :fields="checkMemberDeleteState.fields"
+                             :mode="checkMemberDeleteState.mode"
+                             :items="checkMemberDeleteState.items"
+                             :header-title="checkMemberDeleteState.headerTitle"
+                             :sub-title="checkMemberDeleteState.subTitle"
+                             :theme-color="checkMemberDeleteState.themeColor"
+                             size="lg"
+                             :visible.sync="checkMemberDeleteState.visible"
+                             @confirm="memberDeleteConfirm"
         />
     </general-page-layout>
 </template>
@@ -121,32 +119,31 @@ import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue
 import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PSearch from '@/components/molecules/search/PSearch.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
 
 import { makeTrItems } from '@/lib/view-helper';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
-import { SearchTableFluentAPI } from '@/lib/api/table';
 import { showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 export default {
     name: 'ProjectDetail',
     components: {
+        PSearchTable,
         PPanelTop,
         ProjectReportTab,
-        PSearch,
-        PToolboxTable,
         ProjectDashboard,
         PTableCheckModal,
         PButtonModal,
@@ -213,13 +210,9 @@ export default {
         });
 
         // List api Handler for query search table
-        const MemberListAction = fluentApi.identity().project().memberList().setId(projectId.value);
-
-
-        const memberApiHandler = new SearchTableFluentAPI(MemberListAction, {
-            shadow: false,
-            border: false,
-            selectable: true,
+        const memberTableQuery = new QueryHelper();
+        const memberTableState = reactive({
+            selectIndex: [] as number[],
             fields: [
                 { label: 'Name', name: 'user_info.name', type: 'item' },
                 { label: 'State', name: 'user_info.state', type: 'item' },
@@ -229,7 +222,56 @@ export default {
                 { label: 'Group', name: 'user_info.group', type: 'item' },
                 { label: 'Language', name: 'user_info.language', type: 'item' },
             ],
-        }, undefined);
+            items: [] as any[],
+            loading: true,
+            totalCount: 0,
+            options: {
+                searchText: '',
+            } as Partial<Options>,
+            selectedItems: computed(() => memberTableState.selectIndex.map(i => memberTableState.items[i])),
+        });
+
+        const listMemberApi = SpaceConnector.client.identity.project.member.list;
+        const listMembers = async () => {
+            memberTableState.loading = true;
+            memberTableState.selectIndex = [];
+            try {
+                const res = await listMemberApi({
+                    project_id: projectId.value,
+                    query: memberTableQuery.data,
+                });
+                memberTableState.items = res.results;
+                memberTableState.totalCount = res.total_count;
+            } catch (e) {
+                memberTableState.items = [];
+                memberTableState.totalCount = 0;
+                console.error(e);
+            }
+            memberTableState.loading = false;
+        };
+
+        const onChangeMemberTable: SearchTableListeners['init'|'change'] = async (options, _changed?) => {
+            const changed = _changed || options;
+
+            if (changed.sortBy !== undefined) {
+                memberTableState.options.sortBy = changed.sortBy;
+                memberTableState.options.sortDesc = !!changed.sortDesc;
+                memberTableQuery.setSort(changed.sortBy, changed.sortDesc);
+            }
+            if (changed.pageLimit !== undefined) {
+                memberTableState.options.pageSize = changed.pageSize;
+                memberTableQuery.setPageLimit(changed.pageSize);
+            }
+            if (changed.pageStart !== undefined) {
+                memberTableState.options.thisPage = changed.thisPage;
+                memberTableQuery.setPageStart(getPageStart(changed.thisPage, memberTableState.options.pageSize));
+            }
+            if (changed.searchText !== undefined) {
+                memberTableState.options.searchText = changed.searchText;
+                memberTableQuery.setKeyword(changed.searchText);
+            }
+            await listMembers();
+        };
 
 
         // Member modal
@@ -306,21 +348,23 @@ export default {
             formState.memberAddFormVisible = true;
         };
 
-        const addMember = async () => {
-            await memberApiHandler.getData();
+        const onAddMemberConfirm = async () => {
+            await listMembers();
         };
 
-        const deleteTS = new TableCheckModalState({
-            fields: [{
-                name: 'user_info.user_id', label: vm?.$t('FIELD.ID'),
-            },
-            {
-                name: 'user_info.name', label: vm?.$t('FIELD.NAME'),
-            },
-            {
-                name: 'user_info.email', label: vm?.$t('FIELD.EMAIL'),
-            },
-            ],
+        const checkMemberDeleteState = reactive({
+            fields: computed(() => [
+                { name: 'user_info.user_id', label: vm?.$t('FIELD.ID') },
+                { name: 'user_info.name', label: vm?.$t('FIELD.NAME') },
+                { name: 'user_info.email', label: vm?.$t('FIELD.EMAIL') },
+            ]),
+            mode: '',
+            items: [] as any[],
+            headerTitle: '',
+            subTitle: '',
+            themeColor: '',
+            visible: false,
+            action: null as any,
         });
 
         const memberDeleteAction = fluentApi.identity().project()
@@ -328,13 +372,13 @@ export default {
             .setId(projectId.value);
 
         const memberDeleteClick = () => {
-            deleteTS.state.mode = 'delete';
-            deleteTS.state.action = memberDeleteAction;
-            deleteTS.state.items = memberApiHandler.tableTS.selectState.selectItems as any[];
-            deleteTS.state.headerTitle = 'Delete Member';
-            deleteTS.state.subTitle = 'Are you sure want to remove a following members from Project?';
-            deleteTS.state.themeColor = 'alert';
-            deleteTS.syncState.visible = true;
+            checkMemberDeleteState.mode = 'delete';
+            checkMemberDeleteState.action = memberDeleteAction;
+            checkMemberDeleteState.items = memberTableState.selectedItems as any[];
+            checkMemberDeleteState.headerTitle = 'Delete Member';
+            checkMemberDeleteState.subTitle = 'Are you sure want to remove a following members from Project?';
+            checkMemberDeleteState.themeColor = 'alert';
+            checkMemberDeleteState.visible = true;
         };
 
         const memberDeleteConfirm = async (items) => {
@@ -351,24 +395,15 @@ export default {
             } catch (e) {
                 showErrorMessage('Fail to Delete Member', e, context.root);
             } finally {
-                deleteTS.syncState.visible = false;
-                await memberApiHandler.getData();
+                checkMemberDeleteState.visible = false;
+                await listMembers();
             }
         };
 
         watch(() => singleItemTabState.activeTab, (tab) => {
-            if (tab === 'member') memberApiHandler.getData();
+            if (tab === 'member') listMembers();
         }, { immediate: true });
 
-
-        // apply search keyword to query string only when search event occurred
-        const onSearch = async (e) => {
-            await memberApiHandler.getData();
-        };
-        const onDelete = async () => {
-            memberApiHandler.tableTS.searchText.value = '';
-            await memberApiHandler.getData();
-        };
 
         const getPageNavigation = async () => {
             const res = await fluentApi.identity().project().treeSearch()
@@ -389,8 +424,6 @@ export default {
         };
 
         const init = () => {
-            // init search text by query string
-            // memberApiHandler.tableTS.searchText.value = vm.$route.query.member_search as string;
             getPageNavigation();
         };
 
@@ -400,19 +433,19 @@ export default {
             ...toRefs(state),
             ...toRefs(formState),
             singleItemTabState,
-            memberApiHandler,
+            memberTableState,
+            checkMemberDeleteState,
             item,
-            deleteTS,
             openProjectDeleteForm,
             projectDeleteFormConfirm,
             openProjectEditForm,
             projectEditFormConfirm,
             openMemberAddForm,
-            addMember,
+            onAddMemberConfirm,
             memberDeleteClick,
             memberDeleteConfirm,
-            onSearch,
-            onDelete,
+            listMembers,
+            onChangeMemberTable,
         };
     },
 };

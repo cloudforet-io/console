@@ -91,7 +91,7 @@ import {
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';

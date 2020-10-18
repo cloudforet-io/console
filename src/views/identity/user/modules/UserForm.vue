@@ -111,13 +111,14 @@
 
 <script>
 /* eslint-disable camelcase */
-import { reactive, computed, ref } from '@vue/composition-api';
+import {
+    reactive, computed, ref, toRefs,
+} from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/PContentModal.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
@@ -182,7 +183,16 @@ export default {
         },
     },
     setup(props, context) {
-        const state = contentModalSetup(props, context);
+        const state = reactive({
+            proxyVisible: makeProxy('visible', props, context.emit),
+            modal: null,
+            allBodyClass: computed(() => {
+                const res = props.bodyClass ? [...props.bodyClass] : [];
+                if (props.size) res.push(props.size);
+                if (props.scrollable) res.push('scrollable');
+                return res;
+            }),
+        });
         const { domain } = useStore();
         const dictRef = ref(null);
         const formState = reactive({
@@ -286,7 +296,7 @@ export default {
         };
 
         return {
-            ...state,
+            ...toRefs(state),
             dictRef,
             formState,
             languageSelectItems,

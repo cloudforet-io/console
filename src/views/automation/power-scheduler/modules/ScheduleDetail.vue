@@ -57,7 +57,7 @@ import {computed, reactive, toRefs, watch} from '@vue/composition-api';
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
 
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 

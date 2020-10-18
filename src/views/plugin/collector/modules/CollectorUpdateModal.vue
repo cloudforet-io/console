@@ -80,7 +80,7 @@ import { toRefs, reactive, computed } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 

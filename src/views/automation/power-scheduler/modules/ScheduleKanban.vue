@@ -260,7 +260,6 @@ export default {
                 });
                 state.columns = [...state.columns];
             }
-            console.debug('resource group confirmed', state.columns);
         };
 
         const hideGuide = () => {

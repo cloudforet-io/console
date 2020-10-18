@@ -26,7 +26,7 @@
 <script lang="ts">
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import {
     makeProxy,
 } from '@/lib/compostion-util';

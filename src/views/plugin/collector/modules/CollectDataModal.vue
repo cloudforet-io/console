@@ -89,7 +89,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';

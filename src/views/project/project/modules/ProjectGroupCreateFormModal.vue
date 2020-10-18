@@ -33,7 +33,7 @@ import {
 } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
 

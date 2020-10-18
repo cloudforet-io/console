@@ -146,7 +146,7 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';

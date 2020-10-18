@@ -79,7 +79,7 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSe
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';

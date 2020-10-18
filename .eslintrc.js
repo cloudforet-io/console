@@ -35,7 +35,7 @@ module.exports = {
     ],
     camelcase: [
       "error",
-      { properties: "always", allow: ["domain_id", "item_type", "region_id", "collector_id", "plugin_info", "plugin_id", "schedule_id"] }
+      { properties: "always", allow: ["domain_id", "user_id", "server_id", "item_type", "region_id", "collector_id", "plugin_info", "plugin_id", "schedule_id", "project_id"] }
     ],
     "vue/max-attributes-per-line": [
       "error",
