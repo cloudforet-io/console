@@ -1,14 +1,13 @@
 <template>
-    <p-content-modal
-        :scrollable="true"
-        :centered="true"
-        :size="'lg'"
-        :fade="true"
-        :backdrop="true"
-        :header-visible="true"
-        :body-visible="true"
-        :footer-visible="false"
-        :visible.sync="proxyVisible"
+    <p-content-modal scrollable
+                     centered
+                     size="lg"
+                     fade
+                     backdrop
+                     header-visible
+                     body-visible
+                     :footer-visible="false"
+                     :visible.sync="proxyVisible"
     >
         <template #header>
             <span class="header-title">
@@ -29,7 +28,9 @@
                 </div>
                 <div class="second">
                     <span class="number">2.</span> Add and Delete <b>filters</b> to narrow your results.
-                    <p class="wrapped-text">OR Search for the same filters, And Search for different filters.</p>
+                    <p class="wrapped-text">
+                        OR Search for the same filters, And Search for different filters.
+                    </p>
                     <img src="@/assets/help guide/help_search_filter.gif" width="643px" height="114px"
                          class="help-search-img"
                     >
@@ -66,11 +67,10 @@ import PContentModal from '@/components/organisms/modals/content-modal/PContentM
 import PI from '@/components/atoms/icons/PI.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/components/util/composition-helpers';
-import PHr from '@/components/atoms/hr/PHr.vue';
 
 export default {
     name: 'PQuerySearchGuide',
-    components: { PHr, PI, PContentModal },
+    components: { PI, PContentModal },
     model: {
         prop: 'visible',
         event: 'update:visible',

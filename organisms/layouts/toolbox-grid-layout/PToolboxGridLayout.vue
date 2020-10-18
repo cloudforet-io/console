@@ -15,7 +15,7 @@
                     <slot name="toolbox-right" />
                     <div v-if="paginationVisible" class="tool">
                         <p-text-pagination
-                            :this-page.sync="proxyThisPage"
+                            :this-page.sync="proxyState.thisPage"
                             :all-page="allPage"
                             @pageChange="changePageNumber"
                         />
@@ -27,7 +27,7 @@
                                 :menu="pageSizeOptions"
                                 @select="changePageSize"
                             >
-                                {{ proxyPageSize }}
+                                {{ proxyState.pageSize }}
                             </p-dropdown-menu-btn>
                         </div>
                     </slot>
@@ -86,6 +86,7 @@ import {
 import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
 import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 export default {
     name: 'PToolboxGridLayout',
@@ -118,13 +119,13 @@ export default {
         thisPage: {
             type: Number,
             validator(value) {
-                return value > 0;
+                return undefined || value > 0;
             },
-            default: 1,
+            default: undefined,
         },
         pageSize: {
             type: Number,
-            default: 24,
+            default: undefined,
         },
         paginationValues: {
             type: Array,
@@ -141,24 +142,33 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const localState = reactive({
+            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
+            pageSize: props.pageSize === undefined ? 24 : props.pageSize,
+        });
+
+        const proxyState = reactive({
+            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+        });
+
         const state = reactive({
-            proxyThisPage: makeOptionalProxy('thisPage', vm),
-            proxyPageSize: makeOptionalProxy('pageSize', vm),
             pageSizeOptions: computed(() => (flatMap(props.paginationValues, size => ({ type: 'item', label: size, name: size })))),
         });
         const changePageNumber = (page) => {
-            state.proxyThisPage = page;
+            proxyState.thisPage = page;
             context.emit('changePageNumber', page);
         };
         const changePageSize = (size) => {
             const sizeNum = Number(size);
-            if (props.pageSize !== sizeNum) {
-                state.proxyPageSize = sizeNum;
-                state.proxyThisPage = 1;
+            if (proxyState.pageSize !== sizeNum) {
+                proxyState.pageSize = sizeNum;
+                proxyState.thisPage = 1;
                 context.emit('changePageSize', sizeNum);
             }
         };
         return {
+            proxyState,
             ...toRefs(state),
             changePageSize,
             changePageNumber,

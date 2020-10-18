@@ -6,15 +6,15 @@ export interface QuerySearchTableProps {
     fields: DataTableFieldType[];
     items: any[];
     loading: boolean;
-    sortBy: string; // sync
-    sortDesc: boolean; // sync
-    selectIndex: number[]; // sync
-    thisPage: number; // sync
-    pageSize: number; // sync
+    sortBy?: string; // sync
+    sortDesc?: boolean; // sync
+    selectIndex?: number[]; // sync
+    thisPage?: number; // sync
+    pageSize?: number; // sync
     totalCount: number;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
-    queryTags: QueryTag[]; // sync
+    queryTags?: QueryTag[]; // sync
     selectable: boolean;
     colCopy: boolean;
     multiSelect: boolean;

@@ -4,11 +4,11 @@
                      :items="items"
                      :loading="loading"
                      :all-page="allPage"
-                     :sort-by.sync="proxySortBy"
-                     :sort-desc.sync="proxySortDesc"
-                     :select-index.sync="proxySelectIndex"
-                     :this-page.sync="proxyThisPage"
-                     :page-size.sync="proxyPageSize"
+                     :sort-by.sync="proxyState.sortBy"
+                     :sort-desc.sync="proxyState.sortDesc"
+                     :select-index.sync="proxyState.selectIndex"
+                     :this-page.sync="proxyState.thisPage"
+                     :page-size.sync="proxyState.pageSize"
                      :excel-visible="excelVisible"
                      :row-cursor-pointer="rowCursorPointer"
                      use-cursor-loading
@@ -47,14 +47,14 @@
         <template v-if="searchable" #toolbox-bottom="scope">
             <div class="flex flex-col flex-1">
                 <p-query-search class="block lg:hidden mt-4"
-                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
+                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && proxyState.queryTags.length === 0}"
                                 :key-items="keyItems"
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
                 <div class="mt-4" :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
                     <p-query-search-tags ref="tagsRef"
-                                         :tags="tags"
+                                         :tags="proxyState.queryTags"
                                          :timezone="timezone"
                                          @init="onQueryTagsInit"
                                          @change="onQueryTagsChange"
@@ -111,23 +111,23 @@ export default {
         },
         sortBy: {
             type: String,
-            default: '',
+            default: undefined,
         },
         sortDesc: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         selectIndex: {
             type: Array,
-            default: () => [],
+            default: undefined,
         },
         thisPage: {
             type: Number,
-            default: 1,
+            default: undefined,
         },
         pageSize: {
             type: Number,
-            default: 15,
+            default: undefined,
         },
         totalCount: {
             type: Number,
@@ -143,7 +143,7 @@ export default {
         },
         queryTags: {
             type: Array,
-            default: () => [],
+            default: undefined,
         },
         selectable: {
             type: Boolean,
@@ -177,16 +177,29 @@ export default {
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const localState = reactive({
+            selectIndex: props.selectIndex === undefined ? [] : props.selectIndex,
+            sortBy: props.sortBy === undefined ? '' : props.sortBy,
+            sortDesc: props.sortDesc === undefined ? true : props.sortDesc,
+            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
+            pageSize: props.pageSize === undefined ? 15 : props.pageSize,
+            queryTags: props.queryTags === undefined ? [] : props.queryTags,
+        });
+
+
+        const proxyState = reactive({
+            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState, ['select']),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
+            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, localState),
+            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+            queryTags: makeOptionalProxy<QueryTag[]>('queryTags', vm, localState),
+        });
+
         const state = reactive({
             /** table */
-            allPage: computed(() => Math.ceil(props.totalCount / props.pageSize) || 1),
-            proxySortBy: makeOptionalProxy('sortBy', vm),
-            proxySortDesc: makeOptionalProxy('sortDesc', vm),
-            proxySelectIndex: makeOptionalProxy('selectIndex', vm),
-            proxyThisPage: makeOptionalProxy('thisPage', vm),
-            proxyPageSize: makeOptionalProxy('pageSize', vm),
+            allPage: computed(() => Math.ceil(props.totalCount / proxyState.pageSize) || 1),
             /** search */
-            tags: makeOptionalProxy('queryTags', vm),
             tagsRef: null as null|QuerySearchTagsFunctions,
             tagSlots: computed(() => {
                 const res = {};
@@ -200,17 +213,17 @@ export default {
 
         // check if each option value is 'undefined' to escape auto type casting
         const getFullOptions = (options: Partial<Options>): Options => ({
-            sortBy: options.sortBy === undefined ? state.proxySortBy : options.sortBy,
-            sortDesc: options.sortDesc === undefined ? state.proxySortDesc : options.sortDesc,
-            thisPage: options.thisPage === undefined ? state.proxyThisPage : options.thisPage,
-            pageSize: options.pageSize === undefined ? state.proxyPageSize : options.pageSize,
-            queryTags: options.queryTags === undefined ? state.tags : options.queryTags,
+            sortBy: options.sortBy === undefined ? proxyState.sortBy : options.sortBy,
+            sortDesc: options.sortDesc === undefined ? proxyState.sortDesc : options.sortDesc,
+            thisPage: options.thisPage === undefined ? proxyState.thisPage : options.thisPage,
+            pageSize: options.pageSize === undefined ? proxyState.pageSize : options.pageSize,
+            queryTags: options.queryTags === undefined ? proxyState.queryTags : options.queryTags,
         });
 
 
         /** Event emitter */
-        const emitSelect = () => {
-            emit('select', [...state.proxySelectIndex]);
+        const emitSelect = (selectIndex) => {
+            proxyState.selectIndex = selectIndex;
         };
 
         let initChildren = 0;
@@ -221,12 +234,11 @@ export default {
         };
 
         const emitChange = (options: Partial<Options> = {}) => {
-            state.proxySelectIndex = [];
-            emitSelect();
+            emitSelect([]);
 
-            if (options.queryTags || state.proxyThisPage > state.proxyPageSize) {
+            if (options.queryTags || proxyState.thisPage > proxyState.pageSize) {
                 options.thisPage = 1;
-                state.proxyThisPage = 1;
+                proxyState.thisPage = 1;
             }
 
             emit('change', getFullOptions(options), options);
@@ -254,8 +266,7 @@ export default {
         };
 
         const onSelect = (selectIndex: number[]) => {
-            state.proxySelectIndex = [...selectIndex];
-            emitSelect();
+            emitSelect([...selectIndex]);
         };
 
         const onRefresh = () => {
@@ -283,13 +294,14 @@ export default {
         };
 
         const onQueryTagsChange: QuerySearchTagsListeners['change'] = (tags: QueryTag[]) => {
-            state.tags = tags;
+            proxyState.queryTags = tags;
             emitChange({ queryTags: tags });
         };
 
         if (!props.searchable) emitInit({});
 
         return {
+            proxyState,
             ...toRefs(state),
             emitChange,
             emitExport,

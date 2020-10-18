@@ -8,8 +8,8 @@
                            :excel-visible="false"
                            :loading="loading"
                            :all-page="allPage"
-                           :this-page.sync="proxyThisPage"
-                           :page-size.sync="proxyPageSize"
+                           :this-page.sync="proxyState.thisPage"
+                           :page-size.sync="proxyState.pageSize"
                            @changePageSize="onChangePageSize"
                            @changePageNumber="onChangePageNumber"
                            @clickRefresh="refresh"
@@ -26,14 +26,14 @@
         <template #toolbox-bottom>
             <div class="flex flex-col flex-1">
                 <p-query-search class="block lg:hidden mb-6"
-                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && tags.length === 0}"
+                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && proxyState.queryTags.length === 0}"
                                 :key-items="keyItems"
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
                 <div :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
                     <p-query-search-tags ref="tagsRef"
-                                         :tags="tags"
+                                         :tags="proxyState.queryTags"
                                          @change="onQueryTagsChange"
                     />
                 </div>
@@ -96,11 +96,11 @@ export default {
         },
         thisPage: {
             type: Number,
-            default: 1,
+            default: undefined,
         },
         pageSize: {
             type: Number,
-            default: 24,
+            default: undefined,
         },
         totalCount: {
             type: Number,
@@ -117,7 +117,7 @@ export default {
         },
         queryTags: {
             type: Array,
-            default: () => [],
+            default: undefined,
         },
         paginationValues: {
             type: Array,
@@ -127,18 +127,26 @@ export default {
     setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const localState = reactive({
+            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
+            pageSize: props.pageSize === undefined ? 24 : props.pageSize,
+            queryTags: props.queryTags === undefined ? [] : props.queryTags,
+        });
+
+        const proxyState = reactive({
+            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+            queryTags: makeOptionalProxy<QueryTag[]>('queryTags', vm, localState),
+        });
+
         const state = reactive({
-            allPage: computed(() => Math.ceil(props.totalCount / props.pageSize) || 1),
-            proxyThisPage: makeOptionalProxy('thisPage', vm),
-            proxyPageSize: makeOptionalProxy('pageSize', vm),
-            /** search */
-            tags: makeOptionalProxy('queryTags', vm),
+            allPage: computed(() => Math.ceil(props.totalCount / proxyState.pageSize) || 1),
             tagsRef: null as null|QuerySearchTagsFunctions,
             /** others */
             options: computed(() => ({
-                thisPage: state.proxyThisPage,
-                pageSize: state.proxyPageSize,
-                queryTags: state.tags,
+                thisPage: proxyState.thisPage,
+                pageSize: proxyState.pageSize,
+                queryTags: proxyState.queryTags,
             })),
             slotNames: computed(() => {
                 const res: string[] = [];
@@ -151,9 +159,9 @@ export default {
 
         /** Event emitter */
         const emitChange = (options: Partial<Options> = {}) => {
-            if (options?.queryTags || state.proxyThisPage > state.proxyPageSize) {
+            if (options?.queryTags || proxyState.thisPage > proxyState.pageSize) {
                 options.thisPage = 1;
-                state.proxyThisPage = 1;
+                proxyState.thisPage = 1;
             }
             emit('change', Object.freeze({
                 ...state.options,
@@ -162,8 +170,8 @@ export default {
         };
 
         const onChangePageSize = (pageSize: number) => {
-            if (props.thisPage > (Math.ceil(props.totalCount / pageSize) || 1)) {
-                state.proxyThisPage = 1;
+            if (proxyState.thisPage > (Math.ceil(props.totalCount / pageSize) || 1)) {
+                proxyState.thisPage = 1;
                 emitChange({ pageSize, thisPage: 1 });
             } else emitChange({ pageSize });
         };
@@ -183,11 +191,12 @@ export default {
         };
 
         const onQueryTagsChange: QuerySearchTagsListeners['change'] = (tags: QueryTag[]) => {
-            state.tags = tags;
+            proxyState.queryTags = tags;
             emitChange({ queryTags: tags });
         };
 
         return {
+            proxyState,
             ...toRefs(state),
             emitChange,
             onChangePageSize,

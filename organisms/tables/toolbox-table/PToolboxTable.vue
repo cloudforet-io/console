@@ -15,7 +15,7 @@
                     <slot name="toolbox-right" />
                     <div v-if="paginationVisible" class="tool">
                         <p-text-pagination
-                            :this-page.sync="proxyThisPage"
+                            :this-page.sync="proxyState.thisPage"
                             :all-page="allPage"
                             @pageChange="changePageNumber"
                         />
@@ -26,7 +26,7 @@
                             :menu="pageSizeOptions"
                             @select="changePageSize"
                         >
-                            {{ proxyPageSize }}
+                            {{ proxyState.pageSize }}
                         </p-dropdown-menu-btn>
                     </div>
                     <div v-if="excelVisible" class="tool">
@@ -61,16 +61,16 @@
             :selectable="selectable"
             :multi-select="multiSelect"
             :col-copy="colCopy"
-            :select-index.sync="proxySelectIndex"
-            :sort-by.sync="proxySortBy"
-            :sort-desc.sync="proxySortDesc"
+            :select-index.sync="proxyState.selectIndex"
+            :sort-by.sync="proxyState.sortBy"
+            :sort-desc.sync="proxyState.sortDesc"
             :table-style-type="tableStyleType"
             :striped="striped"
             :bordered="bordered"
             :hover="hover"
             :loading="loading"
             :use-cursor-loading="useCursorLoading"
-            :skeleton-rows="pageSize"
+            :skeleton-rows="proxyState.pageSize"
             :width="width"
             :row-height-fixed="rowHeightFixed"
             :row-cursor-pointer="rowCursorPointer"
@@ -125,11 +125,11 @@ export default {
         },
         sortBy: {
             type: String,
-            default: null,
+            default: undefined,
         },
         sortDesc: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         colCopy: {
             type: Boolean,
@@ -141,7 +141,7 @@ export default {
         },
         selectIndex: {
             type: [Array, Number],
-            default: () => [],
+            default: undefined,
         },
         multiSelect: {
             type: Boolean,
@@ -209,7 +209,7 @@ export default {
         },
         pageSize: {
             type: Number,
-            default: 15,
+            default: undefined,
         },
         allPage: {
             type: Number,
@@ -221,9 +221,9 @@ export default {
         thisPage: {
             type: Number,
             validator(value) {
-                return value > 0;
+                return value === undefined || value > 0;
             },
-            default: 1,
+            default: undefined,
         },
         pageNationValues: {
             type: Array,
@@ -233,20 +233,32 @@ export default {
     setup(props: PToolboxTableProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const localState = reactive({
+            selectIndex: props.selectIndex === undefined ? [] : props.selectIndex,
+            sortBy: props.sortBy === undefined ? '' : props.sortBy,
+            sortDesc: props.sortDesc === undefined ? true : props.sortDesc,
+            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
+            pageSize: props.pageSize === undefined ? 15 : props.pageSize,
+        });
+
+
+        const proxyState = reactive({
+            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState, ['select']),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
+            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, localState),
+            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+        });
+
         const state = reactive({
             pageSizeOptions: computed(() => (flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
-            proxyPageSize: makeOptionalProxy('pageSize', vm),
-            proxyThisPage: makeOptionalProxy('thisPage', vm),
-            proxySelectIndex: makeOptionalProxy('selectIndex', vm),
-            proxySortBy: makeOptionalProxy('sortBy', vm),
-            proxySortDesc: makeOptionalProxy('sortDesc', vm),
         });
 
         const changePageSize = (size) => {
             const sizeNum = Number(size);
-            if (props.pageSize !== sizeNum) {
-                state.proxyPageSize = sizeNum;
-                state.proxyThisPage = 1;
+            if (proxyState.pageSize !== sizeNum) {
+                proxyState.pageSize = sizeNum;
+                proxyState.thisPage = 1;
                 emit('changePageSize', sizeNum);
             }
         };
@@ -258,10 +270,11 @@ export default {
         const getSelectItem = () => table.getSelectItem();
 
         const changeSort = () => {
-            state.proxyThisPage = 1;
+            proxyState.thisPage = 1;
         };
 
         return {
+            proxyState,
             ...toRefs(state),
             changePageSize,
             changePageNumber,

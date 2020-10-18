@@ -4,11 +4,11 @@
                      :items="items"
                      :loading="loading"
                      :all-page="allPage"
-                     :sort-by.sync="proxySortBy"
-                     :sort-desc.sync="proxySortDesc"
-                     :select-index.sync="proxySelectIndex"
-                     :this-page.sync="proxyThisPage"
-                     :page-size.sync="proxyPageSize"
+                     :sort-by="proxyState.sortBy"
+                     :sort-desc="proxyState.sortDesc"
+                     :select-index="proxyState.selectIndex"
+                     :this-page="proxyState.thisPage"
+                     :page-size="proxyState.pageSize"
                      :excel-visible="excelVisible"
                      use-cursor-loading
                      :setting-visible="false"
@@ -29,7 +29,7 @@
     >
         <template v-if="searchable && !$scopedSlots['toolbox-left']" #toolbox-left="scope">
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                <p-search v-model="proxySearchText"
+                <p-search v-model="proxyState.searchText"
                           @search="onSearch"
                           @delete="onSearch()"
                 />
@@ -39,7 +39,7 @@
             <div class="flex-1 2xs:block lg:hidden mt-4"
                  :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
             >
-                <p-search v-model="proxySearchText"
+                <p-search v-model="proxyState.searchText"
                           @search="onSearch"
                           @delete="onSearch()"
                 />
@@ -50,7 +50,7 @@
             <template v-if="slot === 'toolbox-left'">
                 <slot name="toolbox-left" v-bind="scope" />
                 <div v-if="searchable" :key="i" class="left-toolbox-item w-1/2 2xs:hidden lg:block">
-                    <p-search v-model="proxySearchText"
+                    <p-search v-model="proxyState.searchText"
                               @search="onSearch"
                               @delete="onSearch()"
                     />
@@ -59,7 +59,7 @@
             <div v-else-if="slot === 'toolbox-bottom'" :key="i" class="flex-1 2xs:block lg:hidden mt-4"
                  :class="{'mb-4':$scopedSlots['toolbox-bottom']}"
             >
-                <p-search v-if="searchable" v-model="proxySearchText"
+                <p-search v-if="searchable" v-model="proxyState.searchText"
                           @search="onSearch"
                           @delete="onSearch()"
                 />
@@ -75,11 +75,12 @@ import PSearch from '@/components/molecules/search/PSearch.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import { forEach } from 'lodash';
 import { Options, SearchTableProps } from '@/components/organisms/tables/search-table/type';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
+
 
 export default {
     name: 'PSearchTable',
@@ -99,23 +100,23 @@ export default {
         },
         sortBy: {
             type: String,
-            default: '',
+            default: undefined,
         },
         sortDesc: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         selectIndex: {
             type: Array,
-            default: () => [],
+            default: undefined,
         },
         thisPage: {
             type: Number,
-            default: 1,
+            default: undefined,
         },
         pageSize: {
             type: Number,
-            default: 15,
+            default: undefined,
         },
         totalCount: {
             type: Number,
@@ -123,7 +124,7 @@ export default {
         },
         searchText: {
             type: String,
-            default: '',
+            default: undefined,
         },
         selectable: {
             type: Boolean,
@@ -149,41 +150,60 @@ export default {
     setup(props: SearchTableProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const localState = reactive({
+            selectIndex: props.selectIndex === undefined ? [] : props.selectIndex,
+            sortBy: props.sortBy === undefined ? '' : props.sortBy,
+            sortDesc: props.sortDesc === undefined ? true : props.sortDesc,
+            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
+            pageSize: props.pageSize === undefined ? 15 : props.pageSize,
+            searchText: props.searchText === undefined ? '' : props.searchText,
+        });
+
+
+        const proxyState = reactive({
+            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState, ['select']),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
+            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, localState),
+            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+            searchText: makeOptionalProxy<string>('searchText', vm, localState),
+        });
+
         const state = reactive({
-            /** table */
-            allPage: computed(() => Math.ceil(props.totalCount / props.pageSize) || 1),
-            proxySortBy: makeOptionalProxy('sortBy', vm),
-            proxySortDesc: makeOptionalProxy('sortDesc', vm),
-            proxySelectIndex: makeOptionalProxy('selectIndex', vm),
-            proxyThisPage: makeOptionalProxy('thisPage', vm),
-            proxyPageSize: makeOptionalProxy('pageSize', vm),
-            /** search */
-            proxySearchText: makeOptionalProxy('searchText', vm),
-            /** others */
+            allPage: computed(() => Math.ceil(props.totalCount / proxyState.pageSize) || 1),
             excludeSlotNames: ['toolbox-left', 'toolbox-bottom'],
         });
 
+        watch(() => props.selectIndex, (aft, bef) => {
+            /**
+             * 1. props 가 주어지지 않았을 때: 로컬 변수 사용. 판별: undefined
+             * 2. props 가 주어졌으나, 위에서 바꿔주는 처리를 해주고 있는지 모를 때:
+             *      로컬 변수 사용. props 값에 변경이 일어나면, 이를 로컬 변수에 적용.
+             *      판별: undefined 도 아니고, sync 도 없을 때.
+             * 3. 위에서 event 를 받아서 바꿔주는 처리를 해줄 때: props 값 사용. 판별: sync
+             */
+        });
+
         /** Event emitter */
-        const emitSelect = () => {
-            emit('select', [...state.proxySelectIndex]);
+        const emitSelect = (selectIndex) => {
+            proxyState.selectIndex = [...selectIndex];
         };
 
         const emitChange = (options: Partial<Options> = {}) => {
-            state.proxySelectIndex = [];
-            emitSelect();
+            emitSelect([]);
 
-            if (options.searchText !== undefined || state.proxyThisPage > state.proxyPageSize) {
+            if (options.searchText !== undefined || proxyState.thisPage > proxyState.pageSize) {
                 options.thisPage = 1;
-                state.proxyThisPage = 1;
+                proxyState.thisPage = 1;
             }
 
             // check if each option value is 'undefined' to escape auto type casting
             emit('change', {
-                sortBy: options.sortBy === undefined ? state.proxySortBy : options.sortBy,
-                sortDesc: options.sortDesc === undefined ? state.proxySortDesc : options.sortDesc,
-                thisPage: options.thisPage === undefined ? state.proxyThisPage : options.thisPage,
-                pageSize: options.pageSize === undefined ? state.proxyPageSize : options.pageSize,
-                searchText: options.searchText === undefined ? state.proxySearchText : options.searchText,
+                sortBy: options.sortBy === undefined ? proxyState.sortBy : options.sortBy,
+                sortDesc: options.sortDesc === undefined ? proxyState.sortDesc : options.sortDesc,
+                thisPage: options.thisPage === undefined ? proxyState.thisPage : options.thisPage,
+                pageSize: options.pageSize === undefined ? proxyState.pageSize : options.pageSize,
+                searchText: options.searchText === undefined ? proxyState.searchText : options.searchText,
             } as Options, options);
         };
 
@@ -209,25 +229,25 @@ export default {
         };
 
         const onSelect = (selectIndex: number[]) => {
-            state.proxySelectIndex = [...selectIndex];
-            emitSelect();
+            emitSelect(selectIndex);
         };
 
         const onSearch = async (val?: string) => {
-            state.proxySearchText = val || '';
+            proxyState.searchText = val || '';
             emitChange({ searchText: val || '' });
         };
 
         emit('init', {
-            sortBy: state.proxySortBy,
-            sortDesc: state.proxySortDesc,
-            thisPage: state.proxyThisPage,
-            pageSize: state.proxyPageSize,
-            searchText: state.proxySearchText,
+            sortBy: proxyState.sortBy,
+            sortDesc: proxyState.sortDesc,
+            thisPage: proxyState.thisPage,
+            pageSize: proxyState.pageSize,
+            searchText: proxyState.searchText,
         });
 
         return {
             ...toRefs(state),
+            proxyState,
             emitChange,
             emitExport,
             onChangePageSize,

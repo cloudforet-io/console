@@ -1,6 +1,6 @@
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, ref, Ref,
+    computed, getCurrentInstance, onMounted, onUnmounted, reactive, ref, Ref, UnwrapRef,
 } from '@vue/composition-api';
 import { every } from 'lodash';
 import VueI18n from 'vue-i18n';
@@ -47,20 +47,36 @@ export const makeProxy = <T extends any>(name: string, props: any, emit: any): R
 /**
  * make proxy computed or a value if there's no listener for tracking sync
  * @param name
- * @param props
- * @param emit
- * @return {Ref<*>}
+ * @param vm
+ * @param localState
+ * @return {Ref<*>|*}
  */
-export function makeOptionalProxy<T extends any>(name: string, vm: ComponentRenderProxy): Ref<T>|T {
-    if (vm.$listeners[`update:${name}`]) {
-        return computed({
-            get: () => vm.$props[name],
-            set: (val) => {
+export function makeOptionalProxy <T=any>(name: string, vm, localState?: UnwrapRef<any>, events?: string[]) {
+    if (!localState) return vm.$props[name];
+
+    let propsVal = vm.$props[name];
+    let localVal = localState[name];
+    return computed<T>({
+        set(val) {
+            if (vm.$listeners[`update:${name}`]) {
                 vm.$emit(`update:${name}`, val);
-            },
-        });
-    }
-    return vm.$props[name];
+            } else localState[name] = val;
+            if (Array.isArray(events)) events.forEach(d => vm.$emit(d, val));
+        },
+        get() {
+            if (vm.$listeners[`update:${name}`]) return vm.$props[name];
+            if (vm.$props[name] === undefined) return localState[name];
+
+            if (vm.$props[name] !== propsVal) {
+                propsVal = vm.$props[name];
+                localState[name] = propsVal;
+            } else if (localState[name] !== localVal) {
+                localVal = localState[name];
+                localState[name] = localVal;
+            }
+            return localState[name];
+        },
+    });
 }
 
 

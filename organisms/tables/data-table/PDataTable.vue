@@ -70,7 +70,9 @@
                 <tbody>
                     <slot v-if="showNoData" name="no-data" :fields="fieldsData">
                         <div class="no-data">
-                            <slot name="no-data-format" :fields="fieldsData">No Items</slot>
+                            <slot name="no-data-format" :fields="fieldsData">
+                                No Items
+                            </slot>
                         </div>
                         <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
                     </slot>
@@ -105,12 +107,12 @@
                                         @mouseleave="hoverIndex=null"
                                     >
                                         <p-check-box v-if="multiSelect"
-                                                     v-model="proxySelectIndex"
+                                                     v-model="proxyState.selectIndex"
                                                      :value="index"
                                                      :hovered="hoverIndex===index"
                                         />
                                         <p-radio v-else
-                                                 v-model="proxySelectIndex[0]"
+                                                 v-model="proxyState.selectIndex[0]"
                                                  :value="index"
                                                  :hovered="hoverIndex===index"
                                         />
@@ -169,7 +171,7 @@ import {
 } from 'lodash';
 
 import {
-    toRefs, computed, reactive, watch, onMounted, Ref, ref,
+    toRefs, computed, reactive, watch, onMounted, Ref, ref, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
@@ -179,7 +181,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { PDataTableProps, DataTableField } from '@/components/organisms/tables/data-table/type';
 import { copyAnyData, copyTextToClipboard } from '@/components/util/helpers';
-import { windowEventMount } from '@/components/util/composition-helpers';
+import { makeOptionalProxy, windowEventMount } from '@/components/util/composition-helpers';
 
 const color = ['default', 'light', 'primary4'];
 
@@ -211,11 +213,11 @@ export default {
         },
         sortBy: {
             type: String,
-            default: null,
+            default: undefined,
         },
         sortDesc: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         colCopy: {
             type: Boolean,
@@ -227,7 +229,7 @@ export default {
         },
         selectIndex: {
             type: [Array, Number],
-            default: () => [],
+            default: undefined,
         },
         multiSelect: {
             type: Boolean,
@@ -278,19 +280,27 @@ export default {
         },
     },
     setup(props: PDataTableProps, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const localState = reactive({
+            selectIndex: props.selectIndex === undefined ? [] : props.selectIndex,
+            sortBy: props.sortBy === undefined ? '' : props.sortBy,
+            sortDesc: props.sortDesc === undefined ? true : props.sortDesc,
+        });
+
+
+        const proxyState = reactive({
+            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
+            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, localState),
+        });
+
         const state = reactive({
             table: null,
             allState: false,
             hoverIndex: null,
             thHoverIndex: null,
         });
-        const proxySelectIndex: Ref<number[]> = computed({
-            set(val) {
-                context.emit('update:selectIndex', val);
-                context.emit('select', val);
-            },
-            get() { return props.selectIndex; },
-        }) as unknown as Ref<number[]>;
         const fieldsData: Ref<any> = computed(() => {
             const data = flatMap(props.fields, (value: string|object) => {
                 if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
@@ -299,7 +309,7 @@ export default {
             return data;
         });
         const fieldsName = computed(() => flatMap(fieldsData.value, field => field.name));
-        const sortIcon = computed(() => (props.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
+        const sortIcon = computed(() => (proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
         // @ts-ignore
         const copyTargetElement = computed(() => state.table.children[1].children);
 
@@ -341,10 +351,10 @@ export default {
             if (!hasSelectData()) {
                 if (!props.multiSelect) return;
 
-                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && (proxySelectIndex.value as Array<any>).length > 0) {
+                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && (proxyState.selectIndex as Array<any>).length > 0) {
                     let result = '';
-                    if (Array.isArray(proxySelectIndex.value)) {
-                        proxySelectIndex.value.forEach((tr) => {
+                    if (Array.isArray(proxyState.selectIndex)) {
+                        proxyState.selectIndex.forEach((tr) => {
                             result += makeTableText(copyTargetElement.value[tr]);
                         });
                     }
@@ -352,9 +362,9 @@ export default {
                 }
             }
         };
-        const isSelected = index => (props.multiSelect ? proxySelectIndex.value.indexOf(index) !== -1 : proxySelectIndex.value[0] === index);
+        const isSelected = index => (props.multiSelect ? proxyState.selectIndex.indexOf(index) !== -1 : proxyState.selectIndex[0] === index);
         const checkboxToggle = (index) => {
-            const newSelected = [...proxySelectIndex.value];
+            const newSelected = [...proxyState.selectIndex];
             if (isSelected(index)) {
                 const idx = newSelected.indexOf(index);
                 newSelected.splice(idx, 1);
@@ -362,7 +372,7 @@ export default {
             } else {
                 newSelected.push(index);
             }
-            proxySelectIndex.value = newSelected;
+            proxyState.selectIndex = newSelected;
         };
         const rowLeftClick = (item, index, event) => {
             context.emit('rowLeftClick', item, index, event);
@@ -377,7 +387,7 @@ export default {
                     return;
                 }
             }
-            proxySelectIndex.value = [index];
+            proxyState.selectIndex = [index];
         };
         const rowRightClick = (item, index, event) => {
             context.emit('rowRightClick', item, index, event);
@@ -394,8 +404,8 @@ export default {
         const theadClick = (field, index, event) => {
             if (props.sortable && field.sortable) {
                 const clickedKey = field.sortKey || field.name;
-                let sortBy = props.sortBy;
-                let sortDesc = props.sortDesc;
+                let sortBy = proxyState.sortBy;
+                let sortDesc = proxyState.sortDesc;
 
                 // when clicked the same thead
                 if (sortBy === clickedKey) {
@@ -414,6 +424,9 @@ export default {
                     sortDesc = true;
                 }
 
+                // set changed values
+                localState.sortBy = sortBy;
+                localState.sortDesc = sortDesc;
                 context.emit('update:sortBy', sortBy);
                 context.emit('update:sortDesc', sortDesc);
                 context.emit('changeSort', sortBy, sortDesc);
@@ -426,13 +439,13 @@ export default {
         };
         const selectAllToggle = () => {
             if (state.allState) {
-                proxySelectIndex.value = Array.from(new Array(props.items.length).keys());
+                proxyState.selectIndex = Array.from(new Array(props.items.length).keys());
             } else {
-                proxySelectIndex.value = [];
+                proxyState.selectIndex = [];
             }
         };
         const getSelectItem = (sortable) => {
-            const selectedIndex = sortable ? proxySelectIndex.value : proxySelectIndex.value.sort((a, b) => a - b);
+            const selectedIndex = sortable ? proxyState.selectIndex : proxyState.selectIndex.sort((a, b) => a - b);
             const selectItem = [];
             // @ts-ignore
             selectedIndex.forEach((index) => {
@@ -462,8 +475,8 @@ export default {
         }
 
 
-        watch(() => proxySelectIndex.value, () => {
-            if (props.items && props.items.length && props.items.length === (proxySelectIndex.value as any[]).length) {
+        watch(() => proxyState.selectIndex, () => {
+            if (props.items && props.items.length && props.items.length === (proxyState.selectIndex as any[]).length) {
                 state.allState = true;
             } else {
                 state.allState = false;
@@ -550,8 +563,8 @@ export default {
 
 
         return {
+            proxyState,
             ...toRefs(state),
-            proxySelectIndex,
             fieldsData,
             fieldsName,
             sortIcon,
