@@ -48,7 +48,6 @@
 
 <script lang="ts">
 import PQuerySearch from '@/components/organisms/search/query-search/PQuerySearch.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import {
     ComponentRenderProxy,

@@ -85,6 +85,7 @@ import {
 } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { ToolboxGridLayoutProps } from '@/components/organisms/layouts/toolbox-grid-layout/type';
 
 export default {
     name: 'PToolboxGridLayout',
@@ -180,7 +181,7 @@ export default {
             default: 1,
         },
     },
-    setup(props, context) {
+    setup(props: ToolboxGridLayoutProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const localState = reactive({

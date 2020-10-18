@@ -15,14 +15,59 @@
 
 <script lang="ts">
 import { reactive, computed, toRefs } from '@vue/composition-api';
-import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
+import { GridLayoutProps } from '@/components/molecules/layouts/grid-layout/type';
 
 export default {
     name: 'PGridLayout',
     components: {
     },
-    props: gridLayoutProps,
-    setup(props, context) {
+    props: {
+        cardMinWidth: {
+            type: String,
+            default: '12rem',
+        },
+        cardMaxWidth: {
+            type: String,
+            default: '1fr',
+        },
+        cardHeight: {
+            type: String,
+            default: '20rem',
+        },
+        rowGap: {
+            type: String,
+            default: '1rem',
+        },
+        fixColumn: {
+            type: Number,
+            default: null,
+        },
+        columnGap: {
+            type: String,
+            default: '1rem',
+        },
+        cardClass: {
+            type: Function,
+            default: () => ['card-item'],
+        },
+        cardStyle: {
+            type: Function,
+            default: () => ({}),
+        },
+        items: {
+            type: Array,
+            default: () => [],
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        selectItem: {
+            type: String,
+            default: '',
+        },
+    },
+    setup(props: GridLayoutProps, context) {
         const state = reactive({
             containerStyle: computed(() => ({
                 display: 'grid',
