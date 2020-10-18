@@ -1,7 +1,7 @@
 import { toRefs, reactive } from '@vue/composition-api';
 import { boolean, text } from '@storybook/addon-knobs/vue';
-import PFieldGroup from './FieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import PFieldGroup from './PFieldGroup.vue';
 
 export default {
     title: 'molecules/forms/fieldGroup',

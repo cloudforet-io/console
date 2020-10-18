@@ -19,7 +19,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase,vue/prop-name-casing,@typescript-eslint/camelcase */
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 
 import {
     computed, defineComponent, onMounted, reactive, toRefs, UnwrapRef,

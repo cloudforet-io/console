@@ -34,7 +34,7 @@
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
 import PInputText from '@/components/atoms/inputs/PTextInput.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import { DictInputProps } from '@/components/molecules/forms/dict-input/type';
 
 export default defineComponent({

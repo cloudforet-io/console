@@ -55,7 +55,7 @@ import {
 } from '@/components/util/composition-helpers';
 
 
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 
 const PTextInput = () => import('@/components/atoms/inputs/PTextInput.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/PRadio.vue');
