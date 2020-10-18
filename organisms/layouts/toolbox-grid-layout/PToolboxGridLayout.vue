@@ -76,7 +76,7 @@
 <script lang="ts">
 import { flatMap } from 'lodash';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
-import PTextPagination from '@/components/organisms/pagination/PTextPagination.vue';
+import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import {

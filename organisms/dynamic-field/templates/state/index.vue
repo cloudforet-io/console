@@ -1,11 +1,11 @@
 <script lang="ts">
 import { get } from 'lodash';
 import PStatus from '@/components/molecules/status/PStatus.vue';
-import { getColor } from '@/components/organisms/dynamic-field/PDynamicField.toolset';
 import { StatusProps } from '@/components/molecules/status/type';
 import { StateOptions, TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { StateDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/state/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
+import {getColor} from "@/components/util/helpers";
 
 export default {
     name: 'PDynamicFieldState',

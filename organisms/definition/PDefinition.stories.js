@@ -6,7 +6,6 @@ import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import { definitionProps } from '@/components/organisms/definition/PDefinition.toolset';
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 
 export default {
@@ -24,7 +23,29 @@ export default {
 
 export const defaultCase = () => ({
     components: { PDefinition },
-    props: getKnobProps(definitionProps, {
+    props: getKnobProps({
+        name: {
+            type: String,
+            required: true,
+        },
+        label: {
+            type: String,
+            default: '',
+        },
+        data: {
+            type: [String, Object, Array, Boolean, Number],
+            default: undefined,
+        },
+        options: {
+            type: Object,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            default: () => ({}),
+        },
+        type: {
+            type: String,
+            default: 'text',
+        },
+    }, {
         name: 'name',
         data: 'data',
     }),

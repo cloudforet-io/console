@@ -1,10 +1,10 @@
 import { number } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PBottomPagination from '@/components/organisms/pagination/PPagination.vue';
+import PBottomPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
-    title: 'organisms/bottom-pagination',
+    title: 'organisms/bottom-paginations',
     component: PBottomPagination,
     parameters: {
         info: {
@@ -20,7 +20,7 @@ const actions = {
 
 export const base = () => ({
     components: { PBottomPagination },
-    template: '<p-bottom-pagination :thisPage.sync="thisPage" :allPage="allPage" @updatePage="updatePage" @clickPage="clickPage"/>',
+    template: '<p-bottom-paginations :thisPage.sync="thisPage" :allPage="allPage" @updatePage="updatePage" @clickPage="clickPage"/>',
     props: {
         allPage: {
             default: number('allPage', 10, { min: 1 }),
@@ -48,7 +48,7 @@ export const base = () => ({
 
 export const autoDisabledButton = () => ({
     components: { PBottomPagination },
-    template: '<p-bottom-pagination :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
+    template: '<p-bottom-paginations :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
     data() {
         return {
             allPage: 10,

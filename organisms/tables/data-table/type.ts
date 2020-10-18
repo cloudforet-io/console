@@ -12,7 +12,7 @@ export interface DataTableEventListeners {
     'update:sortDesc'?: (sortDesc: boolean) => void|Promise<void>;
 }
 
-interface DataTableFieldType {
+export interface DataTableFieldType {
     name: string;
     label?: string;
     sortable?: boolean;

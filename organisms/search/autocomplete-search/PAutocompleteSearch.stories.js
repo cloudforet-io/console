@@ -9,7 +9,67 @@ import {
 import casual, { arrayOf } from '@/components/util/casual';
 import md from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.md';
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
-import { autocompleteSearchProps, plainAutocompleteHandler } from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
+import Fuse from 'fuse.js';
+
+
+const autocompleteSearchProps = {
+    value: {
+        type: String,
+        default: '',
+    },
+    placeholder: {
+        type: String,
+        default: 'Search',
+    },
+    focused: {
+        type: Boolean,
+        default: false,
+    },
+    disableIcon: {
+        type: Boolean,
+        default: false,
+    },
+    menu: {
+        type: Array,
+        default: () => [],
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    visibleMenu: {
+        type: Boolean,
+        default: undefined,
+    },
+    isFocused: {
+        type: Boolean,
+        default: undefined,
+    },
+    handler: {
+        type: Function,
+        default: null,
+    },
+};
+
+function plainAutocompleteHandler(inputText, list, key) {
+    let res = list;
+    if (inputText.trim()) {
+        const options = {};
+        if (key) options.keys = [key];
+        const fuse = new Fuse(list, options);
+        res = fuse.search(inputText);
+    }
+
+    // @ts-ignore
+    return res.map((d) => {
+        const value = key ? d[key] : d;
+        return {
+            type: 'item',
+            label: value,
+            name: value,
+        };
+    });
+}
 
 export default {
     title: 'organisms/search/AutocompleteSearch',

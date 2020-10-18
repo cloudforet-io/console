@@ -1,4 +1,4 @@
-import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/type';
 
 export interface SearchTableProps {
     fields: DataTableFieldType[];

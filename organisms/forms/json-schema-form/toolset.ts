@@ -27,8 +27,6 @@ export interface JsonSchemaFormSyncStateType {
   item: {[key: string]: any};
 }
 
-export interface JsonSchemaFormProps extends JsonSchemaFormStateType, JsonSchemaFormSyncStateType{
-}
 
 @StateToolSet<JsonSchemaFormStateType>()
 @SyncStateToolSet<JsonSchemaFormSyncStateType>()

@@ -37,14 +37,30 @@ import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.
 import PI from '@/components/atoms/icons/PI.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
 import {
-    widgetLayoutProps,
     WidgetLayoutPropsType,
-} from '@/components/organisms/layouts/widget-layout/PWidgetLayout.toolset';
+} from '@/components/organisms/layouts/widget-layout/type';
 
 export default {
     name: 'PWidgetLayout',
     components: { PPaneLayout, PI, PTooltipButton },
-    props: widgetLayoutProps,
+    props: {
+        title: {
+            type: String,
+            default: '',
+        },
+        help: {
+            type: String,
+            default: '',
+        },
+        titleStyle: {
+            type: Object,
+            default: () => ({}),
+        },
+        subTitle: {
+            type: String,
+            default: '',
+        },
+    },
     setup(props: WidgetLayoutPropsType) {
         return {};
     },

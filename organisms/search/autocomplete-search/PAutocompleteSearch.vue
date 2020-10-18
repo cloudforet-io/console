@@ -33,9 +33,8 @@
 <script lang="ts">
 
 import {
-    autocompleteSearchProps,
     AutocompleteSearchProps,
-} from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.toolset';
+} from '@/components/organisms/search/autocomplete-search/type';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     computed, onMounted, onUnmounted, reactive, toRefs,
@@ -51,7 +50,44 @@ export default {
         prop: 'value',
         event: 'update:value',
     },
-    props: autocompleteSearchProps,
+    props: {
+        value: {
+            type: String,
+            default: '',
+        },
+        placeholder: {
+            type: String,
+            default: 'Search',
+        },
+        focused: {
+            type: Boolean,
+            default: false,
+        },
+        disableIcon: {
+            type: Boolean,
+            default: false,
+        },
+        menu: {
+            type: Array,
+            default: () => [],
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        visibleMenu: {
+            type: Boolean,
+            default: undefined,
+        },
+        isFocused: {
+            type: Boolean,
+            default: undefined,
+        },
+        handler: {
+            type: Function,
+            default: null,
+        },
+    },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const state: any = reactive({
             searchRef: null,

@@ -1,6 +1,6 @@
-import { DataTableFieldType } from '@/components/organisms/tables/data-table/PDataTable.toolset';
 import { KeyItem, QueryItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/type';
 
 export interface QuerySearchTableProps {
     fields: DataTableFieldType[];

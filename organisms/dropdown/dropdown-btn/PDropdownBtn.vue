@@ -30,12 +30,43 @@
 import { reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import { DropdownBtnProps, dropdownBtnProps } from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.toolset';
+import { DropdownBtnProps } from '@/components/organisms/dropdown/dropdown-btn/type';
+import { BUTTON_STYLE_TYPE } from '@/components/molecules/buttons/icon-button/type';
 
 export default {
     name: 'PDropdownBtn',
     components: { PButton, PIconButton },
-    props: dropdownBtnProps,
+    props: {
+        /* sync */
+        popup: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        block: {
+            type: Boolean,
+            default: false,
+        },
+        buttonOnly: {
+            type: Boolean,
+            default: false,
+        },
+        buttonIcon: {
+            type: String,
+            default: undefined,
+        },
+        buttonStyleType: {
+            type: String,
+            default: undefined,
+            validator: (value) => {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+            },
+        },
+    },
     setup(props: DropdownBtnProps, { emit }) {
         const state = reactive({
             mouseover: false,

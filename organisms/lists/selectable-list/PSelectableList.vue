@@ -30,7 +30,7 @@ import { get, indexOf } from 'lodash';
 import {
     reactive, toRefs,
 } from '@vue/composition-api';
-import { selectableListProps, SelectableListPropsType, MapperKeyType } from '@/components/organisms/lists/selectable-list/PSelectableList.toolset';
+import { SelectableListProps, MapperKeyType } from '@/components/organisms/lists/selectable-list/type';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
@@ -39,8 +39,50 @@ import { makeProxy } from '@/components/util/composition-helpers';
 export default {
     name: 'PSelectableList',
     components: { PSelectableItem, PLottie },
-    props: selectableListProps,
-    setup(props: SelectableListPropsType, { emit }) {
+    props: {
+        items: {
+            type: Array,
+            default: () => [],
+        },
+        /* sync */
+        selectedIndexes: {
+            type: Array,
+            default: () => [],
+        },
+        /* sync */
+        disabledIndexes: {
+            type: Array,
+            default: () => [],
+        },
+        mapper: {
+            type: Object,
+            required: true,
+        },
+        multiSelectable: {
+            type: Boolean,
+            default: true,
+        },
+        mustSelect: {
+            type: Boolean,
+            default: true,
+        },
+        defaultIcon: {
+            type: String,
+            default: '',
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        theme: {
+            type: String,
+            default: 'default',
+            validator(theme) {
+                return ['default', 'card'].includes(theme);
+            },
+        },
+    },
+    setup(props: SelectableListProps, { emit }) {
         const state = reactive({
             proxySelectedIndexes: makeProxy('selectedIndexes', props, emit),
             proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),

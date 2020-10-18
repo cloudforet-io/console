@@ -38,7 +38,7 @@ import { computed, ref } from '@vue/composition-api';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.vue';
 import { reduce } from 'lodash';
-import { dropdownMenuBtnProps } from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.toolset';
+import { BUTTON_STYLE_TYPE } from '@/components/molecules/buttons/icon-button/type';
 
 export default {
     name: 'PDropdownMenuBtn',
@@ -46,7 +46,44 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     components: { PDropdownBtn, PContextMenu },
-    props: dropdownMenuBtnProps,
+    props: {
+        menu: {
+            type: [Array, Object],
+            default: () => [],
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        autoHeight: {
+            type: Boolean,
+            default: false,
+        },
+        block: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        buttonOnly: {
+            type: Boolean,
+            default: false,
+        },
+        buttonIcon: {
+            type: String,
+            default: undefined,
+        },
+        buttonStyleType: {
+            type: String,
+            default: undefined,
+            validator: (value) => {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+            },
+        },
+    },
     setup(props, { emit, slots }) {
         const popup = ref(false);
         const outsideClick = (): void => { popup.value = false; };

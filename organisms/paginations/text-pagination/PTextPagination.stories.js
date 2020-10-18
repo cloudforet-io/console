@@ -1,9 +1,9 @@
 import { number } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PTextPagination from '@/components/organisms/pagination/PTextPagination.vue';
+import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
 
 export default {
-    title: 'organisms/pagination',
+    title: 'organisms/paginations',
     component: PTextPagination,
     parameters: {
         info: {
@@ -18,7 +18,7 @@ const actions = {
 
 export const base = () => ({
     components: { PTextPagination },
-    template: '<p-text-pagination :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
+    template: '<p-text-paginations :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
     data() {
         return {
             thisPage: 1,
@@ -36,7 +36,7 @@ export const base = () => ({
 
 export const autoDisabledButton = () => ({
     components: { PTextPagination },
-    template: '<p-text-pagination :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
+    template: '<p-text-paginations :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
     data() {
         return {
             allPage: 10,

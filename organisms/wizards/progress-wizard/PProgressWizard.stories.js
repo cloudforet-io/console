@@ -5,7 +5,6 @@ import { toRefs, reactive, ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import { VTooltip } from 'v-tooltip';
 import { getKnobProps } from '@sb/storybook-util';
-import { progressWizardProps } from '@/components/organisms/wizards/progress-wizard/PProgressWizard.toolset';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
 
 
@@ -40,7 +39,41 @@ const actions = () => ({
 
 export const defaultCase = () => ({
     components: { PProgressWizard },
-    props: getKnobProps(progressWizardProps, {
+    props: getKnobProps({
+        tabs: {
+            type: Array,
+            default: () => [],
+        },
+        /** sync */
+        activeIdx: {
+            type: Number,
+            default: 0,
+        },
+        invalidState: {
+            type: Object,
+            default: () => ({}),
+        },
+        cancelBtnBind: {
+            type: Object,
+            default: () => ({}),
+        },
+        navigationBtnBind: {
+            type: Object,
+            default: () => ({}),
+        },
+        confirmBtnBind: {
+            type: Object,
+            default: () => ({}),
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+    }, {
         title: 'Wizard Title',
         tabs: [
             {

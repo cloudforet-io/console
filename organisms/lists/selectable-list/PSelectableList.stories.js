@@ -6,7 +6,6 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { selectableListProps } from '@/components/organisms/lists/selectable-list/PSelectableList.toolset';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 
 export default {
@@ -21,7 +20,49 @@ export default {
     },
 };
 
-const getProps = () => getKnobProps(selectableListProps, {
+const getProps = () => getKnobProps({
+    items: {
+        type: Array,
+        default: () => [],
+    },
+    /* sync */
+    selectedIndexes: {
+        type: Array,
+        default: () => [],
+    },
+    /* sync */
+    disabledIndexes: {
+        type: Array,
+        default: () => [],
+    },
+    mapper: {
+        type: Object,
+        required: true,
+    },
+    multiSelectable: {
+        type: Boolean,
+        default: true,
+    },
+    mustSelect: {
+        type: Boolean,
+        default: true,
+    },
+    defaultIcon: {
+        type: String,
+        default: '',
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    theme: {
+        type: String,
+        default: 'default',
+        validator(theme) {
+            return ['default', 'card'].includes(theme);
+        },
+    },
+}, {
     items: [
         {
             id: '1',
@@ -114,7 +155,49 @@ export const extraSlot = () => ({
 
 export const cardTheme = () => ({
     components: { PSelectableList },
-    props: getKnobProps(selectableListProps, {
+    props: getKnobProps({
+        items: {
+            type: Array,
+            default: () => [],
+        },
+        /* sync */
+        selectedIndexes: {
+            type: Array,
+            default: () => [],
+        },
+        /* sync */
+        disabledIndexes: {
+            type: Array,
+            default: () => [],
+        },
+        mapper: {
+            type: Object,
+            required: true,
+        },
+        multiSelectable: {
+            type: Boolean,
+            default: true,
+        },
+        mustSelect: {
+            type: Boolean,
+            default: true,
+        },
+        defaultIcon: {
+            type: String,
+            default: '',
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        theme: {
+            type: String,
+            default: 'default',
+            validator(theme) {
+                return ['default', 'card'].includes(theme);
+            },
+        },
+    }, {
         items: [
             {
                 id: '1',

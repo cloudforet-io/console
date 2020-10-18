@@ -93,8 +93,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import {
     ProgressWizardProps,
-    progressWizardProps,
-} from '@/components/organisms/wizards/progress-wizard/PProgressWizard.toolset';
+} from '@/components/organisms/wizards/progress-wizard/type';
 import PLoadingButton from '@/components/molecules/buttons/loading-button/PLoadingButton.vue';
 
 
@@ -135,7 +134,41 @@ export default {
         PI,
         PButton,
     },
-    props: progressWizardProps,
+    props: {
+        tabs: {
+            type: Array,
+            default: () => [],
+        },
+        /** sync */
+        activeIdx: {
+            type: Number,
+            default: 0,
+        },
+        invalidState: {
+            type: Object,
+            default: () => ({}),
+        },
+        cancelBtnBind: {
+            type: Object,
+            default: () => ({}),
+        },
+        navigationBtnBind: {
+            type: Object,
+            default: () => ({}),
+        },
+        confirmBtnBind: {
+            type: Object,
+            default: () => ({}),
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props: ProgressWizardProps, { emit }) {
         const state = reactive({
             proxyActiveIdx: makeProxy('activeIdx', props, emit),
