@@ -172,7 +172,7 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { Filter } from '@/lib/space-connector/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import axios, { CancelTokenSource } from 'axios';
-import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';

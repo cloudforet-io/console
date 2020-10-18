@@ -53,11 +53,7 @@ export { default as PDynamicField } from './components/organisms/dynamic-field/P
 // organisms forms
 export { default as PJsonSchemaFieldGroup } from './components/organisms/forms/json-schema-field-group/PJsonSchemaFieldGroup.vue';
 export { default as PJsonSchemaForm } from './components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
-import * as PJsonSchemaFormToolSet from './components/organisms/forms/json-schema-form/toolset';
 
 // organisms tables
 export { default as PDataTable } from './components/organisms/tables/data-table/PDataTable.vue';
-import * as PDataTableToolSet from './components/organisms/tables/data-table/PDataTable.toolset';
-export { default as PToolboxTable } from './components/organisms/tables/toolbox-table/PToolboxTable.vue';
-import * as PToolboxTableToolSet from './components/organisms/tables/toolbox-table/PToolboxTable.toolset';
 

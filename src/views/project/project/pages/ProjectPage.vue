@@ -258,7 +258,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { Location } from 'vue-router';
-import { getAllPage } from '@/components/organisms/pagination/PTextPagination.toolset';
+import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ListType, TimeStamp } from '@/models';

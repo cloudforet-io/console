@@ -129,7 +129,7 @@ import PCollectorHistoryJob from '@/views/management/collector-history/modules/C
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PPagination from '@/components/organisms/pagination/PPagination.vue';
+import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
