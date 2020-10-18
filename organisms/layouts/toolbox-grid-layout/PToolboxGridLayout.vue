@@ -1,5 +1,5 @@
 <template>
-    <div class="grid-list-container">
+    <div class="p-toolbox-grid-layout">
         <div class="toolbox">
             <div class="toolbox-top">
                 <slot name="toolbox-top" />
@@ -83,10 +83,8 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
-import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/PGridLayout.toolset';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 export default {
     name: 'PToolboxGridLayout',
@@ -99,7 +97,50 @@ export default {
     },
     events: ['pageChange', 'select', 'clickRefresh'],
     props: {
-        ...gridLayoutProps,
+        cardMinWidth: {
+            type: String,
+            default: '12rem',
+        },
+        cardMaxWidth: {
+            type: String,
+            default: '1fr',
+        },
+        cardHeight: {
+            type: String,
+            default: '20rem',
+        },
+        rowGap: {
+            type: String,
+            default: '1rem',
+        },
+        fixColumn: {
+            type: Number,
+            default: null,
+        },
+        columnGap: {
+            type: String,
+            default: '1rem',
+        },
+        cardClass: {
+            type: Function,
+            default: () => ['card-item'],
+        },
+        cardStyle: {
+            type: Function,
+            default: () => ({}),
+        },
+        items: {
+            type: Array,
+            default: () => [],
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        selectItem: {
+            type: String,
+            default: '',
+        },
         paginationVisible: {
             type: Boolean,
             default: true,
@@ -178,30 +219,33 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-    .grid-list-container {
-        @apply flex flex-col w-full h-full;
-    }
-    .transition-group {
-        @apply relative h-full w-full;
-    }
-    .transition-item {
-        @apply w-full h-full;
-    }
-    .fade-in-leave-active, .fade-in-enter-active {
-        @apply absolute;
-        transition: opacity 0.25s;
-    }
-    .fade-in-leave-to, .fade-in-enter {
-        opacity: 0;
-    }
-    .fade-in-enter-to, .fade-in-leave {
-        opacity: 1;
-    }
+<style lang="postcss">
+    .p-toolbox-grid-layout {
+        $min-height: 16.875rem;
 
-    /* .toolbox { */
+        @apply relative flex flex-col w-full h-full;
+        min-height: $min-height;
 
-    /*    margin-top: 0.5rem; */
+        .transition-group {
+            @apply relative h-full w-full;
+        }
+        .transition-item {
+            @apply w-full h-full;
+        }
+        .fade-in-leave-active, .fade-in-enter-active {
+            @apply absolute;
+            transition: opacity 0.25s;
+        }
+        .fade-in-leave-to, .fade-in-enter {
+            opacity: 0;
+        }
+        .fade-in-enter-to, .fade-in-leave {
+            opacity: 1;
+        }
+
+        /* .toolbox { */
+
+        /*    margin-top: 0.5rem; */
         .toolbox-middle {
             @apply flex flex-no-wrap justify-between items-center mb-6;
             .left {
@@ -220,31 +264,30 @@ export default {
             }
         }
 
-    .loading-backdrop {
-        @apply absolute w-full h-full overflow-hidden;
-        background-color: white;
-        opacity: 0.5;
-        top: 0;
-        z-index: 1;
+        .loading-backdrop {
+            @apply absolute w-full h-full overflow-hidden;
+            background-color: white;
+            opacity: 0.5;
+            top: 0;
+            z-index: 1;
+        }
+        .loading-spinner {
+            @apply absolute flex justify-center items-center w-full;
+            z-index: 1;
+            height: $min-height;
+        }
+        /* transitions */
+        .fade-in-enter-active {
+            transition: opacity 0.2s;
+        }
+        .fade-in-leave-active {
+            transition: opacity 0.2s;
+        }
+        .fade-in-enter, .fade-in-leave-to {
+            opacity: 0;
+        }
+        .fade-in-leave, .fade-in-enter-to {
+            opacity: 0.5;
+        }
     }
-    .loading-spinner {
-        @apply absolute flex justify-center items-center;
-        z-index: 1;
-        width: 80%;
-        height: 50%;
-    }
-    /* transitions */
-    .fade-in-enter-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-leave-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-enter, .fade-in-leave-to {
-        opacity: 0;
-    }
-    .fade-in-leave, .fade-in-enter-to {
-        opacity: 0.5;
-    }
-
 </style>
