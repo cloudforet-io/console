@@ -589,9 +589,8 @@ export default {
 
         /** ******* Page Init ******* */
         const init = async () => {
-            await getTableSchema();
             await store.dispatch('resource/loadAll');
-            await listServerData();
+            await getTableSchema();
         };
 
         init();
