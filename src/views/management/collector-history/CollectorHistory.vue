@@ -78,9 +78,7 @@
                     <p-pagination :total-count="totalCount"
                                   :this-page.sync="thisPage"
                                   :page-size.sync="pageSize"
-                                  @prevPage="onClickPrevPageButton"
-                                  @nextPage="onClickNextPageButton"
-                                  @clickPage="onClickPageNumber"
+                                  @change="onPaginationChange"
                     />
                 </div>
             </p-pane-layout>
@@ -342,7 +340,6 @@ export default {
                 const res = await SpaceConnector.client.inventory.job.list({ query });
                 state.jobs = res.results;
                 state.totalCount = res.total_count;
-
                 convertJobsToFieldItem(res.results);
             } catch (e) {
                 console.error(e);
@@ -377,19 +374,10 @@ export default {
                 console.error(e);
             }
         };
-        const onClickPageNumber = async (page) => {
-            state.thisPage = page;
+        const onPaginationChange = async () => {
             await getJobs();
         };
-        const onClickPrevPageButton = async (page) => {
-            state.thisPage = page - 1;
-            if (state.thisPage <= 0) state.thisPage = 1;
-            await getJobs();
-        };
-        const onClickNextPageButton = async (page) => {
-            state.thisPage = page + 1;
-            await getJobs();
-        };
+
         const onClickGoBack = () => {
             state.selectedJobId = '';
             // eslint-disable-next-line no-empty-function
@@ -436,9 +424,7 @@ export default {
             handlers,
             onSelect,
             onChange,
-            onClickPageNumber,
-            onClickPrevPageButton,
-            onClickNextPageButton,
+            onPaginationChange,
             onClickGoBack,
             onClickStatus,
             statusFormatter,

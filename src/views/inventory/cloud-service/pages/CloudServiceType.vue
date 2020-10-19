@@ -128,9 +128,7 @@
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
-                              @prevPage="prevPage"
-                              @nextPage="nextPage"
-                              @clickPage="clickPage"
+                              @change="onPaginationChange"
                 />
             </div>
         </template>
@@ -396,19 +394,7 @@ export default {
             await replaceQuery('filters', queryTagsToQueryString(options.queryTags));
         };
 
-        const clickPage = async (page) => {
-            state.thisPage = page;
-            await listCloudServiceType();
-        };
-
-        const prevPage = async (page) => {
-            state.thisPage = page - 1;
-            if (state.thisPage <= 0) state.thisPage = 1;
-            await listCloudServiceType();
-        };
-
-        const nextPage = async (page) => {
-            state.thisPage = page + 1;
+        const onPaginationChange = async () => {
             await listCloudServiceType();
         };
 
@@ -479,9 +465,7 @@ export default {
             providerState,
             getToCloudService,
             skeletons: range(5),
-            clickPage,
-            prevPage,
-            nextPage,
+            onPaginationChange,
             onChange,
         };
     },
