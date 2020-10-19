@@ -12,7 +12,9 @@
 
 <script lang="ts">
 import { cloneDeep } from 'lodash';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import VueFormJsonSchema from 'vue-form-json-schema/dist/vue-form-json-schema.esm';
 import {
@@ -39,15 +41,19 @@ export default {
             type: Boolean,
             default: false,
         },
+        showValidationErrors: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props: JsonSchemaFormProps, { emit }) {
         const state = reactive({
             proxyModel: makeProxy('model', props, emit),
             uiSchema: [] as UiSchema[],
-            options: {
+            options: computed(() => ({
                 castToSchemaType: true,
-                showValidationErrors: true,
-            },
+                showValidationErrors: props.showValidationErrors,
+            })),
             vueFormJsonSchemaState: {}, // contains information such as validation errors
         });
 

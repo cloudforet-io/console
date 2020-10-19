@@ -4,10 +4,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import {
-    CustomValidator, JsonSchemaFormToolSet,
-} from '@/components/organisms/forms/json-schema-form/toolset';
-import { JsonSchemaObjectType } from '@/components/util/type';
+// import { JsonSchemaObjectType } from '@/components/util/type';
 
 export default {
     title: 'organisms/forms/json-schema-form',
@@ -77,10 +74,9 @@ export const defaultCase = () => ({
     components: { PJsonSchemaForm, PButton },
     template: `
     <div style="width: 50rem">
-        <p-json-schema-form 
-                :model.sync="model" 
-                :schema="schema"
-                :is-valid.sync="isValid"
+        <p-json-schema-form :model.sync="model" 
+                            :schema="schema" 
+                            :is-valid.sync="isValid"
         />
         <pre>{{ model }}</pre>
     </div>
@@ -100,64 +96,73 @@ export const defaultCase = () => ({
 export const customSchemaForm = () => ({
     components: { PJsonSchemaForm, PButton },
     template: `
-    <div class="w-64">
-        <p-json-schema-form
-          v-bind="jscTS.state"
-          :item.sync="jscTS.syncState.item" 
+    <div>
+        <p-json-schema-form :model.sync="model"
+                            :schema="schema"
+                            :is-valid.sync="isValid"
+                            :show-validation-errors="showValidationErrors"
         />
-        <p-button style-type="primary" @click="jscTS.formState.validator()"> Validate!</p-button>
-        <pre>{{jscTS.syncState.item}}</pre>
+        <p-button style-type="primary" @click="validate()"> Validate!</p-button>
+        <pre>{{ model }}</pre>
+        <div>
+            <p>is valid {{ isValid }}</p>
+            <p>show validation errors: {{ showValidationErrors }}</p>
+        </div>
     </div>
   `,
-    setup(props, context) {
-        const jscTS = new JsonSchemaFormToolSet();
-        const schema = new JsonSchemaObjectType();
-        schema.addStringProperty('name', 'Name', true);
-        schema.addStringProperty('email', 'EMail', true);
-
-        jscTS.setProperty(schema, ['name', 'email']);
+    setup() {
+        const state = reactive({
+            schema: defaultSchema,
+            model: {},
+            isValid: false,
+            showValidationErrors: false,
+        });
+        const validate = () => {
+            state.showValidationErrors = true;
+        };
         return {
-            jscTS,
+            ...toRefs(state),
+            validate,
         };
     },
 });
 
-export const customValidatorForm = () => ({
-    components: { PJsonSchemaForm, PButton },
-    template: `
-    <div class="w-64">
-        <p-json-schema-form
-          v-bind="jscTS.state"
-          :item.sync="jscTS.syncState.item" 
-        />
-        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
-        <pre>{{jscTS.syncState.item}}</pre>
-    </div>
-  `,
-    setup(props, context) {
-        const jscTS = new JsonSchemaFormToolSet();
-        const checkEmail = (...args) => {
-            const prom = new Promise((resolve, reject) => {
-                const data = args[1] || '';
-                // console.debug(data.indexOf('@'));
-                if (data.indexOf('@') !== -1) {
-                    resolve(true);
-                }
-                resolve(false);
-            });
-            return prom;
-        };
-
-        const validation = {
-            isEmail: new CustomValidator(checkEmail, 'is it email?'),
-        };
-        const schema = new JsonSchemaObjectType(undefined, undefined, true);
-        schema.addStringProperty('name', 'Name', true);
-        schema.addStringProperty('emailDomain', 'EMail Domain', true, 'you start @ text', { isEmail: true });
-
-        jscTS.setProperty(schema, ['name', 'emailDomain'], validation);
-        return {
-            jscTS,
-        };
-    },
-});
+// export const customValidatorForm = () => ({
+//     components: { PJsonSchemaForm, PButton },
+//     template: `
+//     <div class="w-64">
+//         <p-json-schema-form
+//           v-bind="jscTS.state"
+//           :item.sync="jscTS.syncState.item"
+//         />
+//         <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
+//         <pre>{{jscTS.syncState.item}}</pre>
+//     </div>
+//   `,
+//     setup(props, context) {
+//         const jscTS = new JsonSchemaFormToolSet();
+//         const checkEmail = (...args) => {
+//             const prom = new Promise((resolve, reject) => {
+//                 const data = args[1] || '';
+//                 // console.debug(data.indexOf('@'));
+//                 if (data.indexOf('@') !== -1) {
+//                     resolve(true);
+//                 }
+//                 resolve(false);
+//             });
+//             return prom;
+//         };
+//
+//         const validation = {
+//             isEmail: new CustomValidator(checkEmail, 'is it email?'),
+//         };
+//         const schema = new JsonSchemaObjectType(undefined, undefined, true);
+//         schema.addStringProperty('name', 'Name', true);
+//         schema.addStringProperty('emailDomain', 'EMail Domain', true, 'you start @ text', { isEmail: true });
+//
+//         jscTS.setProperty(schema, ['name', 'emailDomain'], validation);
+//         return {
+//             jscTS,
+//         };
+//     },
+// });

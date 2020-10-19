@@ -18,6 +18,7 @@ export interface JsonSchemaFormProps {
     model: object;
     schema: JsonSchema;
     isValid: boolean;
+    showValidationErrors?: boolean;
 }
 
 // ui schema
