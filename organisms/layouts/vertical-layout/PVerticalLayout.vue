@@ -108,7 +108,7 @@ export default {
                 }
                 state.clientX = event.clientX;
             }
-            event.preventDefault();
+            // event.preventDefault();
         };
         const endResizing = () => {
             state.resizing = false;
