@@ -18,10 +18,11 @@
             <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key) || idx"
                                :icon-url="getItem(item, mapper.iconUrl) || undefined"
                                :title="getItem(item, mapper.title) || undefined"
-                               :active="proxySelectedIndexes.includes(idx)"
-                               :disabled="proxyDisabledIndexes.includes(idx)"
+                               :active="proxyState.selectedIndexes.includes(idx)"
+                               :disabled="disabled || proxyState.disabledIndexes.includes(idx)"
                                :color="getItem(item, mapper.color) || undefined"
                                :theme="theme"
+                               :default-icon="defaultIcon"
                                @click="onItemClick(item, idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -35,14 +36,16 @@
 </template>
 
 <script lang="ts">
-import { get, indexOf } from 'lodash';
+import { get, indexOf, findIndex } from 'lodash';
 import {
+    ComponentRenderProxy,
+    getCurrentInstance,
     reactive, toRefs,
 } from '@vue/composition-api';
 import { SelectableListProps, MapperKeyType } from '@/components/organisms/lists/selectable-list/type';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { makeProxy } from '@/components/util/composition-helpers';
+import { makeOptionalProxy, makeProxy } from '@/components/util/composition-helpers';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 
@@ -57,16 +60,20 @@ export default {
         /* sync */
         selectedIndexes: {
             type: Array,
-            default: () => [],
+            default: undefined,
         },
         /* sync */
         disabledIndexes: {
             type: Array,
-            default: () => [],
+            default: undefined,
+        },
+        disabled: {
+            type: Boolean,
+            default: undefined,
         },
         mapper: {
             type: Object,
-            required: true,
+            default: () => ({}),
         },
         multiSelectable: {
             type: Boolean,
@@ -93,9 +100,10 @@ export default {
         },
     },
     setup(props: SelectableListProps, { emit }) {
-        const state = reactive({
-            proxySelectedIndexes: makeProxy('selectedIndexes', props, emit),
-            proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const proxyState = reactive({
+            selectedIndexes: makeOptionalProxy('selectedIndexes', vm, []),
+            disabledIndexes: makeOptionalProxy('disabledIndexes', vm, []),
         });
 
         const getItem = (item, key: MapperKeyType) => {
@@ -104,21 +112,41 @@ export default {
         };
 
         const onItemClick = (item, idx) => {
-            const foundIdx = indexOf(state.proxySelectedIndexes, idx);
-            if (foundIdx !== -1) {
-                if (props.mustSelect && state.proxySelectedIndexes.length === 1) return;
-                state.proxySelectedIndexes.splice(foundIdx, 1);
-                emit('unselected', item, idx, state.proxySelectedIndexes);
-            } else if (props.multiSelectable || state.proxySelectedIndexes.length === 0) {
-                state.proxySelectedIndexes = [...state.proxySelectedIndexes, idx];
-                emit('selected', item, idx, state.proxySelectedIndexes);
+            // multi select case
+            if (props.multiSelectable) {
+                const foundIdx = findIndex(proxyState.selectedIndexes, idx);
+                if (foundIdx === -1) {
+                    if (props.mustSelect && proxyState.selectedIndexes.length === 1) return;
+                    proxyState.selectedIndexes.splice(foundIdx, 1);
+                    emit('unselected', item, idx, proxyState.selectedIndexes);
+                } else {
+                    proxyState.selectedIndexes = [...proxyState.selectedIndexes, idx];
+                    emit('selected', item, idx, proxyState.selectedIndexes);
+                }
+                return;
+            }
+
+            // single select case
+            if (proxyState.selectedIndexes.length === 0) {
+                console.debug('aaa');
+                proxyState.selectedIndexes = [idx];
+                emit('selected', item, idx, proxyState.selectedIndexes);
             } else {
-                state.proxySelectedIndexes = [idx];
-                emit('selected', item, idx, state.proxySelectedIndexes);
+                const isSame = proxyState.selectedIndexes[0] === idx;
+                if (props.mustSelect) {
+                    proxyState.selectedIndexes = [idx];
+                    if (!isSame) emit('selected', item, idx, proxyState.selectedIndexes);
+                    return;
+                }
+
+                if (isSame) {
+                    proxyState.selectedIndexes = [];
+                    emit('unselected', item, idx, proxyState.selectedIndexes);
+                }
             }
         };
         return {
-            ...toRefs(state),
+            proxyState,
             getItem,
             onItemClick,
         };

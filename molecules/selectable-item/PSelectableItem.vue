@@ -2,7 +2,8 @@
     <div class="item-container" :class="{
         active: active,
         [theme]: true,
-    }" v-on="$listeners"
+        disabled: disabled
+    }" v-on="itemListeners"
     >
         <slot name="bar" v-bind="$props">
             <div v-if="color" class="bar" :style="{color}" />
@@ -33,6 +34,10 @@
 <script lang="ts">
 import { SelectableItemPropsType } from '@/components/molecules/selectable-item/type';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { makeByPassListeners } from '@/components/util/composition-helpers';
 
 export default {
     name: 'PSelectableItem',
@@ -72,8 +77,17 @@ export default {
             },
         },
     },
-    setup(props: SelectableItemPropsType) {
+    setup(props: SelectableItemPropsType, { listeners }) {
+        const state = reactive({
+            itemListeners: computed(() => ({
+                ...listeners,
+                click(...args) {
+                    if (!props.disabled) makeByPassListeners(listeners, 'click', ...args);
+                },
+            })),
+        });
         return {
+            ...toRefs(state),
         };
     },
 };
@@ -103,10 +117,10 @@ export default {
     .contents {
         @apply flex items-center w-full content-between p-2 overflow-hidden leading-normal;
     }
-    &:hover {
+    &:not(.disabled):hover {
         background-color: $hover-bg-color;
     }
-    &.active {
+    &.active:not(.disabled) {
         background-color: $active-bg-color;
         color: $active-color;
         border-color: $active-color;
@@ -130,6 +144,11 @@ export default {
         .contents {
             padding: 0.5rem 1rem;
         }
+    }
+
+    &.disabled {
+        cursor: unset;
+        opacity: 0.5;
     }
 }
 

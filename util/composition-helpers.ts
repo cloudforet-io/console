@@ -54,13 +54,13 @@ export const makeProxy = <T extends any>(name: string, props: any, emit: any): R
  */
 export function makeOptionalProxy <T=any>(name: string, vm, initData: any, events?: string[]) {
     let propsVal = vm.$props[name];
-    let currentVal = propsVal === undefined ? initData : propsVal;
-    let prevVal = currentVal;
+    const currentVal = ref(propsVal === undefined ? initData : propsVal);
+    let prevVal = currentVal.value;
     return computed<T>({
         set(val) {
             if (vm.$listeners[`update:${name}`]) {
                 vm.$emit(`update:${name}`, val);
-            } else currentVal = val;
+            } else currentVal.value = val;
             if (Array.isArray(events)) events.forEach(d => vm.$emit(d, val));
         },
         get() {
@@ -68,12 +68,13 @@ export function makeOptionalProxy <T=any>(name: string, vm, initData: any, event
 
             if (vm.$props[name] !== propsVal) {
                 propsVal = vm.$props[name];
-                currentVal = propsVal;
-            } else if (currentVal !== prevVal) {
-                prevVal = currentVal;
-                currentVal = prevVal;
+                currentVal.value = propsVal;
+                prevVal = currentVal.value;
+            } else if (currentVal.value !== prevVal) {
+                prevVal = currentVal.value;
+                currentVal.value = prevVal;
             }
-            return currentVal;
+            return currentVal.value;
         },
     });
 }

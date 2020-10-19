@@ -10,12 +10,13 @@ interface MapperType {
 
 export interface SelectableListProps<item=any> {
     items: item[];
-    mapper: MapperType;
+    mapper?: MapperType;
     multiSelectable?: boolean;
     mustSelect?: boolean;
     defaultIcon?: string;
     loading?: boolean;
     theme: ThemeType;
-    selectedIndexes: number[];
-    disabledIndexes: number[];
+    selectedIndexes?: number[];
+    disabledIndexes?: number[];
+    disabled?: boolean;
 }
