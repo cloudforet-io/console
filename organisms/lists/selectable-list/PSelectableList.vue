@@ -1,23 +1,32 @@
 <template>
-    <div class="list-container" :class="[theme]">
-        <div v-if="loading" class="spinner-container">
-            <p-lottie name="thin-spinner" auto
-                      :size="1.5"
-            />
-        </div>
+    <div class="p-selectable-list" :class="[theme]">
+        <slot v-if="loading" name="loading">
+            <div class="spinner-container">
+                <p-lottie name="thin-spinner" auto
+                          :size="1.5"
+                />
+            </div>
+        </slot>
+        <slot v-else-if="items.length === 0" name="no-data">
+            <p-empty>
+                <slot name="no-data-format">
+                    No Items
+                </slot>
+            </p-empty>
+        </slot>
         <template v-else>
             <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key) || idx"
-                               :icon-url="getItem(item, mapper.iconUrl)"
-                               :title="getItem(item, mapper.title)"
+                               :icon-url="getItem(item, mapper.iconUrl) || undefined"
+                               :title="getItem(item, mapper.title) || undefined"
                                :active="proxySelectedIndexes.includes(idx)"
                                :disabled="proxyDisabledIndexes.includes(idx)"
-                               :color="getItem(item, mapper.color)"
+                               :color="getItem(item, mapper.color) || undefined"
                                :theme="theme"
                                @click="onItemClick(item, idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                    <slot :name="slot" v-bind="scope" :items="items"
-                          :item="item" :index="idx"
+                    <slot :name="slot" v-bind="scope"
+                          :items="items" :item="item" :index="idx"
                     />
                 </template>
             </p-selectable-item>
@@ -34,11 +43,12 @@ import { SelectableListProps, MapperKeyType } from '@/components/organisms/lists
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 
 export default {
     name: 'PSelectableList',
-    components: { PSelectableItem, PLottie },
+    components: { PEmpty, PSelectableItem, PLottie },
     props: {
         items: {
             type: Array,
@@ -116,7 +126,8 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
+.p-selectable-list {
     .spinner-container {
         display: flex;
         height: 100%;
@@ -131,4 +142,5 @@ export default {
             grid-column-gap: 0.5rem;
         }
     }
+}
 </style>

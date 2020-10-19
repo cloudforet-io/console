@@ -1,12 +1,14 @@
 const { colors } = require('tailwindcss/defaultTheme');
+const { kebabCase, forEach } = require('lodash');
 
 const palette = {
     black: '#000000',
     white: '#FFFFFF',
+    pointViolet: '#8F7CFF',
     gray: {
-        100: '#F2F2F2',
-        200: '#DCDDE2',
-        300: '#BBBCC4',
+        100: '#F7F7F7',
+        200: '#E5E5E8',
+        300: '#CED0D6',
         400: '#A7A9B2',
         500: '#858895',
         600: '#6B6E7B',
@@ -85,6 +87,7 @@ const colorSet = {
     transparent: 'transparent',
     black: palette.black,
     white: palette.white,
+    pointViolet: palette.pointViolet,
     gray: {
         ...palette.gray,
         default: palette.gray[500],
@@ -127,7 +130,7 @@ const colorSet = {
 
 const semanticColors = {
     primary: palette.violet[500],
-    'primary-dark': palette.violet[800],
+    primaryDark: palette.violet[800],
     primary1: palette.violet[400],
     primary2: palette.violet[300],
     primary3: palette.violet[200],
@@ -137,10 +140,15 @@ const semanticColors = {
     secondary2: palette.blue[100],
     alert: palette.red[500],
     safe: palette.green[500],
-    'point-violet': '#8F7CFF',
 };
+
+const kebabColors = {};
+forEach(semanticColors, (d, k) => { kebabColors[kebabCase(k)] = d; });
+forEach(colorSet, (d, k) => { kebabColors[kebabCase(k)] = d; });
+
 
 module.exports = {
     ...semanticColors,
     ...colorSet,
+    ...kebabColors,
 };

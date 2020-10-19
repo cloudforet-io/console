@@ -2,10 +2,10 @@ import { ThemeType } from '@/components/molecules/selectable-item/type';
 
 export type MapperKeyType = string | ((key: string) => string);
 interface MapperType {
-    key: MapperKeyType;
-    iconUrl: MapperKeyType;
-    title: MapperKeyType;
-    color: MapperKeyType;
+    key?: MapperKeyType;
+    iconUrl?: MapperKeyType;
+    title?: MapperKeyType;
+    color?: MapperKeyType;
 }
 
 export interface SelectableListProps<item=any> {
@@ -16,6 +16,6 @@ export interface SelectableListProps<item=any> {
     defaultIcon?: string;
     loading?: boolean;
     theme: ThemeType;
-    electedIndexes: number[];
+    selectedIndexes: number[];
     disabledIndexes: number[];
 }

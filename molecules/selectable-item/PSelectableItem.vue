@@ -4,11 +4,11 @@
         [theme]: true,
     }" v-on="$listeners"
     >
-        <slot name="bar" :color="color">
+        <slot name="bar" v-bind="$props">
             <div v-if="color" class="bar" :style="{color}" />
         </slot>
         <div class="contents">
-            <slot name="side">
+            <slot name="side" v-bind="$props">
                 <p-lazy-img :src="iconUrl"
                             :error-icon="defaultIcon"
                             width="2rem" height="2rem"
@@ -16,16 +16,16 @@
                 />
             </slot>
             <div class="flex-grow overflow-hidden">
-                <slot name="contents" :color="color">
-                    <slot name="title">
+                <slot name="contents" v-bind="$props">
+                    <slot name="title" v-bind="$props">
                         <p class="title">
                             {{ title }}
                         </p>
                     </slot>
-                    <slot name="contents-bottom" />
+                    <slot name="contents-bottom" v-bind="$props" />
                 </slot>
             </div>
-            <slot name="extra" :color="color" />
+            <slot name="extra" v-bind="$props" />
         </div>
     </div>
 </template>
