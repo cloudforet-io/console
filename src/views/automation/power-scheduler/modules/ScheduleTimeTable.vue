@@ -46,12 +46,23 @@
                         v-if="editMode"
                         :drag-container="dragContainer"
                         :selectable-targets="['.item']"
-                        :hit-rate="5"
+                        :hit-rate="3"
                         :select-by-click="false"
                         :select-from-inside="false"
-                        :continue-select="true"
-                        @select="onDragSelect"
+                        :continue-select="false"
+                        @select="onSelectStart"
+                        @selectEnd="onSelectEnd"
                     />
+                    <transition name="fade-in">
+                        <div v-if="loading" class="loader w-full h-full">
+                            <slot name="loader" :loading="loading">
+                                <p-lottie name="thin-spinner"
+                                          auto
+                                          :size="1.5"
+                                />
+                            </slot>
+                        </div>
+                    </transition>
                     <div v-for="time in range(0, 24)"
                          :key="time"
                          class="item-row"
@@ -177,6 +188,7 @@ import {
 import { ViewMode } from '@/views/automation/power-scheduler/type';
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
@@ -224,6 +236,7 @@ interface Props {
 export default {
     name: 'ScheduleTimeTable',
     components: {
+        PLottie,
         PI,
         PButton,
         PDatePagination,
@@ -242,6 +255,7 @@ export default {
     setup(props: Props, { refs }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            loading: false,
             weekdayTexts: [
                 vm.$t('PWR_SCHED.DAY_SUN'),
                 vm.$t('PWR_SCHED.DAY_MON'),
@@ -270,6 +284,12 @@ export default {
             }),
             // schedule
             editMode: computed(() => props.mode !== 'READ' || state.oneTimeEditMode),
+            editModeClassName: computed(() => {
+                if (props.mode !== 'READ') return 'routine';
+                if (state.oneTimeEditMode === 'RUN') return 'one-time-run';
+                if (state.oneTimeEditMode === 'STOP') return 'one-time-stop';
+                return '';
+            }),
             oneTimeEditMode: false as boolean | string,
             dragContainer: undefined,
             rule: {
@@ -429,54 +449,35 @@ export default {
 
             if (!props.scheduleId) return;
 
-            const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
-                schedule_id: props.scheduleId,
-            });
-            res.results.forEach((scheduleRule) => {
-                const rule: Rule = {};
-                if (scheduleRule.rule_type === RULE_TYPE.routine) {
-                    scheduleRule.rule.forEach((r) => {
-                        rule[r.day] = r.times;
-                    });
-                    state.rule.routine = changeTimezoneToLocal(rule, scheduleRule.rule_type);
-                } else {
-                    scheduleRule.rule.forEach((r) => {
-                        rule[r.date] = r.times;
-                    });
-                    if (scheduleRule.state === RULE_STATE.running) {
-                        state.rule.oneTimeRun = changeTimezoneToLocal(rule, scheduleRule.rule_type);
-                    } else if (scheduleRule.state === RULE_STATE.stopped) {
-                        state.rule.oneTimeStop = changeTimezoneToLocal(rule, scheduleRule.rule_type);
-                    }
-                }
-            });
-        };
-
-        const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
-            const query = new QueryHelper().setFilter(
-                {
-                    k: 'rule_type',
-                    v: settings.ruleType,
-                    o: 'eq',
-                },
-                {
-                    k: 'state',
-                    v: settings.ruleState,
-                    o: 'eq',
-                },
-            );
             try {
+                state.loading = true;
                 const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
-                    schedule_id: scheduleId,
-                    query: query.data,
+                    schedule_id: props.scheduleId,
                 });
-                return res.results[0]?.schedule_rule_id || '';
+                res.results.forEach((scheduleRule) => {
+                    const rule: Rule = {};
+                    if (scheduleRule.rule_type === RULE_TYPE.routine) {
+                        scheduleRule.rule.forEach((r) => {
+                            rule[r.day] = r.times;
+                        });
+                        state.rule.routine = changeTimezoneToLocal(rule, scheduleRule.rule_type);
+                    } else {
+                        scheduleRule.rule.forEach((r) => {
+                            rule[r.date] = r.times;
+                        });
+                        if (scheduleRule.state === RULE_STATE.running) {
+                            state.rule.oneTimeRun = changeTimezoneToLocal(rule, scheduleRule.rule_type);
+                        } else if (scheduleRule.state === RULE_STATE.stopped) {
+                            state.rule.oneTimeStop = changeTimezoneToLocal(rule, scheduleRule.rule_type);
+                        }
+                    }
+                });
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
-            return '';
         };
-
         const getRuleSettings = (): RuleSettings|null => {
             const settings: RuleSettings = {
                 ruleType: RULE_TYPE.routine,
@@ -510,7 +511,30 @@ export default {
             }
             return null;
         };
-
+        const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
+            const query = new QueryHelper().setFilter(
+                {
+                    k: 'rule_type',
+                    v: settings.ruleType,
+                    o: 'eq',
+                },
+                {
+                    k: 'state',
+                    v: settings.ruleState,
+                    o: 'eq',
+                },
+            );
+            try {
+                const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
+                    schedule_id: scheduleId,
+                    query: query.data,
+                });
+                return res.results[0]?.schedule_rule_id || '';
+            } catch (e) {
+                console.error(e);
+            }
+            return '';
+        };
         const updateOrDelete = async (settings: RuleSettings, scheduleRuleId: string) => {
             try {
                 if (settings.ruleForApi.length === 0) {
@@ -527,7 +551,6 @@ export default {
                 console.error(e);
             }
         };
-
         const create = async (settings: RuleSettings, scheduleId: string) => {
             if (settings.ruleForApi.length === 0) return;
             try {
@@ -562,8 +585,17 @@ export default {
         const onClickCurrentWeek = () => {
             state.currentDate = dayjs().tz(state.timezone);
         };
-        const onDragSelect = (e) => {
-            const setClass = (el) => {
+        const onSelectStart = (e) => {
+            state.showHelpBlock = false;
+            e.added.forEach((el) => {
+                el.classList.add(`selected-${state.editModeClassName}`);
+            });
+            e.removed.forEach((el) => {
+                el.classList.remove(`selected-${state.editModeClassName}`);
+            });
+        };
+        const onSelectEnd = (e) => {
+            const setRuleData = (el) => {
                 const classList = el.classList;
                 const date = classList[1];
                 const week = classList[2].split('-')[0].toLowerCase();
@@ -593,14 +625,11 @@ export default {
                     }
                 }
             };
-            e.added.forEach((el) => {
-                setClass(el);
-            });
-            e.removed.forEach((el) => {
-                setClass(el);
+            e.afterAdded.forEach((el) => {
+                el.classList.remove(`selected-${state.editModeClassName}`);
+                setRuleData(el);
             });
             setStyleClass();
-            state.showHelpBlock = false;
         };
         const onClickTimeBlock = (e) => {
             if (!state.editMode) return;
@@ -700,7 +729,8 @@ export default {
         return {
             ...toRefs(state),
             onClickCurrentWeek,
-            onDragSelect,
+            onSelectStart,
+            onSelectEnd,
             onDeleteAllRoutine,
             onClickStartOneTimeEditMode,
             onClickSaveOneTimeSchedule,
@@ -713,217 +743,223 @@ export default {
 };
 </script>
 
-<style lang="postcss">
-    .schedule-time-table-container {
-        width: 100%;
-        .title-lap {
-            display: block;
-            .title {
-                @apply text-gray-900;
-                font-size: 1rem;
-                font-weight: bold;
-                padding-right: 0.5rem;
-            }
-            .sub-title {
-                @apply text-gray-400;
-                font-size: 0.75rem;
-            }
+<style lang="postcss" scoped>
+.schedule-time-table-container {
+    width: 100%;
+    .title-lap {
+        display: block;
+        .title {
+            @apply text-gray-900;
+            font-size: 1rem;
+            font-weight: bold;
+            padding-right: 0.5rem;
         }
-        .button-lap {
-            position: relative;
-            width: 75%;
-            padding-top: 1.5rem;
-            padding-bottom: 0.5rem;
-            .this-week-button {
-                @apply border-gray-300;
-            }
-            .p-date-pagination {
-                position: absolute;
-                right: 0;
-            }
+        .sub-title {
+            @apply text-gray-400;
+            font-size: 0.75rem;
         }
-        .left {
-            display: inline-block;
-            width: 75%;
-            .table-lap {
-                display: flex;
-                width: 100%;
-                .time-section {
-                    @apply bg-primary4 border border-primary3 border-r-0;
-                    width: 3rem;
-                    .icon-item {
-                        @apply border-b border-primary3;
-                        height: 3.125rem;
-                    }
-                    .time {
-                        @apply text-gray-500;
-                        height: 0.75rem;
-                        font-size: 0.625rem;
-                        text-align: center;
-                        line-height: 0.625rem;
-                    }
-                }
-                .data-section {
-                    @apply border border-primary3;
-                    position: relative;
-                    width: calc(100% - 3rem);
-                    .weekday-row {
-                        @apply bg-primary4 border-b border-primary3;
-                        width: 100%;
-                        height: 3.125rem;
-                        .weekday-item {
-                            @apply text-gray-500;
-                            display: inline-block;
-                            width: calc(100% / 7);
-                            font-size: 0.75rem;
-                            text-align: center;
-                            padding: 0.625rem;
-                            .weekday-text {
-                                font-weight: bold;
-                            }
-                            &.today {
-                                @apply text-gray-900;
-                                font-weight: bold;
-                            }
-                        }
-                    }
-                    .item-row {
-                        @apply bg-white border-b border-primary4;
-                        display: flex;
-                        width: 100%;
-                        height: 0.75rem;
-                        &:last-child {
-                            border-bottom: none;
-                        }
-                        .item {
-                            @apply border-l border-primary4;
-                            display: inline-flex;
-                            width: calc(100% / 7);
-                            height: 0.75rem;
-                            margin: 0;
-                            &:first-child {
-                                @apply border-l-0;
-                            }
-                            &.selected {
-                                @apply border border-gray-900 border-dashed;
-                            }
-                            &.routine {
-                                @apply bg-point-violet;
-                                height: 0.7rem;
-                                border-radius: 0.125rem;
-                            }
-                            &.one-time-run {
-                                @apply bg-peacock-300;
-                                height: 0.7rem;
-                                border-radius: 0.125rem;
-                            }
-                            &.one-time-stop {
-                                @apply bg-red-400;
-                                height: 0.7rem;
-                                border-radius: 0.125rem;
-                            }
-                        }
-                    }
-                    .help-block {
-                        @apply border-dashed border-secondary text-secondary;
-                        position: absolute;
-                        display: table;
-                        width: calc(100% / 7 * 3);
-                        height: 3.75rem;
-                        top: 9rem;
-                        left: calc(100% / 7 * 2);
-                        border-width: 2px;
-                        border-radius: 2px;
-                        opacity: 0.75;
-                        .help-text {
-                            display: table-cell;
-                            height: 100%;
-                            vertical-align: middle;
-                            font-size: 0.75rem;
-                            line-height: 120%;
-                            text-align: center;
-                        }
-                        .cursor-icon {
-                            position: absolute;
-                            bottom: -1.4rem;
-                            right: -0.9rem;
-                        }
-                    }
-                }
-            }
+    }
+    .button-lap {
+        position: relative;
+        width: 75%;
+        padding-top: 1.5rem;
+        padding-bottom: 0.5rem;
+        .this-week-button {
+            @apply border-gray-300;
         }
-        .right {
-            display: inline-block;
-            width: 25%;
-            vertical-align: top;
-            font-size: 0.875rem;
-            padding-left: 1.5rem;
-            .content-lap {
-                padding: 1rem;
-                &.activated {
-                    @apply border border-blue-200;
-                    background-color: white;
-                    box-sizing: border-box;
-                    border-radius: 2px;
+        .p-date-pagination {
+            position: absolute;
+            right: 0;
+        }
+    }
+    .left {
+        display: inline-block;
+        width: 75%;
+        .table-lap {
+            display: flex;
+            width: 100%;
+            .time-section {
+                @apply bg-primary4 border border-primary3 border-r-0;
+                width: 3rem;
+                .icon-item {
+                    @apply border-b border-primary3;
+                    height: 3.125rem;
                 }
-                .p-select-dropdown {
-                    @apply bg-white;
-                }
-                .one-time-button-lap {
-                    text-align: right;
-                    margin-top: 2rem;
-                }
-            }
-            .title {
-                @apply text-gray-400;
-                font-weight: bold;
-                line-height: 1.5rem;
-                padding-bottom: 0.5rem;
-                &.activated {
-                    @apply text-secondary;
-                }
-            }
-            .legend-lap {
-                line-height: 1.25rem;
-                &.routine {
-                    @apply text-point-violet;
-                    .legend-icon {
-                        @apply bg-point-violet;
-                    }
-                }
-                &.one-time-run {
-                    @apply text-peacock-300;
-                    .legend-icon {
-                        @apply bg-peacock-300;
-                    }
-                }
-                &.one-time-stop {
-                    @apply text-red-500;
-                    .legend-icon {
-                        @apply bg-red-400;
-                    }
-                }
-                .legend-icon {
-                    display: inline-block;
-                    width: 0.75rem;
+                .time {
+                    @apply text-gray-500;
                     height: 0.75rem;
-                    vertical-align: baseline;
+                    font-size: 0.625rem;
+                    text-align: center;
+                    line-height: 0.625rem;
+                }
+            }
+            .data-section {
+                @apply border border-primary3;
+                position: relative;
+                width: calc(100% - 3rem);
+                .loader {
+                    position: absolute;
+                    top: 50%;
+                }
+                .weekday-row {
+                    @apply bg-primary4 border-b border-primary3;
+                    width: 100%;
+                    height: 3.125rem;
+                    .weekday-item {
+                        @apply text-gray-500;
+                        display: inline-block;
+                        width: calc(100% / 7);
+                        font-size: 0.75rem;
+                        text-align: center;
+                        padding: 0.625rem;
+                        .weekday-text {
+                            font-weight: bold;
+                        }
+                        &.today {
+                            @apply text-gray-900;
+                            font-weight: bold;
+                        }
+                    }
+                }
+                .item-row {
+                    @apply bg-white border-b border-primary4;
+                    display: flex;
+                    width: 100%;
+                    height: 0.75rem;
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                    .item {
+                        @apply border-l border-primary4;
+                        display: inline-flex;
+                        width: calc(100% / 7);
+                        height: 0.7rem;
+                        border-radius: 0.125rem;
+                        margin: 0;
+                        &:first-child {
+                            @apply border-l-0;
+                        }
+                        &.routine, &.selected-routine {
+                            @apply bg-point-violet;
+                            &.selected-one-time-run {
+                                @apply bg-point-violet;
+                            }
+                            &.selected-one-time-stop {
+                                @apply bg-red-400;
+                                opacity: 1;
+                            }
+                        }
+                        &.one-time-run, &.selected-one-time-run {
+                            @apply bg-peacock-300;
+                        }
+                        &.one-time-stop, &.selected-one-time-stop {
+                            @apply bg-red-400;
+                            &:not(.routine) {
+                                @apply bg-transparent;
+                            }
+                        }
+                    }
+                }
+                .help-block {
+                    @apply border-dashed border-secondary text-secondary;
+                    position: absolute;
+                    display: table;
+                    width: calc(100% / 7 * 3);
+                    height: 3.75rem;
+                    top: 9rem;
+                    left: calc(100% / 7 * 2);
+                    border-width: 2px;
                     border-radius: 2px;
-                    margin-right: 0.5rem;
-                }
-                .making-ticket-text {
-                    @apply bg-blue-200 text-secondary;
-                    font-size: 0.75rem;
-                    margin-left: 1rem;
-                    padding-left: 0.5rem;
-                    padding-right: 0.5rem;
-                }
-                .p-button {
-                    @apply border-gray-300;
-                    height: 1.25rem;
-                    margin-left: 1rem;
+                    opacity: 0.75;
+                    .help-text {
+                        display: table-cell;
+                        height: 100%;
+                        vertical-align: middle;
+                        font-size: 0.75rem;
+                        line-height: 120%;
+                        text-align: center;
+                    }
+                    .cursor-icon {
+                        position: absolute;
+                        bottom: -1.4rem;
+                        right: -0.9rem;
+                    }
                 }
             }
         }
     }
+    .right {
+        display: inline-block;
+        width: 25%;
+        vertical-align: top;
+        font-size: 0.875rem;
+        padding-left: 1.5rem;
+        .content-lap {
+            padding: 1rem;
+            &.activated {
+                @apply border border-blue-200;
+                background-color: white;
+                box-sizing: border-box;
+                border-radius: 2px;
+            }
+            .p-select-dropdown {
+                @apply bg-white;
+            }
+            .one-time-button-lap {
+                text-align: right;
+                margin-top: 2rem;
+            }
+        }
+        .title {
+            @apply text-gray-400;
+            font-weight: bold;
+            line-height: 1.5rem;
+            padding-bottom: 0.5rem;
+            &.activated {
+                @apply text-secondary;
+            }
+        }
+        .legend-lap {
+            line-height: 1.25rem;
+            &.routine {
+                @apply text-point-violet;
+                .legend-icon {
+                    @apply bg-point-violet;
+                }
+            }
+            &.one-time-run {
+                @apply text-peacock-300;
+                .legend-icon {
+                    @apply bg-peacock-300;
+                }
+            }
+            &.one-time-stop {
+                @apply text-red-500;
+                .legend-icon {
+                    @apply bg-red-400;
+                }
+            }
+            .legend-icon {
+                display: inline-block;
+                width: 0.75rem;
+                height: 0.75rem;
+                vertical-align: baseline;
+                border-radius: 2px;
+                margin-right: 0.5rem;
+            }
+            .making-ticket-text {
+                @apply bg-blue-200 text-secondary;
+                font-size: 0.75rem;
+                margin-left: 1rem;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            .p-button {
+                @apply border-gray-300;
+                height: 1.25rem;
+                margin-left: 1rem;
+            }
+        }
+    }
+}
 </style>
