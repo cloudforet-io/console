@@ -1,61 +1,45 @@
 import { number } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PBottomPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
+import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
-    title: 'organisms/bottom-paginations',
-    component: PBottomPagination,
+    title: 'organisms/paginations',
+    component: PPagination,
     parameters: {
         info: {
             summary: '',
-            components: { PBottomPagination },
+            components: { PPagination },
         },
     },
 };
 const actions = {
-    updatePage: action('pageChange'),
-    clickPage: action('clickPage'),
+    prevPage: action('click-prev'),
+    nextPage: action('click-next'),
+    clickPage: action('click-page'),
 };
 
-export const base = () => ({
-    components: { PBottomPagination },
-    template: '<p-bottom-paginations :thisPage.sync="thisPage" :allPage="allPage" @updatePage="updatePage" @clickPage="clickPage"/>',
+export const baseCase = () => ({
+    components: { PPagination },
+    template: `<p-pagination :this-page.sync="thisPage" :page-size.sync="pageSize"
+                             :total-count="totalCount" />`,
     props: {
         allPage: {
             default: number('allPage', 10, { min: 1 }),
         },
-    },
-    methods: {
-        ...actions,
+        totalCount: {
+            default: number('totalCount', 100, { min: 1 }),
+        },
     },
     setup(props, context) {
         const state = reactive({
             thisPage: 1,
+            pageSize: 15,
         });
-
-        const updatePage = (pageStart, allPage) => {
-            console.debug(pageStart, allPage);
-            state.thisPage = allPage + 1;
-        };
 
         return {
             ...toRefs(state),
-            updatePage,
+            ...actions,
         };
-    },
-});
-
-export const autoDisabledButton = () => ({
-    components: { PBottomPagination },
-    template: '<p-bottom-paginations :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
-    data() {
-        return {
-            allPage: 10,
-            thisPage: 10,
-        };
-    },
-    methods: {
-        ...actions,
     },
 });

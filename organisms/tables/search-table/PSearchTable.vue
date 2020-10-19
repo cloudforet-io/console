@@ -192,7 +192,7 @@ export default {
         const emitChange = (options: Partial<Options> = {}) => {
             emitSelect([]);
 
-            if (options.searchText !== undefined || proxyState.thisPage > proxyState.pageSize) {
+            if (options.searchText !== undefined || proxyState.thisPage > state.allPage) {
                 options.thisPage = 1;
                 proxyState.thisPage = 1;
             }

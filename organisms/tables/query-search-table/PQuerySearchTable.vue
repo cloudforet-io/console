@@ -186,7 +186,6 @@ export default {
             queryTags: props.queryTags === undefined ? [] : props.queryTags,
         });
 
-
         const proxyState = reactive({
             selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState, ['select']),
             sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
@@ -236,7 +235,7 @@ export default {
         const emitChange = (options: Partial<Options> = {}) => {
             emitSelect([]);
 
-            if (options.queryTags || proxyState.thisPage > proxyState.pageSize) {
+            if (options.queryTags || proxyState.thisPage > state.allPage) {
                 options.thisPage = 1;
                 proxyState.thisPage = 1;
             }

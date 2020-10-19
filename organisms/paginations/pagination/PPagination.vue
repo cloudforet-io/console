@@ -3,15 +3,15 @@
         <p-icon-button class="text"
                        name="ic_arrow_left"
                        color="inherit transparent"
-                       :disabled="thisPage === 1"
-                       @click="prevPage(thisPage)"
+                       :disabled="proxyState.thisPage === 1"
+                       @click="prevPage"
         />
         <div class="page-number-wrapper">
             <div class="page-number-list">
                 <span v-for="page in pageList.pages" :key="page"
                       @click="clickPage(page)"
                 >
-                    <span v-if="page === thisPage" class="page-number"><b>{{ thisPage }}</b></span>
+                    <span v-if="page === proxyState.thisPage" class="page-number"><b>{{ proxyState.thisPage }}</b></span>
                     <span v-else class="page-number"> {{ page }} </span>
                 </span>
             </div>
@@ -19,14 +19,18 @@
         <p-icon-button class="text"
                        name="ic_arrow_right"
                        color="inherit transparent"
-                       :disabled="thisPage === pageList.totalPages"
-                       @click="nextPage(thisPage)"
+                       :disabled="proxyState.thisPage === pageList.totalPages"
+                       @click="nextPage"
         />
     </nav>
 </template>
 <script lang="ts">
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
 
 export default {
     name: 'PBottomPagination',
@@ -35,30 +39,34 @@ export default {
         thisPage: {
             type: Number,
             validator(value) {
-                return value > 0;
+                return undefined || value > 0;
             },
-        },
-        pageStart: {
-            type: Number,
-            validator(value) {
-                return value > 0;
-            },
-        },
-        pageLimit: {
-            type: Number,
-            validator(value) {
-                return value > 0;
-            },
+            default: undefined,
         },
         pageSize: {
             type: Number,
+            default: undefined,
         },
         totalCount: {
             type: Number,
             required: true,
         },
+        // pageStart: {
+        //     type: Number,
+        //     validator(value) {
+        //         return value > 0;
+        //     },
+        // },
+        // pageLimit: {
+        //     type: Number,
+        //     validator(value) {
+        //         return value > 0;
+        //     },
+        // },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        // pagination logic
         const paginate = (
             totalItems,
             currentPage,
@@ -121,30 +129,45 @@ export default {
                 pages,
             };
         };
-
         const pageList = computed(() => paginate(props.totalCount, props.thisPage, props.pageSize, 10));
 
+        const localState = reactive({
+            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
+            pageSize: props.pageSize === undefined ? 15 : props.pageSize,
+        });
+
+        const proxyState = reactive({
+            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+        });
+
         const clickPage = (page) => {
-            emit('clickPage', page);
+            proxyState.thisPage = page;
+            emit('click-page', page);
+            emit('change', page);
         };
 
-        const updatePage = (thisPage) => {
-            emit('updatePage', thisPage);
+        const prevPage = () => {
+            let page = proxyState.thisPage - 1;
+            if (page <= 0) page = 1;
+            proxyState.thisPage = page;
+            emit('click-prev', page);
+            emit('change', page);
         };
 
-        const prevPage = (thisPage) => {
-            emit('prevPage', thisPage);
-        };
-
-        const nextPage = (thisPage) => {
-            emit('nextPage', thisPage);
+        const nextPage = () => {
+            const page = proxyState.thisPage + 1;
+            proxyState.thisPage = page;
+            emit('click-next', page);
+            emit('change', page);
         };
 
         return {
             paginate,
             pageList,
+            proxyState,
             clickPage,
-            updatePage,
+            // updatePage,
             prevPage,
             nextPage,
             iconHoverColor: 'transparent inherit',
