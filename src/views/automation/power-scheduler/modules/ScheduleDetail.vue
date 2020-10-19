@@ -52,7 +52,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {computed, reactive, toRefs, watch} from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
@@ -171,8 +173,7 @@ export default {
 
         watch(() => props.scheduleId, () => {
             state.showValidation = false;
-            state.isNameValid = false;
-        })
+        });
 
         return {
             ...toRefs(state),
