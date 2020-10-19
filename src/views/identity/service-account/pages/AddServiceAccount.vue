@@ -1,7 +1,7 @@
 <template>
     <general-page-layout class="add-service-account-container">
         <div class="page-navigation">
-            <p-page-navigation :routes="route" />
+            <p-page-navigation :routes="routeState.routes" />
         </div>
         <p-page-title
             class="mb-6"
@@ -40,7 +40,7 @@
                            :required="true"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="accountName" class="block" :class="{'is-invalid': invalid}"
+                    <p-text-input v-model="accountName" class="block" :class="{'invalid': invalid}"
                                   placeholder="Cloud Account Name"
                     />
                 </template>
@@ -86,7 +86,7 @@
                            :required="true"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="credentialName" class="block" :class="{'is-invalid': invalid}"
+                    <p-text-input v-model="credentialName" class="block" :class="{'invalid': invalid}"
                                   placeholder="Credentials Name"
                     />
                 </template>
@@ -100,7 +100,7 @@
                     </span>
                 </div>
             </p-field-group>
-            <p-tab :tabs="tabs" :active-tab.sync="activeTab">
+            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab">
                 <template #input>
                     <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid"
                                         class="custom-schema-box"
@@ -133,6 +133,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { get } from 'lodash';
 
 import {
@@ -145,6 +146,7 @@ import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectT
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -152,16 +154,15 @@ import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
+import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { SpaceConnector } from '@/lib/space-connector';
-import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
-import { makeTrItems } from '@/lib/view-helper';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 
 export default {
     name: 'AddServiceAccount',
@@ -205,12 +206,11 @@ export default {
             dictRef: null as any,
         });
 
-
         const tabState = reactive({
-            tabs: computed(() => makeTrItems([
-                ['input', 'Input Form', { keepAlive: true }],
-                ['json', 'Json Code', { keepAlive: true }],
-            ], context.parent)),
+            tabs: [
+                { label: 'Input Form', name: 'input', keepAlive: true },
+                { label: 'Json Code', name: 'json', keepAlive: true },
+            ] as TabItem[],
             activeTab: 'input',
         });
 
@@ -273,7 +273,7 @@ export default {
         });
 
         const routeState = reactive({
-            route: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
+            routes: [{ name: 'Identity', path: '/identity' }, { name: 'Service Account', path: '/identity/service-account' },
                 { name: 'Add Account', path: `/identity/service-account/add/${props.provider}` }],
         });
         const projectRef = ref<any>(null);
@@ -310,7 +310,6 @@ export default {
 
         const deleteServiceAccount = async () => {
             await SpaceConnector.client.identity.serviceAccount.delete({
-                // eslint-disable-next-line camelcase
                 service_account_id: state.serviceAccountId,
             });
             state.serviceAccountId = '';
@@ -324,7 +323,6 @@ export default {
             };
 
             if (projectRef.value.selectNode) {
-                // eslint-disable-next-line camelcase
                 item.project_id = projectRef.value.selectNode.node.data.id;
             }
             try {
@@ -342,9 +340,7 @@ export default {
                 name: formState.credentialName,
                 data: formState.credentialModel,
                 schema: state.selectedSecretType,
-                // eslint-disable-next-line camelcase
                 secret_type: 'CREDENTIALS',
-                // eslint-disable-next-line camelcase
                 service_account_id: state.serviceAccountId,
             });
         };
@@ -353,9 +349,7 @@ export default {
                 data: jsonData,
                 name: formState.credentialName,
                 schema: state.selectedSecretType,
-                // eslint-disable-next-line camelcase
                 secret_type: 'CREDENTIALS',
-                // eslint-disable-next-line camelcase
                 service_account_id: state.serviceAccountId,
             });
         };
@@ -390,7 +384,6 @@ export default {
                 await createServiceAccount();
                 if (state.serviceAccountId) {
                     if (formState.credentialModel.private_key) {
-                        // eslint-disable-next-line camelcase
                         formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
                     }
                     await createSecret();
@@ -421,8 +414,8 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            ...toRefs(routeState),
-            ...toRefs(tabState),
+            routeState,
+            tabState,
             projectRef,
             onClickSave,
             onClickGoBack,
@@ -470,6 +463,9 @@ export default {
                     width: 100%;
                     @screen lg {
                         max-width: 50%;
+                    }
+                    &.invalid {
+                        @apply border border-red-500;
                     }
                 }
             }
