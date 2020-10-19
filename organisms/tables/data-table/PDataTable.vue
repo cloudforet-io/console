@@ -282,17 +282,10 @@ export default {
     setup(props: PDataTableProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const localState = reactive({
-            selectIndex: props.selectIndex === undefined ? [] : props.selectIndex,
-            sortBy: props.sortBy === undefined ? '' : props.sortBy,
-            sortDesc: props.sortDesc === undefined ? true : props.sortDesc,
-        });
-
-
         const proxyState = reactive({
-            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState),
-            sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
-            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, localState),
+            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, []),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, true),
+            sortDesc: makeOptionalProxy<boolean|undefined>('sortDesc', vm, ''),
         });
 
         const state = reactive({
@@ -405,7 +398,7 @@ export default {
             if (props.sortable && field.sortable) {
                 const clickedKey = field.sortKey || field.name;
                 let sortBy = proxyState.sortBy;
-                let sortDesc = proxyState.sortDesc;
+                let sortDesc: undefined|boolean = proxyState.sortDesc;
 
                 // when clicked the same thead
                 if (sortBy === clickedKey) {
@@ -425,10 +418,8 @@ export default {
                 }
 
                 // set changed values
-                localState.sortBy = sortBy;
-                localState.sortDesc = sortDesc;
-                context.emit('update:sortBy', sortBy);
-                context.emit('update:sortDesc', sortDesc);
+                proxyState.sortBy = sortBy;
+                proxyState.sortDesc = sortDesc;
                 context.emit('changeSort', sortBy, sortDesc);
             }
             context.emit('theadClick', field, index, event);

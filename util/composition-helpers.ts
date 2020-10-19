@@ -48,33 +48,32 @@ export const makeProxy = <T extends any>(name: string, props: any, emit: any): R
  * make proxy computed or a value if there's no listener for tracking sync
  * @param name
  * @param vm
- * @param localState
+ * @param initData
+ * * @param events?
  * @return {Ref<*>|*}
  */
-export function makeOptionalProxy <T=any>(name: string, vm, localState?: UnwrapRef<any>, events?: string[]) {
-    if (!localState) return vm.$props[name];
-
+export function makeOptionalProxy <T=any>(name: string, vm, initData: any, events?: string[]) {
     let propsVal = vm.$props[name];
-    let localVal = localState[name];
+    let currentVal = propsVal === undefined ? initData : propsVal;
+    let prevVal = currentVal;
     return computed<T>({
         set(val) {
             if (vm.$listeners[`update:${name}`]) {
                 vm.$emit(`update:${name}`, val);
-            } else localState[name] = val;
+            } else currentVal = val;
             if (Array.isArray(events)) events.forEach(d => vm.$emit(d, val));
         },
         get() {
             if (vm.$listeners[`update:${name}`]) return vm.$props[name];
-            if (vm.$props[name] === undefined) return localState[name];
 
             if (vm.$props[name] !== propsVal) {
                 propsVal = vm.$props[name];
-                localState[name] = propsVal;
-            } else if (localState[name] !== localVal) {
-                localVal = localState[name];
-                localState[name] = localVal;
+                currentVal = propsVal;
+            } else if (currentVal !== prevVal) {
+                prevVal = currentVal;
+                currentVal = prevVal;
             }
-            return localState[name];
+            return currentVal;
         },
     });
 }

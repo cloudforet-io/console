@@ -233,21 +233,12 @@ export default {
     setup(props: PToolboxTableProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const localState = reactive({
-            selectIndex: props.selectIndex === undefined ? [] : props.selectIndex,
-            sortBy: props.sortBy === undefined ? '' : props.sortBy,
-            sortDesc: props.sortDesc === undefined ? true : props.sortDesc,
-            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
-            pageSize: props.pageSize === undefined ? 15 : props.pageSize,
-        });
-
-
         const proxyState = reactive({
-            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, localState, ['select']),
-            sortBy: makeOptionalProxy<string>('sortBy', vm, localState),
-            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, localState),
-            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
-            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, [], ['select']),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, ''),
+            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, true),
+            thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, 15),
         });
 
         const state = reactive({

@@ -131,14 +131,9 @@ export default {
         };
         const pageList = computed(() => paginate(props.totalCount, props.thisPage, props.pageSize, 10));
 
-        const localState = reactive({
-            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
-            pageSize: props.pageSize === undefined ? 15 : props.pageSize,
-        });
-
         const proxyState = reactive({
-            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
-            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+            thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, 15),
         });
 
         const clickPage = (page) => {

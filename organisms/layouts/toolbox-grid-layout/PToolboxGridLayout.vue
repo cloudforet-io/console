@@ -184,14 +184,9 @@ export default {
     setup(props: ToolboxGridLayoutProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const localState = reactive({
-            thisPage: props.thisPage === undefined ? 1 : props.thisPage,
-            pageSize: props.pageSize === undefined ? 24 : props.pageSize,
-        });
-
         const proxyState = reactive({
-            thisPage: makeOptionalProxy<number>('thisPage', vm, localState),
-            pageSize: makeOptionalProxy<number>('pageSize', vm, localState),
+            thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
+            pageSize: makeOptionalProxy<number>('pageSize', vm, 24),
         });
 
         const state = reactive({

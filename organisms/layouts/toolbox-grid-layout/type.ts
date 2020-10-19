@@ -7,6 +7,6 @@ export interface ToolboxGridLayoutProps extends GridLayoutProps {
     refreshVisible: boolean;
     allPage: number;
     paginationValues: number[];
-    pageSize: number;
-    thisPage: number;
+    pageSize?: number;
+    thisPage?: number;
 }
