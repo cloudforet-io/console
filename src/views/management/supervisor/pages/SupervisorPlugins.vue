@@ -13,28 +13,28 @@
                     @change="onChange"
                 >
                     <template #col-managed-format="data">
-                        <p-button style-type="primary" :disabled="true" @click="recovery(data.item)">
+                        <p-button style-type="primary" :disabled="true" @click="onClickRecovery(data.item)">
                             Recovery
                         </p-button>
                     </template>
                 </p-query-search-table>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="selectIndex.length === 1" :tabs="singleItemTab.state.tabs"
-               :active-tab.sync="singleItemTab.syncState.activeTab"
+        <p-tab v-if="selectIndex.length === 1" :tabs="singleItemTab.tabs"
+               :active-tab.sync="singleItemTab.activeTab"
         >
             <template #detail>
                 <div>
-                    <p-panel-top>{{ pluginDetails.name }}</p-panel-top>
-                    <p-definition-table :fields="pluginDetails.fields" :data="pluginDetails.data"
+                    <p-panel-top>{{ pluginDetailState.name }}</p-panel-top>
+                    <p-definition-table :fields="pluginDetailState.fields" :data="pluginDetailState.data"
                                         :skeleton-rows="7" v-on="$listeners"
                     />
                 </div>
             </template>
         </p-tab>
         <p-tab v-else-if="selectIndex.length > 1"
-               :tabs="multiItemTab.state.tabs"
-               :active-tab.sync="multiItemTab.syncState.activeTab"
+               :tabs="multiItemTab.tabs"
+               :active-tab.sync="multiItemTab.activeTab"
         >
             <template #data>
                 <p-data-table
@@ -51,23 +51,24 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { makeTrItems } from '@/lib/view-helper/index';
-import { fluentApi } from '@/lib/fluent-api';
+
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import { showErrorMessage } from '@/lib/util';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import { SupervisorPluginModel } from '@/lib/fluent-api/plugin/supervisorPlugin';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { Options } from '@/components/organisms/tables/query-search-table/type';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
+
+import { SupervisorPluginModel } from '@/lib/fluent-api/plugin/supervisorPlugin';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { fluentApi } from '@/lib/fluent-api';
+import {SpaceConnector} from "@/lib/space-connector";
 
 export default {
     name: 'Supervisor',
@@ -89,6 +90,7 @@ export default {
         },
     },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             fields: [
@@ -100,10 +102,15 @@ export default {
                 { label: 'Recovery', name: 'managed' },
             ],
             items: [] as SupervisorPluginModel[],
-            sortBy: 'plugin_id',
             totalCount: 0,
             selectIndex: [],
-            selectedItems: [],
+            selectedItems: computed(() => {
+                const items = [] as SupervisorPluginModel[];
+                state.selectIndex.forEach((idx) => {
+                    items.push(state.items[idx]);
+                });
+                return items;
+            }),
             keyItems: [
                 { name: 'plugin_id', label: 'Collector ID' },
                 { name: 'name', label: 'Name' },
@@ -111,34 +118,7 @@ export default {
                 { name: 'version', label: 'Version' },
             ],
         });
-
-        const listPlugins = async () => {
-            try {
-                const resp = await fluentApi.plugin().supervisorPlugin().list().execute();
-                state.totalCount = resp.data.total_count || 0;
-                state.items = resp.data.results;
-            } catch (e) {
-                state.items = [];
-                console.error(e);
-            }
-        };
-
-        const onChange = async (options: Options) => {
-            try {
-                await listPlugins();
-                state.selectIndex = [];
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        // const onChange = async (options: Options, changedOptions: Partial<Options>) => {
-        //     if (changedOptions.pageSize !== undefined) fluentApi.plugin().supervisorPlugin().list().setPageSize(changedOptions.pageSize);
-        //     if (changedOptions.thisPage !== undefined) fluentApi.plugin().supervisorPlugin().list().setThisPage(changedOptions.thisPage);
-        //     //TODO: pageSize, thisPage, refresh와 같은 액션이 필요한 경우 위와 같이 구현
-        // }
-
-        const pluginDetails = reactive({
+        const pluginDetailState = reactive({
             name: 'Base Information',
             isLoading: true,
             fields: computed(() => [
@@ -152,52 +132,50 @@ export default {
             ]),
             data: {},
         });
+        const tabState = reactive({
+            singleItemTab: {
+                tabs: [
+                    { label: vm.$t('COMMON.DETAILS'), name: 'detail', keepAlive: true },
+                ] as TabItem[],
+                activeTab: 'detail',
+            },
+            multiItemTab: {
+                tabs: [
+                    { label: vm.$t('TAB.SELECTED_DATA'), name: 'data', keepAlive: true },
+                ] as TabItem[],
+                activeTab: 'data',
+            },
+        });
+
+        /* apis */
+        const listPlugins = async () => {
+            try {
+                const res = await SpaceConnector.client.plugin.supervisor.plugin.list();
+                state.totalCount = res.total_count || 0;
+                state.items = res.results;
+            } catch (e) {
+                state.items = [];
+                console.error(e);
+            }
+        };
         const getPluginDetailData = async (index) => {
-            pluginDetails.data = state.items[index];
+            pluginDetailState.data = state.items[index];
         };
 
+        /* events */
         const onSelect = (index) => {
             state.selectIndex = index;
             getPluginDetailData(index);
         };
-
-        const selectedItems = computed(() => {
-            const items = [] as SupervisorPluginModel[];
-            state.selectIndex.forEach((idx) => {
-                items.push(state.items[idx]);
-            });
-            return items;
-        });
-
-        const singleItemTab = new TabBarState(
-            {
-                tabs: computed(() => makeTrItems([
-                    ['detail', 'COMMON.DETAILS', { keepAlive: true }],
-                ],
-                context.parent)),
-            },
-            {
-                activeTab: 'detail',
-            },
-        );
-        const multiItemTab = new TabBarState(
-            {
-                tabs: makeTrItems([
-                    ['data', 'TAB.SELECTED_DATA'],
-                ]),
-            }, {
-                activeTab: 'data',
-            },
-        );
-
-        const btnDisabled = computed(() => {
-            if (state.selectIndex.length > 0 && state.items.every(item => item.managed === true)) {
-                return true;
+        const onChange = async () => {
+            try {
+                await listPlugins();
+                state.selectIndex = [];
+            } catch (e) {
+                console.error(e);
             }
-            return false;
-        });
-
-        const recovery = async (item) => {
+        };
+        const onClickRecovery = async (item) => {
             try {
                 await fluentApi.plugin().supervisorPlugin().recovery().setSubIds([
                     // eslint-disable-next-line camelcase
@@ -205,34 +183,25 @@ export default {
                 ])
                     .setId(item.supervisor_id)
                     .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'success', context.root);
             } catch (e) {
                 showErrorMessage('Fail to recover plugin', e, context.root);
             }
         };
 
-        /** init
-         */
-        listPlugins();
+        const init = () => {
+            listPlugins();
+        };
+        init();
 
         return {
             ...toRefs(state),
+            ...toRefs(tabState),
+            pluginDetailState,
             listPlugins,
             onSelect,
-            selectedItems,
             onChange,
-            pluginDetails,
-            getPluginDetailData,
-            btnDisabled,
-            recovery,
-            singleItemTab,
-            multiItemTab,
+            onClickRecovery,
         };
     },
 };

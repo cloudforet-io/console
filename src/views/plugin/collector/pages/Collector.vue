@@ -64,8 +64,8 @@
         </p-horizontal-layout>
 
         <p-tab v-if="selectedItems.length === 1"
-               :tabs="singleItemTab.state.tabs"
-               :active-tab.sync="singleItemTab.syncState.activeTab"
+               :tabs="singleItemTab.tabs"
+               :active-tab.sync="singleItemTab.activeTab"
         >
             <template #detail>
                 <collector-detail :collector-id="selectedItems[0].collector_id" />
@@ -85,7 +85,7 @@
             </template>
         </p-tab>
         <p-tab v-else-if="selectedItems.length > 1"
-               :tabs="multiItemTab.state.tabs" :active-tab.sync="multiItemTab.syncState.activeTab"
+               :tabs="multiItemTab.tabs" :active-tab.sync="multiItemTab.activeTab"
         >
             <template #data>
                 <div>
@@ -152,22 +152,21 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { TabBarState } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import router from '@/routes';
-import { makeTrItems } from '@/lib/view-helper';
+import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { getFiltersFromQueryTags, parseTag } from '@/lib/component-utils/query-search-tags';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
-import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import { getFiltersFromQueryTags, parseTag } from '@/lib/component-utils/query-search-tags';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import config from '@/lib/config';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { makeTrItems } from '@/lib/view-helper';
+import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
+import config from '@/lib/config';
+import router from '@/routes';
 
 const GeneralPageLayout = (): Component => import('@/views/containers/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
@@ -337,7 +336,8 @@ export default {
             ], null, { type: 'item' }))),
             updateModalVisible: false,
             collectDataModalVisible: false,
-            //
+        });
+        const routeState = reactive({
             routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
         });
         const checkModalState: UnwrapRef<{
@@ -357,30 +357,23 @@ export default {
             });
 
         // Tab
-        const singleItemTab = new TabBarState(
-            {
-                tabs: computed(() => makeTrItems([
-                    ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-                    ['tag', 'TAB.TAG', { keepAlive: true }],
-                    ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-                    ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
-                ],
-                context.parent)),
-            },
-            {
+        const tabState = reactive({
+            singleItemTab: {
+                tabs: [
+                    { label: vm.$t('PANEL.DETAILS'), name: 'detail', keepAlive: true },
+                    { label: vm.$t('TAB.TAG'), name: 'tag', keepAlive: true },
+                    { label: vm.$t('PANEL.CREDENTIAL'), name: 'credentials', keepAlive: true },
+                    { label: vm.$t('PANEL.SCHEDULE'), name: 'schedules', keepAlive: true },
+                ] as TabItem[],
                 activeTab: 'detail',
             },
-        );
-        const multiItemTab = new TabBarState(
-            {
-                tabs: makeTrItems([
-                    ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
-                ], context.parent),
-            },
-            {
+            multiItemTab: {
+                tabs: [
+                    { label: vm.$t('TAB.SELECTED_DATA'), name: 'data', keepAlive: true },
+                ] as TabItem[],
                 activeTab: 'data',
             },
-        );
+        });
 
         // Url query
         const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
@@ -539,8 +532,8 @@ export default {
 
         return {
             ...toRefs(state),
-            singleItemTab,
-            multiItemTab,
+            ...toRefs(routeState),
+            ...toRefs(tabState),
             checkModalState,
             getIcon: (data): void => get(data, 'item.tags.icon', ''),
             onSelect,

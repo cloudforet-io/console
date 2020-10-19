@@ -45,9 +45,6 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { TabItem } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
-import { find } from 'lodash';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
