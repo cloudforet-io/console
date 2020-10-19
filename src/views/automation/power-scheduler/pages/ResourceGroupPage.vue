@@ -545,6 +545,7 @@ export default {
                     },
                     tags: state.dictRef.getDict(),
                 },
+                recommended: false,
             };
 
             if (props.resourceGroup?.resource_group_id) params.resource_group.resource_group_id = props.resourceGroup.resource_group_id;

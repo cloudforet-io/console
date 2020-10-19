@@ -58,21 +58,33 @@
                     >
                         <div v-for="(item, index) in column.items"
                              :key="`${columnIdx}-${index}`"
+                             :class="{'recommended': item.recommended }"
                              class="resource-group-item"
                              @click="onClickResourceGroup(index, columnIdx)"
                         >
                             <div class="resource">
                                 <p-lazy-img :src="iconUrl(item)"
                                             width="2rem" height="2rem"
-                                            class="mr-2"
+                                            class="resource-image"
                                 />
-                                <span class="resource-description">
-                                    {{ item.name }} <br> ({{ item.count }})
-                                </span>
-                                <p-i v-if="editable" name="ic_delete" width="1rem"
-                                     color="transparent inherit" class="float-right"
-                                     @click.stop="deleteResourceGroup(column, item, index)"
+                                <div class="resource-description">
+                                    <p class="resource-name">
+                                        {{ item.name }}
+                                    </p><span class="resource-count">({{ item.count }})</span>
+                                </div>
+                                <p-icon-button v-if="editable && !item.recommended" name="ic_delete" width="1rem"
+                                               color="transparent inherit"
+                                               class="float-right"
+                                               @click.stop="deleteResourceGroup(column, item, index)"
                                 />
+                                <p v-if="editable && item.recommended" class="recommended-text">
+                                    추천
+                                </p>
+                                <p-button v-if="editable && item.recommended"
+                                          style-type="secondary" size="sm" class="add-btn"
+                                >
+                                    추가
+                                </p-button>
                             </div>
                         </div>
                     </draggable>
@@ -100,6 +112,8 @@ import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 
 
     interface ColumnType {
@@ -120,6 +134,8 @@ import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/powe
 export default {
     name: 'App',
     components: {
+        PIconButton,
+        PButton,
         ResourceGroupPage,
         PIconTextButton,
         PI,
@@ -147,6 +163,7 @@ export default {
             loading: false,
             editable: false,
             showGuide: false,
+            isHovered: false,
             resourceGroupVisible: false,
             selectedResourceGroupIndex: -1,
             selectedItem: computed(() => state.columns[state.selectedColumnIndex]?.items[state.selectedResourceGroupIndex] || null),
@@ -265,6 +282,7 @@ export default {
         const hideGuide = () => {
             state.showGuide = false;
         };
+
 
         watch(() => props.scheduleId, async (after, before) => {
             if (props.scheduleId && (after !== before)) {
@@ -420,7 +438,7 @@ export default {
                     .resource-group-item {
                         @apply w-full block;
                         .add-resource-group {
-                            @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
+                            @apply border border-dashed border-gray-200 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
                             height: 3.25rem;
                             border-radius: 0.25rem;
                             margin-bottom: 0.5rem;
@@ -432,19 +450,60 @@ export default {
                             }
                         }
                         .resource {
-                            @apply border border-dashed border-blue-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
+                            @apply border border-gray-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal whitespace-no-wrap;
                             height: 3.25rem;
                             border-radius: 0.25rem;
                             margin-bottom: 0.5rem;
-                            .resource-description {
-                                flex-grow: 1;
-                                font-size: 0.75rem;
-                            }
+                            line-height: 1.5;
+                            position: relative;
+                            cursor: pointer;
                             &:hover {
                                 @apply border-blue-500 border border-solid bg-blue-100;
+                                .add-btn {
+                                    display: inline;
+                                    position: absolute;
+                                    right: 0.5rem;
+                                    line-height: 1.8;
+                                }
                             }
                             &:active {
                                 @apply cursor-move bg-blue-200;
+                            }
+                            .resource-description {
+                                @apply ml-2;
+                                flex-grow: 1;
+                                overflow-x: hidden;
+                                font-size: 0.75rem;
+                            }
+                            .resource-image {
+                                flex-shrink: 0;
+                            }
+                            .resource-name {
+                                @apply truncate w-full;
+                            }
+                            .add-btn {
+                                display: none;
+                            }
+                        }
+
+                        &.recommended {
+                            .resource {
+                                @apply border border-dashed border-gray-300;
+                            }
+                            .resource-image {
+                                opacity: 0.5;
+                            }
+                            .recommended-text {
+                                @apply text-blue-500;
+                                opacity: 0.5;
+                                font-size: 0.75rem;
+                                flex-shrink: 0;
+                                margin-right: 0.5rem;
+                            }
+                            .resource-description {
+                                .resource-name, .resource-count {
+                                    opacity: 0.5;
+                                }
                             }
                         }
                     }

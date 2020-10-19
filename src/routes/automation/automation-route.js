@@ -1,5 +1,5 @@
 const Automation = () => import('@/views/automation/Automation.vue');
-const PowerScheduler = () => import('@/views/automation/power-scheduler/pages/PowerScheduler.vue');
+const PowerScheduler = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerLandingPage.vue');
 const PowerSchedulerDetail = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerDetailPage.vue');
 
 export default {

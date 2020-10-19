@@ -25,6 +25,7 @@ export interface KanbanItem {
     name?: string;
     count?: number;
     icon?: string;
+    recommended?: boolean;
 }
 
-export type ResourceGroupItem = Pick<Required<KanbanItem>, 'resource_group'|'count'|'name'>
+export type ResourceGroupItem = Pick<Required<KanbanItem>, 'resource_group'|'count'|'name'|'recommended'>
