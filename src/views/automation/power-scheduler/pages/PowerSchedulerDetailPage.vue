@@ -13,29 +13,34 @@
                     >
                         {{ $t('PWR_SCHED.CREATE') }}
                     </p-icon-text-button>
+                    <p-selectable-list :items="scheduleList" :loading="loading"
+                                       :selected-indexes.sync="selectedIndexes"
+                                       :multi-selectable="false"
+                                       theme="card"
+                                       default-icon="ic_clock-history"
+                                       :disabled="mode !== 'READ'"
+                                       class="mt-6"
+                    >
+                        <template #loading>
+                            <div />
+                        </template>
+                        <template #no-data>
+                            <div class="no-data">
+                                {{ $t('PWR_SCHED.NO_SCHED') }}
+                            </div>
+                        </template>
+                        <template #contents="{item}">
+                            <div class="item-contents">
+                                <p class="item-name">
+                                    {{ item.name }}
+                                </p>
+                                <span class="item-state">
+                                    {{ EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].label : 'test' }}
+                                </span>
+                            </div>
+                        </template>
+                    </p-selectable-list>
                 </div>
-                <p-selectable-list :items="scheduleList" :loading="loading"
-                                   :mapper="{
-                                       title: 'name'
-                                   }"
-                                   :multi-selectable="false"
-                >
-                    <template #loading>
-                        <div />
-                    </template>
-                    <template #no-data>
-                        <div class="no-data">
-                            {{ $t('PWR_SCHED.NO_SCHED') }}
-                        </div>
-                    </template>
-                    <template #contents-bottom="{item}">
-                        <p-status :icon-color="EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].color : undefined"
-                                  :text-color="EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].color : undefined"
-                        >
-                            {{ EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].label : '' }}
-                        </p-status>
-                    </template>
-                </p-selectable-list>
                 <!--                <table v-else>-->
                 <!--                    <tbody>-->
                 <!--                        <tr v-for="(schedule, index) in scheduleList" :key="index"-->
@@ -95,10 +100,11 @@
                       :auto="true" class="loading"
             />
         </div>
-        <schedule-detail v-else-if="selectedSchedule" :schedule-id.sync="selectedSchedule.schedule_id"
+        <schedule-detail v-else-if="selectedSchedule"
+                         :schedule-id="selectedSchedule.schedule_id"
                          :project-id="projectId"
                          :mode.sync="mode"
-                         :name.sync="selectedSchedule.name"
+                         :name="selectedSchedule.name"
                          @cancel="onCancel"
         />
         <p-button-modal
@@ -214,7 +220,8 @@ export default {
             scheduleList: [] as Schedule[],
             totalCount: 0,
             loading: true,
-            selectedSchedule: null as null|Schedule,
+            selectedIndexes: [],
+            selectedSchedule: computed(() => state.scheduleList[state.selectedIndexes[0]] || { ...defaultSchedule }),
             // eslint-disable-next-line camelcase
             mode: 'CREATE' as Mode,
         });
@@ -228,7 +235,7 @@ export default {
         });
 
         const onClickCreate = () => {
-            state.selectedSchedule = { ...defaultSchedule };
+            state.selectedIndexes = [];
             state.mode = 'CREATE';
         };
 
@@ -240,12 +247,12 @@ export default {
 
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
-                state.selectedSchedule = state.scheduleList[0];
 
                 if (state.totalCount === 0) {
                     onClickCreate();
                 } else {
                     state.mode = 'READ';
+                    state.selectedIndexes = [0];
                 }
             } catch (e) {
                 console.error(e);
@@ -257,14 +264,14 @@ export default {
         // eslint-disable-next-line camelcase
         const isActiveItem = (schedule: Schedule) => state.selectedSchedule?.schedule_id === schedule.schedule_id;
 
-        const showDetail = async (schedule: Schedule) => {
+        const showDetail = async (idx) => {
             if (state.mode === 'READ') {
-                state.selectedSchedule = schedule;
+                state.selectedIndexes = [idx];
             }
         };
 
-        const onClickEdit = (schedule?: Schedule) => {
-            if (schedule) state.selectedSchedule = schedule;
+        const onClickEdit = (idx = -1) => {
+            if (idx === -1) state.selectedIndexes = [idx];
             state.mode = 'UPDATE';
         };
 
@@ -296,7 +303,7 @@ export default {
             if (state.mode === 'CREATE') {
                 state.scheduleList.pop();
                 if (state.scheduleList.length === 0) vm.$router.push('/automation/power-scheduler');
-                else state.selectedSchedule = state.scheduleList[0];
+                else state.selectedIndexes = [];
             }
             state.mode = 'READ';
         };
@@ -331,6 +338,16 @@ export default {
         @apply flex justify-between;
     }
     .p-selectable-list::v-deep {
+        .item-contents {
+            @apply ml-4 leading-none;
+        }
+        .item-name {
+            @apply text-sm leading-normal text-gray-900 truncate;
+        }
+        .item-state {
+            @apply text-xs text-gray-500;
+            line-height: 1.2;
+        }
         .no-data {
             @apply mt-6 mx-4 text-gray-200 font-normal;
             line-height: 1.2;

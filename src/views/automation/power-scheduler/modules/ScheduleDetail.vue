@@ -16,7 +16,7 @@
                     </div>
                 </template>
                 <template #default="{invalid}">
-                    <p-text-input v-model="proxyName" v-focus
+                    <p-text-input v-model="groupName" v-focus
                                   :invalid="invalid"
                                   class="name-input"
                     />
@@ -112,10 +112,10 @@ export default {
     setup(props: Props, { emit, refs }) {
         const state = reactive({
             showValidation: false,
-            isNameValid: computed(() => !!state.proxyName),
+            isNameValid: computed(() => !!state.groupName),
             isAllValid: computed(() => state.isNameValid),
-            proxyName: makeProxy('name', props, emit),
-            proxyScheduleId: makeProxy('scheduleId', props, emit),
+            groupName: props.name,
+            proxyScheduleId: props.scheduleId,
             kanban: null,
             timeTable: null,
         });
