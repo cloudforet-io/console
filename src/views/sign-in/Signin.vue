@@ -61,15 +61,14 @@ export default {
         const state = reactive<any>({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             component: computed(() => {
-                let authType;
+                let authSystem = vm.$store.getters['domain/getAuthSystem'];
                 if (props.admin) {
-                    authType = 'admin';
-                } else {
-                    authType = store.domain.state.authType;
+                    authSystem = 'admin';
                 }
+
                 let component;
                 try {
-                    component = () => import(`./templates/${authType}/index.vue`);
+                    component = () => import(`./templates/${authSystem}/index.vue`);
                 } catch (e) {
                     component = () => import('./templates/local/index.vue');
                 }

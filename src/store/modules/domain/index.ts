@@ -7,6 +7,7 @@ const state: DomainState = {
     domainId: undefined,
     name: undefined,
     authType: undefined,
+    authSystem: undefined,
     authOptions: undefined,
 };
 
