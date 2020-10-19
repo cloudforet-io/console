@@ -200,14 +200,6 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-interface RoutineRule {
-    day: string;
-    times: number[];
-}
-interface TicketRule {
-    date: string;
-    times: number[];
-}
 interface Rule {
     [key: string]: number[];
 }
@@ -271,10 +263,10 @@ export default {
             ],
             timezone: computed(() => store.state.user.timezone),
             today: computed(() => dayjs().tz(state.timezone).format('YYYY-MM-DD')),
-            currentDate: computed(() => dayjs().tz(state.timezone)),
+            currentDate: dayjs(),
             currentWeekList: computed(() => {
-                let weekStart = state.currentDate.startOf('week');
-                const weekEnd = state.currentDate.endOf('week');
+                let weekStart = state.currentDate.tz(state.timezone).startOf('week');
+                const weekEnd = state.currentDate.tz(state.timezone).endOf('week');
                 const weekList: Dayjs[] = [];
                 while (weekStart.isSameOrBefore(weekEnd, 'day')) {
                     weekList.push(weekStart);
@@ -583,7 +575,7 @@ export default {
 
         // events
         const onClickCurrentWeek = () => {
-            state.currentDate = dayjs().tz(state.timezone);
+            state.currentDate = dayjs();
         };
         const onSelectStart = (e) => {
             state.showHelpBlock = false;
