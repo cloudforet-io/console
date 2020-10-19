@@ -429,6 +429,7 @@
 		"LOCAL_TIME": "현지시간 (기본값)",
 		"MAKING_TICKET": "티켓 생성중",
 		"MONTH": "월",
+		"NO_SCHED": "스케줄러가 없습니다.",
 		"RESRC_GRP": {
 			"ADD_TAG": "태그 추가",
 			"BASE_INFO": "그룹 기본 정보",

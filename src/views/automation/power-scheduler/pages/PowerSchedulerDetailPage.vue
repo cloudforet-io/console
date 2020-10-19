@@ -7,55 +7,71 @@
                 </p>
                 <p-hr />
                 <div class="my-6 mx-4">
-                    <p-icon-text-button name="ic_plus_bold" outline
+                    <p-icon-text-button v-if="!(mode === 'CREATE' && totalCount === 0)" name="ic_plus_bold" outline
                                         :disabled="mode === 'CREATE'" block
                                         @click="onClickCreate"
                     >
                         {{ $t('PWR_SCHED.CREATE') }}
                     </p-icon-text-button>
                 </div>
-                <div v-if="loading">
-                    <div class="loading-backdrop fade-in" />
-                    <p-lottie name="thin-spinner" :size="2.5"
-                              :auto="true" class="loading"
-                    />
-                </div>
-                <table v-else>
-                    <tbody>
-                        <tr v-for="(schedule, index) in scheduleList" :key="index"
-                            class="list-item"
-                            :class="{ active: isActiveItem(schedule),
-                                      'edit-mode': mode !== 'READ',
-                                      disabled: mode !== 'READ' && !isActiveItem(schedule)
-                            }"
+                <p-selectable-list :items="scheduleList" :loading="loading"
+                                   :mapper="{
+                                       title: 'name'
+                                   }"
+                                   :multi-selectable="false"
+                >
+                    <template #loading>
+                        <div />
+                    </template>
+                    <template #no-data>
+                        <div class="no-data">
+                            {{ $t('PWR_SCHED.NO_SCHED') }}
+                        </div>
+                    </template>
+                    <template #contents-bottom="{item}">
+                        <p-status :icon-color="EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].color : undefined"
+                                  :text-color="EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].color : undefined"
                         >
-                            <td class="name" @click="showDetail(schedule)">
-                                <p-i v-if="isActiveItem(schedule)"
-                                     name="ic_check" height="1rem" width="1rem"
-                                     color="transparent inherit"
-                                /> {{ schedule.name }}
-                            </td>
-                            <td class="edit">
-                                <span v-if="mode === 'UPDATE' && isActiveItem(schedule)"
-                                      class="tag"
-                                >{{ $t('PWR_SCHED.EDITING') }}</span>
-                                <span v-else-if="mode === 'CREATE' && isActiveItem(schedule)"
-                                      class="tag"
-                                >{{ $t('PWR_SCHED.CREATING') }}</span>
-                                <p-icon-button v-else class="edit" name="ic_edit"
-                                               :disabled="mode !== 'READ' && !isActiveItem(schedule)"
-                                               @click="onClickEdit(schedule)"
-                                />
-                            </td>
-                            <td class="delete">
-                                <p-icon-button class="delete" name="ic_trashcan"
-                                               :disabled="mode !== 'READ' && !isActiveItem(schedule)"
-                                               @click="onClickDelete(schedule)"
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            {{ EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].label : '' }}
+                        </p-status>
+                    </template>
+                </p-selectable-list>
+                <!--                <table v-else>-->
+                <!--                    <tbody>-->
+                <!--                        <tr v-for="(schedule, index) in scheduleList" :key="index"-->
+                <!--                            class="list-item"-->
+                <!--                            :class="{ active: isActiveItem(schedule),-->
+                <!--                                      'edit-mode': mode !== 'READ',-->
+                <!--                                      disabled: mode !== 'READ' && !isActiveItem(schedule)-->
+                <!--                            }"-->
+                <!--                        >-->
+                <!--                            <td class="name" @click="showDetail(schedule)">-->
+                <!--                                <p-i v-if="isActiveItem(schedule)"-->
+                <!--                                     name="ic_check" height="1rem" width="1rem"-->
+                <!--                                     color="transparent inherit"-->
+                <!--                                /> {{ schedule.name }}-->
+                <!--                            </td>-->
+                <!--                            <td class="edit">-->
+                <!--                                <span v-if="mode === 'UPDATE' && isActiveItem(schedule)"-->
+                <!--                                      class="tag"-->
+                <!--                                >{{ $t('PWR_SCHED.EDITING') }}</span>-->
+                <!--                                <span v-else-if="mode === 'CREATE' && isActiveItem(schedule)"-->
+                <!--                                      class="tag"-->
+                <!--                                >{{ $t('PWR_SCHED.CREATING') }}</span>-->
+                <!--                                <p-icon-button v-else class="edit" name="ic_edit"-->
+                <!--                                               :disabled="mode !== 'READ' && !isActiveItem(schedule)"-->
+                <!--                                               @click="onClickEdit(schedule)"-->
+                <!--                                />-->
+                <!--                            </td>-->
+                <!--                            <td class="delete">-->
+                <!--                                <p-icon-button class="delete" name="ic_trashcan"-->
+                <!--                                               :disabled="mode !== 'READ' && !isActiveItem(schedule)"-->
+                <!--                                               @click="onClickDelete(schedule)"-->
+                <!--                                />-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+                <!--                    </tbody>-->
+                <!--                </table>-->
             </section>
         </template>
         <p-page-navigation :routes="routeState.route" />
@@ -73,7 +89,13 @@
             </p-page-title>
         </header>
 
-        <schedule-detail v-if="selectedSchedule" :schedule-id.sync="selectedSchedule.schedule_id"
+        <div v-if="loading">
+            <div class="loading-backdrop fade-in" />
+            <p-lottie name="thin-spinner" :size="2.5"
+                      :auto="true" class="loading"
+            />
+        </div>
+        <schedule-detail v-else-if="selectedSchedule" :schedule-id.sync="selectedSchedule.schedule_id"
                          :project-id="projectId"
                          :mode.sync="mode"
                          :name.sync="selectedSchedule.name"
@@ -123,6 +145,9 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
+import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
+import { pointViolet, gray } from '@/styles/colors';
+import PStatus from '@/components/molecules/status/PStatus.vue';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
@@ -136,10 +161,22 @@ export type Mode = typeof modes[number];
 // eslint-disable-next-line camelcase
 const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
+const EXPECTED_STATES = {
+    RUNNING: {
+        label: 'Running',
+        color: pointViolet,
+    },
+    STOPPED: {
+        label: 'Stopped',
+        color: gray[900],
+    },
+};
 
 export default {
     name: 'PowerSchedulerDetail',
     components: {
+        PStatus,
+        PSelectableList,
         PHr,
         VerticalPageLayout,
         PButtonModal,
@@ -179,7 +216,7 @@ export default {
             loading: true,
             selectedSchedule: null as null|Schedule,
             // eslint-disable-next-line camelcase
-            mode: 'READ' as Mode,
+            mode: 'CREATE' as Mode,
         });
 
         const formState = reactive({
@@ -190,6 +227,11 @@ export default {
             schedule_id: '',
         });
 
+        const onClickCreate = () => {
+            state.selectedSchedule = { ...defaultSchedule };
+            state.mode = 'CREATE';
+        };
+
         const listSchedule = async () => {
             state.loading = true;
             try {
@@ -198,14 +240,13 @@ export default {
 
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
+                state.selectedSchedule = state.scheduleList[0];
 
                 if (state.totalCount === 0) {
-                    state.mode = 'CREATE';
-                    // eslint-disable-next-line camelcase
-                    state.scheduleList = [{ ...defaultSchedule }];
+                    onClickCreate();
+                } else {
+                    state.mode = 'READ';
                 }
-
-                state.selectedSchedule = state.scheduleList[0];
             } catch (e) {
                 console.error(e);
             } finally {
@@ -251,12 +292,6 @@ export default {
             }
         };
 
-        const onClickCreate = () => {
-            state.selectedSchedule = { ...defaultSchedule };
-            state.scheduleList.push(state.selectedSchedule);
-            state.mode = 'CREATE';
-        };
-
         const onCancel = () => {
             if (state.mode === 'CREATE') {
                 state.scheduleList.pop();
@@ -285,6 +320,7 @@ export default {
             scheduleDeleteConfirm,
             onClickCreate,
             onCancel,
+            EXPECTED_STATES,
         };
     },
 };
@@ -294,12 +330,19 @@ export default {
     header {
         @apply flex justify-between;
     }
+    .p-selectable-list::v-deep {
+        .no-data {
+            @apply mt-6 mx-4 text-gray-200 font-normal;
+            line-height: 1.2;
+        }
+    }
     .list-section {
         @apply relative mx-1 mt-8;
         min-height: 8rem;
         .title {
             @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
         }
+
         table {
             width: 100%;
             border-collapse: separate;
