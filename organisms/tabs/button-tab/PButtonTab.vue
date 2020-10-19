@@ -22,14 +22,12 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-} from '@vue/composition-api';
-import {
-    isOne, TabItem,
-} from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import { computed } from '@vue/composition-api';
+
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { ButtonTabProps } from '@/components/organisms/tabs/button-tab/type';
+
 import { makeProxy } from '@/components/util/composition-helpers';
 
 export default {
@@ -42,6 +40,7 @@ export default {
         },
         activeTab: {
             type: String,
+            default: '',
         },
         keepAliveAll: {
             type: Boolean,
@@ -51,7 +50,7 @@ export default {
     setup(props: ButtonTabProps, { emit }) {
         return {
             proxyActiveTab: makeProxy('activeTab', props, emit),
-            isOne: isOne(props),
+            isOne: computed(() => props.tabs.length === 1),
             nonKeepTabs: computed(() => props.tabs.reduce<TabItem[]>((results, current, idx) => {
                 if (props.keepAliveAll) return [];
                 if (typeof current === 'string') results.push({ name: current, label: current, keepAlive: false });

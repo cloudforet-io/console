@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { TabBarProps, TabItem } from '@/components/molecules/tabs/tab-bar/type';
 
 export default {
@@ -41,14 +41,14 @@ export default {
     },
     setup(props: TabBarProps, { emit }) {
         const state = reactive({
-            tabData: props.tabs.map((value: string|TabItem) => {
+            tabData: computed(() => props.tabs.map((value: string|TabItem) => {
                 if (typeof value === 'string') {
                     return { name: value, label: value };
                 }
                 value.label = value.label || value.name;
                 return value;
-            }),
-            isSingle: props.tabs.length === 1,
+            })),
+            isSingle: computed(() => props.tabs.length === 1),
         });
 
         const onClickTab = (name) => {

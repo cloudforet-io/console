@@ -1,5 +1,5 @@
-import { TabBarProps } from '@/components/molecules/tabs/tab-bar/PTabBar.toolset';
+import { TabProps } from '@/components/organisms/tabs/tab/type';
 
-export interface ButtonTabProps extends TabBarProps {
+export interface ButtonTabProps extends TabProps {
     keepAliveAll: boolean;
 }
