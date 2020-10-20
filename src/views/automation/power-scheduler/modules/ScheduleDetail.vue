@@ -201,17 +201,6 @@ export default {
             emit('confirm');
         };
 
-        const onClickSave = () => {
-            state.showValidation = true;
-            if (!state.isAllValid) return;
-
-            if (state.timeTable.isRuleExist()) {
-                onConfirmCheckModal();
-            } else {
-                checkModalState.visible = true;
-            }
-        };
-
         watch(() => props.scheduleId, () => {
             state.showValidation = false;
             state.groupName = props.name;
