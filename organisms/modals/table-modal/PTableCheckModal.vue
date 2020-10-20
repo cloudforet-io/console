@@ -16,9 +16,13 @@
     >
         <template #body>
             <div>
-                <h4 class="p-table-check-modal-sub-title">
-                    {{ subTitle }}
-                </h4>
+                <slot name="sub-title">
+                    <h4 class="p-table-check-modal-sub-title">
+                        <slot name="sub-title-format">
+                            {{ subTitle }}
+                        </slot>
+                    </h4>
+                </slot>
                 <div class="overflow-auto" :style="{'max-height': '300px'}">
                     <slot v-bind="$props">
                         <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
