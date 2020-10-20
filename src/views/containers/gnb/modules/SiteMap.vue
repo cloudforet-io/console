@@ -151,9 +151,11 @@ export default {
         position: absolute;
         top: 2.5rem;
         left: 0;
+        max-height: calc(100vh - 4rem);
         width: 15rem;
         font-size: 0.875rem;
         box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
         z-index: 10;
         padding: 1.5rem 0;
         margin-left: 1.5rem;

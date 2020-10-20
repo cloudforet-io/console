@@ -7,14 +7,14 @@
             <div class="logo-lap">
                 <router-link to="/dashboard">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
-                    <img class="brand-logo-text hidden md:inline-block lg:inline-block"
+                    <img class="brand-logo-text hidden lg:inline-block"
                          src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
                     >
                 </router-link>
             </div>
             <div v-for="(dItem, idx) in defaultMenuList"
                  :key="idx"
-                 class="menu-lap hidden md:inline-block lg:inline-block"
+                 class="menu-lap hidden lg:inline-block"
             >
                 <div class="menu-button opacity mr-4 lg:mr-8"
                      :class="[{
