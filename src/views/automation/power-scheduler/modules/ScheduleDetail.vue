@@ -1,6 +1,6 @@
 <template>
-    <section :class="{'edit-mode': mode !== 'READ'}" class="schedule-detail">
-        <div class="detail-box">
+    <div>
+        <section class="mt-4">
             <p-field-group v-if="mode !== 'READ'"
                            class="name-field"
                            :required="true"
@@ -20,18 +20,14 @@
                 </template>
             </p-field-group>
 
-            <div class="scroll-contents">
-                <schedule-time-table
-                    ref="timeTable"
-                    :schedule-id="scheduleId"
-                    :mode="mode"
-                />
-            </div>
-            <div class="scroll-contents">
-                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
-                                 :mode="mode"
-                />
-            </div>
+            <schedule-time-table
+                ref="timeTable"
+                :schedule-id="scheduleId"
+                :mode="mode"
+            />
+            <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
+                             :mode="mode"
+            />
 
             <div v-if="mode !== 'READ'" class="actions">
                 <p-button style-type="gray900" :outline="true" @click="onClickCancel">
@@ -43,7 +39,7 @@
                     {{ $t('PWR_SCHED.SAVE') }}
                 </p-button>
             </div>
-        </div>
+        </section>
         <p-button-modal
             :header-title="$t('PWR_SCHED.CHECK_TIME_SET')"
             centered
@@ -71,7 +67,7 @@
                 {{ $t('PWR_SCHED.CHECK_TIME_SET_YES') }}
             </template>
         </p-button-modal>
-    </section>
+    </div>
 </template>
 
 <script lang="ts">
@@ -141,7 +137,6 @@ export default {
             isNameValid: computed(() => !!state.groupName),
             isAllValid: computed(() => state.isNameValid),
             groupName: props.name,
-            proxyScheduleId: props.scheduleId,
             kanban: null,
             timeTable: null,
             loading: false,
@@ -219,6 +214,7 @@ export default {
 
         watch(() => props.scheduleId, () => {
             state.showValidation = false;
+            state.groupName = props.name;
         });
 
         return {
@@ -233,9 +229,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .schedule-detail {
-        margin-top: 3rem;
-    }
     .detail-box {
         @apply mt-2 border border-gray-200;
         padding: 3.25rem 3rem 2.75rem;
@@ -252,15 +245,12 @@ export default {
             background-color: rgba(theme('colors.secondary2'), 0.5);
         }
     }
-    .scroll-contents {
-        @apply overflow-x-auto;
-    }
     .kanban {
         margin-top: 2.875rem;
     }
     .actions {
         @apply flex justify-end;
-        margin-top: 2.5rem;
+        margin-top: 1.5rem;
     }
     .name-field {
         margin-bottom: 3.25rem;

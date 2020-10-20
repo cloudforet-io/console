@@ -7,8 +7,8 @@
                 </p>
                 <p-hr />
                 <div class="my-6 mx-4">
-                    <p-icon-text-button v-if="!(mode === 'CREATE' && totalCount === 0)" name="ic_plus_bold" outline
-                                        :disabled="mode === 'CREATE'" block
+                    <p-icon-text-button v-if="!isFirstTimeCreate" name="ic_plus_bold" outline
+                                        :disabled="mode !== 'READ'" block
                                         @click="onClickCreate"
                     >
                         {{ $t('PWR_SCHED.CREATE') }}
@@ -184,6 +184,7 @@ export default {
             selectedSchedule: computed(() => state.scheduleList[state.selectedIndexes[0]] || { ...defaultSchedule }),
             // eslint-disable-next-line camelcase
             mode: 'CREATE' as Mode,
+            isFirstTimeCreate: computed(() => state.mode === 'CREATE' && state.totalCount === 0),
         });
 
         const formState = reactive({
@@ -252,7 +253,7 @@ export default {
         };
 
         const onCancel = () => {
-            listSchedule();
+            if (state.mode === 'CREATE') state.selectedIndexes = [0];
             state.mode = 'READ';
         };
 

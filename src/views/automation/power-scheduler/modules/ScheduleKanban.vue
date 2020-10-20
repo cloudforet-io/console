@@ -5,7 +5,7 @@
             <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
             <p-icon-text-button v-if="mode === 'UPDATE'" style-type="gray900" outline
                                 name="ic_plus_bold"
-                                class="add-column-btn mr-2 float-right" @click="addColumn"
+                                class="add-column-btn float-right" @click="addColumn"
             >
                 우선순위 추가
             </p-icon-text-button>
@@ -358,13 +358,13 @@ export default {
             height: 20rem;
         }
         .kanban-container {
-            @apply flex flex-wrap w-full h-full;
+            @apply grid w-full h-full;
+            row-gap: 0.5rem;
+            column-gap: 0.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(11.75rem, 1fr));
             .resource-group-box {
                 @apply border border-violet-200 bg-white box-border;
-                width: calc(20% - 0.5rem);
-                min-width: calc(20% - 0.5rem);
                 border-radius: 2px;
-                margin-bottom: 0.5rem;
                 box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
                 .resource-group-header {
                     @apply bg-violet-100;
@@ -509,13 +509,6 @@ export default {
                     }
                 }
             }
-            .resource-group-box + .resource-group-box {
-                margin-right: 0.5rem;
-            }
-            .resource-group-box:nth-child(1) {
-                margin-right: 0.5rem;
-            }
         }
     }
-
 </style>
