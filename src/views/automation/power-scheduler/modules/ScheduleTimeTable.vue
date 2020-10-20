@@ -16,14 +16,15 @@
             </div>
         </div>
         <div class="content-lap">
-            <div class="left-lap">
+            <div class="left-lap" :class="[editMode ? 'editing' : '']">
                 <div class="time-section">
                     <div class="icon-item" />
                     <div v-for="time in range(0, 24)"
                          :key="time"
                          class="time"
+                         :class="editMode && hoveredTime === time ? 'hovered' : ''"
                     >
-                        {{ time % 2 !== 0 ? ('0' + time).slice(-2) : '' }}
+                        {{ ('0' + time).slice(-2) }}
                     </div>
                 </div>
                 <div ref="draggableSection" class="data-section">
@@ -74,11 +75,14 @@
                             :class="[week.format('YYYY-MM-DD'), `${week.format('ddd')}-${time}`]"
                             class="item"
                             @click="onClickTimeBlock"
+                            @mouseenter="onMouseEnterTimeBlock(time)"
+                            @mouseleave="onMouseLeaveTimeBlock"
                         />
                     </div>
                     <div v-if="showHelpBlock" class="help-block">
                         <p class="help-text">
-                            날짜와 시간을 클릭/드래그하여 타이머를 적용하세요.<br>재 클릭시 해제할 수 있습니다.
+                            날짜와 시간을 클릭/드래그하여 타이머를 적용하세요. 재 클릭시 해제할 수 있습니다.<br>
+                            <b>*주의: 아무 설정도 없는 경우 모든 리소스의 작동이 멈추게 됩니다.</b>
                         </p>
                         <p-i name="cursor_pointer--blue" class="cursor-icon"
                              width="2rem" height="2rem"
@@ -250,6 +254,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            // date
             weekdayTexts: [
                 vm.$t('PWR_SCHED.DAY_SUN'),
                 vm.$t('PWR_SCHED.DAY_MON'),
@@ -292,9 +297,11 @@ export default {
                 oneTimeStop: {} as Rule,
             },
             showHelpBlock: false,
+            //
+            hoveredTime: null,
         });
 
-        // util
+        /* util */
         const setStyleClass = () => {
             refs.item.forEach((item) => {
                 const classes = item.classList;
@@ -434,7 +441,7 @@ export default {
             return newRule;
         };
 
-        // api
+        /* api */
         const getScheduleRule = async () => {
             // init schedule Rule state
             state.rule.routine = {};
@@ -559,12 +566,6 @@ export default {
                 console.error(e);
             }
         };
-
-        const isRuleExist = () => {
-            const settings = getRuleSettings();
-            return settings.ruleForApi.length > 0;
-        };
-
         const createOrUpdate = async (scheduleId) => {
             const settings = getRuleSettings();
 
@@ -579,7 +580,7 @@ export default {
             }
         };
 
-        // events
+        /* event */
         const onClickCurrentWeek = () => {
             state.currentDate = dayjs();
         };
@@ -700,6 +701,18 @@ export default {
             await getScheduleRule();
             setStyleClass();
         };
+        const onMouseEnterTimeBlock = (time) => {
+            state.hoveredTime = time;
+        };
+        const onMouseLeaveTimeBlock = () => {
+            state.hoveredTime = null;
+        };
+
+        /* etc */
+        const isRuleExist = () => {
+            const settings = getRuleSettings();
+            return settings.ruleForApi.length > 0;
+        };
 
         watch(() => props.scheduleId, async (after, before) => {
             if (after !== before) {
@@ -709,12 +722,14 @@ export default {
             }
         }, { immediate: true });
         watch(() => props.mode, async (after) => {
-            if (after === 'CREATE') state.showHelpBlock = true;
-            if (after !== 'READ') {
+            if (after === 'READ') {
+                state.showHelpBlock = false;
+            } else {
                 state.oneTimeEditMode = false;
                 await getScheduleRule();
                 setStyleClass();
             }
+            if (after === 'CREATE') state.showHelpBlock = true;
         }, { immediate: true });
         watch(() => state.currentDate, () => {
             setStyleClass();
@@ -734,6 +749,8 @@ export default {
             onClickSaveOneTimeSchedule,
             onClickCancelOneTimeSchedule,
             onClickTimeBlock,
+            onMouseEnterTimeBlock,
+            onMouseLeaveTimeBlock,
             range,
             isRuleExist,
             createOrUpdate,
@@ -774,22 +791,46 @@ export default {
         display: flex;
         .left-lap {
             @apply border border-gray-200;
+            border-top-left-radius: 2px;
+            border-bottom-left-radius: 2px;
             display: flex;
             width: 80%;
+            &.editing {
+                cursor: crosshair;
+                .time-section {
+                    @apply bg-blue-200;
+                }
+                .data-section {
+                    .weekday-row {
+                        @apply bg-blue-200;
+                        .weekday-item {
+                            &.today {
+                                @apply text-secondary;
+                            }
+                        }
+                    }
+                    .item-row:hover {
+                        @apply bg-gray-100;
+                    }
+                }
+            }
             .time-section {
                 @apply bg-primary3 border-r border-gray-200;
                 display: inline-block;
                 width: 3rem;
+                cursor: default;
                 .icon-item {
                     @apply border-b border-gray-200;
                     height: 3.125rem;
                 }
                 .time {
-                    @apply text-gray-500;
+                    @apply text-gray-900;
                     height: 1rem;
                     font-size: 0.625rem;
                     text-align: center;
-                    line-height: 0.625rem;
+                    &.hovered {
+                        background-color: rgba(theme('colors.secondary1'), 0.25);
+                    }
                 }
             }
             .data-section {
@@ -804,8 +845,9 @@ export default {
                     @apply bg-primary3 border-b border-gray-200;
                     width: 100%;
                     height: 3.125rem;
+                    cursor: default;
                     .weekday-item {
-                        @apply text-gray-500 border-l border-gray-200;
+                        @apply text-gray-900 border-l border-gray-200;
                         display: inline-block;
                         width: calc(100% / 7);
                         height: 100%;
@@ -868,10 +910,10 @@ export default {
                     @apply border-dashed border-secondary text-secondary;
                     position: absolute;
                     display: table;
-                    width: calc(100% / 7 * 3);
+                    width: calc(100% / 7 * 5);
                     height: 4rem;
-                    top: 10rem;
-                    left: calc(100% / 7 * 2);
+                    top: 12rem;
+                    left: calc(100% / 7);
                     border-width: 2px;
                     border-radius: 2px;
                     opacity: 0.75;
@@ -896,6 +938,8 @@ export default {
             position: relative;
             width: 20%;
             font-size: 0.875rem;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
             padding: 1.5rem;
             .title {
                 @apply text-gray-400;
