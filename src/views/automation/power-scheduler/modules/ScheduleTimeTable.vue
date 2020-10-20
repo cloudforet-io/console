@@ -734,6 +734,10 @@ export default {
         watch(() => state.currentDate, () => {
             setStyleClass();
         });
+        watch(() => state.timezone, async () => {
+            await getScheduleRule();
+            setStyleClass();
+        });
 
         onMounted(() => {
             state.dragContainer = refs.draggableSection;
