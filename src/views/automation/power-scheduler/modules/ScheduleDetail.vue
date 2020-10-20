@@ -1,6 +1,24 @@
 <template>
     <div>
         <section class="mt-4">
+            <div v-if="mode === 'READ'">
+                <p class="section-title">
+                    {{ $t('PWR_SCHED.BASIC_INFO') }}
+                </p>
+                <div class="detail-box">
+                    <div class="info-lab w-1/3">
+                        <span class="title">{{ $t('PWR_SCHED.CREATED_TIME') }}</span>
+                        <span class="content">{{ created }}</span>
+                    </div>
+                    <div class="info-lab w-1/3">
+                        <span class="title">{{ $t('PWR_SCHED.TARGET_STATE') }}</span>
+                    </div>
+                    <div class="info-lab w-1/3">
+                        <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
+                    </div>
+                </div>
+            </div>
+
             <p-field-group v-if="mode !== 'READ'"
                            class="name-field"
                            :required="true"
@@ -78,15 +96,14 @@ import {
 
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
-
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-
-import { makeProxy } from '@/components/util/composition-helpers';
-import { SpaceConnector } from '@/lib/space-connector';
 import { ViewMode } from '@/views/automation/power-scheduler/type';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+
+import { SpaceConnector } from '@/lib/space-connector';
+import { timestampFormatter } from '@/lib/util';
 
 
 interface Props {
@@ -131,7 +148,7 @@ export default {
             default: '',
         },
     },
-    setup(props: Props, { emit, refs }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             showValidation: false,
             isNameValid: computed(() => !!state.groupName),
@@ -140,11 +157,26 @@ export default {
             kanban: null,
             timeTable: null,
             loading: false,
+            //
+            created: '',
+            targetState: '',
+            currentState: '',
         });
 
         const checkModalState = reactive({
             visible: false,
         });
+
+        const getSchedule = async () => {
+            try {
+                const res = await SpaceConnector.client.powerScheduler.schedule.get({
+                    schedule_id: props.scheduleId,
+                });
+                state.created = timestampFormatter(res.created_at);
+            } catch (e) {
+                console.error(e);
+            }
+        };
 
         const createSchedule = async () => {
             try {
@@ -204,7 +236,8 @@ export default {
         watch(() => props.scheduleId, () => {
             state.showValidation = false;
             state.groupName = props.name;
-        });
+            getSchedule();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -218,46 +251,59 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .detail-box {
-        @apply mt-2 border border-gray-200;
-        padding: 3.25rem 3rem 2.75rem;
-        box-shadow: inset 0 0 1.25rem rgba(theme('colors.primary4'), 0.08);
-        background-color: rgba(theme('colors.primary4'), 0.5);
-    }
-    .edit-mode {
+.section-title {
+    @apply text-xs text-gray-900;
+    margin-bottom: 0.5rem;
+}
+.detail-box {
+    @apply mt-2 border border-gray-200;
+    display: flex;
+    width: 100%;
+    height: 4.5rem;
+    border-radius: 2px;
+    padding: 1rem 0;
+    margin-bottom: 3.25rem;
+    .info-lab {
+        @apply border-r border-gray-200;
+        font-size: 0.875rem;
+        line-height: 2.25rem;
+        padding: 0 1.5rem;
+        &:last-of-type {
+            @apply border-none;
+        }
         .title {
-            @apply text-secondary;
-        }
-        .detail-box {
-            @apply border-secondary;
-            box-shadow: inset 0 0 1.25rem rgba(theme('colors.secondary2'), 0.08);
-            background-color: rgba(theme('colors.secondary2'), 0.5);
-        }
-    }
-    .kanban {
-        margin-top: 2.875rem;
-    }
-    .actions {
-        @apply flex justify-end;
-        margin-top: 1.5rem;
-    }
-    .name-field {
-        margin-bottom: 3.25rem;
-    }
-    .name-field-label {
-        display: inline-block;
-        .label {
-            @apply text-gray-900;
-            font-size: 1rem;
-            font-weight: bold;
-            padding-right: 0.5rem;
-        }
-        .desc {
             @apply text-gray-400;
-            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .content {
+            float: right;
         }
     }
-    .name-input {
-        @apply block mt-4 w-full;
+}
+.kanban {
+    margin-top: 2.875rem;
+}
+.actions {
+    @apply flex justify-end;
+    margin-top: 1.5rem;
+}
+.name-field {
+    margin-bottom: 3.25rem;
+}
+.name-field-label {
+    display: inline-block;
+    .label {
+        @apply text-gray-900;
+        font-size: 1rem;
+        font-weight: bold;
+        padding-right: 0.5rem;
     }
+    .desc {
+        @apply text-gray-400;
+        font-size: 0.75rem;
+    }
+}
+.name-input {
+    @apply block mt-4 w-full;
+}
 </style>

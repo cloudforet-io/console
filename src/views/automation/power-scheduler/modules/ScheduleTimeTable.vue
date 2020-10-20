@@ -116,7 +116,7 @@
                         <span>{{ $t('PWR_SCHED.ROUTINE_TIMER') }}</span>
                         <div>
                             <p-button v-if="mode !== 'READ'"
-                                      class="gray900 sm" :outline="true"
+                                      class="gray900 sm delete-all-button" :outline="true"
                                       @click="onDeleteAllRoutine"
                             >
                                 {{ $t('PWR_SCHED.DELETE_ALL') }}
@@ -793,6 +793,7 @@ export default {
                 }
             }
             .data-section {
+                position: relative;
                 display: inline-block;
                 width: calc(100% - 3rem);
                 .loader {
@@ -868,8 +869,8 @@ export default {
                     position: absolute;
                     display: table;
                     width: calc(100% / 7 * 3);
-                    height: 3.75rem;
-                    top: 9rem;
+                    height: 4rem;
+                    top: 10rem;
                     left: calc(100% / 7 * 2);
                     border-width: 2px;
                     border-radius: 2px;
@@ -932,6 +933,10 @@ export default {
                     vertical-align: baseline;
                     border-radius: 2px;
                     margin-right: 0.5rem;
+                }
+                .delete-all-button {
+                    @apply border-gray-300;
+                    margin-top: 0.5rem;
                 }
                 .edit-button {
                     @apply border-gray-300;
