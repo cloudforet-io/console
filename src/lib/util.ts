@@ -171,7 +171,7 @@ export const showSuccessMessage = (successTitle, successMessage, root) => {
             title: successTitle,
             text: successMessage,
             duration: 2000,
-            speed: 1000,
+            speed: 500,
         });
     }
 };

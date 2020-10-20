@@ -361,7 +361,7 @@ export default {
         const onSelect = (item) => {
             state.selectedJobId = item.job_id;
             // eslint-disable-next-line no-empty-function
-            vm.$router.replace({ query: { ...router.currentRoute.query }, hash: item.job_id }).catch(() => {});
+            vm.$router.push({ path: router.currentRoute.fullPath, query: { ...router.currentRoute.query }, hash: item.job_id }).catch(() => {});
         };
         const onChange = async (item) => {
             state.tags = item.queryTags;

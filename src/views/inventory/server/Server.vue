@@ -325,12 +325,12 @@ export default {
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
 
-            query.setOnly(...typeOptionState.keyItems.map(d => d.name), 'server_id', 'collection_info.collectors');
+            query.setOnly(...typeOptionState.keyItems.map(d => d.name), 'collection_info.collectors');
             if (tableState.schema?.options?.fields) {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
-                }), 'reference', 'server_id', 'primary_ip_address', 'collection_info.collectors');
+                }), 'reference', 'primary_ip_address', 'collection_info.collectors');
             }
 
             return query.data;
@@ -378,6 +378,9 @@ export default {
                 const res = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: 'inventory.Server',
                     schema: 'table',
+                    options: {
+                        include_id: true,
+                    },
                 });
 
                 // declare keyItems and valueHandlerMap with search schema

@@ -44,7 +44,7 @@
                 :mode="mode"
             />
             <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
-                             :mode="mode"
+                             :mode.sync="mode"
             />
 
             <div v-if="mode !== 'READ'" class="actions">
@@ -218,6 +218,7 @@ export default {
                     scheduleId = await updateSchedule();
                 }
 
+
                 await state.timeTable.createOrUpdate(scheduleId);
                 await state.kanban.onSave(scheduleId);
                 state.loading = false;
@@ -236,12 +237,10 @@ export default {
             }
         };
 
-        watch(() => props.scheduleId, (after) => {
+        watch(() => props.scheduleId, (id) => {
             state.showValidation = false;
             state.groupName = props.name;
-            if (after) {
-                getSchedule();
-            }
+            if (id) getSchedule();
         }, { immediate: true });
 
         return {

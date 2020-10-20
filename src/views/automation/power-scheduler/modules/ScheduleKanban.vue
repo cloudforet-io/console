@@ -88,11 +88,12 @@
                 </div>
             </div>
         </transition-group>
-        <resource-group-page :visible.sync="resourceGroupVisible"
+        <resource-group-page :visible="resourceGroupVisible"
                              :resource-group="selectedItem ? selectedItem.resource_group : null"
                              :project-id="projectId"
                              :read-mode="mode === 'READ'"
                              @confirm="onResourceGroupConfirm"
+                             @cancel="hideResourceGroupPage"
         />
     </div>
 </template>
@@ -100,7 +101,8 @@
 <script lang="ts">
 import draggable from 'vuedraggable';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -111,6 +113,7 @@ import ResourceGroupPage from '@/views/automation/power-scheduler/pages/Resource
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import router from '@/routes';
 
 
     interface ColumnType {
@@ -154,11 +157,12 @@ export default {
         },
     },
     setup(props: Props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             columns: [] as unknown as ColumnType[],
             maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
             loading: false,
-            editable: false,
+            editable: computed(() => props.mode === 'UPDATE' || props.mode === 'CREATE'),
             showGuide: false,
             isHovered: false,
             resourceGroupVisible: false,
@@ -232,9 +236,11 @@ export default {
             }
         };
 
-        const checkMode = () => {
-            if (props.mode === 'UPDATE' || props.mode === 'CREATE') state.editable = true;
-            else state.editable = false;
+        const syncModeWithRoute = () => {
+            let hash;
+            if (props.mode === 'CREATE') hash = '#create';
+            else if (props.mode === 'UPDATE') hash = '#edit';
+            vm.$router.replace({ hash }).catch(() => {});
         };
 
         const deleteResourceGroup = (column, item, itemIndex) => {
@@ -253,13 +259,23 @@ export default {
             }
         };
 
-        const onClickResourceGroup = (index = -1, columnIdx = 0) => {
-            state.selectedResourceGroupIndex = index;
-            state.selectedColumnIndex = columnIdx;
+        const hideResourceGroupPage = async () => {
+            state.resourceGroupVisible = false;
+        };
+
+        const showResourceGroupPage = () => {
             state.resourceGroupVisible = true;
         };
 
+
+        const onClickResourceGroup = (index = -1, columnIdx = 0) => {
+            state.selectedResourceGroupIndex = index;
+            state.selectedColumnIndex = columnIdx;
+            showResourceGroupPage();
+        };
+
         const onResourceGroupConfirm = (resourceGroupItem: ResourceGroupItem) => {
+            hideResourceGroupPage();
             // update case
             if (state.selectedItem) {
                 state.columns[state.selectedColumnIndex].items[state.selectedResourceGroupIndex] = {
@@ -291,8 +307,17 @@ export default {
         }, { immediate: true });
 
         watch(() => props.mode, async (after, before) => {
-            if (after !== before) {
-                await checkMode();
+            await syncModeWithRoute();
+        }, { immediate: true });
+
+        watch(() => vm.$route, (route) => {
+            if (route.hash === '#create') {
+
+            } else if (route.hash === '#edit') {
+
+            // read mode
+            } else {
+
             }
         }, { immediate: true });
 
@@ -307,6 +332,7 @@ export default {
             onClickResourceGroup,
             onResourceGroupConfirm,
             hideGuide,
+            hideResourceGroupPage,
         };
     },
 };

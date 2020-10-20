@@ -54,9 +54,10 @@
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit"
                                    @click="onClickEdit"
                     />
-                    <p-icon-button v-if="mode !== 'CREATE'" class="ml-2" name="ic_trashcan"
+                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
                                    @click="onClickDelete"
                     />
+                    <div v-if="mode === 'UPDATE'" class="edit-tag">{{$t('PWR_SCHED.EDITING')}}</div>
                 </template>
             </p-page-title>
         </header>
@@ -316,46 +317,6 @@ export default {
         .title {
             @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
         }
-
-        .list-item {
-            @apply cursor-pointer bg-white;
-            td {
-                @apply border-t border-b border-gray-200;
-                height: 3.5rem;
-            }
-            td:first-child {
-                @apply border-l pl-6 rounded-l;
-            }
-            td:last-child {
-                @apply border-r rounded-r;
-            }
-            &.active {
-                td {
-                    @apply border-primary text-primary;
-                }
-                &.edit-mode {
-                    td {
-                        @apply border-secondary text-secondary;
-                    }
-                }
-            }
-            &.disabled {
-                @apply bg-gray-200 text-gray-400;
-                opacity: 0.8;
-                cursor: default;
-                &:hover {
-                    @apply bg-gray-200;
-                }
-            }
-            &:hover {
-                @apply bg-secondary2;
-            }
-        }
-        .tag {
-            @apply bg-blue-200 text-secondary py-1 px-2 text-xs;
-            border-radius: 2px;
-        }
-
         .loading-backdrop {
             @apply absolute w-full h-full overflow-hidden;
             background-color: white;
@@ -380,5 +341,10 @@ export default {
         .fade-in-leave, .fade-in-enter-to {
             opacity: 0.5;
         }
+    }
+
+    .edit-tag {
+        @apply bg-blue-200 text-secondary py-1 px-2 text-xs ml-2;
+        border-radius: 2px;
     }
 </style>

@@ -2,7 +2,7 @@
     <div>
         <transition name="slide-fade">
             <general-page-layout v-show="visible">
-                <p-page-title :title="title" child @goBack="proxyVisible = false" />
+                <p-page-title :title="title" child @goBack="onClickCancel" />
                 <p-pane-layout>
                     <section>
                         <div class="label">
@@ -132,13 +132,20 @@
                 </div>
             </general-page-layout>
         </transition>
-        <p-table-check-modal :header-title="$t('PWR_SCHED.RESRC_GRP.CHECK_LIST')"
-                             :sub-title="$t('PWR_SCHED.RESRC_GRP.CHECK_LIST_DESC')"
-                             theme-color="primary"
+        <p-table-check-modal theme-color="primary"
                              size="lg"
+                             centered
                              :visible.sync="listModalState.visible"
                              @confirm="onListModalConfirm"
         >
+            <template #sub-title-format>
+                <p class="check-title">
+                    {{ $t('PWR_SCHED.RESRC_GRP.CHECK_LIST_DESC') }} <span class="count">({{ typeOptionState.totalCount }})</span>
+                </p>
+            </template>
+            <p-query-search-tags read-only :tags="fetchOptionState.queryTags"
+                                 :timezone="typeOptionState.timezone"
+            />
             <p-dynamic-layout v-if="schema"
                               type="query-search-table"
                               class="resource-table"
@@ -364,14 +371,14 @@ export default {
                 });
             }
 
-            state.hiddenFilters = [{ k: 'project_id', v: props.projectId, o: 'contain' }];
+            state.hiddenFilters = [{ k: 'project_id', v: props.projectId, o: 'eq' }];
             forEach(options, (d, k) => {
                 state.hiddenFilters.push({
-                    k, v: d, o: 'contain',
+                    k, v: d, o: 'eq',
                 });
             });
 
-            return options;
+            return { ...options, include_id: true };
         };
 
         const getPageSchema = async () => {
@@ -513,7 +520,7 @@ export default {
         };
 
         const onClickCancel = async () => {
-            state.proxyVisible = false;
+            emit('cancel');
         };
 
         const onClickSave = () => {
@@ -530,7 +537,12 @@ export default {
 
         /* list modal */
         const onListModalConfirm = () => {
-            const query = queryHelper.data;
+            const { keywords, andFilters } = getFiltersFromQueryTags(fetchOptionState.queryTags);
+            const query = new QueryHelper()
+                .setFilter(...andFilters)
+                .setKeyword(...keywords)
+                .data;
+
             state.resource.filter = query.filter || [];
             state.resource.keyword = query.keyword || '';
 
@@ -552,7 +564,6 @@ export default {
 
             emit('confirm', params);
             listModalState.visible = false;
-            state.proxyVisible = false;
         };
 
 
@@ -653,5 +664,13 @@ section {
 }
 .actions {
     @apply mt-6 text-right;
+}
+.check-title {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    .count {
+        @apply text-gray-500;
+        font-size: 1rem;
+    }
 }
 </style>
