@@ -41,42 +41,6 @@
                         </template>
                     </p-selectable-list>
                 </div>
-                <!--                <table v-else>-->
-                <!--                    <tbody>-->
-                <!--                        <tr v-for="(schedule, index) in scheduleList" :key="index"-->
-                <!--                            class="list-item"-->
-                <!--                            :class="{ active: isActiveItem(schedule),-->
-                <!--                                      'edit-mode': mode !== 'READ',-->
-                <!--                                      disabled: mode !== 'READ' && !isActiveItem(schedule)-->
-                <!--                            }"-->
-                <!--                        >-->
-                <!--                            <td class="name" @click="showDetail(schedule)">-->
-                <!--                                <p-i v-if="isActiveItem(schedule)"-->
-                <!--                                     name="ic_check" height="1rem" width="1rem"-->
-                <!--                                     color="transparent inherit"-->
-                <!--                                /> {{ schedule.name }}-->
-                <!--                            </td>-->
-                <!--                            <td class="edit">-->
-                <!--                                <span v-if="mode === 'UPDATE' && isActiveItem(schedule)"-->
-                <!--                                      class="tag"-->
-                <!--                                >{{ $t('PWR_SCHED.EDITING') }}</span>-->
-                <!--                                <span v-else-if="mode === 'CREATE' && isActiveItem(schedule)"-->
-                <!--                                      class="tag"-->
-                <!--                                >{{ $t('PWR_SCHED.CREATING') }}</span>-->
-                <!--                                <p-icon-button v-else class="edit" name="ic_edit"-->
-                <!--                                               :disabled="mode !== 'READ' && !isActiveItem(schedule)"-->
-                <!--                                               @click="onClickEdit(schedule)"-->
-                <!--                                />-->
-                <!--                            </td>-->
-                <!--                            <td class="delete">-->
-                <!--                                <p-icon-button class="delete" name="ic_trashcan"-->
-                <!--                                               :disabled="mode !== 'READ' && !isActiveItem(schedule)"-->
-                <!--                                               @click="onClickDelete(schedule)"-->
-                <!--                                />-->
-                <!--                            </td>-->
-                <!--                        </tr>-->
-                <!--                    </tbody>-->
-                <!--                </table>-->
             </section>
         </template>
         <p-page-navigation :routes="routeState.route" />
@@ -88,7 +52,10 @@
             >
                 <template #extra>
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit"
-                                   @click="onClickEdit()"
+                                   @click="onClickEdit"
+                    />
+                    <p-icon-button v-if="mode !== 'CREATE'" class="ml-2" name="ic_trashcan"
+                                   @click="onClickDelete"
                     />
                 </template>
             </p-page-title>
@@ -103,9 +70,10 @@
         <schedule-detail v-else-if="selectedSchedule"
                          :schedule-id="selectedSchedule.schedule_id"
                          :project-id="projectId"
-                         :mode.sync="mode"
+                         :mode="mode"
                          :name="selectedSchedule.name"
                          @cancel="onCancel"
+                         @confirm="onConfirm"
         />
         <p-button-modal
             :header-title="headerTitle"
@@ -134,7 +102,7 @@
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -261,8 +229,6 @@ export default {
             }
         };
 
-        // eslint-disable-next-line camelcase
-        const isActiveItem = (schedule: Schedule) => state.selectedSchedule?.schedule_id === schedule.schedule_id;
 
         const showDetail = async (idx) => {
             if (state.mode === 'READ') {
@@ -270,17 +236,16 @@ export default {
             }
         };
 
-        const onClickEdit = (idx = -1) => {
-            if (idx === -1) state.selectedIndexes = [idx];
+        const onClickEdit = () => {
             state.mode = 'UPDATE';
         };
 
-        const onClickDelete = (schedule) => {
+        const onClickDelete = () => {
             formState.visible = true;
             formState.themeColor = 'alert';
             formState.headerTitle = '스케줄 그룹 삭제';
             formState.modalContent = '스케줄 그룹을 삭제하시겠습니까?';
-            formState.schedule_id = schedule.schedule_id;
+            formState.schedule_id = state.selectedSchedule.schedule_id;
         };
 
         const scheduleDeleteConfirm = async () => {
@@ -300,11 +265,12 @@ export default {
         };
 
         const onCancel = () => {
-            if (state.mode === 'CREATE') {
-                state.scheduleList.pop();
-                if (state.scheduleList.length === 0) vm.$router.push('/automation/power-scheduler');
-                else state.selectedIndexes = [];
-            }
+            listSchedule();
+            state.mode = 'READ';
+        };
+
+        const onConfirm = () => {
+            listSchedule();
             state.mode = 'READ';
         };
 
@@ -320,13 +286,13 @@ export default {
             routeState,
             ...toRefs(state),
             ...toRefs(formState),
-            isActiveItem,
             showDetail,
             onClickEdit,
             onClickDelete,
             scheduleDeleteConfirm,
             onClickCreate,
             onCancel,
+            onConfirm,
             EXPECTED_STATES,
         };
     },
@@ -338,6 +304,9 @@ export default {
         @apply flex justify-between;
     }
     .p-selectable-list::v-deep {
+        .item-container {
+            @apply mb-2;
+        }
         .item-contents {
             @apply ml-4 leading-none;
         }
@@ -360,28 +329,6 @@ export default {
             @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
         }
 
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 0.5rem;
-            table-layout: fixed;
-        }
-        th {
-            @apply font-normal text-xs text-gray-500;
-        }
-        th, td {
-            &.name {
-                @apply text-left truncate;
-            }
-            &.edit {
-                @apply text-center pr-4;
-                width: 4.2rem;
-            }
-            &.delete {
-                @apply text-center pr-6;
-                width: 3rem;
-            }
-        }
         .list-item {
             @apply cursor-pointer bg-white;
             td {

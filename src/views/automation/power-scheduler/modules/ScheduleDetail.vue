@@ -1,8 +1,5 @@
 <template>
     <section :class="{'edit-mode': mode !== 'READ'}" class="schedule-detail">
-        <p class="section-title">
-            {{ mode === 'UPDATE' ? $t('PWR_SCHED.EDIT_MODE') : (mode === 'CREATE' ? $t('PWR_SCHED.CREATE_MODE') : $t('PWR_SCHED.DETAILS')) }}
-        </p>
         <div class="detail-box">
             <p-field-group v-if="mode !== 'READ'"
                            class="name-field"
@@ -26,12 +23,12 @@
             <div class="scroll-contents">
                 <schedule-time-table
                     ref="timeTable"
-                    :schedule-id="proxyScheduleId"
+                    :schedule-id="scheduleId"
                     :mode="mode"
                 />
             </div>
             <div class="scroll-contents">
-                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="proxyScheduleId"
+                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
                                  :mode="mode"
                 />
             </div>
@@ -123,7 +120,7 @@ export default {
         const createSchedule = async () => {
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.create({
-                    name: props.name,
+                    name: state.groupName,
                     project_id: props.projectId,
                 });
                 return res.schedule_id;
@@ -136,8 +133,8 @@ export default {
         const updateSchedule = async () => {
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.update({
-                    schedule_id: state.proxyScheduleId,
-                    name: props.name,
+                    schedule_id: props.scheduleId,
+                    name: state.groupName,
                 });
                 return res.schedule_id;
             } catch (e) {
@@ -155,7 +152,7 @@ export default {
             if (!state.isAllValid) return;
 
             if (props.mode !== 'READ') {
-                let scheduleId = state.proxyScheduleId;
+                let scheduleId = props.scheduleId;
                 if (props.mode === 'CREATE') {
                     scheduleId = await createSchedule();
                 } else if (props.mode === 'UPDATE') {
@@ -164,11 +161,8 @@ export default {
 
                 await state.timeTable.createOrUpdate(scheduleId);
                 await state.kanban.onSave(scheduleId);
-
-                // must change scheduleId after all process end
-                state.proxyScheduleId = scheduleId;
             }
-            emit('update:mode', 'READ');
+            emit('confirm');
         };
 
         watch(() => props.scheduleId, () => {
@@ -187,9 +181,6 @@ export default {
 <style lang="postcss" scoped>
     .schedule-detail {
         margin-top: 3rem;
-    }
-    .section-title {
-        @apply text-xs text-gray-500;
     }
     .detail-box {
         @apply mt-2 border border-gray-200;
