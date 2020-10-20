@@ -104,20 +104,19 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import {
     makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
 } from '@/lib/compostion-util';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import { fluentApi } from '@/lib/fluent-api';
-import { useStore } from '@/store/toolset';
 import { store } from '@/store';
 
 export default {
@@ -129,13 +128,17 @@ export default {
         PTextInput,
     },
     props: {
-        visible: Boolean,
-        userId: String,
+        visible: {
+            type: Boolean,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
     },
     setup(props, context) {
         const vm: any = getCurrentInstance();
-
-        const { user, domain } = useStore();
 
         const userState = reactive({
             password: '',
@@ -158,11 +161,10 @@ export default {
         };
 
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, context.emit),
             loading: false,
-            showPassword: computed(() => state.isDomainOwner || state.isLocalType),
+            proxyVisible: makeProxy('visible', props, context.emit),
+            showPassword: computed(() => state.isDomainOwner || state.isInternalAuth),
             userState,
-            // languages: context.root.$i18n.availableLocales.map(lang => (new MenuItem(lang, LANGUAGES[lang]))),
             languages: [
                 { type: 'item', label: 'English (default)', name: 'en' },
                 { type: 'item', label: '한국어', name: 'ko' },
@@ -171,101 +173,36 @@ export default {
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
             ],
-            // timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
             showValidation: false,
             ...formValidation(userState, updateUserValidations),
-            isLocalType: computed(() => domain.state.isLocalType),
+            isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
 
-        const params: any = {};
-
-        const getUser = async (id) => {
-            const res = await fluentApi.identity().user().get().setId(id)
-                .execute();
+        const getProfile = async (id) => {
             try {
-                state.userState.name = res.data.name;
-                state.userState.email = res.data.email;
-                state.userState.mobile = res.data.mobile;
-                state.userState.group = res.data.group;
-                state.userState.language = res.data.language;
-                state.userState.timezone = res.data.timezone;
+                await store.dispatch('user/getUser', id);
+                state.userState.name = store.state.user.name;
+                state.userState.email = store.state.user.email;
+                state.userState.mobile = store.state.user.mobile;
+                state.userState.group = store.state.user.group;
+                state.userState.language = store.state.user.language;
+                state.userState.timezone = store.state.user.timezone;
             } catch (e) {
                 console.error(e);
             }
         };
-
-        const getOwner = async (id) => {
-            const res = await fluentApi.identity().domainOwner().get().setId(id)
-                .execute();
+        const updateProfile = async (parameters) => {
             try {
-                state.userState.name = res.data.name;
-                state.userState.email = res.data.email;
-                state.userState.mobile = res.data.mobile;
-                state.userState.group = res.data.group;
-                state.userState.language = res.data.language;
-                state.userState.timezone = res.data.timezone;
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        const syncStore = () => {
-            // store.dispatch('user/setLanguage', {language: state.userState.language || 'en'})
-            // store.dispatch('user/setTimezone', {timezone: state.userState.timezone || 'UTC'})
-            user.state.language = state.userState.language || 'en';
-            user.state.timezone = state.userState.timezone || 'UTC';
-            localStorage.setItem('user/language', user.state.language as string);
-            localStorage.setItem('user/timezone', user.state.timezone as string);
-        };
-
-        const updateOwner = async (parameters) => {
-            try {
-                await fluentApi.identity().domainOwner().update().setParameter(parameters)
-                    .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Update Profile',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                await store.dispatch('user/setUser', parameters);
+                showSuccessMessage('success', 'Update Profile', context.root);
                 state.proxyVisible = false;
-                syncStore();
             } catch (e) {
-                showErrorMessage('Fail to Update Owner', e, context.root);
+                showErrorMessage('Fail to Update Profile', e, context.root);
             }
         };
 
-        const updateUser = async (parameters) => {
-            try {
-                await fluentApi.identity().user().update().setParameter(parameters)
-                    .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Update Profile',
-                    duration: 2000,
-                    speed: 1000,
-                });
-                state.proxyVisible = false;
-                syncStore();
-            } catch (e) {
-                showErrorMessage('Fail to Update User', e, context.root);
-            }
-        };
-
-        if (state.isDomainOwner) {
-            // eslint-disable-next-line camelcase
-            params.owner_id = props.userId;
-            getOwner(params.owner_id);
-        } else {
-            // eslint-disable-next-line camelcase
-            params.user_id = props.userId;
-            getUser(params.user_id);
-        }
+        getProfile(props.userId);
 
         const onClickConfirm = async () => {
             state.showValidation = true;
@@ -277,14 +214,11 @@ export default {
             if (!state.showPassword) delete userParam.password;
 
             if (state.isDomainOwner) {
-                // eslint-disable-next-line camelcase
                 userParam.owner_id = props.userId;
-                await updateOwner(userParam);
             } else {
-                // eslint-disable-next-line camelcase
                 userParam.user_id = props.userId;
-                await updateUser(userParam);
             }
+            await updateProfile(userParam);
 
             vm.$i18n.locale = state.userState.language;
             state.proxyVisible = false;
@@ -292,10 +226,6 @@ export default {
 
         return {
             ...toRefs(state),
-            getOwner,
-            getUser,
-            updateOwner,
-            updateUser,
             onClickConfirm,
         };
     },

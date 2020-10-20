@@ -6,22 +6,30 @@ import {
     UserState, SignInRequest, UpdateUserRequest,
 } from './type';
 
-const getDomainOwner = async (ownerId: string): Promise<UserState> => {
+const getDomainOwnerInfo = async (ownerId: string): Promise<UserState> => {
     const response = await SpaceConnector.client.identity.domainOwner.get({ owner_id: ownerId });
     return {
         userId: response.owner_id,
         userType: 'DOMAIN_OWNER',
+        name: response.name,
+        email: response.email,
+        mobile: response.mobile,
+        group: response.group,
         language: response.language,
         timezone: response.timezone,
     };
 };
 
 
-const getUser = async (userId: string): Promise<UserState> => {
+const getUserInfo = async (userId: string): Promise<UserState> => {
     const response = await SpaceConnector.client.identity.user.get({ user_id: userId });
     return {
         userId: response.user_id,
         userType: 'USER',
+        name: response.name,
+        email: response.email,
+        mobile: response.mobile,
+        group: response.group,
         language: response.language,
         timezone: response.timezone,
     };
@@ -49,6 +57,7 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userRequest.password) request.password = userRequest.password;
     if (userRequest.email) request.email = userRequest.email;
     if (userRequest.mobile) request.mobile = userRequest.mobile;
+    if (userRequest.group) request.group = userRequest.group;
     if (userRequest.language) request.language = userRequest.language;
     if (userRequest.timezone) request.timezone = userRequest.timezone;
     if (userRequest.tags) request.tags = userRequest.tags;
@@ -72,10 +81,10 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
     const [userType, userId] = getUserInfoFromToken(response.access_token);
 
     if (userType === 'DOMAIN_OWNER') {
-        const userInfo = await getDomainOwner(userId);
+        const userInfo = await getDomainOwnerInfo(userId);
         commit('setUser', userInfo);
     } else {
-        const userInfo = await getUser(userId);
+        const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
     }
 
@@ -89,8 +98,8 @@ export const signOut = (): void => {
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
     await updateUser(state.userId, state.userType, userRequest);
-    commit('setTimezone', { timezone: userRequest.timezone });
-    commit('setLanguage', { timezone: userRequest.language });
+    commit('setTimezone', userRequest.timezone);
+    commit('setLanguage', userRequest.language);
 };
 
 export const setTimezone = async ({ commit, state }, timezone: string): Promise<void> => {
@@ -102,3 +111,13 @@ export const setLanguage = async ({ commit, state }, language: string): Promise<
     await updateUser(state.userId, state.userType, { language });
     commit('setLanguage', language);
 };
+
+export const getUser = async ({ commit, state }, userId): Promise<void> => {
+    if (state.userType === 'DOMAIN_OWNER') {
+        const userInfo = await getDomainOwnerInfo(userId);
+        commit('setUser', userInfo);
+    } else {
+        const userInfo = await getUserInfo(userId);
+        commit('setUser', userInfo);
+    }
+}

@@ -16,6 +16,10 @@ try {
 const state: UserState = {
     userId: storedUserState.userId,
     userType: storedUserState.userType,
+    name: storedUserState.name,
+    email: storedUserState.email,
+    mobile: storedUserState.mobile,
+    group: storedUserState.group,
     language: storedUserState.language,
     timezone: storedUserState.timezone,
     reportState: storedUserState.reportState,
