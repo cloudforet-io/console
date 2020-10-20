@@ -12,7 +12,7 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
-import PRawData from '@/components/organisms/text-editor/raw-data/PRawData.vue';
+import PRawData from '@/components/organisms/raw-data/PRawData.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { RawDynamicLayoutProps, RawFetchOptions } from '@/components/organisms/dynamic-layout/templates/raw/type';
 

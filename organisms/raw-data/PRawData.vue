@@ -11,7 +11,7 @@ import {
 import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
 
 export default {
-    name: 'PRawDataNew',
+    name: 'PRawData',
     components: {
         PTextEditor,
     },

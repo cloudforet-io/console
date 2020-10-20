@@ -1,49 +1,51 @@
 <template>
-    <p-toolbox-grid-layout class="p-search-grid-layout"
-                           :items="items"
-                           :card-class="cardClass"
-                           :card-min-width="cardMinWidth"
-                           :card-height="cardHeight"
-                           :pagination-values="paginationValues"
-                           :excel-visible="false"
-                           :loading="loading"
-                           :all-page="allPage"
-                           :this-page.sync="proxyState.thisPage"
-                           :page-size.sync="proxyState.pageSize"
-                           @changePageSize="onChangePageSize"
-                           @changePageNumber="onChangePageNumber"
-                           @clickRefresh="refresh"
-    >
-        <template #toolbox-left>
-            <slot name="toolbox-left" />
-            <div class="left-toolbox-item hidden lg:block">
-                <p-query-search :key-items="keyItems"
-                                :value-handler-map="valueHandlerMap"
-                                @search="onSearch"
-                />
-            </div>
-        </template>
-        <template #toolbox-bottom>
-            <div class="flex flex-col flex-1">
-                <p-query-search class="block lg:hidden mb-6"
-                                :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && proxyState.queryTags.length === 0}"
-                                :key-items="keyItems"
-                                :value-handler-map="valueHandlerMap"
-                                @search="onSearch"
-                />
-                <div :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
-                    <p-query-search-tags ref="tagsRef"
-                                         :tags="proxyState.queryTags"
-                                         @change="onQueryTagsChange"
+    <div class="p-search-grid-layout">
+        <p-toolbox-grid-layout
+            :items="items"
+            :card-class="cardClass"
+            :card-min-width="cardMinWidth"
+            :card-height="cardHeight"
+            :pagination-values="paginationValues"
+            :excel-visible="false"
+            :loading="loading"
+            :all-page="allPage"
+            :this-page.sync="proxyState.thisPage"
+            :page-size.sync="proxyState.pageSize"
+            @changePageSize="onChangePageSize"
+            @changePageNumber="onChangePageNumber"
+            @clickRefresh="refresh"
+        >
+            <template #toolbox-left>
+                <slot name="toolbox-left" />
+                <div class="left-toolbox-item hidden lg:block">
+                    <p-query-search :key-items="keyItems"
+                                    :value-handler-map="valueHandlerMap"
+                                    @search="onSearch"
                     />
                 </div>
-                <slot name="toolbox-bottom" />
-            </div>
-        </template>
-        <template v-for="name in slotNames" v-slot:[name]="data">
-            <slot :name="name" v-bind="data" />
-        </template>
-    </p-toolbox-grid-layout>
+            </template>
+            <template #toolbox-bottom>
+                <div class="flex flex-col flex-1">
+                    <p-query-search class="block lg:hidden mb-6"
+                                    :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && proxyState.queryTags.length === 0}"
+                                    :key-items="keyItems"
+                                    :value-handler-map="valueHandlerMap"
+                                    @search="onSearch"
+                    />
+                    <div :class="{ 'mb-4': $scopedSlots['toolbox-bottom']}">
+                        <p-query-search-tags ref="tagsRef"
+                                             :tags="proxyState.queryTags"
+                                             @change="onQueryTagsChange"
+                        />
+                    </div>
+                    <slot name="toolbox-bottom" />
+                </div>
+            </template>
+            <template v-for="name in slotNames" v-slot:[name]="data">
+                <slot :name="name" v-bind="data" />
+            </template>
+        </p-toolbox-grid-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -60,9 +62,10 @@ import {
     QuerySearchTagsListeners,
     QueryTag,
 } from '@/components/organisms/search/query-search-tags/type';
-import { Options, QuerySearchTableProps } from '@/components/organisms/tables/query-search-table/type';
+
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
+import { SearchGridLayoutProps, Options } from '@/components/organisms/layouts/search-grid-layout/type';
 
 export default {
     name: 'PSearchGridLayout',
@@ -123,7 +126,7 @@ export default {
             default: () => [24, 36, 48],
         },
     },
-    setup(props: QuerySearchTableProps, { slots, emit, listeners }) {
+    setup(props: SearchGridLayoutProps, { slots, emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const proxyState = reactive({

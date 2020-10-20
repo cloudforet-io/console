@@ -52,17 +52,17 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-    .active {
-        label {
-            @apply text-blue-500;
-        }
-        .tracker-bar {
-            @apply bg-blue-500;
-        }
-    }
+<style lang="postcss">
     .progress-bar {
         width: 100%;
+        .active {
+            label {
+                @apply text-blue-500;
+            }
+            .tracker-bar {
+                @apply bg-blue-500;
+            }
+        }
 
         label {
             color: grey;

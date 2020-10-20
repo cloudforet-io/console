@@ -56,9 +56,6 @@
             />
         </slot>
         <transition-group name="fade-in" tag="div" class="transition-group">
-            <!--            <div v-if="loading" key="loading" class="transition-item">-->
-            <!--                <slot name="loading" />-->
-            <!--            </div>-->
             <div v-if="!items || items.length === 0" key="no-data" class="transition-item">
                 <slot name="no-data" />
             </div>
