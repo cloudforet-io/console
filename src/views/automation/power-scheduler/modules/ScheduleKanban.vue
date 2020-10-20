@@ -10,9 +10,6 @@
                 우선순위 추가
             </p-icon-text-button>
         </div>
-        <!--        <div v-if="loading">-->
-        <!--            <p-skeleton class="skeleton-container" />-->
-        <!--        </div>-->
         <transition-group v-if="!loading" class="kanban-container">
             <div
                 v-for="(column, columnIdx) in columns"
@@ -37,7 +34,7 @@
                 </div>
                 <div class="resource-item-wrapper">
                     <div v-if="editable && column.title === '1'" class="resource-group-item">
-                        <div class="justify-center text-xs add-resource-group" @click="onClickResourceGroup()">
+                        <div class="add-resource-group" @click="onClickResourceGroup()">
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
                     </div>
@@ -353,10 +350,6 @@ export default {
     }
 
     .kanban {
-        .skeleton-container {
-            max-width: calc(100vw - 4.5rem);
-            height: 20rem;
-        }
         .kanban-container {
             @apply grid w-full h-full;
             row-gap: 0.5rem;
@@ -438,7 +431,7 @@ export default {
                     .resource-group-item {
                         @apply w-full block;
                         .add-resource-group {
-                            @apply border border-dashed border-gray-200 flex items-center w-full content-between p-2 overflow-hidden leading-normal;
+                            @apply border border-dashed border-gray-200 flex items-center w-full justify-center text-xs cursor-pointer content-between p-2 overflow-hidden leading-normal;
                             height: 3.25rem;
                             border-radius: 0.25rem;
                             margin-bottom: 0.5rem;

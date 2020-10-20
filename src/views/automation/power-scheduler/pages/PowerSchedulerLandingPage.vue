@@ -6,7 +6,7 @@
         <div class="page-title">
             <p-page-title :title="'Power Scheduler'" :total-count="totalCount">
                 <template #extra>
-                    <p class="h-1"></p>
+                    <p class="h-1" />
                     <span id="current-date">업데이트 {{ currentDate }} (Local Time) </span>
                 </template>
             </p-page-title>
@@ -31,6 +31,21 @@
             >
                 <template #toolbox-bottom>
                     <page-information />
+                </template>
+                <template #no-data>
+                    <div v-if="!loading && totalCount === 0" class="text-center empty-project">
+                        <img class="empty-project-img" src="@/assets/images/illust_satellite.svg">
+                        <p class="text-primary2 mb-12">
+                            {{ $t('PWR_SCHED.GO_TO_PROJ') }}
+                        </p>
+                        <router-link :to="`/project`">
+                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                                class="mx-auto text-center"
+                            >
+                                {{ $t('BTN.GO_PROJECT') }}
+                            </p-icon-text-button>
+                        </router-link>
+                    </div>
                 </template>
                 <template #card="{item, index}">
                     <router-link :to="goToDetail(item)">
@@ -132,6 +147,7 @@ import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 interface Scheduler {
     name: string;
@@ -142,6 +158,7 @@ interface Scheduler {
 export default {
     name: 'PowerScheduler',
     components: {
+        PIconTextButton,
         ScheduleHeatmap,
         PI,
         PageInformation,
@@ -322,6 +339,12 @@ export default {
     .power-scheduler {
         .power-scheduler-project {
             margin-top: 1.5rem;
+            .empty-project {
+                @apply w-full h-full;
+                .empty-project-img {
+                    @apply w-48 mx-auto pt-19 mb-8;
+                }
+            }
         }
 
         #current-date {

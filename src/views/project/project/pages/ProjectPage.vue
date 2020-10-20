@@ -115,7 +115,7 @@
                                     Create Project Group
                                 </p-button>
                             </div>
-                            <div v-if="!noProjectGroup && listState.totalCount === 0" class="empty-project">
+                            <div v-if="!noProjectGroup && listState.totalCount === 0 && !listState.loading" class="empty-project">
                                 <p class="text-primary2">
                                     Looks like you don't have any Project.
                                 </p>
@@ -473,7 +473,7 @@ export default {
         const listState = reactive({
             items: [],
             totalCount: 0,
-            loading: false,
+            loading: true,
             thisPage: 1,
             pageSize: 24,
             allPage: computed(() => getAllPage(listState.totalCount, (listState.pageSize))),
