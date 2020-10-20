@@ -3,20 +3,20 @@
         <div class="title-lap">
             <span class="title">{{ $t('PWR_SCHED.TIME') }}</span>
             <span class="sub-title">{{ $t('PWR_SCHED.SCHED_TIME') }}</span>
+            <div class="button-lap">
+                <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week"
+                                   :timezone="timezone"
+                />
+                <p-button class="gray900 this-week-button" block
+                          :outline="true"
+                          @click="onClickCurrentWeek"
+                >
+                    {{ $t('PWR_SCHED.THIS_WEEK') }}
+                </p-button>
+            </div>
         </div>
-        <div class="button-lap">
-            <p-button class="gray900 this-week-button" block
-                      :outline="true"
-                      @click="onClickCurrentWeek"
-            >
-                {{ $t('PWR_SCHED.THIS_WEEK') }}
-            </p-button>
-            <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week"
-                               :timezone="timezone"
-            />
-        </div>
-        <div class="left">
-            <div class="table-lap">
+        <div class="content-lap">
+            <div class="left-lap">
                 <div class="time-section">
                     <div class="icon-item" />
                     <div v-for="time in range(0, 24)"
@@ -46,7 +46,7 @@
                         v-if="editMode"
                         :drag-container="dragContainer"
                         :selectable-targets="['.item']"
-                        :hit-rate="3"
+                        :hit-rate="1"
                         :select-by-click="false"
                         :select-from-inside="false"
                         :continue-select="false"
@@ -87,72 +87,76 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="right">
-            <div class="content-lap" :class="editMode ? 'opacity-25' : ''">
-                <div class="title">
-                    {{ $t('PWR_SCHED.TIMEZONE') }}
+            <div class="right-lap">
+                <!--timezone-->
+                <div class="pb-8" :class="editMode ? 'opacity-25' : ''">
+                    <div class="title pt-0">
+                        {{ $t('PWR_SCHED.TIMEZONE') }}
+                    </div>
+                    <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
+                    <!--                <div class="content">-->
+                    <!--                    <div v-if="mode === 'READ'">-->
+                    <!--                        {{ timezone }}-->
+                    <!--                    </div>-->
+                    <!--                    <div v-else>-->
+                    <!--                        <p-select-dropdown v-model="timezone"-->
+                    <!--                                           :items="timezones"-->
+                    <!--                                           auto-height-->
+                    <!--                        />-->
+                    <!--                    </div>-->
+                    <!--                </div>-->
                 </div>
-                <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
-                <!--                <div class="content">-->
-                <!--                    <div v-if="mode === 'READ'">-->
-                <!--                        {{ timezone }}-->
-                <!--                    </div>-->
-                <!--                    <div v-else>-->
-                <!--                        <p-select-dropdown v-model="timezone"-->
-                <!--                                           :items="timezones"-->
-                <!--                                           auto-height-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--                </div>-->
-            </div>
-            <!--routine-->
-            <div class="content-lap" :class="oneTimeEditMode ? 'opacity-25' : ''">
-                <div class="title">
-                    {{ $t('PWR_SCHED.SCHED_ROUTINE') }}
+                <!--routine-->
+                <div class="pb-8" :class="oneTimeEditMode ? 'opacity-25' : ''">
+                    <div class="title">
+                        {{ $t('PWR_SCHED.SCHED_ROUTINE') }}
+                    </div>
+                    <div class="legend-lap routine">
+                        <span class="legend-icon" />
+                        <span>{{ $t('PWR_SCHED.ROUTINE_TIMER') }}</span>
+                        <div>
+                            <p-button v-if="mode !== 'READ'"
+                                      class="gray900 sm" :outline="true"
+                                      @click="onDeleteAllRoutine"
+                            >
+                                {{ $t('PWR_SCHED.DELETE_ALL') }}
+                            </p-button>
+                        </div>
+                    </div>
                 </div>
-                <div class="legend-lap routine">
-                    <span class="legend-icon" />
-                    <span>{{ $t('PWR_SCHED.ROUTINE_TIMER') }}</span>
-                    <p-button v-if="mode !== 'READ'"
-                              class="gray900 sm" :outline="true"
-                              @click="onDeleteAllRoutine"
-                    >
-                        {{ $t('PWR_SCHED.DELETE_ALL') }}
-                    </p-button>
+                <!--one time ticket-->
+                <div :class="[mode !== 'READ' ? 'opacity-25' : '', oneTimeEditMode ? 'activated' : '']">
+                    <div class="title" :class="oneTimeEditMode ? 'activated' : ''">
+                        {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
+                    </div>
+                    <div class="legend-lap one-time-run pb-2" :class="oneTimeEditMode === 'STOP' ? 'opacity-25' : ''">
+                        <span class="legend-icon" />
+                        <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
+                        <p-button v-if="!editMode"
+                                  class="edit-button gray900 sm" :outline="true"
+                                  @click="onClickStartOneTimeEditMode('RUN')"
+                        >
+                            {{ $t('PWR_SCHED.EDIT') }}
+                        </p-button>
+                        <span v-if="oneTimeEditMode === 'RUN'" class="making-ticket-text">
+                            {{ $t('PWR_SCHED.MAKING_TICKET') }}
+                        </span>
+                    </div>
+                    <div class="legend-lap one-time-stop" :class="oneTimeEditMode === 'RUN' ? 'opacity-25' : ''">
+                        <span class="legend-icon" />
+                        <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
+                        <p-button v-if="!editMode"
+                                  class="edit-button gray900 sm" :outline="true"
+                                  @click="onClickStartOneTimeEditMode('STOP')"
+                        >
+                            {{ $t('PWR_SCHED.EDIT') }}
+                        </p-button>
+                        <span v-if="oneTimeEditMode === 'STOP'" class="making-ticket-text">
+                            {{ $t('PWR_SCHED.MAKING_TICKET') }}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <!--one time ticket-->
-            <div class="content-lap" :class="[mode !== 'READ' ? 'opacity-25' : '', oneTimeEditMode ? 'activated' : '']">
-                <div class="title" :class="oneTimeEditMode ? 'activated' : ''">
-                    {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
-                </div>
-                <div class="legend-lap one-time-run pb-2">
-                    <span class="legend-icon" />
-                    <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
-                    <p-button v-if="!editMode"
-                              class="gray900 sm" :outline="true"
-                              @click="onClickStartOneTimeEditMode('RUN')"
-                    >
-                        {{ $t('PWR_SCHED.EDIT') }}
-                    </p-button>
-                    <span v-if="oneTimeEditMode === 'RUN'" class="making-ticket-text">
-                        {{ $t('PWR_SCHED.MAKING_TICKET') }}
-                    </span>
-                </div>
-                <div class="legend-lap one-time-stop">
-                    <span class="legend-icon" />
-                    <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
-                    <p-button v-if="!editMode"
-                              class="gray900 sm" :outline="true"
-                              @click="onClickStartOneTimeEditMode('STOP')"
-                    >
-                        {{ $t('PWR_SCHED.EDIT') }}
-                    </p-button>
-                    <span v-if="oneTimeEditMode === 'STOP'" class="making-ticket-text">
-                        {{ $t('PWR_SCHED.MAKING_TICKET') }}
-                    </span>
-                </div>
+                <!--buttons-->
                 <div class="one-time-button-lap">
                     <p-button v-if="oneTimeEditMode"
                               class="gray900 sm mr-1" :outline="true"
@@ -742,7 +746,10 @@ export default {
 .schedule-time-table-container {
     width: 100%;
     .title-lap {
+        position: relative;
         display: block;
+        line-height: 2.25rem;
+        margin-bottom: 0.5rem;
         .title {
             @apply text-gray-900;
             font-size: 1rem;
@@ -753,57 +760,54 @@ export default {
             @apply text-gray-400;
             font-size: 0.75rem;
         }
-    }
-    .button-lap {
-        position: relative;
-        width: 75%;
-        padding-top: 1.5rem;
-        padding-bottom: 0.5rem;
-        .this-week-button {
-            @apply border-gray-300;
-        }
-        .p-date-pagination {
+        .button-lap {
             position: absolute;
+            top: 0;
             right: 0;
+            .this-week-button {
+                @apply border-gray-300;
+                margin-left: 1rem;
+            }
         }
     }
-    .left {
-        display: inline-block;
-        width: 75%;
-        .table-lap {
+    .content-lap {
+        display: flex;
+        .left-lap {
+            @apply border border-gray-200;
             display: flex;
-            width: 100%;
+            width: 80%;
             .time-section {
-                @apply bg-primary4 border border-primary3 border-r-0;
+                @apply bg-primary3 border-r border-gray-200;
+                display: inline-block;
                 width: 3rem;
                 .icon-item {
-                    @apply border-b border-primary3;
+                    @apply border-b border-gray-200;
                     height: 3.125rem;
                 }
                 .time {
                     @apply text-gray-500;
-                    height: 0.75rem;
+                    height: 1rem;
                     font-size: 0.625rem;
                     text-align: center;
                     line-height: 0.625rem;
                 }
             }
             .data-section {
-                @apply border border-primary3;
-                position: relative;
+                display: inline-block;
                 width: calc(100% - 3rem);
                 .loader {
                     position: absolute;
                     top: 50%;
                 }
                 .weekday-row {
-                    @apply bg-primary4 border-b border-primary3;
+                    @apply bg-primary3 border-b border-gray-200;
                     width: 100%;
                     height: 3.125rem;
                     .weekday-item {
-                        @apply text-gray-500;
+                        @apply text-gray-500 border-l border-gray-200;
                         display: inline-block;
                         width: calc(100% / 7);
+                        height: 100%;
                         font-size: 0.75rem;
                         text-align: center;
                         padding: 0.625rem;
@@ -811,31 +815,33 @@ export default {
                             font-weight: bold;
                         }
                         &.today {
-                            @apply text-gray-900;
-                            font-weight: bold;
+                            @apply text-primary;
+                        }
+                        &:first-of-type {
+                            @apply border-l-0;
                         }
                     }
                 }
                 .item-row {
-                    @apply bg-white border-b border-primary4;
+                    @apply bg-white border-b border-gray-200;
                     display: flex;
                     width: 100%;
-                    height: 0.75rem;
+                    height: 1rem;
                     &:last-child {
-                        border-bottom: none;
+                        @apply border-b-0;
                     }
                     .item {
-                        @apply border-l border-primary4;
+                        @apply border-l border-gray-200;
                         display: inline-flex;
                         width: calc(100% / 7);
-                        height: 0.7rem;
-                        border-radius: 0.125rem;
+                        height: 0.95rem;
                         margin: 0;
                         &:first-child {
                             @apply border-l-0;
                         }
                         &.routine, &.selected-routine {
                             @apply bg-point-violet;
+                            border-radius: 0.125rem;
                             &.selected-one-time-run {
                                 @apply bg-point-violet;
                             }
@@ -846,9 +852,11 @@ export default {
                         }
                         &.one-time-run, &.selected-one-time-run {
                             @apply bg-peacock-300;
+                            border-radius: 0.125rem;
                         }
                         &.one-time-stop, &.selected-one-time-stop {
                             @apply bg-red-400;
+                            border-radius: 0.125rem;
                             &:not(.routine) {
                                 @apply bg-transparent;
                             }
@@ -882,77 +890,72 @@ export default {
                 }
             }
         }
-    }
-    .right {
-        display: inline-block;
-        width: 25%;
-        vertical-align: top;
-        font-size: 0.875rem;
-        padding-left: 1.5rem;
-        .content-lap {
-            padding: 1rem;
-            &.activated {
-                @apply border border-blue-200;
-                background-color: white;
-                box-sizing: border-box;
-                border-radius: 2px;
+        .right-lap {
+            @apply border border-gray-200 border-l-0;
+            position: relative;
+            width: 20%;
+            font-size: 0.875rem;
+            padding: 1.5rem;
+            .title {
+                @apply text-gray-400;
+                font-weight: bold;
+                line-height: 1.5rem;
+                padding-bottom: 0.5rem;
+                &.activated {
+                    @apply text-secondary;
+                }
             }
-            .p-select-dropdown {
-                @apply bg-white;
+            .legend-lap {
+                line-height: 1.25rem;
+                &.routine {
+                    @apply text-point-violet;
+                    .legend-icon {
+                        @apply bg-point-violet;
+                    }
+                }
+                &.one-time-run {
+                    @apply text-peacock-300;
+                    .legend-icon {
+                        @apply bg-peacock-300;
+                    }
+                }
+                &.one-time-stop {
+                    @apply text-red-500;
+                    .legend-icon {
+                        @apply bg-red-400;
+                    }
+                }
+                .legend-icon {
+                    display: inline-block;
+                    width: 0.75rem;
+                    height: 0.75rem;
+                    vertical-align: baseline;
+                    border-radius: 2px;
+                    margin-right: 0.5rem;
+                }
+                .edit-button {
+                    @apply border-gray-300;
+                    margin-left: 0.5rem;
+                }
+                .making-ticket-text {
+                    @apply bg-blue-200 text-secondary;
+                    font-size: 0.75rem;
+                    margin-left: 1rem;
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                }
             }
             .one-time-button-lap {
-                text-align: right;
-                margin-top: 2rem;
-            }
-        }
-        .title {
-            @apply text-gray-400;
-            font-weight: bold;
-            line-height: 1.5rem;
-            padding-bottom: 0.5rem;
-            &.activated {
-                @apply text-secondary;
-            }
-        }
-        .legend-lap {
-            line-height: 1.25rem;
-            &.routine {
-                @apply text-point-violet;
-                .legend-icon {
-                    @apply bg-point-violet;
+                position: absolute;
+                bottom: 1.5rem;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                .p-button {
+                    @apply border-gray-300;
+                    height: 1.25rem;
+                    margin-top: 0.5rem;
                 }
-            }
-            &.one-time-run {
-                @apply text-peacock-300;
-                .legend-icon {
-                    @apply bg-peacock-300;
-                }
-            }
-            &.one-time-stop {
-                @apply text-red-500;
-                .legend-icon {
-                    @apply bg-red-400;
-                }
-            }
-            .legend-icon {
-                display: inline-block;
-                width: 0.75rem;
-                height: 0.75rem;
-                vertical-align: baseline;
-                border-radius: 2px;
-                margin-right: 0.5rem;
-            }
-            .making-ticket-text {
-                @apply bg-blue-200 text-secondary;
-                font-size: 0.75rem;
-                margin-left: 1rem;
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-            }
-            .p-button {
-                @apply border-gray-300;
-                height: 1.25rem;
-                margin-left: 1rem;
             }
         }
     }
