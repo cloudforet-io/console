@@ -208,14 +208,6 @@ export default {
             emit('cancel');
         };
 
-
-        const onClickSave = () => {
-            state.showValidation = true;
-            if (!state.isAllValid) return;
-
-            checkModalState.visible = true;
-        };
-
         const onConfirmCheckModal = async () => {
             if (props.mode !== 'READ') {
                 state.loading = true;
@@ -233,10 +225,23 @@ export default {
             emit('confirm');
         };
 
-        watch(() => props.scheduleId, () => {
+        const onClickSave = () => {
+            state.showValidation = true;
+            if (!state.isAllValid) return;
+
+            if (state.timeTable.isRuleExist()) {
+                onConfirmCheckModal();
+            } else {
+                checkModalState.visible = true;
+            }
+        };
+
+        watch(() => props.scheduleId, (after) => {
             state.showValidation = false;
             state.groupName = props.name;
-            getSchedule();
+            if (after) {
+                getSchedule();
+            }
         }, { immediate: true });
 
         return {
