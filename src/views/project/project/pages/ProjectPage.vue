@@ -244,7 +244,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import {
     makeQueryStringComputeds,
 } from '@/lib/router-query-string';
@@ -340,7 +340,7 @@ export default {
         SProjectGroupCreateFormModal,
         PIconTextButton,
     },
-    setup(props, context) {
+    setup(props, { root }) {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -577,17 +577,10 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.delete({
                     project_group_id: state.searchedProjectGroup.id,
                 });
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Delete Project Group',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Delete Project Group', root);
                 state.treeRef.deleteSelectedNode();
             } catch (e) {
-                showErrorMessage('Fail to Delete Project Group', e, context.root);
+                showErrorMessage('Fail to Delete Project Group', e, root);
             } finally {
                 formState.projectGroupDeleteFormVisible = false;
                 await state.treeRef.listNodes();
@@ -641,16 +634,9 @@ export default {
                     project_group_id: state.searchedProjectGroup?.id,
                     ...item,
                 });
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Create Project',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Create Project', root);
             } catch (e) {
-                showErrorMessage('Fail to Create a Project', e, context.root);
+                showErrorMessage('Fail to Create a Project', e, root);
             } finally {
                 formState.projectFormVisible = false;
                 await getData();

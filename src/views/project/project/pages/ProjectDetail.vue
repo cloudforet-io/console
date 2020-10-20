@@ -130,7 +130,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
@@ -159,9 +159,9 @@ export default {
         PIconTextButton,
         PPageNavigation,
     },
-    setup(props, context) {
+    setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const projectId = computed<string>(() => context.root.$route.params.id as string);
+        const projectId = computed<string>(() => root.$route.params.id as string);
         const item = ref({} as ProjectModel);
         const state = reactive({
             projectName: '',
@@ -204,7 +204,7 @@ export default {
                 if (state.reportState) {
                     items.push(['report', 'TAB.REPORT', { beta: true }]);
                 }
-                return makeTrItems(items, context.parent);
+                return makeTrItems(items, parent);
             }),
             activeTab: 'summary',
         });
@@ -297,16 +297,9 @@ export default {
             try {
                 await fluentApi.identity().project().delete().setId(projectId.value)
                     .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Delete Project',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Delete Project', root);
             } catch (e) {
-                showErrorMessage('Delete Project Fail', e, context.root);
+                showErrorMessage('Delete Project Fail', e, root);
             } finally {
                 formState.projectDeleteFormVisible = false;
                 vm.$router.go(-1);
@@ -326,18 +319,10 @@ export default {
                     ...input,
                 })
                     .execute();
-
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Update Project',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Update Project', root);
                 item.value.name = input.name;
             } catch (e) {
-                showErrorMessage('Update Project Fail', e, context.root);
+                showErrorMessage('Update Project Fail', e, root);
             } finally {
                 formState.projectEditFormVisible = false;
             }
@@ -384,16 +369,9 @@ export default {
         const memberDeleteConfirm = async (items) => {
             try {
                 await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Successfully Deleted',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Successfully Deleted', root);
             } catch (e) {
-                showErrorMessage('Fail to Delete Member', e, context.root);
+                showErrorMessage('Fail to Delete Member', e, root);
             } finally {
                 checkMemberDeleteState.visible = false;
                 await listMembers();

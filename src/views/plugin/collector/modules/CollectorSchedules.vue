@@ -86,7 +86,7 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 import moment from 'moment';
-import { showErrorMessage, timestampFormatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -195,15 +195,7 @@ export default {
                     collector_id: props.collectorId,
                     schedule_id: state.items[state.selectIndex[0]].schedule_id,
                 });
-
-                root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Delete Schedule',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Delete Schedule', root);
                 await listSchedules();
             } catch (e) {
                 console.error(e);

@@ -50,7 +50,7 @@ import {
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { isEqual } from 'lodash';
 
@@ -130,7 +130,7 @@ export default {
             default: false,
         },
     },
-    setup(props, context) {
+    setup(props, { emit, root }) {
         const state = reactive({
             fields: [
                 { label: 'Name', name: 'name', type: 'item' },
@@ -150,8 +150,8 @@ export default {
         const formState = reactive({
             tagTools: tagList(null),
         });
-        const proxyVisible = makeProxy('visible', props, context.emit);
-        const projectId = context.root.$route.params.id;
+        const proxyVisible = makeProxy('visible', props, emit);
+        const projectId = root.$route.params.id;
 
         // List api Handler for query search table
         const listUser = async () => {
@@ -190,18 +190,11 @@ export default {
                 await fluentApi.identity().project().addMember().setId(projectId)
                     .setSubIds(users)
                     .execute();
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'Success',
-                    text: 'Add Member',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Add Member', root);
             } catch (e) {
-                showErrorMessage('Fail to Add Member', e, context.root);
+                showErrorMessage('Fail to Add Member', e, root);
             } finally {
-                context.emit('confirm');
+                emit('confirm');
                 proxyVisible.value = false;
             }
         };

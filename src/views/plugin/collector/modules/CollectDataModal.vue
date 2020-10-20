@@ -94,7 +94,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { MenuItem } from '@/components/organisms/context-menu/type';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { formValidation, requiredValidation } from '@/components/util/composition-helpers';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
@@ -313,14 +313,7 @@ export default {
             state.showValidation = true;
             try {
                 await collectorApi(getCollectParams());
-                context.root.$notify({
-                    group: 'noticeTopRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'Collect Data',
-                    duration: 2000,
-                    speed: 1000,
-                });
+                showSuccessMessage('success', 'Collect Data', context.root);
             } catch (e) {
                 console.error(e);
                 showErrorMessage('Fail to Collect Data', e, context.root);
