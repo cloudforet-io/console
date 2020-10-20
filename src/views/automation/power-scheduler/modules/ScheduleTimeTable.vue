@@ -187,12 +187,10 @@ import {
 
 import { ViewMode } from '@/views/automation/power-scheduler/type';
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { getTimezone } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 
@@ -470,7 +468,7 @@ export default {
                 state.loading = false;
             }
         };
-        const getRuleSettings = (): RuleSettings|null => {
+        const getRuleSettings = (): RuleSettings => {
             const settings: RuleSettings = {
                 ruleType: RULE_TYPE.routine,
                 ruleState: RULE_STATE.running,
@@ -485,8 +483,7 @@ export default {
                         settings.ruleForApi.push({ day: k, times: v });
                     }
                 });
-                return settings;
-            } if (state.oneTimeEditMode) {
+            } else if (state.oneTimeEditMode) {
                 settings.ruleType = RULE_TYPE.ticket;
                 if (state.oneTimeEditMode === 'RUN') {
                     settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeRun, RULE_TYPE.ticket);
@@ -499,9 +496,9 @@ export default {
                         settings.ruleForApi.push({ date: k, times: v });
                     }
                 });
-                return settings;
             }
-            return null;
+
+            return settings;
         };
         const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
             const query = new QueryHelper().setFilter(
@@ -558,9 +555,14 @@ export default {
                 console.error(e);
             }
         };
+
+        const isRuleExist = () => {
+            const settings = getRuleSettings();
+            return settings.ruleForApi.length > 0;
+        };
+
         const createOrUpdate = async (scheduleId) => {
             const settings = getRuleSettings();
-            if (!settings) return;
 
             // check scheduleRule exists
             const scheduleRuleId = await checkScheduleRuleExist(settings, scheduleId);
@@ -729,6 +731,7 @@ export default {
             onClickCancelOneTimeSchedule,
             onClickTimeBlock,
             range,
+            isRuleExist,
             createOrUpdate,
         };
     },

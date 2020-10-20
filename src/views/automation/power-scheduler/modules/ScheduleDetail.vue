@@ -44,6 +44,33 @@
                 </p-button>
             </div>
         </div>
+        <p-button-modal
+            :header-title="$t('PWR_SCHED.CHECK_TIME_SET')"
+            centered
+            size="md"
+            fade
+            :visible.sync="checkModalState.visible"
+            theme-color="alert"
+            :footer-confirm-button-bind="{
+                styleType: 'alert',
+            }"
+            :loading="loading"
+            @confirm="onConfirmCheckModal"
+        >
+            <template #body>
+                <p class="delete-modal-content">
+                    {{ $t('PWR_SCHED.CHECK_TIME_SET_DESC') }}
+                    <br>
+                    {{ $t('PWR_SCHED.CHECK_TIME_SET_DESC2') }}
+                </p>
+            </template>
+            <template #cancel-button>
+                {{ $t('PWR_SCHED.CHECK_TIME_SET_NO') }}
+            </template>
+            <template #confirm-button>
+                {{ $t('PWR_SCHED.CHECK_TIME_SET_YES') }}
+            </template>
+        </p-button-modal>
     </section>
 </template>
 
@@ -63,6 +90,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { makeProxy } from '@/components/util/composition-helpers';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ViewMode } from '@/views/automation/power-scheduler/type';
+import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 
 
 interface Props {
@@ -75,6 +103,7 @@ interface Props {
 export default {
     name: 'ScheduleDetail',
     components: {
+        PButtonModal,
         PTextInput,
         PFieldGroup,
         PButton,
@@ -115,6 +144,11 @@ export default {
             proxyScheduleId: props.scheduleId,
             kanban: null,
             timeTable: null,
+            loading: false,
+        });
+
+        const checkModalState = reactive({
+            visible: false,
         });
 
         const createSchedule = async () => {
@@ -147,11 +181,17 @@ export default {
             emit('cancel');
         };
 
-        const onClickSave = async () => {
+
+        const onClickSave = () => {
             state.showValidation = true;
             if (!state.isAllValid) return;
 
+            checkModalState.visible = true;
+        };
+
+        const onConfirmCheckModal = async () => {
             if (props.mode !== 'READ') {
+                state.loading = true;
                 let scheduleId = props.scheduleId;
                 if (props.mode === 'CREATE') {
                     scheduleId = await createSchedule();
@@ -161,6 +201,7 @@ export default {
 
                 await state.timeTable.createOrUpdate(scheduleId);
                 await state.kanban.onSave(scheduleId);
+                state.loading = false;
             }
             emit('confirm');
         };
@@ -171,8 +212,10 @@ export default {
 
         return {
             ...toRefs(state),
+            checkModalState,
             onClickCancel,
             onClickSave,
+            onConfirmCheckModal,
         };
     },
 };

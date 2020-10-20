@@ -409,6 +409,13 @@
 	"PWR_SCHED": {
 		"APPLY": "",
 		"CANCEL": "",
+		"CHECK_DELETE": "",
+		"CHECK_DELETE_DESC": "",
+		"CHECK_TIME_SET": "",
+		"CHECK_TIME_SET_DESC": "",
+		"CHECK_TIME_SET_DESC2": "",
+		"CHECK_TIME_SET_NO": "",
+		"CHECK_TIME_SET_YES": "",
 		"CREATE": "",
 		"CREATE_MODE": "",
 		"CREATING": "",

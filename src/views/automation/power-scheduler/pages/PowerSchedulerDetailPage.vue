@@ -83,15 +83,13 @@
             :fade="true"
             :backdrop="true"
             :visible.sync="visible"
-            :theme-color="themeColor"
-            :footer-confirm-button-bind="{
-                styleType: 'alert',
-            }"
+            theme-color="alert"
+            :footer-confirm-button-bind="{styleType: 'alert'}"
             @confirm="scheduleDeleteConfirm"
         >
             <template #body>
                 <p class="delete-modal-content">
-                    {{ modalContent }}
+                    {{ $t('PWR_SCHED.CHECK_DELETE_DESC') }}
                 </p>
             </template>
         </p-button-modal>
@@ -102,16 +100,14 @@
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance,
-    reactive, toRefs, watch,
+    reactive, toRefs,
 } from '@vue/composition-api';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { store } from '@/store';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
@@ -121,7 +117,6 @@ import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayou
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import { pointViolet, gray } from '@/styles/colors';
-import PStatus from '@/components/molecules/status/PStatus.vue';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
@@ -149,7 +144,6 @@ const EXPECTED_STATES = {
 export default {
     name: 'PowerSchedulerDetail',
     components: {
-        PStatus,
         PSelectableList,
         PHr,
         VerticalPageLayout,
@@ -157,11 +151,9 @@ export default {
         ScheduleDetail,
         PLottie,
         PIconButton,
-        PI,
         PIconTextButton,
         PPageTitle,
         PPageNavigation,
-        GeneralPageLayout,
     },
     props: {
         projectId: {
@@ -196,9 +188,7 @@ export default {
 
         const formState = reactive({
             visible: false,
-            headerTitle: '',
-            themeColor: '',
-            modalContent: '',
+            headerTitle: computed(() => vm.$t('PWR_SCHED.CHECK_DELETE')),
             schedule_id: '',
         });
 
@@ -241,11 +231,8 @@ export default {
         };
 
         const onClickDelete = () => {
-            formState.visible = true;
-            formState.themeColor = 'alert';
-            formState.headerTitle = '스케줄 그룹 삭제';
-            formState.modalContent = '스케줄 그룹을 삭제하시겠습니까?';
             formState.schedule_id = state.selectedSchedule.schedule_id;
+            formState.visible = true;
         };
 
         const scheduleDeleteConfirm = async () => {

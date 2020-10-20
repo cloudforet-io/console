@@ -409,6 +409,13 @@
 	"PWR_SCHED": {
 		"APPLY": "적용",
 		"CANCEL": "취소",
+		"CHECK_DELETE": "스케줄 그룹 삭제",
+		"CHECK_DELETE_DESC": "스케줄 그룹을 삭제하시겠습니까?",
+		"CHECK_TIME_SET": "리소스 그룹 즉시 작동 정지",
+		"CHECK_TIME_SET_DESC": "시간 설정을 하지 않으면 리소스 그룹은 즉시 작동을 멈추게 됩니다.",
+		"CHECK_TIME_SET_DESC2": "해당 리소스가 모두 정지되어도 괜찮습니까?",
+		"CHECK_TIME_SET_NO": "아니오, 시간 설정을 하겠습니다.",
+		"CHECK_TIME_SET_YES": "네, 모두 정지하겠습니다.",
 		"CREATE": "새 스케줄러 만들기",
 		"CREATE_MODE": "스케줄러 생성",
 		"CREATING": "생성중",
