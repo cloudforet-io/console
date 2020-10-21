@@ -2,7 +2,7 @@
     <div class="menu-container">
         <div class="left">
             <div class="site-map-lap">
-                <site-map :is-domain-owner="isDomainOwner" :visible.sync="sitemapVisible" />
+                <site-map :is-domain-owner="userState.isDomainOwner" :visible.sync="sitemapVisible" />
             </div>
             <div class="logo-lap">
                 <router-link to="/dashboard">
@@ -41,7 +41,7 @@
                     :menu="dItem.menu" theme="white"
                 >
                     <template #item-plugin>
-                        <div v-if="!isDomainOwner" class="empty" />
+                        <div v-if="!userState.isDomainOwner" class="empty" />
                     </template>
                     <template #item--format="{item}">
                         <router-link :to="item.link" @click.native="hideMenu">
@@ -80,7 +80,7 @@
                      @click.stop="toggleMenu('account')"
                 >
                     <div class="menu-icon"
-                         :class="[{opened: openedMenu === 'account'}, isDomainOwner ? 'admin' : 'member']"
+                         :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'admin' : 'member']"
                     />
                 </div>
                 <p-context-menu
@@ -92,22 +92,22 @@
                 >
                     <template #info--format>
                         <div class="context-info">
-                            <p-i v-if="isDomainOwner" class="icon" name="admin" />
+                            <p-i v-if="userState.isDomainOwner" class="icon" name="admin" />
                             <p-i v-else class="icon" name="user" />
-                            <span class="value">{{ email }}</span>
+                            <span class="value">{{ userState.email }}</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Role</span>
-                            <span v-if="isDomainOwner" class="value">Root Admin</span>
+                            <span v-if="userState.isDomainOwner" class="value">Root Admin</span>
                             <span v-else class="value">Domain Admin</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Time zone</span>
-                            <span class="value">{{ storeTimezone }}</span>
+                            <span class="value">{{ userState.timezone }}</span>
                         </div>
                         <div class="context-info">
                             <span class="label">Language</span>
-                            <span class="value">{{ storeLanguage }}</span>
+                            <span class="value">{{ userState.language }}</span>
                         </div>
                     </template>
                     <template #divider>
@@ -120,7 +120,7 @@
                             </div>
                         </div>
                         <div v-else>
-                            <div @click="logOutAction">
+                            <div @click="logOut">
                                 {{ item.label }}
                             </div>
                         </div>
@@ -130,7 +130,7 @@
         </div>
         <profile-modal v-if="profileVisible"
                        :visible.sync="profileVisible"
-                       :user-id="userId"
+                       :user-id="userState.userId"
         />
     </div>
 </template>
@@ -139,7 +139,7 @@
 import vClickOutside from 'v-click-outside';
 
 import {
-    reactive, toRefs, getCurrentInstance, computed, ComponentRenderProxy,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
@@ -147,8 +147,8 @@ import SiteMap from '@/views/containers/gnb/modules/SiteMap.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 
-import { fluentApi } from '@/lib/fluent-api';
-import { useStore } from '@/store/toolset';
+import { store } from '@/store';
+import router from '@/routes';
 
 export default {
     name: 'GNB',
@@ -162,17 +162,18 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { user, logout } = useStore();
         const userState = reactive({
-            name: '',
-            email: '',
-            language: '',
-            timezone: '',
+            name: computed(() => store.state.user.name),
+            email: computed(() => store.state.user.email),
+            language: computed(() => store.state.user.language),
+            timezone: computed(() => store.state.user.timezone),
+            userId: computed(() => store.state.user.userId),
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
         const state = reactive({
             openedMenu: null,
             sitemapVisible: false,
+            profileVisible: false,
             defaultMenuList: [
                 {
                     key: 'project',
@@ -280,14 +281,10 @@ export default {
                     type: 'item', label: 'Log out', name: 'logout',
                 },
             ],
-            // account
-            profileVisible: false,
-            userId: computed(() => user.state.userId),
-            isDomainOwner: computed(() => user.state.isDomainOwner),
-        });
-        const selectedMenu = computed(() => {
-            const pathRegex = vm.$route.path.match(/\/(\w+)/);
-            return pathRegex ? pathRegex[1] : null;
+            selectedMenu: computed(() => {
+                const pathRegex = router.currentRoute.path.match(/\/(\w+)/);
+                return pathRegex ? pathRegex[1] : null;
+            }),
         });
 
         const hideMenu = () => {
@@ -306,48 +303,29 @@ export default {
         };
 
         // account
-        const getUser = async () => {
-            let api;
-            if (state.userId && state.isDomainOwner) {
-                api = fluentApi.identity().domainOwner().get().setId(state.userId);
-            } else if (state.userId) {
-                api = fluentApi.identity().user().get().setId(state.userId);
-            }
-            try {
-                const res = await api.execute();
-                userState.name = res.data.name;
-                userState.email = res.data.email;
-                userState.language = res.data.language;
-                userState.timezone = res.data.timezone;
-                vm.$i18n.locale = res.data.language;
-                user.sync(userState);
-            } catch (e) {
-                console.error(e);
-            }
-        };
         const openProfile = () => {
             state.profileVisible = true;
         };
-        const logOutAction = async () => {
-            await vm.$store.dispatch('user/signOut');
-            logout(vm);
+        const logOut = () => {
+            store.dispatch('user/signOut');
+            const routerMeta: any = {
+                name: userState.isDomainOwner ? 'AdminLogin' : 'Login',
+            };
+            if (router && router.currentRoute.path) {
+                routerMeta.query = { nextPath: router.currentRoute.path };
+            }
+            if (router) {
+                router.push(routerMeta);
+            }
         };
-
-        const init = async () => {
-            await getUser();
-        };
-        init();
 
         return {
             ...toRefs(state),
-            ...toRefs(userState),
-            selectedMenu,
+            userState,
             hideMenu,
             toggleMenu,
             openProfile,
-            logOutAction,
-            storeTimezone: computed(() => user.state.timezone),
-            storeLanguage: computed(() => user.state.language),
+            logOut,
         };
     },
 };
