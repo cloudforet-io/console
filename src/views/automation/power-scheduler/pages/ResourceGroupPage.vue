@@ -289,7 +289,7 @@ export default {
             data: null as any,
 
             hiddenFilters: [] as Filter[],
-            dictRef: null as any,
+            // dictRef: null as any,
         });
 
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
@@ -316,10 +316,10 @@ export default {
         const validState = reactive({
             showValidation: false,
             name: false,
-            tags: false,
+            // tags: false,
             resourceType: false,
             resources: false,
-            all: computed(() => validState.name && validState.tags && validState.resourceType && validState.resources),
+            all: computed(() => validState.name && validState.resourceType && validState.resources),
             nameInvalidMsg: '',
         });
 
@@ -336,9 +336,9 @@ export default {
             else validState.nameInvalidMsg = vm.$t('PWR_SCHED.RESRC_GRP.NAME_INVALID');
         };
 
-        const validateTags = () => {
-            validState.tags = state.dictRef.allValidation();
-        };
+        // const validateTags = () => {
+        //     validState.tags = state.dictRef.allValidation();
+        // };
 
         const validateResourceType = () => {
             validState.resourceType = !!RESOURCE_GROUP_TYPES[state.selectedTypeIndex];
@@ -350,7 +350,7 @@ export default {
 
         const validate = () => {
             validateName(state.name);
-            validateTags();
+            // validateTags();
             validateResourceType();
             validateResources();
             return validState.all;
@@ -496,21 +496,21 @@ export default {
             if (idx !== -1) await resetTable();
         };
 
-        const onChangeTags = () => {
-            validState.tags = state.dictRef.isAllValid;
-        };
+        // const onChangeTags = () => {
+        //     validState.tags = state.dictRef.isAllValid;
+        // };
 
         const resetAll = async () => {
             // reset validations
             validState.showValidation = false;
             validState.name = false;
-            validState.tags = false;
+            // validState.tags = false;
             validState.resourceType = false;
             validState.resources = false;
 
             // reset forms
             state.name = props.resourceGroup?.name || '';
-            state.tags = props.resourceGroup?.tags || {};
+            // state.tags = props.resourceGroup?.tags || {};
             state.selectedTypeIndex = findIndex(props.resourceGroup?.resources[0]?.resource_type);
 
             // reset resource
@@ -555,7 +555,7 @@ export default {
                     options: {
                         raw_filter: queryTagsToQueryFilters(fetchOptionState.queryTags),
                     },
-                    tags: state.dictRef.getDict(),
+                    // tags: state.dictRef.getDict(),
                 },
                 recommended: false,
             };
@@ -581,7 +581,7 @@ export default {
             onClickCancel,
             onClickSave,
             onSelectedTypeIndexChange,
-            onChangeTags,
+            // onChangeTags,
             onListModalConfirm,
         };
     },

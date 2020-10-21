@@ -17,7 +17,7 @@ export interface ResourceGroup {
     options: {
         raw_filter: QueryFilters;
     };
-    tags: object;
+    // tags?: object;
 }
 
 export interface KanbanItem {
