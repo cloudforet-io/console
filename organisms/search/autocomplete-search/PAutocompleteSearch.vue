@@ -262,7 +262,8 @@ export default {
             @apply w-full relative;
         }
         .p-context-menu {
-            @apply w-full font-normal;
+            @apply font-normal;
+            min-width: unset;
             .secondary {
                 &.context-header {
                     @apply text-secondary;
