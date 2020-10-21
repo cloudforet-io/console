@@ -30,36 +30,36 @@
 
                             <div v-if="readMode" class="separator read-mode" />
 
-                            <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">
-                                <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"
-                                       style-type="primary" outline
-                                >
-                                    <strong>{{ k }}:</strong>&nbsp;{{ v }}
-                                </p-tag>
-                            </p-field-group>
-                            <p-field-group v-else :label="$t('PWR_SCHED.RESRC_GRP.TAG')">
-                                <template #help>
-                                    {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC') }}
-                                    <br>
-                                    {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC2') }}
-                                </template>
-                                <p-dict-input-group ref="dictRef"
-                                                    :dict="tags"
-                                                    :show-validation="validState.showValidation"
-                                                    :focused="false"
-                                                    @change="onChangeTags"
-                                >
-                                    <template #addButton="scope">
-                                        <p-icon-text-button class="mt-4"
-                                                            outline style-type="primary-dark" :disabled="scope.disabled"
-                                                            name="ic_plus_bold"
-                                                            @click="scope.addPair($event)"
-                                        >
-                                            {{ $t('PWR_SCHED.RESRC_GRP.ADD_TAG') }}
-                                        </p-icon-text-button>
-                                    </template>
-                                </p-dict-input-group>
-                            </p-field-group>
+                            <!--                            <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">-->
+                            <!--                                <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"-->
+                            <!--                                       style-type="primary" outline-->
+                            <!--                                >-->
+                            <!--                                    <strong>{{ k }}:</strong>&nbsp;{{ v }}-->
+                            <!--                                </p-tag>-->
+                            <!--                            </p-field-group>-->
+                            <!--                            <p-field-group v-else :label="$t('PWR_SCHED.RESRC_GRP.TAG')">-->
+                            <!--                                <template #help>-->
+                            <!--                                    {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC') }}-->
+                            <!--                                    <br>-->
+                            <!--                                    {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC2') }}-->
+                            <!--                                </template>-->
+                            <!--                            </p-field-group>-->
+                            <!--                                <p-dict-input-group ref="dictRef"-->
+                            <!--                                                    :dict="tags"-->
+                            <!--                                                    :show-validation="validState.showValidation"-->
+                            <!--                                                    :focused="false"-->
+                            <!--                                                    @change="onChangeTags"-->
+                            <!--                                >-->
+                            <!--                                    <template #addButton="scope">-->
+                            <!--                                        <p-icon-text-button class="mt-4"-->
+                            <!--                                                            outline style-type="primary-dark" :disabled="scope.disabled"-->
+                            <!--                                                            name="ic_plus_bold"-->
+                            <!--                                                            @click="scope.addPair($event)"-->
+                            <!--                                        >-->
+                            <!--                                            {{ $t('PWR_SCHED.RESRC_GRP.ADD_TAG') }}-->
+                            <!--                                        </p-icon-text-button>-->
+                            <!--                                    </template>-->
+                            <!--                                </p-dict-input-group>-->
                         </div>
                     </section>
                     <div class="separator" />
@@ -135,6 +135,7 @@
         <p-table-check-modal theme-color="primary"
                              size="lg"
                              centered
+                             :header-title="listModalState.headerTitle"
                              :visible.sync="listModalState.visible"
                              @confirm="onListModalConfirm"
         >
@@ -148,7 +149,7 @@
             />
             <p-dynamic-layout v-if="schema"
                               type="query-search-table"
-                              class="resource-table"
+                              class="resource-table modal-table"
                               :options="schema.options"
                               :data="data"
                               :type-options="{
@@ -200,7 +201,6 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import PTag from '@/components/molecules/tags/PTag.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
@@ -238,7 +238,6 @@ export default {
     name: 'ResourceGroupPage',
     components: {
         PTableCheckModal,
-        PButtonModal,
         PQuerySearchTags,
         PButton,
         PTag,
@@ -325,6 +324,7 @@ export default {
         });
 
         const listModalState = reactive({
+            headerTitle: computed(() => vm.$t('PWR_SCHED.RESRC_GRP.CHECK_LIST')),
             visible: false,
         });
 
@@ -635,6 +635,12 @@ section {
     .toolbox {
         @apply px-0 pt-0;
     }
+    .p-autocomplete-search .p-context-menu {
+        max-height: 20rem;
+    }
+}
+.resource-table.modal-table::v-deep .p-toolbox-table {
+    height: unset;
 }
 .p-field-group {
     width: 100%;
