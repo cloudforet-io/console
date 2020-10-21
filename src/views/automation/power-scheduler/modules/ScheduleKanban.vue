@@ -363,17 +363,7 @@ export default {
         opacity: 0;
         transform: translateY(20px);
     }
-    .edit-mode {
-        .kanban .kanban-container .resource-group-box .resource-group-header {
-            @apply bg-blue-100;
-        }
-        .kanban .kanban-container .resource-group-box .resource-group-header .header-decorator {
-            @apply bg-blue-200 text-blue-500;
-        }
-        .kanban .kanban-container .resource-group-box .resource-item-wrapper {
-            height: 17rem;
-        }
-    }
+
 
     .kanban {
         .kanban-container {
@@ -527,6 +517,17 @@ export default {
                         }
                     }
                 }
+            }
+        }
+        &.edit-mode {
+            .kanban-container .resource-group-box .resource-group-header {
+                @apply bg-blue-100;
+            }
+            .kanban-container .resource-group-box .resource-group-header .header-decorator {
+                @apply bg-blue-200 text-blue-500;
+            }
+            .kanban-container .resource-group-box .resource-item-wrapper {
+                height: 17rem;
             }
         }
     }
