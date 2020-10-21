@@ -23,22 +23,31 @@ export default {
         const getHeatMapColor = (length: number) => {
             let color = '';
             switch (true) {
+            // case (length === 0):
+            //     color = 'bg-gray-200';
+            //     break;
+            // case (length < 7):
+            //     color = 'bg-primary2 opacity-50';
+            //     break;
+            // case (length < 13):
+            //     color = 'bg-primary2';
+            //     break;
+            // case (length < 19):
+            //     color = 'bg-primary1';
+            //     break;
+            // case (length < 24):
+            //     color = 'bg-primary';
+            //     break;
+            // case (length === 24):
+            //     color = 'bg-primary-dark';
+            //     break;
             case (length === 0):
                 color = 'bg-gray-200';
-                break;
-            case (length < 7):
-                color = 'bg-primary2 opacity-50';
                 break;
             case (length < 13):
                 color = 'bg-primary2';
                 break;
-            case (length < 19):
-                color = 'bg-primary1';
-                break;
-            case (length < 24):
-                color = 'bg-primary';
-                break;
-            case (length === 24):
+            case (length <= 24):
                 color = 'bg-primary-dark';
                 break;
             default:

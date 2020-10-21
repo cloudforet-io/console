@@ -1,18 +1,18 @@
 <template>
     <div class="page-information">
-        <span>사용 비율</span>
+        <span>사용 시간 비율</span>
 
         <span id="circle1" />
-        <span class="text-gray-400 text">10%</span>
+        <span class="text-gray-200 text">0</span>
 
-        <span id="circle2" />
-        <span class="text-primary2 text">20%</span>
+<!--        <span id="circle2" />-->
+<!--        <span class="text-primary2 text">20%</span>-->
 
         <span id="circle3" />
-        <span class="text-primary1 text">30%</span>
+        <span class="text-primary2 text">50%</span>
 
-        <span id="circle4" />
-        <span class="text-primary text">80%</span>
+<!--        <span id="circle4" />-->
+<!--        <span class="text-primary text">80%</span>-->
 
         <span id="circle5" />
         <span class="text-primary-dark text">100%</span>

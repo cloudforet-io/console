@@ -4,12 +4,11 @@
             <p-page-navigation :routes="route" />
         </div>
         <div class="page-title">
-            <p-page-title :title="'Power Scheduler'" :total-count="totalCount">
-                <template #extra>
-                    <p class="h-1" />
-                    <span id="current-date">업데이트 {{ currentDate }} (Local Time) </span>
-                </template>
-            </p-page-title>
+            <p-page-title :title="'Power Scheduler'" :total-count="totalCount" />
+            <!--                <template #extra>-->
+            <!--                    <p class="h-1" />-->
+            <!--                    <span id="current-date">업데이트 {{ currentDate }} (Local Time) </span>-->
+            <!--                </template>-->
         </div>
         <p-hr class="cloud-service-divider" />
         <div class="power-scheduler-project">
@@ -60,7 +59,9 @@
                             </div>
                             <div class="resources">
                                 <div class="scheduled-resources">
-                                    <p>Scheduled Resources</p>
+                                    <div v-tooltip.bottom="{content: 'Scheduled resources 설명', delay: {show: 500}}">
+                                        <p>Scheduled Resources</p>
+                                    </div>
                                     <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
                                     <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
                                     <p-progress-bar
@@ -70,9 +71,11 @@
                                     />
                                 </div>
                                 <div class="saving">
-                                    <p class="saving-this-month">
-                                        Saving of This Month
-                                    </p>
+                                    <div v-tooltip.bottom="{content: `${currentDate}에 대한 Cost 설명`, delay: {show: 500}}">
+                                        <p class="saving-this-month">
+                                            Saving of This Month
+                                        </p>
+                                    </div>
                                     <p class="approximate">
                                         approx.
                                     </p>

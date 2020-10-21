@@ -583,7 +583,6 @@ export default {
                 showErrorMessage('Fail to Delete Project Group', e, root);
             } finally {
                 formState.projectGroupDeleteFormVisible = false;
-                await state.treeRef.listNodes();
             }
         };
 

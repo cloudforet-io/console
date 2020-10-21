@@ -211,6 +211,16 @@ export default {
                     ],
                 },
                 {
+                    key: 'automation',
+                    link: '/automation',
+                    parentRoutes: ['automation'],
+                    menu: [
+                        {
+                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/automation/power-scheduler', isNew: true,
+                        },
+                    ],
+                },
+                {
                     key: 'plugin',
                     link: '/plugin',
                     parentRoutes: ['plugin'],
@@ -230,16 +240,6 @@ export default {
                         },
                         {
                             type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history', isNew: true,
-                        },
-                    ],
-                },
-                {
-                    key: 'automation',
-                    link: '/automation',
-                    parentRoutes: ['automation'],
-                    menu: [
-                        {
-                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/automation/power-scheduler', isNew: true,
                         },
                     ],
                 },
