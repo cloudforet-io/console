@@ -370,7 +370,7 @@ export default {
             @apply grid w-full h-full;
             row-gap: 0.5rem;
             column-gap: 0.5rem;
-            grid-template-columns: repeat(auto-fill, minmax(11.75rem, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(11.75rem, 1fr));
             .resource-group-box {
                 @apply border border-violet-200 bg-white box-border;
                 border-radius: 2px;
