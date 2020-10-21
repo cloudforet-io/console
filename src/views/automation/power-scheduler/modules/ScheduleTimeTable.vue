@@ -392,9 +392,10 @@ export default {
             return newRule;
         };
         const changeTimezoneToLocal = (rule: Rule, ruleType) => {
-            // routine
+            let newRule = {};
+
             if (ruleType === RULE_TYPE.routine) {
-                const newRule = {
+                newRule = {
                     sun: [],
                     mon: [],
                     tue: [],
@@ -403,8 +404,8 @@ export default {
                     fri: [],
                     sat: [],
                 };
-                const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
                 const offsetHours = (dayjs().tz(state.timezone).utcOffset()) / 60;
+                const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
                 Object.entries(rule).forEach(([weekday, times]) => {
                     times.forEach((time) => {
                         let newTime = time + offsetHours;
@@ -421,23 +422,24 @@ export default {
                         }
                     });
                 });
-                return newRule;
+            } else if (ruleType === RULE_TYPE.ticket) {
+                if (state.timezone === 'UTC') newRule = rule;
+                else {
+                    Object.entries(rule).forEach(([date, times]) => {
+                        times.forEach((time) => {
+                            const utcDate = dayjs.utc(`${date} ${time}:00`);
+                            const localDate = utcDate.tz(state.timezone).format('YYYY-MM-DD');
+                            const localHour = Number(utcDate.tz(state.timezone).format('H'));
+                            if (localDate in newRule) {
+                                newRule[localDate].push(localHour);
+                            } else {
+                                newRule[localDate] = [localHour];
+                            }
+                        });
+                    });
+                }
             }
 
-            // one time
-            const newRule = {};
-            Object.entries(rule).forEach(([date, times]) => {
-                times.forEach((time) => {
-                    const utcDate = dayjs.utc(`${date} ${time}:00`);
-                    const localDate = utcDate.tz(state.timezone).format('YYYY-MM-DD');
-                    const localHour = Number(utcDate.tz(state.timezone).format('H'));
-                    if (localDate in newRule) {
-                        newRule[localDate].push(localHour);
-                    } else {
-                        newRule[localDate] = [localHour];
-                    }
-                });
-            });
             return newRule;
         };
 
