@@ -22,7 +22,7 @@
                     <div v-for="time in range(0, 24)"
                          :key="time"
                          class="time"
-                         :class="editMode && hoveredTime === time ? 'hovered' : ''"
+                         :class="hoveredTime === time ? 'hovered' : ''"
                     >
                         {{ ('0' + time).slice(-2) }}
                     </div>
@@ -97,7 +97,7 @@
                     <div class="title pt-0">
                         {{ $t('PWR_SCHED.TIMEZONE') }}
                     </div>
-                    <div>{{ $t('PWR_SCHED.LOCAL_TIME') }}</div>
+                    <div>{{ timezone }}</div>
                     <!--                <div class="content">-->
                     <!--                    <div v-if="mode === 'READ'">-->
                     <!--                        {{ timezone }}-->
@@ -492,6 +492,7 @@ export default {
             if (props.mode !== 'READ') {
                 settings.ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
                 Object.entries(settings.ruleWithUTC).forEach(([k, v]) => {
+                    // todo: if문 삭제해야 함
                     if (v.length > 0) {
                         settings.ruleForApi.push({ day: k, times: v });
                     }
@@ -726,12 +727,14 @@ export default {
         watch(() => props.mode, async (after) => {
             if (after === 'READ') {
                 state.showHelpBlock = false;
-            } else {
-                state.oneTimeEditMode = false;
                 await getScheduleRule();
                 setStyleClass();
+            } else if (after === 'UPDATE') {
+                state.oneTimeEditMode = false;
+                setStyleClass();
+            } else if (after === 'CREATE') {
+                state.showHelpBlock = true;
             }
-            if (after === 'CREATE') state.showHelpBlock = true;
         }, { immediate: true });
         watch(() => state.currentDate, () => {
             setStyleClass();
@@ -806,6 +809,13 @@ export default {
                 .time-section {
                     @apply bg-blue-200;
                 }
+                .time-section {
+                    .time {
+                        &.hovered {
+                            background-color: rgba(theme('colors.secondary1'), 0.25);
+                        }
+                    }
+                }
                 .data-section {
                     .weekday-row {
                         @apply bg-blue-200;
@@ -814,9 +824,6 @@ export default {
                                 @apply text-secondary;
                             }
                         }
-                    }
-                    .item-row:hover {
-                        @apply bg-gray-100;
                     }
                 }
             }
@@ -835,7 +842,7 @@ export default {
                     font-size: 0.625rem;
                     text-align: center;
                     &.hovered {
-                        background-color: rgba(theme('colors.secondary1'), 0.25);
+                        background-color: rgba(theme('colors.gray.900'), 0.25);
                     }
                 }
             }
@@ -878,6 +885,9 @@ export default {
                     height: 1rem;
                     &:last-child {
                         @apply border-b-0;
+                    }
+                    &:hover {
+                        @apply bg-gray-100;
                     }
                     .item {
                         @apply border-l border-gray-200;
