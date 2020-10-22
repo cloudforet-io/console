@@ -45,7 +45,7 @@
                                   class="w-full"
                     />
                 </p-field-group>
-                <p-field-group label="Action type">
+                <p-field-group label="Action type" class="mb-20">
                     <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
                 </p-field-group>
                 <!--                </div>-->
