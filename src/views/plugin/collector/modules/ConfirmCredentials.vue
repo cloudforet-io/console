@@ -28,14 +28,15 @@
 </template>
 
 <script lang="ts">
-import { makeTrItems } from '@/lib/view-helper';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getPageStart } from '@/lib/component-utils/pagination';
+import { makeTrItems } from '@/lib/view-helper';
 
 interface Value {
     name: string;
@@ -71,15 +72,11 @@ export default {
             ], context.parent)),
         });
 
-        // const providerApi = fluentApi.identity().provider();
-
         const getProviderSchemaList = async () => {
             try {
                 const res = await SpaceConnector.client.identity.provider.get({
                     provider: props.provider,
                 });
-                // const res = await providerApi.get().setId(props.provider).execute();
-                // all schema list that supported by provider
                 state.schemaItems = res.capability.supported_schema.map(name => ({ name }));
             } catch (e) {
                 console.error(e);

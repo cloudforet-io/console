@@ -74,15 +74,32 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed, reactive, toRefs, UnwrapRef,
-    } from '@vue/composition-api';
+/* eslint-disable camelcase */
+import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
+
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { fluentApi } from '@/lib/fluent-api';
+
+import { SpaceConnector } from '@/lib/space-connector';
+
+interface Data {
+    eventTypeCode: string;
+    eventTypeCategory: string;
+    region: string;
+    count: number;
+}
+
+interface StateInterface {
+    data: Data[];
+    loading: boolean;
+}
+
+interface Props {
+    projectId: string;
+}
 
 export default {
     name: 'HealthDashboard',
@@ -93,38 +110,27 @@ export default {
         PSelectableItem,
         PSkeleton,
     },
-    setup(props, context) {
-        const projectId = computed<string>(() => context.root.$route.params.id as string);
-
-        interface Data {
-            eventTypeCode: string;
-            eventTypeCategory: string;
-            region: string;
-            count: number;
-        }
-
-        interface StateInterface {
-            data: Data[];
-            loading: boolean;
-            // widgetRef: any;
-        }
-
+    props: {
+        projectId: {
+            type: String,
+            default: '',
+        },
+    },
+    setup(props: Props) {
         const state: UnwrapRef<StateInterface> = reactive({
             data: [],
             loading: true,
-            // widgetRef: null,
         });
-
-        const api = fluentApi.addons().awsHealth().list().setId(projectId.value)
-            .setDateSubtractor(10);
-
 
         const getData = async (): Promise<void> => {
             state.loading = true;
             state.data = [];
             try {
-                const res = await api.execute();
-                state.data = res.data.logs.map(item => ({
+                const res = await SpaceConnector.client.addOns.awsHealth.list({
+                    project_id: props.projectId,
+                    date_subtractor: 10,
+                });
+                state.data = res.logs.map(item => ({
                     eventTypeCode: item.eventTypeCode,
                     eventTypeCategory: item.eventTypeCategory,
                     region: item.region,

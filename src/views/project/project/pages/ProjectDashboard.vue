@@ -49,6 +49,7 @@
         <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
                               row-start-5 row-end-8 sm:row-start-3 sm:row-end-5 lg:row-start-3
                               health-dashboard"
+                          :project-id="projectId"
         />
     </div>
 </template>

@@ -20,17 +20,18 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, watch,
-} from '@vue/composition-api';
-import { fluentApi } from '@/lib/fluent-api';
+import { get } from 'lodash';
+
+import { computed, reactive, watch } from '@vue/composition-api';
+
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { get } from 'lodash';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
+
 import { timestampFormatter } from '@/lib/util';
+import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'CollectorDetail',
@@ -64,10 +65,11 @@ export default {
             data: {},
         });
         const getCollectorDetailData = async () => {
-            const res = await fluentApi.inventory().collector().get().setId(props.collectorId)
-                .execute();
+            const res = await SpaceConnector.client.inventory.collector.get({
+                collector_id: props.collectorId,
+            });
             baseState.isLoading = false;
-            if (res.data) baseState.data = res.data;
+            if (res) baseState.data = res;
         };
         watch(() => props.collectorId, () => {
             getCollectorDetailData();
