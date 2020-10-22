@@ -102,7 +102,7 @@ export default {
     setup(props: SelectableListProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const proxyState = reactive({
-            selectedIndexes: makeOptionalProxy('selectedIndexes', vm, []),
+            selectedIndexes: makeOptionalProxy('selectedIndexes', vm, [], ['select']),
             disabledIndexes: makeOptionalProxy('disabledIndexes', vm, []),
         });
 
@@ -128,7 +128,6 @@ export default {
 
             // single select case
             if (proxyState.selectedIndexes.length === 0) {
-                console.debug('aaa');
                 proxyState.selectedIndexes = [idx];
                 emit('selected', item, idx, proxyState.selectedIndexes);
             } else {
