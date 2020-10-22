@@ -18,19 +18,17 @@
 
         <section class="mt-4">
             <div v-if="mode === 'READ'">
-                <p class="section-title">
-                    {{ $t('PWR_SCHED.BASIC_INFO') }}
-                </p>
-                <div class="detail-box">
-                    <div class="info-lab w-1/3">
-                        <span class="title">{{ $t('PWR_SCHED.CREATED_TIME') }}</span>
-                        <span class="content">{{ created }}</span>
+                <div class="detail-wrapper">
+                    <div class="info-group w-1/2">
+                        <span class="title">{{ $t('PWR_SCHED.SETTING') }}</span>
+                        <span class="content" :class="expectedState.toLowerCase()">
+                            <span class="circle" />
+                            <span>{{ expectedState }}</span>
+                        </span>
                     </div>
-                    <div class="info-lab w-1/3">
-                        <span class="title">{{ $t('PWR_SCHED.TARGET_STATE') }}</span>
-                    </div>
-                    <div class="info-lab w-1/3">
+                    <div class="info-group w-1/2">
                         <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
+                        <span class="content">{{ currentState }}</span>
                     </div>
                 </div>
             </div>
@@ -236,8 +234,8 @@ export default {
             createLoading: false,
             //
             created: '',
-            targetState: '',
-            currentState: '',
+            expectedState: 'RUNNING', // TODO: to be updated
+            currentState: 'BOOTING', // TODO: to be updated
         });
 
 
@@ -397,23 +395,18 @@ export default {
 header {
     @apply flex justify-between;
 }
-.section-title {
-    @apply text-xs text-gray-900;
-    margin-bottom: 0.5rem;
-}
-.detail-box {
+.detail-wrapper {
     @apply mt-2 border border-gray-200;
     display: flex;
     width: 100%;
-    height: 4.5rem;
+    height: 3.5rem;
     border-radius: 2px;
-    padding: 1rem 0;
     margin-bottom: 3.25rem;
-    .info-lab {
+    .info-group {
         @apply border-r border-gray-200;
         font-size: 0.875rem;
-        line-height: 2.25rem;
         padding: 0 1.5rem;
+        margin: auto 0;
         &:last-of-type {
             @apply border-none;
         }
@@ -422,7 +415,26 @@ header {
             font-weight: bold;
         }
         .content {
-            float: right;
+            padding-left: 1rem;
+            .circle {
+                display: inline-block;
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 50%;
+                margin-right: 4px;
+            }
+            &.running {
+                @apply text-safe;
+                .circle {
+                    @apply bg-safe;
+                }
+            }
+            &.stopped {
+                @apply text-gray-400;
+                .circle {
+                    @apply bg-alert;
+                }
+            }
         }
     }
 }
