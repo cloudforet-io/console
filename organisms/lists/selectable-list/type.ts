@@ -20,4 +20,5 @@ export interface SelectableListProps<item=any> {
     selectedIndexes?: number[];
     disabledIndexes?: number[];
     disabled?: boolean;
+    iconSize?: string;
 }

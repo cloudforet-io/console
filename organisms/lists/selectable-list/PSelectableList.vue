@@ -23,6 +23,7 @@
                                :color="getItem(item, mapper.color) || undefined"
                                :theme="theme"
                                :default-icon="getItem(item, mapper.icon) || defaultIcon"
+                               :icon-size="iconSize"
                                @click="onItemClick(item, idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -98,6 +99,10 @@ export default {
                 return ['default', 'card'].includes(theme);
             },
         },
+        iconSize: {
+            type: String,
+            default: undefined
+        }
     },
     setup(props: SelectableListProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

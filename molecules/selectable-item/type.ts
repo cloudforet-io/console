@@ -8,4 +8,5 @@ export interface SelectableItemPropsType {
     defaultIcon?: string;
     color?: string;
     theme?: ThemeType;
+    iconSize?: string;
 }

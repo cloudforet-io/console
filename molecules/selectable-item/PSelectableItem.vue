@@ -12,7 +12,7 @@
             <slot name="side" v-bind="$props">
                 <p-lazy-img :src="iconUrl"
                             :error-icon="defaultIcon"
-                            width="2rem" height="2rem"
+                            :width="iconSize" :height="iconSize"
                             class="flex-shrink-0 mr-2"
                 />
             </slot>
@@ -75,6 +75,10 @@ export default {
             validator(theme) {
                 return ['default', 'card'].includes(theme);
             },
+        },
+        iconSize: {
+            type: String,
+            default: '2rem',
         },
     },
     setup(props: SelectableItemPropsType, { listeners }) {
