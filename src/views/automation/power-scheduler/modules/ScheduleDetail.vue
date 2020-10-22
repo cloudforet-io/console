@@ -3,7 +3,7 @@
         <header>
             <p-page-title :title="title"
                           :child="mode === 'READ'"
-                          @goBack="$router.push({name: 'powerSchedulerLanding'})"
+                          @goBack="$router.go(-1)"
             >
                 <template #extra>
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
