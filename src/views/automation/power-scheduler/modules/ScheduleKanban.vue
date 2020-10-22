@@ -125,6 +125,7 @@ import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/powe
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import router from '@/routes';
+import { showSuccessMessage } from '@/lib/util';
 
 
     interface ColumnType {
@@ -250,11 +251,13 @@ export default {
 
         const startEdit = () => {
             state.isEditMode = true;
+            vm.$emit('edit-start');
         };
 
         const finishEdit = async () => {
             state.isEditMode = false;
             await getResourceGroup(props.scheduleId);
+            vm.$emit('edit-finish');
         };
 
         const deleteResourceGroup = (column, item, itemIndex) => {
@@ -268,11 +271,15 @@ export default {
                     schedule_id: scheduleId,
                     columns: state.columns,
                 });
+
+                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.CREATE_SUCCESS'), vm.$root);
             } catch (e) {
                 console.error(e);
+                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.CREATE_SUCCESS'), vm.$root);
             } finally {
                 state.isEditMode = false;
             }
+            vm.$emit('edit-finish');
         };
 
         const hideResourceGroupPage = async () => {

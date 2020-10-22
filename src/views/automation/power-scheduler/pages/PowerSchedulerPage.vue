@@ -8,7 +8,7 @@
                 <p-hr />
                 <div class="my-6 mx-4">
                     <p-icon-text-button name="ic_plus_bold" outline
-                                        :disabled="mode !== 'READ'" block
+                                        :disabled="mode === 'CREATE' || isEditing" block
                                         @click="onClickCreate"
                     >
                         {{ $t('PWR_SCHED.CREATE') }}
@@ -18,7 +18,7 @@
                                        :multi-selectable="false"
                                        theme="card"
                                        default-icon="ic_clock-history"
-                                       :disabled="mode !== 'READ'"
+                                       :disabled="mode === 'CREATE' || isEditing"
                                        class="mt-6"
                                        @select="onSelectItem"
                     >
@@ -59,6 +59,8 @@
                          @delete="onDelete"
                          @create="onCreate"
                          @cancel="onCancel"
+                         @edit-start="onEditStart"
+                         @edit-finish="onEditFinish"
         />
     </vertical-page-layout>
 </template>
@@ -75,18 +77,15 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import { store } from '@/store';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { getTimezone, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import { pointViolet, gray } from '@/styles/colors';
-import { ViewMode } from '@/views/automation/power-scheduler/type';
 import { findIndex } from 'lodash';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
-import { DateTime } from 'luxon';
 
 dayjs.extend(timezone);
 
@@ -166,6 +165,7 @@ export default {
                 if (vm.$route.params.scheduleId) return 'READ';
                 return 'CREATE';
             }),
+            isEditing: false,
         });
 
 
@@ -199,7 +199,7 @@ export default {
                 });
             } catch (e) {}
 
-            showErrorMessage('Invalid URL', 'Please check Project ID', root);
+            showErrorMessage(vm.$t('PWR_SCHED.PROJECT_INVALID'), vm.$t('PWR_SCHED.PROJECT_INVALID_DESC'), root);
         };
 
         const validateProjectId = async (): Promise<boolean> => {
@@ -234,13 +234,16 @@ export default {
         };
 
 
-        const initSelectedSchedule = async () => {
+        const initSelectedSchedule = async (init = false) => {
             if (state.scheduleList.length === 0) {
                 state.selectedIndexes = [];
+                if (init && props.scheduleId) showErrorMessage(vm.$t('PWR_SCHED.SCHED_INVALID'), vm.$t('PWR_SCHED.SCHED_INVALID_DESC'), root);
             } else {
                 const idx = findIndex(state.scheduleList, { schedule_id: props.scheduleId });
-                if (idx === -1) state.selectedIndexes = [0];
-                else state.selectedIndexes = [idx];
+                if (idx === -1) {
+                    state.selectedIndexes = [0];
+                    if (init && props.scheduleId) showErrorMessage(vm.$t('PWR_SCHED.SCHED_INVALID'), vm.$t('PWR_SCHED.SCHED_INVALID_DESC'), root);
+                } else state.selectedIndexes = [idx];
             }
 
             await setMode();
@@ -266,6 +269,14 @@ export default {
             await initSelectedSchedule();
         };
 
+        const onEditStart = () => {
+            state.isEditing = true;
+        };
+
+        const onEditFinish = () => {
+            state.isEditing = false;
+        };
+
         const onSelectItem = async (idxes) => {
             state.selectedIndexes = idxes;
             await setMode();
@@ -278,12 +289,7 @@ export default {
             }
 
             await listSchedule();
-            await initSelectedSchedule();
-
-            // invalid scheduleId case
-            if (props.scheduleId && !state.selectedSchedule) {
-                await redirectToLandingPage();
-            }
+            await initSelectedSchedule(true);
 
             // watch(() => state.selectedSchedule, async () => {
             //     await setMode();
@@ -298,6 +304,8 @@ export default {
             onDelete,
             onCancel,
             onUpdate,
+            onEditStart,
+            onEditFinish,
             onSelectItem,
             listMapper,
             getFormattedTime,

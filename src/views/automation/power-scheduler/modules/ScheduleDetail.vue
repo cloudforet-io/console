@@ -7,17 +7,17 @@
             >
                 <template #extra>
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
-                                   @click="onClickDelete"
+                                   @click="onClickDelete" :disabled="disabledState.visible"
                     />
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit-text"
-                                   @click="onClickNameEdit"
+                                   @click="onClickNameEdit" :disabled="disabledState.visible"
                     />
                 </template>
             </p-page-title>
         </header>
 
         <section class="mt-4">
-            <div v-if="mode === 'READ'">
+            <div v-if="mode === 'READ'" class="section-wrapper">
                 <div class="detail-wrapper">
                     <div class="info-group w-1/2">
                         <span class="title">{{ $t('PWR_SCHED.SETTING') }}</span>
@@ -31,6 +31,7 @@
                         <span class="content">{{ currentState }}</span>
                     </div>
                 </div>
+                <div v-if="disabledState.visible" class="section-disabled" @click.prevent />
             </div>
 
             <p-field-group v-if="mode === 'CREATE'" class="name-field"
@@ -51,14 +52,23 @@
                 </template>
             </p-field-group>
 
-            <schedule-time-table
-                ref="timeTable"
-                :schedule-id="scheduleId"
-                :mode="mode"
-            />
-            <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
-                             :mode.sync="mode"
-            />
+            <div class="section-wrapper">
+                <schedule-time-table ref="timeTable"
+                                     :schedule-id="scheduleId"
+                                     :mode="mode"
+                />
+                <div v-if="disabledState.visible && disabledState.current !== 'time-table'" class="section-disabled" @click.prevent />
+            </div>
+
+            <div class="section-wrapper">
+                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
+                                 :mode="mode"
+                                 @edit-start="onEditStart('kanban')"
+                                 @edit-finish="onEditFinish('kanban')"
+                />
+                <div v-if="disabledState.visible && disabledState.current !== 'kanban'" class="section-disabled" @click.prevent />
+            </div>
+
             <div v-if="mode === 'CREATE'" class="actions">
                 <p-button style-type="gray900" :outline="true" @click="onClickCancel">
                     {{ $t('PWR_SCHED.CANCEL') }}
@@ -117,7 +127,7 @@
             </template>
         </p-button-modal>
 
-        <p-button-modal header-title="" centered size="md"
+        <p-button-modal :header-title="nameEditState.headerTitle" centered size="md"
                         :visible.sync="nameEditState.visible"
                         :disabled="nameEditState.loading ||
                             (nameEditState.showValidation && !nameEditState.isValid)"
@@ -178,6 +188,8 @@ interface Props {
     projectId: string;
 }
 
+type sectionType = 'kanban'|'time-table'
+
 const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
 export default {
@@ -222,6 +234,7 @@ export default {
             isValid: computed(() => !!nameEditState.name),
             showValidation: false,
             loading: false,
+            headerTitle: computed(() => vm.$t('PWR_SCHED.EDIT_NAME')),
         });
 
         const state = reactive({
@@ -236,6 +249,11 @@ export default {
             created: '',
             expectedState: 'RUNNING', // TODO: to be updated
             currentState: 'BOOTING', // TODO: to be updated
+        });
+
+        const disabledState = reactive({
+            visible: false,
+            current: '' as sectionType,
         });
 
 
@@ -265,9 +283,10 @@ export default {
                     name: nameEditState.name,
                 });
                 state.schedule.name = nameEditState.name;
-                showSuccessMessage('성공', checkDeleteState.headerTitle, root);
+                showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), nameEditState.headerTitle, root);
             } catch (e) {
                 console.error(e);
+                showErrorMessage(`${checkDeleteState.headerTitle} ${vm.$t('PWR_SCHED.SUCCESS')}`, e, root);
             } finally {
                 nameEditState.visible = false;
                 nameEditState.loading = false;
@@ -284,10 +303,10 @@ export default {
                 await SpaceConnector.client.powerScheduler.schedule.delete({
                     schedule_id: props.scheduleId,
                 });
-                showSuccessMessage('성공', checkDeleteState.headerTitle, root);
+                showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), checkDeleteState.headerTitle, root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(`${checkDeleteState.headerTitle} 실패`, e, root);
+                showErrorMessage(`${checkDeleteState.headerTitle} ${vm.$t('PWR_SCHED.SUCCESS')}`, e, root);
             } finally {
                 checkDeleteState.visible = false;
                 emit('delete');
@@ -326,9 +345,11 @@ export default {
                     name: nameEditState.name,
                     project_id: props.projectId,
                 });
+                showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.CREATE_SUCCESS'), root);
                 return res.schedule_id;
             } catch (e) {
                 console.error(e);
+                showErrorMessage(vm.$t('PWR_SCHED.CREATE_FAIL'), e, root);
             } finally {
                 state.createLoading = false;
             }
@@ -368,6 +389,17 @@ export default {
             checkModalState.visible = false;
         };
 
+        const onEditFinish = () => {
+            disabledState.visible = false;
+            vm.$emit('edit-finish');
+        };
+
+        const onEditStart = (type: sectionType) => {
+            disabledState.current = type;
+            disabledState.visible = true;
+            vm.$emit('edit-start');
+        };
+
         watch(() => props.scheduleId, async (id) => {
             nameEditState.showValidation = false;
             await getSchedule();
@@ -378,6 +410,7 @@ export default {
             nameEditState,
             checkModalState,
             checkDeleteState,
+            disabledState,
             onClickNameEdit,
             onNameEditConfirm,
             onClickDelete,
@@ -386,6 +419,8 @@ export default {
             onClickCancel,
             onClickSave,
             onClickCheckModalConfirm,
+            onEditFinish,
+            onEditStart,
         };
     },
 };
@@ -464,4 +499,12 @@ header {
 .name-input {
     @apply block mt-4 w-full;
 }
+
+.section-wrapper {
+    @apply relative;
+    .section-disabled {
+        @apply absolute w-full h-full top-0 left-0 bg-white opacity-50;
+    }
+}
+
 </style>
