@@ -2,7 +2,8 @@
 import { QueryFilters } from '@/lib/type';
 import { Filter } from '@/lib/space-connector/type';
 
-export type ViewMode = 'READ'|'CREATE'|'UPDATE'
+export const modes = ['READ', 'CREATE', 'UPDATE'];
+export type ViewMode = typeof modes[number];
 
 export interface Resource {
     resource_type: string;

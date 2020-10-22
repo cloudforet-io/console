@@ -305,7 +305,7 @@ export default {
         * */
         const goToDetail = (item) => {
             const res: Location = {
-                name: 'powerSchedulerDetail',
+                name: 'powerScheduler',
                 params: {
                     projectId: item.project_id,
                 },

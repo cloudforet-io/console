@@ -1,5 +1,21 @@
 <template>
     <div>
+        <header>
+            <p-page-title :title="title"
+                          :child="mode === 'READ'"
+                          @goBack="$router.push({name: 'powerSchedulerLanding'})"
+            >
+                <template #extra>
+                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
+                                   @click="onClickDelete"
+                    />
+                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit-text"
+                                   @click="onClickNameEdit"
+                    />
+                </template>
+            </p-page-title>
+        </header>
+
         <section class="mt-4">
             <div v-if="mode === 'READ'">
                 <p class="section-title">
@@ -19,10 +35,9 @@
                 </div>
             </div>
 
-            <p-field-group v-if="mode !== 'READ'"
-                           class="name-field"
+            <p-field-group v-if="mode === 'CREATE'" class="name-field"
                            :required="true"
-                           :invalid="showValidation && !isNameValid"
+                           :invalid="nameEditState.showValidation && !nameEditState.isValid"
             >
                 <template #label>
                     <div class="name-field-label">
@@ -31,7 +46,7 @@
                     </div>
                 </template>
                 <template #default="{invalid}">
-                    <p-text-input v-model="groupName" v-focus
+                    <p-text-input v-model="nameEditState.name" v-focus
                                   :invalid="invalid"
                                   class="name-input"
                     />
@@ -46,30 +61,48 @@
             <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
                              :mode.sync="mode"
             />
-
-            <div v-if="mode !== 'READ'" class="actions">
+            <div v-if="mode === 'CREATE'" class="actions">
                 <p-button style-type="gray900" :outline="true" @click="onClickCancel">
                     {{ $t('PWR_SCHED.CANCEL') }}
                 </p-button>
-                <p-button class="ml-4" style-type=" secondary" :disabled="showValidation && !isAllValid"
+                <p-button class="ml-4" style-type=" secondary"
+                          :disabled="nameEditState.showValidation && !nameEditState.isValid"
                           @click="onClickSave"
                 >
                     {{ $t('PWR_SCHED.SAVE') }}
                 </p-button>
             </div>
         </section>
-        <p-button-modal
-            :header-title="$t('PWR_SCHED.CHECK_TIME_SET')"
-            centered
-            size="md"
-            fade
-            :visible.sync="checkModalState.visible"
-            theme-color="alert"
-            :footer-confirm-button-bind="{
-                styleType: 'alert',
-            }"
-            :loading="loading"
-            @confirm="onConfirmCheckModal"
+
+        <p-button-modal :header-title="checkDeleteState.headerTitle"
+                        :centered="true"
+                        :scrollable="false"
+                        size="md"
+                        :fade="true"
+                        :backdrop="true"
+                        :visible.sync="checkDeleteState.visible"
+                        theme-color="alert"
+                        :footer-confirm-button-bind="{styleType: 'alert'}"
+                        @confirm="scheduleDeleteConfirm"
+        >
+            <template #body>
+                <p class="delete-modal-content">
+                    {{ $t('PWR_SCHED.CHECK_DELETE_DESC') }}
+                </p>
+            </template>
+        </p-button-modal>
+
+        <p-button-modal :header-title="$t('PWR_SCHED.CHECK_TIME_SET')"
+                        centered
+                        size="md"
+                        fade
+                        :visible.sync="checkModalState.visible"
+                        theme-color="alert"
+                        :footer-confirm-button-bind="{
+                            styleType: 'alert',
+                        }"
+                        :loading="createLoading"
+                        @confirm="onClickCheckModalConfirm"
         >
             <template #body>
                 <p class="delete-modal-content">
@@ -85,41 +118,79 @@
                 {{ $t('PWR_SCHED.CHECK_TIME_SET_YES') }}
             </template>
         </p-button-modal>
+
+        <p-button-modal header-title="" centered size="md"
+                        :visible.sync="nameEditState.visible"
+                        :disabled="nameEditState.loading ||
+                            (nameEditState.showValidation && !nameEditState.isValid)"
+                        @confirm="onNameEditConfirm"
+        >
+            <template #body>
+                <p-field-group class="name-field"
+                               :required="true"
+                               :invalid="nameEditState.showValidation && !nameEditState.isValid"
+                >
+                    <template #label>
+                        <div class="name-field-label">
+                            <span class="label">{{ $t('PWR_SCHED.SET_NAME') }}</span>
+                            <span class="desc">{{ $t('PWR_SCHED.SET_NAME_DESC') }}</span>
+                        </div>
+                    </template>
+                    <template #default="{invalid}">
+                        <p-text-input v-model="nameEditState.name" v-focus
+                                      :invalid="invalid"
+                                      class="name-input"
+                        />
+                    </template>
+                </p-field-group>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { ViewMode } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { timestampFormatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
+interface Schedule {
+    // eslint-disable-next-line camelcase
+    schedule_id: string;
+    name: string;
+}
 
 interface Props {
     scheduleId?: string;
     mode: ViewMode;
     projectId: string;
-    name: string;
 }
+
+const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
 export default {
     name: 'ScheduleDetail',
     components: {
+        PButton,
+        PIconButton,
+        PPageTitle,
         PButtonModal,
         PTextInput,
         PFieldGroup,
-        PButton,
         ScheduleTimeTable,
         ScheduleKanban,
     },
@@ -143,118 +214,189 @@ export default {
             type: String,
             default: 'READ',
         },
-        name: {
-            type: String,
-            default: '',
-        },
     },
-    setup(props: Props, { emit }) {
-        const state = reactive({
+    setup(props: Props, { emit, root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const nameEditState = reactive({
+            visible: false,
+            name: '',
+            isValid: computed(() => !!nameEditState.name),
             showValidation: false,
-            isNameValid: computed(() => !!state.groupName),
-            isAllValid: computed(() => state.isNameValid),
-            groupName: props.name,
+            loading: false,
+        });
+
+        const state = reactive({
+            title: computed(() => (props.mode === 'CREATE' ? vm.$t('PWR_SCHED.CREATE') : state.schedule.name)),
+
+            schedule: { ...defaultSchedule } as Schedule,
             kanban: null,
             timeTable: null,
-            loading: false,
+            loading: true,
+            createLoading: false,
             //
             created: '',
             targetState: '',
             currentState: '',
         });
 
+
         const checkModalState = reactive({
             visible: false,
         });
 
-        const getSchedule = async () => {
+        const checkDeleteState = reactive({
+            visible: false,
+            headerTitle: computed(() => vm.$t('PWR_SCHED.CHECK_DELETE')),
+        });
+
+        const onClickNameEdit = () => {
+            nameEditState.showValidation = false;
+            nameEditState.name = state.schedule.name;
+            nameEditState.visible = true;
+        };
+
+        const onNameEditConfirm = async () => {
+            nameEditState.showValidation = true;
+            if (!nameEditState.isValid) return;
+
+            nameEditState.loading = true;
             try {
-                const res = await SpaceConnector.client.powerScheduler.schedule.get({
+                await SpaceConnector.client.powerScheduler.schedule.update({
                     schedule_id: props.scheduleId,
+                    name: nameEditState.name,
                 });
-                state.created = timestampFormatter(res.created_at);
+                state.schedule.name = nameEditState.name;
+                showSuccessMessage('성공', checkDeleteState.headerTitle, root);
             } catch (e) {
                 console.error(e);
+            } finally {
+                nameEditState.visible = false;
+                nameEditState.loading = false;
+            }
+            emit('update');
+        };
+
+        const onClickDelete = () => {
+            checkDeleteState.visible = true;
+        };
+
+        const scheduleDeleteConfirm = async () => {
+            try {
+                await SpaceConnector.client.powerScheduler.schedule.delete({
+                    schedule_id: props.scheduleId,
+                });
+                showSuccessMessage('성공', checkDeleteState.headerTitle, root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(`${checkDeleteState.headerTitle} 실패`, e, root);
+            } finally {
+                checkDeleteState.visible = false;
+                emit('delete');
             }
         };
 
-        const createSchedule = async () => {
+        const getSchedule = async () => {
+            state.loading = true;
+            if (props.scheduleId) {
+                try {
+                    const res = await SpaceConnector.client.powerScheduler.schedule.get({
+                        schedule_id: props.scheduleId,
+                    });
+                    state.schedule = res;
+                    state.created = timestampFormatter(res.created_at);
+                } catch (e) {
+                    state.schedule = { ...defaultSchedule };
+                    state.created = '';
+                    console.error(e);
+                }
+            } else {
+                state.schedule = { ...defaultSchedule };
+            }
+
+            state.loading = false;
+        };
+
+
+        const createSchedule = async (): Promise<string> => {
+            nameEditState.showValidation = true;
+            if (!nameEditState.isValid) return '';
+
+            state.createLoading = true;
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.create({
-                    name: state.groupName,
+                    name: nameEditState.name,
                     project_id: props.projectId,
                 });
                 return res.schedule_id;
             } catch (e) {
                 console.error(e);
-                return '';
+            } finally {
+                state.createLoading = false;
             }
+
+            return '';
         };
 
-        const updateSchedule = async () => {
-            try {
-                const res = await SpaceConnector.client.powerScheduler.schedule.update({
-                    schedule_id: props.scheduleId,
-                    name: state.groupName,
-                });
-                return res.schedule_id;
-            } catch (e) {
-                console.error(e);
-                return '';
-            }
+
+        const createAll = async () => {
+            state.createLoading = true;
+            const scheduleId = await createSchedule();
+            await state.timeTable.createOrUpdate(scheduleId);
+            await state.kanban.onSave(scheduleId);
+            state.createLoading = false;
+            emit('create');
         };
 
         const onClickCancel = () => {
+            nameEditState.showValidation = true;
+            nameEditState.name = '';
             emit('cancel');
         };
 
-        const onConfirmCheckModal = async () => {
-            if (props.mode !== 'READ') {
-                state.loading = true;
-                let scheduleId = props.scheduleId;
-                if (props.mode === 'CREATE') {
-                    scheduleId = await createSchedule();
-                } else if (props.mode === 'UPDATE') {
-                    scheduleId = await updateSchedule();
-                }
-
-
-                await state.timeTable.createOrUpdate(scheduleId);
-                await state.kanban.onSave(scheduleId);
-                state.loading = false;
-            }
-            emit('confirm');
-        };
-
-        const onClickSave = () => {
-            state.showValidation = true;
-            if (!state.isAllValid) return;
+        const onClickSave = async () => {
+            nameEditState.showValidation = true;
+            if (!nameEditState.isValid) return;
 
             if (state.timeTable.isRuleExist()) {
-                onConfirmCheckModal();
+                await createAll();
             } else {
                 checkModalState.visible = true;
             }
         };
 
-        watch(() => props.scheduleId, (id) => {
-            state.showValidation = false;
-            state.groupName = props.name;
-            if (id) getSchedule();
+        const onClickCheckModalConfirm = async () => {
+            await createAll();
+            checkModalState.visible = false;
+        };
+
+        watch(() => props.scheduleId, async (id) => {
+            nameEditState.showValidation = false;
+            await getSchedule();
         }, { immediate: true });
 
         return {
             ...toRefs(state),
+            nameEditState,
             checkModalState,
+            checkDeleteState,
+            onClickNameEdit,
+            onNameEditConfirm,
+            onClickDelete,
+            scheduleDeleteConfirm,
+            createAll,
             onClickCancel,
             onClickSave,
-            onConfirmCheckModal,
+            onClickCheckModalConfirm,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
+header {
+    @apply flex justify-between;
+}
 .section-title {
     @apply text-xs text-gray-900;
     margin-bottom: 0.5rem;

@@ -7,19 +7,20 @@
                 </p>
                 <p-hr />
                 <div class="my-6 mx-4">
-                    <p-icon-text-button v-if="!isFirstTimeCreate" name="ic_plus_bold" outline
+                    <p-icon-text-button name="ic_plus_bold" outline
                                         :disabled="mode !== 'READ'" block
                                         @click="onClickCreate"
                     >
                         {{ $t('PWR_SCHED.CREATE') }}
                     </p-icon-text-button>
                     <p-selectable-list :items="scheduleList" :loading="loading"
-                                       :selected-indexes.sync="selectedIndexes"
+                                       :selected-indexes="selectedIndexes"
                                        :multi-selectable="false"
                                        theme="card"
                                        default-icon="ic_clock-history"
                                        :disabled="mode !== 'READ'"
                                        class="mt-6"
+                                       @select="onSelectItem"
                     >
                         <template #loading>
                             <div />
@@ -44,56 +45,21 @@
             </section>
         </template>
         <p-page-navigation :routes="routeState.route" />
-
-        <header>
-            <p-page-title :title="projectName"
-                          child
-                          @goBack="$router.push('/automation/power-scheduler')"
-            >
-                <template #extra>
-                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit"
-                                   @click="onClickEdit"
-                    />
-                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
-                                   @click="onClickDelete"
-                    />
-                    <div v-if="mode === 'UPDATE'" class="edit-tag">{{$t('PWR_SCHED.EDITING')}}</div>
-                </template>
-            </p-page-title>
-        </header>
-
         <div v-if="loading">
             <div class="loading-backdrop fade-in" />
             <p-lottie name="thin-spinner" :size="2.5"
                       :auto="true" class="loading"
             />
         </div>
-        <schedule-detail v-else-if="selectedSchedule"
-                         :schedule-id="selectedSchedule.schedule_id"
+        <schedule-detail v-else
+                         :schedule-id="selectedSchedule ? selectedSchedule.schedule_id : ''"
                          :project-id="projectId"
                          :mode="mode"
-                         :name="selectedSchedule.name"
+                         @update="onUpdate"
+                         @delete="onDelete"
+                         @create="onCreate"
                          @cancel="onCancel"
-                         @confirm="onConfirm"
         />
-        <p-button-modal
-            :header-title="headerTitle"
-            :centered="true"
-            :scrollable="false"
-            size="md"
-            :fade="true"
-            :backdrop="true"
-            :visible.sync="visible"
-            theme-color="alert"
-            :footer-confirm-button-bind="{styleType: 'alert'}"
-            @confirm="scheduleDeleteConfirm"
-        >
-            <template #body>
-                <p class="delete-modal-content">
-                    {{ $t('PWR_SCHED.CHECK_DELETE_DESC') }}
-                </p>
-            </template>
-        </p-button-modal>
     </vertical-page-layout>
 </template>
 
@@ -101,16 +67,13 @@
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { store } from '@/store';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -118,18 +81,15 @@ import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayou
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import { pointViolet, gray } from '@/styles/colors';
+import { ViewMode } from '@/views/automation/power-scheduler/type';
+import { findIndex } from 'lodash';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 interface Schedule {
     // eslint-disable-next-line camelcase
     schedule_id: string;
     name: string;
 }
-
-export const modes = ['READ', 'CREATE', 'UPDATE'];
-export type Mode = typeof modes[number];
-
-// eslint-disable-next-line camelcase
-const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
 const EXPECTED_STATES = {
     RUNNING: {
@@ -142,62 +102,99 @@ const EXPECTED_STATES = {
     },
 };
 
+interface Props {
+    projectId: string;
+    scheduleId?: string;
+}
+
 export default {
-    name: 'PowerSchedulerDetail',
+    name: 'PowerSchedulerPage',
     components: {
+        PLottie,
         PSelectableList,
         PHr,
         VerticalPageLayout,
-        PButtonModal,
         ScheduleDetail,
-        PLottie,
-        PIconButton,
         PIconTextButton,
-        PPageTitle,
         PPageNavigation,
     },
     props: {
         projectId: {
             type: String,
+            required: true,
+        },
+        scheduleId: {
+            type: String,
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup(props: Props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         if (!props.projectId) vm.$router.push('/error-page');
 
-        const projectName = computed(() => store.state.resource.project.items[props.projectId]?.label || props.projectId);
-
         /** Breadcrumb */
         const routeState = reactive({
+            projectName: computed(() => store.state.resource.project.items[props.projectId]?.label || props.projectId),
             route: computed(() => [
                 { name: 'Automation', path: '/automation' },
                 { name: 'Power Scheduler', path: '/automation/power-scheduler' },
-                { name: `${projectName.value}`, path: `/automation/power-scheduler/${props.projectId}` },
+                { name: `${routeState.projectName}`, path: `/automation/power-scheduler/${props.projectId}` },
             ]),
         });
 
         const state = reactive({
+            title: computed(() => state.selectedSchedule?.name || vm.$t('PWR_SCHED.CREATE')),
             scheduleList: [] as Schedule[],
             totalCount: 0,
             loading: true,
             selectedIndexes: [],
-            selectedSchedule: computed(() => state.scheduleList[state.selectedIndexes[0]] || { ...defaultSchedule }),
-            // eslint-disable-next-line camelcase
-            mode: 'CREATE' as Mode,
-            isFirstTimeCreate: computed(() => state.mode === 'CREATE' && state.totalCount === 0),
+            selectedSchedule: computed(() => state.scheduleList[state.selectedIndexes[0]] || null),
+            mode: computed(() => {
+                if (state.loading) return 'READ';
+                if (vm.$route.params.scheduleId) return 'READ';
+                return 'CREATE';
+            }),
         });
 
-        const formState = reactive({
-            visible: false,
-            headerTitle: computed(() => vm.$t('PWR_SCHED.CHECK_DELETE')),
-            schedule_id: '',
-        });
 
-        const onClickCreate = () => {
-            state.selectedIndexes = [];
-            state.mode = 'CREATE';
+        const setMode = async () => {
+            if (state.selectedSchedule?.schedule_id) {
+                try {
+                    await vm.$router.replace({
+                        params: {
+                            projectId: props.projectId,
+                            scheduleId: state.selectedSchedule.schedule_id,
+                        },
+                    });
+                } catch (e) {}
+            } else {
+                try {
+                    await vm.$router.replace({
+                        params: {
+                            projectId: props.projectId,
+                            scheduleId: undefined as unknown as string,
+                        },
+                    });
+                } catch (e) {}
+            }
         };
+
+        const redirectToLandingPage = async () => {
+            try {
+                await vm.$router.replace({
+                    name: 'powerSchedulerLanding',
+                    params: {},
+                });
+            } catch (e) {}
+
+            showErrorMessage('Invalid URL', 'Please check Project ID', root);
+        };
+
+        const validateProjectId = async (): Promise<boolean> => {
+            await store.dispatch('resource/project/load');
+            return !!store.state.resource.project.items[props.projectId];
+        };
+
 
         const listSchedule = async () => {
             state.loading = true;
@@ -207,81 +204,89 @@ export default {
 
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
-
-                if (state.totalCount === 0) {
-                    onClickCreate();
-                } else {
-                    state.mode = 'READ';
-                    state.selectedIndexes = [0];
-                }
             } catch (e) {
                 console.error(e);
+                state.scheduleList = [];
+                state.totalCount = 0;
+                state.selectedIndexes = [];
+                await setMode();
             } finally {
                 state.loading = false;
             }
         };
 
 
-        const showDetail = async (idx) => {
-            if (state.mode === 'READ') {
-                state.selectedIndexes = [idx];
+        const onClickCreate = async () => {
+            state.selectedIndexes = [];
+            await setMode();
+        };
+
+
+        const initSelectedSchedule = async () => {
+            if (state.scheduleList.length === 0) {
+                state.selectedIndexes = [];
+            } else {
+                const idx = findIndex(state.scheduleList, { schedule_id: props.scheduleId });
+                if (idx === -1) state.selectedIndexes = [0];
+                else state.selectedIndexes = [idx];
             }
+
+            await setMode();
         };
 
-        const onClickEdit = () => {
-            state.mode = 'UPDATE';
-        };
 
-        const onClickDelete = () => {
-            formState.schedule_id = state.selectedSchedule.schedule_id;
-            formState.visible = true;
-        };
-
-        const scheduleDeleteConfirm = async () => {
-            try {
-                await SpaceConnector.client.powerScheduler.schedule.delete({
-                    schedule_id: formState.schedule_id,
-                });
-                showSuccessMessage('성공', formState.headerTitle, root);
-            } catch (e) {
-                console.error(e);
-                showErrorMessage(`${formState.headerTitle} 실패`, e, root);
-            } finally {
-                formState.visible = false;
-                state.mode = 'READ';
-                await listSchedule();
-            }
-        };
-
-        const onCancel = () => {
-            if (state.mode === 'CREATE') state.selectedIndexes = [0];
-            state.mode = 'READ';
-        };
-
-        const onConfirm = () => {
-            listSchedule();
-            state.mode = 'READ';
-        };
-
-        const init = async () => {
-            await store.dispatch('resource/project/load');
+        const onCreate = async () => {
             await listSchedule();
+            await initSelectedSchedule();
         };
 
-        init();
+        const onDelete = async () => {
+            await listSchedule();
+            await initSelectedSchedule();
+        };
+
+        const onCancel = async () => {
+            await initSelectedSchedule();
+        };
+
+        const onUpdate = async () => {
+            await listSchedule();
+            await initSelectedSchedule();
+        };
+
+        const onSelectItem = async (idxes) => {
+            state.selectedIndexes = idxes;
+            await setMode();
+        };
+
+        (async () => {
+            if (!await validateProjectId()) {
+                await redirectToLandingPage();
+                return;
+            }
+
+            await listSchedule();
+            await initSelectedSchedule();
+
+            // invalid scheduleId case
+            if (props.scheduleId && !state.selectedSchedule) {
+                await redirectToLandingPage();
+            }
+
+            // watch(() => state.selectedSchedule, async () => {
+            //     await setMode();
+            // }, { immediate: true });
+        })();
 
         return {
-            projectName,
-            routeState,
             ...toRefs(state),
-            ...toRefs(formState),
-            showDetail,
-            onClickEdit,
-            onClickDelete,
-            scheduleDeleteConfirm,
+            routeState,
             onClickCreate,
+            onCreate,
+            onDelete,
             onCancel,
-            onConfirm,
+            onUpdate,
+            onSelectItem,
             EXPECTED_STATES,
         };
     },
@@ -289,9 +294,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    header {
-        @apply flex justify-between;
-    }
     .p-selectable-list::v-deep {
         .item-container {
             @apply mb-2;
@@ -343,8 +345,4 @@ export default {
         }
     }
 
-    .edit-tag {
-        @apply bg-blue-200 text-secondary py-1 px-2 text-xs ml-2;
-        border-radius: 2px;
-    }
 </style>

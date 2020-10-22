@@ -289,6 +289,7 @@ export default {
             data: null as any,
 
             hiddenFilters: [] as Filter[],
+            extraFilters: [] as Filter[],
             // dictRef: null as any,
         });
 
@@ -372,8 +373,9 @@ export default {
             }
 
             state.hiddenFilters = [{ k: 'project_id', v: props.projectId, o: 'eq' }];
+            state.extraFilters = [];
             forEach(options, (d, k) => {
-                state.hiddenFilters.push({
+                state.extraFilters.push({
                     k, v: d, o: 'eq',
                 });
             });
@@ -454,7 +456,7 @@ export default {
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
                 const { keywords, orFilters, andFilters } = getFiltersFromQueryTags(changed.queryTags);
-                queryHelper.setFilter(...state.hiddenFilters, ...andFilters)
+                queryHelper.setFilter(...state.hiddenFilters, ...state.extraFilters, ...andFilters)
                     .setFilterOr(...orFilters)
                     .setKeyword(...keywords);
             }
@@ -539,7 +541,7 @@ export default {
         const onListModalConfirm = () => {
             const { keywords, andFilters } = getFiltersFromQueryTags(fetchOptionState.queryTags);
             const query = new QueryHelper()
-                .setFilter(...andFilters)
+                .setFilter(...state.extraFilters, ...andFilters)
                 .setKeyword(...keywords)
                 .data;
 

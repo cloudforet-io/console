@@ -236,13 +236,6 @@ export default {
             }
         };
 
-        const syncModeWithRoute = () => {
-            let hash;
-            if (props.mode === 'CREATE') hash = '#create';
-            else if (props.mode === 'UPDATE') hash = '#edit';
-            vm.$router.replace({ hash }).catch(() => {});
-        };
-
         const deleteResourceGroup = (column, item, itemIndex) => {
             const columnIndex = parseInt(column.title) - 1;
             state.columns[columnIndex].items.splice(itemIndex, 1);
@@ -260,6 +253,8 @@ export default {
         };
 
         const hideResourceGroupPage = async () => {
+            state.selectedResourceGroupIndex = -1;
+            state.selectedColumnIndex = 0;
             state.resourceGroupVisible = false;
         };
 
@@ -303,21 +298,6 @@ export default {
             }
             if (!props.scheduleId && (after !== before)) {
                 await getInitResourceGroup();
-            }
-        }, { immediate: true });
-
-        watch(() => props.mode, async (after, before) => {
-            await syncModeWithRoute();
-        }, { immediate: true });
-
-        watch(() => vm.$route, (route) => {
-            if (route.hash === '#create') {
-
-            } else if (route.hash === '#edit') {
-
-            // read mode
-            } else {
-
             }
         }, { immediate: true });
 

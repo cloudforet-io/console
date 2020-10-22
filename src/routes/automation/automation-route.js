@@ -1,6 +1,6 @@
 const Automation = () => import('@/views/automation/Automation.vue');
-const PowerScheduler = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerLandingPage.vue');
-const PowerSchedulerDetail = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerDetailPage.vue');
+const PowerSchedulerLandingPage = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerLandingPage.vue');
+const PowerSchedulerPage = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerPage.vue');
 
 export default {
     path: 'automation',
@@ -18,14 +18,14 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: 'powerScheduler',
-                    component: PowerScheduler,
+                    name: 'powerSchedulerLanding',
+                    component: PowerSchedulerLandingPage,
                 },
                 {
-                    path: ':projectId',
-                    name: 'powerSchedulerDetail',
+                    path: ':projectId/:scheduleId?',
+                    name: 'powerScheduler',
                     props: true,
-                    component: PowerSchedulerDetail,
+                    component: PowerSchedulerPage,
                 },
             ],
         },
