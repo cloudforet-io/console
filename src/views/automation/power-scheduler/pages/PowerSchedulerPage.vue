@@ -1,18 +1,20 @@
 <template>
     <vertical-page-layout :min-width="270" :init-width="270" :max-width="400">
         <template #sidebar="{width}">
+            <div class="px-3 mt-10 mb-12">
+                <p-icon-text-button name="ic_plus_bold" outline
+                                    :disabled="mode === 'CREATE' || isEditing" block
+                                    @click="onClickCreate"
+                >
+                    {{ $t('PWR_SCHED.CREATE') }}
+                </p-icon-text-button>
+            </div>
             <section class="list-section" :style="{width: width}">
                 <p class="title">
                     <strong>{{ $t('PWR_SCHED.LIST') }}</strong>&nbsp;({{ totalCount }})
                 </p>
                 <p-hr />
                 <div class="my-6 mx-4">
-                    <p-icon-text-button name="ic_plus_bold" outline
-                                        :disabled="mode === 'CREATE' || isEditing" block
-                                        @click="onClickCreate"
-                    >
-                        {{ $t('PWR_SCHED.CREATE') }}
-                    </p-icon-text-button>
                     <p-selectable-list :items="scheduleList" :loading="loading" :mapper="listMapper"
                                        :selected-indexes="selectedIndexes"
                                        :multi-selectable="false"
@@ -56,6 +58,7 @@
                          :schedule-id="selectedSchedule ? selectedSchedule.schedule_id : ''"
                          :project-id="projectId"
                          :mode="mode"
+                         :first-create="mode === 'CREATE' && scheduleList.length === 0"
                          @update="onUpdate"
                          @delete="onDelete"
                          @create="onCreate"
@@ -86,7 +89,7 @@ import { findIndex } from 'lodash';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
-import {DESIRED_STATES, Schedule} from '@/views/automation/power-scheduler/type';
+import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
 
 dayjs.extend(timezone);
 
@@ -273,10 +276,6 @@ export default {
 
             await listSchedule();
             await initSelectedSchedule(true);
-
-            // watch(() => state.selectedSchedule, async () => {
-            //     await setMode();
-            // }, { immediate: true });
         })();
 
         return {
@@ -319,7 +318,7 @@ export default {
         }
     }
     .list-section {
-        @apply relative mx-1 mt-8;
+        @apply relative mx-1;
         min-height: 8rem;
         .title {
             @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;

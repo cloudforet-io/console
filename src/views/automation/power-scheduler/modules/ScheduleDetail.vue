@@ -2,7 +2,7 @@
     <div>
         <header>
             <p-page-title :title="title"
-                          :child="mode === 'READ'"
+                          :child="mode === 'READ' || firstCreate"
                           @goBack="$router.go(-1)"
             >
                 <template #extra>
@@ -24,20 +24,18 @@
                         <p-status v-if="DESIRED_STATES[desiredState]"
                                   :icon-color="DESIRED_STATES[desiredState].iconColor"
                                   :text-color="DESIRED_STATES[desiredState].textColor"
+                                  :text="DESIRED_STATES[desiredState].label"
                                   class="ml-2"
-                        >
-                            {{ DESIRED_STATES[desiredState].label }}
-                        </p-status>
+                        />
                     </div>
                     <div class="info-group">
                         <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
                         <p-status v-if="BOOTING_STATES[jobStatus]"
                                   :icon-color="BOOTING_STATES[jobStatus].iconColor"
                                   :text-color="BOOTING_STATES[jobStatus].textColor"
+                                  :text="BOOTING_STATES[jobStatus].label"
                                   class="ml-2"
-                        >
-                            {{ BOOTING_STATES[jobStatus].label }}
-                        </p-status>
+                        />
                     </div>
                 </div>
                 <div v-if="disabledState.visible" class="section-disabled" @click.prevent />
@@ -65,12 +63,16 @@
                 <schedule-time-table ref="timeTable"
                                      :schedule-id="scheduleId"
                                      :mode="mode"
+                                     @edit-start="onEditStart('time-table')"
+                                     @edit-finish="onEditFinish('time-table')"
                 />
                 <div v-if="disabledState.visible && disabledState.current !== 'time-table'" class="section-disabled" @click.prevent />
             </div>
 
             <div class="section-wrapper">
-                <schedule-kanban ref="kanban" :project-id="projectId" :schedule-id="scheduleId"
+                <schedule-kanban ref="kanban"
+                                 :project-id="projectId"
+                                 :schedule-id="scheduleId"
                                  :mode="mode"
                                  @edit-start="onEditStart('kanban')"
                                  @edit-finish="onEditFinish('kanban')"
@@ -79,7 +81,9 @@
             </div>
 
             <div v-if="mode === 'CREATE'" class="actions">
-                <p-button style-type="gray900" :outline="true" @click="onClickCancel">
+                <p-button v-if="!firstCreate" style-type="gray900" :outline="true"
+                          @click="onClickCancel"
+                >
                     {{ $t('PWR_SCHED.CANCEL') }}
                 </p-button>
                 <p-button class="ml-4" style-type=" secondary"
@@ -193,6 +197,7 @@ interface Props {
     scheduleId?: string;
     mode: ViewMode;
     projectId: string;
+    firstCreate: boolean;
 }
 
 type sectionType = 'kanban'|'time-table'
@@ -231,6 +236,10 @@ export default {
             type: String,
             default: 'READ',
         },
+        firstCreate: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -254,8 +263,8 @@ export default {
             createLoading: false,
             //
             created: '',
-            desiredState: computed(() => state.schedule.desired_state),
-            jobStatus: computed(() => state.schedule.job_status),
+            desiredState: '',
+            jobStatus: '',
         });
 
         const disabledState = reactive({
@@ -317,6 +326,20 @@ export default {
             } finally {
                 checkDeleteState.visible = false;
                 emit('delete');
+            }
+        };
+
+        const getScheduleState = async () => {
+            try {
+                const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleState({
+                    schedule_id: props.scheduleId,
+                });
+                state.desiredState = res.desired_state;
+                state.jobStatus = res.job_status;
+            } catch (e) {
+                state.desiredState = '';
+                state.jobStatus = '';
+                console.error(e);
             }
         };
 
@@ -409,7 +432,9 @@ export default {
 
         watch(() => props.scheduleId, async (id) => {
             nameEditState.showValidation = false;
-            await getSchedule();
+            const actions = [getSchedule()];
+            if (id) actions.push(getScheduleState());
+            await Promise.all(actions);
         }, { immediate: true });
 
         return {
