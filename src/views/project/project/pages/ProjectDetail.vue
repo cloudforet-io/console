@@ -128,7 +128,6 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 import { makeTrItems } from '@/lib/view-helper';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
@@ -172,11 +171,11 @@ export default {
         });
 
         const getProject = async (id) => {
-            const resp = await fluentApi.identity().project().get()
-                .setId(id)
-                .execute();
+            const resp = await SpaceConnector.client.identity.project.get({
+                project_id: id,
+            });
             if (resp) {
-                item.value = resp.data;
+                item.value = resp;
                 state.projectGroupId = item.value.project_group_info.project_group_id;
                 state.projectName = item.value.name;
             }
@@ -295,8 +294,9 @@ export default {
 
         const projectDeleteFormConfirm = async () => {
             try {
-                await fluentApi.identity().project().delete().setId(projectId.value)
-                    .execute();
+                await SpaceConnector.client.identity.project.delete({
+                    project_id: projectId.value,
+                });
                 showSuccessMessage('success', 'Delete Project', root);
             } catch (e) {
                 showErrorMessage('Delete Project Fail', e, root);
@@ -313,12 +313,10 @@ export default {
 
         const projectEditFormConfirm = async (input) => {
             try {
-                await fluentApi.identity().project().update().setParameter({
-                    // eslint-disable-next-line camelcase
+                await SpaceConnector.client.identity.project.update({
                     project_id: projectId.value,
                     ...input,
-                })
-                    .execute();
+                });
                 showSuccessMessage('success', 'Update Project', root);
                 item.value.name = input.name;
             } catch (e) {
@@ -352,13 +350,9 @@ export default {
             action: null as any,
         });
 
-        const memberDeleteAction = fluentApi.identity().project()
-            .removeMember()
-            .setId(projectId.value);
-
         const memberDeleteClick = () => {
             checkMemberDeleteState.mode = 'delete';
-            checkMemberDeleteState.action = memberDeleteAction;
+            // checkMemberDeleteState.action = memberDeleteAction;
             checkMemberDeleteState.items = memberTableState.selectedItems as any[];
             checkMemberDeleteState.headerTitle = 'Delete Member';
             checkMemberDeleteState.subTitle = 'Are you sure want to remove a following members from Project?';
@@ -368,7 +362,11 @@ export default {
 
         const memberDeleteConfirm = async (items) => {
             try {
-                await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute();
+                await SpaceConnector.client.identity.project.member.remove({
+                    project_id: projectId.value,
+                    users: items.map(it => it.user_info.user_id),
+                });
+                // await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute();
                 showSuccessMessage('success', 'Successfully Deleted', root);
             } catch (e) {
                 showErrorMessage('Fail to Delete Member', e, root);
@@ -384,16 +382,22 @@ export default {
 
 
         const getPageNavigation = async () => {
-            const res = await fluentApi.identity().project().treeSearch()
-                .setItemType('PROJECT')
-                .setItemId(projectId.value)
-                .execute();
-            const projectGroupName = await fluentApi.identity().projectGroup().list()
-                .setFilter({ key: 'project_group_id', value: res.data.open_path, operator: FILTER_OPERATOR.in })
-                .execute();
+            const res = await SpaceConnector.client.identity.project.tree.search({
+                item_type: 'PROJECT',
+                // eslint-disable-next-line camelcase
+                item_id: projectId.value,
+            });
+            const query = new QueryHelper().setFilter({
+                k: 'project_group_id',
+                v: res.open_path,
+                o: 'in',
+            });
+            const projectGroupName = await SpaceConnector.client.identity.projectGroup.list({
+                query: query.data,
+            });
             state.pageNavigation = [
                 { name: 'Project', path: '/project' },
-                ...projectGroupName.data.results.map(d => ({
+                ...projectGroupName.results.map(d => ({
                     name: d.name,
                     path: `/project?select_pg=${d.project_group_id}`,
                 })),

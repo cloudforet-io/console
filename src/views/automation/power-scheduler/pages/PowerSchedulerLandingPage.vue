@@ -5,10 +5,6 @@
         </div>
         <div class="page-title">
             <p-page-title :title="'Power Scheduler'" :total-count="totalCount" />
-            <!--                <template #extra>-->
-            <!--                    <p class="h-1" />-->
-            <!--                    <span id="current-date">업데이트 {{ currentDate }} (Local Time) </span>-->
-            <!--                </template>-->
         </div>
         <p-hr class="cloud-service-divider" />
         <div class="power-scheduler-project">
@@ -59,9 +55,8 @@
                             </div>
                             <div class="resources">
                                 <div class="scheduled-resources">
-                                    <div v-tooltip.bottom="{content: 'Scheduled resources 설명', delay: {show: 500}}">
-                                        <p>Scheduled Resources</p>
-                                    </div>
+                                    <p>{{ $t('PWR_SCHED.APPLY_RESOURCE') }} / {{ $t('PWR_SCHED.AVAILABLE_RESOURCE') }}</p>
+
                                     <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
                                     <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
                                     <p-progress-bar
@@ -71,23 +66,21 @@
                                     />
                                 </div>
                                 <div class="saving">
-                                    <div v-tooltip.bottom="{content: `${currentDate}에 대한 Cost 설명`, delay: {show: 500}}">
-                                        <p class="saving-this-month">
-                                            Saving of This Month
-                                        </p>
-                                    </div>
+                                    <p class="saving-this-month">
+                                        {{ $t('PWR_SCHED.MONTH_COST_SAVING') }}
+                                    </p>
                                     <p class="approximate">
-                                        approx.
+                                        {{ $t('PWR_SCHED.APPROX') }}
                                     </p>
                                     <span class="costs"><span>$ </span><span class="approx-costs">{{ approximateCosts }}</span></span>
                                 </div>
                             </div>
                         </div>
                         <p-hr />
-                        <div class="schedule">
+                        <div class="schedule" :class="{'no-schedule': item.scheduler.length === 0}">
                             <div>
-                                <p class="mb-4">
-                                    <span class="schedule-title">SCHEDULE
+                                <p v-if="item.scheduler.length > 0" class="mb-4">
+                                    <span class="schedule-title">{{ $t('PWR_SCHED.SCHED') }}
                                         <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
                                         <span v-else class="schedule-title-num">(+3)</span>
                                     </span>
@@ -98,10 +91,12 @@
                                     </p>
                                 </div>
                                 <div v-else>
-                                    <p-i name="ic_plus"
-                                         width=".75rem" height=".75rem"
-                                         class="schedule-add-btn"
-                                    /> <span class="schedule-add-text">Create Scheduler</span>
+                                    <div class="schedule-add-btn">
+                                        <p-i name="ic_plus"
+                                             class="add-btn-icon"
+                                             width="0.875rem" height="0.875rem"
+                                        />
+                                    </div><span class="schedule-add-text">{{ $t('PWR_SCHED.NEED_SCHED') }}</span>
                                 </div>
                             </div>
                             <div v-if="item.scheduler.length > 0" class="schedule-matrix">
@@ -403,6 +398,7 @@ export default {
             .saving {
                 .saving-this-month {
                     @apply mb-1 text-xs;
+                    margin-right: 4.75rem;
                 }
 
                 .approximate {
@@ -444,18 +440,25 @@ export default {
             }
 
             .schedule-add-btn {
-                @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
-
-                &:hover {
-                    @apply bg-blue-300;
+                @apply border border-gray-900 rounded-full inline-block z-10;
+                width: 1.25rem;
+                height: 1.25rem;
+                .add-btn-icon {
+                    @apply text-gray-900;
+                    margin-left: 0.125rem;
+                    margin-bottom: 0.0625rem;
                 }
             }
 
             .schedule-add-text {
                 @apply text-gray-900;
                 margin-left: 0.5rem;
-                font-size: 0.75rem;
+                font-size: 0.875rem;
                 line-height: 1.5;
+            }
+            &.no-schedule {
+                @apply ml-6 mr-5 mb-6 flex justify-center;
+                margin-top: 3.625rem;
             }
         }
     }

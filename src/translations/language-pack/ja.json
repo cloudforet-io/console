@@ -409,6 +409,9 @@
 	},
 	"PWR_SCHED": {
 		"APPLY": "",
+		"APPLY_RESOURCE": "",
+		"APPROX": "",
+		"AVAILABLE_RESOURCE": "",
 		"BASIC_INFO": "",
 		"CANCEL": "",
 		"CHECK_DELETE": "",
@@ -440,6 +443,8 @@
 		"LIST": "",
 		"MAKING_TICKET": "",
 		"MONTH": "",
+		"MONTH_COST_SAVING": "",
+		"NEED_SCHED": "",
 		"NO_SCHED": "",
 		"RESRC_GRP": {
 			"ADD_TAG": "",
@@ -469,6 +474,7 @@
 		"ROUTINE_TIMER": "",
 		"RUN_SCHED": "",
 		"SAVE": "",
+		"SCHED": "",
 		"SCHED_ONE_TIME": "",
 		"SCHED_ROUTINE": "",
 		"SCHED_TIME": "",

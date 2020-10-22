@@ -409,6 +409,9 @@
 	},
 	"PWR_SCHED": {
 		"APPLY": "적용",
+		"APPLY_RESOURCE": "적용 자원 ",
+		"APPROX": "약",
+		"AVAILABLE_RESOURCE": "가능한 총 자원",
 		"BASIC_INFO": "기본 정보",
 		"CANCEL": "취소",
 		"CHECK_DELETE": "스케줄 그룹 삭제",
@@ -440,6 +443,8 @@
 		"LIST": "스케줄러 목록",
 		"MAKING_TICKET": "티켓 생성중",
 		"MONTH": "월",
+		"MONTH_COST_SAVING": "이달의 비용 절감",
+		"NEED_SCHED": "스케줄러 설정이 필요합니다.",
 		"NO_SCHED": "스케줄러가 없습니다.",
 		"RESRC_GRP": {
 			"ADD_TAG": "태그 추가",
@@ -469,6 +474,7 @@
 		"ROUTINE_TIMER": "루틴 타이머",
 		"RUN_SCHED": "켜기",
 		"SAVE": "저장",
+		"SCHED": "스케줄",
 		"SCHED_ONE_TIME": "1회성 스케줄",
 		"SCHED_ROUTINE": "반복 스케줄",
 		"SCHED_TIME": "스케줄러 적용 시간",
