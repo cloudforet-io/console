@@ -139,7 +139,7 @@
 import vClickOutside from 'v-click-outside';
 
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
@@ -162,6 +162,7 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const userState = reactive({
             name: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
@@ -282,7 +283,7 @@ export default {
                 },
             ],
             selectedMenu: computed(() => {
-                const pathRegex = router.currentRoute.path.match(/\/(\w+)/);
+                const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
         });
