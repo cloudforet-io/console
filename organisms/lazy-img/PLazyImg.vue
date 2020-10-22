@@ -25,7 +25,7 @@
                          @load="onLoad"
                          @error="onError"
                     >
-                    <span v-if="isError" key="error-img" class="img-container">
+                    <span v-if="isError" key="error-img" class="img-container error">
                         <slot name="error" :height="height" :width="width"
                               :imgLoading="imgLoading"
                         >
@@ -112,6 +112,9 @@ export default {
         @apply inline-block relative;
         .img-container {
             @apply inline-block w-full h-full absolute rounded-sm overflow-hidden;
+            &.error {
+                @apply inline-flex;
+            }
         }
         .fade-in-leave-active, .fade-in-enter-active {
             transition: opacity 0.5s;
