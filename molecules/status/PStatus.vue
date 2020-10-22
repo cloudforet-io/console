@@ -1,19 +1,23 @@
 <template>
     <span v-if="theme" class="p-status" :class="theme">
-        <span v-if="isFortAwesome" class="fort-awesome"><i :class="icon.split(' ')" /></span>
-        <p-i v-else-if="icon" :name="icon" />
-        <span v-else class="circle" />
+        <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
+        <span v-else-if="isFortAwesome" class="fort-awesome"><i :class="icon.split(' ')" /></span>
+        <p-i v-else-if="icon" :name="icon"
+             :height="`${iconSize}rem`" :width="`${iconSize}rem`"
+        />
+        <span v-else-if="!disableIcon" class="circle" />
         <p-label class="label">
             {{ text }}
         </p-label>
     </span>
     <span v-else class="p-status">
-        <span v-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
+        <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
+        <span v-else-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
              :color="realIconColor ? `transparent ${realIconColor}` : undefined"
-             width="1rem" height="1rem"
+             :height="`${iconSize}rem`" :width="`${iconSize}rem`"
         />
-        <span v-else class="circle" :style="{
+        <span v-else-if="!disableIcon" class="circle" :style="{
             backgroundColor: circleColor
         }"
         />
@@ -32,12 +36,13 @@ import PLabel from '@/components/atoms/labels/PLabel.vue';
 import { computed } from '@vue/composition-api';
 import { StatusProps } from '@/components/molecules/status/type';
 import { getColor } from '@/components/util/helpers';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 const fontAwesomePrefix = RegExp('fa-');
 
 export default {
     name: 'PStatus',
-    components: { PI, PLabel },
+    components: { PLottie, PI, PLabel },
     props: {
         icon: {
             type: String,
@@ -58,6 +63,18 @@ export default {
         theme: {
             type: String,
             default: null,
+        },
+        disableIcon: {
+            type: Boolean,
+            default: false,
+        },
+        lottie: {
+            type: String,
+            default: undefined,
+        },
+        iconSize: {
+            type: Number,
+            default: 1,
         },
     },
     setup(props: StatusProps) {

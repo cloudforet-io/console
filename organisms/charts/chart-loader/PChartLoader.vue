@@ -41,6 +41,9 @@ export default {
         position: relative;
         .loader {
             position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .fade-in-leave-active, .fade-in-enter-active {
             transition: opacity 0.5s;

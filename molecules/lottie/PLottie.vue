@@ -1,29 +1,49 @@
 <template>
-    <div class="aligner">
-        <div ref="loading" class="aligner-item" :style="{
+    <div class="p-lottie">
+        <div ref="lottieRef" :style="{
             height: height || `${size}rem`,
             width: width || `${size}rem`
         }"
         />
     </div>
 </template>
-<script>
+<script lang="ts">
 import lottie from 'lottie-web';
+import {
+    computed, onMounted, onUnmounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { LottieProps } from '@/components/molecules/lottie/type';
+
+/** <Default rendererSettings>
+ *
+     preserveAspectRatio: (config && config.preserveAspectRatio) || 'xMidYMid meet',
+     imagePreserveAspectRatio: (config && config.imagePreserveAspectRatio) || 'xMidYMid slice',
+     progressiveLoad: (config && config.progressiveLoad) || false,
+     hideOnTransparent: (config && config.hideOnTransparent === false) ? false : true,
+     viewBoxOnly: (config && config.viewBoxOnly) || false,
+     viewBoxSize: (config && config.viewBoxSize) || false,
+     className: (config && config.className) || '',
+     id: (config && config.id) || '',
+     focusable: config && config.focusable,
+     filterSize: {
+        width: config && config.filterSize && config.filterSize.width || '100%',
+        height: config && config.filterSize && config.filterSize.height || '100%',
+        x: config && config.filterSize && config.filterSize.x || '0%',
+        y: config && config.filterSize && config.filterSize.y || '0%',
+    }
+ */
 
 export default {
     name: 'PLottie',
     props: {
         name: {
             type: String,
+            required: true,
             default: 'cloudone_loading',
         },
         size: {
             type: Number,
             default: 1,
-        },
-        auto: {
-            type: Boolean,
-            default: false,
         },
         height: {
             type: String,
@@ -34,53 +54,47 @@ export default {
             default: undefined,
         },
     },
-    data() {
-        return {
-            animation: null,
-        };
-    },
-    created() {
-        if (this.auto) this.create();
-    },
-    destroy() {
-        if (this.auto) this.destroy();
-    },
-    methods: {
-        async create() {
-            const animationDT = await import(`@/assets/lottiefiles/${this.name}.json`);
-            if (animationDT) {
-                await lottie.loadAnimation({
-                    name: this.name,
-                    container: this.$refs.loading,
+    setup(props: LottieProps) {
+        // noinspection TypeScriptCheckImport
+        const state = reactive({
+            animation: null as any,
+            lottieRef: null as any,
+            loader: computed<() => Promise<any>>(() => () => import(`./p-lotties/${props.name}.json`)) as unknown as () => Promise<any>,
+        });
+
+        let stopWatch: any;
+
+        const loadLottie = async () => {
+            if (!state.lottieRef) return;
+
+            const lottieFile = await state.loader();
+            if (lottieFile) {
+                state.animation = await lottie.loadAnimation({
+                    name: props.name,
+                    container: state.lottieRef,
                     renderer: 'svg',
                     loop: true,
                     autoplay: true,
-                    animationData: animationDT,
-                    rendererSettings: {
-                        scaleMode: 'noScale',
-                        clearCanvas: false,
-                        progressiveLoad: false,
-                        hideOnTransparent: true,
-                    },
+                    animationData: lottieFile,
                 });
             }
-        },
-        destroy() {
-            lottie.destroy(this.name);
-        },
-    },
+        };
 
+        onMounted(async () => {
+            stopWatch = watch(() => props.name, async (after) => {
+                if (after) await loadLottie();
+            }, { immediate: true });
+        });
+
+        onUnmounted(() => {
+            lottie.destroy(props.name);
+            stopWatch();
+        });
+
+
+        return {
+            ...toRefs(state),
+        };
+    },
 };
 </script>
-
-<style lang="postcss" scoped>
-    .aligner {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .aligner-item {
-        max-width: 100%;
-    }
-</style>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="js/lottie.min.js" type="text/javascript"></script>
+    <style>
+        body,
+        html {
+            /* background color: primary4 */
+            background-color: #F8F8FC;
+            margin: 0px;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        
+        #loading {
+            background-color: transparent;
+            /*loading image size*/
+            width: 100%;
+            height: auto;
+            max-width: 600px;
+            max-height: 600px;
+            /*loading image size end*/
+            display: block;
+            overflow: hidden;
+            margin: auto;
+            padding-top: 100px;
+            z-index: 999;
+            animation: fadein 3s;
+            -moz-animation: fadein 3s;
+            -webkit-animation: fadein 3s;
+            -o-animation: fadein 3s;
+        }
+        
+        @keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @-moz-keyframes fadein {
+            /* Firefox */
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @-webkit-keyframes fadein {
+            /* Safari and Chrome */
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @-o-keyframes fadein {
+            /* Opera */
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div id="loading"></div>
+    <script>
+        var element = document.getElementById('loading');
+        lottie.loadAnimation({
+            container: element, // the dom element that will contain the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'spinner.json' // the path to the animation json
+        });
+    </script>
+
+</body>
+
+</html>

@@ -6,6 +6,7 @@
                     <p-lottie name="thin-spinner"
                               auto
                               :size="2.5"
+                              class="flex items-center justify-center"
                     />
                 </slot>
             </div>

@@ -4,4 +4,7 @@ export interface StatusProps {
     textColor?: string|null;
     iconColor?: string|null;
     theme?: string|null;
+    disableIcon?: boolean;
+    lottie?: string;
+    iconSize?: number;
 }
