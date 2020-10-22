@@ -78,7 +78,7 @@
                                         <p class="approximate">
                                             {{ $t('PWR_SCHED.APPROX') }}
                                         </p>
-                                        <span class="costs"><span>$ </span><span class="approx-costs">{{ approximateCosts }}</span></span>
+                                        <span class="costs"><span>$ </span><span class="approx-costs">{{ item.savingCost }}</span></span>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,13 @@
                                     <div v-if="item.scheduler.length > 0">
                                         <p v-for="(schedule, idx) in item.scheduler.slice(0, 3)" :key="idx">
                                             <router-link :to="goToDetail(item, schedule.schedule_id)">
-                                                <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span>
+                                                <p-i v-if="schedule.desired_state === 'ON'" name="ic_power-on" height="0.75rem"
+                                                     width="0.75rem"
+                                                />
+                                                <p-i v-else name="ic_power-off" height="0.75rem"
+                                                     width="0.75rem"
+                                                />
+                                                <span class="scheduler-name" :class="{ 'schedule-on': schedule.desired_state === 'ON' }"> {{ schedule.name }}</span>
                                             </router-link>
                                         </p>
                                     </div>
@@ -161,6 +167,8 @@ interface Scheduler {
     rule: object;
     // eslint-disable-next-line camelcase
     schedule_id: string;
+    // eslint-disable-next-line camelcase
+    desired_state: string;
 }
 export default {
     name: 'PowerScheduler',
@@ -208,7 +216,6 @@ export default {
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,
-            approximateCosts: 0,
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
             currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
@@ -244,6 +251,19 @@ export default {
             return {
                 query: query.data,
             };
+        };
+
+        const getSavingCost = async () => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSavingCost({ projects: state.items.map(d => d.project_id) }, {
+                    MOCK_MODE: true,
+                });
+                for (let i = 0; i < Object.keys(state.items).length; i++) {
+                    state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_cost).toLocaleString();
+                }
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const getScheduledResources = async () => {
@@ -288,7 +308,7 @@ export default {
                         rule: [],
                     },
                 }));
-                await Promise.all([getScheduledResources(), getScheduleList()]);
+                await Promise.all([getScheduledResources(), getScheduleList(), getSavingCost()]);
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
             } catch (e) {
@@ -447,6 +467,9 @@ export default {
             .scheduler-name {
                 @apply ml-1;
                 font-size: 0.75rem;
+                &.schedule-on {
+                    @apply text-green-500;
+                }
             }
 
             .weekday {
