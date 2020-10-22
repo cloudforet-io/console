@@ -7,10 +7,10 @@
             >
                 <template #extra>
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
-                                   @click="onClickDelete" :disabled="disabledState.visible"
+                                   :disabled="disabledState.visible" @click="onClickDelete"
                     />
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit-text"
-                                   @click="onClickNameEdit" :disabled="disabledState.visible"
+                                   :disabled="disabledState.visible" @click="onClickNameEdit"
                     />
                 </template>
             </p-page-title>
@@ -19,16 +19,25 @@
         <section class="mt-4">
             <div v-if="mode === 'READ'" class="section-wrapper">
                 <div class="detail-wrapper">
-                    <div class="info-group w-1/2">
+                    <div class="info-group">
                         <span class="title">{{ $t('PWR_SCHED.SETTING') }}</span>
-                        <span class="content" :class="expectedState.toLowerCase()">
-                            <span class="circle" />
-                            <span>{{ expectedState }}</span>
-                        </span>
+                        <p-status v-if="DESIRED_STATES[desiredState]"
+                                  :icon-color="DESIRED_STATES[desiredState].iconColor"
+                                  :text-color="DESIRED_STATES[desiredState].textColor"
+                                  class="ml-2"
+                        >
+                            {{ DESIRED_STATES[desiredState].label }}
+                        </p-status>
                     </div>
-                    <div class="info-group w-1/2">
+                    <div class="info-group">
                         <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
-                        <span class="content">{{ currentState }}</span>
+                        <p-status v-if="BOOTING_STATES[jobStatus]"
+                                  :icon-color="BOOTING_STATES[jobStatus].iconColor"
+                                  :text-color="BOOTING_STATES[jobStatus].textColor"
+                                  class="ml-2"
+                        >
+                            {{ BOOTING_STATES[jobStatus].label }}
+                        </p-status>
                     </div>
                 </div>
                 <div v-if="disabledState.visible" class="section-disabled" @click.prevent />
@@ -168,19 +177,17 @@ import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleK
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { ViewMode } from '@/views/automation/power-scheduler/type';
+import {
+    BOOTING_STATES, defaultSchedule, DESIRED_STATES, Schedule, ViewMode,
+} from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import PStatus from '@/components/molecules/status/PStatus.vue';
 
-interface Schedule {
-    // eslint-disable-next-line camelcase
-    schedule_id: string;
-    name: string;
-}
 
 interface Props {
     scheduleId?: string;
@@ -190,11 +197,11 @@ interface Props {
 
 type sectionType = 'kanban'|'time-table'
 
-const defaultSchedule: Schedule = { name: '', schedule_id: '' };
 
 export default {
     name: 'ScheduleDetail',
     components: {
+        PStatus,
         PButton,
         PIconButton,
         PPageTitle,
@@ -247,8 +254,8 @@ export default {
             createLoading: false,
             //
             created: '',
-            expectedState: 'RUNNING', // TODO: to be updated
-            currentState: 'BOOTING', // TODO: to be updated
+            desiredState: computed(() => state.schedule.desired_state),
+            jobStatus: computed(() => state.schedule.job_status),
         });
 
         const disabledState = reactive({
@@ -421,6 +428,8 @@ export default {
             onClickCheckModalConfirm,
             onEditFinish,
             onEditStart,
+            DESIRED_STATES,
+            BOOTING_STATES,
         };
     },
 };
@@ -438,7 +447,7 @@ header {
     border-radius: 2px;
     margin-bottom: 3.25rem;
     .info-group {
-        @apply border-r border-gray-200;
+        @apply border-r border-gray-200 w-1/2;
         font-size: 0.875rem;
         padding: 0 1.5rem;
         margin: auto 0;
@@ -448,28 +457,6 @@ header {
         .title {
             @apply text-gray-400;
             font-weight: bold;
-        }
-        .content {
-            padding-left: 1rem;
-            .circle {
-                display: inline-block;
-                width: 0.5rem;
-                height: 0.5rem;
-                border-radius: 50%;
-                margin-right: 4px;
-            }
-            &.running {
-                @apply text-safe;
-                .circle {
-                    @apply bg-safe;
-                }
-            }
-            &.stopped {
-                @apply text-gray-400;
-                .circle {
-                    @apply bg-alert;
-                }
-            }
         }
     }
 }

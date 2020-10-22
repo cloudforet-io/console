@@ -17,8 +17,9 @@
                                        :selected-indexes="selectedIndexes"
                                        :multi-selectable="false"
                                        theme="card"
-                                       default-icon="ic_clock-history"
+                                       default-icon="ic_power-off"
                                        :disabled="mode === 'CREATE' || isEditing"
+                                       icon-size="1.5rem"
                                        class="mt-6"
                                        @select="onSelectItem"
                     >
@@ -81,32 +82,14 @@ import { getTimezone, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
-import { pointViolet, gray } from '@/styles/colors';
 import { findIndex } from 'lodash';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
+import {DESIRED_STATES, Schedule} from '@/views/automation/power-scheduler/type';
 
 dayjs.extend(timezone);
 
-interface Schedule {
-    // eslint-disable-next-line camelcase
-    schedule_id: string;
-    name: string;
-}
-
-const EXPECTED_STATES = {
-    RUNNING: {
-        label: 'Running',
-        color: pointViolet,
-        icon: 'ic_clock-history',
-    },
-    STOPPED: {
-        label: 'Stopped',
-        color: gray[900],
-        icon: 'ic_clock-history--on',
-    },
-};
 
 interface Props {
     projectId: string;
@@ -114,7 +97,7 @@ interface Props {
 }
 
 const listMapper = {
-    icon: d => EXPECTED_STATES[d.expected_state]?.icon || '',
+    icon: d => DESIRED_STATES[d.desired_state]?.icon || '',
 };
 const getFormattedTime = time => dayjs.unix(time.seconds).tz(getTimezone()).format('YYYY-MM-DD');
 
@@ -309,7 +292,7 @@ export default {
             onSelectItem,
             listMapper,
             getFormattedTime,
-            EXPECTED_STATES,
+            DESIRED_STATES,
         };
     },
 };
