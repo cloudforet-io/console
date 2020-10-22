@@ -22,7 +22,7 @@
                                :disabled="disabled || proxyState.disabledIndexes.includes(idx)"
                                :color="getItem(item, mapper.color) || undefined"
                                :theme="theme"
-                               :default-icon="defaultIcon"
+                               :default-icon="getItem(item, mapper.icon) || defaultIcon"
                                @click="onItemClick(item, idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
