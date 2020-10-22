@@ -347,7 +347,7 @@ export default {
         };
 
         const onClickCancel = () => {
-            nameEditState.showValidation = true;
+            nameEditState.showValidation = false;
             nameEditState.name = '';
             emit('cancel');
         };

@@ -13,7 +13,7 @@
                     >
                         {{ $t('PWR_SCHED.CREATE') }}
                     </p-icon-text-button>
-                    <p-selectable-list :items="scheduleList" :loading="loading"
+                    <p-selectable-list :items="scheduleList" :loading="loading" :mapper="listMapper"
                                        :selected-indexes="selectedIndexes"
                                        :multi-selectable="false"
                                        theme="card"
@@ -35,8 +35,8 @@
                                 <p class="item-name">
                                     {{ item.name }}
                                 </p>
-                                <span class="item-state">
-                                    {{ EXPECTED_STATES[item.expected_state] ? EXPECTED_STATES[item.expected_state].label : 'test' }}
+                                <span class="item-time">
+                                    {{ getFormattedTime(item.created_at) }}
                                 </span>
                             </div>
                         </template>
@@ -76,7 +76,7 @@ import { store } from '@/store';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { getTimezone, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
@@ -84,6 +84,11 @@ import { pointViolet, gray } from '@/styles/colors';
 import { ViewMode } from '@/views/automation/power-scheduler/type';
 import { findIndex } from 'lodash';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import { DateTime } from 'luxon';
+
+dayjs.extend(timezone);
 
 interface Schedule {
     // eslint-disable-next-line camelcase
@@ -95,10 +100,12 @@ const EXPECTED_STATES = {
     RUNNING: {
         label: 'Running',
         color: pointViolet,
+        icon: 'ic_clock-history',
     },
     STOPPED: {
         label: 'Stopped',
         color: gray[900],
+        icon: 'ic_clock-history--on',
     },
 };
 
@@ -106,6 +113,11 @@ interface Props {
     projectId: string;
     scheduleId?: string;
 }
+
+const listMapper = {
+    icon: d => EXPECTED_STATES[d.expected_state]?.icon || '',
+};
+const getFormattedTime = time => dayjs.unix(time.seconds).tz(getTimezone()).format('YYYY-MM-DD');
 
 export default {
     name: 'PowerSchedulerPage',
@@ -287,6 +299,8 @@ export default {
             onCancel,
             onUpdate,
             onSelectItem,
+            listMapper,
+            getFormattedTime,
             EXPECTED_STATES,
         };
     },
@@ -304,7 +318,7 @@ export default {
         .item-name {
             @apply text-sm leading-normal text-gray-900 truncate;
         }
-        .item-state {
+        .item-time {
             @apply text-xs text-gray-500;
             line-height: 1.2;
         }
