@@ -22,8 +22,14 @@ export default {
                     component: PowerSchedulerLandingPage,
                 },
                 {
-                    path: ':projectId/:scheduleId?',
+                    path: ':projectId',
                     name: 'powerScheduler',
+                    props: true,
+                    component: PowerSchedulerPage,
+                },
+                {
+                    path: ':projectId/:scheduleId',
+                    name: 'powerSchedulerDetail',
                     props: true,
                     component: PowerSchedulerPage,
                 },

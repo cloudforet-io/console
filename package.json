@@ -16,7 +16,8 @@
     "build:storybook:github": "build-storybook -s ./public -o .out",
     "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console",
     "storybook": "start-storybook -p 6006 -s ./public",
-    "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6",
+    "icon": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6",
+    "lottie": "copyfiles -f ./src/assets/lottiefiles/* ./src/components/molecules/lottie/p-lotties",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build"
   },
   "dependencies": {

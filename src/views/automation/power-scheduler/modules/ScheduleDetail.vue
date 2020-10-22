@@ -22,18 +22,15 @@
                     <div class="info-group">
                         <span class="title">{{ $t('PWR_SCHED.SETTING') }}</span>
                         <p-status v-if="DESIRED_STATES[desiredState]"
-                                  :icon-color="DESIRED_STATES[desiredState].iconColor"
-                                  :text-color="DESIRED_STATES[desiredState].textColor"
-                                  :text="DESIRED_STATES[desiredState].label"
+                                  v-bind="DESIRED_STATES[desiredState]"
+                                  :icon="undefined"
                                   class="ml-2"
                         />
                     </div>
                     <div class="info-group">
                         <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
                         <p-status v-if="BOOTING_STATES[jobStatus]"
-                                  :icon-color="BOOTING_STATES[jobStatus].iconColor"
-                                  :text-color="BOOTING_STATES[jobStatus].textColor"
-                                  :text="BOOTING_STATES[jobStatus].label"
+                                  v-bind="BOOTING_STATES[jobStatus]"
                                   class="ml-2"
                         />
                     </div>
@@ -472,7 +469,7 @@ header {
     border-radius: 2px;
     margin-bottom: 3.25rem;
     .info-group {
-        @apply border-r border-gray-200 w-1/2;
+        @apply flex border-r border-gray-200 w-1/2;
         font-size: 0.875rem;
         padding: 0 1.5rem;
         margin: auto 0;

@@ -1,20 +1,20 @@
 /* eslint-disable camelcase */
 import { QueryFilters } from '@/lib/type';
 import { Filter } from '@/lib/space-connector/type';
-import { gray, safe, coral } from '@/styles/colors';
+import { gray, safe, coral, peacock } from '@/styles/colors';
 
 export const modes = ['READ', 'CREATE'];
 export type ViewMode = typeof modes[number];
 
 export const DESIRED_STATES = {
     ON: {
-        label: 'ON',
+        text: 'ON',
         iconColor: safe,
         textColor: safe,
         icon: 'ic_power-off',
     },
     OFF: {
-        label: 'OFF',
+        text: 'OFF',
         iconColor: coral[600],
         textColor: gray[400],
         icon: 'ic_power-on',
@@ -23,22 +23,19 @@ export const DESIRED_STATES = {
 
 export const BOOTING_STATES = {
     BOOTING: {
-        label: 'BOOTING',
-        iconColor: safe,
-        textColor: safe,
-        icon: 'ic_power-on',
+        text: 'BOOTING',
+        textColor: peacock[400],
+        lottie: 'lottie_booting',
     },
     STOPPING: {
-        label: 'STOPPING',
-        iconColor: safe,
-        textColor: safe,
-        icon: 'ic_power-on',
+        text: 'STOPPING',
+        textColor: coral[400],
+        lottie: 'lottie_stopping',
     },
     NONE: {
-        label: 'NONE',
-        iconColor: coral[600],
+        text: 'NONE',
         textColor: gray[400],
-        icon: 'ic_power-on',
+        disableIcon: true,
     },
 };
 

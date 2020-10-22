@@ -6,9 +6,9 @@
         />
         <div class="error">
             <div class="error-contents">
-                <p-lottie
-                    name="lottie_floating-astronaut" auto
-                    :size="20"
+                <p-lottie class="flex items-center justify-center"
+                          name="lottie_floating-astronaut" auto
+                          :size="20"
                 />
                 <p class="error-message">
                     There are no matching resources. <br> <a href="/dashboard">Click here</a> to go back home.

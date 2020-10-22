@@ -159,6 +159,7 @@ export default {
             if (state.selectedSchedule?.schedule_id) {
                 try {
                     await vm.$router.replace({
+                        name: 'powerSchedulerDetail',
                         params: {
                             projectId: props.projectId,
                             scheduleId: state.selectedSchedule.schedule_id,
@@ -168,9 +169,9 @@ export default {
             } else {
                 try {
                     await vm.$router.replace({
+                        name: 'powerScheduler',
                         params: {
                             projectId: props.projectId,
-                            scheduleId: undefined as unknown as string,
                         },
                     });
                 } catch (e) {}

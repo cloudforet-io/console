@@ -12,10 +12,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
 
@@ -25,10 +24,9 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { GTag, setGtagUserID } from '@/lib/gtag';
 import { useStore } from '@/store/toolset';
 
-export default defineComponent({
+export default {
     name: 'App',
     components: {
-        PLottie,
         PNoticeAlert,
         PToastAlert,
     },
@@ -82,8 +80,7 @@ export default defineComponent({
             ...toRefs(state),
         };
     },
-
-});
+};
 
 </script>
 

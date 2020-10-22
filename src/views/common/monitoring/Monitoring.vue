@@ -43,7 +43,9 @@
                 </template>
             </i18n>
             <div v-if="metricsLoading">
-                <p-lottie name="thin-spinner" auto />
+                <p-lottie class="loader" name="thin-spinner" auto
+                          :size="2"
+                />
             </div>
             <div v-else-if="metrics.length === 0" class="text-center text-gray">
                 No Metrics
@@ -431,5 +433,10 @@ export default {
         @apply border-gray-300 mt-12 block mx-auto;
         max-width: 38rem;
         width: 40%;
+    }
+    .loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
