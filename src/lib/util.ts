@@ -142,7 +142,8 @@ export const showErrorMessage = (errorTitle, error, root?) => {
     const vm = getCurrentInstance();
     const vmRoot = root || vm;
     let errorMsg = '';
-    if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
+    if (error.message) errorMsg = error.message;
+    else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
     if (vmRoot) {
         vmRoot.$notify({
             group: 'toastTopCenter',
