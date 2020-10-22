@@ -513,7 +513,7 @@ export default {
             // reset forms
             state.name = props.resourceGroup?.name || '';
             // state.tags = props.resourceGroup?.tags || {};
-            state.selectedTypeIndex = findIndex(props.resourceGroup?.resources[0]?.resource_type);
+            state.selectedTypeIndex = findIndex(RESOURCE_GROUP_TYPES, { name: props.resourceGroup?.resources[0]?.resource_type });
 
             // reset resource
             state.resource = props.resourceGroup?.resources[0] || { filter: [], keyword: '', resource_type: '' };

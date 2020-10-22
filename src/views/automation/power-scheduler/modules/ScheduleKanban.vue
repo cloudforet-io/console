@@ -1,16 +1,17 @@
 <template>
-    <div :class="{'edit-mode': mode === 'UPDATE'}" class="kanban">
+    <div :class="{'edit-mode': isEditMode }" class="kanban">
         <div class="title-lap">
             <span class="title">리소스 그룹</span>
             <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
-            <p-icon-text-button v-if="mode === 'UPDATE'" style-type="gray900" outline
+            <p-icon-text-button v-if="isEditMode || isCreateMode" style-type="gray900" outline
                                 name="ic_plus_bold"
                                 class="add-column-btn float-right" @click="addColumn"
             >
                 우선순위 추가
             </p-icon-text-button>
+            <span v-if="!isEditMode && !isCreateMode" class="edit-btn float-right" @click="startEdit">편집하기</span>
         </div>
-        <transition-group v-if="!loading" class="kanban-container">
+        <transition-group class="kanban-container">
             <div
                 v-for="(column, columnIdx) in columns"
                 :key="column.title"
@@ -26,14 +27,14 @@
                         낮음
                     </div>
                     <span v-if="column.title === '1'" id="header-priority">우선순위</span>
-                    <p-i v-if="column.title > 5 && editable" name="ic_delete" width="1.5rem"
+                    <p-i v-if="column.title > 5 && (isCreateMode || isEditMode)" name="ic_delete" width="1.5rem"
                          color="transparent inherit"
                          class="header-button"
                          @click="deleteColumn(column.title, column)"
                     />
                 </div>
                 <div class="resource-item-wrapper">
-                    <div v-if="editable && column.title === '1'" class="resource-group-item">
+                    <div v-if="(isCreateMode || isEditMode) && column.title === '1'" class="resource-group-item">
                         <div class="add-resource-group" @click="onClickResourceGroup()">
                             <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
                         </div>
@@ -50,7 +51,7 @@
                     <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
                                group="items"
                                :empty-insert-threshold="30"
-                               :disabled="!editable"
+                               :disabled="!(isCreateMode || isEditMode)"
                                class="list-group"
                     >
                         <div v-for="(item, index) in column.items"
@@ -69,15 +70,15 @@
                                         {{ item.name }}
                                     </p><span class="resource-count">({{ item.count }})</span>
                                 </div>
-                                <p-icon-button v-if="editable && !item.recommended" name="ic_delete" width="1rem"
+                                <p-icon-button v-if="(isCreateMode || isEditMode) && !item.recommended" name="ic_delete" width="1rem"
                                                color="transparent inherit"
                                                class="float-right"
                                                @click.stop="deleteResourceGroup(column, item, index)"
                                 />
-                                <p v-if="editable && item.recommended" class="recommended-text">
+                                <p v-if="isCreateMode && item.recommended" class="recommended-text">
                                     추천
                                 </p>
-                                <p-button v-if="editable && item.recommended"
+                                <p-button v-if="isCreateMode && item.recommended"
                                           style-type="secondary" size="sm" class="add-btn"
                                 >
                                     추가
@@ -88,10 +89,20 @@
                 </div>
             </div>
         </transition-group>
+        <div v-if="isEditMode" class="actions">
+            <p-button style-type="gray900" :outline="true" @click="finishEdit">
+                {{ $t('PWR_SCHED.CANCEL') }}
+            </p-button>
+            <p-button class="ml-4" style-type=" secondary"
+                      @click="onSave(scheduleId)"
+            >
+                {{ $t('PWR_SCHED.SAVE') }}
+            </p-button>
+        </div>
         <resource-group-page :visible="resourceGroupVisible"
                              :resource-group="selectedItem ? selectedItem.resource_group : null"
                              :project-id="projectId"
-                             :read-mode="mode === 'READ'"
+                             :read-mode="mode === 'READ' && !isEditMode"
                              @confirm="onResourceGroupConfirm"
                              @cancel="hideResourceGroupPage"
         />
@@ -162,7 +173,8 @@ export default {
             columns: [] as unknown as ColumnType[],
             maxPriority: computed(() => state.columns.map(d => Math.max(d.options?.priority))),
             loading: false,
-            editable: computed(() => props.mode === 'UPDATE' || props.mode === 'CREATE'),
+            isEditMode: false,
+            isCreateMode: computed(() => props.mode === 'CREATE'),
             showGuide: false,
             isHovered: false,
             resourceGroupVisible: false,
@@ -236,6 +248,15 @@ export default {
             }
         };
 
+        const startEdit = () => {
+            state.isEditMode = true;
+        };
+
+        const finishEdit = async () => {
+            state.isEditMode = false;
+            await getResourceGroup(props.scheduleId);
+        };
+
         const deleteResourceGroup = (column, item, itemIndex) => {
             const columnIndex = parseInt(column.title) - 1;
             state.columns[columnIndex].items.splice(itemIndex, 1);
@@ -249,6 +270,8 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.isEditMode = false;
             }
         };
 
@@ -306,6 +329,8 @@ export default {
             ...toRefs(state),
             addColumn,
             deleteColumn,
+            startEdit,
+            finishEdit,
             deleteResourceGroup,
             onSave,
             iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
@@ -332,6 +357,10 @@ export default {
             @apply text-gray-400;
             font-size: 0.75rem;
         }
+        .edit-btn {
+            @apply text-blue-600 float-right cursor-pointer;
+            font-size: 0.875rem;
+        }
     }
     .v-enter-active, .v-leave-active, .v-move {
         transition: all ease 0.5s;
@@ -343,7 +372,6 @@ export default {
         opacity: 0;
         transform: translateY(20px);
     }
-
 
     .kanban {
         .kanban-container {
@@ -510,5 +538,9 @@ export default {
                 height: 17rem;
             }
         }
+    }
+    .actions {
+        @apply flex justify-end;
+        margin-top: 1.5rem;
     }
 </style>

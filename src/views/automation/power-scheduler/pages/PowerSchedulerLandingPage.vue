@@ -44,68 +44,72 @@
                 </template>
                 <template #card="{item, index}">
                     <router-link :to="goToDetail(item)">
-                        <div class="project-description">
-                            <div class="project">
-                                <div class="project-group-name">
-                                    {{ item.project_group_info.name }}
+                        <div class="h-full">
+                            <div class="project-description">
+                                <div class="project">
+                                    <div class="project-group-name">
+                                        {{ item.project_group_info.name }}
+                                    </div>
+                                    <p id="project-name">
+                                        {{ item.name }}
+                                    </p>
                                 </div>
-                                <p id="project-name">
-                                    {{ item.name }}
-                                </p>
-                            </div>
-                            <div class="resources">
-                                <div class="scheduled-resources">
-                                    <p>{{ $t('PWR_SCHED.APPLY_RESOURCE') }} / {{ $t('PWR_SCHED.AVAILABLE_RESOURCE') }}</p>
+                                <div class="resources">
+                                    <div class="scheduled-resources">
+                                        <p>{{ $t('PWR_SCHED.APPLY_RESOURCE') }} / {{ $t('PWR_SCHED.AVAILABLE_RESOURCE') }}</p>
 
-                                    <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
-                                    <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
-                                    <p-progress-bar
-                                        :percentage="item.percentage"
-                                        :style="'width: 160px'"
-                                        class="pt-2"
-                                    />
-                                </div>
-                                <div class="saving">
-                                    <p class="saving-this-month">
-                                        {{ $t('PWR_SCHED.MONTH_COST_SAVING') }}
-                                    </p>
-                                    <p class="approximate">
-                                        {{ $t('PWR_SCHED.APPROX') }}
-                                    </p>
-                                    <span class="costs"><span>$ </span><span class="approx-costs">{{ approximateCosts }}</span></span>
-                                </div>
-                            </div>
-                        </div>
-                        <p-hr />
-                        <div class="schedule" :class="{'no-schedule': item.scheduler.length === 0}">
-                            <div>
-                                <p v-if="item.scheduler.length > 0" class="mb-4">
-                                    <span class="schedule-title">{{ $t('PWR_SCHED.SCHED') }}
-                                        <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
-                                        <span v-else class="schedule-title-num">(+3)</span>
-                                    </span>
-                                </p>
-                                <div v-if="item.scheduler.length > 0">
-                                    <p v-for="(schedule, idx) in item.scheduler.slice(0, 3)" :key="idx">
-                                        <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span>
-                                    </p>
-                                </div>
-                                <div v-else>
-                                    <div class="schedule-add-btn">
-                                        <p-i name="ic_plus"
-                                             class="add-btn-icon"
-                                             width="0.875rem" height="0.875rem"
+                                        <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
+                                        <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
+                                        <p-progress-bar
+                                            :percentage="item.percentage"
+                                            :style="'width: 160px'"
+                                            class="pt-2"
                                         />
-                                    </div><span class="schedule-add-text">{{ $t('PWR_SCHED.NEED_SCHED') }}</span>
+                                    </div>
+                                    <div class="saving">
+                                        <p class="saving-this-month">
+                                            {{ $t('PWR_SCHED.MONTH_COST_SAVING') }}
+                                        </p>
+                                        <p class="approximate">
+                                            {{ $t('PWR_SCHED.APPROX') }}
+                                        </p>
+                                        <span class="costs"><span>$ </span><span class="approx-costs">{{ approximateCosts }}</span></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div v-if="item.scheduler.length > 0" class="schedule-matrix">
-                                <div class="pl-1">
-                                    <span v-for="(day, index) in weekday" :key="index">
-                                        <p class="weekday">{{ day }}</p>
-                                    </span>
+                            <p-hr />
+                            <div class="schedule" :class="{'no-schedule': item.scheduler.length === 0}">
+                                <div>
+                                    <p v-if="item.scheduler.length > 0" class="mb-4">
+                                        <span class="schedule-title">{{ $t('PWR_SCHED.SCHED') }}
+                                            <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
+                                            <span v-else class="schedule-title-num">(+3)</span>
+                                        </span>
+                                    </p>
+                                    <div v-if="item.scheduler.length > 0">
+                                        <p v-for="(schedule, idx) in item.scheduler.slice(0, 3)" :key="idx">
+                                            <router-link :to="goToDetail(item, schedule.schedule_id)">
+                                                <p-i name="ic_clock-history" height="0.75rem" width="0.75rem" /> <span class="scheduler-name"> {{ schedule.name }}</span>
+                                            </router-link>
+                                        </p>
+                                    </div>
+                                    <div v-else>
+                                        <div class="schedule-add-btn">
+                                            <p-i name="ic_plus"
+                                                 class="add-btn-icon"
+                                                 width="0.875rem" height="0.875rem"
+                                            />
+                                        </div><span class="schedule-add-text">{{ $t('PWR_SCHED.NEED_SCHED') }}</span>
+                                    </div>
                                 </div>
-                                <schedule-heatmap :schedule="item.scheduler.slice(0, 3)" />
+                                <div v-if="item.scheduler.length > 0" class="schedule-matrix">
+                                    <div class="pl-1">
+                                        <span v-for="(day, index) in weekday" :key="index">
+                                            <p class="weekday">{{ day }}</p>
+                                        </span>
+                                    </div>
+                                    <schedule-heatmap :schedule="item.scheduler.slice(0, 3)" />
+                                </div>
                             </div>
                         </div>
                     </router-link>
@@ -303,11 +307,12 @@ export default {
         /**
         *  Card Click Event
         * */
-        const goToDetail = (item) => {
+        const goToDetail = (item, scheduleId) => {
             const res: Location = {
                 name: 'powerScheduler',
                 params: {
                     projectId: item.project_id,
+                    scheduleId,
                 },
             };
             return res;
@@ -351,7 +356,7 @@ export default {
         }
 
         >>> .power-scheduler-list {
-            @apply border border-gray-200 rounded overflow-visible;
+            @apply border border-gray-200 rounded;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 
             &:hover {
@@ -365,7 +370,7 @@ export default {
         }
 
         .project-description {
-            @apply mx-6 mt-6 mb-6;
+            @apply px-6 pt-6 pb-6;
 
             .project {
                 .project-group-name {
