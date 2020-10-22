@@ -1,21 +1,15 @@
 <template>
     <div class="page-information">
-        <span>사용 시간</span>
+        <span>반복 스케줄 설정 시간</span>
 
         <span id="circle1" />
-        <span class="text-gray-200 text">0 </span>
-
-<!--        <span id="circle2" />-->
-<!--        <span class="text-primary2 text">20%</span>-->
+        <span class="text-gray-400 text">미설정 </span>
 
         <span id="circle3" />
-        <span class="text-primary2 text">1~12 </span>
-
-<!--        <span id="circle4" />-->
-<!--        <span class="text-primary text">80%</span>-->
+        <span class="text-primary1 text">12시간 미만 </span>
 
         <span id="circle5" />
-        <span class="text-primary-dark text">13~24</span>
+        <span class="text-primary-dark text">12시간 이상</span>
     </div>
 </template>
 
@@ -33,27 +27,15 @@ export default {
         font-size: 0.75rem;
         line-height: 0.8;
         #circle1 {
-            @apply bg-primary2;
+            @apply bg-gray-300;
             margin-left: 1rem;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 0.125rem;
             opacity: 0.5;
         }
-        #circle2 {
-            @apply bg-primary2;
-            width: 0.625rem;
-            height: 0.625rem;
-            border-radius: 0.125rem;
-        }
         #circle3 {
             @apply bg-primary1;
-            width: 0.625rem;
-            height: 0.625rem;
-            border-radius: 0.125rem;
-        }
-        #circle4 {
-            @apply bg-primary;
             width: 0.625rem;
             height: 0.625rem;
             border-radius: 0.125rem;

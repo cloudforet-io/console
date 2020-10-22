@@ -56,7 +56,10 @@
                                 </div>
                                 <div class="resources">
                                     <div class="scheduled-resources">
-                                        <p>{{ $t('PWR_SCHED.APPLY_RESOURCE') }} / {{ $t('PWR_SCHED.AVAILABLE_RESOURCE') }}</p>
+                                        <p>
+                                            {{ $t('PWR_SCHED.APPLY_RESOURCE') }} / <span v-tooltip.bottom="{content: tooltip.resource, delay: {show: 500}}">
+                                                {{ $t('PWR_SCHED.AVAILABLE_RESOURCE') }}</span>
+                                        </p>
 
                                         <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
                                         <span class="max-schedule-resources">/ {{ item.scheduledResources.total_count }}</span>
@@ -68,7 +71,9 @@
                                     </div>
                                     <div class="saving">
                                         <p class="saving-this-month">
-                                            {{ $t('PWR_SCHED.MONTH_COST_SAVING') }}
+                                            <span v-tooltip.bottom="{content: tooltip.cost, delay: {show: 500}}">
+                                                {{ $t('PWR_SCHED.MONTH_COST_SAVING') }}
+                                            </span>
                                         </p>
                                         <p class="approximate">
                                             {{ $t('PWR_SCHED.APPROX') }}
@@ -207,6 +212,14 @@ export default {
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
             currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
+            tooltip: {
+                resource: `적용 가능한 자원 종류 <br>
+                                [ALL] Server <br>
+                                [AWS] RDS <br>
+                                [AWS] Auto Scaling Group`,
+                cost: `파워 스케줄러를 통해 절감된 이 달의 비용 <br>
+                            (기준: 이번 달 1일 ~ 현재)`,
+            },
         });
 
         /**
