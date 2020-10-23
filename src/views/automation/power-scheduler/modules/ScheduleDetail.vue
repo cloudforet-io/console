@@ -16,7 +16,7 @@
             </p-page-title>
         </header>
 
-        <section class="mt-4">
+        <section>
             <div v-if="mode === 'READ'" class="section-wrapper">
                 <div class="detail-wrapper">
                     <div class="info-group">
@@ -461,9 +461,12 @@ export default {
 <style lang="postcss" scoped>
 header {
     @apply flex justify-between;
+    .p-page-title {
+        margin-bottom: 2rem;
+    }
 }
 .detail-wrapper {
-    @apply mt-2 border border-gray-200;
+    @apply border border-gray-200;
     display: flex;
     width: 100%;
     height: 3.5rem;

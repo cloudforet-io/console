@@ -110,7 +110,7 @@
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.ROUTINE_ON') }}</span>
                         <p-button v-if="!isCreateMode && !isEditMode"
-                                  class="edit-button gray900 sm" :outline="true"
+                                  class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('routine')"
                         >
                             {{ $t('PWR_SCHED.EDIT') }}
@@ -136,7 +136,7 @@
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
                         <p-button v-if="!isEditMode"
-                                  class="edit-button gray900 sm" :outline="true"
+                                  class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('oneTimeRun')"
                         >
                             {{ $t('PWR_SCHED.EDIT') }}
@@ -146,7 +146,7 @@
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
                         <p-button v-if="!isEditMode"
-                                  class="edit-button gray900 sm" :outline="true"
+                                  class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('oneTimeStop')"
                         >
                             {{ $t('PWR_SCHED.EDIT') }}
@@ -194,6 +194,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
+import {showErrorMessage, showSuccessMessage} from "@/lib/util";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
@@ -248,7 +249,7 @@ export default {
             default: 'READ',
         },
     },
-    setup(props: Props, { emit, refs }) {
+    setup(props: Props, { emit, refs, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
@@ -549,8 +550,10 @@ export default {
                         rule: settings.ruleForApi,
                     });
                 }
+                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.TT.EDIT_SUCCESS'), root);
             } catch (e) {
                 console.error(e);
+                if (props.mode !== 'CREATE') showErrorMessage(vm.$t('PWR_SCHED.TT.EDIT_FAIL'), e, root);
             }
         };
         const create = async (settings: RuleSettings, scheduleId: string) => {
@@ -775,7 +778,7 @@ export default {
         margin-bottom: 0.5rem;
         .title {
             @apply text-gray-900;
-            font-size: 1rem;
+            font-size: 1.125rem;
             font-weight: bold;
             padding-right: 0.5rem;
         }
@@ -1027,7 +1030,6 @@ export default {
                 .edit-button {
                     height: 20px;
                     padding: 0 0.5rem;
-                    margin-left: 0.5rem;
                 }
             }
             .one-time-button-wrapper {
@@ -1038,7 +1040,7 @@ export default {
                 text-align: right;
                 .p-button {
                     min-width: 4rem;
-                    max-width: 5rem;
+                    max-width: 7rem;
                 }
             }
         }
