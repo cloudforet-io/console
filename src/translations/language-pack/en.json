@@ -458,6 +458,8 @@
 			"CHECK_LIST_DESC": "리소스 목록을 확인해주세요.",
 			"CRT_NAME": "리소스 그룹 만들기",
 			"CRT_SUCCESS": "리소스 그룹이 생성되었습니다.",
+			"EDIT_FAIL": "리소스그룹 편집 실패",
+			"EDIT_SUCCESS": "리소스그룹 편집 성공",
 			"ID_INVALID": "해당 리소스그룹이 없습니다.",
 			"ID_INVALID_DESC": "목록을 확인해주세요.",
 			"NAME": "그룹 이름",
@@ -497,6 +499,10 @@
 		"TIMER": "타이머",
 		"TIMEZONE": "시간대",
 		"TODAY": "오늘",
+		"TT": {
+			"EDIT_FAIL": "스케줄러 시간 편집 실패",
+			"EDIT_SUCCESS": "스케줄러 시간 편집 성공"
+		},
 		"YEAR": "년"
 	},
 	"SECRET": {

@@ -448,6 +448,7 @@ export default {
 
                     .approx-costs {
                         @apply text-primary font-bold;
+                        font-size: 1.25rem;
                     }
                 }
             }

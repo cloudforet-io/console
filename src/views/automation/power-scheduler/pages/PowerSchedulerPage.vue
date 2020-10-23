@@ -3,6 +3,7 @@
         <template #sidebar="{width}">
             <div class="px-3 mt-10 mb-12">
                 <p-icon-text-button name="ic_plus_bold" outline
+                                    style-type="gray900"
                                     :disabled="mode === 'CREATE' || isEditing" block
                                     @click="onClickCreate"
                 >

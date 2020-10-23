@@ -1,6 +1,6 @@
 <template>
     <div :class="{'edit-mode': isEditMode }" class="kanban">
-        <div class="title-lap">
+        <div class="title-wrapper">
             <span class="title">리소스 그룹</span>
             <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
             <p-icon-text-button v-if="isEditMode || isCreateMode" style-type="gray900" outline
@@ -9,7 +9,9 @@
             >
                 우선순위 추가
             </p-icon-text-button>
-            <span v-if="!isEditMode && !isCreateMode" class="edit-btn float-right" @click="startEdit">편집하기</span>
+            <p-button v-if="!isEditMode && !isCreateMode"
+                      style-type="gray900 outline"
+                      class="edit-btn" @click="startEdit">편집하기</p-button>
         </div>
         <transition-group class="kanban-container">
             <div
@@ -72,7 +74,7 @@
                                 </div>
                                 <p-icon-button v-if="(isCreateMode || isEditMode) && !item.recommended" name="ic_delete" width="1rem"
                                                color="transparent inherit"
-                                               class="float-right"
+                                               class="float-right -mr-1"
                                                @click.stop="deleteResourceGroup(column, item, index)"
                                 />
                                 <p v-if="isCreateMode && item.recommended" class="recommended-text">
@@ -126,7 +128,7 @@ import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/powe
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import router from '@/routes';
-import { showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 
     interface ColumnType {
@@ -145,7 +147,7 @@ import { showSuccessMessage } from '@/lib/util';
     }
 
 export default {
-    name: 'App',
+    name: 'ScheduleKanban',
     components: {
         PIconButton,
         PButton,
@@ -273,10 +275,10 @@ export default {
                     columns: state.columns,
                 });
 
-                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.CREATE_SUCCESS'), vm.$root);
+                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.RESRC_GRP.EDIT_SUCCESS'), vm.$root);
             } catch (e) {
                 console.error(e);
-                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.CREATE_SUCCESS'), vm.$root);
+                if (props.mode !== 'CREATE') showErrorMessage(vm.$t('PWR_SCHED.RESRC_GRP.EDIT_FAIL'), e, vm.$root);
             } finally {
                 state.isEditMode = false;
             }
@@ -364,12 +366,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .title-lap {
+    .title-wrapper {
         @apply w-full;
         margin-bottom: 1.5rem;
         .title {
             @apply text-gray-900;
-            font-size: 1rem;
+            font-size: 1.125rem;
             font-weight: bold;
             padding-right: 0.5rem;
         }
@@ -378,7 +380,7 @@ export default {
             font-size: 0.75rem;
         }
         .edit-btn {
-            @apply text-blue-600 float-right cursor-pointer;
+            @apply float-right cursor-pointer;
             font-size: 0.875rem;
         }
     }
@@ -562,5 +564,11 @@ export default {
     .actions {
         @apply flex justify-end;
         margin-top: 1.5rem;
+    }
+    .p-button.gray900 {
+        @apply border-gray-300;
+        &:hover {
+            @apply border-gray-900;
+        }
     }
 </style>
