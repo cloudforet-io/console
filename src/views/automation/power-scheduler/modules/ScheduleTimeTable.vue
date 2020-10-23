@@ -36,7 +36,7 @@
                             :class="{'today': weekday.format('YYYY-MM-DD') === today}"
                         >
                             <div class="weekday-text">
-                                {{ weekdayTexts[weekday.day()] }}
+                                {{ weekday.format('YYYY-MM-DD') === today ? $t('PWR_SCHED.TODAY') : weekdayTexts[weekday.day()] }}
                             </div>
                             <div class="weekday-number-text">
                                 {{ weekday.format('D') }}
@@ -801,7 +801,6 @@ export default {
             display: flex;
             width: 80%;
             &.editing {
-                cursor: crosshair;
                 .time-section {
                     @apply bg-secondary2;
                     .time {
@@ -847,7 +846,7 @@ export default {
                 }
                 .weekday-row {
                     @apply border-b border-gray-200;
-                    display: flex;
+                    /*display: flex;*/
                     width: 100%;
                     height: 3rem;
                     cursor: default;
@@ -856,12 +855,9 @@ export default {
                         display: inline-block;
                         width: calc(100% / 7);
                         height: 100%;
-                        font-size: 0.75rem;
+                        font-size: 0.625rem;
                         text-align: center;
-                        padding: 0.5rem;
-                        .weekday-text {
-                            font-weight: bold;
-                        }
+                        padding: 0.3rem;
                         .weekday-number-text {
                             width: 1.25rem;
                             height: 1.25rem;
@@ -1037,11 +1033,12 @@ export default {
             .one-time-button-wrapper {
                 position: absolute;
                 bottom: 1.5rem;
-                left: 0;
+                right: 1.5rem;
                 width: 100%;
-                text-align: center;
+                text-align: right;
                 .p-button {
                     min-width: 4rem;
+                    max-width: 5rem;
                 }
             }
         }

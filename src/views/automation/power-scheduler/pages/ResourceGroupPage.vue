@@ -28,8 +28,6 @@
                                 />
                             </p-field-group>
 
-                            <div v-if="readMode" class="separator read-mode" />
-
                             <!--                            <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">-->
                             <!--                                <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"-->
                             <!--                                       style-type="primary" outline-->
