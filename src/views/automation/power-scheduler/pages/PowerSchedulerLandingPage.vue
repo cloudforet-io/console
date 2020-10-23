@@ -84,7 +84,7 @@
                             </div>
                             <p-hr />
                             <div class="schedule" :class="{'no-schedule': item.scheduler.length === 0}">
-                                <div>
+                                <div class="scheduler-list-wrapper">
                                     <p v-if="item.scheduler.length > 0" class="mb-4">
                                         <span class="schedule-title">{{ $t('PWR_SCHED.SCHED') }}
                                             <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
@@ -93,12 +93,12 @@
                                     </p>
                                     <div v-if="item.scheduler.length > 0">
                                         <p v-for="(schedule, idx) in item.scheduler.slice(0, 3)" :key="idx">
-                                            <router-link :to="goToDetail(item, schedule.schedule_id)">
+                                            <router-link :to="goToDetail(item, schedule.schedule_id)" class="scheduler-list">
                                                 <p-i v-if="schedule.desired_state === 'ON'" name="ic_power-on" height="0.75rem"
-                                                     width="0.75rem"
+                                                     width="0.75rem" class="flex-shrink-0"
                                                 />
                                                 <p-i v-else name="ic_power-off" height="0.75rem"
-                                                     width="0.75rem"
+                                                     width="0.75rem" class="flex-shrink-0"
                                                 />
                                                 <span class="scheduler-name" :class="{ 'schedule-on': schedule.desired_state === 'ON' }"> {{ schedule.name }}</span>
                                             </router-link>
@@ -464,12 +464,30 @@ export default {
                 }
             }
 
-            .scheduler-name {
-                @apply ml-1;
-                font-size: 0.75rem;
-                &.schedule-on {
-                    @apply text-green-500;
+            .scheduler-list-wrapper {
+                max-width: 70%;
+                .scheduler-list {
+                    @apply flex mb-2 w-full overflow-x-hidden;
+
+                    .p-i {
+                        flex-shrink: 0;
+                    }
+
+                    .scheduler-name {
+                        @apply ml-1 truncate;
+                        flex-grow: 1;
+                        font-size: 0.75rem;
+                        line-height: 1.2;
+
+                        &.schedule-on {
+                            @apply text-green-500;
+                        }
+                    }
                 }
+            }
+
+            .schedule-matrix {
+                white-space: nowrap;
             }
 
             .weekday {
