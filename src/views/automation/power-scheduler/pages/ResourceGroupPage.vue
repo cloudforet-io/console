@@ -1,7 +1,7 @@
 <template>
     <div>
         <transition name="slide-fade">
-            <general-page-layout v-show="visible">
+            <general-page-layout v-show="visible === undefined || visible">
                 <p-page-title :title="title" child @goBack="onClickCancel" />
                 <p-pane-layout>
                     <section>
@@ -120,12 +120,12 @@
                 </p-pane-layout>
 
                 <div class="actions">
-                    <p-button style-type="gray900" :outline="true" @click="onClickCancel">
+                    <p-button style-type="gray900" :outline="true" @click.stop="onClickCancel">
                         {{ $t('PWR_SCHED.CANCEL') }}
                     </p-button>
                     <p-button v-if="!readMode" class="ml-4" style-type="secondary"
                               :disabled="validState.showValidation && !validState.all"
-                              @click="onClickSave"
+                              @click.stop="onClickSave"
                     >
                         {{ $t('PWR_SCHED.SAVE') }}
                     </p-button>
@@ -178,8 +178,6 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -198,18 +196,20 @@ import {
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import PTag from '@/components/molecules/tags/PTag.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
+import { showErrorMessage } from '@/lib/util';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
 
 interface Props {
     projectId: string;
     resourceGroup: null|ResourceGroup;
-    visible: boolean;
+    visible?: boolean;
     readMode: boolean;
+    resourceGroupId?: string;
+    scheduleId?: string;
 }
 
 const RESOURCE_GROUP_TYPES = [
@@ -240,11 +240,8 @@ export default {
         PTableCheckModal,
         PQuerySearchTags,
         PButton,
-        PTag,
         PDynamicLayout,
         PSelectDropdown,
-        PIconTextButton,
-        PDictInputGroup,
         PTextInput,
         PFieldGroup,
         PPaneLayout,
@@ -252,22 +249,35 @@ export default {
         GeneralPageLayout,
     },
     props: {
+        // props only
         resourceGroup: {
             type: Object,
             default: null,
         },
-        /* sync */
+        // props only, sync
         visible: {
             type: Boolean,
-            default: false,
+            default: undefined,
         },
+        // props only
+        readMode: {
+            type: Boolean,
+            default: true,
+        },
+        // both props and route params
         projectId: {
             type: String,
             required: true,
         },
-        readMode: {
-            type: Boolean,
-            default: true,
+        // route param
+        resourceGroupId: {
+            type: String,
+            default: undefined,
+        },
+        // route param
+        scheduleId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props: Props, { emit }) {
@@ -275,10 +285,14 @@ export default {
         const queryHelper = new QueryHelper() as QueryHelper;
 
         /* reactive variables */
+        const formState = reactive({
+            resourceGroup: null as ResourceGroup|null,
+        });
+
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            resourceTypeReadOnly: computed(() => !!props.resourceGroup),
-            title: computed(() => props.resourceGroup?.name || vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME')),
+            resourceTypeReadOnly: computed(() => !!formState.resourceGroup),
+            title: computed(() => formState.resourceGroup?.name || vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME')),
 
             name: '',
             selectedTypeIndex: -1,
@@ -482,8 +496,8 @@ export default {
             fetchOptionState.sortDesc = true;
             fetchOptionState.sortBy = 'created_at';
 
-            if (props.resourceGroup?.options.raw_filter) {
-                fetchOptionState.queryTags = queryFiltersToQueryTags(props.resourceGroup.options.raw_filter);
+            if (formState.resourceGroup?.options.raw_filter) {
+                fetchOptionState.queryTags = queryFiltersToQueryTags(formState.resourceGroup.options.raw_filter);
             } else fetchOptionState.queryTags = [];
 
             // set table schema
@@ -511,18 +525,19 @@ export default {
             validState.resources = false;
 
             // reset forms
-            state.name = props.resourceGroup?.name || '';
-            // state.tags = props.resourceGroup?.tags || {};
-            state.selectedTypeIndex = findIndex(RESOURCE_GROUP_TYPES, { name: props.resourceGroup?.resources[0]?.resource_type });
+            state.name = formState.resourceGroup?.name || '';
+            // state.tags = formState.resourceGroup?.tags || {};
+            state.selectedTypeIndex = findIndex(RESOURCE_GROUP_TYPES, { name: formState.resourceGroup?.resources[0]?.resource_type });
 
             // reset resource
-            state.resource = props.resourceGroup?.resources[0] || { filter: [], keyword: '', resource_type: '' };
+            state.resource = formState.resourceGroup?.resources[0] || { filter: [], keyword: '', resource_type: '' };
 
             await resetTable();
         };
 
         const onClickCancel = async () => {
-            emit('cancel');
+            if (props.resourceGroupId) await vm.$router.go(-1);
+            else emit('cancel');
         };
 
         const onClickSave = () => {
@@ -531,10 +546,6 @@ export default {
 
             listModalState.visible = true;
         };
-
-        watch(() => props.visible, async (aft, bef) => {
-            if (aft && !bef) await resetAll();
-        }, { immediate: true });
 
 
         /* list modal */
@@ -562,11 +573,46 @@ export default {
                 recommended: false,
             };
 
-            if (props.resourceGroup?.resource_group_id) params.resource_group.resource_group_id = props.resourceGroup.resource_group_id;
+            if (formState.resourceGroup?.resource_group_id) params.resource_group.resource_group_id = formState.resourceGroup.resource_group_id;
 
             emit('confirm', params);
             listModalState.visible = false;
         };
+
+        const getResourceGroup = async () => {
+            try {
+                const res = await SpaceConnector.client.inventory.resourceGroup.get({
+                    resource_group_id: props.resourceGroupId,
+                });
+                formState.resourceGroup = res;
+            } catch (e) {
+                showErrorMessage(vm.$t('PWR_SCHED.RESRC_GRP.ID_INVALID'), vm.$t('PWR_SCHED.RESRC_GRP.ID_INVALID_DESC'), vm.$root);
+                await vm.$router.replace({
+                    name: 'powerScheduler',
+                    params: {
+                        projectId: props.projectId,
+                        scheduleId: props.scheduleId as string,
+                        resourceGroupId: null as unknown as string,
+                    },
+                });
+            }
+        };
+
+        /* init */
+        (async () => {
+            // by url enter case
+            if (props.resourceGroupId) {
+                await getResourceGroup();
+                await resetAll();
+            } else {
+                watch(() => props.visible, async (aft, bef) => {
+                    if (aft && !bef) {
+                        formState.resourceGroup = props.resourceGroup;
+                        await resetAll();
+                    }
+                }, { immediate: true });
+            }
+        })();
 
 
         return {

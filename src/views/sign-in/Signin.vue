@@ -78,7 +78,7 @@ export default {
         const login = async (userId: string, credentials: Credentials) => {
             store.user.setToken(credentials.refresh_token, credentials.access_token);
             await store.user.setUser(state.userType, userId, vm);
-            setGtagUserID(vm);
+            setGtagUserID(vm, vm.$store);
             await vm.$router.push(props.nextPath);
         };
         return {

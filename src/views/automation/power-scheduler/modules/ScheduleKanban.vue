@@ -99,6 +99,7 @@
                 {{ $t('PWR_SCHED.SAVE') }}
             </p-button>
         </div>
+        <router-view v-if="!isCreateMode && !isEditMode" />
         <resource-group-page :visible="resourceGroupVisible"
                              :resource-group="selectedItem ? selectedItem.resource_group : null"
                              :project-id="projectId"
@@ -289,7 +290,18 @@ export default {
         };
 
         const showResourceGroupPage = () => {
-            state.resourceGroupVisible = true;
+            if (state.isCreateMode || state.isEditMode) {
+                state.resourceGroupVisible = true;
+            } else {
+                vm.$router.push({
+                    name: 'powerSchedulerResourceGroup',
+                    params: {
+                        projectId: props.projectId,
+                        scheduleId: props.scheduleId,
+                        resourceGroupId: state.selectedItem?.resource_group.resource_group_id,
+                    },
+                });
+            }
         };
 
 

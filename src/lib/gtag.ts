@@ -1,17 +1,19 @@
-import Vue from 'vue';
 import VueGtag from 'vue-gtag';
 import Hashids from 'hashids';
 import config from '@/lib/config';
-import { store } from '@/store';
+import { VueRouter } from 'vue-router/types/router';
+import { VueConstructor } from 'vue/types/umd';
+import { Store } from 'vuex';
+import { Vue } from 'vue/types/vue';
 
-export const setGtagUserID = (vm: any) => {
-    if (vm.$gtag) {
+export const setGtagUserID = (vue: Vue, store: Store<any>) => {
+    if (vue.$gtag) {
         try {
             if (store.state.domain.domainId && store.state.user.userId) {
                 const hashids = new Hashids(store.state.user.userId);
 
                 // eslint-disable-next-line camelcase
-                vm.$gtag.set({
+                vue.$gtag.set({
                     // eslint-disable-next-line camelcase
                     user_id: `${store.state.domain.domainId}:${hashids.encode(1)}`,
                     domain_id: store.state.domain.domainId,
@@ -28,16 +30,20 @@ export const setGtagUserID = (vm: any) => {
 export class GTag {
     gtag: any;
 
-    constructor(id: string, vm: Vue) {
+    constructor(id: string, vue: VueConstructor|any, router: VueRouter) {
         const gtagId: string = id || 'DISABLED';
 
         if (gtagId === 'DISABLED') return;
-        Vue.use(VueGtag, {
-            config: { id: gtagId },
-        });
-        this.gtag = vm.$gtag;
+        if (vue.use) {
+            vue.use(VueGtag, {
+                config: { id: gtagId },
+            });
+            this.gtag = vue.prototype.$gtag;
+        } else {
+            this.gtag = vue.$gtag;
+        }
 
-        vm.$router.afterEach((to, from) => {
+        router.afterEach((to, from) => {
             this.gtag.pageview({
                 // eslint-disable-next-line camelcase
                 page_path: to.path,

@@ -139,8 +139,7 @@ export const isNotEmpty = (value): boolean => {
  *   @returns
  */
 export const showErrorMessage = (errorTitle, error, root?) => {
-    const vm = getCurrentInstance();
-    const vmRoot = root || vm;
+    const vmRoot = root || getCurrentInstance();
     let errorMsg = '';
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }

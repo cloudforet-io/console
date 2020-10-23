@@ -65,7 +65,7 @@ export class API {
     }
 
 
-    init(baseURL: string, vm: any) {
+    init(baseURL: string) {
         this.axiosOptions = {
             baseURL,
             headers: {
@@ -109,7 +109,7 @@ export class API {
             failedRequest.response.config.headers.Authorization = `Bearer ${this.store.user.state.accessToken}`;
             return Promise.resolve();
         }, (error) => {
-            this.store.logout(vm);
+            this.store.logout();
             return Promise.reject(error);
         });
 

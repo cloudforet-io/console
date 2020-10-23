@@ -8,18 +8,23 @@ import router from '@/routes/index';
 import { store } from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
-import setStore from '@/store/toolset';
+import setStore, { useStore } from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import Codemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
-import App from './App.vue';
 import '@/styles/style.scss';
 import '@/styles/style.pcss';
+import config from '@/lib/config';
+import { SpaceConnector } from '@/lib/space-connector';
+import { api } from '@/lib/api/axios';
+import { GTag, setGtagUserID } from '@/lib/gtag';
+import App from './App.vue';
 
 
+/** ********** SET VUE PLUGINS ************** */
 Vue.use(VueCompositionApi);
 Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {
@@ -41,25 +46,69 @@ webFontLoader.load({
     },
 });
 
-/** ***************************************************************
- * This is a Global Bus Event;
- * Please, name your '$emit' event name as action + Event such as
- * nodeSelectedEvent, closeModalEvent
- **************************************************************** */
-
-Vue.prototype.$bus = new Vue({});
-Vue.prototype.$ls = setStore();
-
 directive(Vue);
 
-new Vue({
-    el: '#app',
-    router,
-    i18n,
-    store,
-    components: {
-        App,
-    },
-    template: '<App/>',
-});
-export default Vue;
+
+/** ********** INIT ************** */
+
+// TODO: remove legacy store
+setStore();
+const { logout } = useStore();
+
+const configInit = async () => {
+    await config.init();
+    await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
+        // TODO: open session expire modal
+        logout();
+    });
+    Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'));
+};
+
+const domainInit = async () => {
+    let domainName;
+    if (config.get('DOMAIN_NAME_REF') === 'hostname') {
+        const { hostname } = window.location;
+        domainName = hostname.split('.')[0];
+    } else {
+        domainName = config.get('DOMAIN_NAME');
+    }
+    await store.dispatch('domain/load', domainName);
+};
+
+const gtagInit = () => {
+    if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), Vue, router);
+    setGtagUserID(Vue.prototype, store);
+};
+
+
+(async () => {
+    try {
+        await configInit();
+        await domainInit();
+        gtagInit();
+    } catch (e) {
+        console.error(e);
+    }
+
+    new Vue({
+        el: '#app',
+        router,
+        i18n,
+        store,
+        components: {
+            App,
+        },
+        template: '<App/>',
+    });
+})();
+//
+// new Vue({
+//     el: '#app',
+//     router,
+//     i18n,
+//     store,
+//     components: {
+//         App,
+//     },
+//     template: '<App/>',
+// });

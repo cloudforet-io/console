@@ -90,6 +90,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
+import router from '@/routes';
 
 dayjs.extend(timezone);
 
@@ -103,6 +104,11 @@ const listMapper = {
     icon: d => DESIRED_STATES[d.desired_state]?.icon || '',
 };
 const getFormattedTime = time => dayjs.unix(time.seconds).tz(getTimezone()).format('YYYY-MM-DD');
+
+const validateProjectId = async (projectId): Promise<boolean> => {
+    await store.dispatch('resource/project/load');
+    return !!store.state.resource.project.items[projectId];
+};
 
 export default {
     name: 'PowerSchedulerPage',
@@ -124,6 +130,20 @@ export default {
             type: String,
             default: undefined,
         },
+    },
+    beforeRouteEnter(to, from, next) {
+        (async () => {
+            if (!await validateProjectId(to.params.projectId)) {
+                showErrorMessage(router.app.$t('PWR_SCHED.PROJECT_INVALID'), router.app.$t('PWR_SCHED.PROJECT_INVALID_DESC'), router.app.$root);
+                next({
+                    name: 'powerSchedulerLanding',
+                    params: {},
+                });
+                return;
+            }
+
+            next();
+        })();
     },
     setup(props: Props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -176,22 +196,6 @@ export default {
                     });
                 } catch (e) {}
             }
-        };
-
-        const redirectToLandingPage = async () => {
-            try {
-                await vm.$router.replace({
-                    name: 'powerSchedulerLanding',
-                    params: {},
-                });
-            } catch (e) {}
-
-            showErrorMessage(vm.$t('PWR_SCHED.PROJECT_INVALID'), vm.$t('PWR_SCHED.PROJECT_INVALID_DESC'), root);
-        };
-
-        const validateProjectId = async (): Promise<boolean> => {
-            await store.dispatch('resource/project/load');
-            return !!store.state.resource.project.items[props.projectId];
         };
 
 
@@ -269,15 +273,12 @@ export default {
             await setMode();
         };
 
+        // init
         (async () => {
-            if (!await validateProjectId()) {
-                await redirectToLandingPage();
-                return;
-            }
-
             await listSchedule();
             await initSelectedSchedule(true);
         })();
+
 
         return {
             ...toRefs(state),
