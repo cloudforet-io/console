@@ -11,13 +11,13 @@ export const DESIRED_STATES = {
         text: 'ON',
         iconColor: safe,
         textColor: safe,
-        icon: 'ic_power-off',
+        icon: 'ic_power-on',
     },
     OFF: {
         text: 'OFF',
         iconColor: coral[600],
         textColor: gray[400],
-        icon: 'ic_power-on',
+        icon: 'ic_power-off',
     },
 };
 

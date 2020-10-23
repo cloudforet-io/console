@@ -48,24 +48,26 @@
             </section>
         </template>
         <p-page-navigation :routes="routeState.route" />
-        <div v-if="loading">
-            <div class="loading-backdrop fade-in" />
-            <p-lottie name="thin-spinner" :size="2.5"
-                      :auto="true" class="loading"
+        <div class="detail-container">
+            <template v-if="loading" >
+                <div class="loading-backdrop fade-in" />
+                <p-lottie name="thin-spinner" :size="2.5"
+                          :auto="true" class="loading"
+                />
+            </template>
+            <schedule-detail v-else
+                             :schedule-id="selectedSchedule ? selectedSchedule.schedule_id : ''"
+                             :project-id="projectId"
+                             :mode="mode"
+                             :first-create="mode === 'CREATE' && scheduleList.length === 0"
+                             @update="onUpdate"
+                             @delete="onDelete"
+                             @create="onCreate"
+                             @cancel="onCancel"
+                             @edit-start="onEditStart"
+                             @edit-finish="onEditFinish"
             />
         </div>
-        <schedule-detail v-else
-                         :schedule-id="selectedSchedule ? selectedSchedule.schedule_id : ''"
-                         :project-id="projectId"
-                         :mode="mode"
-                         :first-create="mode === 'CREATE' && scheduleList.length === 0"
-                         @update="onUpdate"
-                         @delete="onDelete"
-                         @create="onCreate"
-                         @cancel="onCancel"
-                         @edit-start="onEditStart"
-                         @edit-finish="onEditFinish"
-        />
     </vertical-page-layout>
 </template>
 
@@ -203,7 +205,11 @@ export default {
             state.loading = true;
             try {
                 const query = new QueryHelper().setFilter({ k: 'project_id', v: props.projectId, o: 'contain' });
-                const res = await SpaceConnector.client.powerScheduler.schedule.list({ query: query.data });
+                const res = await SpaceConnector.client.powerScheduler.schedule.list({
+                    // eslint-disable-next-line camelcase
+                    include_desired_state: true,
+                    query: query.data,
+                });
 
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
@@ -325,30 +331,34 @@ export default {
         .title {
             @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
         }
-        .loading-backdrop {
-            @apply absolute w-full h-full overflow-hidden;
-            background-color: white;
-            opacity: 0.5;
-            top: 0;
-            z-index: 1;
-        }
-        .loading {
-            @apply absolute flex w-full h-full justify-center items-center;
-            top: 0;
-            max-height: 16.875rem;
-        }
-        .fade-in-enter-active {
-            transition: opacity 0.2s;
-        }
-        .fade-in-leave-active {
-            transition: opacity 0.2s;
-        }
-        .fade-in-enter, .fade-in-leave-to {
-            opacity: 0;
-        }
-        .fade-in-leave, .fade-in-enter-to {
-            opacity: 0.5;
-        }
+    }
+
+    .detail-container {
+        @apply relative w-full h-full;
+    }
+    .loading-backdrop {
+        @apply absolute w-full h-full overflow-hidden;
+        background-color: white;
+        opacity: 0.5;
+        top: 0;
+        z-index: 1;
+    }
+    .loading {
+        @apply absolute flex w-full h-full justify-center items-center;
+        top: 0;
+        max-height: 16.875rem;
+    }
+    .fade-in-enter-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-enter, .fade-in-leave-to {
+        opacity: 0;
+    }
+    .fade-in-leave, .fade-in-enter-to {
+        opacity: 0.5;
     }
 
 </style>
