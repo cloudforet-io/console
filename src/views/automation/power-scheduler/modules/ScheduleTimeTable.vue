@@ -1,9 +1,9 @@
 <template>
     <div class="schedule-time-table-container">
-        <div class="title-lap">
+        <div class="title-wrapper">
             <span class="title">{{ $t('PWR_SCHED.TIME') }}</span>
             <span class="sub-title">{{ $t('PWR_SCHED.SCHED_TIME') }}</span>
-            <div class="button-lap">
+            <div class="button-wrapper">
                 <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week"
                                    :timezone="timezone"
                 />
@@ -15,8 +15,8 @@
                 </p-button>
             </div>
         </div>
-        <div class="content-lap">
-            <div class="left-lap" :class="[isCreateMode || isEditMode ? 'editing' : '']">
+        <div class="content-wrapper">
+            <div class="left-part" :class="{'editing': isCreateMode || isEditMode}">
                 <div class="time-section">
                     <div class="icon-item" />
                     <div v-for="time in range(0, 24)"
@@ -33,7 +33,7 @@
                             v-for="(weekday, index) in currentWeekList"
                             :key="index"
                             class="weekday-item"
-                            :class="[weekday.format('YYYY-MM-DD') === today ? 'today' : '' ]"
+                            :class="{'today': weekday.format('YYYY-MM-DD') === today}"
                         >
                             <div class="weekday-text">
                                 {{ weekdayTexts[weekday.day()] }}
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <vue-selecto
-                        v-if="isEditMode"
+                        v-if="isCreateMode || isEditMode"
                         :drag-container="dragContainer"
                         :selectable-targets="['.item']"
                         :hit-rate="1"
@@ -91,7 +91,7 @@
                     </div>
                 </div>
             </div>
-            <div class="right-lap" :class="[isCreateMode || isEditMode ? 'editing' : '']">
+            <div class="right-part" :class="{'editing': isCreateMode || isEditMode}">
                 <!--timezone-->
                 <div class="pb-8" :class="isEditMode ? 'opacity-25' : ''">
                     <div class="title pt-0">
@@ -106,7 +106,7 @@
                     <div class="title">
                         {{ $t('PWR_SCHED.SCHED_ROUTINE') }}
                     </div>
-                    <div class="legend-group routine">
+                    <div class="legend-wrapper routine">
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.ROUTINE_ON') }}</span>
                         <p-button v-if="!isCreateMode && !isEditMode"
@@ -116,10 +116,10 @@
                             {{ $t('PWR_SCHED.EDIT') }}
                         </p-button>
                     </div>
-                    <div class="legend-group routine-off">
+                    <div class="legend-wrapper routine-off">
                         <span class="legend-icon" />
                         <span v-if="!(isCreateMode || (isEditMode && editMode === 'routine'))">{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
-                        <p-button v-if="isEditMode && editMode === 'routine'"
+                        <p-button v-if="isCreateMode || (isEditMode && editMode === 'routine')"
                                   class="edit-button gray900 sm" :outline="true"
                                   @click="onDeleteAllRoutine"
                         >
@@ -132,7 +132,7 @@
                     <div class="title">
                         {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
                     </div>
-                    <div class="legend-group one-time-run" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeRun'}">
+                    <div class="legend-wrapper one-time-run" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeRun'}">
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
                         <p-button v-if="!isEditMode"
@@ -142,7 +142,7 @@
                             {{ $t('PWR_SCHED.EDIT') }}
                         </p-button>
                     </div>
-                    <div class="legend-group one-time-stop" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeStop'}">
+                    <div class="legend-wrapper one-time-stop" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeStop'}">
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
                         <p-button v-if="!isEditMode"
@@ -154,15 +154,15 @@
                     </div>
                 </div>
                 <!--buttons-->
-                <div class="one-time-button-lap">
+                <div class="one-time-button-wrapper">
                     <p-button v-if="isEditMode"
-                              class="gray900 sm mr-1" :outline="true"
+                              class="gray900 mr-4" :outline="true"
                               @click="onClickCancel"
                     >
                         {{ $t('PWR_SCHED.CANCEL') }}
                     </p-button>
                     <p-button v-if="isEditMode"
-                              class="secondary sm"
+                              class="secondary"
                               @click="onClickSave"
                     >
                         {{ $t('PWR_SCHED.SAVE') }}
@@ -284,12 +284,11 @@ export default {
             isEditMode: false as boolean,
             editMode: undefined as undefined | keyof typeof EDIT_MODE, // oneTimeRun, oneTimeStop
             editModeClassName: computed(() => {
-                if (props.mode === 'CREATE') return 'routine';
+                if (state.editMode === EDIT_MODE.routine) return 'routine';
                 if (state.editMode === EDIT_MODE.oneTimeRun) return 'one-time-run';
                 if (state.editMode === EDIT_MODE.oneTimeStop) return 'one-time-stop';
                 return '';
             }),
-            // oneTimeEditMode: false as boolean | string,
             dragContainer: undefined,
             rule: {
                 routine: {} as Rule,
@@ -724,6 +723,7 @@ export default {
         watch(() => props.mode, async (after) => {
             if (after === 'CREATE') {
                 state.showHelpBlock = true;
+                state.editMode = EDIT_MODE.routine;
             } else {
                 state.showHelpBlock = false;
                 await getScheduleRule();
@@ -763,9 +763,19 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    /*
+@define-mixin diagonal-background $color {
+    background: repeating-linear-gradient(45deg,
+        rgba($color, 0.5),
+        rgba($color, 0.5), 3px,
+        $color 3px,
+        $color 6px
+    );
+}
+     */
 .schedule-time-table-container {
     width: 100%;
-    .title-lap {
+    .title-wrapper {
         position: relative;
         display: block;
         line-height: 2.25rem;
@@ -780,19 +790,18 @@ export default {
             @apply text-gray-400;
             font-size: 0.75rem;
         }
-        .button-lap {
+        .button-wrapper {
             position: absolute;
             top: 0;
             right: 0;
             .this-week-button {
-                @apply border-gray-300;
                 margin-left: 1rem;
             }
         }
     }
-    .content-lap {
+    .content-wrapper {
         display: flex;
-        .left-lap {
+        .left-part {
             @apply border border-gray-200;
             border-top-left-radius: 2px;
             border-bottom-left-radius: 2px;
@@ -802,8 +811,6 @@ export default {
                 cursor: crosshair;
                 .time-section {
                     @apply bg-secondary2;
-                }
-                .time-section {
                     .time {
                         &.hovered {
                             background-color: rgba(theme('colors.secondary1'), 0.25);
@@ -951,7 +958,7 @@ export default {
                 }
             }
         }
-        .right-lap {
+        .right-part {
             @apply border border-gray-200 border-l-0;
             position: relative;
             width: 20%;
@@ -971,8 +978,8 @@ export default {
                     @apply text-secondary;
                 }
             }
-            .legend-group {
-                line-height: 1.25rem;
+            .legend-wrapper {
+                line-height: 1.5rem;
                 vertical-align: middle;
                 padding-bottom: 0.5rem;
                 &.routine {
@@ -990,16 +997,29 @@ export default {
                 &.one-time-run {
                     @apply text-point-violet;
                     .legend-icon {
-                        background: repeating-linear-gradient(45deg, theme('colors.pointViolet'), theme('colors.pointViolet') 2px, white 0, white 4px);
+                        background: repeating-linear-gradient(
+                                45deg,
+                                rgba(theme('colors.pointViolet'), 0.5),
+                                rgba(theme('colors.pointViolet'), 0.5) 3px,
+                                theme('colors.pointViolet') 3px,
+                                theme('colors.pointViolet') 6px
+                        );
                     }
                 }
                 &.one-time-stop {
                     @apply text-gray-400;
                     .legend-icon {
-                        background: repeating-linear-gradient(45deg, theme('colors.gray.700'), theme('colors.gray.700') 2px, white 0, white 4px);
+                        background: repeating-linear-gradient(
+                                45deg,
+                                rgba(theme('colors.gray.700'), 0.5),
+                                rgba(theme('colors.gray.700'), 0.5) 3px,
+                                theme('colors.gray.700') 3px,
+                                theme('colors.gray.700') 6px
+                        );
                     }
                 }
                 .legend-icon {
+                    position: relative;
                     display: inline-block;
                     width: 0.75rem;
                     height: 0.75rem;
@@ -1007,30 +1027,28 @@ export default {
                     margin-right: 0.5rem;
                 }
                 .edit-button {
-                    @apply border-gray-300;
+                    height: 20px;
+                    padding: 0 0.5rem;
                     margin-left: 0.5rem;
                 }
-                .making-ticket-text {
-                    @apply bg-blue-200 text-secondary;
-                    font-size: 0.75rem;
-                    margin-left: 1rem;
-                    padding-left: 0.5rem;
-                    padding-right: 0.5rem;
-                }
             }
-            .one-time-button-lap {
+            .one-time-button-wrapper {
                 position: absolute;
                 bottom: 1.5rem;
                 left: 0;
                 width: 100%;
                 text-align: center;
                 .p-button {
-                    @apply border-gray-300;
-                    height: 1.25rem;
-                    margin-top: 0.5rem;
+                    min-width: 4rem;
                 }
             }
         }
+    }
+}
+.p-button.gray900 {
+    @apply border-gray-300;
+    &:hover {
+        @apply border-gray-900;
     }
 }
 </style>
