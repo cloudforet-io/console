@@ -4,7 +4,7 @@ const { kebabCase, forEach } = require('lodash');
 const palette = {
     black: '#000000',
     white: '#FFFFFF',
-    pointViolet: '#8F7CFF',
+    pointViolet: '#7545FF',
     gray: {
         100: '#F7F7F7',
         200: '#E5E5E8',
