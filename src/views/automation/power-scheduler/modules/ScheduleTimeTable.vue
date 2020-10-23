@@ -22,9 +22,12 @@
                     <div v-for="time in range(0, 24)"
                          :key="time"
                          class="time"
-                         :class="hoveredTime === time ? 'hovered' : ''"
+                         :class="{
+                             'hovered': hoveredTime === time,
+                             'current': time === currentHour,
+                         }"
                     >
-                        {{ ('0' + time).slice(-2) }}
+                        {{ time === currentHour ? `${('0' + time).slice(-2)}:${('0' + currentMinute).slice(-2)}` : ('0' + time).slice(-2) }}
                     </div>
                 </div>
                 <div ref="draggableSection" class="data-section">
@@ -78,6 +81,7 @@
                             @mouseenter="onMouseEnterTimeBlock(time)"
                             @mouseleave="onMouseLeaveTimeBlock"
                         />
+                        <div v-if="time === currentHour" class="current-time-bar" :style="currentTimeBarStyle" />
                     </div>
                     <div v-if="showHelpBlock" class="help-block">
                         <p class="help-text">
@@ -186,15 +190,15 @@ import {
     computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch, onMounted,
 } from '@vue/composition-api';
 
-import { ViewMode } from '@/views/automation/power-scheduler/type';
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { ViewMode } from '@/views/automation/power-scheduler/type';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
-import {showErrorMessage, showSuccessMessage} from "@/lib/util";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
@@ -299,6 +303,14 @@ export default {
             showHelpBlock: false,
             //
             hoveredTime: null,
+            currentHour: computed(() => Number(dayjs().tz(state.timezone).format('HH'))),
+            currentMinute: computed(() => Number(dayjs().tz(state.timezone).format('mm'))),
+            currentTimeBarStyle: computed(() => {
+                if (Math.floor(60 / state.currentMinute) > 4) return { top: 0 };
+                if (Math.floor(60 / state.currentMinute) > 3) return { top: '25%' };
+                if (Math.floor(60 / state.currentMinute) > 2) return { top: '50%' };
+                return { top: '75%' };
+            }),
         });
 
         /* util */
@@ -842,6 +854,9 @@ export default {
                     height: 1rem;
                     font-size: 0.625rem;
                     text-align: center;
+                    &.current {
+                        @apply text-secondary;
+                    }
                 }
             }
             .data-section {
@@ -887,10 +902,12 @@ export default {
                     }
                 }
                 .item-row {
-                    @apply bg-gray-200 border-b border-white;
+                    @apply border-b border-white;
+                    position: relative;
                     display: flex;
                     width: 100%;
                     height: 1rem;
+                    background-color: rgba(theme('colors.gray.200'), 0.75);
                     &:last-child {
                         @apply border-b-0;
                     }
@@ -935,6 +952,11 @@ export default {
                                 @apply bg-transparent;
                             }
                         }
+                    }
+                    .current-time-bar {
+                        @apply border-b border-secondary;
+                        position: absolute;
+                        width: 100%;
                     }
                 }
                 .help-block {
