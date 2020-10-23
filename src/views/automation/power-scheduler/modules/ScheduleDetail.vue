@@ -24,14 +24,15 @@
                         <p-status v-if="DESIRED_STATES[desiredState]"
                                   v-bind="DESIRED_STATES[desiredState]"
                                   :icon="undefined"
-                                  class="ml-2"
+                                  class="ml-4"
                         />
                     </div>
                     <div class="info-group">
                         <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
                         <p-status v-if="BOOTING_STATES[jobStatus]"
                                   v-bind="BOOTING_STATES[jobStatus]"
-                                  class="ml-2"
+                                  class="ml-4"
+                                  :icon-size="0.5"
                         />
                     </div>
                 </div>

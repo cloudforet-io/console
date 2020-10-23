@@ -248,7 +248,7 @@ export default {
             default: 'READ',
         },
     },
-    setup(props: Props, { refs }) {
+    setup(props: Props, { emit, refs }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
@@ -321,7 +321,7 @@ export default {
                 // one time
                 if (!state.isCreateMode) {
                     // run
-                    if (state.editMode !== EDIT_MODE.oneTimeStop) {
+                    if (!state.isEditMode || (state.isEditMode && state.editMode === EDIT_MODE.oneTimeRun)) {
                         rules = get(state.rule.oneTimeRun, date);
                         if (rules && rules.includes(time)) {
                             if (!item.classList.contains('one-time-run')) item.classList.add('one-time-run');
@@ -329,7 +329,7 @@ export default {
                     }
 
                     // stop
-                    if (state.editMode !== EDIT_MODE.oneTimeRun) {
+                    if (!state.isEditMode || (state.isEditMode && state.editMode === EDIT_MODE.oneTimeStop)) {
                         rules = get(state.rule.oneTimeStop, date);
                         if (rules && rules.includes(time)) {
                             if (!item.classList.contains('one-time-stop')) item.classList.add('one-time-stop');
@@ -633,7 +633,7 @@ export default {
             setStyleClass();
         };
         const onClickTimeBlock = (e) => {
-            if (!state.isCreateMode || !state.isEditMode) return;
+            if (!(state.isCreateMode || state.isEditMode)) return;
 
             const classList = e.target.classList;
             const date = classList[1];
@@ -687,6 +687,7 @@ export default {
             state.isEditMode = true;
             state.editMode = type;
             setStyleClass();
+            emit('edit-start');
         };
         const onClickSave = async () => {
             await createOrUpdate(props.scheduleId);
@@ -694,11 +695,13 @@ export default {
 
             state.isEditMode = false;
             setStyleClass();
+            emit('edit-finish');
         };
         const onClickCancel = async () => {
             state.isEditMode = false;
             await getScheduleRule();
             setStyleClass();
+            emit('edit-finish');
         };
         const onMouseEnterTimeBlock = (time) => {
             state.hoveredTime = time;
@@ -763,16 +766,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    /*
-@define-mixin diagonal-background $color {
-    background: repeating-linear-gradient(45deg,
-        rgba($color, 0.5),
-        rgba($color, 0.5), 3px,
-        $color 3px,
-        $color 6px
-    );
-}
-     */
 .schedule-time-table-container {
     width: 100%;
     .title-wrapper {
@@ -813,13 +806,18 @@ export default {
                     @apply bg-secondary2;
                     .time {
                         &.hovered {
-                            background-color: rgba(theme('colors.secondary1'), 0.25);
+                            background-color: rgba(theme('colors.blue.300'), 0.5);
                         }
                     }
                 }
                 .data-section {
                     .weekday-row {
                         @apply bg-secondary2;
+                    }
+                    .item-row {
+                        &:hover {
+                            background-color: rgba(theme('colors.blue.300'), 0.5);
+                        }
                     }
                 }
             }
@@ -837,9 +835,6 @@ export default {
                     height: 1rem;
                     font-size: 0.625rem;
                     text-align: center;
-                    &.hovered {
-                        background-color: rgba(theme('colors.gray.900'), 0.25);
-                    }
                 }
             }
             .data-section {
@@ -888,18 +883,15 @@ export default {
                     }
                 }
                 .item-row {
-                    @apply bg-gray-100 border-b border-gray-200;
+                    @apply bg-gray-200 border-b border-white;
                     display: flex;
                     width: 100%;
                     height: 1rem;
                     &:last-child {
                         @apply border-b-0;
                     }
-                    &:hover {
-                        @apply bg-gray-200;
-                    }
                     .item {
-                        @apply border-l border-gray-200;
+                        @apply border-l border-white;
                         display: inline-flex;
                         width: calc(100% / 7);
                         height: 0.95rem;
@@ -913,17 +905,27 @@ export default {
                             &.selected-one-time-run {
                                 @apply bg-point-violet;
                             }
-                            &.selected-one-time-stop {
-                                @apply bg-red-400;
-                                opacity: 1;
+                            &.one-time-stop, &.selected-one-time-stop {
+                                background: repeating-linear-gradient(
+                                        45deg,
+                                        rgba(theme('colors.gray.700'), 0.5),
+                                        rgba(theme('colors.gray.700'), 0.5) 3px,
+                                        transparent 3px,
+                                        transparent 6px
+                                );
                             }
                         }
                         &.one-time-run, &.selected-one-time-run {
-                            @apply bg-peacock-300;
+                            background: repeating-linear-gradient(
+                                    45deg,
+                                    rgba(theme('colors.point-violet'), 0.5),
+                                    rgba(theme('colors.point-violet'), 0.5) 3px,
+                                    theme('colors.point-violet') 3px,
+                                    theme('colors.point-violet') 6px
+                            );
                             border-radius: 0.125rem;
                         }
                         &.one-time-stop, &.selected-one-time-stop {
-                            @apply bg-red-400;
                             border-radius: 0.125rem;
                             &:not(.routine) {
                                 @apply bg-transparent;
