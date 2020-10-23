@@ -204,7 +204,7 @@ export default {
         const listSchedule = async () => {
             state.loading = true;
             try {
-                const query = new QueryHelper().setFilter({ k: 'project_id', v: props.projectId, o: 'contain' });
+                const query = new QueryHelper().setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
                 const res = await SpaceConnector.client.powerScheduler.schedule.list({
                     // eslint-disable-next-line camelcase
                     include_desired_state: true,
