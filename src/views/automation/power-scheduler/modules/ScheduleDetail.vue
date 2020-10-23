@@ -9,7 +9,7 @@
                     <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
                                    :disabled="disabledState.visible" @click="onClickDelete"
                     />
-                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_edit-text"
+                    <p-icon-button v-if="mode === 'READ'" name="ic_edit-text"
                                    :disabled="disabledState.visible" @click="onClickNameEdit"
                     />
                 </template>

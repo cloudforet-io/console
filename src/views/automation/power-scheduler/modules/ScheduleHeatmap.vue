@@ -1,6 +1,6 @@
 <template>
     <div class="mt-4">
-        <div v-for="(color, index) in scheduleHeatMapColor" :key="index">
+        <div v-for="(color, index) in scheduleHeatMapColor" :key="index" class="heatmap-line">
             <span v-for="(num, index) in 7" :key="num">
                 <span class="circle inline-block" :class="`${color[index]}`" />
             </span>
@@ -58,6 +58,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    .heatmap-line {
+        line-height: 1.2;
+    }
     .circle {
         width: 0.5rem;
         height: 0.5rem;
