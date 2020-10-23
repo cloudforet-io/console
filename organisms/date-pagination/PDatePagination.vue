@@ -119,8 +119,9 @@ export default {
     .date-text-lap {
         @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
         .date-text {
-            line-height: 1.2rem;
-            font-size: 0.875rem;
+            line-height: 1rem;
+            font-size: 1rem;
+            margin-right: 1rem;
         }
 
         @screen lg {
