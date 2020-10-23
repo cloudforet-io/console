@@ -123,7 +123,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import {TimeStamp} from "@/lib/fluent-api";
+import { TimeStamp } from '@/models';
 
 enum REPOSITORY_TYPE {
     remote = 'remote',

@@ -72,7 +72,7 @@ import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { fluentApi, ProjectGroupInfo } from '@/lib/fluent-api';
-import { ProjectModel } from '@/lib/fluent-api/identity/project';
+import { ProjectModel } from '@/views/project/project/type';
 import {
     ProjectGroup, Props, DataType, SearchResult,
 } from './ProjectSearch.toolset';

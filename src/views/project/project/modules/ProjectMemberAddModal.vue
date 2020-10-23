@@ -45,7 +45,6 @@ import {
     makeProxy,
 } from '@/lib/compostion-util';
 import PTag from '@/components/molecules/tags/PTag.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import {
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
@@ -53,6 +52,8 @@ import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { isEqual } from 'lodash';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
 
 const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus?: any, eventName?: string, addTagCallBack?: any) => {
     const tags: Ref<any[]> = proxyTags || ref([]);
@@ -153,18 +154,19 @@ export default {
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
 
+        const query = new QueryHelper()
+            .setPageStart(getPageStart(state.thisPage, state.pageSize))
+            .setPageLimit(state.pageSize)
+            .setKeyword(state.keyword);
+
         // List api Handler for query search table
         const listUser = async () => {
             try {
-                const resp = await fluentApi.identity().user().list()
-                    .setPageSize(state.pageSize)
-                    .setThisPage(state.thisPage)
-                    .setSortBy(state.sortBy)
-                    .setSortDesc(state.sortDesc)
-                    .setKeyword(state.keyword)
-                    .execute();
-                state.items = resp.data.results;
-                state.totalCount = resp.data.total_count || 0;
+                const resp = await SpaceConnector.client.identity.user.list({
+                    query: query.data,
+                });
+                state.items = resp.results;
+                state.totalCount = resp.total_count || 0;
             } catch (e) {
                 state.items = [];
                 console.error(e);
@@ -187,9 +189,10 @@ export default {
         const confirm = async () => {
             const users = formState.tagTools.tags;
             try {
-                await fluentApi.identity().project().addMember().setId(projectId)
-                    .setSubIds(users)
-                    .execute();
+                await SpaceConnector.client.identity.project.member.add({
+                    project_id: projectId,
+                    users,
+                });
                 showSuccessMessage('success', 'Add Member', root);
             } catch (e) {
                 showErrorMessage('Fail to Add Member', e, root);

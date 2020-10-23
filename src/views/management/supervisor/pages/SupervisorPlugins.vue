@@ -65,10 +65,9 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { SupervisorPluginModel } from '@/lib/fluent-api/plugin/supervisorPlugin';
+import { SupervisorPluginModel } from '@/views/management/supervisor/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { fluentApi } from '@/lib/fluent-api';
-import {SpaceConnector} from "@/lib/space-connector";
+import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'Supervisor',
@@ -177,12 +176,12 @@ export default {
         };
         const onClickRecovery = async (item) => {
             try {
-                await fluentApi.plugin().supervisorPlugin().recovery().setSubIds([
+                await SpaceConnector.client.plugin.supervisor.plugin.recover({
                     // eslint-disable-next-line camelcase
-                    { plugin_id: item.plugin_id, version: item.version },
-                ])
-                    .setId(item.supervisor_id)
-                    .execute();
+                    supervisor_id: item.supervisor_id,
+                    plugin_id: item.plugin_id,
+                    version: item.version,
+                })
                 showSuccessMessage('success', 'success', context.root);
             } catch (e) {
                 showErrorMessage('Fail to recover plugin', e, context.root);

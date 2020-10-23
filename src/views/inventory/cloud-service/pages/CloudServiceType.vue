@@ -174,7 +174,7 @@ import PPagination from '@/components/organisms/paginations/pagination/PPaginati
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import { Tags, TimeStamp } from '@/lib/fluent-api';
+import { Tags, TimeStamp } from '@/models';
 
 interface RegionModel extends Tags {
     region_id: string;

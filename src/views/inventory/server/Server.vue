@@ -158,7 +158,6 @@ import ServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 
 /* types */
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
@@ -187,6 +186,13 @@ import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout
 
 
 const DEFAULT_PAGE_SIZE = 15;
+
+interface ProjectItemResp {
+    id: string;
+    name: string;
+    has_child: boolean;
+    item_type: 'PROJECT_GROUP'|'PROJECT';
+}
 
 // TODO: move this code to store
 const STORAGE_PREFIX = 'inventory/server';

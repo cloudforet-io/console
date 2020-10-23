@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 export interface Tags {
-    [key: string]: string|number|boolean;
+    [key: string]: any;
 }
 
 export interface TimeStamp {

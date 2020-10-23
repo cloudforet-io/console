@@ -161,8 +161,8 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ProviderModel } from '@/views/identity/service-account/type';
 
 export default {
     name: 'AddServiceAccount',

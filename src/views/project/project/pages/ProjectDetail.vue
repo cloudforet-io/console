@@ -126,16 +126,16 @@ import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 
 import { makeTrItems } from '@/lib/view-helper';
-import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { ProjectModel } from '@/views/project/project/type';
 
 export default {
     name: 'ProjectDetail',
@@ -484,8 +484,6 @@ export default {
         @apply w-full flex pr-4 ;
         .p-search {
             @apply w-full;
-
-            /* max-width: 23.125rem; */
         }
     }
 </style>

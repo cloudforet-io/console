@@ -155,7 +155,7 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
+import { CollectorModel } from '@/views/plugin/collector/type';
 import { getFiltersFromQueryTags, parseTag } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
@@ -164,7 +164,7 @@ import {
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeTrItems } from '@/lib/view-helper';
-import { ActionAPIInterface, fluentApi } from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import config from '@/lib/config';
 import router from '@/routes';
 
@@ -341,7 +341,7 @@ export default {
             routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
         });
         const checkModalState: UnwrapRef<{
-                visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api: ActionAPIInterface;
+                visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api;
             }> = reactive({
                 visible: false,
                 mode: '',

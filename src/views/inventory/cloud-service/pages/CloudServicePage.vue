@@ -144,7 +144,7 @@ import {
     queryStringToQueryTags,
     queryTagsToQueryString, replaceQuery,
 } from '@/lib/router-query-string';
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import { ProjectItemResp } from '@/views/project/project/type';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import {
