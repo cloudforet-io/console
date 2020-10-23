@@ -306,9 +306,9 @@ export default {
             currentHour: computed(() => Number(dayjs().tz(state.timezone).format('HH'))),
             currentMinute: computed(() => Number(dayjs().tz(state.timezone).format('mm'))),
             currentTimeBarStyle: computed(() => {
-                if (Math.floor(60 / state.currentMinute) > 4) return { top: 0 };
-                if (Math.floor(60 / state.currentMinute) > 3) return { top: '25%' };
-                if (Math.floor(60 / state.currentMinute) > 2) return { top: '50%' };
+                if (60 / state.currentMinute > 4) return { top: 0 };
+                if (60 / state.currentMinute > 2) return { top: '25%' };
+                if (60 / state.currentMinute > 4 / 3) return { top: '50%' };
                 return { top: '75%' };
             }),
         });
