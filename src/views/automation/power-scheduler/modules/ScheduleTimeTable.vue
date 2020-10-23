@@ -743,6 +743,11 @@ export default {
             await getScheduleRule();
             setStyleClass();
         });
+        watch(() => state.isEditMode, (after) => {
+            if (!after) {
+                state.showHelpBlock = false;
+            }
+        });
 
         onMounted(() => {
             state.dragContainer = refs.draggableSection;
