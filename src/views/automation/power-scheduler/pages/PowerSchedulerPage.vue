@@ -157,7 +157,7 @@ export default {
             route: computed(() => [
                 { name: 'Automation', path: '/automation' },
                 { name: 'Power Scheduler', path: '/automation/power-scheduler' },
-                { name: `${routeState.projectName}`, path: `/automation/power-scheduler/${props.projectId}` },
+                { name: `${routeState.projectName}` },
             ]),
         });
 

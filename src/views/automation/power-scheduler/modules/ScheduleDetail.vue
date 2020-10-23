@@ -517,4 +517,8 @@ header {
     }
 }
 
+.delete-modal-content {
+    line-height: 160%;
+}
+
 </style>
