@@ -1,8 +1,8 @@
 <template>
     <div class="schedule-time-table-container">
         <div class="title-wrapper">
-            <span class="title">{{ $t('PWR_SCHED.TIME') }}</span>
-            <span class="sub-title">{{ $t('PWR_SCHED.SCHED_TIME') }}</span>
+            <span class="title">{{ $t('PWR_SCHED.TT.TITLE') }}</span>
+            <span class="sub-title">{{ $t('PWR_SCHED.TT.SUB_TITLE') }}</span>
             <div class="button-wrapper">
                 <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week"
                                    :timezone="timezone"
@@ -11,7 +11,7 @@
                           :outline="true"
                           @click="onClickCurrentWeek"
                 >
-                    {{ $t('PWR_SCHED.THIS_WEEK') }}
+                    {{ $t('PWR_SCHED.TT.THIS_WEEK') }}
                 </p-button>
             </div>
         </div>
@@ -39,7 +39,7 @@
                             :class="{'today': weekday.format('YYYY-MM-DD') === today}"
                         >
                             <div class="weekday-text">
-                                {{ weekday.format('YYYY-MM-DD') === today ? $t('PWR_SCHED.TODAY') : weekdayTexts[weekday.day()] }}
+                                {{ weekday.format('YYYY-MM-DD') === today ? $t('PWR_SCHED.TT.TODAY') : weekdayTexts[weekday.day()] }}
                             </div>
                             <div class="weekday-number-text">
                                 {{ weekday.format('D') }}
@@ -85,8 +85,8 @@
                     </div>
                     <div v-if="showHelpBlock" class="help-block">
                         <p class="help-text">
-                            날짜와 시간을 클릭/드래그하여 타이머를 적용하세요. 재 클릭시 해제할 수 있습니다.<br>
-                            <b>*주의: 아무 설정도 없는 경우 모든 리소스의 작동이 멈추게 됩니다.</b>
+                            {{ $t('PWR_SCHED.TT.HELP_MSG_1') }}<br>
+                            <b class="text-base">{{ $t('PWR_SCHED.TT.HELP_MSG_2') }}</b>
                         </p>
                         <p-i name="cursor_pointer--blue" class="cursor-icon"
                              width="2rem" height="2rem"
@@ -99,7 +99,7 @@
                 <!--timezone-->
                 <div class="pb-8" :class="isEditMode ? 'opacity-25' : ''">
                     <div class="title pt-0">
-                        {{ $t('PWR_SCHED.TIMEZONE') }}
+                        {{ $t('PWR_SCHED.TT.TIMEZONE') }}
                     </div>
                     <div class="text-gray-400">
                         {{ timezone }}
@@ -108,52 +108,52 @@
                 <!--routine-->
                 <div class="pb-8" :class="{'opacity-25': isEditMode && editMode !== 'routine'}">
                     <div class="title">
-                        {{ $t('PWR_SCHED.SCHED_ROUTINE') }}
+                        {{ $t('PWR_SCHED.TT.SCHED_ROUTINE') }}
                     </div>
                     <div class="legend-wrapper routine">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.ROUTINE_ON') }}</span>
+                        <span>{{ $t('PWR_SCHED.TT.ROUTINE_ON') }}</span>
                         <p-button v-if="!isCreateMode && !isEditMode"
                                   class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('routine')"
                         >
-                            {{ $t('PWR_SCHED.EDIT') }}
+                            {{ $t('PWR_SCHED.TT.EDIT') }}
                         </p-button>
                     </div>
                     <div class="legend-wrapper routine-off">
                         <span class="legend-icon" />
-                        <span v-if="!(isCreateMode || (isEditMode && editMode === 'routine'))">{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
+                        <span v-if="!(isCreateMode || (isEditMode && editMode === 'routine'))">{{ $t('PWR_SCHED.TT.ROUTINE_OFF') }}</span>
                         <p-button v-if="isCreateMode || (isEditMode && editMode === 'routine')"
                                   class="edit-button gray900 sm" :outline="true"
                                   @click="onDeleteAllRoutine"
                         >
-                            {{ $t('PWR_SCHED.DELETE_ALL') }}
+                            {{ $t('PWR_SCHED.TT.DELETE_ALL') }}
                         </p-button>
                     </div>
                 </div>
                 <!--one time ticket-->
                 <div v-if="!isCreateMode" :class="{'opacity-25': isEditMode && editMode === 'routine'}">
                     <div class="title">
-                        {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
+                        {{ $t('PWR_SCHED.TT.SCHED_ONE_TIME') }}
                     </div>
                     <div class="legend-wrapper one-time-run" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeRun'}">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
+                        <span>{{ $t('PWR_SCHED.TT.RUN') }}</span>
                         <p-button v-if="!isEditMode"
                                   class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('oneTimeRun')"
                         >
-                            {{ $t('PWR_SCHED.EDIT') }}
+                            {{ $t('PWR_SCHED.TT.EDIT') }}
                         </p-button>
                     </div>
                     <div class="legend-wrapper one-time-stop" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeStop'}">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
+                        <span>{{ $t('PWR_SCHED.TT.STOP') }}</span>
                         <p-button v-if="!isEditMode"
                                   class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('oneTimeStop')"
                         >
-                            {{ $t('PWR_SCHED.EDIT') }}
+                            {{ $t('PWR_SCHED.TT.EDIT') }}
                         </p-button>
                     </div>
                 </div>
@@ -259,13 +259,13 @@ export default {
             loading: false,
             // date
             weekdayTexts: [
-                vm.$t('PWR_SCHED.DAY_SUN'),
-                vm.$t('PWR_SCHED.DAY_MON'),
-                vm.$t('PWR_SCHED.DAY_TUE'),
-                vm.$t('PWR_SCHED.DAY_WED'),
-                vm.$t('PWR_SCHED.DAY_THU'),
-                vm.$t('PWR_SCHED.DAY_FRI'),
-                vm.$t('PWR_SCHED.DAY_SAT'),
+                vm.$t('PWR_SCHED.TT.DAY_SUN'),
+                vm.$t('PWR_SCHED.TT.DAY_MON'),
+                vm.$t('PWR_SCHED.TT.DAY_TUE'),
+                vm.$t('PWR_SCHED.TT.DAY_WED'),
+                vm.$t('PWR_SCHED.TT.DAY_THU'),
+                vm.$t('PWR_SCHED.TT.DAY_FRI'),
+                vm.$t('PWR_SCHED.TT.DAY_SAT'),
             ],
             timezones: [
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
@@ -975,7 +975,7 @@ export default {
                         height: 100%;
                         vertical-align: middle;
                         font-size: 0.75rem;
-                        line-height: 120%;
+                        line-height: 1.125rem;
                         text-align: center;
                     }
                     .cursor-icon {
