@@ -435,7 +435,7 @@
 		"DAY_TUE": "화",
 		"DAY_WED": "수",
 		"DELETE": "삭제",
-		"DELETE_ALL": "모두 지우기",
+		"DELETE_ALL": "모두 끄기",
 		"DETAILS": "세부 내용",
 		"EDIT": "편집",
 		"EDITING": "편집중",
@@ -476,7 +476,7 @@
 			"TAG_DESC": "관련된 태그를 추가합니다.",
 			"TAG_DESC2": "키는 문자, 숫자 및 밑줄만 포함할 수 있습니다."
 		},
-		"ROUTINE_TIMER": "루틴 타이머",
+		"ROUTINE_ON": "반복 켜기",
 		"RUN_SCHED": "켜기",
 		"SAVE": "저장",
 		"SCHED": "스케줄",

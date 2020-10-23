@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="content-lap">
-            <div class="left-lap" :class="[editMode ? 'editing' : '']">
+            <div class="left-lap" :class="[isCreateMode || isEditMode ? 'editing' : '']">
                 <div class="time-section">
                     <div class="icon-item" />
                     <div v-for="time in range(0, 24)"
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <vue-selecto
-                        v-if="editMode"
+                        v-if="isEditMode"
                         :drag-container="dragContainer"
                         :selectable-targets="['.item']"
                         :hit-rate="1"
@@ -91,86 +91,79 @@
                     </div>
                 </div>
             </div>
-            <div class="right-lap">
+            <div class="right-lap" :class="[isCreateMode || isEditMode ? 'editing' : '']">
                 <!--timezone-->
-                <div class="pb-8" :class="editMode ? 'opacity-25' : ''">
+                <div class="pb-8" :class="isEditMode ? 'opacity-25' : ''">
                     <div class="title pt-0">
                         {{ $t('PWR_SCHED.TIMEZONE') }}
                     </div>
-                    <div>{{ timezone }}</div>
-                    <!--                <div class="content">-->
-                    <!--                    <div v-if="mode === 'READ'">-->
-                    <!--                        {{ timezone }}-->
-                    <!--                    </div>-->
-                    <!--                    <div v-else>-->
-                    <!--                        <p-select-dropdown v-model="timezone"-->
-                    <!--                                           :items="timezones"-->
-                    <!--                                           auto-height-->
-                    <!--                        />-->
-                    <!--                    </div>-->
-                    <!--                </div>-->
+                    <div class="text-gray-400">
+                        {{ timezone }}
+                    </div>
                 </div>
                 <!--routine-->
-                <div class="pb-8" :class="oneTimeEditMode ? 'opacity-25' : ''">
+                <div class="pb-8" :class="{'opacity-25': isEditMode && editMode !== 'routine'}">
                     <div class="title">
                         {{ $t('PWR_SCHED.SCHED_ROUTINE') }}
                     </div>
-                    <div class="legend-lap routine">
+                    <div class="legend-group routine">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.ROUTINE_TIMER') }}</span>
-                        <div>
-                            <p-button v-if="mode !== 'READ'"
-                                      class="gray900 sm delete-all-button" :outline="true"
-                                      @click="onDeleteAllRoutine"
-                            >
-                                {{ $t('PWR_SCHED.DELETE_ALL') }}
-                            </p-button>
-                        </div>
+                        <span>{{ $t('PWR_SCHED.ROUTINE_ON') }}</span>
+                        <p-button v-if="!isCreateMode && !isEditMode"
+                                  class="edit-button gray900 sm" :outline="true"
+                                  @click="onClickStartEditMode('routine')"
+                        >
+                            {{ $t('PWR_SCHED.EDIT') }}
+                        </p-button>
+                    </div>
+                    <div class="legend-group routine-off">
+                        <span class="legend-icon" />
+                        <span v-if="!(isCreateMode || (isEditMode && editMode === 'routine'))">{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
+                        <p-button v-if="isEditMode && editMode === 'routine'"
+                                  class="edit-button gray900 sm" :outline="true"
+                                  @click="onDeleteAllRoutine"
+                        >
+                            {{ $t('PWR_SCHED.DELETE_ALL') }}
+                        </p-button>
                     </div>
                 </div>
                 <!--one time ticket-->
-                <div :class="[mode !== 'READ' ? 'opacity-25' : '', oneTimeEditMode ? 'activated' : '']">
-                    <div class="title" :class="oneTimeEditMode ? 'activated' : ''">
+                <div v-if="!isCreateMode" :class="{'opacity-25': isEditMode && editMode === 'routine'}">
+                    <div class="title">
                         {{ $t('PWR_SCHED.SCHED_ONE_TIME') }}
                     </div>
-                    <div class="legend-lap one-time-run pb-2" :class="oneTimeEditMode === 'STOP' ? 'opacity-25' : ''">
+                    <div class="legend-group one-time-run" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeRun'}">
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.RUN_SCHED') }}</span>
-                        <p-button v-if="!editMode"
+                        <p-button v-if="!isEditMode"
                                   class="edit-button gray900 sm" :outline="true"
-                                  @click="onClickStartOneTimeEditMode('RUN')"
+                                  @click="onClickStartEditMode('oneTimeRun')"
                         >
                             {{ $t('PWR_SCHED.EDIT') }}
                         </p-button>
-                        <span v-if="oneTimeEditMode === 'RUN'" class="making-ticket-text">
-                            {{ $t('PWR_SCHED.MAKING_TICKET') }}
-                        </span>
                     </div>
-                    <div class="legend-lap one-time-stop" :class="oneTimeEditMode === 'RUN' ? 'opacity-25' : ''">
+                    <div class="legend-group one-time-stop" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeStop'}">
                         <span class="legend-icon" />
                         <span>{{ $t('PWR_SCHED.STOP_SCHED') }}</span>
-                        <p-button v-if="!editMode"
+                        <p-button v-if="!isEditMode"
                                   class="edit-button gray900 sm" :outline="true"
-                                  @click="onClickStartOneTimeEditMode('STOP')"
+                                  @click="onClickStartEditMode('oneTimeStop')"
                         >
                             {{ $t('PWR_SCHED.EDIT') }}
                         </p-button>
-                        <span v-if="oneTimeEditMode === 'STOP'" class="making-ticket-text">
-                            {{ $t('PWR_SCHED.MAKING_TICKET') }}
-                        </span>
                     </div>
                 </div>
                 <!--buttons-->
                 <div class="one-time-button-lap">
-                    <p-button v-if="oneTimeEditMode"
+                    <p-button v-if="isEditMode"
                               class="gray900 sm mr-1" :outline="true"
-                              @click="onClickCancelOneTimeSchedule"
+                              @click="onClickCancel"
                     >
                         {{ $t('PWR_SCHED.CANCEL') }}
                     </p-button>
-                    <p-button v-if="oneTimeEditMode"
+                    <p-button v-if="isEditMode"
                               class="secondary sm"
-                              @click="onClickSaveOneTimeSchedule"
+                              @click="onClickSave"
                     >
                         {{ $t('PWR_SCHED.SAVE') }}
                     </p-button>
@@ -217,6 +210,11 @@ enum RULE_TYPE {
 enum RULE_STATE {
     running = 'RUNNING',
     stopped = 'STOPPED',
+}
+enum EDIT_MODE {
+    routine = 'routine',
+    oneTimeRun = 'oneTimeRun',
+    oneTimeStop = 'oneTimeStop',
 }
 
 interface RuleSettings {
@@ -282,14 +280,16 @@ export default {
                 return weekList;
             }),
             // schedule
-            editMode: computed(() => props.mode !== 'READ' || state.oneTimeEditMode),
+            isCreateMode: computed(() => props.mode === 'CREATE'),
+            isEditMode: false as boolean,
+            editMode: undefined as undefined | keyof typeof EDIT_MODE, // oneTimeRun, oneTimeStop
             editModeClassName: computed(() => {
-                if (props.mode !== 'READ') return 'routine';
-                if (state.oneTimeEditMode === 'RUN') return 'one-time-run';
-                if (state.oneTimeEditMode === 'STOP') return 'one-time-stop';
+                if (props.mode === 'CREATE') return 'routine';
+                if (state.editMode === EDIT_MODE.oneTimeRun) return 'one-time-run';
+                if (state.editMode === EDIT_MODE.oneTimeStop) return 'one-time-stop';
                 return '';
             }),
-            oneTimeEditMode: false as boolean | string,
+            // oneTimeEditMode: false as boolean | string,
             dragContainer: undefined,
             rule: {
                 routine: {} as Rule,
@@ -316,13 +316,13 @@ export default {
                 let rules = get(state.rule.routine, weekday);
                 if (rules && rules.includes(time)) {
                     if (!item.classList.contains('routine')) item.classList.add('routine');
-                    if (state.oneTimeEditMode) item.classList.add('opacity-25');
+                    if (state.isEditMode && (state.editMode !== EDIT_MODE.routine)) item.classList.add('opacity-25');
                 }
 
                 // one time
-                if (props.mode === 'READ') {
+                if (!state.isCreateMode) {
                     // run
-                    if (state.oneTimeEditMode !== 'STOP') {
+                    if (state.editMode !== EDIT_MODE.oneTimeStop) {
                         rules = get(state.rule.oneTimeRun, date);
                         if (rules && rules.includes(time)) {
                             if (!item.classList.contains('one-time-run')) item.classList.add('one-time-run');
@@ -330,7 +330,7 @@ export default {
                     }
 
                     // stop
-                    if (state.oneTimeEditMode !== 'RUN') {
+                    if (state.editMode !== EDIT_MODE.oneTimeRun) {
                         rules = get(state.rule.oneTimeStop, date);
                         if (rules && rules.includes(time)) {
                             if (!item.classList.contains('one-time-stop')) item.classList.add('one-time-stop');
@@ -489,7 +489,7 @@ export default {
                 ruleForApi: [],
             };
 
-            if (props.mode !== 'READ') {
+            if (state.isCreateMode || state.editMode === EDIT_MODE.routine) {
                 settings.ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
                 Object.entries(settings.ruleWithUTC).forEach(([k, v]) => {
                     // todo: if문 삭제해야 함
@@ -497,11 +497,11 @@ export default {
                         settings.ruleForApi.push({ day: k, times: v });
                     }
                 });
-            } else if (state.oneTimeEditMode) {
+            } else {
                 settings.ruleType = RULE_TYPE.ticket;
-                if (state.oneTimeEditMode === 'RUN') {
+                if (state.editMode === EDIT_MODE.oneTimeRun) {
                     settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeRun, RULE_TYPE.ticket);
-                } else if (state.oneTimeEditMode === 'STOP') {
+                } else if (state.editMode === EDIT_MODE.oneTimeStop) {
                     settings.ruleState = RULE_STATE.stopped;
                     settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeStop, RULE_TYPE.ticket);
                 }
@@ -605,20 +605,20 @@ export default {
 
                 const routineTimes = get(state.rule.routine, week);
 
-                if (props.mode !== 'READ') {
+                if (state.isCreateMode || state.editMode === EDIT_MODE.routine) {
                     if (routineTimes && routineTimes.includes(time)) return;
                     if (state.rule.routine[week]) state.rule.routine[week].push(time);
                     else state.rule.routine[week] = [time];
                 } else {
                     // prevent adding run(stop) tickets when the rule is (not) routine
                     const isRoutineTime = routineTimes && routineTimes.includes(time);
-                    if (state.oneTimeEditMode === 'RUN') {
+                    if (state.editMode === EDIT_MODE.oneTimeRun) {
                         const oneTimeTimes = get(state.rule.oneTimeRun, date);
                         if (isRoutineTime) return;
                         if (oneTimeTimes && oneTimeTimes.includes(time)) return;
                         if (state.rule.oneTimeRun[date]) state.rule.oneTimeRun[date].push(time);
                         else state.rule.oneTimeRun[date] = [time];
-                    } else if (state.oneTimeEditMode === 'STOP') {
+                    } else if (state.editMode === EDIT_MODE.oneTimeStop) {
                         const oneTimeTimes = get(state.rule.oneTimeStop, date);
                         if (!isRoutineTime) return;
                         if (oneTimeTimes && oneTimeTimes.includes(time)) return;
@@ -634,7 +634,7 @@ export default {
             setStyleClass();
         };
         const onClickTimeBlock = (e) => {
-            if (!state.editMode) return;
+            if (!state.isCreateMode || !state.isEditMode) return;
 
             const classList = e.target.classList;
             const date = classList[1];
@@ -644,7 +644,7 @@ export default {
             const routineTimes = get(state.rule.routine, week);
             const isRoutineTime = routineTimes && routineTimes.includes(time);
 
-            if (props.mode !== 'READ') {
+            if (state.isCreateMode || state.editMode === 'routine') {
                 if (routineTimes && routineTimes.includes(time)) { // already exists
                     const idx = routineTimes.indexOf(time);
                     state.rule.routine[week].splice(idx, 1);
@@ -654,21 +654,17 @@ export default {
                     state.rule.routine[week] = [time];
                 }
             } else {
-                if (state.oneTimeEditMode === 'RUN' && isRoutineTime) return;
-                if (state.oneTimeEditMode === 'STOP' && !isRoutineTime) return;
+                if (state.editMode === 'oneTimeRun' && isRoutineTime) return;
+                if (state.editMode === 'oneTimeStop' && !isRoutineTime) return;
 
-                let editMode: string;
-                if (state.oneTimeEditMode === 'RUN') editMode = 'oneTimeRun';
-                else editMode = 'oneTimeStop';
-
-                const oneTimeTimes = get(state.rule[editMode], date);
+                const oneTimeTimes = get(state.rule[state.editMode], date);
                 if (oneTimeTimes && oneTimeTimes.includes(time)) { // already exists
                     const idx = oneTimeTimes.indexOf(time);
-                    state.rule[editMode][date].splice(idx, 1);
-                } else if (state.rule[editMode][date]) {
-                    state.rule[editMode][date].push(time);
+                    state.rule[state.editMode][date].splice(idx, 1);
+                } else if (state.rule[state.editMode][date]) {
+                    state.rule[state.editMode][date].push(time);
                 } else {
-                    state.rule[editMode][date] = [time];
+                    state.rule[state.editMode][date] = [time];
                 }
             }
 
@@ -688,19 +684,20 @@ export default {
             setStyleClass();
             state.showHelpBlock = true;
         };
-        const onClickStartOneTimeEditMode = (type) => {
-            state.oneTimeEditMode = type;
+        const onClickStartEditMode = (type) => {
+            state.isEditMode = true;
+            state.editMode = type;
             setStyleClass();
         };
-        const onClickSaveOneTimeSchedule = async () => {
+        const onClickSave = async () => {
             await createOrUpdate(props.scheduleId);
             await getScheduleRule();
 
-            state.oneTimeEditMode = false;
+            state.isEditMode = false;
             setStyleClass();
         };
-        const onClickCancelOneTimeSchedule = async () => {
-            state.oneTimeEditMode = false;
+        const onClickCancel = async () => {
+            state.isEditMode = false;
             await getScheduleRule();
             setStyleClass();
         };
@@ -719,21 +716,18 @@ export default {
 
         watch(() => props.scheduleId, async (after, before) => {
             if (after !== before) {
-                state.oneTimeEditMode = false;
+                state.editMode = false;
                 await getScheduleRule();
                 setStyleClass();
             }
         }, { immediate: true });
         watch(() => props.mode, async (after) => {
-            if (after === 'READ') {
+            if (after === 'CREATE') {
+                state.showHelpBlock = true;
+            } else {
                 state.showHelpBlock = false;
                 await getScheduleRule();
                 setStyleClass();
-            } else if (after === 'UPDATE') {
-                state.oneTimeEditMode = false;
-                setStyleClass();
-            } else if (after === 'CREATE') {
-                state.showHelpBlock = true;
             }
         }, { immediate: true });
         watch(() => state.currentDate, () => {
@@ -754,9 +748,9 @@ export default {
             onSelectStart,
             onSelectEnd,
             onDeleteAllRoutine,
-            onClickStartOneTimeEditMode,
-            onClickSaveOneTimeSchedule,
-            onClickCancelOneTimeSchedule,
+            onClickStartEditMode,
+            onClickSave,
+            onClickCancel,
             onClickTimeBlock,
             onMouseEnterTimeBlock,
             onMouseLeaveTimeBlock,
@@ -807,7 +801,7 @@ export default {
             &.editing {
                 cursor: crosshair;
                 .time-section {
-                    @apply bg-blue-200;
+                    @apply bg-secondary2;
                 }
                 .time-section {
                     .time {
@@ -818,23 +812,18 @@ export default {
                 }
                 .data-section {
                     .weekday-row {
-                        @apply bg-blue-200;
-                        .weekday-item {
-                            &.today {
-                                @apply text-secondary;
-                            }
-                        }
+                        @apply bg-secondary2;
                     }
                 }
             }
             .time-section {
-                @apply bg-primary3 border-r border-gray-200;
+                @apply border-r border-gray-200;
                 display: inline-block;
                 width: 3rem;
                 cursor: default;
                 .icon-item {
                     @apply border-b border-gray-200;
-                    height: 3.125rem;
+                    height: 3rem;
                 }
                 .time {
                     @apply text-gray-900;
@@ -855,9 +844,10 @@ export default {
                     top: 50%;
                 }
                 .weekday-row {
-                    @apply bg-primary3 border-b border-gray-200;
+                    @apply border-b border-gray-200;
+                    display: flex;
                     width: 100%;
-                    height: 3.125rem;
+                    height: 3rem;
                     cursor: default;
                     .weekday-item {
                         @apply text-gray-900 border-l border-gray-200;
@@ -866,12 +856,24 @@ export default {
                         height: 100%;
                         font-size: 0.75rem;
                         text-align: center;
-                        padding: 0.625rem;
+                        padding: 0.5rem;
                         .weekday-text {
                             font-weight: bold;
                         }
+                        .weekday-number-text {
+                            width: 1.25rem;
+                            height: 1.25rem;
+                            line-height: 1.25rem;
+                            border-radius: 50%;
+                            margin: auto;
+                        }
                         &.today {
-                            @apply text-primary;
+                            .weekday-text {
+                                @apply text-secondary;
+                            }
+                            .weekday-number-text {
+                                @apply bg-secondary text-white;
+                            }
                         }
                         &:first-of-type {
                             @apply border-l-0;
@@ -879,7 +881,7 @@ export default {
                     }
                 }
                 .item-row {
-                    @apply bg-white border-b border-gray-200;
+                    @apply bg-gray-100 border-b border-gray-200;
                     display: flex;
                     width: 100%;
                     height: 1rem;
@@ -887,7 +889,7 @@ export default {
                         @apply border-b-0;
                     }
                     &:hover {
-                        @apply bg-gray-100;
+                        @apply bg-gray-200;
                     }
                     .item {
                         @apply border-l border-gray-200;
@@ -957,8 +959,11 @@ export default {
             border-top-right-radius: 2px;
             border-bottom-right-radius: 2px;
             padding: 1.5rem;
+            &.editing {
+                @apply bg-secondary2;
+            }
             .title {
-                @apply text-gray-400;
+                @apply text-gray-900;
                 font-weight: bold;
                 line-height: 1.5rem;
                 padding-bottom: 0.5rem;
@@ -966,37 +971,40 @@ export default {
                     @apply text-secondary;
                 }
             }
-            .legend-lap {
+            .legend-group {
                 line-height: 1.25rem;
+                vertical-align: middle;
+                padding-bottom: 0.5rem;
                 &.routine {
                     @apply text-point-violet;
                     .legend-icon {
                         @apply bg-point-violet;
                     }
                 }
-                &.one-time-run {
-                    @apply text-peacock-300;
+                &.routine-off {
+                    @apply text-gray-400;
                     .legend-icon {
-                        @apply bg-peacock-300;
+                        @apply bg-gray-300;
+                    }
+                }
+                &.one-time-run {
+                    @apply text-point-violet;
+                    .legend-icon {
+                        background: repeating-linear-gradient(45deg, theme('colors.pointViolet'), theme('colors.pointViolet') 2px, white 0, white 4px);
                     }
                 }
                 &.one-time-stop {
-                    @apply text-red-500;
+                    @apply text-gray-400;
                     .legend-icon {
-                        @apply bg-red-400;
+                        background: repeating-linear-gradient(45deg, theme('colors.gray.700'), theme('colors.gray.700') 2px, white 0, white 4px);
                     }
                 }
                 .legend-icon {
                     display: inline-block;
                     width: 0.75rem;
                     height: 0.75rem;
-                    vertical-align: baseline;
                     border-radius: 2px;
                     margin-right: 0.5rem;
-                }
-                .delete-all-button {
-                    @apply border-gray-300;
-                    margin-top: 0.5rem;
                 }
                 .edit-button {
                     @apply border-gray-300;
