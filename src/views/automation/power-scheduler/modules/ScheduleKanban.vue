@@ -312,7 +312,6 @@ export default {
         };
 
         const onResourceGroupConfirm = (resourceGroupItem: ResourceGroupItem) => {
-            hideResourceGroupPage();
             // update case
             if (state.selectedItem) {
                 state.columns[state.selectedColumnIndex].items[state.selectedResourceGroupIndex] = {
@@ -327,6 +326,8 @@ export default {
                 });
                 state.columns = [...state.columns];
             }
+
+            hideResourceGroupPage();
         };
 
         const hideGuide = () => {
