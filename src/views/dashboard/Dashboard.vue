@@ -3,24 +3,25 @@
         <service-summary class="col-start-1 col-end-13
                                 sm:col-end-5
                                 lg:col-end-4"
-                         v-bind="projects.state"
+                         v-bind="projectSummaryState"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-5 sm:col-end-9
                                 lg:col-start-4 lg:col-end-7"
-                         v-bind="servers.state"
+                         v-bind="serverSummaryState"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-9
                                 lg:col-start-7 lg:col-end-10"
-                         v-bind="cloudServices.state"
+                         v-bind="cloudServiceSummaryState"
         />
         <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
                                  row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
         />
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
-                              daily-updates" />
+                              daily-updates"
+        />
         <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
                              lg:row-start-2"
         />
@@ -33,17 +34,29 @@
 </template>
 
 <script lang="ts">
+import { Location } from 'vue-router';
+
+import { reactive } from '@vue/composition-api';
+
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
-import { blue, secondary, secondary1 } from '@/styles/colors';
-import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
+
 import { Stat } from '@/lib/fluent-api/statistics/resource';
+import { blue, secondary, secondary1 } from '@/styles/colors';
+
+
+interface SummaryState {
+    type: string;
+    title: string;
+    to: Location | string;
+    color: string;
+}
+
 
 export default {
     name: 'Dashboard',
@@ -57,31 +70,25 @@ export default {
         Collectors,
     },
     setup() {
-        const projects = new ServiceSummaryWidgetState({
+        const projectSummaryState: SummaryState = reactive({
+            type: 'project',
             title: 'projects',
             to: '/project',
             color: blue[600],
-            getAction: api => api.setResourceType('identity.Project'),
-            getTrendAction: api => api.setTopic('daily_project_count')
-                .addGroupField('count', STAT_OPERATORS.sum, 'values.project_count'),
         });
 
-        const servers = new ServiceSummaryWidgetState({
+        const serverSummaryState: SummaryState = reactive({
+            type: 'server',
             title: 'servers',
             to: '/inventory/server',
             color: secondary,
-            getAction: api => api.setResourceType('inventory.Server'),
-            getTrendAction: api => api.setTopic('daily_server_count')
-                .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
         });
 
-        const cloudServices = new ServiceSummaryWidgetState({
+        const cloudServiceSummaryState: SummaryState = reactive({
+            type: 'cloudService',
             title: 'cloud services',
             to: '/inventory/cloud-service',
             color: secondary1,
-            getAction: api => api.setResourceType('inventory.CloudService'),
-            getTrendAction: api => api.setTopic('daily_cloud_service_count')
-                .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });
 
         const topics = ({
@@ -90,9 +97,9 @@ export default {
         });
 
         return {
-            projects,
-            servers,
-            cloudServices,
+            projectSummaryState,
+            serverSummaryState,
+            cloudServiceSummaryState,
             topics,
             cloudServiceWidgetGetAction(apiAction: Stat) {
                 return apiAction
@@ -103,26 +110,6 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss">
-    /*@media (max-width: 477px) {*/
-    /*    html, body {*/
-    /*        font-size: 12px;*/
-    /*    }*/
-    /*}*/
-
-    /*@media (min-width: 478px) and (max-width: 676px) {*/
-    /*    html, body {*/
-    /*        font-size: 14px;*/
-    /*    }*/
-    /*}*/
-
-    /*@media (min-width: 768px) {*/
-    /*    html, body {*/
-    /*        font-size: 16px;*/
-    /*    }*/
-    /*}*/
-</style>
 
 <style lang="postcss" scoped>
     .dashboard::v-deep {

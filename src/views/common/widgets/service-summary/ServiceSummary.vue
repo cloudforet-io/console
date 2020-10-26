@@ -23,58 +23,92 @@
 </template>
 
 <script lang="ts">
+import { maxBy, minBy, chain } from 'lodash';
+import Color from 'color';
+import numeral from 'numeral';
+import Chart, { ChartColor } from 'chart.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+
 import {
     computed, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import numeral from 'numeral';
-import {
-    serviceSummaryProps,
-    ServiceSummaryPropsType, Trend, Value,
-} from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+
 import AnimatedNumber from 'animated-number-vue';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import { gray, blue } from '@/styles/colors';
-import { FILTER_OPERATOR, fluentApi } from '@/lib/fluent-api';
-import { maxBy, minBy, chain } from 'lodash';
-import moment from 'moment';
-import Chart, { ChartColor } from 'chart.js';
-import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
-import Color from 'color';
 
+import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
+import { colorset } from '@/lib/util';
+import { SpaceConnector } from '@/lib/space-connector';
+import { gray, blue } from '@/styles/colors';
+
+dayjs.extend(utc);
+dayjs.extend(tz);
+
+
+const GRADIENT_HEIGHT = 80;
+
+interface ChartData {
+    count: number;
+    date: string;
+}
+
+interface State {
+    loading: boolean;
+    chartRef: HTMLCanvasElement|null;
+    chart: Chart|null;
+    data: ChartData[];
+    count: number;
+    errored: boolean;
+    noChange: boolean;
+    isDataReady: boolean;
+}
 
 export default {
     name: 'ServiceSummary',
-    components: { PWidgetLayout, PChartLoader, AnimatedNumber },
-    props: serviceSummaryProps,
-    setup(props: ServiceSummaryPropsType) {
-        interface StateInterface {
-            chartRef: HTMLCanvasElement|null;
-            chart: Chart|null;
-            data: Trend[];
-            loading: boolean;
-            count: number;
-            errored: boolean;
-            noChange: boolean;
-            isDataReady: boolean;
-        }
-
-        const state: UnwrapRef<StateInterface> = reactive({
+    components: {
+        PWidgetLayout,
+        PChartLoader,
+        AnimatedNumber,
+    },
+    props: {
+        type: {
+            type: String,
+            required: true,
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        to: {
+            type: [String, Object],
+            default: '/dashboard',
+        },
+        color: {
+            type: String,
+            default: colorset[0],
+        },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
+    },
+    setup(props) {
+        const state: UnwrapRef<State> = reactive({
+            loading: true,
             chartRef: null,
             chart: null,
             data: [],
-            loading: true,
             count: 0,
             errored: false,
             noChange: computed(() => state.data.every(d => d.count === state.data[0].count)),
             isDataReady: false,
         });
 
+        /* util */
         const countFormatter = (val): string => (val < 10000 ? numeral(val).format('0,0') : numeral(val).format('0.0a'));
-
-        const gradientHeight = 80;
-        const ticksCount = 2;
-
         const drawChart = (canvas) => {
             const maxItem = maxBy(state.data, 'count');
             const minItem = minBy(state.data, 'count');
@@ -206,7 +240,7 @@ export default {
                     lineTension: 0.02,
                     backgroundColor: (): ChartColor => {
                         const color = state.errored ? gray.default : props.color;
-                        const gradient = canvas.getContext('2d')?.createLinearGradient(0, 0, 0, gradientHeight);
+                        const gradient = canvas.getContext('2d')?.createLinearGradient(0, 0, 0, GRADIENT_HEIGHT);
                         if (gradient) {
                             gradient.addColorStop(0, Color(color).alpha(0.25).toString());
                             gradient.addColorStop(0.5, Color(color).alpha(0.125).toString());
@@ -218,51 +252,54 @@ export default {
                 });
         };
 
-        watch([() => state.chartRef, () => state.isDataReady], ([ctx, isDataReady]) => {
-            if (ctx && isDataReady) {
-                drawChart(ctx);
-            }
-        }, {
-            immediate: false,
-        });
-
-
-        const countApi = fluentApi.statisticsTest().resource().stat<Value>().setCount('count');
-
-        const trendApi = fluentApi.statisticsTest().history().stat<Trend>()
-            .addGroupKey('created_at', 'date')
-            .setFilter(
-                { key: 'created_at', value: 'now/d-30d', operator: FILTER_OPERATOR.gtTime },
-            );
-
-        const getCount = async (): Promise<void> => {
+        /* api */
+        const getCount = async () => {
             try {
-                const res = await props.getAction(countApi).execute();
-                state.count = res.data.results[0]?.count || 0;
+                let res;
+                if (props.type === 'project') {
+                    res = await SpaceConnector.client.statistics.topic.projectCount();
+                } else if (props.type === 'server') {
+                    res = await SpaceConnector.client.statistics.topic.serverCount({
+                        project_id: props.projectId,
+                    });
+                } else if (props.type === 'cloudService') {
+                    res = await SpaceConnector.client.statistics.topic.cloudServiceCount({
+                        project_id: props.projectId,
+                    });
+                }
+                state.count = res.results[0]?.count || 0;
             } catch (e) {
                 console.error(e);
             }
         };
-
-        const getTrend = async (): Promise<void> => {
+        const getTrend = async () => {
             const padItem = { count: 0, date: '' };
             try {
-                const res = await props.getTrendAction(trendApi).execute();
-                // no data case
-                if (res.data.results.length === 0) {
+                let res;
+                if (props.type === 'project') {
+                    res = await SpaceConnector.client.statistics.topic.dailyProjectCount();
+                } else if (props.type === 'server') {
+                    res = await SpaceConnector.client.statistics.topic.dailyServerCount({
+                        project_id: props.projectId,
+                    });
+                } else if (props.type === 'cloudService') {
+                    res = await SpaceConnector.client.statistics.topic.dailyCloudServiceCount({
+                        project_id: props.projectId,
+                    });
+                }
+
+                if (res.results.length === 0) {
                     state.data = [padItem, padItem];
-                    // one data case
-                } else if (res.data.results.length === 1) {
-                    const item = res.data.results[0];
+                } else if (res.results.length === 1) {
+                    const item = res.results[0];
                     item.count = state.count;
-                    item.date = moment(item.date).format('M/D');
+                    item.date = dayjs(item.date).format('M/D');
                     state.data = [padItem, item, { ...padItem, count: item.count }];
-                    // more than one data case
                 } else {
-                    state.data = chain(res.data.results)
+                    state.data = chain(res.results)
                         .sortBy('date')
                         .forEach((d) => {
-                            d.date = moment(d.date).format('M/D');
+                            d.date = dayjs(d.date).format('M/D');
                         })
                         .value();
                     state.data[state.data.length - 1].count = state.count;
@@ -278,8 +315,7 @@ export default {
             }
         };
 
-
-        const getData = async (): Promise<void> => {
+        const init = async () => {
             state.loading = true;
             state.data = [];
             state.count = 0;
@@ -292,8 +328,15 @@ export default {
                 state.loading = false;
             }
         };
+        init();
 
-        getData();
+        watch([() => state.chartRef, () => state.isDataReady], ([ctx, isDataReady]) => {
+            if (ctx && isDataReady) {
+                drawChart(ctx);
+            }
+        }, {
+            immediate: false,
+        });
 
         return {
             ...toRefs(state),

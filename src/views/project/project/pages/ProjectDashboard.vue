@@ -4,12 +4,14 @@
                                 sm:col-end-6
                                 lg:col-end-5
                                 "
-                         v-bind="serverSummary.state"
+                         v-bind="serverSummaryState"
+                         :project-id="projectId"
         />
         <service-summary class="col-start-1 col-end-13
                                 sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-9"
-                         v-bind="cloudServiceSummary.state"
+                         v-bind="cloudServiceSummaryState"
+                         :project-id="projectId"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
                                sm:col-end-13 lg:row-start-2 cloud-service"
@@ -54,19 +56,30 @@
 </template>
 
 <script lang="ts">
+import { Location } from 'vue-router';
+
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
-import { blue, secondary, secondary1 } from '@/styles/colors';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+
+import { blue, secondary, secondary1 } from '@/styles/colors';
+
 import { makeTrItems } from '@/lib/view-helper';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
-import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
-import { ServiceSummaryWidgetState } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
+
+
+interface SummaryState {
+    type: string;
+    title: string;
+    to: Location | string;
+    color: string;
+}
 
 export default {
     name: 'ProjectDashboard',
@@ -104,43 +117,56 @@ export default {
             activeTab: 'server',
         });
 
-        const serverSummary = new ServiceSummaryWidgetState({
+        const serverSummaryState: SummaryState = reactive({
+            type: 'server',
             title: 'servers',
-            to: `/inventory/server?filters=project_id%3A${projectId.value}`,
+            to: '/inventory/server',
             color: secondary,
-            getAction: api => api.setResourceType('identity.Project')
-                .setFilter({
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                }).setResourceType('inventory.Server'),
-            getTrendAction: api => api.setTopic('daily_server_count')
-                .setFilter({
-                    key: 'values.project_id',
-                    value: projectId.value,
-                    operator: '=',
-                })
-                .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
         });
 
-        const cloudServiceSummary = new ServiceSummaryWidgetState({
+        const cloudServiceSummaryState: SummaryState = reactive({
+            type: 'cloudService',
             title: 'cloud services',
-            to: `/inventory/cloud-service?filters=project_id%3A${projectId.value}&provider=all`,
+            to: '/inventory/cloud-service',
             color: secondary1,
-            getAction: api => api.setResourceType('identity.Project')
-                .setFilter({
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                }).setResourceType('inventory.CloudService'),
-            getTrendAction: api => api.setTopic('daily_cloud_service_count')
-                .setFilter({
-                    key: 'values.project_id',
-                    value: projectId.value,
-                    operator: '=',
-                })
-                .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
         });
+        // const serverSummary = new ServiceSummaryWidgetState({
+        //     title: 'servers',
+        //     to: `/inventory/server?filters=project_id%3A${projectId.value}`,
+        //     color: secondary,
+        //     getAction: api => api.setResourceType('identity.Project')
+        //         .setFilter({
+        //             key: 'project_id',
+        //             value: projectId.value,
+        //             operator: '=',
+        //         }).setResourceType('inventory.Server'),
+        //     getTrendAction: api => api.setTopic('daily_server_count')
+        //         .setFilter({
+        //             key: 'values.project_id',
+        //             value: projectId.value,
+        //             operator: '=',
+        //         })
+        //         .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
+        // });
+
+        // const cloudServiceSummary = new ServiceSummaryWidgetState({
+        //     title: 'cloud services',
+        //     to: `/inventory/cloud-service?filters=project_id%3A${projectId.value}&provider=all`,
+        //     color: secondary1,
+        //     getAction: api => api.setResourceType('identity.Project')
+        //         .setFilter({
+        //             key: 'project_id',
+        //             value: projectId.value,
+        //             operator: '=',
+        //         }).setResourceType('inventory.CloudService'),
+        //     getTrendAction: api => api.setTopic('daily_cloud_service_count')
+        //         .setFilter({
+        //             key: 'values.project_id',
+        //             value: projectId.value,
+        //             operator: '=',
+        //         })
+        //         .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
+        // });
 
         const dailyUpdates = ({
             server: api => api.setId(projectId.value),
@@ -152,8 +178,8 @@ export default {
             ...toRefs(tabData),
             projectId,
             projectFilter,
-            serverSummary,
-            cloudServiceSummary,
+            serverSummaryState,
+            cloudServiceSummaryState,
             dailyUpdates,
             getCloudServiceCount(apiAction: Stat) {
                 return apiAction

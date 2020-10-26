@@ -41,33 +41,40 @@
 </template>
 
 <script lang="ts">
+import { map, forEach, range } from 'lodash';
+import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
+import Color from 'color';
+
 import {
-    getCurrentInstance, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+
 import {
     black, violet, white, yellow,
 } from '@/styles/colors';
-import { map, forEach, range } from 'lodash';
-import Color from 'color';
-import { fluentApi } from '@/lib/fluent-api';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import {
-    serviceAccountsProps,
-    ServiceAccountsPropsType,
-} from '@/views/common/widgets/service-accounts/ServiceAccounts.toolset';
-import { store } from '@/store';
-import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
+import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
+
 
 const DEFAULT_COUNT = 4;
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 
+interface Data {
+    provider?: string;
+    name: string;
+    icon: string;
+    color: string;
+    count: number;
+    href: string;
+}
 
 export default {
     name: 'ServiceAccounts',
@@ -79,40 +86,14 @@ export default {
         PSkeleton,
         PChartLoader,
     },
-    props: serviceAccountsProps,
-    setup(props: ServiceAccountsPropsType) {
-        const vm: any = getCurrentInstance();
-
-        interface Value {
-            provider: string;
-            count: number;
-        }
-
-        const api = fluentApi.statisticsTest().resource().stat<Value>()
-            .addGroupKey('provider', 'provider')
-            .addGroupField('count', STAT_OPERATORS.count)
-            .setSort('count');
-
-        interface Item {
-            provider: string;
-            name: string;
-            icon: string;
-            color: string;
-            count: number;
-            href: string;
-        }
-
+    setup() {
         const state = reactive({
+            skeletons: range(4),
+            loading: true,
+            //
             loaderRef: null,
             chartRef: null,
-            data: [] as Array<{
-                name: string;
-                icon: string;
-                color: string;
-                count: number;
-                href: string;
-            }>,
-            loading: true,
+            data: [] as Data[],
             chart: null as null|Chart,
         });
 
@@ -228,21 +209,13 @@ export default {
             });
         };
 
-        // draw loader chart or data chart
-        watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
-            if (loaderCtx) {
-                drawChart(loaderCtx, true);
-            } else if (chartCtx) drawChart(chartCtx, false);
-        }, { immediate: true });
-
-
-        const getData = async (): Promise<void> => {
+        const getData = async () => {
             state.loading = true;
             state.data = [];
             await store.dispatch('resource/provider/load');
             try {
-                const res = await props.getAction(api).execute();
-                const others: Item = {
+                const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider();
+                const others: Data = {
                     name: 'Others',
                     icon: 'ic_provider_other',
                     color: yellow[500],
@@ -252,8 +225,8 @@ export default {
                 };
                 const providers = store.state.resource.provider.items;
 
-                if (res.data.results.length > 0) {
-                    forEach(res.data.results, (d: Value, i) => {
+                if (res.results.length > 0) {
+                    forEach(res.results, (d) => {
                         if (providers[d.provider]) {
                             state.data.push({
                                 name: providers[d.provider].label || d.provider,
@@ -277,14 +250,20 @@ export default {
             }
         };
 
-        getData();
+        const init = async () => {
+            await getData();
+        };
+        init();
+
+        // draw loader chart or data chart
+        watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
+            if (loaderCtx) {
+                drawChart(loaderCtx, true);
+            } else if (chartCtx) drawChart(chartCtx, false);
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
-            skeletons: range(4),
-            onSelected(item): void {
-                vm.$router.push('/identity/service-account');
-            },
         };
     },
 };

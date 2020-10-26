@@ -71,66 +71,62 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { store } from '@/store';
-import { getTimezone } from '@/lib/util';
+/* eslint-disable camelcase */
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+
+import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
+
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+
+import { store } from '@/store';
+import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-    interface CloudService {
-        // eslint-disable-next-line camelcase
-        cloud_service_group: string;
-        // eslint-disable-next-line camelcase
-        cloud_service_type: string;
-        // eslint-disable-next-line camelcase
-        total_count: number;
-        provider: string;
-        icon: string;
-        // eslint-disable-next-line camelcase
-        created_count: number;
-        // eslint-disable-next-line camelcase
-        deleted_count: number;
-    }
 
-    interface Server {
-        // eslint-disable-next-line camelcase
-        server_type: string;
-        // eslint-disable-next-line camelcase
-        total_count: number;
-        // eslint-disable-next-line camelcase
-        created_count: number;
-        // eslint-disable-next-line camelcase
-        deleted_count: number;
-    }
+interface CloudService {
+    cloud_service_group: string;
+    cloud_service_type: string;
+    total_count: number;
+    provider: string;
+    icon: string;
+    created_count: number;
+    deleted_count: number;
+}
 
-    interface Data {
-        group: string;
-        type: string;
-        isServer?: boolean;
-        count: number;
-        icon?: string;
-        provider?: string;
-        defaultIcon?: string;
-    }
+interface Server {
+    server_type: string;
+    total_count: number;
+    created_count: number;
+    deleted_count: number;
+}
 
-    interface State {
-        serverData: Server[];
-        cloudServiceData: CloudService[];
-        data: Data[];
-        loading: boolean;
-        widgetRef: any;
-        dailyUpdates: boolean;
-    }
+interface Data {
+    group: string;
+    type: string;
+    isServer?: boolean;
+    count: number;
+    icon?: string;
+    provider?: string;
+    defaultIcon?: string;
+}
+
+interface State {
+    serverData: Server[];
+    cloudServiceData: CloudService[];
+    data: Data[];
+    loading: boolean;
+    widgetRef: any;
+    dailyUpdates: boolean;
+}
 
 const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
 const getDeletedAtFilters = () => `filters=deleted_at:=${dayjs().format('YYYY-MM-DD')}&filters=state:=DELETED`;
@@ -171,7 +167,6 @@ export default {
                 const params: any = {
                     timezone: getTimezone(),
                 };
-                    // eslint-disable-next-line camelcase
                 if (props.projectId) params.project_id = props.projectId;
                 const res = await serverAPI(params);
                 state.serverData = res.results;
@@ -187,7 +182,6 @@ export default {
                 const params: any = {
                     timezone: getTimezone(),
                 };
-                    // eslint-disable-next-line camelcase
                 if (props.projectId) params.project_id = props.projectId;
                 const res = await cloudServiceAPI(params);
                 state.cloudServiceData = res.results;
@@ -207,9 +201,7 @@ export default {
                         type: d.server_type,
                         count: d.total_count,
                         isServer: true,
-                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
-                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
                         createdHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getCreatedAtFilters()}`,
@@ -220,9 +212,7 @@ export default {
                         type: d.cloud_service_type,
                         count: d.total_count,
                         provider: d.provider,
-                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
-                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
                         href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
@@ -237,9 +227,7 @@ export default {
                         type: d.server_type,
                         count: d.total_count,
                         isServer: true,
-                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
-                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
                         createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
@@ -249,9 +237,7 @@ export default {
                         group: d.cloud_service_group,
                         type: d.cloud_service_type,
                         count: d.total_count,
-                        // eslint-disable-next-line camelcase
                         created_count: d.created_count,
-                        // eslint-disable-next-line camelcase
                         deleted_count: d.deleted_count,
                         provider: d.provider,
                         icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
