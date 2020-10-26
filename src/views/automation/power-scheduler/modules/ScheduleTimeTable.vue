@@ -272,7 +272,10 @@ export default {
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
             ],
             timezone: computed(() => store.state.user.timezone),
-            today: computed(() => dayjs().tz(state.timezone).format('YYYY-MM-DD')),
+            today: computed(() => {
+                if (state.timezone === 'UTC') return dayjs().utc().format('YYYY-MM-DD');
+                return dayjs().tz(state.timezone).format('YYYY-MM-DD');
+            }),
             currentDate: dayjs(),
             currentWeekList: computed(() => {
                 let weekStart = state.currentDate.tz(state.timezone).startOf('week');
@@ -303,8 +306,14 @@ export default {
             showHelpBlock: false,
             //
             hoveredTime: null,
-            currentHour: computed(() => Number(dayjs().tz(state.timezone).format('HH'))),
-            currentMinute: computed(() => Number(dayjs().tz(state.timezone).format('mm'))),
+            currentHour: computed(() => {
+                if (state.timezone === 'UTC') return Number(dayjs().utc().format('HH'));
+                return Number(dayjs().tz(state.timezone).format('HH'));
+            }),
+            currentMinute: computed(() => {
+                if (state.timezone === 'UTC') return Number(dayjs().utc().format('mm'));
+                return Number(dayjs().tz(state.timezone).format('mm'));
+            }),
             currentTimeBarStyle: computed(() => {
                 if (60 / state.currentMinute > 4) return { top: 0 };
                 if (60 / state.currentMinute > 2) return { top: '25%' };
