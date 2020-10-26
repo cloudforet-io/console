@@ -97,7 +97,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
+import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/views/plugin/collector/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { makeProxy } from '@/lib/compostion-util';

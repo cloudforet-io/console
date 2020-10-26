@@ -138,7 +138,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 
-import { ProviderModel } from '@/lib/fluent-api/identity/provider';
+import { ProviderModel } from '@/views/identity/service-account/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
@@ -151,8 +151,8 @@ import router from '@/routes';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import { TimeStamp } from '@/lib/fluent-api';
+import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
+import { TimeStamp } from '@/models';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

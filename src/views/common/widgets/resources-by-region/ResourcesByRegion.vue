@@ -47,6 +47,7 @@
 
 <script lang="ts">
 import {
+    ComponentRenderProxy,
     computed,
     getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -61,18 +62,13 @@ import {
     blue, coral, green, peacock, violet, white, yellow,
 } from '@/styles/colors';
 import {
-    map, range
+    map, range,
 } from 'lodash';
 import Color from 'color';
-import { fluentApi } from '@/lib/fluent-api';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import {
-    resourceByRegionProps,
-    ResourcesByRegionProps,
-} from '@/views/common/widgets/resources-by-region/ResourcesByRegion.toolset';
 import { store } from '@/store';
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { ChartDataSets, ChartOptions } from 'chart.js';
+import { SpaceConnector } from '@/lib/space-connector';
 
 interface Value {
     provider: string;
@@ -93,6 +89,27 @@ const colors = [coral[500], blue[500], violet[500], yellow[500], green[400],
 const DEFAULT_COUNT = 4;
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 
+const resourceByRegionProps = {
+    projectFilter: {
+        type: String,
+        default: '',
+    },
+    isServer: {
+        type: Boolean,
+        default: true,
+    },
+    projectId: {
+        type: String,
+        default: '',
+    },
+};
+
+interface ResourcesByRegionProps {
+    projectFilter: string;
+    projectId: string;
+    isServer: boolean;
+}
+
 export default {
     name: 'ResourcesByRegion',
     components: {
@@ -105,11 +122,7 @@ export default {
     },
     props: resourceByRegionProps,
     setup(props: ResourcesByRegionProps) {
-        const vm: any = getCurrentInstance();
-
-        const api = fluentApi.statisticsTest().resource().stat<Value>()
-            .addGroupKey('provider', 'provider')
-            .addGroupField('count', STAT_OPERATORS.count);
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             chartRef: null,
@@ -243,14 +256,45 @@ export default {
             icon: 'ic_provider_other',
         }));
 
+        const getServerData = async () => {
+            let result;
+            if (props.projectId) {
+                result = await SpaceConnector.client.statistics.topic.serverByRegion({
+                    project_id: props.projectId,
+                });
+            } else {
+                result = await SpaceConnector.client.statistics.topic.serverByRegion({
+                    project_id: props.projectId,
+                });
+            }
+            return result;
+        };
+
+        const getCloudServiceData = async () => {
+            let result;
+            if (props.projectId) {
+                result = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
+                    project_id: props.projectId,
+                });
+            } else {
+                result = await SpaceConnector.client.statistics.topic.serverByRegion({
+                    project_id: props.projectId,
+                });
+            }
+            return result;
+        };
+
+
         const getData = async (): Promise<void> => {
             state.loading = true;
             state.data = [];
+            let res;
             await store.dispatch('resource/provider/load');
             const providers = store.state.resource.provider.items;
             try {
-                const res = await props.getAction(api).execute();
-                state.data = res.data.results.map((item, index) => ({
+                if (props.isServer) res = await getServerData();
+                else res = await getCloudServiceData();
+                state.data = res.results.map((item, index) => ({
                     name: item.region_name,
                     count: item.count,
                     provider: item.provider,

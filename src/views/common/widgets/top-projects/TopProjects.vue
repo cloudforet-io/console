@@ -153,11 +153,10 @@ import {
 import PI from '@/components/atoms/icons/PI.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import { fluentApi } from '@/lib/fluent-api';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import Chart, { ChartDataSets } from 'chart.js';
+import { SpaceConnector } from '@/lib/space-connector';
 
 const DATA_COUNT = 5;
 const DEFAULT_MAX = 1000;
@@ -321,31 +320,11 @@ export default {
             immediate: false,
         });
 
-
-        const api = fluentApi.statisticsTest().resource().stat<Value>()
-            .setResourceType('identity.Project')
-            .addGroupKey('project_id', 'project_id')
-            .addGroupKey('name', 'project')
-            .addGroupKey('project_group.project_group_id', 'project_group_id')
-            .addGroupKey('project_group.name', 'project_group')
-            .setJoinResourceType('inventory.Server')
-            .addJoinKey('project_id')
-            .addJoinGroupKey('project_id', 'project_id')
-            .addJoinGroupField('servers', STAT_OPERATORS.count)
-            .setJoinResourceType('inventory.CloudService', 1)
-            .addJoinKey('project_id', 1)
-            .addJoinGroupKey('project_id', 'project_id', 1)
-            .addJoinGroupField('cloud_services', STAT_OPERATORS.count, undefined, 1)
-            .addFormula('total', 'cloud_services + servers')
-            .setSort('total')
-            .setLimit(5);
-
-
         const getData = async (): Promise<void> => {
             state.loading = true;
             try {
-                const res = await api.execute();
-                state.data = res.data.results;
+                const res = await SpaceConnector.client.statistics.topic.topProject();
+                state.data = res.results;
             } catch (e) {
                 console.error(e);
                 state.data = [];

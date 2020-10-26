@@ -106,8 +106,8 @@ import {
 } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { COLLECT_MODE, CollectorModel } from '@/lib/fluent-api/inventory/collector.type';
-import { TimeStamp } from '@/lib/fluent-api';
+import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
+import { TimeStamp } from '@/models';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',

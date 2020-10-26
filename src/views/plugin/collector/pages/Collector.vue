@@ -164,7 +164,6 @@ import {
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeTrItems } from '@/lib/view-helper';
-import { fluentApi } from '@/lib/fluent-api';
 import config from '@/lib/config';
 import router from '@/routes';
 
@@ -341,14 +340,13 @@ export default {
             routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
         });
         const checkModalState: UnwrapRef<{
-                visible: boolean; mode: string; title: string; subTitle: string; themeColor: string; api;
+                visible: boolean; mode: string; title: string; subTitle: string; themeColor: string;
             }> = reactive({
                 visible: false,
                 mode: '',
                 title: '',
                 subTitle: '',
                 themeColor: '',
-                api: fluentApi.inventory().collector().enable(),
                 tableCheckFields: computed(() => makeTrItems([
                     ['name', 'COMMON.NAME'],
                     ['state', 'COMMON.STATE'],
@@ -449,7 +447,21 @@ export default {
         };
         const checkModalConfirm = async (): Promise<void> => {
             try {
-                await checkModalState.api.execute();
+                if (checkModalState.mode === 'enable') {
+                    await SpaceConnector.client.inventory.collector.enable({
+                        collectors: state.selectedItems.map(d => d.collector_id),
+                    });
+                }
+                if (checkModalState.mode === 'disable') {
+                    await SpaceConnector.client.inventory.collector.disable({
+                        collectors: state.selectedItems.map(d => d.collector_id),
+                    });
+                }
+                if (checkModalState.mode === 'delete') {
+                    await SpaceConnector.client.inventory.collector.delete({
+                        collectors: state.selectedItems.map(d => d.collector_id),
+                    });
+                }
                 showSuccessMessage('success', checkModalState.title, context.root);
             } catch (e) {
                 console.error(e);
@@ -465,8 +477,6 @@ export default {
         };
         const onClickEnable = (): void => {
             checkModalState.mode = 'enable';
-            checkModalState.api = fluentApi.inventory().collector().enable()
-                .setIds(state.selectedItems.map(d => d.collector_id));
             checkModalState.title = 'Enable Collector';
             checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
             checkModalState.themeColor = 'primary';
@@ -474,8 +484,6 @@ export default {
         };
         const onClickDisable = (): void => {
             checkModalState.mode = 'disable';
-            checkModalState.api = fluentApi.inventory().collector().disable()
-                .setIds(state.selectedItems.map(d => d.collector_id));
             checkModalState.title = 'Disable Collector';
             checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
             checkModalState.themeColor = 'primary';
@@ -483,8 +491,6 @@ export default {
         };
         const onClickDelete = (): void => {
             checkModalState.mode = 'delete';
-            checkModalState.api = fluentApi.inventory().collector().delete()
-                .setIds(state.selectedItems.map(d => d.collector_id));
             checkModalState.title = 'Delete Collector';
             checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
             checkModalState.themeColor = 'alert';

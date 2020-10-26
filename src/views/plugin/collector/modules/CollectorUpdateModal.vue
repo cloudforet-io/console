@@ -87,7 +87,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { CollectorPluginModel, CollectorUpdateParameter } from '@/lib/fluent-api/inventory/collector.type';
+import { CollectorPluginModel, CollectorUpdateParameter } from '@/views/plugin/collector/type';
 
 export default {
     name: 'CollectorUpdateModal',

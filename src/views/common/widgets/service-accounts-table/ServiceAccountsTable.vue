@@ -80,9 +80,8 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetL
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { gray, secondary, secondary1 } from '@/styles/colors';
-import { fluentApi } from '@/lib/fluent-api';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
-import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
+import { store } from '@/store';
+import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'ServiceAccountsTable',
@@ -92,10 +91,6 @@ export default {
     },
     setup(props, context) {
         const projectId = computed<string>(() => context.root.$route.params.id as string);
-        const {
-            provider,
-        } = useStore();
-        const providerStore: ProviderStoreType = provider;
 
             interface DataType {
                 provider: string;
@@ -123,53 +118,20 @@ export default {
                     ['cloud_service_count', 'FIELD.CLOUD_SERVICE'],
                     ['secret_count', 'FIELD.CREDENTIALS'],
                 ])),
+                providers: computed(() => store.state.resource.provider.items),
             });
-
-            const api = fluentApi.statisticsTest().resource().stat<DataType>()
-                .setFilter({
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                })
-                .setResourceType('identity.ServiceAccount')
-                .addGroupKey('provider', 'provider')
-                .addGroupKey('service_account_id', 'service_account_id')
-                .addGroupKey('name', 'service_account_name')
-
-                .setJoinResourceType('inventory.Server')
-                .addJoinKey('service_account_id')
-                .addJoinUnwind({
-                    path: 'collection_info.service_accounts',
-                })
-                .addJoinGroupKey('collection_info.service_accounts', 'service_account_id')
-                .addJoinGroupField('server_count', STAT_OPERATORS.count, undefined)
-
-                .addJoinKey('service_account_id', 1)
-                .setJoinResourceType('inventory.CloudService', 1)
-                .addJoinUnwind({
-                    path: 'collection_info.service_accounts',
-                }, 1)
-                .addJoinGroupKey('collection_info.service_accounts', 'service_account_id', 1)
-                .addJoinGroupField('cloud_service_count', STAT_OPERATORS.count, undefined, 1)
-
-                .setJoinResourceType('secret.Secret', 2)
-                .addJoinKey('service_account_id', 2)
-                .addJoinGroupKey('service_account_id', 'service_account_id', 2)
-                .addJoinGroupField('secret_count', STAT_OPERATORS.count, undefined, 2)
-
-                .addFormula('resource_count', 'server_count + cloud_service_count')
-                .setSort('resource_count');
 
             const getData = async () => {
                 state.loading = true;
                 state.data = [];
-                await providerStore.getProvider();
+                await store.dispatch('resource/provider/load');
                 try {
-                    const res = await api.execute();
-                    const providers: ProviderInfo = providerStore.state.providers;
-                    state.data = res.data.results.map(item => ({
+                    const res = await SpaceConnector.client.statistics.topic.serviceAccountSummary({
+                        project_id: projectId.value,
+                    });
+                    state.data = res.results.map(item => ({
                         provider: item.provider,
-                        provider_color: providers[item.provider].color,
+                        provider_color: state.providers[item.provider].color,
                         service_account_name: item.service_account_name,
                         service_account_id: item.service_account_id,
                         cloud_service_count: item.cloud_service_count || 0,

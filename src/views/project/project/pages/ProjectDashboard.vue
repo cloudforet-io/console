@@ -22,7 +22,6 @@
             <p-tab :tabs="tabs" :active-tab.sync="activeTab">
                 <template #server>
                     <resources-by-region
-                        :get-action="resources.server"
                         :project-filter="projectFilter"
                         :project-id="projectId"
                         :is-server="true"
@@ -30,8 +29,8 @@
                 </template>
                 <template #cloud_service>
                     <resources-by-region
-                        :get-action="resources.cloudService"
                         :project-filter="projectFilter"
+                        :project-id="projectId"
                         :is-server="false"
                     />
                 </template>
@@ -62,7 +61,6 @@ import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { FILTER_OPERATOR } from '@/lib/fluent-api';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { Stat } from '@/lib/fluent-api/statistics/resource';
@@ -149,29 +147,6 @@ export default {
             cloudService: api => api.setId(projectId.value),
         });
 
-        const resources = ({
-            server: api => api.addGroupKey('region_code', 'region_name')
-                .setFilter({
-                    key: 'region_code',
-                    value: [null, ''],
-                    operator: FILTER_OPERATOR.notIn,
-                }, {
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                }).setResourceType('inventory.Server'),
-            cloudService: api => api.addGroupKey('region_code', 'region_name')
-                .setFilter({
-                    key: 'project_id',
-                    value: projectId.value,
-                    operator: '=',
-                }, {
-                    key: 'region_code',
-                    value: [null, ''],
-                    operator: FILTER_OPERATOR.notIn,
-                }).setResourceType('inventory.CloudService'),
-        });
-
         return {
             ...toRefs(state),
             ...toRefs(tabData),
@@ -180,7 +155,6 @@ export default {
             serverSummary,
             cloudServiceSummary,
             dailyUpdates,
-            resources,
             getCloudServiceCount(apiAction: Stat) {
                 return apiAction
                     .setJoinType('INNER')
