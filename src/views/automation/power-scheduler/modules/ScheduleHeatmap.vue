@@ -10,6 +10,10 @@
 
 <script lang="ts">
 import { map } from 'lodash';
+import { changeTimezoneToLocal } from '@/views/automation/power-scheduler/lib/util';
+import { RULE_TYPE } from '@/views/automation/power-scheduler/type';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { store } from '@/store';
 
 export default {
     name: 'ScheduleHeatmap',
@@ -20,6 +24,9 @@ export default {
         },
     },
     setup(props, context) {
+        const state = reactive({
+            timezone: computed(() => (store.state.user.timezone ? store.state.user.timezone : 'UTC')),
+        });
         const getHeatMapColor = (length: number) => {
             let color = '';
             switch (true) {
@@ -41,9 +48,16 @@ export default {
 
         let scheduleHeatMapColor: string[][] = [];
 
+        const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
         if (props.schedule.length > 0) {
             map(props.schedule, (sd) => {
-                const dailyHeatMapColor: string[] = map(sd.rule, d => getHeatMapColor(d.times.length));
+                const scheduleRuleWithTimezone = changeTimezoneToLocal(sd.rule, RULE_TYPE.routine, state.timezone);
+                const ruleObjForSorting = {};
+                scheduleRuleWithTimezone.forEach((r) => {
+                    ruleObjForSorting[r.day] = r.times;
+                });
+                const sortedRule = weekdays.map(w => ruleObjForSorting[w]);
+                const dailyHeatMapColor: string[] = map(sortedRule, d => getHeatMapColor(d.length));
                 scheduleHeatMapColor.push(dailyHeatMapColor);
             });
         } else {
@@ -51,6 +65,7 @@ export default {
         }
 
         return {
+            ...toRefs(state),
             scheduleHeatMapColor,
         };
     },

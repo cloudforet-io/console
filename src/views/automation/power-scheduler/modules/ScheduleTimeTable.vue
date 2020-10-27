@@ -187,35 +187,34 @@ import timezone from 'dayjs/plugin/timezone';
 import { VueSelecto } from 'vue-selecto';
 
 import {
-    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy, watch, onMounted,
+    ComponentRenderProxy,
+    computed,
+    getCurrentInstance,
+    onMounted,
+    reactive,
+    toRefs,
+    watch,
 } from '@vue/composition-api';
 
 import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { ViewMode } from '@/views/automation/power-scheduler/type';
+import {
+    RoutineRule,
+    Rule, RULE_STATE, RULE_TYPE, TicketRule, ViewMode,
+} from '@/views/automation/power-scheduler/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { changeTimezoneToLocal, changeTimezoneToUTC } from '@/views/automation/power-scheduler/lib/util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-interface Rule {
-    [key: string]: number[];
-}
 
-enum RULE_TYPE {
-    routine = 'ROUTINE',
-    ticket = 'TICKET',
-}
-enum RULE_STATE {
-    running = 'RUNNING',
-    stopped = 'STOPPED',
-}
 enum EDIT_MODE {
     routine = 'routine',
     oneTimeRun = 'oneTimeRun',
@@ -225,8 +224,7 @@ enum EDIT_MODE {
 interface RuleSettings {
     ruleType: RULE_TYPE;
     ruleState: RULE_STATE;
-    ruleWithUTC: Rule;
-    ruleForApi: object[];
+    ruleWithUTC: RoutineRule[] | TicketRule[];
 }
 
 interface Props {
@@ -361,108 +359,6 @@ export default {
                 }
             });
         };
-        const changeTimezoneToUTC = (rule: Rule, ruleType) => {
-            if (state.timezone === 'UTC') return rule;
-
-            // routine
-            if (ruleType === RULE_TYPE.routine) {
-                const newRule = {
-                    sun: [],
-                    mon: [],
-                    tue: [],
-                    wed: [],
-                    thu: [],
-                    fri: [],
-                    sat: [],
-                };
-                const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-                const offsetHours = (dayjs().tz(state.timezone).utcOffset()) / 60;
-                Object.entries(rule).forEach(([weekday, times]) => {
-                    times.forEach((time) => {
-                        let newTime = time - offsetHours;
-                        if (newTime > 0) {
-                            newRule[weekday].push(newTime);
-                        } else {
-                            newTime += 24;
-                            const weekIdx = weekdays.indexOf(weekday);
-                            if (weekIdx === 0) {
-                                newRule[weekdays[6]].push(newTime);
-                            } else {
-                                newRule[weekdays[weekIdx - 1]].push(newTime);
-                            }
-                        }
-                    });
-                });
-                return newRule;
-            }
-
-            // one time
-            const newRule = {};
-            Object.entries(rule).forEach(([date, times]) => {
-                times.forEach((time) => {
-                    const utcRawDate = dayjs(`${date} ${time}:00`).utc();
-                    const utcDate = utcRawDate.format('YYYY-MM-DD');
-                    const utcHour = Number(utcRawDate.format('H'));
-                    if (utcDate in newRule) {
-                        newRule[utcDate].push(utcHour);
-                    } else {
-                        newRule[utcDate] = [utcHour];
-                    }
-                });
-            });
-            return newRule;
-        };
-        const changeTimezoneToLocal = (rule: Rule, ruleType) => {
-            let newRule = {};
-
-            if (ruleType === RULE_TYPE.routine) {
-                newRule = {
-                    sun: [],
-                    mon: [],
-                    tue: [],
-                    wed: [],
-                    thu: [],
-                    fri: [],
-                    sat: [],
-                };
-                const offsetHours = (dayjs().tz(state.timezone).utcOffset()) / 60;
-                const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-                Object.entries(rule).forEach(([weekday, times]) => {
-                    times.forEach((time) => {
-                        let newTime = time + offsetHours;
-                        if (newTime < 24) {
-                            newRule[weekday].push(newTime);
-                        } else {
-                            newTime -= 24;
-                            const weekIdx = weekdays.indexOf(weekday);
-                            if (weekIdx === 6) {
-                                newRule[weekdays[0]].push(newTime);
-                            } else {
-                                newRule[weekdays[weekIdx + 1]].push(newTime);
-                            }
-                        }
-                    });
-                });
-            } else if (ruleType === RULE_TYPE.ticket) {
-                if (state.timezone === 'UTC') newRule = rule;
-                else {
-                    Object.entries(rule).forEach(([date, times]) => {
-                        times.forEach((time) => {
-                            const utcDate = dayjs.utc(`${date} ${time}:00`);
-                            const localDate = utcDate.tz(state.timezone).format('YYYY-MM-DD');
-                            const localHour = Number(utcDate.tz(state.timezone).format('H'));
-                            if (localDate in newRule) {
-                                newRule[localDate].push(localHour);
-                            } else {
-                                newRule[localDate] = [localHour];
-                            }
-                        });
-                    });
-                }
-            }
-
-            return newRule;
-        };
 
         /* api */
         const getScheduleRule = async () => {
@@ -479,21 +375,19 @@ export default {
                     schedule_id: props.scheduleId,
                 });
                 res.results.forEach((scheduleRule) => {
-                    const rule: Rule = {};
+                    const scheduleRuleWithTimezone = changeTimezoneToLocal(scheduleRule.rule, scheduleRule.rule_type, state.timezone);
                     if (scheduleRule.rule_type === RULE_TYPE.routine) {
-                        scheduleRule.rule.forEach((r) => {
-                            rule[r.day] = r.times;
+                        scheduleRuleWithTimezone.forEach((r) => {
+                            state.rule.routine[r.day] = r.times;
                         });
-                        state.rule.routine = changeTimezoneToLocal(rule, scheduleRule.rule_type);
-                    } else {
-                        scheduleRule.rule.forEach((r) => {
-                            rule[r.date] = r.times;
+                    } else if (scheduleRule.rule_type === RULE_TYPE.ticket && scheduleRule.state === RULE_STATE.running) {
+                        scheduleRuleWithTimezone.forEach((r) => {
+                            state.rule.oneTimeRun[r.date] = r.times;
                         });
-                        if (scheduleRule.state === RULE_STATE.running) {
-                            state.rule.oneTimeRun = changeTimezoneToLocal(rule, scheduleRule.rule_type);
-                        } else if (scheduleRule.state === RULE_STATE.stopped) {
-                            state.rule.oneTimeStop = changeTimezoneToLocal(rule, scheduleRule.rule_type);
-                        }
+                    } else if (scheduleRule.rule_type === RULE_TYPE.ticket && scheduleRule.state === RULE_STATE.stopped) {
+                        scheduleRuleWithTimezone.forEach((r) => {
+                            state.rule.oneTimeStop[r.date] = r.times;
+                        });
                     }
                 });
             } catch (e) {
@@ -506,33 +400,29 @@ export default {
             const settings: RuleSettings = {
                 ruleType: RULE_TYPE.routine,
                 ruleState: RULE_STATE.running,
-                ruleWithUTC: {},
-                ruleForApi: [],
+                ruleWithUTC: [],
             };
 
+            const scheduleRule = [] as RoutineRule[] | TicketRule[];
             if (state.isCreateMode || state.editMode === EDIT_MODE.routine) {
-                settings.ruleWithUTC = changeTimezoneToUTC(state.rule.routine, RULE_TYPE.routine);
-                Object.entries(settings.ruleWithUTC).forEach(([k, v]) => {
-                    // todo: if문 삭제해야 함
-                    if (v.length > 0) {
-                        settings.ruleForApi.push({ day: k, times: v });
-                    }
+                Object.keys(state.rule.routine).forEach((k) => {
+                    scheduleRule.push({ day: k, times: state.rule.routine[k] });
                 });
+                settings.ruleWithUTC = changeTimezoneToUTC(scheduleRule, RULE_TYPE.routine, state.timezone);
             } else {
                 settings.ruleType = RULE_TYPE.ticket;
                 if (state.editMode === EDIT_MODE.oneTimeRun) {
-                    settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeRun, RULE_TYPE.ticket);
+                    Object.keys(state.rule.oneTimeRun).forEach((k) => {
+                        scheduleRule.push({ date: k, times: state.rule.oneTimeRun[k] });
+                    });
                 } else if (state.editMode === EDIT_MODE.oneTimeStop) {
                     settings.ruleState = RULE_STATE.stopped;
-                    settings.ruleWithUTC = changeTimezoneToUTC(state.rule.oneTimeStop, RULE_TYPE.ticket);
+                    Object.keys(state.rule.oneTimeStop).forEach((k) => {
+                        scheduleRule.push({ date: k, times: state.rule.oneTimeStop[k] });
+                    });
                 }
-                Object.entries(settings.ruleWithUTC).forEach(([k, v]) => {
-                    if (v.length > 0) {
-                        settings.ruleForApi.push({ date: k, times: v });
-                    }
-                });
+                settings.ruleWithUTC = changeTimezoneToUTC(scheduleRule, RULE_TYPE.ticket, state.timezone);
             }
-
             return settings;
         };
         const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
@@ -561,14 +451,14 @@ export default {
         };
         const updateOrDelete = async (settings: RuleSettings, scheduleRuleId: string) => {
             try {
-                if (settings.ruleForApi.length === 0) {
+                if (settings.ruleWithUTC.length === 0) {
                     await SpaceConnector.client.powerScheduler.scheduleRule.delete({
                         schedule_rule_id: scheduleRuleId,
                     });
                 } else {
                     await SpaceConnector.client.powerScheduler.scheduleRule.update({
                         schedule_rule_id: scheduleRuleId,
-                        rule: settings.ruleForApi,
+                        rule: settings.ruleWithUTC,
                     });
                 }
                 if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.TT.EDIT_SUCCESS'), root);
@@ -578,7 +468,7 @@ export default {
             }
         };
         const create = async (settings: RuleSettings, scheduleId: string) => {
-            if (settings.ruleForApi.length === 0) return;
+            if (settings.ruleWithUTC.length === 0) return;
             try {
                 await SpaceConnector.client.powerScheduler.scheduleRule.create({
                     user_id: store.state.user.userId,
@@ -586,7 +476,7 @@ export default {
                     rule_type: settings.ruleType,
                     name: `${settings.ruleType} - ${settings.ruleState}`,
                     state: settings.ruleState,
-                    rule: settings.ruleForApi,
+                    rule: settings.ruleWithUTC,
                 });
             } catch (e) {
                 console.error(e);
@@ -737,7 +627,7 @@ export default {
         /* etc */
         const isRuleExist = () => {
             const settings = getRuleSettings();
-            return settings.ruleForApi.length > 0;
+            return settings.ruleWithUTC.length > 0;
         };
 
         watch(() => props.scheduleId, async (after, before) => {

@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
 import { QueryFilters } from '@/lib/type';
 import { Filter } from '@/lib/space-connector/type';
-import { gray, safe, coral, peacock } from '@/styles/colors';
+import {
+    gray, safe, coral, peacock,
+} from '@/styles/colors';
 
 export const modes = ['READ', 'CREATE'];
 export type ViewMode = typeof modes[number];
@@ -74,3 +76,28 @@ export interface KanbanItem {
 }
 
 export type ResourceGroupItem = Pick<Required<KanbanItem>, 'resource_group'|'count'|'name'|'recommended'>
+
+
+// ScheduleTimeTable
+export interface Rule {
+    [key: string]: number[];
+}
+
+export interface RoutineRule {
+    day?: string;
+    times: number[];
+}
+
+export interface TicketRule {
+    date?: string;
+    times: number[];
+}
+
+export enum RULE_TYPE {
+    routine = 'ROUTINE',
+    ticket = 'TICKET',
+}
+export enum RULE_STATE {
+    running = 'RUNNING',
+    stopped = 'STOPPED',
+}
