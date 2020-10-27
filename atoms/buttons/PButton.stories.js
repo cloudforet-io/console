@@ -1,14 +1,20 @@
 import { select, text, boolean } from '@storybook/addon-knobs/vue';
+import { withDesign } from 'storybook-addon-designs';
 import { action } from '@storybook/addon-actions';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
     title: 'atoms/buttons',
     component: PButton,
+    decorators: [withDesign],
     parameters: {
         info: {
             summary: '',
             components: { PButton },
+        },
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=100%3A47',
         },
     },
 };
@@ -17,7 +23,7 @@ const actions = {
 };
 const data = {};
 
-export const DefaultCase = () => ({
+export const defaultCase = () => ({
     components: { PButton },
     template: `
 <p-button
@@ -74,7 +80,6 @@ export const DefaultCase = () => ({
         ...actions,
     },
 });
-
 
 export const block = () => ({
     components: { PButton },
