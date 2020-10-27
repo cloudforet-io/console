@@ -15,7 +15,6 @@ import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import Codemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
-import '@/styles/style.scss';
 import '@/styles/style.pcss';
 import config from '@/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
