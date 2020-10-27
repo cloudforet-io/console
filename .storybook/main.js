@@ -23,6 +23,7 @@ module.exports = {
       }
     },
     '@storybook/addon-google-analytics',
+    'storybook-addon-designs/register'
   ],
   webpackFinal:  async (config) => {
 

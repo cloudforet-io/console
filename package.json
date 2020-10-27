@@ -134,6 +134,7 @@
     "postcss-simple-vars": "^5.0.2",
     "resolve-url-loader": "^3.1.0",
     "sass-loader": "^7.3.1",
+    "storybook-addon-designs": "^5.4.2",
     "storybook-addon-vue-info": "^1.4.1",
     "style-loader": "^1.0.0",
     "stylelint": "^13.2.1",

@@ -2,6 +2,7 @@ import {configure, addParameters, addDecorator} from '@storybook/vue';
 import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
 import '@storybook/addon-console';
+import { withDesign } from 'storybook-addon-designs';
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
@@ -78,6 +79,7 @@ addParameters({
 addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
+addDecorator(withDesign);
 addDecorator(() => ({
     i18n,
     router: new VueRouter(),
