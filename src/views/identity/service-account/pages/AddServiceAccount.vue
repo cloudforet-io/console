@@ -116,7 +116,7 @@
                               :resource-name="$t('WORD.SERVICE_ACCOUNT')"
                               :target-name="accountName"
         />
-        <div class="button-lap">
+        <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
                       :disabled="!isValid"
                       @click="onClickSave"
@@ -424,93 +424,93 @@ export default {
 };
 </script>
 
-<style lang="postcss">
-    .add-service-account-container {
-        .p-page-title {
-            .icon {
-                display: inline-block;
-                margin-left: 0.5rem;
-                margin-right: 0.5rem;
-                margin-top: -0.25rem;
-            }
+<style lang="postcss" scoped>
+.add-service-account-container {
+    .p-page-title {
+        .icon {
+            display: inline-block;
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            margin-top: -0.25rem;
         }
-        .p-pane-layout {
-            width: 100%;
-            padding: 2rem 1rem;
-            margin-bottom: 1rem;
-            &:nth-last-child(1) {
-                @apply mb-0;
-            }
-            .title {
-                font-size: 1.5rem;
-                line-height: 120%;
-                margin-bottom: 2rem;
-            }
-            .tag-title {
-                font-size: 0.875rem;
-                font-weight: bold;
-                line-height: 120%;
-                margin-top: 1rem;
-                margin-bottom: 0.5rem;
-            }
-            .tag-help-msg {
-                font-size: 0.875rem;
-                line-height: 150%;
-                margin-bottom: 1.5rem;
-            }
-            .p-field-group {
-                .p-text-input {
-                    width: 100%;
-                    @screen lg {
-                        max-width: 50%;
-                    }
-                    &.invalid {
-                        @apply border border-red-500;
-                    }
-                }
-            }
-            .secret-type-text {
-                margin-right: 4.375rem;
-            }
-            .custom-schema-box {
-                @apply border border-gray-200;
-                border-radius: 0.125rem;
-                border-left-width: 0.25rem;
-                padding-left: 2rem;
-                padding-right: 2rem;
-                padding-bottom: 2rem;
-                margin-bottom: -2rem;
-                .form-label {
-                    margin-top: 1.5rem;
-                }
-            }
-            .p-text-editor {
-                .CodeMirror {
-                    font-family: Inconsolata, monospace;
-                    line-height: 1.5;
-                    height: 14.375rem;
-                    padding: 1rem;
-                    margin: 0 0 -2rem;
-                }
-            }
+    }
+    .p-pane-layout {
+        width: 100%;
+        padding: 2rem 1rem;
+        margin-bottom: 1rem;
+        &:nth-last-child(1) {
+            @apply mb-0;
         }
-
-        .tree-panel {
-            width: 100%;
-            padding: 2rem 1rem;
-            margin-bottom: 1rem;
-            &:nth-last-child(1) {
-                margin-bottom: 0;
-            }
+        .title {
+            font-size: 1.5rem;
+            line-height: 120%;
+            margin-bottom: 2rem;
         }
-
-        .button-lap {
-            display: flex;
-            flex-direction: row-reverse;
+        .tag-title {
+            font-size: 0.875rem;
+            font-weight: bold;
+            line-height: 120%;
             margin-top: 1rem;
-            .text-button {
-                margin-left: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .tag-help-msg {
+            font-size: 0.875rem;
+            line-height: 150%;
+            margin-bottom: 1.5rem;
+        }
+        .p-field-group {
+            .p-text-input {
+                width: 100%;
+                @screen lg {
+                    max-width: 50%;
+                }
+                &.invalid {
+                    @apply border border-red-500;
+                }
+            }
+        }
+        .secret-type-text {
+            margin-right: 4.375rem;
+        }
+        .custom-schema-box {
+            @apply border border-gray-200;
+            border-radius: 0.125rem;
+            border-left-width: 0.25rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-bottom: 2rem;
+            margin-bottom: -2rem;
+            .form-label {
+                margin-top: 1.5rem;
+            }
+        }
+        .p-text-editor {
+            .CodeMirror {
+                font-family: Inconsolata, monospace;
+                line-height: 1.5;
+                height: 14.375rem;
+                padding: 1rem;
+                margin: 0 0 -2rem;
             }
         }
     }
+
+    .tree-panel {
+        width: 100%;
+        padding: 2rem 1rem;
+        margin-bottom: 1rem;
+        &:nth-last-child(1) {
+            margin-bottom: 0;
+        }
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: row-reverse;
+        margin-top: 1rem;
+        .text-button {
+            margin-left: 1rem;
+        }
+    }
+}
 </style>

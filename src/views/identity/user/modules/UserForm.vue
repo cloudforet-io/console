@@ -10,8 +10,8 @@
                     @confirm="confirm"
     >
         <template #body>
-            <div class="user-input-lap">
-                <div class="top-lap">
+            <div class="user-input-wrapper">
+                <div class="top-part">
                     <p-field-group :label="$t('COMMON.USER_ID')"
                                    :required="true"
                                    :invalid-text="invalidMsg.user_id"
@@ -37,8 +37,8 @@
                     </p-field-group>
                 </div>
                 <p-hr class="p-divider" />
-                <div class="bottom-lap">
-                    <div class="bottom-left-lap">
+                <div class="bottom-part">
+                    <div class="bottom-left-part">
                         <p-field-group v-if="formState.is_local_auth"
                                        label="Password"
                                        :invalid-text="invalidMsg.password1"
@@ -71,7 +71,7 @@
                             <p-select-dropdown v-model="formState.timezone" :items="timezoneSelectItems" />
                         </p-field-group>
                     </div>
-                    <div class="bottom-right-lap">
+                    <div class="bottom-right-part">
                         <p-field-group v-if="formState.is_local_auth"
                                        label="Password Check"
                                        :invalid-text="invalidMsg.password2"
@@ -312,16 +312,16 @@ export default {
 
 <style lang="postcss">
 .user-form-modal {
-    .user-input-lap {
-        .top-lap {
+    .user-input-wrapper {
+        .top-part {
             padding-bottom: 0.25rem;
         }
-        .bottom-lap {
-            .bottom-left-lap {
+        .bottom-part {
+            .bottom-left-part {
                 display: inline-grid;
                 width: 50%;
             }
-            .bottom-right-lap {
+            .bottom-right-part {
                 display: inline-grid;
                 width: 50%;
             }

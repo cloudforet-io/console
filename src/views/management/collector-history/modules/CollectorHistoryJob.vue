@@ -1,8 +1,8 @@
 <template>
-    <div class="collector-history-job">
+    <div class="collector-history-job-container">
         <p-collapsible-panel>
             <template #content>
-                <div class="more-information-lap">
+                <div class="more-information-wrapper">
                     <div>
                         <span class="info-title">Collector Name: </span>
                         <span class="info-text">{{ collectorName }}</span>
@@ -14,7 +14,7 @@
                 </div>
             </template>
         </p-collapsible-panel>
-        <p-horizontal-layout class="job-tasks-lap">
+        <p-horizontal-layout class="job-tasks-wrapper">
             <template #container="{ height }">
                 <p-query-search-table
                     :loading="loading"
@@ -37,16 +37,15 @@
                     @rowLeftClick="onSelect"
                 >
                     <template #toolbox-top>
-                        <div class="toolbox-filter-button-lap">
-                            <div v-for="(status, idx) in statusList"
-                                 :key="idx"
-                                 class="filter-button-lap"
-                            >
-                                <span class="filter-button"
-                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                      @click="onClickStatus(status.key)"
-                                >{{ status.label }}</span>
-                            </div>
+                        <div v-for="(status, idx) in statusList"
+                             :key="idx"
+                             class="filter-button-wrapper"
+                        >
+                            <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                            <span class="filter-button"
+                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                  @click="onClickStatus(status.key)"
+                            >{{ status.label }}</span>
                         </div>
                     </template>
                     <template #col-sequence-format="{ value }">
@@ -58,7 +57,7 @@
                 </p-query-search-table>
             </template>
         </p-horizontal-layout>
-        <div v-if="selectedItem" class="error-list-lap">
+        <div v-if="selectedItem" class="error-list-wrapper">
             <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
                 Error List
             </p-panel-top>
@@ -87,6 +86,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { capitalize, find } from 'lodash';
 import moment from 'moment';
 
@@ -192,8 +192,12 @@ export default {
             statusList: [
                 { key: 'all', label: 'All', class: 'all' },
                 { key: 'inProgress', label: 'In-Progress', class: 'in-progress' },
-                { key: 'success', label: 'Success', class: 'success' },
-                { key: 'failure', label: 'Failure', class: 'failure' },
+                {
+                    key: 'success', label: 'Success', class: 'success', icon: true,
+                },
+                {
+                    key: 'failure', label: 'Failure', class: 'failure', icon: true,
+                },
             ],
             activatedStatus: 'all',
             //
@@ -388,9 +392,9 @@ export default {
 };
 </script>
 
-<style lang="postcss">
-.collector-history-job {
-    .more-information-lap {
+<style lang="postcss" scoped>
+.collector-history-job-container {
+    .more-information-wrapper {
         position: relative;
         font-size: 0.75rem;
         line-height: 150%;
@@ -406,7 +410,7 @@ export default {
         }
     }
 
-    .job-tasks-lap {
+    .job-tasks-wrapper {
         .p-query-search-table {
             .p-data-table {
                 .failure {
@@ -414,9 +418,52 @@ export default {
                 }
             }
         }
+        .toolbox-top {
+            .filter-button-wrapper {
+                @apply border-r border-gray-200;
+                display: inline-block;
+                padding: 0 1rem;
+                &:first-child {
+                    padding-left: 0;
+                }
+                &:last-child {
+                    @apply border-none;
+                }
+                .legend-icon {
+                    display: inline-block;
+                    width: 0.75rem;
+                    height: 0.75rem;
+                    border-radius: 2px;
+                    margin-right: 7px;
+                    &.success {
+                        @apply bg-primary;
+                    }
+                    &.failure {
+                        @apply bg-red-500;
+                    }
+                }
+                .filter-button {
+                    @apply text-gray-400;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    &:hover, &:focus {
+                        @apply text-gray-900;
+                    }
+                    &.active {
+                        @apply text-gray-900;
+                        font-weight: bold;
+                        &:before {
+                        }
+                    }
+                    &.failure:hover, &.failure:focus, &.failure.active {
+                        @apply text-red-500;
+                    }
+                }
+            }
+        }
     }
 
-    .error-list-lap {
+    .error-list-wrapper {
         @apply border border-gray-200;
         border-radius: 0.125rem;
         padding-bottom: 2.375rem;

@@ -1,10 +1,10 @@
 <template>
     <div class="menu-container">
-        <div class="left">
-            <div class="site-map-lap">
+        <div class="left-part">
+            <div class="site-map-wrapper">
                 <site-map :is-domain-owner="userState.isDomainOwner" :visible.sync="sitemapVisible" />
             </div>
-            <div class="logo-lap">
+            <div class="logo-wrapper">
                 <router-link to="/dashboard">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden lg:inline-block"
@@ -14,7 +14,7 @@
             </div>
             <div v-for="(dItem, idx) in defaultMenuList"
                  :key="idx"
-                 class="menu-lap hidden lg:inline-block"
+                 class="menu-wrapper hidden lg:inline-block"
             >
                 <div class="menu-button opacity mr-4 lg:mr-8"
                      :class="[{
@@ -55,8 +55,8 @@
             </div>
         </div>
 
-        <div class="right">
-            <div class="menu-lap">
+        <div class="right-part">
+            <div class="menu-wrapper">
                 <div class="menu-button opacity"
                      :class="{opened: openedMenu === 'support'}"
                      @click.stop="toggleMenu('support')"
@@ -75,7 +75,7 @@
                     <template #item--format="{item}" />
                 </p-context-menu>
             </div>
-            <div class="menu-lap account ml-6">
+            <div class="menu-wrapper account ml-6">
                 <div class="menu-button account"
                      @click.stop="toggleMenu('account')"
                 >
@@ -338,27 +338,65 @@ export default {
     display: flex !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
-    .left, .right {
+    .left-part, .right-part {
         line-height: 3rem;
     }
 
-    .right {
+    .left-part {
+        .site-map-wrapper {
+            display: inline-block;
+            margin: 0 1rem;
+        }
+        .logo-wrapper {
+            display: inline-block;
+            margin-right: 1.5rem;
+
+            .brand-logo {
+                display: inline-block;
+                width: 2rem;
+                height: 2rem;
+            }
+            .brand-logo-text {
+                height: 0.875rem;
+                margin-left: 0.5rem;
+            }
+        }
+    }
+
+    .right-part {
         position: absolute;
         display: inline-flex;
         right: 0;
         padding-right: 1.5rem;
     }
 
-    .site-map-lap {
-        display: inline-block;
-        margin: 0 1rem;
-    }
-    .menu-lap {
+    .menu-wrapper {
         position: relative;
 
         &.account {
             .p-context-menu {
                 min-width: 15.125rem;
+            }
+            .menu-button {
+                .menu-icon {
+                    width: 2rem;
+                    height: 2rem;
+                    overflow: hidden;
+                    background-size: cover;
+                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
+                    margin-top: 0.5rem;
+
+                    &.admin {
+                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
+                    }
+                    &.member {
+                        background: url('~@/assets/icons/user.svg') no-repeat center center;
+                    }
+
+                    &.opened {
+                        box-shadow: inset 0 0 0 2px theme('colors.primary');
+                    }
+                }
             }
         }
         .menu-button {
@@ -382,28 +420,6 @@ export default {
             &:hover {
                 @apply text-primary;
                 opacity: 1;
-            }
-
-            &.account {
-                .menu-icon {
-                    width: 2rem;
-                    height: 2rem;
-                    overflow: hidden;
-                    background-size: cover;
-                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
-                    margin-top: 0.5rem;
-
-                    &.admin {
-                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
-                    }
-                    &.member {
-                        background: url('~@/assets/icons/user.svg') no-repeat center center;
-                    }
-
-                    &.opened {
-                        box-shadow: inset 0 0 0 2px theme('colors.primary');
-                    }
-                }
             }
 
             .menu-icon {
@@ -448,20 +464,6 @@ export default {
                 cursor: default;
                 margin-left: 0.25rem;
             }
-        }
-    }
-    .logo-lap {
-        display: inline-block;
-        margin-right: 1.5rem;
-
-        .brand-logo {
-            display: inline-block;
-            width: 2rem;
-            height: 2rem;
-        }
-        .brand-logo-text {
-            height: 0.875rem;
-            margin-left: 0.5rem;
         }
     }
 }

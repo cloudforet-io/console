@@ -3,7 +3,7 @@
         <template #loader>
             <p-skeleton width="100%" height="16rem" />
         </template>
-        <div class="top-lap">
+        <div class="top-part">
             <p-date-pagination :date.sync="currentDate" :timezone="timezone" />
         </div>
         <span class="y-label-text">Job Count</span>
@@ -255,7 +255,7 @@ export default {
     padding-top: 1rem;
     padding-bottom: 3rem;
 
-    .top-lap {
+    .top-part {
         position: relative;
         height: 2rem;
         .p-date-pagination {

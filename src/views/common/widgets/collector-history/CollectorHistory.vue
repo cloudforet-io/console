@@ -18,7 +18,7 @@
             </template>
             <canvas ref="chartRef" />
         </p-chart-loader>
-        <div class="legend-lap">
+        <div class="legend-wrapper">
             <span v-for="(legend) in legends" :key="legend.name" class="legend">
                 <span class="color" :style="{color: legend.color}" />
                 {{ legend.name }}
@@ -286,7 +286,7 @@ export default {
         height: 254px;
     }
 
-    .legend-lap {
+    .legend-wrapper {
         width: 100%;
         text-align: center;
         text-transform: capitalize;

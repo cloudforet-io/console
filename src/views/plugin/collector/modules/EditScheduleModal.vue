@@ -28,7 +28,7 @@
             >
                 <span class="label-help-text">Select Hourly or Interval.</span>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
-                     class="schedule-lap block lg:flex h-48 lg:h-40"
+                     class="time-schedule-wrapper block lg:flex h-48 lg:h-40"
                      :class="scheduleType === type ? 'selected' : ''"
                      @click="scheduleType = type"
                 >
@@ -48,7 +48,7 @@
                         </span>
                     </div>
                     <div class="w-full lg:w-2/3 m-auto">
-                        <div v-if="type === 'hourly'" class="hourly-schedule-lap">
+                        <div v-if="type === 'hourly'" class="hourly-schedule-wrapper">
                             <span v-for="(hour) in hoursMatrix" :key="hour"
                                   class="time-block"
                                   :class="{active: selectedHours[hour] }"
@@ -64,7 +64,7 @@
                                 {{ $t('COMMON.ALL') }}
                             </p-button>
                         </div>
-                        <div v-else class="interval-lap">
+                        <div v-else class="interval-wrapper">
                             <p-field-group label="Every" class="w-1/2">
                                 <p-text-input v-model="intervalTime" type="number" placeholder="Time" />
                             </p-field-group>
@@ -338,7 +338,7 @@ export default {
 };
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .edit-schedule-modal-container {
     .modal-content .modal-body-container.scrollable {
         min-height: 34rem;
@@ -356,7 +356,7 @@ export default {
         }
     }
 
-    .schedule-lap {
+    .time-schedule-wrapper {
         @apply border border-gray-200;
         cursor: pointer;
         border-bottom-left-radius: 0.25rem;
@@ -381,7 +381,7 @@ export default {
             font-size: 0.75rem;
             padding-left: 0.5rem;
         }
-        .hourly-schedule-lap {
+        .hourly-schedule-wrapper {
             display: grid;
             gap: 0.5rem;
             grid-template-columns: repeat(12, 2rem);
@@ -417,7 +417,7 @@ export default {
                 }
             }
         }
-        .interval-lap {
+        .interval-wrapper {
             display: inline-flex;
             width: 100%;
             .form-label {

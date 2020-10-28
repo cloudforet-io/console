@@ -15,7 +15,7 @@
                     <strong>{{ $t('PWR_SCHED.LIST') }}</strong>&nbsp;({{ totalCount }})
                 </p>
                 <p-hr />
-                <div class="my-6 mx-4">
+                <div class="my-6 mx-3">
                     <p-selectable-list :items="scheduleList" :loading="loading" :mapper="listMapper"
                                        :selected-indexes="selectedIndexes"
                                        :multi-selectable="false"

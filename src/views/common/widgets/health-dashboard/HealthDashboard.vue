@@ -21,7 +21,7 @@
                         <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                     </p>
                 </div>
-                <div class="background-lap">
+                <div class="background-wrapper">
                     <img class="logo" src="@/assets/icons/ic_provider_aws.svg">
                     <p class="text">
                         Check your AWS Support Plans first.
@@ -189,7 +189,7 @@ export default {
                 text-decoration: underline;
             }
         }
-        .background-lap {
+        .background-wrapper {
             position: absolute;
             display: flex;
             width: 100%;

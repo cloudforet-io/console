@@ -1,7 +1,7 @@
 <template>
     <div class="project-report-tab-container">
         <p>SpaceONE offers Monthly Report based on this project. We will provide more content soon.</p>
-        <div class="input-lap">
+        <div class="input-wrapper">
             <p-field-group label="Company Name on the Report Cover"
                            :invalid="!isValid"
                            :invalid-text="invalidText"
@@ -17,7 +17,7 @@
                 />
             </p-field-group>
         </div>
-        <div class="button-lap">
+        <div class="button-wrapper">
             <p-icon-text-button
                 class="text-button"
                 name="ic_download"
@@ -33,11 +33,11 @@
             </p>
         </div>
         <p-hr />
-        <div class="example-lap">
+        <div class="example-wrapper">
             <p class="title">
                 Sample Report
             </p>
-            <div class="image-lap">
+            <div class="image-group">
                 <div class="image-box">
                     <img class="image" src="@/assets/images/img_report_1.png">
                 </div>
@@ -48,7 +48,7 @@
                     <img class="image" src="@/assets/images/img_report_3.png">
                 </div>
             </div>
-            <div class="image-lap">
+            <div class="image-group">
                 <div class="image-box">
                     <img class="image" src="@/assets/images/img_report_4.png">
                 </div>
@@ -203,7 +203,7 @@ export default {
     border-radius: 0.125rem;
     font-size: 0.875rem;
     padding: 2rem 1.5rem;
-    .input-lap {
+    .input-wrapper {
         margin-bottom: 6.25rem;
         .p-field-group {
             margin-top: 3rem;
@@ -213,7 +213,7 @@ export default {
             width: 20rem;
         }
     }
-    .button-lap {
+    .button-wrapper {
         text-align: right;
         padding-bottom: 1.75rem;
         .text-button {
@@ -230,14 +230,14 @@ export default {
             padding-top: 0.5rem;
         }
     }
-    .example-lap {
+    .example-wrapper {
         padding-top: 2rem;
         .title {
             @apply text-gray-500;
             font-size: 0.875rem;
             font-weight: bold;
         }
-        .image-lap {
+        .image-group {
             display: flex;
             padding-top: 2rem;
             .image-box {

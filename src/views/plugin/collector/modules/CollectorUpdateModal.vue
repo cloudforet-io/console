@@ -16,7 +16,7 @@
                     @confirm="onClickConfirm"
     >
         <template #body>
-            <div class="collector-input-lap">
+            <div class="collector-input-wrapper">
                 <p-lazy-img class="flex-shrink-0 mr-8"
                             :src="imageUrl"
                             :loading="!imageUrl"
@@ -242,7 +242,7 @@ export default {
 
 <style lang="postcss">
 .collector-update-modal {
-    .collector-input-lap {
+    .collector-input-wrapper {
         @apply flex border-r border-gray-200;
         width: 50%;
         padding: 2.5rem;

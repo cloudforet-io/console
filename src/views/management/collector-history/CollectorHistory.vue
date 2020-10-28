@@ -29,17 +29,15 @@
                     @rowLeftClick="onSelect"
                 >
                     <template #toolbox-top>
-                        <div class="toolbox-filter-button-lap">
-                            <div v-for="(status, idx) in statusList"
-                                 :key="idx"
-                                 class="filter-button-lap"
-                            >
-                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                                <span class="filter-button"
-                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                      @click="onClickStatus(status.key)"
-                                >{{ status.label }}</span>
-                            </div>
+                        <div v-for="(status, idx) in statusList"
+                             :key="idx"
+                             class="filter-button-wrapper"
+                        >
+                            <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                            <span class="filter-button"
+                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                  @click="onClickStatus(status.key)"
+                            >{{ status.label }}</span>
                         </div>
                     </template>
                     <template #th-task-format="{ value }">
@@ -116,6 +114,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 
 import {
@@ -435,10 +434,10 @@ export default {
 };
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .collector-history-container {
     .toolbox-top {
-        .filter-button-lap {
+        .filter-button-wrapper {
             @apply border-r border-gray-200;
             display: inline-block;
             padding: 0 1rem;
