@@ -40,13 +40,6 @@ import { DictInputProps } from '@/components/molecules/forms/dict-input/type';
 export default defineComponent({
     name: 'PDictInput',
     components: { PInputText, PFieldGroup },
-    directives: {
-        focus: {
-            inserted(el, binding) {
-                if (binding.value) el.focus();
-            },
-        },
-    },
     props: {
         name: {
             type: String,

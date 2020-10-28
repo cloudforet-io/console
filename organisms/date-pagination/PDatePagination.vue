@@ -1,6 +1,6 @@
 <template>
     <nav class="p-date-pagination">
-        <div class="date-text-lap">
+        <div class="date-text-wrapper">
             <div class="date-text">
                 {{ dateText }}
             </div>
@@ -116,7 +116,7 @@ export default {
     align-items: center;
     flex-wrap: nowrap;
 
-    .date-text-lap {
+    .date-text-wrapper {
         @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
         .date-text {
             line-height: 1rem;

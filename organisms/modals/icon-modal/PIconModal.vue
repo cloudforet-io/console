@@ -3,16 +3,16 @@
              :backdrop="true"
              class="p-icon-modal-container"
     >
-        <div class="content-lap">
+        <div class="content-wrapper">
             <p-lottie v-if="lottieName"
-                      class="block" :name="lottieName"
-                      auto :size="5"
+                      :name="lottieName"
+                      :size="5"
             />
             <p-i v-if="iconName"
                  class="block" :name="iconName"
                  width="5rem" height="5rem"
             />
-            <div class="text-lap">
+            <div class="text-wrapper">
                 <p v-if="headerTitle" class="header-title">
                     {{ headerTitle }}
                 </p>
@@ -96,17 +96,20 @@ export default {
 
 <style lang="postcss">
 .p-icon-modal-container {
-    .content-lap {
+    .content-wrapper {
         @apply bg-white;
         text-align: center;
         opacity: 0.9;
         border-radius: 1rem;
         padding: 3.75rem;
         margin-top: calc(50% - 1rem);
+        .p-lottie {
+            display: inline-flex;
+        }
         .p-i-icon {
             margin: auto;
         }
-        .text-lap {
+        .text-wrapper {
             padding-top: 1.5rem;
             padding-bottom: 1.5rem;
             .header-title {

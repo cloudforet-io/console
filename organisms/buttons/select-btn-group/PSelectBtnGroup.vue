@@ -1,6 +1,6 @@
 <template>
     <div ref="btnGroup" class="p-select-btn-group">
-        <div class="button-lap">
+        <div class="button-group">
             <p-button v-for="(button, idx) in formattedButtons"
                       :key="`${button.name}-${idx}`"
                       :class="{ active:selected === button.name }"
@@ -72,7 +72,7 @@ export default {
 <style lang="postcss">
 .p-select-btn-group {
     @apply flex flex-wrap;
-    .button-lap {
+    .button-group {
         margin-right: -0.5rem;
         margin-bottom: -0.5rem;
     }

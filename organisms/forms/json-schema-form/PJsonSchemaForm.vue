@@ -61,7 +61,7 @@ export default {
             const errorContainerUiSchema = {
                 component: 'div',
                 fieldOptions: {
-                    class: ['error-text-lap'],
+                    class: ['error-text-wrapper'],
                 },
                 children: [] as UiSchema[],
             };
