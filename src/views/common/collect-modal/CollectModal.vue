@@ -72,7 +72,6 @@ import { makeProxy } from '@/components/util/composition-helpers';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 
-import { fluentApi } from '@/lib/fluent-api';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
@@ -153,7 +152,6 @@ export default {
             return 'gray900';
         };
 
-        const collectorApi = fluentApi.inventory().collector();
         const listCollector = async (): Promise<void> => {
             state.loading = true;
 
@@ -171,10 +169,10 @@ export default {
 
         const collectData = async (id: string): Promise<void> => {
             try {
-                await collectorApi.collect()
-                    .setId(id)
-                    .setFilters({ [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) })
-                    .execute();
+                await SpaceConnector.client.inventory.collector.collect({
+                    collector_id: id,
+                    filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
+                });
                 showSuccessMessage('success', 'Collect Data', context.root);
             } catch (e) {
                 showErrorMessage('Fail to Collect Data', e, context.root);

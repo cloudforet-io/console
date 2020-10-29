@@ -4,8 +4,10 @@ import {
     ResourceActions, SingleDeleteAction, SingleItemQueryAction, SubMultiItemAction, TreeAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType, ProjectGroupInfo, Tags, TimeStamp,
-} from '@/lib/fluent-api/type';
+    ListType, Tags, TimeStamp,
+} from '@/models';
+import { ProjectGroupInfo } from '@/views/project/project/type';
+
 
 const idField = 'project_group_id';
 

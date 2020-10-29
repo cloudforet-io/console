@@ -15,14 +15,18 @@ import {
     UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType, ProjectGroupInfo, Tags, TimeStamp, TreeResp,
-} from '@/lib/fluent-api/type';
-import Config from '@/lib/fluent-api/config';
+    ListType, Tags, TimeStamp,
+} from '@/models';
+import { ProjectGroupInfo } from '@/views/project/project/type';
 
 const idField = 'project_id';
 
 interface IdParameter {
     [idField]: string;
+}
+
+interface TreeResp<T> {
+    items: T[];
 }
 
 export interface ProjectModel {
@@ -112,12 +116,7 @@ export interface ProjectFavoriteParameter {
     projectGroupId?: string[];
 }
 
-class Favorite extends Config<ProjectFavoriteParameter, ProjectFavoriteParameter> {
-    name = 'favorite'
-}
-
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'|'treeSearch'|'memberList'|'addMember'|'removeMember'>,
-    ServiceResources<'favorite'> {
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'|'treeSearch'|'memberList'|'addMember'|'removeMember'> {
     protected name = 'project';
 
     create() { return new Create(this.api, this.baseUrl); }
@@ -139,6 +138,4 @@ export default class Project extends Resource implements ResourceActions<'create
     addMember() { return new AddMember(this.api, this.baseUrl); }
 
     removeMember() { return new RemoveMember(this.api, this.baseUrl); }
-
-    favorite() { return new Favorite(this.api, this.baseUrl.substring(0, this.baseUrl.length - 1)); }
 }
