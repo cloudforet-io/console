@@ -61,7 +61,7 @@ import { getTimezone } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
-import { TimeStamp } from '@/lib/fluent-api';
+import { TimeStamp } from '@/models';
 
 
 enum JOB_STATE {

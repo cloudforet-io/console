@@ -15,8 +15,8 @@
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
                                sm:col-end-13 lg:row-start-2 cloud-service"
-                        :get-action="getCloudServiceCount"
                         :project-filter="projectFilter"
+                        :project-id="projectId"
         />
         <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
              lg:row-start-3 resources-tab"
@@ -67,11 +67,8 @@ import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/
 import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-
 import { blue, secondary, secondary1 } from '@/styles/colors';
-
 import { makeTrItems } from '@/lib/view-helper';
-import { Stat } from '@/lib/fluent-api/statistics/resource';
 
 
 interface SummaryState {
@@ -120,53 +117,16 @@ export default {
         const serverSummaryState: SummaryState = reactive({
             type: 'server',
             title: 'servers',
-            to: '/inventory/server',
+            to: `/inventory/server?filters=project_id%3A${projectId.value}`,
             color: secondary,
         });
 
         const cloudServiceSummaryState: SummaryState = reactive({
             type: 'cloudService',
             title: 'cloud services',
-            to: '/inventory/cloud-service',
+            to: `/inventory/cloud-service?filters=project_id%3A${projectId.value}&provider=all`,
             color: secondary1,
         });
-        // const serverSummary = new ServiceSummaryWidgetState({
-        //     title: 'servers',
-        //     to: `/inventory/server?filters=project_id%3A${projectId.value}`,
-        //     color: secondary,
-        //     getAction: api => api.setResourceType('identity.Project')
-        //         .setFilter({
-        //             key: 'project_id',
-        //             value: projectId.value,
-        //             operator: '=',
-        //         }).setResourceType('inventory.Server'),
-        //     getTrendAction: api => api.setTopic('daily_server_count')
-        //         .setFilter({
-        //             key: 'values.project_id',
-        //             value: projectId.value,
-        //             operator: '=',
-        //         })
-        //         .addGroupField('count', STAT_OPERATORS.sum, 'values.server_count'),
-        // });
-
-        // const cloudServiceSummary = new ServiceSummaryWidgetState({
-        //     title: 'cloud services',
-        //     to: `/inventory/cloud-service?filters=project_id%3A${projectId.value}&provider=all`,
-        //     color: secondary1,
-        //     getAction: api => api.setResourceType('identity.Project')
-        //         .setFilter({
-        //             key: 'project_id',
-        //             value: projectId.value,
-        //             operator: '=',
-        //         }).setResourceType('inventory.CloudService'),
-        //     getTrendAction: api => api.setTopic('daily_cloud_service_count')
-        //         .setFilter({
-        //             key: 'values.project_id',
-        //             value: projectId.value,
-        //             operator: '=',
-        //         })
-        //         .addGroupField('count', STAT_OPERATORS.sum, 'values.cloud_service_count'),
-        // });
 
         const dailyUpdates = ({
             server: api => api.setId(projectId.value),
@@ -181,15 +141,6 @@ export default {
             serverSummaryState,
             cloudServiceSummaryState,
             dailyUpdates,
-            getCloudServiceCount(apiAction: Stat) {
-                return apiAction
-                    .setJoinType('INNER')
-                    .setJoinFilter([{
-                        key: 'project_id',
-                        value: projectId.value,
-                        operator: '=',
-                    }]);
-            },
         };
     },
 };

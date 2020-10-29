@@ -65,13 +65,12 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import { range } from 'lodash';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { store } from '@/store';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'CloudServices',
@@ -82,10 +81,6 @@ export default {
         PI,
     },
     props: {
-        getAction: {
-            type: Function,
-            default: api => api,
-        },
         projectFilter: {
             type: String,
             default: '',
@@ -93,6 +88,10 @@ export default {
         moreInfo: {
             type: Boolean,
             default: false,
+        },
+        projectId: {
+            type: String,
+            default: '',
         },
     },
     setup(props) {
@@ -118,47 +117,51 @@ export default {
             providers: computed(() => store.state.resource.provider.items),
         });
 
-        const api = fluentApi.statisticsTest().resource().stat<Value>()
-            .setResourceType('inventory.CloudServiceType')
-            .addGroupKey('name', 'name')
-            .addGroupKey('group', 'group')
-            .addGroupKey('provider', 'provider')
-            .addGroupKey('tags.spaceone:icon', 'icon')
-            .setJoinKeys(['name', 'group', 'provider'])
-            .setJoinResourceType('inventory.CloudService')
-            .addJoinGroupKey('cloud_service_type', 'name')
-            .addJoinGroupKey('cloud_service_group', 'group')
-            .addJoinGroupKey('provider', 'provider')
-            .addJoinGroupField('count', STAT_OPERATORS.count)
-            .setSort('count');
-
+        const getDataInProject = async () => {
+            const query = new QueryHelper()
+                .setSort('created_at')
+                .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
+            const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage({
+                query: query.data,
+                // eslint-disable-next-line camelcase
+                show_all: false,
+            });
+            state.data = [
+                ...res.results.map(d => ({
+                    count: d.cloud_service_count,
+                    group: d.cloud_service_group,
+                    icon: d.icon,
+                    name: d.cloud_service_type,
+                    provider: d.provider,
+                    href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}?provider=${d.provider}${props.projectFilter}`,
+                })),
+            ];
+        };
 
         const getData = async (): Promise<void> => {
             state.loading = true;
             await store.dispatch('resource/provider/load');
+            const query = new QueryHelper()
+                .setSort('created_at')
+                .setPage(1, 12);
             try {
-                const res = await props.getAction(api).execute();
                 if (props.projectFilter) {
-                    state.data = [
-                        ...res.data.results.map(d => ({
-                            count: d.count,
-                            group: d.group,
-                            icon: d.icon,
-                            name: d.name,
-                            provider: d.provider,
-                            href: `/inventory/cloud-service/${d.provider}/${d.group}/${d.name}?provider=${d.provider}${props.projectFilter}`,
-                        })),
-                    ];
+                    await getDataInProject();
                 } else {
+                    const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage({
+                        query: query.data,
+                        // eslint-disable-next-line camelcase
+                        show_all: false,
+                    });
                     state.data = [
-                        ...res.data.results.map(d => ({
-                            count: d.count,
-                            group: d.group,
+                        ...res.results.map(d => ({
+                            count: d.cloud_service_count,
+                            group: d.cloud_service_group,
                             icon: d.icon,
-                            name: d.name,
+                            name: d.cloud_service_type,
                             provider: d.provider,
                             href: {
-                                path: `/inventory/cloud-service/${d.provider}/${d.group}/${d.name}`,
+                                path: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}`,
                                 query: { provider: d.provider },
                             },
                         })),

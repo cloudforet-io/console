@@ -1,5 +1,5 @@
 import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import { ProjectItemResp } from '@/views/project/project/type';
 import { ProjectNodeState } from '@/lib/api/tree-node';
 
 export type DataType = 'PROJECT'|'PROJECT_GROUP';

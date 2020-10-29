@@ -236,14 +236,10 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import {
-    FILTER_OPERATOR, fluentApi,
-} from '@/lib/fluent-api';
 import { useStore } from '@/store/toolset';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
-import { STAT_OPERATORS } from '@/lib/fluent-api/statistics/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import {
     makeQueryStringComputeds,
@@ -285,8 +281,6 @@ interface ProjectModel {
     deleted_at: TimeStamp;
     tags: object;
 }
-
-type ProjectListResp = ListType<ProjectModel>
 
 interface ProjectItemResp {
     id: string;
@@ -395,25 +389,6 @@ export default {
         const { provider } = useStore();
         provider.getProvider();
 
-        const statisticsAPI = fluentApi.statisticsTest().resource().stat()
-            .setResourceType('identity.Project')
-            .addGroupKey('project_id', 'project_id')
-
-            .setJoinResourceType('inventory.Server')
-            .addJoinKey('project_id')
-            .addJoinGroupKey('project_id', 'project_id')
-            .addJoinGroupField('servers_count', STAT_OPERATORS.count)
-
-            .setJoinResourceType('inventory.CloudService', 1)
-            .addJoinKey('project_id', 1)
-            .addJoinGroupKey('project_id', 'project_id', 1)
-            .addJoinGroupField('cloud_services', STAT_OPERATORS.count, undefined, 1)
-
-            .setJoinResourceType('identity.Project', 2)
-            .addJoinKey('project_id', 2)
-            .addJoinGroupKey('project_id', 'project_id', 2)
-            .addJoinGroupField('member_count', STAT_OPERATORS.size, 'project_member.user', 2);
-
         /**
              * Make Card Data
              */
@@ -440,26 +415,21 @@ export default {
             if (items) {
                 items.forEach((item) => {
                     const project_id = item.project_id;
-                    item.cloud_services = item.cloud_services || 0;
-                    item.servers_count = item.servers_count || 0;
+                    item.cloud_services = item.cloud_service_count || 0;
+                    item.servers_count = item.server_count || 0;
                     cardSummary.value[project_id] = item;
                 });
             }
         };
 
-        const getCard = (resp: ProjectListResp) => {
+        const getCard = async (resp) => {
             if (resp.results.length !== 0) {
                 const ids = resp.results.map(item => item.project_id);
                 cardSummary.value = reactive(zipObject(ids));
-                statisticsAPI.setFilter({
-                    key: 'project_id',
-                    value: ids,
-                    operator: FILTER_OPERATOR.in,
-                }).execute().then((rp) => {
-                    if (rp.data?.results) {
-                        setCard(rp.data.results);
-                    }
+                const projects = await SpaceConnector.client.statistics.topic.projectPage({
+                    projects: ids,
                 });
+                if (projects) setCard(projects.results);
             }
             resp.results = setProvider(resp);
             projectSummary.value = resp.results;
@@ -524,9 +494,9 @@ export default {
                 const api = state.searchedProjectGroup ? listProjectApi : listAllProjectApi;
                 const resp = await api(getParams());
 
-                const res = getCard(resp);
+                const res = await getCard(resp);
                 listState.items = res.results;
-                listState.totalCount = res.total_count;
+                listState.totalCount = res.results.length;
             } catch (e) {
                 listState.items = [];
                 listState.totalCount = 0;

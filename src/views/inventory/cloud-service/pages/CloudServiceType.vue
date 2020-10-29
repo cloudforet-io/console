@@ -83,6 +83,11 @@
                     @change="onChange"
                     @refresh="onChange"
                 >
+                    <template #toolbox-left>
+                        <p-check-box v-model="filterState.showAllCloudServices">
+                            <span class="show-all">Show All</span>
+                        </p-check-box>
+                    </template>
                     <template #card="{item}">
                         <router-link :to="getToCloudService(item)">
                             <div class="left">
@@ -228,6 +233,7 @@ export default {
             regionList: [] as RegionModel[],
             selectedRegionIdx: [] as number[],
             regionFilter: [] as string[],
+            showAllCloudServices: false,
         });
         const handlers = makeQuerySearchPropsWithSearchSchema(
             {
@@ -348,7 +354,7 @@ export default {
             else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
-                show_all: true,
+                show_all: filterState.showAllCloudServices,
                 labels,
                 query: query.data,
             };
@@ -387,6 +393,12 @@ export default {
                 await replaceQuery('provider', selectedProvider.value);
                 await replaceQuery('region', filterState.regionFilter);
                 await replaceQuery('service', filterState.serviceFilter);
+            }
+        }, { immediate: false });
+
+        watch<boolean, boolean>(() => filterState.showAllCloudServices, async (after, before) => {
+            if (after !== before) {
+                await listCloudServiceType();
             }
         }, { immediate: false });
 
@@ -546,6 +558,9 @@ export default {
                 @apply text-secondary cursor-pointer;
             }
         }
+    }
+    .show-all {
+        @apply text-sm mr-2;
     }
     .cloud-service-divider {
         @apply w-full;
