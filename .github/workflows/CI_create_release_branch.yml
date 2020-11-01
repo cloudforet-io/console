@@ -10,7 +10,7 @@ on:
     types: [create_release_branch]
 
 env:
-  VERSION: v${{ github.event.client_payload.version }}-rc0
+  VERSION: v${{ github.event.client_payload.version }}-rc1
   BRANCH: release-${{ github.event.client_payload.version }}
 
 jobs:
@@ -20,12 +20,11 @@ jobs:
       - name: task
         uses: actions/checkout@v2
       - run: |
-          echo ${{ env.VERSION }} > src/VERSION
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "[CI/CD] create branch ${{ env.BRANCH }}"
-          git tag ${{ env.VERSION }}
-          git push --atomic origin master ${{ env.VERSION }}
           git checkout -b ${{ env.BRANCH }}
           git push --set-upstream origin ${{ env.BRANCH }}
+      - name: dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: branch_tagging
+          client-payload: '{"version": "${{ env.VERSION }}"}'
