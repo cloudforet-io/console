@@ -8,7 +8,7 @@ const USER_MUTATIONS = Object.keys(mutations).map((mutation) => {
 
 const localStoragePlugin = (store: Store<any>) => {
     store.subscribe((mutation, state) => {
-        if (USER_MUTATIONS.indexOf(mutation.type) >= 0) {
+        if (USER_MUTATIONS.includes(mutation.type)) {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
         }
     });
