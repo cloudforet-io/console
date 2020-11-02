@@ -22,4 +22,3 @@ dist
 src/assets
 
 node_modules.nosync/
-src/translations/__pycache__/
