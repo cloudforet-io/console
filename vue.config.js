@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const postcssConfig = require('./postcss.config');
+process.env.VUE_APP_VERSION = require('./package.json').version;
 
 
 const extraPlugins = [];

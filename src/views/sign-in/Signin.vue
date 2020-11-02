@@ -1,14 +1,19 @@
 <template>
     <div>
-        <div class="p-4 flex items-center text-center h-screen w-full wrapper default-theme">
-            <div id="login-container" class="m-auto justify-center bg-primary4 lg rounded-lg p-8 md:p-16 ">
-                <img id="logo" src="@/assets/images/brand/brand_logo.png">
-                <div class="header">
-                    <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
+        <div class="p-4 flex flex-col items-center text-center h-screen w-full wrapper default-theme">
+            <div class="m-auto justify-center">
+                <div id="login-container" class="bg-primary4 lg rounded-lg p-8 md:p-16 ">
+                    <img id="logo" src="@/assets/images/brand/brand_logo.png">
+                    <div class="header">
+                        <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
+                    </div>
+                    <div class="user-info">
+                        <component :is="component" @onLogin="login" />
+                    </div>
                 </div>
-                <div class="user-info">
-                    <component :is="component" @onLogin="login" />
-                </div>
+                <p class="version">
+                    Version {{ version }}
+                </p>
             </div>
         </div>
     </div>
@@ -53,7 +58,6 @@ export default {
         },
     },
     setup(props: any, context: any) {
-        // console.debug('login!!');
         const vm = (getCurrentInstance() as any);
         const store = useStore();
         store.domain.getDomain(api);
@@ -74,6 +78,7 @@ export default {
                 }
                 return component;
             }),
+            version: process.env.VUE_APP_VERSION,
         });
         const login = async (userId: string, credentials: Credentials) => {
             store.user.setToken(credentials.refresh_token, credentials.access_token);
@@ -118,17 +123,8 @@ export default {
     }
 
     #login-container {
-        /* background-color: white; */
-
-        /* max-width: 24.5rem; */
-
-        /* width: 100%; */
-
-        /* margin: 1rem; */
-
-        /* padding: 1.5rem 1rem 0.62rem; */
-        width: 26.5rem;
-        /*height: calc(100vh - 30%);*/
+        max-width: 26.5rem;
+        bottom: 0;
     }
 
     #logo {
@@ -157,12 +153,10 @@ export default {
         }
     }
 
-    .input-title {
+    .version {
+        @apply text-primary3;
+        margin-top: 1rem;
         font-size: 0.875rem;
-        font-weight: bold;
-
-        /* padding-top: 16px; */
-
-        /* padding-bottom: 4px; */
+        opacity: 0.75;
     }
 </style>

@@ -72,6 +72,7 @@ import {
     requiredValidation,
 } from '@/lib/compostion-util';
 import { useStore } from '@/store/toolset';
+import {showErrorMessage} from "@/lib/util";
 
 export default defineComponent({
     name: 'Admin',
@@ -115,9 +116,10 @@ export default defineComponent({
                         user_id: state.userId,
                         password: state.password,
                     },
-                }).catch(() => {
+                }).catch((e) => {
                     state.loginFail = true;
                     state.password = '';
+                    showErrorMessage('Please Confirm your ID or PW', '', context.root);
                 });
 
                 const response = await vm.$http.post('/identity/token/issue', {
