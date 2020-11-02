@@ -7,9 +7,7 @@ export default {
     name: 'management',
     redirect: '/management/supervisor/plugins',
     meta: { label: 'Management' },
-    components: {
-        main: Management,
-    },
+    component: Management,
     children: [
         {
             path: 'supervisor',

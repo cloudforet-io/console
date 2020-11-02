@@ -143,12 +143,12 @@ import {
 } from '@vue/composition-api';
 
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
-import SiteMap from '@/views/containers/gnb/modules/SiteMap.vue';
+import SiteMap from '@/views/common/gnb/modules/SiteMap.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 
 import { store } from '@/store';
-import router from '@/routes';
+import router from '@/routes/index';
 
 export default {
     name: 'GNB',

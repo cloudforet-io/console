@@ -6,9 +6,7 @@ export const PROJECT_DETAIL_PAGE_NAME = 'projectDetail';
 export default {
     path: 'project',
     meta: { label: 'Project' },
-    components: {
-        main: { template: '<router-view />' },
-    },
+    component: { template: '<router-view />' },
     children: [
         {
             path: '/',

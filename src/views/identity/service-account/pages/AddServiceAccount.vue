@@ -141,7 +141,7 @@ import {
     reactive, computed, ref, toRefs, watch,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';

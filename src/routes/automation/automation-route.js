@@ -8,9 +8,7 @@ export default {
     name: 'automation',
     redirect: '/automation/power-scheduler',
     meta: { label: 'Automation' },
-    components: {
-        main: Automation,
-    },
+    component: Automation,
     children: [
         {
             path: 'power-scheduler',

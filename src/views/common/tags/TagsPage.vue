@@ -67,7 +67,7 @@ import {
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import FNB from '@/views/containers/fnb/FNB.vue';
+import FNB from '@/views/common/fnb/FNB.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage } from '@/lib/util';
 

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import FNB from '@/views/containers/fnb/FNB.vue';
+import FNB from '@/views/common/fnb/FNB.vue';
 
 export default {
     name: 'GeneralPageLayout',

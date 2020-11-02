@@ -149,7 +149,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 /* Page Modules */
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
 import SMonitoring from '@/views/common/monitoring/Monitoring.vue';

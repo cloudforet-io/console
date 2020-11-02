@@ -85,7 +85,7 @@ import { store } from '@/store';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import { getTimezone, showErrorMessage, showSuccessMessage } from '@/lib/util';
-import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import VerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import { findIndex } from 'lodash';

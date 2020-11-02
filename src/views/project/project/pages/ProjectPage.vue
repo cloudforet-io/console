@@ -223,7 +223,7 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
 
 import {
     get, zipObject, range, reverse,

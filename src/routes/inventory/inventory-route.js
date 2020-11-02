@@ -11,9 +11,7 @@ export default {
     name: 'inventory',
     redirect: 'inventory/server',
     meta: { label: 'Inventory' },
-    components: {
-        main: Inventory,
-    },
+    component: Inventory,
     children: [
         {
             path: 'server',

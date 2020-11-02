@@ -20,7 +20,7 @@
 
 <script>
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/PVerticalLayout.vue';
-import FNB from '@/views/containers/fnb/FNB.vue';
+import FNB from '@/views/common/fnb/FNB.vue';
 
 export default {
     name: 'VerticalPageLayout',

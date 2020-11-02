@@ -135,7 +135,7 @@ import { get } from 'lodash';
 import { render } from 'ejs';
 
 /* components */
-import PVerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';

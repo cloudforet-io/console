@@ -121,7 +121,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';

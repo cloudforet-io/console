@@ -10,9 +10,7 @@ export default {
     name: 'plugin',
     redirect: '/plugin/collector',
     meta: { label: 'Plugin' },
-    components: {
-        main: Plugin,
-    },
+    component: Plugin,
     children: [
         {
             path: 'collector',

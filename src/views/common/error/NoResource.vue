@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import FNB from '@/views/containers/fnb/FNB.vue';
+import FNB from '@/views/common/fnb/FNB.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';

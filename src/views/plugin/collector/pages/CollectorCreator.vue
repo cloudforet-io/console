@@ -71,7 +71,7 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';

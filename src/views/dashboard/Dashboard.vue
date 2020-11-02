@@ -42,7 +42,7 @@ import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue'
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
 
 import { blue, secondary, secondary1 } from '@/styles/colors';

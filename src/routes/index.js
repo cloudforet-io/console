@@ -8,7 +8,6 @@ import { SpaceConnector } from '@/lib/space-connector';
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
-import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 import pluginRoute from '@/routes/plugin/plugin-route';
 import projectRoute from '@/routes/project/project-route';
 import managementRoute from '@/routes/management/management-route';
@@ -74,7 +73,7 @@ const router = new VueRouter({
             name: 'root',
             meta: { label: 'root' },
             redirect: '/dashboard',
-            component: DefaultContainer,
+            component: { template: '<router-view />' },
             children: [
                 dashboardRoute,
                 identityRoute,

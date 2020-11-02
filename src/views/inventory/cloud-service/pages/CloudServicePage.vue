@@ -127,7 +127,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 
 import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
 import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';

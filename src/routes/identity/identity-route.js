@@ -13,9 +13,7 @@ export default {
     name: 'identity',
     redirect: '/identity/service-account',
     meta: { label: 'Identity' },
-    components: {
-        main: Identity,
-    },
+    component: Identity,
     children: [
         {
             path: 'service-account',
