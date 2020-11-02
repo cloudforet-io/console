@@ -32,10 +32,10 @@ module.exports = {
     },
     css: {
         loaderOptions: {
+            postcss: postcssConfig,
             sass: {
                 includePaths: ['./node_modules'],
             },
-            postcss: postcssConfig,
         },
     },
     configureWebpack: {
