@@ -1,7 +1,6 @@
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 
-const Inventory = () => import('@/views/inventory/Inventory.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
 const NoResource = () => import('@/views/common/error/NoResource.vue');
@@ -11,7 +10,7 @@ export default {
     name: 'inventory',
     redirect: 'inventory/server',
     meta: { label: 'Inventory' },
-    component: Inventory,
+    component: { template: '<router-view />' },
     children: [
         {
             path: 'server',

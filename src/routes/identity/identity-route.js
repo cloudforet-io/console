@@ -1,7 +1,5 @@
 const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount.vue');
 
-const Identity = () => import('@/views/identity/Identity');
-
 const User = () => import('@/views/identity/user/User');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage');
 const ServiceAccountSearch = () => import('@/views/identity/service-account/pages/ServiceAccountSearch');
@@ -13,7 +11,7 @@ export default {
     name: 'identity',
     redirect: '/identity/service-account',
     meta: { label: 'Identity' },
-    component: Identity,
+    component: { template: '<router-view />' },
     children: [
         {
             path: 'service-account',

@@ -1,4 +1,3 @@
-const Automation = () => import('@/views/automation/Automation.vue');
 const PowerSchedulerLandingPage = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerLandingPage.vue');
 const PowerSchedulerPage = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerPage.vue');
 const ResourceGroupPage = () => import('@/views/automation/power-scheduler/pages/ResourceGroupPage.vue');
@@ -8,7 +7,7 @@ export default {
     name: 'automation',
     redirect: '/automation/power-scheduler',
     meta: { label: 'Automation' },
-    component: Automation,
+    component: { template: '<router-view />' },
     children: [
         {
             path: 'power-scheduler',

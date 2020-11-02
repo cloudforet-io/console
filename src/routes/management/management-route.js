@@ -1,4 +1,3 @@
-const Management = () => import('@/views/management/Management.vue');
 const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 
@@ -7,7 +6,7 @@ export default {
     name: 'management',
     redirect: '/management/supervisor/plugins',
     meta: { label: 'Management' },
-    component: Management,
+    component: { template: '<router-view />' },
     children: [
         {
             path: 'supervisor',
