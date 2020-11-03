@@ -50,15 +50,17 @@
                 </p>
             </div>
             <div v-for="(region, idx) in filterState.regionList" :key="idx"
-                 :class="{selected: region}"
-                 class="region-list"
+                 :class="{selected: region}" class="region-list"
             >
                 <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
                              @change="onClickRegion(region, ...arguments)"
-                >
-                    <span class="region-type">[{{ region.region_type }}] {{ region.name }} <br> </span>
+                />
+                <span class="region-list-text">
+                    <span class="region-type">
+                        [{{ region.region_type }}] {{ region.name }} <br>
+                    </span>
                     <span class="region-code">{{ region.region_code }} </span>
-                </p-check-box>
+                </span>
             </div>
         </template>
         <template #default>
@@ -537,9 +539,14 @@ export default {
         padding-left: 1rem;
     }
     .region-list {
-        @apply text-sm;
+        display: flex;
         margin-left: 1rem;
+    }
+    .region-list-text {
+        @apply text-sm;
         margin-bottom: 0.875rem;
+        display: flex;
+        flex-direction: column;
         &:hover {
             @apply text-secondary cursor-pointer;
         }
@@ -548,7 +555,7 @@ export default {
         }
         .region-code {
             @apply text-gray-400;
-            padding-left: 1.5rem;
+            padding-left: 0.25rem;
         }
     }
     .service-categories {
