@@ -264,73 +264,74 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .daily-updates {
-        @apply bg-white;
-        &::v-deep {
-            .widget-contents {
-                overflow-y: auto;
-                padding: 0;
-            }
-            .item-container.card {
-                background-color: transparent;
-            }
+.daily-updates {
+    @apply bg-white;
+    &::v-deep {
+        .widget-contents {
+            overflow-y: auto;
+            padding: 0;
+        }
+        .item-container.card {
+            background-color: transparent;
         }
     }
-    @screen lg {
-        .daily-updates::v-deep {
-            &.p-pane-layout {
-                background-color: rgba(theme('colors.white'), 0.8);
-            }
-            .title {
-                @apply text-sm leading-normal -mt-2;
-            }
-            .help {
-                @apply -mt-2;
-            }
-        }
-    }
+}
 
-    .no-data-img {
-        @apply mx-auto mb-4 flex-shrink-0;
-        max-width: 14rem;
-    }
-    .card-contents {
-        @apply flex items-center w-full content-between p-4 overflow-hidden;
-        &:hover {
-            background-color: rgba(theme('colors.blue.200'), 0.8);
+@screen lg {
+    .daily-updates::v-deep {
+        &.p-pane-layout {
+            background-color: rgba(theme('colors.white'), 0.8);
         }
-        .daily-update-contents {
-            @apply overflow-hidden text-sm whitespace-no-wrap w-full;
-            line-height: 150%;
-            .top {
-                width: 100%;
-                display: flex;
-            }
-            .group {
-                @apply font-bold pr-1;
-            }
-            .count {
-                @apply font-bold;
-            }
-            .type {
-                @apply truncate text-xs font-light text-gray-500 pl-2 w-full;
-            }
-            .state {
-                @apply text-xs;
-                line-height: 120%;
-            }
-            .created-count {
-                @apply text-green-500 text-xs font-bold pl-1;
-                line-height: 120%;
-            }
-            .deleted-count {
-                @apply text-gray-500 text-xs font-bold pl-1;
-                line-height: 120%;
-            }
-            .divider {
-                @apply pl-3 pr-2 text-xs text-gray-300;
-                line-height: 120%;
-            }
+        .title {
+            @apply text-sm leading-normal -mt-2;
+        }
+        .help {
+            @apply -mt-2;
         }
     }
+}
+
+.no-data-img {
+    @apply mx-auto mb-4 flex-shrink-0;
+    max-width: 14rem;
+}
+.card-contents {
+    @apply flex items-center w-full content-between p-4 overflow-hidden;
+    &:hover {
+        background-color: rgba(theme('colors.blue.200'), 0.8);
+    }
+    .daily-update-contents {
+        @apply overflow-hidden text-sm whitespace-no-wrap w-full;
+        line-height: 150%;
+        .top {
+            width: 100%;
+            display: flex;
+        }
+        .group {
+            @apply font-bold pr-1;
+        }
+        .count {
+            @apply font-bold;
+        }
+        .type {
+            @apply truncate text-xs font-light text-gray-500 pl-2 w-full;
+        }
+        .state {
+            @apply text-xs;
+            line-height: 120%;
+        }
+        .created-count {
+            @apply text-green-500 text-xs font-bold pl-1;
+            line-height: 120%;
+        }
+        .deleted-count {
+            @apply text-gray-500 text-xs font-bold pl-1;
+            line-height: 120%;
+        }
+        .divider {
+            @apply pl-3 pr-2 text-xs text-gray-300;
+            line-height: 120%;
+        }
+    }
+}
 </style>

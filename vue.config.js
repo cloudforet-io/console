@@ -1,28 +1,41 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const webpackBundleAnalyzer = require('webpack-bundle-analyzer');
 const postcssConfig = require('./postcss.config');
+
+
+/** ********************************************
+ *     Set additional environment variables    *
+ * ******************************************* */
 process.env.VUE_APP_VERSION = require('./package.json').version;
 
 
+/** ********************************************
+ *        Set additional webpack plugins       *
+ * ******************************************* */
 const extraPlugins = [];
+
 if (process.env.NODE_ENV === 'development') {
     // const StylelintPlugin = require('stylelint-webpack-plugin');
 
     // extraPlugins.push(
     // new StylelintPlugin({
-    //     files: ['src/**/*.{vue,scss}'],
+    //     files: ['src/**/*.{vue,scss,pcss}'],
     // }),
     // );
 }
 
 if (process.env.VUE_APP_ANALYZE_MOD) {
-    const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+    const BundleAnalyzerPlugin = webpackBundleAnalyzer.BundleAnalyzerPlugin;
     extraPlugins.push(
         new BundleAnalyzerPlugin(),
     );
 }
 
 
+/** ********************************************
+ *              Set Vue CLI config             *
+ * ******************************************* */
 module.exports = {
     lintOnSave: false,
     runtimeCompiler: true,
