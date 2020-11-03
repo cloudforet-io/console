@@ -25,7 +25,7 @@
                                            default-icon="ic_provider_other"
                         >
                             <template #contents>
-                                {{ item.name }}
+                                <div class="truncate">{{ item.name }}</div>
                             </template>
                             <template #extra>
                                 <p-badge :background-color="item.color" class="count">

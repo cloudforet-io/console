@@ -11,7 +11,7 @@
                         <component :is="component" @onLogin="login" />
                     </div>
                 </div>
-                <p class="version">
+                <p class="version hidden sm:hidden md:block lg:block xl:block">
                     Version {{ version }}
                 </p>
             </div>

@@ -114,21 +114,24 @@
                             </div>
                         </router-link>
                     </template>
+                    <template #no-data>
+                        <div v-if="!loading && totalCount === 0" class="text-center empty-cloud-service">
+                            <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
+                            <p class="text-primary2 mb-12">
+                                We need your registration for monitoring cloud resources.
+                            </p>
+                            <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
+                                <p-icon-text-button style-type="primary" name="ic_plus_bold"
+                                                    class="mx-auto text-center"
+                                >
+                                    {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                                </p-icon-text-button>
+                            </router-link>
+                        </div>
+                    </template>
                 </p-search-grid-layout>
             </div>
-            <div v-if="!loading && totalCount === 0" class="text-center empty-cloud-service">
-                <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
-                <p class="text-primary2 mb-12">
-                    We need your registration for monitoring cloud resources.
-                </p>
-                <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
-                    <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                        class="mx-auto text-center"
-                    >
-                        {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
-                    </p-icon-text-button>
-                </router-link>
-            </div>
+
             <div v-if="!loading && items.length > 0" class="pagination">
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
@@ -582,41 +585,45 @@ export default {
             }
 
             .left {
-                @apply inline-flex items-center;
+                @apply flex items-center w-full content-between;
 
                 img {
-                    @apply rounded-sm overflow-hidden;
+                    @apply rounded-sm overflow-hidden flex-shrink-0;
                 }
 
                 .text-content {
-                    @apply ml-4;
+                    @apply ml-4 flex-grow overflow-hidden;
 
                     .title {
                         padding-bottom: 0.3rem;
                         font-size: 1rem;
-                        line-height: 120%;
                     }
 
                     .sub-title {
-                        @apply text-gray-500;
+                        @apply text-gray-500 flex;
                         font-size: 0.875rem;
                         line-height: 150%;
 
                         .sub-title-provider {
                             @apply text-gray-300;
+                            flex-shrink: 2;
+                            margin-right: 0.125rem;
                         }
 
                         .sub-title-divider {
                             @apply text-gray-200;
+                            margin-right: 0.125rem;
                         }
 
                         .sub-title-name {
-                            @apply text-gray-500;
+                            @apply text-gray-500 truncate inline-block;
+                            flex-shrink: 1;
+                            margin-right: 0.125rem;
                         }
 
                         .sub-title-count {
                             @apply font-bold text-base;
-                            line-height: 150%;
+                            flex-shrink: 2;
                         }
                     }
                 }
