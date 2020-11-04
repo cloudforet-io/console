@@ -35,11 +35,11 @@ export default {
             schema: null as null | object,
         });
 
-        const getDetails = async () => {
+        const getDetails = async (accountId) => {
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.get({
                     // eslint-disable-next-line camelcase
-                    service_account_id: props.serviceAccountId,
+                    service_account_id: accountId,
                 });
                 state.items = res;
             } catch (e) {
@@ -48,23 +48,25 @@ export default {
             }
         };
 
-        const getDetailSchema = async () => {
+        const getDetailSchema = async (provider) => {
+            const accountId = props.serviceAccountId;
             const res = await SpaceConnector.client.addOns.pageSchema.get({
                 // eslint-disable-next-line camelcase
                 resource_type: 'identity.ServiceAccount',
                 schema: 'details',
                 options: {
-                    provider: 'aws',
+                    provider,
                 },
             });
             state.schema = res.details[0];
-            await getDetails();
+            await getDetails(accountId);
         };
 
         watch(() => props.serviceAccountId, async (after, before) => {
-            if (after !== before) {
-                await getDetailSchema();
-                await getDetails();
+            if (after) {
+                await getDetailSchema(props.selectedProvider);
+            } else {
+                state.items = [];
             }
         }, { immediate: true });
 

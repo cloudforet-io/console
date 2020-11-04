@@ -68,7 +68,7 @@
                     </p-dynamic-layout>
                 </template>
             </p-horizontal-layout>
-            <p-tab v-if="tableState.selectedItems.length === 1"
+            <p-tab v-if="typeOptionState.selectIndex.length === 1"
                    :tabs="singleItemTabState.tabs"
                    :active-tab.sync="singleItemTabState.activeTab"
             >
@@ -269,7 +269,7 @@ export default {
                 ['name', 'COMMON.NAME'],
             ],
             context.parent)),
-            selectedAccountIds: computed(() => tableState.selectedItems.map(d => d.service_account_id)),
+            selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
             schema: [],
         });
 
