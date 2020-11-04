@@ -360,6 +360,26 @@
 		"REQ_FIELD": "{0} is require field!",
 		"SCHEDULE": "Collecting Schedule",
 		"SELECT_ARG": "Selected {0}",
+		"SERVER": {
+			"MAIN": {
+				"ACTION": "Action",
+				"ALT_E_CHANGE_PROJECT_TITLE": "Project Change Failure",
+				"ALT_E_RELEASE_PROJECT_TITLE": "Project Release Failure",
+				"ALT_S_CHANGE_PROJECT_TITLE": "Project Change Success",
+				"ALT_S_RELEASE_PROJECT_TITLE": "Project Release Success",
+				"CHANGE_PROJECT": "Change Project",
+				"COLLECT_DATA": "Collect Data",
+				"CONSOLE": "Console",
+				"DELETE": "Delete",
+				"NO_SELECTED_SERVER": "Select a Server above for details.",
+				"TAB_DATA": " Data",
+				"TAB_DETAILS": "Details",
+				"TAB_HISTORY": "History",
+				"TAB_MEMBER": "Member",
+				"TAB_MONITORING": "Monitoring",
+				"TAB_TAG": "Tag"
+			}
+		},
 		"TAB": {
 			"ADD_TAG": "Add Tag",
 			"CONFIRM_CRD": "Confirm Credentials",

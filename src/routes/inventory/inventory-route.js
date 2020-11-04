@@ -1,7 +1,7 @@
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 
-const Server = () => import('@/views/inventory/server/Server.vue');
+const Server = () => import('@/views/inventory/server/pages/ServerPage.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
 const NoResource = () => import('@/views/common/error/NoResource.vue');
 

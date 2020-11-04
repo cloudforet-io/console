@@ -29,7 +29,7 @@
                                             :disabled="tableState.selectedItems.length === 0"
                                             @click="clickCollectData"
                         >
-                            {{ $t('BTN.COLLECT_DATA') }}
+                            {{ $t('INVENTORY.SERVER.MAIN.COLLECT_DATA') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="server-dropdown-btn"
@@ -41,7 +41,7 @@
                             @click-delete="clickDelete"
                             @click-project="clickProject"
                         >
-                            {{ $t('BTN.ACTION') }}
+                            {{ $t('INVENTORY.SERVER.MAIN.ACTION') }}
                         </p-dropdown-menu-btn>
                     </template>
                 </p-dynamic-layout>
@@ -101,7 +101,7 @@
         </p-tab>
 
         <div v-else class="empty-space">
-            Select a Server above for details.
+            {{ $t('INVENTORY.SERVER.MAIN.NO_SELECTED_SERVER') }}
         </div>
         <p-table-check-modal v-if="!!checkTableModalState.visible"
                              :visible.sync="checkTableModalState.visible"
@@ -169,7 +169,7 @@ import { get } from 'lodash';
 import {
     serverStateFormatter, showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
-import { makeTrItems } from '@/lib/view-helper';
+import { makeTrItems } from '@/lib/view-helper/index';
 import {
     queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
 } from '@/lib/router-query-string';
@@ -183,6 +183,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { store } from '@/store';
 import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -292,28 +293,26 @@ export default {
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
-            dropdown: computed(() => makeTrItems([
-                ['delete', 'BTN.DELETE'],
-                [null, null, { type: 'divider' }],
-                ['project', 'COMMON.CHG_PRO'],
-                [null, null, { type: 'divider' }],
-                ['link', null, {
-                    label: 'Console',
-                    disabled: !tableState.consoleLink,
-                    link: tableState.consoleLink,
-                    target: 'blank',
-                }],
-            ],
-            context.parent,
-            { type: 'item', disabled: tableState.selectedItems.length === 0 })),
+            dropdown: computed<MenuItem[]>(() => [
+                {
+                    name: 'delete', label: vm.$t('INVENTORY.SERVER.MAIN.DELETE') as string, type: 'item', disabled: tableState.selectedItems.length === 0,
+                }, {
+                    name: 'null', type: 'divider',
+                }, {
+                    name: 'project', label: vm.$t('INVENTORY.SERVER.MAIN.CHANGE_PROJECT') as string, type: 'item', disabled: tableState.selectedItems.length === 0,
+                }, {
+                    name: 'null', type: 'divider',
+                }, {
+                    name: 'link', label: vm.$t('INVENTORY.SERVER.MAIN.CONSOLE') as string, type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: 'blank',
+                },
+            ]),
             collectModalVisible: false,
-            multiFields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
-                ['primary_ip_address', 'COMMON.IP'],
-                ['os_type', 'COMMON.O_TYPE'],
-            ],
-            context.parent)),
+            multiFields: computed<MenuItem[]>(() => [
+                { name: 'name', label: 'Name', type: 'item' },
+                { name: 'state', label: 'State', type: 'item' },
+                { name: 'primary_ip_address', label: 'IP', type: 'item' },
+                { name: 'os_type', label: 'OS Type', type: 'item' },
+            ]),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
 
@@ -462,9 +461,9 @@ export default {
                 try {
                     params.project_id = data.id;
                     await api(params);
-                    showSuccessMessage('Success', 'Project has been successfully changed.', context.root);
+                    showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHANGE_PROJECT_TITLE'), '', context.root);
                 } catch (e) {
-                    showErrorMessage('Fail to Change Project', e, context.root);
+                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'), e, context.root);
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listServerData();
@@ -473,9 +472,9 @@ export default {
                 try {
                     params.release_project = true;
                     await api(params);
-                    showSuccessMessage('Success', 'Release Project Success', context.root);
+                    showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_RELEASE_PROJECT_TITLE'), '', context.root);
                 } catch (e) {
-                    showErrorMessage('Fail to Release Project', e, context.root);
+                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_RELEASE_PROJECT_TITLE'), e, context.root);
                 } finally {
                     await listServerData();
                 }
@@ -487,23 +486,32 @@ export default {
 
         /** Tabs */
         const singleItemTabState = reactive({
-            tabs: computed(() => makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['tag', 'TAB.TAG'],
-                ['admin', 'TAB.MEMBER'],
-                ['history', 'TAB.HISTORY'],
-                ['monitoring', 'TAB.MONITORING'],
-            ],
-            context.parent)),
+            tabs: computed(() => [
+                {
+                    name: 'detail', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_DETAILS') as string, type: 'item',
+                }, {
+                    name: 'tag', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_TAG') as string, type: 'item',
+                }, {
+                    name: 'admin', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MEMBER') as string, type: 'item',
+                }, {
+                    name: 'history', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_HISTORY') as string, type: 'item',
+                }, {
+                    name: 'monitoring', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string, type: 'item',
+                },
+            ]),
             activeTab: 'detail',
         });
 
         const multiItemTabState = reactive({
-            tabs: makeTrItems([
-                ['data', 'TAB.DATA'],
-                ['admin', 'TAB.MEMBER'],
-                ['monitoring', 'TAB.MONITORING'],
-            ], context.parent),
+            tabs: computed(() => [
+                {
+                    name: 'data', label: vm.$t('INVENTORY.SERVER.MAIN.DATA') as string, type: 'item',
+                }, {
+                    name: 'admin', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MEMBER') as string, type: 'item',
+                }, {
+                    name: 'monitoring', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string, type: 'item',
+                },
+            ]),
             activeTab: 'data',
         });
 
@@ -648,25 +656,25 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item {
-        margin-left: 1rem;
-        &:last-child {
-            flex-grow: 1;
-        }
+.left-toolbox-item {
+    margin-left: 1rem;
+    &:last-child {
+        flex-grow: 1;
     }
+}
 
-    .empty-space {
-        @apply text-primary2 mt-6;
-        text-align: center;
-        margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-    }
+.empty-space {
+    @apply text-primary2 mt-6;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
 
-    .selected-data-tab {
-        @apply mt-8;
-    }
+.selected-data-tab {
+    @apply mt-8;
+}
 
-    >>> .p-dynamic-layout-query-search-table .p-query-search-table {
-        border-width: 1px;
-    }
+>>> .p-dynamic-layout-query-search-table .p-query-search-table {
+    border-width: 1px;
+}
 </style>

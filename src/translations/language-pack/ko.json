@@ -360,6 +360,26 @@
 		"REQ_FIELD": "{0}은(는) 필수 항목입니다!",
 		"SCHEDULE": "스케줄에 의한 수집 중",
 		"SELECT_ARG": "{0} 선택",
+		"SERVER": {
+			"MAIN": {
+				"ACTION": "작업",
+				"ALT_E_CHANGE_PROJECT_TITLE": "프로젝트 변경 실패",
+				"ALT_E_RELEASE_PROJECT_TITLE": "프로젝트 해제 실패",
+				"ALT_S_CHANGE_PROJECT_TITLE": "프로젝트 변경 성공",
+				"ALT_S_RELEASE_PROJECT_TITLE": "프로젝트 해제 성공",
+				"CHANGE_PROJECT": "프로젝트 변경",
+				"COLLECT_DATA": "데이터 수집",
+				"CONSOLE": "콘솔",
+				"DELETE": "삭제",
+				"NO_SELECTED_SERVER": "자세한 내용은 위에서 서버를 선택하세요.",
+				"TAB_DATA": "데이터",
+				"TAB_DETAILS": "상세 정보",
+				"TAB_HISTORY": "변경 기록",
+				"TAB_MEMBER": "구성원",
+				"TAB_MONITORING": "모니터링",
+				"TAB_TAG": "태그"
+			}
+		},
 		"TAB": {
 			"ADD_TAG": "태그 추가",
 			"CONFIRM_CRD": "암호화 키 확인",

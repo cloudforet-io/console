@@ -360,6 +360,26 @@
 		"REQ_FIELD": "",
 		"SCHEDULE": "",
 		"SELECT_ARG": "",
+		"SERVER": {
+			"MAIN": {
+				"ACTION": "",
+				"ALT_E_CHANGE_PROJECT_TITLE": "",
+				"ALT_E_RELEASE_PROJECT_TITLE": "",
+				"ALT_S_CHANGE_PROJECT_TITLE": "",
+				"ALT_S_RELEASE_PROJECT_TITLE": "",
+				"CHANGE_PROJECT": "",
+				"COLLECT_DATA": "",
+				"CONSOLE": "",
+				"DELETE": "",
+				"NO_SELECTED_SERVER": "",
+				"TAB_DATA": "",
+				"TAB_DETAILS": "",
+				"TAB_HISTORY": "",
+				"TAB_MEMBER": "",
+				"TAB_MONITORING": "",
+				"TAB_TAG": ""
+			}
+		},
 		"TAB": {
 			"ADD_TAG": "",
 			"CONFIRM_CRD": "",
