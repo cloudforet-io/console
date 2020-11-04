@@ -5,7 +5,7 @@
                                 class="add-btn" name="ic_plus_bold"
                                 @click="addPair"
             >
-                {{ $t('BTN.ADD') }}
+                {{ $t('COMPONENT.DICT_INPUT.ADD') }}
             </p-icon-text-button>
         </slot>
         <div v-if="showHeader" class="tag-header">

@@ -1,0 +1,33 @@
+{
+	"BUTTON_MODAL": {
+		"CANCEL": "취소 ",
+		"CONFIRM": "확인 "
+	},
+	"CONTEXT_MENU": {
+		"NO_ITEM": "아이템이 없습니다. "
+	},
+	"DATE_PAGINATION": {
+		"MONTH": "월 ",
+		"YEAR": "년 "
+	},
+	"DICT_INPUT": {
+		"ADD": "추가 ",
+		"KEY": "키 ",
+		"VALUE": "값 "
+	},
+	"PAGE_TITLE": {
+		"SELECTED_OF": "{selectedCount} / {totalCount}"
+	},
+	"PANEL_CONTENT": {
+		"ID": "아이디 ",
+		"NAME": "이름 ",
+		"STATE": "상태 "
+	},
+	"PROGRESS_WIZARD": {
+		"CANCEL": "취",
+		"CONFIRM": "확인 ",
+		"NEXT": "다음 ",
+		"OPTIONAL": "선택 사항 ",
+		"PREV": "이전 "
+	}
+}

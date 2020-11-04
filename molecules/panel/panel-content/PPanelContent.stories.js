@@ -34,18 +34,18 @@ export const DefaultCase = () => ({
             renderData: [
                 {
                     name: 'id',
-                    label: this.$t('COMMON.ID'),
+                    label: this.$t('COMPONENT.PANEL_CONTENT.ID'),
                     full: true,
                     copyFlag: true,
                 },
                 {
                     name: 'name',
                     full: false,
-                    label: this.$t('COMMON.NAME'),
+                    label: this.$t('COMPONENT.PANEL_CONTENT.NAME'),
                 },
                 {
                     name: 'state',
-                    label: this.$t('COMMON.STATE'),
+                    label: this.$t('COMPONENT.PANEL_CONTENT.STATE'),
                     full: false,
                     copyFlag: true,
                 },

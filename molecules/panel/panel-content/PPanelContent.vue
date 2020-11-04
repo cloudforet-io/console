@@ -104,59 +104,59 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .content-container {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        width: 100%;
-        .content-list {
-            flex-basis: 50%;
-            max-width: 50%;
-        }
-        .content-full-list {
-            flex-basis: 100%;
-            max-width: 100%;
-        }
+.content-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    .content-list {
+        flex-basis: 50%;
+        max-width: 50%;
     }
-    .content {
-        display: flex;
-        align-items: center;
-        padding-bottom: 1rem;
-        .label {
-            @apply text-gray-400;
-            float: left;
-            clear: left;
-            text-align: left;
-            word-break: break-word;
-            padding: 0 1rem;
-            font-weight: bold;
-            min-width: 10rem;
-        }
-        .label-common {
-            width: 25%;
-        }
-        .label-full {
-            width: 12.5%;
-        }
+    .content-full-list {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+}
+.content {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1rem;
+    .label {
+        @apply text-gray-400;
+        float: left;
+        clear: left;
+        text-align: left;
+        word-break: break-word;
+        padding: 0 1rem;
+        font-weight: bold;
+        min-width: 10rem;
+    }
+    .label-common {
+        width: 25%;
+    }
+    .label-full {
+        width: 12.5%;
+    }
 
-        .data {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            text-align: left;
-            color: #222532;
-            opacity: 1;
-            dd {
-                margin: 0;
-            }
-        }
-        .copy-btn::v-deep {
-            flex: 1;
-            height: 1rem;
-            .p-copy-btn {
-                top: -0.3rem;
-            }
+    .data {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        text-align: left;
+        color: #222532;
+        opacity: 1;
+        dd {
+            margin: 0;
         }
     }
+    .copy-btn::v-deep {
+        flex: 1;
+        height: 1rem;
+        .p-copy-btn {
+            top: -0.3rem;
+        }
+    }
+}
 
 </style>

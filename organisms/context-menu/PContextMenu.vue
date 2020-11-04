@@ -15,7 +15,7 @@
         <slot v-else-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
             <div key="no-data" class="context-content context-item no-drag empty" :class="theme">
                 <slot name="no-data-format" v-bind="{...$props, uuid}">
-                    {{ $t('COMMON.NO_ITEM') }}
+                    {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
                 </slot>
             </div>
         </slot>
@@ -191,6 +191,7 @@ export default {
         border-top-color: $border-color;
     }
 }
+
 @define-mixin context-item-theme $color, $hover-bg-color, $hover-color, $active-bg-color, $active-color, $disabled-color {
     color: $color;
     &:hover {
@@ -300,15 +301,15 @@ export default {
 
         &.secondary {
             @mixin context-item-theme theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'),
-            theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.200');
+                theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.200');
         }
         &.gray900 {
             @mixin context-item-theme theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
-            theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
         }
         &.white {
             @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
-            theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
             border-radius: 0.25rem;
         }
     }

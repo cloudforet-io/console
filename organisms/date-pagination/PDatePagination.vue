@@ -61,9 +61,10 @@ export default {
                 const weekEnd = props.date.endOf('week').format('M');
                 if (props.type === 'week') {
                     if (weekStart !== weekEnd) {
-                        return `${weekStart + vm.$t('PWR_SCHED.MONTH')} - ${weekEnd + vm.$t('PWR_SCHED.MONTH')} ${props.date.format('YYYY') + vm.$t('PWR_SCHED.YEAR')}`;
+                        return `${weekStart + vm.$t('COMPONENT.DATE_PAGINATION.MONTH')} -
+                        ${weekEnd + vm.$t('COMPONENT.DATE_PAGINATION.MONTH')} ${props.date.format('YYYY') + vm.$t('COMPONENT.DATE_PAGINATION.YEAR')}`;
                     }
-                    return `${props.date.format('M') + vm.$t('PWR_SCHED.MONTH')} ${props.date.format('YYYY') + vm.$t('PWR_SCHED.YEAR')}`;
+                    return `${props.date.format('M') + vm.$t('COMPONENT.DATE_PAGINATION.MONTH')} ${props.date.format('YYYY') + vm.$t('COMPONENT.DATE_PAGINATION.YEAR')}`;
                 }
                 return props.date.format('YYYY-MM');
             }),

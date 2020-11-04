@@ -1,0 +1,33 @@
+{
+	"BUTTON_MODAL": {
+		"CANCEL": "Cancel",
+		"CONFIRM": "Confirm"
+	},
+	"CONTEXT_MENU": {
+		"NO_ITEM": "No Item"
+	},
+	"DATE_PAGINATION": {
+		"MONTH": "Month",
+		"YEAR": "Year"
+	},
+	"DICT_INPUT": {
+		"ADD": "Add",
+		"KEY": "Key",
+		"VALUE": "Value"
+	},
+	"PAGE_TITLE": {
+		"SELECTED_OF": "{selectedCount} / {totalCount}"
+	},
+	"PANEL_CONTENT": {
+		"ID": "ID",
+		"NAME": "Name",
+		"STATE": "State"
+	},
+	"PROGRESS_WIZARD": {
+		"CANCEL": "Cancel",
+		"CONFIRM": "Confirm",
+		"NEXT": "Next",
+		"OPTIONAL": "Optional",
+		"PREV": "Prev"
+	}
+}

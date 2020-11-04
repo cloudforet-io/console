@@ -2,8 +2,8 @@
     <div class="p-page-title">
         <p-icon-button v-if="child" width="1.5rem" height="1.5rem"
                        name="ic_back"
-                       @click="$emit('goBack',$event)"
                        class="mr-1"
+                       @click="$emit('goBack',$event)"
         />
         <div class="title" :class="{child}">
             <slot name="before-title" />
@@ -16,7 +16,7 @@
             <slot name="extra">
                 <template v-if="useTotalCount">
                     <span v-if="useSelectedCount&&selectedCount">
-                        &nbsp;({{ $t('ACTION.SELECTED_OF',{selectedCount,totalCount}) }})
+                        &nbsp;({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{selectedCount,totalCount}) }})
                     </span>
                     <span v-else>
                         &nbsp;({{ totalCount }})
@@ -65,18 +65,18 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-page-title {
-        @apply mb-6 inline-flex content-start items-center;
-        .title {
-            @apply font-bold;
+.p-page-title {
+    @apply mb-6 inline-flex content-start items-center;
+    .title {
+        @apply font-bold;
+        font-size: 1.5rem;
+        line-height: 120%;
+        &.child {
             font-size: 1.5rem;
-            line-height: 120%;
-            &.child {
-                font-size: 1.5rem;
-            }
-        }
-        .extra {
-            @apply font-normal text-lg;
         }
     }
+    .extra {
+        @apply font-normal text-lg;
+    }
+}
 </style>

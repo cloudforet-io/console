@@ -7,7 +7,7 @@
             <p-input-text v-focus="focused"
                           :class="{invalid: keyInvalid}"
                           :value="name"
-                          :placeholder="$t('WORD.KEY')"
+                          :placeholder="$t('COMPONENT.DICT_INPUT.KEY')"
                           :disabled="disabled"
                           @input="onInput('name', $event)"
                           @blur="$emit('blur:key')"
@@ -21,7 +21,7 @@
         >
             <p-input-text :class="{invalid: valueInvalid}"
                           :value="value"
-                          :placeholder="$t('WORD.VALUE')"
+                          :placeholder="$t('COMPONENT.DICT_INPUT.VALUE')"
                           :disabled="disabled"
                           @input="onInput('value', $event)"
                           @blur="$emit('blur:value')"
@@ -88,30 +88,29 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .p-dict-input {
-        display: inline-flex;
-        align-items: flex-start;
-        .input-box {
-            margin-bottom: 0;
-            &.key {
-                width: 15rem;
-            }
-            &.value {
-                width: 20rem;
-            }
-            .p-text-input {
-                width: 100%;
-                &.invalid {
-                    @apply border border-alert;
-                }
-            }
+.p-dict-input {
+    display: inline-flex;
+    align-items: flex-start;
+    .input-box {
+        margin-bottom: 0;
+        &.key {
+            width: 15rem;
         }
-        .split {
-            padding-left: 0.125rem;
-            padding-right: 0.125rem;
-            line-height: 2rem;
+        &.value {
+            width: 20rem;
+        }
+        .p-text-input {
+            width: 100%;
+            &.invalid {
+                @apply border border-alert;
+            }
         }
     }
-
+    .split {
+        padding-left: 0.125rem;
+        padding-right: 0.125rem;
+        line-height: 2rem;
+    }
+}
 
 </style>

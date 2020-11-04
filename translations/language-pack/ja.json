@@ -1,0 +1,33 @@
+{
+	"BUTTON_MODAL": {
+		"CANCEL": "",
+		"CONFIRM": ""
+	},
+	"CONTEXT_MENU": {
+		"NO_ITEM": ""
+	},
+	"DATE_PAGINATION": {
+		"MONTH": "",
+		"YEAR": ""
+	},
+	"DICT_INPUT": {
+		"ADD": "",
+		"KEY": "",
+		"VALUE": ""
+	},
+	"PAGE_TITLE": {
+		"SELECTED_OF": ""
+	},
+	"PANEL_CONTENT": {
+		"ID": "",
+		"NAME": "",
+		"STATE": ""
+	},
+	"PROGRESS_WIZARD": {
+		"CANCEL": "",
+		"CONFIRM": "",
+		"NEXT": "",
+		"OPTIONAL": "",
+		"PREV": ""
+	}
+}

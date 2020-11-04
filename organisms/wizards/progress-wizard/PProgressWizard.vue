@@ -34,7 +34,7 @@
                 <div class="step-title">
                     <span class="step">Step {{ proxyActiveIdx + 1 }}.</span>
                     <span class="title">{{ activeTab.label || activeTab.name }}</span>
-                    <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
+                    <span v-if="activeTab.optional" class="optional"> ({{ $t('PROGRESS_WIZARD.OPTIONAL') }})</span>
                 </div>
                 <div class="step-appendix">
                     <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />
@@ -52,20 +52,20 @@
                 <p-button v-bind="mergedCancelBtnBind"
                           class="txt-btn" @click="$emit('cancel', $event)"
                 >
-                    {{ $t('BTN.CANCEL') }}
+                    {{ $t('PROGRESS_WIZARD.CANCEL') }}
                 </p-button>
                 <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
                               v-bind="mergedNavBtnBind"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="transparent inherit" />{{ $t('COMMON.PREV') }}
+                        <p-i name="ic_back" color="transparent inherit" />{{ $t('PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               v-bind="mergedNavBtnBind"
                               @click="onClickNext"
                     >
-                        {{ $t('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
+                        {{ $t('PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
                     <p-loading-button :button-bind="mergedConfirmBtnBind"
                                       :loading="loading"
@@ -73,7 +73,7 @@
                                       class="txt-btn"
                                       @click="$emit('confirm', tabs, $event)"
                     >
-                        {{ $t('BTN.CONFIRM') }}
+                        {{ $t('PROGRESS_WIZARD.CONFIRM') }}
                     </p-loading-button>
                 </div>
             </div>

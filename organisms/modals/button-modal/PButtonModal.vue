@@ -41,7 +41,7 @@
                         @click="onCancelClick"
                     >
                         <slot :slot-scope="$props" name="close-button">
-                            {{ $t('BTN.CANCEL') }}
+                            {{ $t('COMPONENT.BUTTON_MODAL.CANCEL') }}
                         </slot>
                     </p-button>
                     <p-loading-button v-if="footerConfirmButtonVisible"
@@ -52,7 +52,7 @@
                                       @click="onConfirmClick"
                     >
                         <slot :slot-scope="$props" name="confirm-button">
-                            {{ $t('BTN.CONFIRM') }}
+                            {{ $t('COMPONENT.BUTTON_MODAL.CONFIRM') }}
                         </slot>
                     </p-loading-button>
                 </div>
@@ -204,40 +204,40 @@ export default {
 
 </script>
 <style lang="postcss" scoped>
-    .scrollable-body {
-        display: flex;
-    }
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        .close-btn {
-            @apply text-gray-900;
-            cursor: pointer;
-            &:hover {
-                @apply text-secondary;
-            }
-            &.disabled {
-                @apply text-gray-200;
-            }
+.scrollable-body {
+    display: flex;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    .close-btn {
+        @apply text-gray-900;
+        cursor: pointer;
+        &:hover {
+            @apply text-secondary;
+        }
+        &.disabled {
+            @apply text-gray-200;
         }
     }
+}
 
-    .footer {
-        display: flex;
-        align-items: center;
-        width: 100%;
+.footer {
+    display: flex;
+    align-items: center;
+    width: 100%;
 
-        .modal-btn {
-            height: 2.5rem;
-            font-size: 1rem;
-        }
-
-        .cancel-btn {
-            margin-left: auto;
-            margin-right: 1rem;
-        }
+    .modal-btn {
+        height: 2.5rem;
+        font-size: 1rem;
     }
+
+    .cancel-btn {
+        margin-left: auto;
+        margin-right: 1rem;
+    }
+}
 
 </style>
