@@ -26,6 +26,7 @@
                 <p-markdown
                     :markdown="description.options.markdown"
                     :data="description.options.markdown"
+                    class="p-4"
                 />
             </template>
         </p-collapsible-panel>
@@ -62,13 +63,13 @@
             <p-dict-input-group ref="dictRef"
                                 :dict="tags"
                                 show-validation
-                                show-header
             >
                 <template #addButton="scope">
                     <p-icon-text-button
                         outline style-type="primary" :disabled="scope.disabled"
                         name="ic_plus_bold"
                         @click="scope.addPair($event)"
+                        class="mb-2"
                     >
                         {{ $t('BTN.ADD_TAG') }}
                     </p-icon-text-button>
