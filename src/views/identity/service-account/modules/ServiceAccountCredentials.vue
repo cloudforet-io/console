@@ -10,17 +10,24 @@
                         :style="{height: '100%', border: 'none'}"
                         @init="onChange"
                         @change="onChange"
-        />
+        >
+            <template #col-created_at-format="{value}">
+                {{ timestampFormatter(value) }}
+            </template>
+        </p-search-table>
     </div>
 </template>
 
 <script lang="ts">
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { reactive, toRefs, watch } from '@vue/composition-api';
+
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
+
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { timestampFormatter } from '@/lib/util';
 
 export default {
     name: 'ServiceAccountCredentials',
@@ -42,7 +49,7 @@ export default {
                 { label: 'Schema', name: 'schema' },
                 {
                     label: 'Created',
-                    name: 'created_at.seconds',
+                    name: 'created_at',
                     type: 'datetime',
                     options: {
                         source_type: 'timestamp',
@@ -97,6 +104,7 @@ export default {
 
         return {
             ...toRefs(state),
+            timestampFormatter,
             onChange,
         };
     },

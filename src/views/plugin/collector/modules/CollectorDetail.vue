@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-panel-top>{{ baseState.name }}</p-panel-top>
-        <p-definition-table :fields="baseState.fields" :data="baseState.data" :loading="baseState.isLoading"
+        <p-definition-table :fields="baseState.fields" :data="baseState.data" :loading="baseState.loading"
                             :skeleton-rows="7" v-on="$listeners"
         >
             <template #data-name>
@@ -49,33 +49,21 @@ export default {
         },
     },
     setup(props) {
-        // Base Information
         const baseState = reactive({
             name: 'Base Information',
-            isLoading: true,
+            loading: true,
             fields: computed(() => [
                 { label: 'ID', name: 'collector_id' },
                 { label: 'Name', name: 'name' },
                 { label: 'Provider', name: 'provider' },
                 { label: 'Priority', name: 'priority' },
                 { label: 'Resource Type', name: 'plugin_info.options.supported_resource_type' },
-                { label: 'Last Collected', name: 'last_collected_at.seconds', formatter: timestampFormatter },
-                { label: 'Created', name: 'created_at.seconds', formatter: timestampFormatter },
+                { label: 'Last Collected', name: 'last_collected_at', formatter: timestampFormatter },
+                { label: 'Created', name: 'created_at', formatter: timestampFormatter },
             ]),
             data: {},
         });
-        const getCollectorDetailData = async () => {
-            const res = await SpaceConnector.client.inventory.collector.get({
-                collector_id: props.collectorId,
-            });
-            baseState.isLoading = false;
-            if (res) baseState.data = res;
-        };
-        watch(() => props.collectorId, () => {
-            getCollectorDetailData();
-        }, { immediate: true });
 
-        // Filter Format
         const filterState = reactive({
             name: 'Filter Format',
             fields: computed(() => [
@@ -87,6 +75,19 @@ export default {
             rootPath: 'plugin_info.options.filter_format',
             items: computed(() => get(baseState.data, filterState.rootPath, [])),
         });
+
+        /* api */
+        const getCollectorDetailData = async () => {
+            const res = await SpaceConnector.client.inventory.collector.get({
+                collector_id: props.collectorId,
+            });
+            baseState.loading = false;
+            console.log(res);
+            if (res) baseState.data = res;
+        };
+        watch(() => props.collectorId, () => {
+            getCollectorDetailData();
+        }, { immediate: true });
 
         return {
             baseState,
