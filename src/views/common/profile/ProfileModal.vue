@@ -220,7 +220,6 @@ export default {
             }
             await updateProfile(userParam);
 
-            vm.$i18n.locale = state.userState.language;
             state.proxyVisible = false;
         };
 

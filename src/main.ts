@@ -54,7 +54,7 @@ directive(Vue);
 setStore();
 const { logout } = useStore();
 
-const configInit = async () => {
+const initConfig = async () => {
     await config.init();
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // TODO: open session expire modal
@@ -63,7 +63,7 @@ const configInit = async () => {
     Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'));
 };
 
-const domainInit = async () => {
+const initDomain = async () => {
     let domainName;
     if (config.get('DOMAIN_NAME_REF') === 'hostname') {
         const { hostname } = window.location;
@@ -74,17 +74,24 @@ const domainInit = async () => {
     await store.dispatch('domain/load', domainName);
 };
 
-const gtagInit = () => {
+const initGtag = () => {
     if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), Vue, router);
     setGtagUserID(Vue.prototype, store);
+};
+
+const initLanguage = () => {
+    store.watch(state => state.user.language, (lang) => {
+        i18n.locale = lang as string;
+    }, { immediate: true });
 };
 
 
 (async () => {
     try {
-        await configInit();
-        await domainInit();
-        gtagInit();
+        await initConfig();
+        await initDomain();
+        initGtag();
+        initLanguage();
     } catch (e) {
         console.error(e);
     }
