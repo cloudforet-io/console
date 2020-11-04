@@ -110,33 +110,33 @@ export default {
 </script>
 
 <style lang="postcss">
-    @import 'codemirror/theme/ayu-mirage.css';
-    @import 'codemirror/addon/lint/lint.css';
-    @import 'codemirror/lib/codemirror.css';
-    @import 'codemirror/addon/fold/foldgutter.css';
-    .p-text-editor {
-        height: 100%;
-        min-height: 5rem;
-        .CodeMirror {
-            font-family: Inconsolata, monospace;
-            line-height: 1.5;
-            height: fit-content;
-            margin: 1rem;
-            padding: 1rem;
-        }
-        position: relative;
-        .loader {
-            position: absolute;
-            padding-top: 2rem;
-        }
-        .fade-in-leave-active, .fade-in-enter-active {
-            transition: opacity 0.5s;
-        }
-        .fade-in-leave-to, .fade-in-enter {
-            opacity: 0;
-        }
-        .fade-in-enter-to, .fade-in-leave {
-            opacity: 1;
-        }
+@import 'codemirror/theme/ayu-mirage.css';
+@import 'codemirror/addon/lint/lint.css';
+@import 'codemirror/lib/codemirror.css';
+@import 'codemirror/addon/fold/foldgutter.css';
+.p-text-editor {
+    height: 100%;
+    min-height: 5rem;
+    .CodeMirror {
+        font-family: Inconsolata, monospace;
+        line-height: 1.5;
+        height: fit-content;
+        margin: 1rem;
+        padding: 1rem;
     }
+    position: relative;
+    .loader {
+        position: absolute;
+        padding-top: 2rem;
+    }
+    .fade-in-leave-active, .fade-in-enter-active {
+        transition: opacity 0.5s;
+    }
+    .fade-in-leave-to, .fade-in-enter {
+        opacity: 0;
+    }
+    .fade-in-enter-to, .fade-in-leave {
+        opacity: 1;
+    }
+}
 </style>

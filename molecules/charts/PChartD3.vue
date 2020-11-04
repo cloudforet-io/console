@@ -238,61 +238,61 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-chart-container {
-        position: relative;
+.p-chart-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+
+    .spinner-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 99;
         width: 100%;
         height: 100%;
-        display: flex;
-        justify-content: center;
-
-        .spinner-container {
+        overflow: hidden;
+        background: rgba(theme('colors.white'), 0.5);
+        .spinner {
             position: absolute;
-            left: 0;
-            top: 0;
-            z-index: 99;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: rgba(theme('colors.white'), 0.5);
-            .spinner {
-                position: absolute;
-                display: inline-flex;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
+            display: inline-flex;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-            &.fade-in-enter-active {
-                transition: opacity 0.3s, visibility 0.3s;
-            }
-            &.fade-in-leave-active {
-                transition: opacity 0.3s, visibility 0.3s;
-            }
-            &.fade-in-enter, &.fade-in-leave-to {
-                visibility: hidden;
-                opacity: 0;
-            }
-            &.fade-in-leave, &.fade-in-enter-to {
-                visibility: visible;
-                opacity: 1;
-            }
+        &.fade-in-enter-active {
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        &.fade-in-leave-active {
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        &.fade-in-enter, &.fade-in-leave-to {
+            visibility: hidden;
+            opacity: 0;
+        }
+        &.fade-in-leave, &.fade-in-enter-to {
+            visibility: visible;
+            opacity: 1;
         }
     }
+}
 
-    .tooltip-title {
-        display: flex;
-        align-items: center;
-        .circle {
-            display: inline-block;
-            height: 12px;
-            width: 12px;
-            border-radius: 50%;
-        }
-        .text {
-            @apply text-white;
-            padding-left: 4px;
-            font-size: 14px;
-        }
+.tooltip-title {
+    display: flex;
+    align-items: center;
+    .circle {
+        display: inline-block;
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
     }
+    .text {
+        @apply text-white;
+        padding-left: 4px;
+        font-size: 14px;
+    }
+}
 
 </style>

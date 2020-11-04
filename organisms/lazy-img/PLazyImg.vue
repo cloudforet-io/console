@@ -108,22 +108,22 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-lazy-img {
-        @apply inline-block relative;
-        .img-container {
-            @apply inline-block w-full h-full absolute rounded-sm overflow-hidden;
-            &.error {
-                @apply inline-flex;
-            }
-        }
-        .fade-in-leave-active, .fade-in-enter-active {
-            transition: opacity 0.5s;
-        }
-        .fade-in-leave-to, .fade-in-enter {
-            opacity: 0;
-        }
-        .fade-in-enter-to, .fade-in-leave {
-            opacity: 1;
+.p-lazy-img {
+    @apply inline-block relative;
+    .img-container {
+        @apply inline-block w-full h-full absolute rounded-sm overflow-hidden;
+        &.error {
+            @apply inline-flex;
         }
     }
+    .fade-in-leave-active, .fade-in-enter-active {
+        transition: opacity 0.5s;
+    }
+    .fade-in-leave-to, .fade-in-enter {
+        opacity: 0;
+    }
+    .fade-in-enter-to, .fade-in-leave {
+        opacity: 1;
+    }
+}
 </style>

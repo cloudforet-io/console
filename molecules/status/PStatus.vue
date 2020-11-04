@@ -99,47 +99,47 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    @define-mixin status-theme $icon-color, $circle-color {
-        .fort-awesome {
-            color: $icon-color;
-        }
-        .p-i {
-            color: $icon-color;
-        }
-        .circle {
-            background-color: $icon-color;
-        }
-        .label {
-            color: $circle-color;
-        }
+@define-mixin status-theme $icon-color, $circle-color {
+    .fort-awesome {
+        color: $icon-color;
     }
-    .p-status {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        .circle {
-            border-radius: 50%;
-            height: 0.5rem;
-            width: 0.5rem;
-            margin-right: 0.1rem;
-        }
-        .label {
-            margin: 0;
-            margin-left: 0.3rem;
-        }
+    .p-i {
+        color: $icon-color;
+    }
+    .circle {
+        background-color: $icon-color;
+    }
+    .label {
+        color: $circle-color;
+    }
+}
+.p-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    .circle {
+        border-radius: 50%;
+        height: 0.5rem;
+        width: 0.5rem;
+        margin-right: 0.1rem;
+    }
+    .label {
+        margin: 0;
+        margin-left: 0.3rem;
+    }
 
-        /* theme */
-        &.yellow {
-            @mixin status-theme theme('colors.yellow.500'), theme('colors.black');
-        }
-        &.green {
-            @mixin status-theme theme('colors.green.500'), theme('colors.black');
-        }
-        &.red {
-            @mixin status-theme theme('colors.red.500'), theme('colors.red.500');
-        }
-        &.gray {
-            @mixin status-theme theme('colors.gray.500'), theme('colors.gray.500');
-        }
+    /* theme */
+    &.yellow {
+        @mixin status-theme theme('colors.yellow.500'), theme('colors.black');
     }
+    &.green {
+        @mixin status-theme theme('colors.green.500'), theme('colors.black');
+    }
+    &.red {
+        @mixin status-theme theme('colors.red.500'), theme('colors.red.500');
+    }
+    &.gray {
+        @mixin status-theme theme('colors.gray.500'), theme('colors.gray.500');
+    }
+}
 </style>

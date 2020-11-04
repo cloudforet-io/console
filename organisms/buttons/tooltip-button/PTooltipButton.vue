@@ -73,24 +73,24 @@ export default {
 
 <style scoped lang="postcss">
 
-    @define-mixin theme $theme, $color {
-        &.$(theme) {
-            &:hover, &.active {
-                background-color: $color;
-            }
+@define-mixin theme $theme, $color {
+    &.$(theme) {
+        &:hover, &.active {
+            background-color: $color;
         }
     }
-    .tooltip-btn {
-        @apply text-primary4;
-        display: inline-block;
-        padding: 0;
-        border-radius: 2px;
-        border: 0;
-        min-width: 32px;
-        line-height: 1;
+}
+.tooltip-btn {
+    @apply text-primary4;
+    display: inline-block;
+    padding: 0;
+    border-radius: 2px;
+    border: 0;
+    min-width: 32px;
+    line-height: 1;
 
-        @mixin theme primary-dark, theme('colors.primary-dark');
-        @mixin theme transparent, transparent;
-    }
+    @mixin theme primary-dark, theme('colors.primary-dark');
+    @mixin theme transparent, transparent;
+}
 
 </style>

@@ -147,68 +147,68 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .vertical-container {
-        display: flex;
-        width: 100%;
-        flex-direction: row;
-        z-index: 1;
-        padding: 0;
-        margin: unset;
+.vertical-container {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    z-index: 1;
+    padding: 0;
+    margin: unset;
+}
+.sidebar-container {
+    &.transition {
+        transition: width 0.5s;
     }
-    .sidebar-container {
-        &.transition {
-            transition: width 0.5s;
-        }
-    }
-    .main {
-        display: flex;
-        flex-direction: column;
-        justify-content: stretch;
+}
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
 
-        /* flex-grow: 1; */
-        overflow-x: hidden;
-        overflow-y: auto;
+    /* flex-grow: 1; */
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.resizer-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 5px;
+    &.line {
+        @apply border-l border-gray-200;
+        background-color: transparent;
+        &:hover {
+            @apply border-l border-secondary;
+            cursor: ew-resize;
+        }
     }
-    .resizer-container {
-        display: flex;
-        align-items: flex-start;
+    &.prohibit-line {
+        @apply border-l  border-gray-200;
+        background-color: transparent;
+        &:hover {
+            @apply border-l border-secondary;
+        }
+    }
+    .resizer {
+        @apply text-gray-400;
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        z-index: 1;
+        cursor: col-resize;
+        > span {
+            margin-right: 0.65rem;
+            cursor: pointer;
+        }
+    }
+    .btn-vertical-hide {
+        margin-top: 1rem;
+        margin-left: 0.5rem;
         justify-content: center;
-        width: 5px;
-        &.line {
-            @apply border-l border-gray-200;
-            background-color: transparent;
-            &:hover {
-                @apply border-l border-secondary;
-                cursor: ew-resize;
-            }
-        }
-        &.prohibit-line {
-            @apply border-l  border-gray-200;
-            background-color: transparent;
-            &:hover {
-                @apply border-l border-secondary;
-            }
-        }
-        .resizer {
-            @apply text-gray-400;
-            display: inline-block;
-            font-size: 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            z-index: 1;
-            cursor: col-resize;
-            > span {
-                margin-right: 0.65rem;
-                cursor: pointer;
-            }
-        }
-        .btn-vertical-hide {
-            margin-top: 1rem;
-            margin-left: 0.5rem;
-            justify-content: center;
-            &:hover {
-                @apply text-secondary;
-            }
+        &:hover {
+            @apply text-secondary;
         }
     }
+}
 </style>

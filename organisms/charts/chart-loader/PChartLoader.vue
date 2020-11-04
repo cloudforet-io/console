@@ -37,22 +37,22 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-chart-loader {
-        position: relative;
-        .loader {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .fade-in-leave-active, .fade-in-enter-active {
-            transition: opacity 0.5s;
-        }
-        .fade-in-leave-to, .fade-in-enter {
-            opacity: 0;
-        }
-        .fade-in-enter-to, .fade-in-leave {
-            opacity: 1;
-        }
+.p-chart-loader {
+    position: relative;
+    .loader {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
+    .fade-in-leave-active, .fade-in-enter-active {
+        transition: opacity 0.5s;
+    }
+    .fade-in-leave-to, .fade-in-enter {
+        opacity: 0;
+    }
+    .fade-in-enter-to, .fade-in-leave {
+        opacity: 1;
+    }
+}
 </style>

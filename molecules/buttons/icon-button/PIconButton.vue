@@ -154,7 +154,7 @@ export default {
         }
 
         @define-mixin button-style
-        $solid-bg-color, $solid-text-color, $outline-border-color, $outline-text-color {
+            $solid-bg-color, $solid-text-color, $outline-border-color, $outline-text-color {
             color: $outline-text-color;
 
             &.solid {
@@ -174,13 +174,13 @@ export default {
 
         /* default */
         @mixin button-style
-        theme('colors.gray.900'), theme('colors.white'),
+            theme('colors.gray.900'), theme('colors.white'),
         theme('colors.gray.300'), theme('colors.gray.900');
 
         /* themes */
         &.icon-btn-primary-dark {
             @mixin button-style
-            theme('colors.primary-dark'), theme('colors.white'),
+                theme('colors.primary-dark'), theme('colors.white'),
             theme('colors.primary-dark'), theme('colors.primary-dark');
         }
     }

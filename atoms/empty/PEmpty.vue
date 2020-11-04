@@ -21,14 +21,15 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-empty {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.5rem;
-        line-height: 2rem;
-        @apply text-primary2;
-    }
+.p-empty {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    line-height: 2rem;
+
+    @apply text-primary2;
+}
 </style>

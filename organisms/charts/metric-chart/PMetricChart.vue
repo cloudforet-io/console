@@ -213,21 +213,21 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .chart {
-        @apply mt-5 relative px-2;
-        height: 12.5rem;
-    }
-    .shade {
-        @apply absolute opacity-50 bg-white w-full h-full flex items-center justify-center;
-        bottom: 0;
-    }
-    .fade-in-enter-active, .fade-in-leave-active {
-        transition: opacity 0.5s;
-    }
-    .fade-in-enter, .fade-in-leave-to {
-        opacity: 0;
-    }
-    .fade-in-enter-to, .fade-in-leave {
-        opacity: 0.5;
-    }
+.chart {
+    @apply mt-5 relative px-2;
+    height: 12.5rem;
+}
+.shade {
+    @apply absolute opacity-50 bg-white w-full h-full flex items-center justify-center;
+    bottom: 0;
+}
+.fade-in-enter-active, .fade-in-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-in-enter, .fade-in-leave-to {
+    opacity: 0;
+}
+.fade-in-enter-to, .fade-in-leave {
+    opacity: 0.5;
+}
 </style>

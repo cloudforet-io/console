@@ -20,12 +20,12 @@ export default {
 };
 </script>
 <style lang="postcss">
-    .p-dict-list {
-        ul {
-            list-style-type: disc;
-        }
-        li {
-            display: list-item;
-        }
+.p-dict-list {
+    ul {
+        list-style-type: disc;
     }
+    li {
+        display: list-item;
+    }
+}
 </style>

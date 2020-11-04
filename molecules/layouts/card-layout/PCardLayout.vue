@@ -49,23 +49,23 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .card-layout {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        table-layout: fixed;
-        .card-container {
-            @apply border-r border-gray-200;
-            vertical-align: top;
-            &.no-border {
-                border-right: 0;
-            }
-            &.card-margin {
-                margin: 1rem 0;
-            }
-            &.card-padding {
-                padding: 0 1rem;
-            }
+.card-layout {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    table-layout: fixed;
+    .card-container {
+        @apply border-r border-gray-200;
+        vertical-align: top;
+        &.no-border {
+            border-right: 0;
+        }
+        &.card-margin {
+            margin: 1rem 0;
+        }
+        &.card-padding {
+            padding: 0 1rem;
         }
     }
+}
 </style>

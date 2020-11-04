@@ -64,7 +64,7 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-dynamic-layout-raw {
-        @apply w-full;
-    }
+.p-dynamic-layout-raw {
+    @apply w-full;
+}
 </style>

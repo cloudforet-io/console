@@ -85,10 +85,10 @@ export default {
     font-size: 0.875rem;
     line-height: 2rem;
     transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
 
     &[type="button"], &[type="reset"], &[type="submit"] {
         appearance: none;

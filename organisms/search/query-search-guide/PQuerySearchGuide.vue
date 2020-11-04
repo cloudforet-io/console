@@ -122,65 +122,65 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .header-title {
-        line-height: 120%;
+.header-title {
+    line-height: 120%;
+}
+.close-btn {
+    @apply float-right cursor-pointer text-gray-900;
+    &:hover {
+        @apply text-secondary;
     }
-    .close-btn {
-        @apply float-right cursor-pointer text-gray-900;
-        &:hover {
-            @apply text-secondary;
+}
+.number {
+    @apply font-bold text-sm text-gray-500;
+    margin-right: 0.6875rem;
+}
+.help-search-img {
+    @apply border border-gray-200;
+    margin-top: 0.625rem;
+    margin-bottom: 2.5rem;
+    margin-left: 1.625rem;
+    padding: 2px;
+    border-radius: 2px;
+}
+.wrapped-text {
+    margin-left: 1.625rem;
+    line-height: 1.5;
+}
+.search-operator {
+    @apply border border-gray-200;
+    border-radius: 2px;
+    width: 21rem;
+    height: 14rem;
+    margin-top: 0.625rem;
+    margin-left: 1.625rem;
+    margin-bottom: 0.5rem;
+}
+.third {
+    .left-content {
+        @apply text-xs;
+        width: 6.125rem;
+        border-right: 1px solid theme('colors.gray.200');
+        margin-right: 1rem;
+        padding-left: 1rem;
+        #search-key {
+            @apply text-gray-400;
+            margin-bottom: 1rem;
+        }
+        #search-operator {
+            @apply text-gray-900;
+        }
+        #search-operand {
+            @apply text-gray-400;
         }
     }
-    .number {
-        @apply font-bold text-sm text-gray-500;
-        margin-right: 0.6875rem;
+    .right-content {
+        @apply text-xs;
+        padding-left: 1rem;
     }
-    .help-search-img {
-        @apply border border-gray-200;
-        margin-top: 0.625rem;
-        margin-bottom: 2.5rem;
-        margin-left: 1.625rem;
-        padding: 2px;
-        border-radius: 2px;
-    }
-    .wrapped-text {
-        margin-left: 1.625rem;
-        line-height: 1.5;
-    }
-    .search-operator {
-        @apply border border-gray-200;
-        border-radius: 2px;
-        width: 21rem;
-        height: 14rem;
-        margin-top: 0.625rem;
-        margin-left: 1.625rem;
-        margin-bottom: 0.5rem;
-    }
-    .third {
-        .left-content {
-            @apply text-xs;
-            width: 6.125rem;
-            border-right: 1px solid theme('colors.gray.200');;
-            margin-right: 1rem;
-            padding-left: 1rem;
-            #search-key {
-                @apply text-gray-400;
-                margin-bottom: 1rem;
-            }
-            #search-operator {
-                @apply text-gray-900;
-            }
-            #search-operand {
-                @apply text-gray-400;
-            }
-        }
-        .right-content {
-            @apply text-xs;
-            padding-left: 1rem;
-        }
-    }
-    .contact {
-        @apply float-right text-gray-400 text-xs;
-        margin-bottom: 1.875rem;
-    }
+}
+.contact {
+    @apply float-right text-gray-400 text-xs;
+    margin-bottom: 1.875rem;
+}
 </style>

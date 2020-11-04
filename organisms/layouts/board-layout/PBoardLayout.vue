@@ -40,22 +40,22 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .board-pane {
-        padding: 1rem;
+.board-pane {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    .header {
+        padding-top: 0.875rem;
         display: flex;
-        flex-direction: column;
-        .header {
-            padding-top: 0.875rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            &.no-pad {
-                padding-top: 0;
-                height: 3rem;
-            }
-            .title {
-                font-size: 1.125rem;
-            }
+        justify-content: space-between;
+        align-items: center;
+        &.no-pad {
+            padding-top: 0;
+            height: 3rem;
+        }
+        .title {
+            font-size: 1.125rem;
         }
     }
+}
 </style>

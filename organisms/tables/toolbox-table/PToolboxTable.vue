@@ -277,55 +277,55 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-toolbox-table {
-        @apply flex flex-col bg-white border border-gray-200 rounded-sm;
+.p-toolbox-table {
+    @apply flex flex-col bg-white border border-gray-200 rounded-sm;
 
-        .p-data-table {
-            @apply overflow-auto;
+    .p-data-table {
+        @apply overflow-auto;
+    }
+
+    .toolbox {
+        @apply px-4 py-6 flex-col;
+
+        /* margin-top: 0.5rem; */
+        .toolbox-block {
+            @apply flex w-full;
         }
+        .toolbox-top {
+            @apply mb-4;
+        }
+        .toolbox-middle {
+            @apply justify-between flex-no-wrap items-center;
 
-        .toolbox {
-            @apply px-4 py-6 flex-col;
-
-            /* margin-top: 0.5rem; */
-            .toolbox-block {
-                @apply flex w-full;
+            .left {
+                @apply flex flex-wrap justify-start w-auto;
             }
-            .toolbox-top {
-                @apply mb-4;
+            .center {
+                @apply flex w-full flex-no-wrap justify-center;
             }
-            .toolbox-middle {
-                @apply justify-between flex-no-wrap items-center;
-
-                .left {
-                    @apply flex flex-wrap justify-start w-auto;
-                }
-                .center {
-                    @apply flex w-full flex-no-wrap justify-center;
-                }
-                .right {
-                    @apply flex flex-no-wrap w-auto justify-end;
-                    .page-size-dropdown::v-deep {
-                        .p-dropdown-btn {
-                            min-width: 6rem;
-                        }
+            .right {
+                @apply flex flex-no-wrap w-auto justify-end;
+                .page-size-dropdown::v-deep {
+                    .p-dropdown-btn {
+                        min-width: 6rem;
                     }
                 }
             }
         }
-        .tool {
-            @apply inline;
+    }
+    .tool {
+        @apply inline;
 
-            @screen md {
-                @apply ml-4;
-            }
-        }
-        .md-hide-tool {
-            @apply hidden;
-
-            @screen md {
-                @apply inline;
-            }
+        @screen md {
+            @apply ml-4;
         }
     }
+    .md-hide-tool {
+        @apply hidden;
+
+        @screen md {
+            @apply inline;
+        }
+    }
+}
 </style>

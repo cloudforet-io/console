@@ -230,13 +230,13 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-dynamic-layout-query-search-table {
-        .panel-top {
-            margin: 0.5rem 0 0;
-        }
-        .p-query-search-table {
-            height: 100%;
-            border-width: 0;
-        }
+.p-dynamic-layout-query-search-table {
+    .panel-top {
+        margin: 0.5rem 0 0;
     }
+    .p-query-search-table {
+        height: 100%;
+        border-width: 0;
+    }
+}
 </style>

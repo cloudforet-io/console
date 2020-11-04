@@ -117,8 +117,8 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .form-container {
-        display: flex;
-        width: 100%;
-    }
+.form-container {
+    display: flex;
+    width: 100%;
+}
 </style>

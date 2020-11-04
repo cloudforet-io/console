@@ -34,20 +34,20 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-panel-top {
-        @apply mb-4 mx-4 mt-8;
-        display: flex;
-        height: 2rem;
-        align-items: center;
-        .title {
-            @apply text-2xl;
-        }
-        .total-count {
-            @apply text-gray-500 text-lg;
-        }
-        .extra {
-            @apply pl-4;
-            flex-grow: 1;
-        }
+.p-panel-top {
+    @apply mb-4 mx-4 mt-8;
+    display: flex;
+    height: 2rem;
+    align-items: center;
+    .title {
+        @apply text-2xl;
     }
+    .total-count {
+        @apply text-gray-500 text-lg;
+    }
+    .extra {
+        @apply pl-4;
+        flex-grow: 1;
+    }
+}
 </style>

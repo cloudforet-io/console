@@ -18,12 +18,13 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-hr {
-        width: 100%;
-        border: none;
-        height: 1px;
-        @apply text-gray-200 bg-gray-200;
-        margin-top: 0px;
-        margin-bottom: 0px;
-    }
+.p-hr {
+    width: 100%;
+    border: none;
+    height: 1px;
+
+    @apply text-gray-200 bg-gray-200;
+    margin-top: 0;
+    margin-bottom: 0;
+}
 </style>

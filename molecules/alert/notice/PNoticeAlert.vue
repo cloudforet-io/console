@@ -58,14 +58,14 @@ export default {
 </script>
 
 <style lang="postcss">
-    .vue-notification-group {
-        overflow: unset;
-        margin: 0 2rem;
-    }
-    .vue-notification-wrapper {
-        margin: 1rem 0;
-        overflow: visible;
-    }
+.vue-notification-group {
+    overflow: unset;
+    margin: 0 2rem;
+}
+.vue-notification-wrapper {
+    margin: 1rem 0;
+    overflow: visible;
+}
 </style>
 
 <style lang="postcss" scoped>
@@ -96,7 +96,7 @@ export default {
         padding-top: 0.5rem;
     }
     &:hover {
-        opacity: .6;
+        opacity: 0.6;
         cursor: pointer;
     }
 

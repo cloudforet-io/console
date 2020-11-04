@@ -239,10 +239,10 @@ export default {
 };
 </script>
 <style lang="postcss">
-    .p-dynamic-layout-table {
-        .p-search-table {
-            height: 100%;
-            border-width: 0;
-        }
+.p-dynamic-layout-table {
+    .p-search-table {
+        height: 100%;
+        border-width: 0;
     }
+}
 </style>

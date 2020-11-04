@@ -43,7 +43,7 @@ export default {
 };
 </script>
 <style lang="postcss" >
-    .p-raw-data {
-        @apply w-auto;
-    }
+.p-raw-data {
+    @apply w-auto;
+}
 </style>

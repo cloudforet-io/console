@@ -123,50 +123,50 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .p-search {
-        @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full;
-        border-radius: 2px;
-        height: 2rem;
-        line-height: 2rem;
-        min-width: 0;
-        &.disabled {
-            @apply border-gray-200 bg-gray-100;
-        }
-        &.focused {
-            @apply border-secondary bg-blue-100;
-        }
-        &:hover {
-            @apply border-secondary;
-        }
-        input {
-            @apply border-0 bg-transparent flex-grow;
-            color: inherit;
-            font-size: 0.875rem;
-            appearance: none;
-            height: calc(2rem - 2px);
-            &::placeholder {
-                @apply text-gray-300;
-            }
+.p-search {
+    @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full;
+    border-radius: 2px;
+    height: 2rem;
+    line-height: 2rem;
+    min-width: 0;
+    &.disabled {
+        @apply border-gray-200 bg-gray-100;
+    }
+    &.focused {
+        @apply border-secondary bg-blue-100;
+    }
+    &:hover {
+        @apply border-secondary;
+    }
+    input {
+        @apply border-0 bg-transparent flex-grow;
+        color: inherit;
+        font-size: 0.875rem;
+        appearance: none;
+        height: calc(2rem - 2px);
+        &::placeholder {
+            @apply text-gray-300;
         }
     }
-    .right {
-        @apply inline-flex items-center;
+}
+.right {
+    @apply inline-flex items-center;
+}
+.delete-btn {
+    @apply cursor-pointer inline-block flex-shrink-0;
+    position: relative;
+    border-radius: 100px;
+    height: 1rem;
+    width: 1rem;
+    &:hover {
+        @apply bg-gray-200;
     }
-    .delete-btn {
-        @apply cursor-pointer inline-block flex-shrink-0;
-        position: relative;
-        border-radius: 100px;
-        height: 1rem;
-        width: 1rem;
-        &:hover {
-            @apply bg-gray-200;
-        }
-        .icon {
-            position: absolute;
-        }
+    .icon {
+        position: absolute;
     }
-    .left-icon {
-        @apply text-gray-300 mr-1;
-    }
+}
+.left-icon {
+    @apply text-gray-300 mr-1;
+}
 
 </style>

@@ -76,13 +76,13 @@ export default {
 </script>
 
 <style lang="postcss">
-    .vue-notification-group {
-        overflow: unset;
-    }
-    .vue-notification-wrapper {
-        margin: 1rem 0;
-        overflow: visible;
-    }
+.vue-notification-group {
+    overflow: unset;
+}
+.vue-notification-wrapper {
+    margin: 1rem 0;
+    overflow: visible;
+}
 </style>
 
 <style lang="postcss">
@@ -132,6 +132,5 @@ export default {
             }
         }
     }
-
 }
 </style>

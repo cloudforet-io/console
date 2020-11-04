@@ -585,168 +585,168 @@ export default {
 
 <style lang="postcss">
 
-    @define-mixin table-theme $th-bg-color, $stripe-bg-color, $border-color, $hover-color {
-        /* th */
+@define-mixin table-theme $th-bg-color, $stripe-bg-color, $border-color, $hover-color {
+    /* th */
+    th {
+        background-color: $th-bg-color;
+        height: 2rem;
+    }
+    &.bordered {
+        td {
+            border-bottom: 1px solid $border-color;
+        }
+    }
+    tr {
+        &.tr-selected {
+            @apply text-secondary bg-blue-200;
+        }
+        &:not(.no-hover):hover {
+            background-color: $hover-color;
+        }
+    }
+    &.striped {
+        tr:nth-of-type(odd) {
+            background-color: $stripe-bg-color;
+        }
+        tr:nth-of-type(even) {
+            background-color: transparent;
+        }
+        tr:not(.no-hover):hover {
+            background-color: $hover-color;
+        }
+    }
+}
+
+.p-data-table {
+    @apply h-full w-full relative overflow-auto;
+    .table-container {
+        @apply overflow-auto h-full w-full;
+    }
+    table {
+        @apply min-w-full;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+    }
+    th {
+        position: sticky;
+        z-index: 1;
+        top: 0;
+        vertical-align: bottom;
+        line-height: 1.25rem;
+        font-size: 0.875rem;
+        text-align: left;
+        letter-spacing: 0;
+        white-space: nowrap;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        .th-contents {
+            @apply flex justify-between pl-4;
+            line-height: 2;
+        }
+        .sort-icon {
+            @apply text-gray-500 float-right my-px;
+            &:hover { cursor: pointer; }
+        }
+        &.fix-width {
+            @apply min-w-19;
+        }
+        &:last-child {
+            .th-contents {
+                @apply pr-2;
+            }
+        }
+        &.all-select {
+            @apply py-1 pl-4;
+            width: 2.5rem;
+            min-width: 2.5rem;
+            max-width: 2.5rem;
+        }
+    }
+    td {
+        @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
+        vertical-align: middle;
+    }
+    tr {
+        &.row-height-fixed {
+            td {
+                @apply truncate;
+            }
+        }
+        &.row-cursor-pointer {
+            cursor: pointer;
+        }
+    }
+
+    .select-checkbox {
+        @apply cursor-pointer min-w-4 w-4;
+    }
+
+    .no-data {
+        @apply absolute justify-center items-center flex w-full h-full text-gray-300 text-center;
+        line-height: 120%;
+        font-size: 1rem;
+        max-height: 16.875rem;
+        top: 0;
+    }
+
+    .loading-backdrop {
+        @apply absolute w-full h-full overflow-hidden;
+        background-color: white;
+        opacity: 0.5;
+        top: 0;
+        z-index: 1;
+    }
+
+    .loading {
+        @apply absolute flex w-full h-full justify-center items-center;
+        top: 0;
+        max-height: 16.875rem;
+        z-index: 1;
+    }
+
+    .fake-row {
+        @apply opacity-0;
+    }
+
+    /* transitions */
+    .fade-in-enter-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-enter, .fade-in-leave-to {
+        opacity: 0;
+    }
+    .fade-in-leave, .fade-in-enter-to {
+        opacity: 0.5;
+    }
+
+    /* themes */
+    .default {
+        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
+    }
+
+    .light {
+        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
         th {
-            background-color: $th-bg-color;
-            height: 2rem;
+            @apply border-gray-200;
+            border-bottom: 1px solid;
+        }
+    }
+
+    .primary4 {
+        @mixin table-theme theme('colors.white'), transparent, theme('colors.white'), transparent;
+        tr {
+            @apply bg-primary4;
         }
         &.bordered {
             td {
-                border-bottom: 1px solid $border-color;
-            }
-        }
-        tr {
-            &.tr-selected {
-                @apply text-secondary bg-blue-200;
-            }
-            &:not(.no-hover):hover {
-                background-color: $hover-color;
-            }
-        }
-        &.striped {
-            tr:nth-of-type(odd) {
-                background-color: $stripe-bg-color;
-            }
-            tr:nth-of-type(even) {
-                background-color: transparent;
-            }
-            tr:not(.no-hover):hover {
-                background-color: $hover-color;
+                border-bottom-width: 4px;
             }
         }
     }
-
-    .p-data-table {
-        @apply h-full w-full relative overflow-auto;
-        .table-container {
-            @apply overflow-auto h-full w-full;
-        }
-        table {
-            @apply min-w-full;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: fixed;
-        }
-        th {
-            position: sticky;
-            z-index: 1;
-            top: 0;
-            vertical-align: bottom;
-            line-height: 1.25rem;
-            font-size: 0.875rem;
-            text-align: left;
-            letter-spacing: 0;
-            white-space: nowrap;
-            border-top: 1px solid black;
-            border-bottom: 1px solid black;
-            .th-contents {
-                @apply flex justify-between pl-4;
-                line-height: 2;
-            }
-            .sort-icon {
-                @apply text-gray-500 float-right my-px;
-                &:hover { cursor: pointer; }
-            }
-            &.fix-width {
-                @apply min-w-19;
-            }
-            &:last-child {
-                .th-contents {
-                    @apply pr-2;
-                }
-            }
-            &.all-select {
-                @apply py-1 pl-4;
-                width: 2.5rem;
-                min-width: 2.5rem;
-                max-width: 2.5rem;
-            }
-        }
-        td {
-            @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
-            vertical-align: middle;
-        }
-        tr {
-            &.row-height-fixed {
-                td {
-                    @apply truncate;
-                }
-            }
-            &.row-cursor-pointer {
-                cursor: pointer;
-            }
-        }
-
-        .select-checkbox {
-            @apply cursor-pointer min-w-4 w-4;
-        }
-
-        .no-data {
-            @apply absolute justify-center items-center flex w-full h-full text-gray-300 text-center;
-            line-height: 120%;
-            font-size: 1rem;
-            max-height: 16.875rem;
-            top: 0;
-        }
-
-        .loading-backdrop {
-            @apply absolute w-full h-full overflow-hidden;
-            background-color: white;
-            opacity: 0.5;
-            top: 0;
-            z-index: 1;
-        }
-
-        .loading {
-            @apply absolute flex w-full h-full justify-center items-center;
-            top: 0;
-            max-height: 16.875rem;
-            z-index: 1;
-        }
-
-        .fake-row {
-            @apply opacity-0;
-        }
-
-        /* transitions */
-        .fade-in-enter-active {
-            transition: opacity 0.2s;
-        }
-        .fade-in-leave-active {
-            transition: opacity 0.2s;
-        }
-        .fade-in-enter, .fade-in-leave-to {
-            opacity: 0;
-        }
-        .fade-in-leave, .fade-in-enter-to {
-            opacity: 0.5;
-        }
-
-        /* themes */
-        .default {
-            @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
-        }
-
-        .light {
-            @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
-            th {
-                @apply border-gray-200;
-                border-bottom: 1px solid;
-            }
-        }
-
-        .primary4 {
-            @mixin table-theme theme('colors.white'), transparent, theme('colors.white'), transparent;
-            tr {
-                @apply bg-primary4;
-            }
-            &.bordered {
-                td {
-                    border-bottom-width: 4px;
-                }
-            }
-        }
-    }
+}
 
 </style>

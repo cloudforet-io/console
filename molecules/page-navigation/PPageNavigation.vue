@@ -55,27 +55,27 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-page-navigation {
-        margin-bottom: 0.5rem;
+.p-page-navigation {
+    margin-bottom: 0.5rem;
 
-        .link {
-            @apply text-xs text-gray-900 cursor-pointer;
-            opacity: 0.5;
+    .link {
+        @apply text-xs text-gray-900 cursor-pointer;
+        opacity: 0.5;
 
-            &:hover {
-                opacity: 1;
-            }
-        }
-
-        .current-page {
-            @apply text-xs text-gray-900 cursor-default;
-            opacity: 0.5;
-        }
-
-        .arrow-icon {
-            @apply text-gray-200;
-            margin-left: 0.25rem;
-            margin-right: 0.25rem;
+        &:hover {
+            opacity: 1;
         }
     }
+
+    .current-page {
+        @apply text-xs text-gray-900 cursor-default;
+        opacity: 0.5;
+    }
+
+    .arrow-icon {
+        @apply text-gray-200;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+    }
+}
 </style>

@@ -148,18 +148,18 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .p-double-check-modal-sub-title{
-        font-style: normal;
-        font-weight: normal;
-        font-size: 1.5rem;
-        line-height: 1.9rem;
-        margin-bottom: 1.875rem;
-    }
-    .form-label {
-        display: inline-block;
-        font-size: .875rem;
-        letter-spacing: 0;
-        margin-bottom: 0.25rem;
-        margin-right: 0.375rem;
-    }
+.p-double-check-modal-sub-title {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.5rem;
+    line-height: 1.9rem;
+    margin-bottom: 1.875rem;
+}
+.form-label {
+    display: inline-block;
+    font-size: 0.875rem;
+    letter-spacing: 0;
+    margin-bottom: 0.25rem;
+    margin-right: 0.375rem;
+}
 </style>

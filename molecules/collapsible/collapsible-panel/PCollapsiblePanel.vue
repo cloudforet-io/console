@@ -49,42 +49,42 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    details {
-        position: relative;
-        width: 100%;
-        margin-top: -1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    details[open] {
-        position: relative;
-        height: auto;
-        margin-top: inherit;
-    }
-    details span {
-        position: absolute;
-        top: 0;
-    }
-    summary {
-        @apply text-blue-600;
-        cursor: pointer;
-        position: absolute;
-        right: 1rem;
-        bottom: 1rem;
-        z-index: 1;
-        font-size: 0.75rem;
-    }
-    details ::-webkit-details-marker {
-        color: transparent;
-    }
-    details[open] ::-webkit-details-marker {
-        color: transparent;
-    }
-    .hide-icon {
-        transform: rotate(180deg);
-    }
-    .help-panel {
-        @apply bg-primary4 border border-gray-200;
-        border-left-width: 4px;
-        border-radius: 2px 0 0 2px;
-    }
+details {
+    position: relative;
+    width: 100%;
+    margin-top: -1.5rem;
+    margin-bottom: 1.5rem;
+}
+details[open] {
+    position: relative;
+    height: auto;
+    margin-top: inherit;
+}
+details span {
+    position: absolute;
+    top: 0;
+}
+summary {
+    @apply text-blue-600;
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1;
+    font-size: 0.75rem;
+}
+details ::-webkit-details-marker {
+    color: transparent;
+}
+details[open] ::-webkit-details-marker {
+    color: transparent;
+}
+.hide-icon {
+    transform: rotate(180deg);
+}
+.help-panel {
+    @apply bg-primary4 border border-gray-200;
+    border-left-width: 4px;
+    border-radius: 2px 0 0 2px;
+}
 </style>

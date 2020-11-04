@@ -213,74 +213,75 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-toolbox-grid-layout {
-        $min-height: 16.875rem;
+.p-toolbox-grid-layout {
+    $min-height: 16.875rem;
 
-        @apply relative flex flex-col w-full h-full;
-        min-height: $min-height;
+    @apply relative flex flex-col w-full h-full;
+    min-height: $min-height;
 
-        .transition-group {
-            @apply relative h-full w-full;
-        }
-        .transition-item {
-            @apply w-full h-full;
-        }
-        .fade-in-leave-active, .fade-in-enter-active {
-            @apply absolute;
-            transition: opacity 0.25s;
-        }
-        .fade-in-leave-to, .fade-in-enter {
-            opacity: 0;
-        }
-        .fade-in-enter-to, .fade-in-leave {
-            opacity: 1;
-        }
+    .transition-group {
+        @apply relative h-full w-full;
+    }
+    .transition-item {
+        @apply w-full h-full;
+    }
+    .fade-in-leave-active, .fade-in-enter-active {
+        @apply absolute;
+        transition: opacity 0.25s;
+    }
+    .fade-in-leave-to, .fade-in-enter {
+        opacity: 0;
+    }
+    .fade-in-enter-to, .fade-in-leave {
+        opacity: 1;
+    }
 
-        /* .toolbox { */
+    /* .toolbox { */
 
-        /*    margin-top: 0.5rem; */
-        .toolbox-middle {
-            @apply flex flex-no-wrap justify-between items-center mb-6;
-            .left {
-                @apply inline-flex flex-wrap w-auto justify-start;
-            }
-            .right {
-                @apply inline-flex flex-no-wrap w-auto justify-end;
-                .page-size-dropdown::v-deep {
-                    .p-dropdown-btn {
-                        min-width: 6rem;
-                    }
-                }
-                .tool {
-                    @apply ml-4;
+    /*    margin-top: 0.5rem; */
+    .toolbox-middle {
+        @apply flex flex-no-wrap justify-between items-center mb-6;
+        .left {
+            @apply inline-flex flex-wrap w-auto justify-start;
+        }
+        .right {
+            @apply inline-flex flex-no-wrap w-auto justify-end;
+            .page-size-dropdown::v-deep {
+                .p-dropdown-btn {
+                    min-width: 6rem;
                 }
             }
-        }
-
-        .loading-backdrop {
-            @apply absolute w-full h-full overflow-hidden;
-            background-color: white;
-            opacity: 0.5;
-            top: 0;
-            z-index: 1;
-        }
-        .loading-spinner {
-            @apply absolute flex justify-center items-center w-full;
-            z-index: 1;
-            height: $min-height;
-        }
-        /* transitions */
-        .fade-in-enter-active {
-            transition: opacity 0.2s;
-        }
-        .fade-in-leave-active {
-            transition: opacity 0.2s;
-        }
-        .fade-in-enter, .fade-in-leave-to {
-            opacity: 0;
-        }
-        .fade-in-leave, .fade-in-enter-to {
-            opacity: 0.5;
+            .tool {
+                @apply ml-4;
+            }
         }
     }
+
+    .loading-backdrop {
+        @apply absolute w-full h-full overflow-hidden;
+        background-color: white;
+        opacity: 0.5;
+        top: 0;
+        z-index: 1;
+    }
+    .loading-spinner {
+        @apply absolute flex justify-center items-center w-full;
+        z-index: 1;
+        height: $min-height;
+    }
+
+    /* transitions */
+    .fade-in-enter-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-in-enter, .fade-in-leave-to {
+        opacity: 0;
+    }
+    .fade-in-leave, .fade-in-enter-to {
+        opacity: 0.5;
+    }
+}
 </style>

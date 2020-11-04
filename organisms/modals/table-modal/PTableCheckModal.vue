@@ -126,11 +126,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .p-table-check-modal-sub-title {
-        font-style: normal;
-        font-weight: normal;
-        font-size: 1.5rem;
-        line-height: 1.9rem;
-        margin-bottom: 1.2rem;
-    }
+.p-table-check-modal-sub-title {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.5rem;
+    line-height: 1.9rem;
+    margin-bottom: 1.2rem;
+}
 </style>

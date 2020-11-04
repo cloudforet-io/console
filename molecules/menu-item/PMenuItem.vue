@@ -46,48 +46,48 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .list-item-GNB {
-        @apply text-left border border-primary-dark text-primary;
-        padding: .5rem 1rem;
-        font-size: .875rem;
-        min-width: 137px;
-        margin-top: -1px;
-        cursor: pointer;
-        &:hover {
-            @apply bg-primary-dark text-primary4;
-        }
-
-        .indent-text {
-            display: inline;
-            margin: 0;
-            font-size: 1rem;
-        }
+.list-item-GNB {
+    @apply text-left border border-primary-dark text-primary;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    min-width: 137px;
+    margin-top: -1px;
+    cursor: pointer;
+    &:hover {
+        @apply bg-primary-dark text-primary4;
     }
 
-    .list-item-CON {
-        @apply text-left border border-secondary text-secondary;
-        padding: 0px 14px 0px 14px;
-        font: 14px/32px Arial;
-        min-width: 137px;
-        margin-top: -1px;
-        cursor: pointer;
-        &:hover {
-            @apply bg-secondary text-primary4;
-        }
+    .indent-text {
+        display: inline;
+        margin: 0;
+        font-size: 1rem;
+    }
+}
 
-        .indent-text {
-            display: inline;
-            margin: 0;
-            font-size: 1rem;
-        }
+.list-item-CON {
+    @apply text-left border border-secondary text-secondary;
+    padding: 0 14px 0 14px;
+    font: 14px/32px Arial;
+    min-width: 137px;
+    margin-top: -1px;
+    cursor: pointer;
+    &:hover {
+        @apply bg-secondary text-primary4;
     }
 
-    .list-item-CON:first-of-type{
-        border-top-left-radius: 2px;
-        border-top-right-radius: 2px;
+    .indent-text {
+        display: inline;
+        margin: 0;
+        font-size: 1rem;
     }
-    .list-item-CON:last-of-type{
-        border-bottom-left-radius: 2px;
-        border-bottom-right-radius: 2px;
-    }
+}
+
+.list-item-CON:first-of-type {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+.list-item-CON:last-of-type {
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
 </style>

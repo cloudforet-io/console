@@ -60,45 +60,45 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-field-group {
-        margin-bottom: 1rem;
-        .label-box {
-            display: inline-flex;
-            align-items: flex-start;
-        }
-        .form-label {
-            @apply text-gray-900;
-            display: inline-block;
-            font-size: 0.875rem;
-            font-weight: bold;
-            letter-spacing: 0;
-            margin-bottom: 0.25rem;
-            line-height: 1.3125rem;
-        }
-        .required-mark {
-            @apply text-alert;
-            font-size: 0.25rem;
-            line-height: 1.2rem;
-            margin-left: 0.1rem;
-        }
-        .invalid-feedback {
-            @apply text-alert;
-            font-size: 0.75rem;
-            line-height: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        .valid-feedback {
-            @apply text-safe;
-            font-size: 0.75rem;
-            line-height: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        small {
-            font-size: 0.75rem;
-        }
-        .is-invalid {
-            @apply border border-alert;
-        }
+.p-field-group {
+    margin-bottom: 1rem;
+    .label-box {
+        display: inline-flex;
+        align-items: flex-start;
     }
+    .form-label {
+        @apply text-gray-900;
+        display: inline-block;
+        font-size: 0.875rem;
+        font-weight: bold;
+        letter-spacing: 0;
+        margin-bottom: 0.25rem;
+        line-height: 1.3125rem;
+    }
+    .required-mark {
+        @apply text-alert;
+        font-size: 0.25rem;
+        line-height: 1.2rem;
+        margin-left: 0.1rem;
+    }
+    .invalid-feedback {
+        @apply text-alert;
+        font-size: 0.75rem;
+        line-height: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .valid-feedback {
+        @apply text-safe;
+        font-size: 0.75rem;
+        line-height: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    small {
+        font-size: 0.75rem;
+    }
+    .is-invalid {
+        @apply border border-alert;
+    }
+}
 
 </style>

@@ -43,23 +43,23 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-tag {
-        margin-right: 0.5rem;
-        vertical-align: middle;
-        white-space: nowrap;
-        color: inherit;
-        &.deletable {
-            padding-right: 0.15rem;
+.p-tag {
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    white-space: nowrap;
+    color: inherit;
+    &.deletable {
+        padding-right: 0.15rem;
+        .icon {
+            @apply text-gray-400 ml-2;
+            cursor: pointer;
+        }
+        &:hover {
+            @apply bg-gray-100;
             .icon {
-                @apply text-gray-400 ml-2;
-                cursor: pointer;
-            }
-            &:hover {
-                @apply bg-gray-100;
-                .icon {
-                    @apply text-alert;
-                }
+                @apply text-alert;
             }
         }
     }
+}
 </style>

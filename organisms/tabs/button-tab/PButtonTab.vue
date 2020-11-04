@@ -81,16 +81,16 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-button-tab {
-        @apply mt-8;
-        .tab-pane {
-            @apply w-full pb-8;
-        }
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity 0.2s;
-        }
-        .fade-enter, .fade-leave-to {
-            opacity: 0;
-        }
+.p-button-tab {
+    @apply mt-8;
+    .tab-pane {
+        @apply w-full pb-8;
     }
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity 0.2s;
+    }
+    .fade-enter, .fade-leave-to {
+        opacity: 0;
+    }
+}
 </style>

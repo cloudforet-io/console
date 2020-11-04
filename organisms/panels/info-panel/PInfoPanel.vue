@@ -41,7 +41,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .info-panel-basic {
-        min-height: 100px;
-    }
+.info-panel-basic {
+    min-height: 100px;
+}
 </style>

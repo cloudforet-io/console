@@ -313,20 +313,20 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-query-search-table {
-        .left-toolbox-item {
-            &:last-child {
-                flex-grow: 1;
-            }
+.p-query-search-table {
+    .left-toolbox-item {
+        &:last-child {
+            flex-grow: 1;
         }
-        &.p-toolbox-table {
-            .toolbox {
-                @apply pb-2;
+    }
+    &.p-toolbox-table {
+        .toolbox {
+            @apply pb-2;
 
-                .toolbox-bottom {
-                    @apply mt-0;
-                }
+            .toolbox-bottom {
+                @apply mt-0;
             }
         }
     }
+}
 </style>

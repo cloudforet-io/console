@@ -53,30 +53,30 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .text-pagination {
-        @apply min-w-12;
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap;
+.text-pagination {
+    @apply min-w-12;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
 
-        @screen lg {
-            @apply min-w-16;
+    @screen lg {
+        @apply min-w-16;
+    }
+}
+.page-number {
+    @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
+    .page-number-text {
+        line-height: 1.2rem;
+        font-size: 0.875rem;
+        .this-page {
+            font-weight: bold;
         }
     }
-    .page-number {
-        @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
-        .page-number-text {
-            line-height: 1.2rem;
-            font-size: 0.875rem;
-            .this-page {
-                font-weight: bold;
-            }
-        }
 
-        @screen lg {
-            @apply min-w-16;
-        }
+    @screen lg {
+        @apply min-w-16;
     }
+}
 
 </style>

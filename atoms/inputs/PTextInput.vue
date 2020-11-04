@@ -71,10 +71,10 @@ export default {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
         border-radius: 2px;
-        font-size: .875rem;
+        font-size: 0.875rem;
         line-height: 2rem;
         appearance: none;
-        &:hover{
+        &:hover {
             @apply border-secondary;
         }
         &:focus {
@@ -86,7 +86,7 @@ export default {
         &.is-invalid {
             @apply border-alert;
         }
-        &::placeholder{
+        &::placeholder {
             @apply text-gray-300;
         }
     }

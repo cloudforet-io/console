@@ -69,7 +69,7 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-dynamic-layout-html {
+.p-dynamic-layout-html {
 
-    }
+}
 </style>

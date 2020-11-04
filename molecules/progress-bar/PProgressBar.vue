@@ -53,44 +53,44 @@ export default {
 </script>
 
 <style lang="postcss">
-    .progress-bar {
-        width: 100%;
-        .active {
-            label {
-                @apply text-blue-500;
-            }
-            .tracker-bar {
-                @apply bg-blue-500;
-            }
-        }
-
+.progress-bar {
+    width: 100%;
+    .active {
         label {
-            color: grey;
+            @apply text-blue-500;
         }
-        .info {
-            font-size: 17px;
-            justify-content: space-between;
-            display: flex;
-            color: grey;
-            text-transform: uppercase;
-            .percentage {
-                font-weight: bolder;
-            }
-        }
-        .background-bar {
-            @apply bg-gray-100;
-            width: 100%;
-            height: 6px;
-            border-radius: 2px;
-        }
-
         .tracker-bar {
-            @apply bg-primary;
-            height: 5px;
-            border-radius: 2px;
-            width: 0;
-            transition: width 0.5s linear;
-            margin-top: -5px;
+            @apply bg-blue-500;
         }
     }
+
+    label {
+        color: grey;
+    }
+    .info {
+        font-size: 17px;
+        justify-content: space-between;
+        display: flex;
+        color: grey;
+        text-transform: uppercase;
+        .percentage {
+            font-weight: bolder;
+        }
+    }
+    .background-bar {
+        @apply bg-gray-100;
+        width: 100%;
+        height: 6px;
+        border-radius: 2px;
+    }
+
+    .tracker-bar {
+        @apply bg-primary;
+        height: 5px;
+        border-radius: 2px;
+        width: 0;
+        transition: width 0.5s linear;
+        margin-top: -5px;
+    }
+}
 </style>

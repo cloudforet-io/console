@@ -253,36 +253,36 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-autocomplete-search {
+.p-autocomplete-search {
+    @apply w-full relative;
+    .p-search {
+        @apply text-sm font-normal;
+    }
+    .menu-container {
         @apply w-full relative;
-        .p-search {
-            @apply text-sm font-normal;
-        }
-        .menu-container {
-            @apply w-full relative;
-        }
-        .p-context-menu {
-            @apply font-normal;
-            min-width: unset;
-            .secondary {
-                &.context-header {
-                    @apply text-secondary;
+    }
+    .p-context-menu {
+        @apply font-normal;
+        min-width: unset;
+        .secondary {
+            &.context-header {
+                @apply text-secondary;
+            }
+            &.context-item {
+                &:hover {
+                    @apply bg-blue-200;
+                    color: currentColor !important;
                 }
-                &.context-item {
-                    &:hover {
-                        @apply bg-blue-200;
-                        color: currentColor !important;
-                    }
-                    &:focus {
-                        @apply bg-blue-200;
-                        color: currentColor !important;
-                    }
-                    &:active {
-                        @apply bg-blue-200;
-                        color: currentColor !important;
-                    }
+                &:focus {
+                    @apply bg-blue-200;
+                    color: currentColor !important;
+                }
+                &:active {
+                    @apply bg-blue-200;
+                    color: currentColor !important;
                 }
             }
         }
     }
+}
 </style>

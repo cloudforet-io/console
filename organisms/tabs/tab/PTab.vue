@@ -63,16 +63,16 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-tab {
-        @apply rounded-sm border  border-gray-200 bg-white;
-        .p-tab-bar {
-            @apply border-b-4 border-gray-100;
-            &.is-single {
-                @apply border-b-2;
-            }
-        }
-        .tab-pane {
-            @apply w-full pb-8;
+.p-tab {
+    @apply rounded-sm border  border-gray-200 bg-white;
+    .p-tab-bar {
+        @apply border-b-4 border-gray-100;
+        &.is-single {
+            @apply border-b-2;
         }
     }
+    .tab-pane {
+        @apply w-full pb-8;
+    }
+}
 </style>

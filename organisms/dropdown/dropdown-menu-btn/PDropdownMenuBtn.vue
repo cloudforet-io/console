@@ -115,10 +115,10 @@ export default {
 };
 </script>
 <style lang="postcss">
-    .p-dropdown-menu-btn {
-        position: relative;
-        .menu-ctx.block {
-            width: 100%;
-        }
+.p-dropdown-menu-btn {
+    position: relative;
+    .menu-ctx.block {
+        width: 100%;
     }
+}
 </style>

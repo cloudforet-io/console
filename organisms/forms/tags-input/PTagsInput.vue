@@ -186,8 +186,8 @@ export default {
         padding-top: 0;
         padding-bottom: 0;
     }
-    &.is-invalid-tags-input{
-        @apply  border-alert;
+    &.is-invalid-tags-input {
+        @apply border-alert;
     }
     .input.p-text-input {
         border: none;
@@ -201,7 +201,7 @@ export default {
     .fake {
         position: absolute;
         visibility: hidden;
-        font-size: .875rem;
+        font-size: 0.875rem;
         border: 1px solid transparent;
         white-space: nowrap;
     }
@@ -211,7 +211,7 @@ export default {
     }
     .item {
         display: inline-block;
-        margin: .25rem;
+        margin: 0.25rem;
         white-space: normal;
         &.p-tag:last-child {
             margin-right: 0;

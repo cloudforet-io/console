@@ -47,7 +47,7 @@ export default {
 .p-anchor {
     @apply cursor-pointer inline-flex items-center;
     &:hover {
-       @apply underline;
+        @apply underline;
     }
     .text {
         margin-right: 2px;

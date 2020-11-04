@@ -93,21 +93,21 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-skeleton {
-        @apply rounded-sm inline-block w-full;
-        height: 0.875rem;
-        line-height: inherit;
-        background-repeat: no-repeat;
-        background-size: 200px 100%;
-        animation-name: p-skeleton-loading;
-    }
+.p-skeleton {
+    @apply rounded-sm inline-block w-full;
+    height: 0.875rem;
+    line-height: inherit;
+    background-repeat: no-repeat;
+    background-size: 200px 100%;
+    animation-name: p-skeleton-loading;
+}
 
-    @keyframes p-skeleton-loading {
-        0% {
-            background-position: -200px 0;
-        }
-        100% {
-            background-position: calc(200px + 100%) 0;
-        }
+@keyframes p-skeleton-loading {
+    0% {
+        background-position: -200px 0;
     }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
 </style>

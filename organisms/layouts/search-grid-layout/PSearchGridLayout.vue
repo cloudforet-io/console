@@ -206,16 +206,16 @@ export default {
 </script>
 
 <style lang="postcss">
-    .p-search-grid-layout {
-        .left-toolbox-item {
-            &:last-child {
-                flex-grow: 1;
-            }
-        }
-        >>> .toolbox {
-            .toolbox-bottom {
-                @apply mt-0;
-            }
+.p-search-grid-layout {
+    .left-toolbox-item {
+        &:last-child {
+            flex-grow: 1;
         }
     }
+    >>> .toolbox {
+        .toolbox-bottom {
+            @apply mt-0;
+        }
+    }
+}
 </style>

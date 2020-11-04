@@ -237,6 +237,7 @@ export default {
             border-radius: 0.125rem;
             box-shadow: none;
             padding: 0.375rem 0.5rem;
+
             @screen lg {
                 max-width: 50%;
             }

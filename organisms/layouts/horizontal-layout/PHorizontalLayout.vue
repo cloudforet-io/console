@@ -109,26 +109,26 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .dragger-container {
-        @apply relative mt-4 pb-7;
-        .line {
-            @apply absolute inline-block border-b;
-            border-color: transparent;
-            &.colored {
-                @apply border-gray;
-            }
-            &.left {
-                @apply left-0;
-            }
+.dragger-container {
+    @apply relative mt-4 pb-7;
+    .line {
+        @apply absolute inline-block border-b;
+        border-color: transparent;
+        &.colored {
+            @apply border-gray;
         }
-        .dragger {
-            @apply absolute inline-block text-gray-300 top-0 text-2xl items-center;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            &:hover, &:active {
-                @apply text-gray-900;
-                cursor: row-resize;
-            }
+        &.left {
+            @apply left-0;
         }
     }
+    .dragger {
+        @apply absolute inline-block text-gray-300 top-0 text-2xl items-center;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        &:hover, &:active {
+            @apply text-gray-900;
+            cursor: row-resize;
+        }
+    }
+}
 </style>
