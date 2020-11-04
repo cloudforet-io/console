@@ -2,7 +2,7 @@
  const path = require('path');
 const postCssLoader = {
         loader: 'postcss-loader',
-        options: require('../postcss.config'),
+        options: require('./postcss.config'),
     };
 
 module.exports = {

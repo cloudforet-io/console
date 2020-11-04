@@ -18,12 +18,12 @@ import Fragment from "vue-fragment";
 import Codemirror from "vue-codemirror";
 
 import webFontLoader from 'webfontloader';
-import { fontUrls, webFonts } from '@/styles/web-fonts';
+import { fontUrls, webFonts } from '@/components/styles/web-fonts';
 
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
-import "@/styles/style.pcss";
+import "@/components/styles/style.pcss";
 
 
 Vue.use(VueRouter);
