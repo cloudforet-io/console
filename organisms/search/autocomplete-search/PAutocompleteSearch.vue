@@ -57,7 +57,7 @@ export default {
         },
         placeholder: {
             type: String,
-            default: 'Search',
+            default: undefined,
         },
         focused: {
             type: Boolean,
@@ -221,7 +221,7 @@ export default {
                 makeByPassListeners(listeners, 'click', e);
             },
             delete(...args) {
-                onDelete()
+                onDelete();
                 makeByPassListeners(listeners, 'delete', args);
             },
             search: onSearch,

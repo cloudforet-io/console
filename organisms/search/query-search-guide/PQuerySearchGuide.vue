@@ -11,7 +11,7 @@
     >
         <template #header>
             <span class="header-title">
-                Search Guide
+                {{ $t('COMPONENT.QUERY_SEARCH_GUIDE.TITLE') }}
             </span>
             <p-i name="ic_delete" color="transparent inherit"
                  class="close-btn"
@@ -20,43 +20,67 @@
         </template>
         <template #body>
             <div class="flex flex-col">
-                <div class="first">
-                    <span class="number">1.</span> Select a refined filter <b>query(key)</b> and use specific words.
-                    <img src="@/assets/help guide/help_search_key.gif" width="248px" height="117px"
-                         class="help-search-img"
-                    >
+                <div class="step-wrapper">
+                    <span class="number">1.</span>
+                    <div>
+                        <i18n path="COMPONENT.QUERY_SEARCH_GUIDE.STEP_1">
+                            <template #queryKey>
+                                <strong>{{ $t('COMPONENT.QUERY_SEARCH_GUIDE.QUERY_KEY') }}</strong>
+                            </template>
+                        </i18n>
+                        <img src="@/assets/help guide/help_search_key.gif" width="248px" height="117px"
+                             class="help-search-img"
+                        >
+                    </div>
                 </div>
-                <div class="second">
-                    <span class="number">2.</span> Add and Delete <b>filters</b> to narrow your results.
-                    <p class="wrapped-text">
-                        OR Search for the same filters, And Search for different filters.
-                    </p>
-                    <img src="@/assets/help guide/help_search_filter.gif" width="643px" height="114px"
-                         class="help-search-img"
-                    >
+                <div class="step-wrapper">
+                    <span class="number">2.</span>
+                    <div>
+                        <i18n path="COMPONENT.QUERY_SEARCH_GUIDE.STEP_2_1">
+                            <template #filter>
+                                <strong>{{ $t('COMPONENT.QUERY_SEARCH_GUIDE.FILTER') }}</strong>
+                            </template>
+                        </i18n>
+                        <br>
+                        {{ $t('COMPONENT.QUERY_SEARCH_GUIDE.STEP_2_2') }}
+                        <img src="@/assets/help guide/help_search_filter.gif" width="643px" height="114px"
+                             class="help-search-img"
+                        >
+                    </div>
                 </div>
-                <div class="third">
-                    <span class="number">3.</span> We support below <b>operators.</b>
-                    <table class="search-operator">
-                        <tr>
-                            <td class="left-content">
-                                <div v-for="(value, index) in operators" :key="index">
-                                    <span id="search-key">key</span>
-                                    <span id="search-operator">{{ value.operator }}</span>
-                                    <span id="search-operand">{{ value.operand }}</span>
-                                </div>
-                            </td>
-                            <td class="right-content">
-                                <div v-for="(value, index) in operators" :key="index">
-                                    <span id="search-value">{{ value.value }} </span>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                <div class="step-wrapper third">
+                    <span class="number">3.</span>
+                    <div>
+                        <i18n path="COMPONENT.QUERY_SEARCH_GUIDE.STEP_3">
+                            <template #operator>
+                                <strong>{{ $t('COMPONENT.QUERY_SEARCH_GUIDE.OPERATOR') }}</strong>
+                            </template>
+                        </i18n>
+                        <table class="search-operator-table">
+                            <tr v-for="(value, index) in operators" :key="index">
+                                <td class="left-content">
+                                    <span class="search-key">key</span>
+                                    <span class="search-operator">{{ value.operator }}</span>
+                                    <span class="search-operand">{{ value.operand }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ value.value }} </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
             <span class="contact">
-                Need more help? <a target="_blank" href="mailto:support@spaceone.dev">contact us</a>
+                <i18n path="COMPONENT.QUERY_SEARCH_GUIDE.HELP">
+                    <template #contact>
+                        <p-anchor href="mailto:support@spaceone.dev" target="_blank"
+                                  :show-icon="false" highlight
+                        >
+                            {{ $t('COMPONENT.QUERY_SEARCH_GUIDE.CONTACT') }}
+                        </p-anchor>
+                    </template>
+                </i18n>
             </span>
         </template>
     </p-content-modal>
@@ -67,10 +91,11 @@ import PContentModal from '@/components/organisms/modals/content-modal/PContentM
 import PI from '@/components/atoms/icons/PI.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/components/util/composition-helpers';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 
 export default {
     name: 'PQuerySearchGuide',
-    components: { PI, PContentModal },
+    components: { PAnchor, PI, PContentModal },
     model: {
         prop: 'visible',
         event: 'update:visible',
@@ -131,52 +156,52 @@ export default {
         @apply text-secondary;
     }
 }
+.step-wrapper {
+    @apply flex;
+    line-height: 1.5;
+}
 .number {
-    @apply font-bold text-sm text-gray-500;
+    @apply font-bold text-sm text-gray-500 flex-shrink-0;
     margin-right: 0.6875rem;
 }
 .help-search-img {
     @apply border border-gray-200;
     margin-top: 0.625rem;
     margin-bottom: 2.5rem;
-    margin-left: 1.625rem;
     padding: 2px;
     border-radius: 2px;
 }
-.wrapped-text {
-    margin-left: 1.625rem;
-    line-height: 1.5;
-}
-.search-operator {
+.search-operator-table {
     @apply border border-gray-200;
     border-radius: 2px;
     width: 21rem;
     height: 14rem;
     margin-top: 0.625rem;
-    margin-left: 1.625rem;
     margin-bottom: 0.5rem;
-}
-.third {
+    tr:first-child td {
+        @apply pt-4;
+    }
+    tr:last-child td {
+        @apply pb-4;
+    }
+    td {
+        @apply px-4 py-2 text-xs;
+        line-height: 1.2;
+    }
     .left-content {
-        @apply text-xs;
         width: 6.125rem;
         border-right: 1px solid theme('colors.gray.200');
         margin-right: 1rem;
-        padding-left: 1rem;
-        #search-key {
-            @apply text-gray-400;
-            margin-bottom: 1rem;
-        }
-        #search-operator {
-            @apply text-gray-900;
-        }
-        #search-operand {
-            @apply text-gray-400;
-        }
     }
-    .right-content {
-        @apply text-xs;
-        padding-left: 1rem;
+    .search-key {
+        @apply text-gray-400;
+        margin-bottom: 1rem;
+    }
+    .search-operator {
+        @apply text-gray-900;
+    }
+    .search-operand {
+        @apply text-gray-400;
     }
 }
 .contact {

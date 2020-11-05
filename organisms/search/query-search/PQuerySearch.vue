@@ -43,7 +43,7 @@
                     />
                 </span>
                 <div class="separator" />
-                <span class="help" @click="onHelpClick">help</span>
+                <span class="help" @click="onHelpClick">{{ $t('COMPONENT.QUERY_SEARCH.HELP') }}</span>
                 <p-query-search-guide v-model="visibleSearchGuide" />
             </div>
         </template>
@@ -137,7 +137,7 @@ export default {
         },
         placeholder: {
             type: String,
-            default: 'Search',
+            default: undefined,
         },
         focused: {
             type: Boolean,

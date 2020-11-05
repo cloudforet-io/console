@@ -5,7 +5,7 @@
                                 class="add-btn" name="ic_plus_bold"
                                 @click="addPair"
             >
-                {{ $t('COMPONENT.DICT_INPUT.ADD') }}
+                {{ $t('COMPONENT.DICT_INPUT_GROUP.ADD') }}
             </p-icon-text-button>
         </slot>
         <div v-if="showHeader" class="tag-header">
@@ -57,13 +57,13 @@ interface DictValidationType {
         value: Validation[];
     };
 }
-const getValidations = (items: Readonly<DictItem[]>): DictValidationType => {
+const getValidations = (items: Readonly<DictItem[]>, vm, locale): DictValidationType => {
     const res = {} as DictValidationType;
 
     items.forEach((di: DictItem, idx: number) => {
         res[idx] = {
             key: [
-                requiredValidation('no key'),
+                requiredValidation(vm.$t('COMPONENT.DICT_INPUT_GROUP.INVALID_NO_KEY', locale)),
                 new Validation((val, data: DictItem[], itemIdx: number) => {
                     let isDuplicated = false;
                     some(data, (d, i) => {
@@ -72,9 +72,9 @@ const getValidations = (items: Readonly<DictItem[]>): DictValidationType => {
                     });
                     return !isDuplicated;
                 },
-                'duplicated key'),
+                vm.$t('COMPONENT.DICT_INPUT_GROUP.INVALID_DUPLICATED_KEY', locale)),
             ],
-            value: [requiredValidation('no value')],
+            value: [requiredValidation(vm.$t('COMPONENT.DICT_INPUT_GROUP.INVALID_NO_VALUE', locale))],
         };
     });
 
@@ -119,7 +119,7 @@ export default {
 
         const state = reactive({
             items: toDictItems(props.dict) as DictItem[],
-            validations: computed<DictValidationType>(() => getValidations(state.items)),
+            validations: computed<DictValidationType>(() => getValidations(state.items, vm, vm.$i18n.locale)),
             invalidMessages: {} as InvalidMessage,
             isAllValid: computed<boolean>(() => every(state.invalidMessages, (msg: any) => !msg.key && !msg.value)),
         });

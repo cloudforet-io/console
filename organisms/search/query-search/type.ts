@@ -41,7 +41,7 @@ export interface ValueHandlerMap {
 }
 
 export interface QuerySearchState {
-    placeholder: string;
+    placeholder?: string;
     focused: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;

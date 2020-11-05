@@ -12,7 +12,7 @@
         <slot name="default" v-bind="slotBind">
             <input v-focus.lazy="proxyIsFocused"
                    :value="value"
-                   :placeholder="placeholder"
+                   :placeholder="placeholder || $t('COMPONENT.SEARCH.PLACEHOLDER')"
                    :disabled="disabled"
                    v-on="inputListeners"
             >
@@ -35,7 +35,8 @@
 <script lang="ts">
 import { focus } from 'vue-focus';
 import {
-    computed, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { makeByPassListeners, makeProxy } from '@/components/util/composition-helpers';
@@ -56,7 +57,7 @@ export default {
         },
         placeholder: {
             type: String,
-            default: 'Search',
+            default: undefined,
         },
         focused: {
             type: Boolean,
@@ -77,6 +78,7 @@ export default {
         },
     },
     setup(props, { emit, listeners }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state: any = reactive({
             proxyIsFocused: props.isFocused === undefined
                 ? props.focused
@@ -105,7 +107,12 @@ export default {
 
         return {
             ...toRefs(state),
-            slotBind: computed(() => ({ ...props, isFocused: state.proxyIsFocused, inputListeners })),
+            slotBind: computed(() => ({
+                ...props,
+                placeholder: props.placeholder || vm.$t('COMPONENT.SEARCH.PLACEHOLDER'),
+                isFocused: state.proxyIsFocused,
+                inputListeners,
+            })),
             inputListeners,
             onDelete() {
                 emit('delete', props.value);

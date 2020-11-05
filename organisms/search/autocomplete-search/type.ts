@@ -6,7 +6,7 @@ export type AutocompleteHandler = (inputText: string) => Promise<{
 }>
 
 export interface AutocompleteSearchProps {
-    placeholder: string;
+    placeholder?: string;
     menu: MenuItem[];
     loading: boolean;
     focused: boolean;
