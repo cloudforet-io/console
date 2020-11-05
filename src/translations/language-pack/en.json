@@ -61,6 +61,17 @@
 		"COLLECT": "Collect",
 		"COLLECTOR": "Collector",
 		"COLLECT_CONT": "Collecting",
+		"COLLECT_MODAL": {
+			"ALT_E_COLLECT_DATA": "Collect Data Failure",
+			"ALT_S_COLLECT_DATA": "Collect Data Success",
+			"COLLECTOR_LIST": "Collector List",
+			"HINT_TEXT": "It collects all resources including items above.",
+			"ID": "ID",
+			"NAME": "Name",
+			"RESOURCE_LIST": "Resource List",
+			"SELECT_COLLECTOR": "Select a Collector.",
+			"TITLE": "Collect Data"
+		},
 		"COLLECT_PAST": "Collected",
 		"COL_DATA": "Collect Data",
 		"COL_ID": "Collector ID",

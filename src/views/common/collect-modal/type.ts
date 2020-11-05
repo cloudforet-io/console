@@ -6,4 +6,4 @@ interface CollectModalType {
 interface CollectModalSyncType {
     visible: boolean;
 }
-export interface CollectModalPropsType extends CollectModalType, CollectModalSyncType {}
+export interface CollectModalProps extends CollectModalType, CollectModalSyncType {}

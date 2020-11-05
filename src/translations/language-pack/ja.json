@@ -61,6 +61,17 @@
 		"COLLECT": "",
 		"COLLECTOR": "",
 		"COLLECT_CONT": "",
+		"COLLECT_MODAL": {
+			"ALT_E_COLLECT_DATA": "",
+			"ALT_S_COLLECT_DATA": "",
+			"COLLECTOR_LIST": "",
+			"HINT_TEXT": "",
+			"ID": "",
+			"NAME": "",
+			"RESOURCE_LIST": "",
+			"SELECT_COLLECTOR": "",
+			"TITLE": ""
+		},
 		"COLLECT_PAST": "",
 		"COL_DATA": "",
 		"COL_ID": "",

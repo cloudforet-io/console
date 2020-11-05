@@ -61,6 +61,17 @@
 		"COLLECT": "수집",
 		"COLLECTOR": "컬렉터",
 		"COLLECT_CONT": "수집 중",
+		"COLLECT_MODAL": {
+			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
+			"ALT_S_COLLECT_DATA": "데이터 수집 성공",
+			"COLLECTOR_LIST": "컬렉터 목록",
+			"HINT_TEXT": "위의 아이템을 포함한 모든 리소스를 수집합니다.",
+			"ID": "아이디",
+			"NAME": "이름",
+			"RESOURCE_LIST": "리소스 목록",
+			"SELECT_COLLECTOR": "컬렉터를 선택하세요.",
+			"TITLE": "데이터 수집"
+		},
 		"COLLECT_PAST": "수집 완료",
 		"COL_DATA": "데이터 수집",
 		"COL_ID": "컬렉터 아이디",

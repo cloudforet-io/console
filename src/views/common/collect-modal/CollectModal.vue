@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="$t('COMMON.COL_DATA')"
+    <p-button-modal :header-title="$t('COMMON.COLLECT_MODAL.TITLE')"
                     centered
                     size="lg"
                     fade
@@ -15,12 +15,12 @@
     >
         <template #body>
             <p class="title">
-                Select a Collector.
+                {{ $t('COMMON.COLLECT_MODAL.SELECT_COLLECTOR') }}
             </p>
             <div class="collect-modal-body">
                 <div class="left-container">
                     <p class="sub-title">
-                        Collector List
+                        {{ $t('COMMON.COLLECT_MODAL.COLLECTOR_LIST') }}
                     </p>
                     <p-selectable-list :items="collectors"
                                        :multi-selectable="false"
@@ -36,7 +36,7 @@
                 </div>
                 <div class="right-container">
                     <p class="sub-title">
-                        Resource List
+                        {{ $t('COMMON.COLLECT_MODAL.RESOURCE_LIST') }}
                     </p>
                     <p-data-table :fields="fields"
                                   :sortable="false"
@@ -54,7 +54,7 @@
                         </template>
                     </p-data-table>
                     <div v-if="!hasFilterFormat" class="all-resource-msg">
-                        It collects all resources including items above.
+                        {{ $t('COMMON.COLLECT_MODAL.HINT_TEXT') }}
                     </div>
                 </div>
             </div>
@@ -63,20 +63,20 @@
 </template>
 
 <script lang="ts">
-import {
-    toRefs, reactive, computed, SetupContext, watch,
-} from '@vue/composition-api';
 import { keys, forEach, get } from 'lodash';
-import { makeTrItems } from '@/lib/view-helper';
-import { makeProxy } from '@/components/util/composition-helpers';
+
+import {
+    toRefs, reactive, computed, watch, SetupContext, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import { CollectModalPropsType } from '@/views/common/collect-modal/CollectModal.toolset';
+import { CollectModalProps } from '@/views/common/collect-modal/type';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { makeProxy } from '@/components/util/composition-helpers';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
@@ -95,8 +95,7 @@ export default {
                 return resources.every(resource => resource && resource.collection_info && resource.collection_info.collectors);
             },
         },
-        // sync
-        visible: Boolean,
+        visible: Boolean, // sync
         idKey: {
             type: String,
             default: '',
@@ -106,16 +105,18 @@ export default {
             default: 'name',
         },
     },
-    setup(props: CollectModalPropsType, context: SetupContext) {
+    setup(props: CollectModalProps, context: SetupContext) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             loading: true,
             resourceLoading: true,
             proxyVisible: makeProxy('visible', props, context.emit),
             collectors: [],
-            fields: makeTrItems(
-                [[props.idKey, 'COMMON.ID'], [props.nameKey, 'COMMON.NAME']],
-                context.parent,
-            ),
+            fields: computed(() => ([
+                { name: props.idKey, label: vm.$t('COMMON.COLLECT_MODAL.ID') },
+                { name: props.nameKey, label: vm.$t('COMMON.COLLECT_MODAL.NAME') },
+            ])),
             mapper: {
                 key: 'collector_id',
                 iconUrl: 'tags.icon',
@@ -173,9 +174,9 @@ export default {
                     collector_id: id,
                     filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
                 });
-                showSuccessMessage('success', 'Collect Data', context.root);
+                showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', context.root);
             } catch (e) {
-                showErrorMessage('Fail to Collect Data', e, context.root);
+                showErrorMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'), e, context.root);
             } finally {
                 state.proxyVisible = false;
             }
@@ -239,6 +240,10 @@ export default {
 .right-container {
     padding-left: 0.5rem;
     height: 100%;
+    .right-table {
+        height: auto;
+        padding-bottom: 1rem;
+    }
     .p-data-table::v-deep {
         @apply overflow-auto;
         max-height: calc(450px * 0.85);
@@ -250,7 +255,8 @@ export default {
         @apply bg-black text-white;
         float: right;
         height: 1.875rem;
-        border-radius: 100px;
+        font-size: 0.875rem;
+        border-radius: 6.25rem;
         box-shadow: 0 4px 4px rgba(theme('colors.black'), 0.17);
         padding: 0 1rem;
         line-height: 1.875rem;
