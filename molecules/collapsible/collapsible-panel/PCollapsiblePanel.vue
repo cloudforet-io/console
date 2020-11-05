@@ -4,13 +4,13 @@
             v-if="isActive"
             @click="toggleSummary"
         >
-            {{ text }}
+            {{ toggleText }}
             <p-i class="hide-icon" name="ic_arrow_bottom" height="1rem"
                  width="1rem" color="inherit transparent"
             />
         </summary>
         <summary v-if="!isActive" @click="toggleSummary">
-            {{ text }}
+            {{ toggleText }}
             <p-i class="show-icon" name="ic_arrow_bottom" height="1rem"
                  width="1rem" color="inherit transparent"
             />
@@ -21,8 +21,10 @@
     </details>
 </template>
 
-<script>
+<script lang="ts">
 import {
+    ComponentRenderProxy, computed,
+    getCurrentInstance,
     reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
@@ -32,13 +34,20 @@ export default {
     name: 'PCollapsiblePanel',
     components: { PI, PPaneLayout },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            text: 'hide',
+            isCollapsed: false,
+            toggleText: computed(() => (state.isCollapsed ? vm.$t('COMPONENT.COLLAPSIBLE_PANEL.SEE_MORE') : vm.$t('COMPONENT.COLLAPSIBLE_PANEL.HIDE'))),
             isActive: true,
         });
         const toggleSummary = () => {
-            if (state.text === 'hide' && state.isActive) { state.text = 'See more'; state.isActive = !state.isActive; }
-            else if (state.text === 'See more' && !state.isActive) { state.text = 'hide'; state.isActive = !state.isActive; }
+            if (!state.isCollapsed && state.isActive) {
+                state.isCollapsed = true;
+                state.isActive = !state.isActive;
+            } else if (state.isCollapsed && !state.isActive) {
+                state.isCollapsed = false;
+                state.isActive = !state.isActive;
+            }
         };
         return {
             ...toRefs(state),

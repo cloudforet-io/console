@@ -1,7 +1,7 @@
 <template>
     <vue-form-json-schema
         v-model="proxyModel"
-        class="vue-form-json-schema-container"
+        class="p-json-schema-form"
         :schema="schema"
         :ui-schema="uiSchema"
         :options="options"
@@ -213,7 +213,7 @@ export default {
 </script>
 
 <style lang="postcss">
-.vue-form-json-schema-container {
+.p-json-schema-form {
     .form-group {
         .form-label {
             @apply text-gray-900;

@@ -247,7 +247,7 @@ export default {
             const value = val.toLowerCase();
             const res = find(state.keyMenu,
                 (item: MenuItem<KeyItem>) => (item.type === 'item'
-                    && ((item.label && item.label.toLowerCase() === value)
+                    && ((item.label && item.label.toString().toLowerCase() === value)
                     || (item.name && item.name.toLowerCase() === value)))) as MenuItem<KeyItem>|null;
 
             return res ? res.data : undefined;

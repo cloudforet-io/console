@@ -3,6 +3,10 @@
 		"CANCEL": "",
 		"CONFIRM": ""
 	},
+	"COLLAPSIBLE_PANEL": {
+		"HIDE": "",
+		"SEE_MORE": ""
+	},
 	"CONTEXT_MENU": {
 		"NO_ITEM": ""
 	},
@@ -19,6 +23,10 @@
 		"INVALID_DUPLICATED_KEY": "",
 		"INVALID_NO_KEY": "",
 		"INVALID_NO_VALUE": ""
+	},
+	"DOUBLE_CHECK_MODAL": {
+		"INPUT_DESC": "",
+		"INVALID_TEXT": ""
 	},
 	"PAGE_TITLE": {
 		"SELECTED_OF": ""

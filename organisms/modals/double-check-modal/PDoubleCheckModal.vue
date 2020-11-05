@@ -22,11 +22,15 @@
 
                 <p-field-group
                     :required="true"
-                    :invalid-text="'text is not '+verificationText"
+                    :invalid-text="$t('COMPONENT.DOUBLE_CHECK_MODAL.INVALID_TEXT', {text: verificationText})"
                     :invalid="invalid"
                 >
                     <template #label>
-                        <label class="form-label">Type <strong>[{{ verificationText }}]</strong> to Confirm</label>
+                        <i18n path="COMPONENT.DOUBLE_CHECK_MODAL.INPUT_DESC" tag="label" class="form-label">
+                            <template #text>
+                                <strong>[{{ verificationText }}]</strong>
+                            </template>
+                        </i18n>
                     </template>
                     <p-text-input
                         v-model="inputText"
