@@ -1,3 +1,5 @@
+import { TranslateResult } from 'vue-i18n';
+
 export enum CONTEXT_MENU_TYPE {
     divider = 'divider',
     header = 'header',
@@ -7,7 +9,7 @@ export enum CONTEXT_MENU_TYPE {
 
 export interface MenuItem {
     name?: string;
-    label?: string;
+    label?: string | TranslateResult;
     type: keyof typeof CONTEXT_MENU_TYPE;
     disabled?: boolean;
     link?: string;
