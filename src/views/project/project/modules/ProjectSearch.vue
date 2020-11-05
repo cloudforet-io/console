@@ -2,7 +2,7 @@
     <div class="project-search">
         <p-autocomplete-search v-model="proxySearchText"
                                theme="secondary"
-                               :placeholder="selectedProjectGroup ? 'project' : 'e.g. project/project group'"
+                               :placeholder="selectedProjectGroup ? $t('PROJECT.LANDING.PLACE_HOLDER_PROJECT') : $t('PROJECT.LANDING.PLACE_HOLDER_EXAMPLE')"
                                :disable-icon="!!selectedProjectGroup"
                                :menu="menu"
                                :visible-menu.sync="visibleMenu"
@@ -55,7 +55,7 @@
                     <p-i name="ic_search" color="inherit" height="1rem"
                          width="1rem"
                     />
-                    <span class="text">show more</span>
+                    <span class="text">{{$t('PROJECT.LANDING.PLACE_HOLDER_SHOW_MORE')}}</span>
                 </div>
             </template>
         </p-autocomplete-search>

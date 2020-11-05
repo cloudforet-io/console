@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Cloud Services" :help="$t('DASHBOARD.ACTION.CLOUD_SERVICES')">
+    <p-widget-layout :title="$t('COMMON.WIDGETS.CLOUD_SERVICE_TITLE')" :help="$t('COMMON.WIDGETS.CLOUD_SERVICE_HELP')">
         <template #default>
             <div class="grid gap-2
                         grid-cols-1
@@ -24,7 +24,7 @@
                     <p-i name="ic_plus_square" width="1rem" height="1rem"
                          class="mr-2" color="inherit white"
                     />
-                    Create a Collector
+                    {{$t('COMMON.WIDGETS.CLOUD_SERVICE_CREATE_COLLECTOR')}}
                 </router-link>
                 <template v-else>
                     <router-link v-for="(item, index) in data" :key="index" :to="item.href">

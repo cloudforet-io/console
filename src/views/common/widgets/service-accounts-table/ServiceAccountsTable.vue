@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Service Accounts" class="accounts-table">
+    <p-widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_TITLE')" class="accounts-table">
         <div class="mt-4 overflow-auto">
             <p-data-table :fields="fields"
                           :sortable="false"
@@ -74,7 +74,8 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
@@ -90,6 +91,7 @@ export default {
         PDataTable,
     },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectId = computed<string>(() => context.root.$route.params.id as string);
 
             interface DataType {
@@ -111,13 +113,13 @@ export default {
                     cloud_services: secondary1,
                     credentials: gray,
                 },
-                fields: computed(() => makeTrItems([
-                    ['provider', 'FIELD.SERVICE_PROVIDER'],
-                    ['service_account_name', 'FIELD.ACCOUNT_NAME'],
-                    ['server_count', 'FIELD.SERVER'],
-                    ['cloud_service_count', 'FIELD.CLOUD_SERVICE'],
-                    ['secret_count', 'FIELD.CREDENTIALS'],
-                ])),
+                fields: computed(() => [
+                    { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_SERVICE_PROVIDER') },
+                    { name: 'service_account_name', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_ACCOUNT_NAME') },
+                    { name: 'server_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_SERVER') },
+                    { name: 'cloud_service_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_CLOUD_SERVICE') },
+                    { name: 'secret_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_CREDENTIALS') },
+                ]),
                 providers: computed(() => store.state.resource.provider.items),
             });
 

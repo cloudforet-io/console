@@ -1,7 +1,7 @@
 <template>
-    <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
-                     sub-title="00:00 ~ present (Local time)"
-                     :help="$t('DASHBOARD.ACTION.DAILY_UPDATES')"
+    <p-widget-layout ref="widgetRef" class="daily-updates" :title="$t('COMMON.WIDGETS.DAILY_UPDATE_TITLE')"
+                     :sub-title="$t('COMMON.WIDGETS.DAILY_UPDATE_DESC')"
+                     :help="$t('COMMON.WIDGETS.DAILY_UPDATE_HELP')"
     >
         <template #default>
             <div v-if="loading" class="mr-10 flex items-center overflow-hidden">

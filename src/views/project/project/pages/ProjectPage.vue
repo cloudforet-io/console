@@ -4,7 +4,7 @@
             <div class="left-sidebar">
                 <div class="side-item">
                     <header>
-                        <span class="title">Search</span>
+                        <span class="title">{{ $t('PROJECT.LANDING.SEARCH') }}</span>
                     </header>
                     <project-search :search-text.sync="searchText"
                                     :project-group="searchedProjectGroup"
@@ -14,11 +14,11 @@
 
                 <div class="side-item">
                     <header>
-                        <span class="title">Project Groups</span>
+                        <span class="title">{{ $t('PROJECT.LANDING.PROJECT_GROUPS') }}</span>
                         <p-button class="action-btn" @click="openProjectGroupForm(null)">
                             <p-i name="ic_plus" width="1rem" height="1rem"
                                  color="transparent inherit"
-                            /> Create
+                            /> {{ $t('PROJECT.LANDING.CREATE') }}
                         </p-button>
                     </header>
                     <project-group-tree ref="treeRef"
@@ -36,7 +36,7 @@
                 </span>
             </div>
             <p-page-title :title="searchedProjectGroup ? searchedProjectGroup.name
-                              : 'All Project'"
+                              : $t('PROJECT.LANDING.ALL_PROJECT')"
                           use-total-count
                           :total-count="listState.totalCount"
             >
@@ -48,7 +48,7 @@
                                             name="ic_plus_bold"
                                             @click="openProjectGroupForm(null)"
                         >
-                            {{ $t('IDENTITY.CRT_GRP') }}
+                            {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn v-if="searchedProjectGroup"
                                              :menu="settingMenu"
@@ -63,7 +63,7 @@
                                             name="ic_plus_bold"
                                             @click="openProjectForm"
                         >
-                            {{ $t('INVENTORY.CRT_PROJ') }}
+                            {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
                         </p-icon-text-button>
                     </div>
                 </template>
@@ -83,11 +83,11 @@
                 >
                     <template #toolbox-left>
                         <div class="flex items-center">
-                            <div v-tooltip.bottom="{content: 'Show All Projects of Sub Project Groups', delay: {show: 500}}"
+                            <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}"
                                  class="text-base truncate leading-tight"
                             >
                                 <p-check-box v-model="showAllProjects">
-                                    <span class="show-all">Show All Project</span>
+                                    <span class="show-all">{{ $t('PROJECT.LANDING.SHOW_ALL') }}</span>
                                 </p-check-box>
                             </div>
                         </div>
@@ -96,15 +96,13 @@
                         <div class="empty">
                             <div v-if="noProjectGroup" class="empty-project-grp">
                                 <p class="title">
-                                    Let's begin your resource management!<br>
+                                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
                                 </p>
                                 <p class="content">
-                                    Getting started with grouping your scattered resource <br>
-                                    and accounts with your own project.
+                                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT') }}
                                 </p>
                                 <p class="content-order">
-                                    <b>1.</b> Name your project group first. <br>
-                                    <b>2.</b> Register your project.
+                                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER') }}
                                 </p>
                                 <p-button style-type="primary-dark" class="mt-8"
                                           @click="openProjectGroupForm(null)"
@@ -112,12 +110,12 @@
                                     <p-i name="ic_plus_bold" color="inherit"
                                          width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
                                     />
-                                    Create Project Group
+                                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
                                 </p-button>
                             </div>
                             <div v-if="!noProjectGroup && listState.totalCount === 0 && !listState.loading" class="empty-project">
                                 <p class="text-primary2">
-                                    Looks like you don't have any Project.
+                                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
                                 </p>
                             </div>
                         </div>
@@ -137,9 +135,11 @@
                                     </p>
                                     <div class="project-summary">
                                         <div v-if="cardSummary[item.project_id]" class="summary-item">
-                                            <span class="summary-item-text">Server</span><span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span>
+                                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
+                                            <span class="summary-item-num">{{ cardSummary[item.project_id].servers_count }}</span>
                                             <span class="mx-2 text-gray-300 divider">|</span>
-                                            <span class="summary-item-text">Cloud Services<span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
+                                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}
+                                                <span class="summary-item-num">{{ cardSummary[item.project_id].cloud_services }}</span></span><br>
                                         </div>
                                         <div v-else class="skeleton-loading">
                                             <div v-for="v in skeletons" :key="v" class="flex items-center pb-2 pr-15">
@@ -149,7 +149,7 @@
                                     </div>
 
                                     <hr class="solid">
-                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers flex"
+                                    <div v-if="item.force_console_data.providers.length === 0" class="empty-providers flex"
                                          @click.stop="goToServiceAccount"
                                     >
                                         <div class="w-6 h-6 bg-blue-100 rounded-full inline-block">
@@ -157,10 +157,10 @@
                                                  width=".75rem" height=".75rem"
                                             />
                                         </div>
-                                        <span class="ml-2"> Add Service Account</span>
+                                        <span class="ml-2"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                                     </div>
                                     <div v-else-if="item.force_console_data.providers" class="providers">
-                                        <span>Service Accounts</span>
+                                        <span>{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
                                         <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
                                              class="provider-icon"
                                         >
@@ -258,6 +258,9 @@ import { getAllPage } from '@/components/organisms/paginations/text-pagination/h
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ListType, TimeStamp } from '@/models';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 interface ProjectGroupInfo {
     project_group_id: string;
@@ -340,10 +343,10 @@ export default {
         const state = reactive({
             searchText: '',
             items: [] as ProjectCardData[],
-            settingMenu: [
-                { name: 'edit', label: 'Edit Group Name', type: 'item' },
-                { name: 'delete', label: 'Delete This Group', type: 'item' },
-            ] as MenuItem[],
+            settingMenu: computed(() => [
+                { name: 'edit', label: vm.$t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
+                { name: 'delete', label: vm.$t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
+            ] as MenuItem[]),
             showAllProjects: false,
             searchedProjectGroup: null as ProjectGroup|null,
             selectedTreeItem: null as ProjectTreeItem|null,
@@ -379,9 +382,9 @@ export default {
             projectGroupFormVisible: false,
             projectFormVisible: false,
             projectGroupDeleteFormVisible: false,
-            headerTitle: '',
+            headerTitle: '' as unknown as TranslateResult,
             themeColor: '',
-            modalContent: '',
+            modalContent: '' as unknown as TranslateResult,
             updateMode: false,
             createTargetNode: null as ProjectTreeItem|null,
         });
@@ -536,9 +539,9 @@ export default {
              */
         const openProjectGroupDeleteForm = () => {
             formState.projectGroupDeleteFormVisible = true;
-            formState.headerTitle = 'Delete Project Group';
+            formState.headerTitle = vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP_TITLE');
             formState.themeColor = 'alert';
-            formState.modalContent = 'Are you sure you want to delete this Project group?';
+            formState.modalContent = vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP_CONTENT');
         };
 
         const projectGroupDeleteFormConfirm = async () => {
@@ -547,10 +550,10 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.delete({
                     project_group_id: state.searchedProjectGroup.id,
                 });
-                showSuccessMessage('success', 'Delete Project Group', root);
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', root);
                 state.treeRef.deleteSelectedNode();
             } catch (e) {
-                showErrorMessage('Fail to Delete Project Group', e, root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: formState.headerTitle }), e, root);
             } finally {
                 formState.projectGroupDeleteFormVisible = false;
             }
@@ -603,9 +606,9 @@ export default {
                     project_group_id: state.searchedProjectGroup?.id,
                     ...item,
                 });
-                showSuccessMessage('success', 'Create Project', root);
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', root);
             } catch (e) {
-                showErrorMessage('Fail to Create a Project', e, root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, root);
             } finally {
                 formState.projectFormVisible = false;
                 await getData();
@@ -739,158 +742,158 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-sidebar {
-        @apply h-full relative;
+.left-sidebar {
+    @apply h-full relative;
+}
+.side-item {
+    header {
+        @apply flex pl-4 pt-8 pb-3 mb-3 border-b border-gray-200 items-center;
     }
-    .side-item {
-        header {
-            @apply flex pl-4 pt-8 pb-3 mb-3 border-b border-gray-200 items-center;
-        }
-        .title {
-            @apply text-sm text-gray-500 font-semibold capitalize;
-            line-height: 1.2;
-        }
-        .icon-help {
-            @apply ml-2;
-            cursor: help;
-        }
-        .action-btn {
-            @apply ml-auto justify-end text-primary-dark;
-            height: auto;
-            font-size: 0.75rem;
-            line-height: 1.2;
-            &:hover {
-                @apply text-secondary;
-                cursor: pointer;
-            }
-        }
+    .title {
+        @apply text-sm text-gray-500 font-semibold capitalize;
+        line-height: 1.2;
     }
-
-    .p-page-title::v-deep {
-        @apply flex w-full pb-5 border-b border-gray-200;
-        .extra {
-            @apply inline-flex flex-grow justify-between items-center;
-        }
-        .btns {
-            @apply inline-flex items-center;
-            .icon-text-button {
-                @apply ml-4;
-            }
-        }
+    .icon-help {
+        @apply ml-2;
+        cursor: help;
     }
-
-    .parents-info {
-        @apply flex items-center text-gray-900;
-        height: 1rem;
-        .group-name {
-            @apply inline-flex items-center text-xs;
-        }
-        .text {
-            @apply opacity-50;
-            &.link {
-                @apply cursor-pointer;
-                &:hover {
-                    @apply opacity-100;
-                }
-            }
-        }
-    }
-
-    .show-all {
-        @apply text-sm ml-2 leading-relaxed;
-    }
-
-    ::v-deep .card-item {
-        @apply bg-white border border-gray-200 overflow-visible rounded cursor-pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    .action-btn {
+        @apply ml-auto justify-end text-primary-dark;
+        height: auto;
+        font-size: 0.75rem;
+        line-height: 1.2;
         &:hover {
-            @apply border-l border-gray-200 bg-blue-100;
+            @apply text-secondary;
+            cursor: pointer;
         }
     }
+}
 
-    .project-group {
-        & p {
-            @apply text-xs text-gray;
+.p-page-title::v-deep {
+    @apply flex w-full pb-5 border-b border-gray-200;
+    .extra {
+        @apply inline-flex flex-grow justify-between items-center;
+    }
+    .btns {
+        @apply inline-flex items-center;
+        .icon-text-button {
+            @apply ml-4;
         }
-        & span {
-            @apply text-2xl font-bold pb-2;
-        }
-        .delete-btn {
-            @apply text-black -mt-2 ml-2 cursor-pointer;
+    }
+}
+
+.parents-info {
+    @apply flex items-center text-gray-900;
+    height: 1rem;
+    .group-name {
+        @apply inline-flex items-center text-xs;
+    }
+    .text {
+        @apply opacity-50;
+        &.link {
+            @apply cursor-pointer;
             &:hover {
-                @apply text-white;
+                @apply opacity-100;
             }
         }
     }
+}
 
-    .empty {
-        @apply flex-col text-center justify-start;
+.show-all {
+    @apply text-sm ml-2 leading-relaxed;
+}
+
+::v-deep .card-item {
+    @apply bg-white border border-gray-200 overflow-visible rounded cursor-pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    &:hover {
+        @apply border-l border-gray-200 bg-blue-100;
     }
+}
 
-    .loading {
-        padding-top: 3rem;
+.project-group {
+    & p {
+        @apply text-xs text-gray;
     }
+    & span {
+        @apply text-2xl font-bold pb-2;
+    }
+    .delete-btn {
+        @apply text-black -mt-2 ml-2 cursor-pointer;
+        &:hover {
+            @apply text-white;
+        }
+    }
+}
 
-    .project-description {
-        @apply mx-4 mt-6;
-        .project {
-            @apply mb-4;
-            .project-group-name {
-                @apply text-gray-500 text-xs;
-                margin-bottom: 0.25rem;
-            }
-            #project-name {
-                @apply text-lg font-bold truncate pb-6 overflow-hidden;
-            }
-            .provider-icon {
-                @apply mr-4 inline;
-                max-width: 1.25rem;
-                max-height: 1.25rem;
-                min-height: 1.25rem;
-            }
-            .providers {
-                @apply relative text-xs text-gray-500 whitespace-no-wrap;
-                max-height: 1.5rem;
-                min-height: 1.5rem;
-                width: fit-content;
-                .provider-add-btn {
-                    @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
-                    &:hover {
-                        @apply bg-blue-300;
-                    }
+.empty {
+    @apply flex-col text-center justify-start;
+}
+
+.loading {
+    padding-top: 3rem;
+}
+
+.project-description {
+    @apply mx-4 mt-6;
+    .project {
+        @apply mb-4;
+        .project-group-name {
+            @apply text-gray-500 text-xs;
+            margin-bottom: 0.25rem;
+        }
+        #project-name {
+            @apply text-lg font-bold truncate pb-6 overflow-hidden;
+        }
+        .provider-icon {
+            @apply mr-4 inline;
+            max-width: 1.25rem;
+            max-height: 1.25rem;
+            min-height: 1.25rem;
+        }
+        .providers {
+            @apply relative text-xs text-gray-500 whitespace-no-wrap;
+            max-height: 1.5rem;
+            min-height: 1.5rem;
+            width: fit-content;
+            .provider-add-btn {
+                @apply text-gray-900 w-6 h-6 bg-blue-100 rounded-full inline-block z-10;
+                &:hover {
+                    @apply bg-blue-300;
                 }
-                span {
-                    @apply mr-2;
-                    padding: 0.125rem 0.375rem;
-                }
             }
-            .project-summary {
-                @apply mb-6;
-                .summary-item-text {
-                    @apply text-sm text-left inline-block;
-                }
-                .summary-item-num {
-                    @apply ml-2 font-bold;
-                }
+            span {
+                @apply mr-2;
+                padding: 0.125rem 0.375rem;
             }
         }
-        .solid {
-            @apply border-l border-gray-100 mt-5 mb-4 ml-0;
+        .project-summary {
+            @apply mb-6;
+            .summary-item-text {
+                @apply text-sm text-left inline-block;
+            }
+            .summary-item-num {
+                @apply ml-2 font-bold;
+            }
         }
+    }
+    .solid {
+        @apply border-l border-gray-100 mt-5 mb-4 ml-0;
+    }
 
     .empty-providers {
         @apply relative text-xs text-gray-900;
         width: fit-content;
-            div { padding: 0.125rem 0.375rem; }
-            &:hover {
-                 @apply text-secondary font-bold;
-                     div {
-                         @apply bg-blue-300 ;
-                     }
+        div { padding: 0.125rem 0.375rem; }
+        &:hover {
+            @apply text-secondary font-bold;
+            div {
+                @apply bg-blue-300 ;
             }
-            span { line-height: 1.75; }
         }
+        span { line-height: 1.75; }
     }
+}
 
 .tool {
     @apply justify-between mb-6;
@@ -899,15 +902,15 @@ export default {
             @apply mr-4;
         }
         .tool-left-search {
-         @apply flex-1;
+            @apply flex-1;
 
-                @screen lg {
-                    @apply max-w-lg;
-                }
+            @screen lg {
+                @apply max-w-lg;
             }
         }
-        .tool-right-checkbox {
-            @apply whitespace-no-wrap self-center;
+    }
+    .tool-right-checkbox {
+        @apply whitespace-no-wrap self-center;
     }
 }
 

@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="updateMode ?$t('IDENTITY.UPDATE_PROJ') :$t('IDENTITY.CRT_PROJ')"
+        :header-title="updateMode ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
         :centered="true"
         size="md"
         :fade="true"
@@ -11,14 +11,14 @@
         @confirm="confirm"
     >
         <template #body>
-            <p-field-group label="name"
+            <p-field-group :label="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_LABEL')"
                            :invalid-text="projectNameInvalidText"
                            :invalid="projectName && !isProjectNameValid"
                            :required="true"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="projectName" class="block w-full" :class="{'is-invalid': invalid}"
-                                  placeholder="Project Name"
+                                  :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_PLACEHOLDER')"
                     />
                 </template>
             </p-field-group>
@@ -27,7 +27,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
@@ -35,6 +37,9 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { makeProxy } from '@/lib/compostion-util';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 export default {
     name: 'ProjectCreateFormModal',
@@ -79,19 +84,20 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             projectNames: [] as string[],
             projectName: undefined as undefined | string,
             projectNameInvalidText: computed(() => {
-                let invalidText = '';
+                let invalidText = '' as TranslateResult;
                 if (typeof state.projectName === 'string') {
                     if (state.projectName.length === 0) {
-                        invalidText = 'Should have required property \'name\'';
+                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
                     } else if (state.projectName.length > 40) {
-                        invalidText = 'Should not be longer than 40 characters';
+                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
                     } else if (state.projectNames.includes(state.projectName)) {
-                        invalidText = 'Name is duplicated';
+                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
                     }
                 }
                 return invalidText;

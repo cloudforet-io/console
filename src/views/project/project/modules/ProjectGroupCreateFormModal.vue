@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="updateMode ?$t('IDENTITY.UPDATE_PROJ_GRP') :$t('IDENTITY.CRT_PROJ_GRP')"
+        :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
         :centered="true"
         :scrollable="false"
         size="md"
@@ -11,14 +11,14 @@
         @confirm="confirm"
     >
         <template #body>
-            <p-field-group label="name"
+            <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
                            :invalid-text="projectGroupNameInvalidText"
                            :invalid="projectGroupName && !isValid"
                            :required="true"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="projectGroupName" class="block w-full" :class="{'is-invalid': invalid}"
-                                  placeholder="Project Name"
+                                  :placeholder="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER')"
                     />
                 </template>
             </p-field-group>
@@ -29,7 +29,8 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
@@ -40,6 +41,9 @@ import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.tool
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 interface Props {
     visible: boolean;
@@ -80,19 +84,21 @@ export default {
         },
     },
     setup(props: Props, { emit, root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
-                let invalidText = '';
+                let invalidText = '' as TranslateResult;
                 if (typeof state.projectGroupName === 'string') {
                     if (state.projectGroupName.length === 0) {
-                        invalidText = 'Should have required property \'name\'';
+                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
                     } else if (state.projectGroupName.length > 40) {
-                        invalidText = 'Should not be longer than 40 characters';
+                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
                     } else if (state.projectGroupNames.includes(state.projectGroupName)) {
-                        invalidText = 'Name is duplicated';
+                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
                     }
                 }
                 return invalidText;

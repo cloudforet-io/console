@@ -1,6 +1,6 @@
 <template>
-    <p-widget-layout ref="widgetRef" class="health-dashboard" title="AWS Health Dashboard"
-                     help="Get a notice the status of AWS services."
+    <p-widget-layout ref="widgetRef" class="health-dashboard" :title="$t('COMMON.WIDGETS.HEALTH_DASHBOARD_TITLE')"
+                     :help="$t('COMMON.WIDGETS.HEALTH_DASHBOARD_HELP')"
     >
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
@@ -13,18 +13,18 @@
             <div v-else-if="data.length === 0" class="empty-content">
                 <div class="info-text">
                     <p>
-                        You can use the AWS Health Dashboard<br> if you have a Business or Enterprise support plan of AWS.
+                        {{$t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_1')}}
                     </p>
                     <br>
                     <p>
-                        Still cannot use this? <br>If you have a proper plan, let us know.<br>
+                        {{$t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_2')}}<br>
                         <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                     </p>
                 </div>
                 <div class="background-wrapper">
                     <img class="logo" src="@/assets/icons/ic_provider_aws.svg">
                     <p class="text">
-                        Check your AWS Support Plans first.
+                        {{$t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_3')}}
                     </p>
                 </div>
             </div>

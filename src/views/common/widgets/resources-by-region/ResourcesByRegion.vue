@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Resources by Region" class="resources-by-region">
+    <p-widget-layout :title="$t('COMMON.WIDGETS.RESOURCE_BY_REGION_TITLE')" class="resources-by-region">
         <div class="reverse">
             <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
@@ -250,7 +250,7 @@ export default {
         }, { immediate: true });
 
         const defaultItems = range(DEFAULT_COUNT).map((d, index) => ({
-            name: 'region',
+            name: computed(() => vm.$t('COMMON.WIDGETS.RESOURCE_BY_REGION_DEFAULT_ITEM')).value,
             color: colors[index],
             count: 0,
             icon: 'ic_provider_other',
@@ -334,34 +334,34 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .resources-by-region {
-        border: none;
-        height: 27.1rem;
+.resources-by-region {
+    border: none;
+    height: 27.1rem;
     &::v-deep .widget-contents {
-         overflow-y: auto;
-         margin-bottom: 2rem;
-     }
+        overflow-y: auto;
+        margin-bottom: 2rem;
     }
-    .chart {
-        height: 11.25rem;
-    }
-    .count {
-        font-size: 0.875rem;
-        font-weight: bold;
-    }
-    .legends {
-        @apply w-full flex-grow justify-center items-center m-auto;
-    }
-    .chart-container {
-        @apply flex justify-center items-center mb-4;
-    }
-    .reverse {
-        @apply block mb-0;
-    }
+}
+.chart {
+    height: 11.25rem;
+}
+.count {
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+.legends {
+    @apply w-full flex-grow justify-center items-center m-auto;
+}
+.chart-container {
+    @apply flex justify-center items-center mb-4;
+}
+.reverse {
+    @apply block mb-0;
+}
 
-    @screen md {
-        .reverse {
-            @apply flex flex-row-reverse;
+@screen md {
+    .reverse {
+        @apply flex flex-row-reverse;
         .chart-container {
             min-width: 40%;
             .chart {
@@ -369,6 +369,6 @@ export default {
                 width: 100%;
             }
         }
-      }
     }
+}
 </style>
