@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import PI from '@/components/atoms/icons/PI.vue';
+import { AnchorProps } from '@/components/molecules/anchors/type';
 
 export default {
     name: 'PAnchor',
