@@ -56,7 +56,7 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
 };
 
 export default {
-    name: 'PServerDetail',
+    name: 'ServerDetails',
     components: {
         PButtonTab,
         PDynamicLayout,

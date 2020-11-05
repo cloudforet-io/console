@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="History" :total-count="totalCount" />
+        <p-panel-top :title="$t('INVENTORY.SERVER.MAIN.TAB_HISTORY')" :total-count="totalCount" use-total-count />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"

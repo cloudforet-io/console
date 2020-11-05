@@ -72,8 +72,8 @@
                 <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="monitoringState.resourceType"
-                              :resources="monitoringState.resources"
+                <monitoring :resource-type="monitoringState.resourceType"
+                            :resources="monitoringState.resources"
                 />
             </template>
         </p-tab>
@@ -95,8 +95,8 @@
                 <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
             </template>
             <template #monitoring>
-                <s-monitoring :resource-type="monitoringState.resourceType"
-                              :resources="monitoringState.resources"
+                <monitoring :resource-type="monitoringState.resourceType"
+                            :resources="monitoringState.resources"
                 />
             </template>
         </p-tab>
@@ -129,11 +129,11 @@ import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudSer
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
-import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
-import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
+import STagsPanel from '@/views/common/tags/TagsPanel.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import Monitoring from '@/views/common/monitoring/Monitoring.vue';
+import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -227,7 +227,7 @@ export default {
         PEmpty,
         SProjectTreeModal,
         SCollectModal,
-        SMonitoring,
+        Monitoring,
     },
     props: {
         provider: {

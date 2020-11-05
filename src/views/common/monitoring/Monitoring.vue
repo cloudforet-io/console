@@ -1,16 +1,15 @@
 <template>
     <div class="pt-8 pb-16">
         <section>
-            <p-select-btn-group class="px-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
+            <p-select-btn-group class="pr-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
         </section>
         <section class="mb-8">
             <span class="title">
-                {{ $t('WORD.RESOURCE') }}
+                {{ $t('COMMON.MONITORING.RESOURCE') }}
             </span>
             <span class="ml-4 text-gray text-sm">
-                * {{ $t('ACTION.LIMIT_OF', {
+                * {{ $t('COMMON.MONITORING.LIMIT_OF_RESOURCE', {
                     limitCount: 10,
-                    itemName: $t('WORD.RESOURCE')
                 }) }}
             </span>
             <div>
@@ -27,19 +26,19 @@
         </section>
         <section class="toolbox-section">
             <div class="inline-flex items-center">
-                <span class="title mr-1 flex-shrink-0">{{ $t('WORD.TIME_RANGE') }}</span>
+                <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.TIME_RANGE') }}</span>
                 <p-select-btn-group class="time-range" :buttons="timeRanges" :selected.sync="selectedTimeRange" />
             </div>
             <div class="inline-flex items-center">
-                <span class="title mr-4 flex-shrink-0">{{ $t('WORD.STATISTICS') }}</span>
+                <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
                 <p-select-dropdown v-model="selectedStat" :items="statItems" />
                 <p-icon-button class="ml-4 flex-shrink-0" name="ic_refresh" @click="listChartMetrics" />
             </div>
         </section>
         <section class="py-4">
-            <i18n path="ACTION.TIMEZONE_OF" tag="p" class="text-sm text-gray mb-12">
+            <i18n path="COMMON.MONITORING.DISPLAY_TIMEZONE" tag="p" class="text-sm text-gray mb-12">
                 <template #timezone>
-                    <strong>{{ $t('WORD.LOCAL_TIME') }}</strong>
+                    <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
             <div v-if="metricsLoading">
@@ -48,7 +47,7 @@
                 />
             </div>
             <div v-else-if="metrics.length === 0" class="text-center text-gray">
-                No Metrics
+                {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>
             <template v-else>
                 <p-grid-layout :items="chartMetrics" row-gap="3rem" column-gap="1rem"
@@ -74,7 +73,7 @@
                           style-type="black" class="more-btn"
                           @click="loadChartMetrics"
                 >
-                    MORE
+                    {{ $t('COMMON.MONITORING.MORE') }}
                 </p-button>
             </template>
         </section>
@@ -169,7 +168,7 @@ const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
 const LOAD_LIMIT = 12;
 
 export default {
-    name: 'SMonitoring',
+    name: 'Monitoring',
     components: {
         PButton,
         PLottie,

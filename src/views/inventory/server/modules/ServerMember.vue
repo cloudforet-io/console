@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="Member" :total-count="totalCount" />
+        <p-panel-top :title="$t('INVENTORY.SERVER.MAIN.TAB_MEMBER')" :total-count="totalCount" use-total-count />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"
@@ -34,7 +34,7 @@ import config from '@/lib/config';
 import { getTimezone } from '@/lib/util';
 
 export default {
-    name: 'ServerAdmin',
+    name: 'ServerMember',
     components: {
         PPanelTop, PBadge, PTextList, PSearchTable,
     },

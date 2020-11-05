@@ -147,7 +147,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
+import STagsPanel from '@/views/common/tags/TagsPanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
 import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';

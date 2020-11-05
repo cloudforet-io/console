@@ -8,19 +8,19 @@
                                    @click="goBack()"
                     />
                     <div class="title">
-                        Tag
+                        {{ $t('COMMON.TAGS.TITLE') }}
                     </div>
                 </div>
                 <div class="right" />
             </div>
             <p-pane-layout class="tag-panel">
                 <div v-if="noItem" class="comment">
-                    <span class="highlight">{{ $t('ACTION.DICT.NO_TAG') }}</span><br>
-                    {{ $t('ACTION.DICT.CLICK_ADD_BTN_MSG') }}
+                    <span class="highlight">{{ $t('COMMON.TAGS.NO_TAGS') }}</span><br>
+                    {{ $t('COMMON.TAGS.CLICK_TO_ADD_TAG') }}
                 </div>
                 <div v-else class="comment">
-                    <span class="highlight">{{ $t('ACTION.DICT.ADD_TAG') }}</span><br>
-                    {{ $t('ACTION.DICT.HELPMSG') }}
+                    <span class="highlight">{{ $t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
+                    {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
                 </div>
                 <p-dict-input-group ref="dictRef"
                                     :dict="tags"
@@ -34,17 +34,17 @@
                             name="ic_plus_bold"
                             @click="scope.addPair($event)"
                         >
-                            {{ $t('BTN.ADD_TAG') }}
+                            {{ $t('COMMON.TAGS.ADD_TAG') }}
                         </p-icon-text-button>
                     </template>
                 </p-dict-input-group>
             </p-pane-layout>
             <div class="buttons">
                 <p-button style-type="gray900" :outline="true" @click="goBack">
-                    {{ $t('BTN.CANCEL') }}
+                    {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary-dark" @click="onSave">
-                    {{ $t('BTN.SAVE') }}
+                    {{ $t('COMMON.TAGS.SAVE') }}
                 </p-button>
             </div>
         </p-pane-layout>
@@ -56,7 +56,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
@@ -69,7 +69,7 @@ import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import FNB from '@/views/common/fnb/FNB.vue';
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
     name: 'CloudServicePage',
@@ -99,6 +99,7 @@ export default {
         },
     },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
@@ -140,7 +141,7 @@ export default {
             if (!state.showValidation) state.showValidation = true;
             if (!state.dictRef.allValidation()) return;
             if (!api.value) {
-                showErrorMessage('Tags Update Failed', new Error());
+                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), new Error(), vm.$root);
                 return;
             }
 
@@ -149,9 +150,10 @@ export default {
                     [props.resourceKey]: props.resourceId,
                     tags: state.dictRef.getDict(),
                 });
+                showSuccessMessage(vm.$t('COMMON.TAGS.ALT_S_UPDATE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Tags Update Failed', e);
+                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), e, vm.$root);
             } finally {
                 state.loading = false;
             }
@@ -173,48 +175,48 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .page-mask {
-        @apply absolute flex flex-col left-0 w-full h-full;
-        z-index: 99;
-        top: $gnb-height;
+.page-mask {
+    @apply absolute flex flex-col left-0 w-full h-full;
+    z-index: 99;
+    top: $gnb-height;
 
-        /* transition: opacity 0.3s ease; */
+    /* transition: opacity 0.3s ease; */
 
-        max-height: calc(100vh - ($gnb-height));
-        min-height: calc(100vh - ($gnb-height));
-        max-width: 100vw;
-        .page-wrapper {
-            @apply w-screen border-none flex-grow;
-            .page-nav {
-                @apply my-6 ml-8;
-                .left {
-                    @apply flex;
-                    .title {
-                        @apply font-bold text-2xl;
-                        line-height: 120%;
-                    }
-                }
-            }
-            .comment {
-                @apply my-6;
-                line-height: 150%;
-                .highlight {
-                    @apply font-bold;
-                }
-            }
-            .tag-panel {
-                @apply pl-4 pr-6 m-6 overflow-y-auto;
-                height: 60vh;
-            }
-            .buttons {
-                @apply flex mt-8 pr-12 justify-end;
-                .p-button {
-                    @apply ml-4;
+    max-height: calc(100vh - ($gnb-height));
+    min-height: calc(100vh - ($gnb-height));
+    max-width: 100vw;
+    .page-wrapper {
+        @apply w-screen border-none flex-grow;
+        .page-nav {
+            @apply my-6 ml-8;
+            .left {
+                @apply flex;
+                .title {
+                    @apply font-bold text-2xl;
+                    line-height: 120%;
                 }
             }
         }
-        .fnb {
-            @apply flex-grow-0 border-none bg-white;
+        .comment {
+            @apply my-6;
+            line-height: 150%;
+            .highlight {
+                @apply font-bold;
+            }
+        }
+        .tag-panel {
+            @apply pl-4 pr-6 m-6 overflow-y-auto;
+            height: 60vh;
+        }
+        .buttons {
+            @apply flex mt-8 pr-12 justify-end;
+            .p-button {
+                @apply ml-4;
+            }
         }
     }
+    .fnb {
+        @apply flex-grow-0 border-none bg-white;
+    }
+}
 </style>

@@ -168,7 +168,7 @@ import config from '@/lib/config';
 import router from '@/routes';
 
 const GeneralPageLayout = (): Component => import('@/views/common/page-layout/GeneralPageLayout.vue') as Component;
-const STagsPanel = (): Component => import('@/views/common/tags/tag-panel/TagsPanel.vue') as Component;
+const STagsPanel = (): Component => import('@/views/common/tags/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
 const CollectorDetail = (): Component => import('@/views/plugin/collector/modules/CollectorDetail.vue') as Component;
