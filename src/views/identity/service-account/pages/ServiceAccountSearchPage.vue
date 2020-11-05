@@ -12,7 +12,7 @@ const DEFAULT_URL = '/identity/service-account';
 const ERROR_URL = '/identity/service-account/no-resource';
 
 export default {
-    name: 'ServiceAccountSearch',
+    name: 'ServiceAccountSearchPage',
     props: {
         id: {
             type: String,

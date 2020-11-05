@@ -2,7 +2,7 @@
     <p-vertical-page-layout :min-width="270" :init-width="270" :max-width="400">
         <template #sidebar="{width}">
             <p class="sidebar-title">
-                Service Providers
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}
             </p>
             <p-hr class="sidebar-divider" />
             <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
@@ -54,7 +54,7 @@
                                                 class="mr-4"
                                                 @click="clickAddServiceAccount"
                             >
-                                {{ $t('BTN.ADD') }}
+                                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
                             </p-icon-text-button>
                             <p-dropdown-menu-btn
                                 class="left-toolbox-item mr-4"
@@ -62,7 +62,7 @@
                                 @click-delete="clickDeleteServiceAccount"
                                 @click-project="clickProject"
                             >
-                                {{ $t('BTN.ACTION') }}
+                                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
                             </p-dropdown-menu-btn>
                         </template>
                     </p-dynamic-layout>
@@ -72,9 +72,9 @@
                    :tabs="singleItemTabState.tabs"
                    :active-tab.sync="singleItemTabState.activeTab"
             >
-                <template #detail>
-                    <service-account-detail :selected-provider="selectedProvider"
-                                            :service-account-id="tableState.selectedAccountIds[0]"
+                <template #details>
+                    <service-account-details :selected-provider="selectedProvider"
+                                             :service-account-id="tableState.selectedAccountIds[0]"
                     />
                 </template>
                 <template #tag>
@@ -107,16 +107,15 @@
                 </template>
             </p-tab>
             <div v-else class="empty-space">
-                <p-empty>Select a Service Account above for details.</p-empty>
+                <p-empty>{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.NO_SELECTED_ACCOUNT') }}</p-empty>
             </div>
-            <p-double-check-modal
-                :visible.sync="doubleCheckModalState.visible"
-                :header-title="doubleCheckModalState.title"
-                :sub-title="doubleCheckModalState.subTitle"
-                :verification-text="doubleCheckModalState.verificationText"
-                :theme-color="doubleCheckModalState.themeColor"
-                :centered="true"
-                @confirm="deleteServiceAccount"
+            <p-double-check-modal :visible.sync="doubleCheckModalState.visible"
+                                  :header-title="doubleCheckModalState.title"
+                                  :sub-title="doubleCheckModalState.subTitle"
+                                  :verification-text="doubleCheckModalState.verificationText"
+                                  :theme-color="doubleCheckModalState.themeColor"
+                                  :centered="true"
+                                  @confirm="deleteServiceAccount"
             />
             <s-project-tree-modal :visible.sync="changeProjectState.visible"
                                   :project-id="changeProjectState.projectId"
@@ -153,7 +152,7 @@ import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/
 import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';
 
 /* page modules */
-import ServiceAccountDetail from '@/views/identity/service-account/modules/ServiceAccountDetail.vue';
+import ServiceAccountDetails from '@/views/identity/service-account/modules/ServiceAccountDetails.vue';
 import ServiceAccountCredentials from '@/views/identity/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
 
@@ -174,6 +173,9 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { MenuItem } from '@/components/organisms/context-menu/type';
+import { TranslateResult } from 'vue-i18n';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 interface ProjectItemResp {
     id: string;
@@ -184,13 +186,13 @@ interface ProjectItemResp {
 }
 
 export default {
-    name: 'ServiceAccount',
+    name: 'ServiceAccountPage',
     components: {
         SProjectTreeModal,
         PDoubleCheckModal,
         PDropdownMenuBtn,
         PIconTextButton,
-        ServiceAccountDetail,
+        ServiceAccountDetails,
         PEmpty,
         ServiceAccountMember,
         ServiceAccountCredentials,
@@ -251,24 +253,26 @@ export default {
             //     return res;
             // }),
             consoleLink: '',
-            dropdown: computed(() => makeTrItems([
-                ['delete', 'BTN.DELETE', { type: 'item', disabled: tableState.selectedItems.length !== 1 }],
-                [null, null, { type: 'divider' }],
-                ['project', 'COMMON.CHG_PRO'],
-                [null, null, { type: 'divider' }],
-                ['link', null, {
-                    label: 'Console',
-                    disabled: !tableState.consoleLink,
-                    link: tableState.consoleLink,
-                    target: 'blank',
-                }],
+            dropdown: computed<MenuItem[]>(() => [
+                {
+                    name: 'delete', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE'), type: 'item', disabled: tableState.selectedItems.length !== 1,
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    name: 'project', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHANGE_PROJECT'), type: 'item', disabled: tableState.selectedItems.length === 0,
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    name: 'link', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CONSOLE'), type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: 'blank',
+                },
+            ]),
+            multiFields: [
+                { name: 'name', label: 'Name' },
             ],
-            context.parent,
-            { type: 'item', disabled: tableState.selectedItems.length === 0 })),
-            multiFields: computed(() => makeTrItems([
-                ['name', 'COMMON.NAME'],
-            ],
-            context.parent)),
             selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
             schema: [],
         });
@@ -397,8 +401,8 @@ export default {
         const doubleCheckModalState = reactive({
             visible: false,
             item: null,
-            title: '',
-            subTitle: '',
+            title: '' as TranslateResult,
+            subTitle: '' as TranslateResult,
             verificationText: '',
             themeColor: '',
             api: null as any,
@@ -408,11 +412,10 @@ export default {
         const deleteApi = SpaceConnector.client.identity.serviceAccount.delete;
 
         const clickDeleteServiceAccount = () => {
-            const selectedIndex = computed(() => typeOptionState.selectIndex).value as unknown as number;
-            const nameOfSelectedServiceAccount = tableState.items[selectedIndex].name;
+            const nameOfSelectedServiceAccount = tableState.selectedItems[0]?.name;
             doubleCheckModalState.visible = true;
-            doubleCheckModalState.title = 'Delete Account';
-            doubleCheckModalState.subTitle = `You will Permanently lose your [${nameOfSelectedServiceAccount}]`;
+            doubleCheckModalState.title = vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE');
+            doubleCheckModalState.subTitle = vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_DESC', { account: nameOfSelectedServiceAccount });
             doubleCheckModalState.verificationText = nameOfSelectedServiceAccount;
             doubleCheckModalState.themeColor = 'alert';
             doubleCheckModalState.api = deleteApi;
@@ -425,9 +428,9 @@ export default {
                     // eslint-disable-next-line camelcase
                     service_account_id: tableState.selectedAccountIds[0],
                 });
-                showSuccessMessage('Success', 'Success to Delete Account', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage('Delete Failed', e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'), e, vm.$root);
             } finally {
                 doubleCheckModalState.visible = false;
                 await listServiceAccountData();
@@ -454,9 +457,9 @@ export default {
                     // eslint-disable-next-line camelcase
                     release_project: true,
                 });
-                showSuccessMessage('Success', 'Success to Release Project', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_RELEASE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage('Fail to Release Project', e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_RELEASE_PROJECT'), e, vm.$root);
             } finally {
                 await listServiceAccountData();
             }
@@ -473,9 +476,9 @@ export default {
                         // eslint-disable-next-line camelcase
                         project_id: data.id,
                     });
-                    showSuccessMessage('Success', 'Project has been successfully changed.', context.root);
+                    showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_CHANGE_PROJECT'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage('Fail to Change Project', e, context.root);
+                    showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'), e, vm.$root);
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listServiceAccountData();
@@ -489,20 +492,19 @@ export default {
 
         /** Tabs */
         const singleItemTabState = reactive({
-            tabs: computed(() => makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['tag', 'TAB.TAG'],
-                ['credentials', 'TAB.CREDENTIALS'],
-                ['member', 'TAB.MEMBER'],
-            ],
-            context.parent)),
-            activeTab: 'detail',
+            tabs: computed<TabItem[]>(() => [
+                { name: 'details', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_DETAILS') },
+                { name: 'tag', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_TAG') },
+                { name: 'credentials', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS') },
+                { name: 'member', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_MEMBER') },
+            ]),
+            activeTab: 'details',
         });
 
         const multiItemTabState = reactive({
-            tabs: makeTrItems([
-                ['data', 'TAB.DATA'],
-            ], context.parent),
+            tabs: computed<TabItem[]>(() => [
+                { name: 'data', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_DATA') },
+            ]),
             activeTab: 'data',
         });
 
@@ -568,43 +570,43 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .sidebar-title {
-        @apply text-gray-500 text-sm font-bold;
-        padding-top: 2rem;
-        padding-left: 1rem;
+.sidebar-title {
+    @apply text-gray-500 text-sm font-bold;
+    padding-top: 2rem;
+    padding-left: 1rem;
+}
+.sidebar-divider {
+    @apply w-full;
+    padding-left: 0;
+    margin-top: 0.5625rem;
+    margin-bottom: 1rem;
+}
+.provider-list {
+    @apply justify-between text-sm;
+    padding-left: 1rem;
+    padding-right: 1.1875rem;
+    line-height: 1.5rem;
+    .provider-divider {
+        @apply bg-gray-100;
+        margin-top: 0.625rem;
+        margin-bottom: 0.5625rem;
     }
-    .sidebar-divider {
-        @apply w-full;
-        padding-left: 0;
-        margin-top: 0.5625rem;
-        margin-bottom: 1rem;
+    .provider-name {
+        display: inline-block;
+        cursor: pointer;
     }
-    .provider-list {
-        @apply justify-between text-sm;
-        padding-left: 1rem;
-        padding-right: 1.1875rem;
-        line-height: 1.5rem;
-        .provider-divider {
-            @apply bg-gray-100;
-            margin-top: 0.625rem;
-            margin-bottom: 0.5625rem;
-        }
-        .provider-name {
-            display: inline-block;
-            cursor: pointer;
-        }
-        .provider-icon {
-            @apply inline justify-start;
-            width: 1.5rem;
-            height: 1.5rem;
-            cursor: pointer;
-            margin-right: 0.5625rem;
-        }
-        .provider-radio-btn {
-            @apply float-right;
-        }
+    .provider-icon {
+        @apply inline justify-start;
+        width: 1.5rem;
+        height: 1.5rem;
+        cursor: pointer;
+        margin-right: 0.5625rem;
     }
-    >>> .p-dynamic-layout-table .p-search-table {
-        border-width: 1px;
+    .provider-radio-btn {
+        @apply float-right;
     }
+}
+>>> .p-dynamic-layout-table .p-search-table {
+    border-width: 1px;
+}
 </style>

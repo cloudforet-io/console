@@ -14,7 +14,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
-    name: 'ServiceAccountDetail',
+    name: 'ServiceAccountDetails',
     components: {
         PDynamicLayout,
     },

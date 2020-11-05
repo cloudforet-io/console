@@ -1,88 +1,95 @@
 <template>
-    <p-pane-layout class="panel">
-        <div class="tree-panel-header">
-            <span class="title">Project </span><span class="title-optional">(optional)</span>
-            <p-icon-text-button style-type="primary" name="ic_plus_bold" outline
-                                @click="goToProject"
-            >
-                {{ $t('BTN.CREATE_PROJECT') }}
-            </p-icon-text-button>
-        </div>
-        <div class="toolbox">
-            <span v-if="!hasProject" class="msg">
-                {{ $t('ACTION.PROJECT.NO_PROJECT') }}
-            </span>
-            <div v-else-if="error" class="alert">
-                <span class="alert-msg">
-                    <p-i name="ic_alert" width="1rem" height="1rem" />
-                </span>
-                <span>   {{ $t('ACTION.PROJECT.SELECT_PROJECT_OR_RELEASE') }}</span>
-            </div>
-            <i18n v-else-if="targetName&&selectProjectName"
-                  path="ACTION.PROJECT.ITEM_WILL_SELECT_FOR"
-                  tag="span"
-                  class="align-baseline"
-            >
-                <template #item>
-                    <span class="font-bold">[{{ targetName }}]</span>
-                </template>
-                <template #project>
-                    <span class="font-bold text-blue">[{{ selectProjectName }}]</span>
-                </template>
-            </i18n>
-            <span v-else class="msg">
-                {{ $t('ACTION.PROJECT.SELECT_PROJECT_FOR',{resource:resourceName}) }}
-            </span>
-            <p-icon-button
-                name="ic_refresh"
-                @click="refreshProject"
-            />
-        </div>
-
-        <div class="body-container">
-            <div ref="treeContainer" class="tree-container">
-                <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
-                             v-bind="treeApiHandler.ts.state"
-                             :data.sync="node.data"
-                             :children.sync="node.children"
-                             :state.sync="node.state"
-                             @toggle:click="toggle"
-                             @node:click="selectItem"
-                             @checkbox:click="selectItem"
+    <p-pane-layout>
+        <div class="panel-container">
+            <div class="tree-panel-header">
+                <span class="title">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE') }}</span>
+                <span class="title-optional">&nbsp;({{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_OPTIONAL') }})</span>
+                <p-icon-text-button style-type="primary" name="ic_plus_bold" outline
+                                    @click="goToProject"
                 >
-                    <template #data="{data}">
-                        <span :class="{
-                            'ml-2': data.item_type === 'PROJECT'
-                        }"
-                        >{{ data.name }}</span>
-                    </template>
-                    <template #toggle="{state, toggleSize, data, getListeners}">
-                        <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
-                             :height="toggleSize"
-                        />
-                        <p-radio v-else-if="data.item_type === 'PROJECT'"
-                                 :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
-                        />
-                    </template>
-                    <template #toggle-right="{data}">
-                        <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
-                             width="1rem" height="1rem" color="inherit transparent"
-                        />
-                    </template>
-                </p-tree-node>
+                    {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_CREATE') }}
+                </p-icon-text-button>
             </div>
-            <div class="no-select">
-                <p-radio class="mr-2"
-                         :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
-                         :value="true" @click="releaseProject"
-                /><span class="cursor-pointer" @click="releaseProject">Select no Project</span>
-            </div>
-        </div>
-        <div v-if="isLoading">
-            <p-skeleton class="tree-box" />
-        </div>
+            <div class="toolbox">
+                <div class="msg">
+                    <template v-if="isLoading">
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_SELECT_DESC') }}
+                    </template>
+                    <template v-else-if="!hasProject">
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_DATA') }}
+                    </template>
+                    <template v-else-if="error">
+                        <p-i name="ic_alert" width="1rem" height="1rem"
+                             class="mr-2"
+                        />
+                        <span class="alert">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_SELECT_ERROR') }}</span>
+                    </template>
+                    <i18n v-else-if="targetName && selectProjectName"
+                          path="IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_EXIST_DESC"
+                          class="align-baseline"
+                    >
+                        <template #item>
+                            <span class="font-bold">[{{ targetName }}]</span>
+                        </template>
+                        <template #project>
+                            <span class="font-bold text-blue">[{{ selectProjectName }}]</span>
+                        </template>
+                    </i18n>
+                    <template v-else>
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_SELECT_DESC') }}
+                    </template>
+                </div>
 
-        <slot name="bottom" />
+                <p-icon-button name="ic_refresh" class="refresh-btn"
+                               @click="refreshProject"
+                />
+            </div>
+
+            <div class="body-container">
+                <div class="tree-container">
+                    <p-skeleton v-if="isLoading" class="tree-loader" />
+                    <template v-else>
+                        <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
+                                     v-bind="treeApiHandler.ts.state"
+                                     :data.sync="node.data"
+                                     :children.sync="node.children"
+                                     :state.sync="node.state"
+                                     @toggle:click="toggle"
+                                     @node:click="selectItem"
+                                     @checkbox:click="selectItem"
+                        >
+                            <template #data="{data}">
+                                <span :class="{
+                                    'ml-2': data.item_type === 'PROJECT'
+                                }"
+                                >{{ data.name }}</span>
+                            </template>
+                            <template #toggle="{state, toggleSize, data, getListeners}">
+                                <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
+                                     :height="toggleSize"
+                                />
+                                <p-radio v-else-if="data.item_type === 'PROJECT'"
+                                         :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
+                                />
+                            </template>
+                            <template #toggle-right="{data}">
+                                <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                                     width="1rem" height="1rem" color="inherit transparent"
+                                />
+                            </template>
+                        </p-tree-node>
+                    </template>
+                </div>
+                <div class="no-select">
+                    <p-radio class="mr-2"
+                             :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
+                             :value="true" @click="releaseProject"
+                    /><span class="cursor-pointer" @click="releaseProject">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_SELECTION') }}</span>
+                </div>
+            </div>
+
+            <slot name="bottom" />
+        </div>
     </p-pane-layout>
 </template>
 
@@ -104,16 +111,11 @@ import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 
 export default {
-    name: 'SProjectTreePanel',
+    name: 'ProjectTreePanel',
     components: {
         PI, PPaneLayout, PSkeleton, PIconButton, PIconTextButton, PTreeNode, PRadio,
     },
-    events: ['change'],
     props: {
-        resourceName: {
-            type: String,
-            default: '',
-        },
         targetName: {
             type: String,
             default: '',
@@ -224,54 +226,50 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .tree-box {
-        @apply w-full min-h-56 max-h-56 rounded-b-sm;
-
-    @screen lg {
-        @apply w-1/2;
-    }
-    }
-    .toolbox {
-        @apply flex mb-2 mt-5 align-middle items-center;
+.panel-container {
+    max-width: 35.75rem;
+}
+.toolbox {
+    @apply flex mb-2 mt-5 align-middle items-center justify-between;
     .msg {
         @apply align-middle font-bold;
-        padding-right: 10.8rem;
+        .alert {
+            @apply text-alert font-normal;
+        }
     }
+    .refresh-btn {
+        @apply flex-shrink-0;
     }
-    .tree {
-        @apply overflow-auto border-gray-200  border;
-    }
-    .project-group-icon {
-        @apply mx-1;
-    }
+}
+.tree {
+    @apply overflow-auto border-gray-200  border;
+}
+.project-group-icon {
+    @apply mx-1;
+}
+.tree-panel-header {
+    margin-bottom: 2rem;
+    line-height: 120%;
     .title {
-        @apply text-2xl mb-8;
-        line-height: 120%;
+        @apply text-2xl;
     }
     .title-optional {
         @apply text-lg text-gray-400;
         margin-right: 1rem;
     }
-    .alert {
-        @apply text-alert align-middle;
-    .alert-msg {
-        @apply align-middle;
-    }
-    }
-    .body-container {
-        @apply border border-gray-200 rounded-sm flex flex-col;
-        max-width: 35.75rem;
+}
 
-        /* min-height: 17.5rem; */
-    }
-    .tree-container {
-        @apply overflow-auto flex-grow px-2 py-4;
-        max-width: 35.75rem;
-
-        /* min-height: 17.5rem; */
-        height: 21.5rem;
-    }
-    .no-select {
-        @apply border-t border-gray-200 p-4 flex items-center;
-    }
+.body-container {
+    @apply border border-gray-200 rounded-sm flex flex-col w-full;
+}
+.tree-container {
+    @apply overflow-auto flex-grow px-2 py-4 w-full;
+    height: 21.5rem;
+}
+.tree-loader {
+    @apply h-full w-full rounded-b-sm;
+}
+.no-select {
+    @apply border-t border-gray-200 p-4 flex items-center;
+}
 </style>

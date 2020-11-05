@@ -3,11 +3,10 @@
         <div class="page-navigation">
             <p-page-navigation :routes="routeState.routes" />
         </div>
-        <p-page-title
-            class="mb-6"
-            title="Add Service Account"
-            child
-            @goBack="onClickGoBack"
+        <p-page-title class="mb-6"
+                      :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
+                      child
+                      @goBack="onClickGoBack"
         >
             <template #before-title>
                 <div class="icon">
@@ -23,42 +22,41 @@
         </p-page-title>
         <p-collapsible-panel v-if="description">
             <template #content>
-                <p-markdown
-                    :markdown="description.options.markdown"
-                    :data="description.options.markdown"
-                    class="p-4"
+                <p-markdown :markdown="description.options.markdown"
+                            :data="description.options.markdown"
+                            class="p-4"
                 />
             </template>
         </p-collapsible-panel>
 
         <p-pane-layout>
             <div class="title">
-                Base Information
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE') }}
             </div>
-            <p-field-group label="name"
+            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
                            :invalid-text="accountNameInvalidText"
                            :invalid="accountName && !isAccountNameValid"
                            :required="true"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="accountName" class="block" :class="{'invalid': invalid}"
-                                  placeholder="Cloud Account Name"
+                                  :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
                     />
                 </template>
             </p-field-group>
             <p-json-schema-form :model.sync="accountModel" :schema="accountSchema" :is-valid.sync="isAccountModelValid" />
             <div class="tag-title">
-                {{ $t('PANEL.TAG') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL') }}
             </div>
             <div class="tag-help-msg">
-                <i18n path="ACTION.DICT.ADD_TAG_BY">
+                <i18n path="IDENTITY.SERVICE_ACCOUNT.ADD.TAG_DESC_1">
                     <template #name>
                         <span v-if="accountName" class="font-bold">[{{ accountName }}]</span>
-                        <span v-else> Account</span>
+                        <span v-else>{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.ACCOUNT') }}</span>
                     </template>
                 </i18n>
                 <br>
-                {{ $t('ACTION.DICT.HELPMSG') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_DESC_2') }}
             </div>
             <p-dict-input-group ref="dictRef"
                                 :dict="tags"
@@ -68,10 +66,10 @@
                     <p-icon-text-button
                         outline style-type="primary" :disabled="scope.disabled"
                         name="ic_plus_bold"
-                        @click="scope.addPair($event)"
                         class="mb-2"
+                        @click="scope.addPair($event)"
                     >
-                        {{ $t('BTN.ADD_TAG') }}
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
                     </p-icon-text-button>
                 </template>
             </p-dict-input-group>
@@ -79,16 +77,16 @@
 
         <p-pane-layout>
             <div class="title">
-                Credentials
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_TITLE') }}
             </div>
-            <p-field-group label="name"
+            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
                            :invalid-text="credentialNameInvalidText"
                            :invalid="credentialName && !isCredentialNameValid"
                            :required="true"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="credentialName" class="block" :class="{'invalid': invalid}"
-                                  placeholder="Credentials Name"
+                                  :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_NAME_PLACEHOLDER')"
                     />
                 </template>
             </p-field-group>
@@ -113,21 +111,20 @@
             </p-tab>
         </p-pane-layout>
 
-        <s-project-tree-panel ref="projectRef" class="tree-panel"
-                              :resource-name="$t('WORD.SERVICE_ACCOUNT')"
-                              :target-name="accountName"
+        <project-tree-panel ref="projectRef" class="tree-panel"
+                            :target-name="accountName"
         />
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
                       :disabled="!isValid"
                       @click="onClickSave"
             >
-                {{ $t('BTN.SAVE') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.SAVE') }}
             </p-button>
             <p-button class="text-button" style-type="outline gray900" size="lg"
                       @click="onClickGoBack"
             >
-                {{ $t('BTN.CANCEL') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}
             </p-button>
         </div>
     </general-page-layout>
@@ -143,7 +140,7 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
-import SProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
+import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
@@ -164,9 +161,10 @@ import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
+import { TranslateResult } from 'vue-i18n';
 
 export default {
-    name: 'AddServiceAccount',
+    name: 'AddServiceAccountPage',
     components: {
         PTab,
         PTextInput,
@@ -183,7 +181,7 @@ export default {
         PIconTextButton,
         PButton,
         PRadio,
-        SProjectTreePanel,
+        ProjectTreePanel,
         PI,
     },
     props: {
@@ -192,7 +190,7 @@ export default {
             default: null,
         },
     },
-    setup(props, context) {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             providerObj: {} as ProviderModel,
@@ -208,10 +206,10 @@ export default {
         });
 
         const tabState = reactive({
-            tabs: [
-                { label: 'Input Form', name: 'input', keepAlive: true },
-                { label: 'Json Code', name: 'json', keepAlive: true },
-            ] as TabItem[],
+            tabs: computed<TabItem[]>(() => [
+                { label: vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
+                { label: vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_JSON'), name: 'json', keepAlive: true },
+            ]),
             activeTab: 'input',
         });
 
@@ -219,12 +217,12 @@ export default {
             /* static input */
             accountName: undefined as undefined | string,
             accountNameInvalidText: computed(() => {
-                let invalidText = '';
+                let invalidText: TranslateResult = '';
                 if (typeof formState.accountName === 'string') {
                     if (formState.accountName.length < 2) {
-                        invalidText = 'should NOT be shorter than 2 characters';
+                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
                     } else if (state.serviceAccountNames.includes(formState.accountName)) {
-                        invalidText = 'Name is duplicated';
+                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
                     }
                 }
                 return invalidText;
@@ -238,12 +236,12 @@ export default {
             //
             credentialName: undefined as undefined | string,
             credentialNameInvalidText: computed(() => {
-                let invalidText = '';
+                let invalidText: TranslateResult = '';
                 if (typeof formState.credentialName === 'string') {
                     if (formState.credentialName.length < 2) {
-                        invalidText = 'should NOT be shorter than 2 characters';
+                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
                     } else if (state.credentialNames.includes(formState.credentialName)) {
-                        invalidText = 'Name is duplicated';
+                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
                     }
                 }
                 return invalidText;
@@ -332,8 +330,8 @@ export default {
                 });
                 state.serviceAccountId = res.service_account_id;
             } catch (e) {
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
                 console.error(e);
-                showErrorMessage('Request Fail', e, context.root);
             }
         };
         const createSecretWithForm = async () => {
@@ -362,23 +360,25 @@ export default {
                         await createSecretWithJson(json);
                     } catch (e) {
                         console.error(e);
-                        showErrorMessage('Fail to Add Account', e, context.root);
+                        showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
                         await deleteServiceAccount();
                         return;
                     }
                 }
                 if (tabState.activeTab === 'input') await createSecretWithForm();
                 vm.$router.back();
-                showSuccessMessage('Add Success', 'Service Account has been successfully registered.', vm);
+                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'),
+                    vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_DESC'), vm.$root);
             } catch (e) {
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
                 await deleteServiceAccount();
-                showErrorMessage('Fail to Add Account', e, context.root);
             }
         };
 
         const onClickSave = async () => {
             if (!formState.isValid) {
-                showErrorMessage('Fail to Add Account', 'Please check all input forms.', context.root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'),
+                    vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), vm.$root);
                 return;
             }
             if (state.dictRef.allValidation() && !projectRef.value.error) {
@@ -481,8 +481,10 @@ export default {
             padding-right: 2rem;
             padding-bottom: 2rem;
             margin-bottom: -2rem;
-            .form-label {
-                margin-top: 1.5rem;
+            &.p-json-schema-form::v-deep {
+                .form-label {
+                    margin-top: 1.5rem;
+                }
             }
         }
         .p-text-editor {

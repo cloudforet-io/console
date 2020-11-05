@@ -1,8 +1,8 @@
-const AddServiceAccount = () => import('@/views/identity/service-account/pages/AddServiceAccount.vue');
+const AddServiceAccountPage = () => import('@/views/identity/service-account/pages/AddServiceAccountPage.vue');
 
 const User = () => import('@/views/identity/user/User');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage');
-const ServiceAccountSearch = () => import('@/views/identity/service-account/pages/ServiceAccountSearch');
+const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage');
 const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 const NoResource = () => import('@/views/common/error/NoResource.vue');
 
@@ -33,14 +33,14 @@ export default {
                         label: 'search',
                     },
                     props: true,
-                    component: ServiceAccountSearch,
+                    component: ServiceAccountSearchPage,
                 },
                 {
                     path: 'add/:provider',
                     name: 'addServiceAccount',
                     meta: { label: 'Add Service Account' },
                     props: true,
-                    component: AddServiceAccount,
+                    component: AddServiceAccountPage,
                 },
                 {
                     path: 'no-resource',

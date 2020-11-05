@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="Member" :use-total-count="true" :total-count="totalCount" />
+        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_MEMBER')" :use-total-count="true" :total-count="totalCount" />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"

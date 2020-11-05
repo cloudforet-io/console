@@ -1,12 +1,12 @@
 <template>
     <div class="mb-8">
         <p-panel-top :use-total-count="true" :total-count="items.length">
-            <template>{{ $t('WORD.TAG') }}</template>
+            <template>{{ $t('COMMON.TAGS.TITLE') }}</template>
             <template #extra>
                 <p-button style-type="primary-dark"
                           @click="editTag"
                 >
-                    {{ $t('BTN.EDIT') }}
+                    {{ $t('COMMON.TAGS.EDIT') }}
                 </p-button>
             </template>
         </p-panel-top>
@@ -19,8 +19,7 @@
         />
         <s-tags-page v-if="tagEditPageVisible"
                      :resource-id="resourceId"
-                     :resource-key="resourceKey"
-                     :resource-type="resourceType"
+                     :resource-key="resourceKey" :resource-type="resourceType"
                      @close="closeTag"
                      @update="updateTag"
         />
@@ -33,9 +32,8 @@ import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    map, get, camelCase, replace,
+    map, get, camelCase,
 } from 'lodash';
-import { makeTrItems } from '@/lib/view-helper/index';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -72,10 +70,10 @@ export default {
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
-            fields: makeTrItems([
-                ['name', 'WORD.KEY'],
-                ['value', 'WORD.VALUE'],
-            ], vm),
+            fields: computed(() => [
+                { name: 'name', label: vm.$t('COMMON.TAGS.KEY'), type: 'item' },
+                { name: 'value', label: vm.$t('COMMON.TAGS.VALUE'), type: 'item' },
+            ]),
             loading: true,
             items: computed(() => map(tags.value, (v, k) => ({ name: k, value: v })) || []),
         });
