@@ -11,9 +11,14 @@
 		"YEAR": "년 "
 	},
 	"DICT_INPUT": {
-		"ADD": "추가 ",
 		"KEY": "키 ",
 		"VALUE": "값 "
+	},
+	"DICT_INPUT_GROUP": {
+		"ADD": "추가 ",
+		"INVALID_DUPLICATED_KEY": "키가 중복됩니다.",
+		"INVALID_NO_KEY": "키가 없습니다.",
+		"INVALID_NO_VALUE": "값이 없습니다."
 	},
 	"PAGE_TITLE": {
 		"SELECTED_OF": "{selectedCount} / {totalCount}"
@@ -29,5 +34,23 @@
 		"NEXT": "다음 ",
 		"OPTIONAL": "선택 사항 ",
 		"PREV": "이전 "
+	},
+	"QUERY_SEARCH": {
+		"HELP": "도움말"
+	},
+	"QUERY_SEARCH_GUIDE": {
+		"CONTACT": "여기로 문의해주세요",
+		"FILTER": "필터",
+		"HELP": "도움이 필요하면 {contact}",
+		"OPERATOR": "검색조건",
+		"QUERY_KEY": "필터(key)",
+		"STEP_1": "빠른 검색을 위해 {queryKey}를 선택하고 구체적인 검색어를 사용하세요.",
+		"STEP_2_1": "검색한 {filter}를 삭제, 추가 하면서 원하는 검색 결과의 범위를 좁히세요.",
+		"STEP_2_2": "같은 필터일 경우 OR 검색을 하고, 다른 필터일 경우 AND 검색을 합니다.",
+		"STEP_3": "아래의 {operator} 설정을 지원합니다.",
+		"TITLE": "검색 가이드"
+	},
+	"SEARCH": {
+		"PLACEHOLDER": "검색"
 	}
 }

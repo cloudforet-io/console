@@ -11,9 +11,14 @@
 		"YEAR": "Year"
 	},
 	"DICT_INPUT": {
-		"ADD": "Add",
 		"KEY": "Key",
 		"VALUE": "Value"
+	},
+	"DICT_INPUT_GROUP": {
+		"ADD": "Add",
+		"INVALID_DUPLICATED_KEY": "duplicated key",
+		"INVALID_NO_KEY": "no key",
+		"INVALID_NO_VALUE": "no value"
 	},
 	"PAGE_TITLE": {
 		"SELECTED_OF": "{selectedCount} / {totalCount}"
@@ -29,5 +34,23 @@
 		"NEXT": "Next",
 		"OPTIONAL": "Optional",
 		"PREV": "Prev"
+	},
+	"QUERY_SEARCH": {
+		"HELP": "help"
+	},
+	"QUERY_SEARCH_GUIDE": {
+		"CONTACT": "contact us",
+		"FILTER": "filters",
+		"HELP": "Need more help? {contact}",
+		"OPERATOR": "operators",
+		"QUERY_KEY": "query(key)",
+		"STEP_1": "Select a refined filter {queryKey} and use specific words.",
+		"STEP_2_1": "Add and Delete {filter} to narrow your results.",
+		"STEP_2_2": "OR Search for the same filters, And Search for different filters.",
+		"STEP_3": "We support below {operator}.",
+		"TITLE": "Search Guide"
+	},
+	"SEARCH": {
+		"PLACEHOLDER": "Search"
 	}
 }

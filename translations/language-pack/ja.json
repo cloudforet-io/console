@@ -11,9 +11,14 @@
 		"YEAR": ""
 	},
 	"DICT_INPUT": {
-		"ADD": "",
 		"KEY": "",
 		"VALUE": ""
+	},
+	"DICT_INPUT_GROUP": {
+		"ADD": "",
+		"INVALID_DUPLICATED_KEY": "",
+		"INVALID_NO_KEY": "",
+		"INVALID_NO_VALUE": ""
 	},
 	"PAGE_TITLE": {
 		"SELECTED_OF": ""
@@ -29,5 +34,23 @@
 		"NEXT": "",
 		"OPTIONAL": "",
 		"PREV": ""
+	},
+	"QUERY_SEARCH": {
+		"HELP": ""
+	},
+	"QUERY_SEARCH_GUIDE": {
+		"CONTACT": "",
+		"FILTER": "",
+		"HELP": "",
+		"OPERATOR": "",
+		"QUERY_KEY": "",
+		"STEP_1": "",
+		"STEP_2_1": "",
+		"STEP_2_2": "",
+		"STEP_3": "",
+		"TITLE": ""
+	},
+	"SEARCH": {
+		"PLACEHOLDER": ""
 	}
 }
