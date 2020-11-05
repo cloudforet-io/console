@@ -23,8 +23,7 @@
 </template>
 
 <script lang="ts">
-import { find, get, set } from 'lodash';
-
+/* eslint-disable camelcase */
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -37,7 +36,7 @@ import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-se
 import {
     DynamicLayoutEventListeners,
     DynamicLayoutFetchOptions,
-    DynamicLayoutFieldHandler
+    DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
@@ -125,15 +124,13 @@ export default {
         };
 
         const getSchema = async () => {
-            let layouts = layoutSchemaCacheMap[props.cloudServiceId]
+            let layouts = layoutSchemaCacheMap[props.cloudServiceId];
             if (!layouts) {
                 try {
                     const res = await SpaceConnector.client.addOns.pageSchema.get({
-                        // eslint-disable-next-line camelcase
                         resource_type: 'inventory.CloudService',
                         schema: 'details',
                         options: {
-                            // eslint-disable-next-line camelcase
                             cloud_service_id: props.cloudServiceId,
                         },
                     });
@@ -153,7 +150,7 @@ export default {
         const getQuery = (): undefined|any => {
             const query = new QueryHelper();
 
-            const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;;
+            const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
             if (options.sortBy !== undefined) query.setSort(options.sortBy, options.sortDesc);
             if (options.pageLimit !== undefined) query.setPageLimit(options.pageLimit);
             if (options.pageStart !== undefined) query.setPageStart(options.pageStart);

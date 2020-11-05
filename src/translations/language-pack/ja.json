@@ -27,7 +27,6 @@
 	"BTN": {
 		"ACTION": "",
 		"ADD": "",
-		"ADD_SERVICE_ACCOUNT": "",
 		"ADD_TAG": "",
 		"BACK": "",
 		"CANCEL": "",
@@ -207,6 +206,11 @@
 		"TIMEZONE": "",
 		"TIME_SCHEDULE": "",
 		"TITLE": "",
+		"TREE_MODAL": {
+			"SELECT_NO_PROJECT": "",
+			"SELECT_PROJECT": "",
+			"TITLE": ""
+		},
 		"TR_NOTI": "",
 		"TR_NOTI_CON": "",
 		"TYPE": "",
@@ -330,6 +334,39 @@
 			"SET_MAINTENANCE": ""
 		},
 		"CHOOSE_CRD": "",
+		"CLOUD_SERVICE": {
+			"ADMIN": {
+				"MEMBER": ""
+			},
+			"HISTORY": {
+				"HISTORY": ""
+			},
+			"MAIN": {
+				"ADD_SERVICE_ACCOUNT": "",
+				"REGION": "",
+				"SERVICE_CATEGORY": "",
+				"SERVICE_PROVIDER": "",
+				"SHOW_ALL": ""
+			},
+			"PAGE": {
+				"ACTION": "",
+				"ALT_E_CHANGE_PROJECT": "",
+				"ALT_E_RELEASE_PROJECT_TITLE": "",
+				"ALT_S_CHANGE_PROJECT": "",
+				"ALT_S_RELEASE_PROJECT_TITLE": "",
+				"CHANGE_PROJECT": "",
+				"COLLECT_DATA": "",
+				"CONSOLE": "",
+				"DELETE": "",
+				"NO_SELECTED": "",
+				"TAB_DETAILS": "",
+				"TAB_HISTORY": "",
+				"TAB_MEMBER": "",
+				"TAB_MONITORING": "",
+				"TAB_SELECTED_DATA": "",
+				"TAB_TAG": ""
+			}
+		},
 		"COLL_TIME": "",
 		"COL_NAME": "",
 		"COL_NAME_VD": "",

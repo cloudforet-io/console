@@ -150,7 +150,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
-import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
+import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';
 
 /* page modules */
 import ServiceAccountDetail from '@/views/identity/service-account/modules/ServiceAccountDetail.vue';

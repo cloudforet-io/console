@@ -27,7 +27,6 @@
 	"BTN": {
 		"ACTION": "Action",
 		"ADD": "Add",
-		"ADD_SERVICE_ACCOUNT": "Add Service Account",
 		"ADD_TAG": "Add Tag",
 		"BACK": "Back",
 		"CANCEL": "Cancel",
@@ -207,6 +206,11 @@
 		"TIMEZONE": "Timezone",
 		"TIME_SCHEDULE": "Time Schedule",
 		"TITLE": "{0} {1}",
+		"TREE_MODAL": {
+			"SELECT_NO_PROJECT": "Select no Project",
+			"SELECT_PROJECT": "Select a Project",
+			"TITLE": "Change Project"
+		},
 		"TR_NOTI": "Have trouble singing in? find ID/PW",
 		"TR_NOTI_CON": "",
 		"TYPE": "Type",
@@ -330,6 +334,39 @@
 			"SET_MAINTENANCE": "Set Maintenance"
 		},
 		"CHOOSE_CRD": "Choose Credentials",
+		"CLOUD_SERVICE": {
+			"ADMIN": {
+				"MEMBER": "Member"
+			},
+			"HISTORY": {
+				"HISTORY": "History"
+			},
+			"MAIN": {
+				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"REGION": "Region",
+				"SERVICE_CATEGORY": "Service Category",
+				"SERVICE_PROVIDER": "Service Provider",
+				"SHOW_ALL": "Show All"
+			},
+			"PAGE": {
+				"ACTION": "Action",
+				"ALT_E_CHANGE_PROJECT": "Project Change Failure",
+				"ALT_E_RELEASE_PROJECT_TITLE": "Project Release Failure",
+				"ALT_S_CHANGE_PROJECT": "Project Change Success",
+				"ALT_S_RELEASE_PROJECT_TITLE": "Release Project Success",
+				"CHANGE_PROJECT": "Change Project",
+				"COLLECT_DATA": "Collect Data",
+				"CONSOLE": "Console",
+				"DELETE": "Delete",
+				"NO_SELECTED": "No Selected Item",
+				"TAB_DETAILS": "Details",
+				"TAB_HISTORY": "History",
+				"TAB_MEMBER": "Member",
+				"TAB_MONITORING": "Monitoring",
+				"TAB_SELECTED_DATA": "Selected Data",
+				"TAB_TAG": "Tag"
+			}
+		},
 		"COLL_TIME": "Collecting Time",
 		"COL_NAME": "Collector Name",
 		"COL_NAME_VD": "Please enter Collector name.",

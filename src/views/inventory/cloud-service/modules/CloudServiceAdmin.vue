@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="Member" :total-count="totalCount" />
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')" :total-count="totalCount" />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"
@@ -22,16 +22,19 @@
 </template>
 
 <script lang="ts">
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+/* eslint-disable camelcase */
 import { reactive, toRefs, watch } from '@vue/composition-api';
+
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
+
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import config from '@/lib/config';
 import { getTimezone } from '@/lib/util';
+import config from '@/lib/config';
 
 export default {
     name: 'CloudServiceAdmin',
@@ -73,7 +76,6 @@ export default {
 
             try {
                 const res = await api({
-                    // eslint-disable-next-line camelcase
                     cloud_services: props.cloudServiceIds,
                     query: getQuery(),
                 });
@@ -99,7 +101,6 @@ export default {
                     source: {
                         url: '/inventory/cloud-service/member/list',
                         param: {
-                            // eslint-disable-next-line camelcase
                             cloud_services: props.cloudServiceIds,
                             query: getQuery(),
                         },
@@ -109,13 +110,11 @@ export default {
                             fileType: 'xlsx',
                             timezone: getTimezone(),
                         },
-                        // eslint-disable-next-line camelcase
                         data_source: [
                             { name: 'User ID', key: 'user_info.user_id' },
                             { name: 'Name', key: 'user_info.name' },
                             { name: 'Email', key: 'user_info.email' },
                             {
-                                // eslint-disable-next-line camelcase
                                 name: 'Labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
                             },
                         ],

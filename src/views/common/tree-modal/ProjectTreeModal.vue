@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal header-title="Change Project"
+    <p-button-modal :header-title="$t('COMMON.TREE_MODAL.TITLE')"
                     size="md"
                     :scrollable="false"
                     centered
@@ -11,7 +11,7 @@
     >
         <template #body>
             <div class="title">
-                Select a Project
+                {{ $t('COMMON.TREE_MODAL.SELECT_PROJECT') }}
             </div>
             <div class="body-container">
                 <div ref="treeContainer" class="tree-container">
@@ -50,7 +50,7 @@
                     <p-radio class="mr-2"
                              :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
                              :value="true" @click="releaseProject"
-                    /><span class="cursor-pointer" @click="releaseProject">Select no Project</span>
+                    /><span class="cursor-pointer" @click="releaseProject">{{ $t('COMMON.TREE_MODAL.SELECT_NO_PROJECT') }}</span>
                 </div>
             </div>
         </template>

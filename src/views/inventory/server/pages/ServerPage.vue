@@ -150,7 +150,7 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 
 /* Page Modules */
 import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
-import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
+import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';
 import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
 import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
 import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';

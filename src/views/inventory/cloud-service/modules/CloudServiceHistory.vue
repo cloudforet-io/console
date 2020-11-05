@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top title="History" :total-count="totalCount" />
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.HISTORY')" :total-count="totalCount" />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"
@@ -25,16 +25,19 @@
 </template>
 
 <script lang="ts">
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+/* eslint-disable camelcase */
 import { reactive, toRefs, watch } from '@vue/composition-api';
-import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getPageStart } from '@/lib/component-utils/pagination';
+
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import config from '@/lib/config';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
+import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
+
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone, iso8601Formatter } from '@/lib/util';
+import config from '@/lib/config';
 
 export default {
     name: 'CloudServiceHistory',
@@ -63,9 +66,7 @@ export default {
         });
 
         const getParams = () => ({
-            // eslint-disable-next-line camelcase
             cloud_service_id: props.cloudServiceId,
-            // eslint-disable-next-line camelcase
             key_path: 'collection_info.change_history',
             query: new QueryHelper()
                 .setSort(state.options.sortBy, state.options.sortDesc)
@@ -112,7 +113,6 @@ export default {
                             fileType: 'xlsx',
                             timezone: getTimezone(),
                         },
-                        // eslint-disable-next-line camelcase
                         data_source: [
                             { name: 'Key', key: 'key' },
                             { name: 'Job ID', key: 'job_id' },
@@ -122,7 +122,6 @@ export default {
                                 key: 'updated_at',
                                 type: 'datetime',
                                 options: {
-                                    // eslint-disable-next-line camelcase
                                     source_type: 'timestamp',
                                 },
                             },

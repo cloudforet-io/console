@@ -2,7 +2,7 @@
     <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <p class="sidebar-title">
-                Service Providers
+                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
             </p>
             <p-hr class="sidebar-divider" />
             <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
@@ -27,7 +27,7 @@
                 </p-radio>
             </div>
             <p class="sidebar-title">
-                Service Categories
+                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY') }}
             </p>
             <p-hr class="sidebar-divider" />
             <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
@@ -41,7 +41,7 @@
                 </p-check-box>
             </div>
             <p id="region-title">
-                Regions
+                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.REGION') }}
             </p>
             <p-hr class="sidebar-divider" />
             <div v-if="filterState.regionList.length === 0">
@@ -87,7 +87,7 @@
                 >
                     <template #toolbox-left>
                         <p-check-box v-model="filterState.showAllCloudServices">
-                            <span class="show-all">Show All</span>
+                            <span class="show-all">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_ALL') }}</span>
                         </p-check-box>
                     </template>
                     <template #card="{item}">
@@ -126,7 +126,7 @@
                                 <p-icon-text-button style-type="primary" name="ic_plus_bold"
                                                     class="mx-auto text-center"
                                 >
-                                    {{ $t('BTN.ADD_SERVICE_ACCOUNT') }}
+                                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
                                 </p-icon-text-button>
                             </router-link>
                         </div>
@@ -147,44 +147,42 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { Location } from 'vue-router';
+import { zipObject, debounce, range } from 'lodash';
+import axios, { CancelTokenSource } from 'axios';
 
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, Ref, ref, toRefs, watch,
+    ComponentRenderProxy, Ref,
+    computed, reactive, ref, toRefs, watch,
+    getCurrentInstance,
 } from '@vue/composition-api';
+
 import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
-import { zipObject, debounce, range } from 'lodash';
-import PI from '@/components/atoms/icons/PI.vue';
-import {
-    queryStringToQueryTags,
-    queryTagsToQueryString,
-    replaceQuery, RouteQueryString, queryStringToStringArray,
-} from '@/lib/router-query-string';
-import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
+import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { Location } from 'vue-router';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import {
-    makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/dynamic-layout';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-
-import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import {
-    getFiltersFromQueryTags,
-} from '@/lib/component-utils/query-search-tags';
+import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { Filter } from '@/lib/space-connector/type';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
-import axios, { CancelTokenSource } from 'axios';
-import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
+
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { store } from '@/store';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import {
+    queryStringToQueryTags, queryTagsToQueryString, queryStringToStringArray, replaceQuery,
+    RouteQueryString,
+} from '@/lib/router-query-string';
+import { Filter } from '@/lib/space-connector/type';
 import { Tags, TimeStamp } from '@/models';
+import { store } from '@/store';
+
 
 interface RegionModel extends Tags {
     region_id: string;
@@ -486,7 +484,6 @@ export default {
             onChange,
         };
     },
-
 };
 
 </script>
@@ -571,6 +568,7 @@ export default {
     }
     .show-all {
         @apply text-sm mr-2;
+        line-height: 2rem;
     }
     .cloud-service-divider {
         @apply w-full;

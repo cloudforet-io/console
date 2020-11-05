@@ -27,7 +27,6 @@
 	"BTN": {
 		"ACTION": "작업",
 		"ADD": "추가",
-		"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
 		"ADD_TAG": "태그 추가",
 		"BACK": "이전으로",
 		"CANCEL": "취소",
@@ -207,6 +206,11 @@
 		"TIMEZONE": "표준 시간대",
 		"TIME_SCHEDULE": "시간 스케줄",
 		"TITLE": "{1} {0}",
+		"TREE_MODAL": {
+			"SELECT_NO_PROJECT": "프로젝트 선택 안 함",
+			"SELECT_PROJECT": "프로젝트 선택",
+			"TITLE": "프로젝트 변경"
+		},
 		"TR_NOTI": "아이디/비밀번호 찾기",
 		"TR_NOTI_CON": "",
 		"TYPE": "타입",
@@ -330,6 +334,39 @@
 			"SET_MAINTENANCE": "유지보수중"
 		},
 		"CHOOSE_CRD": "암호화 키 선택",
+		"CLOUD_SERVICE": {
+			"ADMIN": {
+				"MEMBER": "구성원"
+			},
+			"HISTORY": {
+				"HISTORY": "변경 기록"
+			},
+			"MAIN": {
+				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
+				"REGION": "Region",
+				"SERVICE_CATEGORY": "서비스 카테고리",
+				"SERVICE_PROVIDER": "서비스 공급자",
+				"SHOW_ALL": "모두 보기"
+			},
+			"PAGE": {
+				"ACTION": "작업",
+				"ALT_E_CHANGE_PROJECT": "프로젝트 변경 실패",
+				"ALT_E_RELEASE_PROJECT_TITLE": "프로젝트 해제 실패",
+				"ALT_S_CHANGE_PROJECT": "프로젝트 변경 성공",
+				"ALT_S_RELEASE_PROJECT_TITLE": "프로젝트 해제 성공",
+				"CHANGE_PROJECT": "프로젝트 변경",
+				"COLLECT_DATA": "데이터 수집",
+				"CONSOLE": "콘솔",
+				"DELETE": "삭제",
+				"NO_SELECTED": "선택된 서비스가 없습니다.",
+				"TAB_DETAILS": "상세 정보",
+				"TAB_HISTORY": "변경 기록",
+				"TAB_MEMBER": "구성원",
+				"TAB_MONITORING": "모니터링",
+				"TAB_SELECTED_DATA": "선택된 데이터",
+				"TAB_TAG": "태그"
+			}
+		},
 		"COLL_TIME": "수집 시간",
 		"COL_NAME": "컬렉터 이름",
 		"COL_NAME_VD": "컬렉터 이름을 입력하세요.",

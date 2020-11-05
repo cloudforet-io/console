@@ -32,14 +32,14 @@
                                                 :disabled="tableState.selectedItems.length === 0"
                                                 @click="clickCollectData"
                             >
-                                {{ $t('BTN.COLLECT_DATA') }}
+                                {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.COLLECT_DATA') }}
                             </p-icon-text-button>
 
                             <p-dropdown-menu-btn class="left-toolbox-item mr-4"
                                                  :menu="tableState.dropdown"
                                                  @click-project="clickProject"
                             >
-                                {{ $t('BTN.ACTION') }}
+                                {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
                             </p-dropdown-menu-btn>
                         </template>
                     </p-dynamic-layout>
@@ -101,7 +101,7 @@
             </template>
         </p-tab>
         <p-empty v-else style="height: auto; margin-top: 4rem;">
-            No Selected Item
+            {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
         </p-empty>
         <s-project-tree-modal :visible.sync="changeProjectState.visible"
                               :project-id="changeProjectState.projectId"
@@ -117,52 +117,50 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { get } from 'lodash';
 
 import {
     reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { makeTrItems } from '@/lib/view-helper';
 
+import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
+import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';
+import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
+import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
+import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
+import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
+import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
+import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
-
-import SProjectTreeModal from '@/views/common/tree-api-modal/ProjectTreeModal.vue';
-import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
-import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
+import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import STagsPanel from '@/views/common/tags/tag-panel/TagsPanel.vue';
-import SMonitoring from '@/views/common/monitoring/Monitoring.vue';
-
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { get } from 'lodash';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import {
-    queryStringToQueryTags,
-    queryTagsToQueryString, replaceQuery,
-} from '@/lib/router-query-string';
-import { ProjectItemResp } from '@/views/project/project/type';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import {
-    QuerySearchTableFetchOptions, QuerySearchTableListeners,
-    QuerySearchTableTypeOptions,
-} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import config from '@/lib/config';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
+import { ProjectItemResp } from '@/views/project/project/type';
+import { MenuItem } from '@/components/organisms/context-menu/type';
+import {
+    QuerySearchTableFetchOptions, QuerySearchTableListeners, QuerySearchTableTypeOptions,
+} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
-import { Reference } from '@/lib/reference/type';
-import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
-import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+
+import {
+    queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
+} from '@/lib/router-query-string';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
+import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
+import config from '@/lib/config';
+
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -245,7 +243,7 @@ export default {
             required: true,
         },
     },
-    setup(props, context) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         /** Breadcrumb */
@@ -283,20 +281,30 @@ export default {
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
-            dropdown: computed(() => makeTrItems([
-                ['delete', 'BTN.DELETE'],
-                [null, null, { type: 'divider' }],
-                ['project', 'COMMON.CHG_PRO', { disabled: tableState.selectedItems.length === 0 }],
-                [null, null, { type: 'divider' }],
-                ['link', null, {
-                    label: 'Console',
+            dropdown: computed(() => ([
+                {
+                    type: 'item',
+                    name: 'delete',
+                    label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.DELETE'),
+                    disabled: true,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item',
+                    name: 'project',
+                    label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.CHANGE_PROJECT'),
+                    disabled: tableState.selectedItems.length === 0 || tableState.selectedItems.length > 1,
+                },
+                { type: 'divider' },
+                {
+                    name: 'link',
+                    label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.CONSOLE'),
+                    type: 'item',
                     disabled: !tableState.consoleLink,
                     link: tableState.consoleLink,
                     target: 'blank',
-                }],
-            ],
-            context.parent,
-            { type: 'item', disabled: true })),
+                },
+            ] as MenuItem[])),
             collectModalVisible: false,
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
@@ -410,7 +418,7 @@ export default {
                 fetchOptionState.queryTags = options.queryTags;
             }
 
-            listCloudServiceData();
+            await listCloudServiceData();
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
@@ -466,9 +474,9 @@ export default {
                 try {
                     params.project_id = data.id;
                     await api(params);
-                    showSuccessMessage('Success', 'Project has been successfully changed.', context.root);
+                    showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_CHANGE_PROJECT'), '', root);
                 } catch (e) {
-                    showErrorMessage('Fail to Change Project', e, context.root);
+                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'), e, root);
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listCloudServiceData();
@@ -477,9 +485,9 @@ export default {
                 try {
                     params.release_project = true;
                     await api(params);
-                    showSuccessMessage('Success', 'Release Project Success', context.root);
+                    showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_RELEASE_PROJECT_TITLE'), '', root);
                 } catch (e) {
-                    showErrorMessage('Fail to Release Project', e, context.root);
+                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'), e, root);
                 } finally {
                     await listCloudServiceData();
                 }
@@ -491,23 +499,22 @@ export default {
 
         /** Tabs */
         const singleItemTabState = reactive({
-            tabs: computed(() => makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['tag', 'TAB.TAG'],
-                ['member', 'TAB.MEMBER'],
-                ['history', 'TAB.HISTORY'],
-                ['monitoring', 'TAB.MONITORING'],
-            ],
-            context.parent)),
+            tabs: computed(() => ([
+                { name: 'detail', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_DETAILS') },
+                { name: 'tag', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
+                { name: 'member', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
+                { name: 'history', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
+                { name: 'monitoring', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
+            ])),
             activeTab: 'detail',
         });
 
         const multiItemTabState = reactive({
-            tabs: makeTrItems([
-                ['data', 'TAB.SELECTED_DATA'],
-                ['member', 'TAB.MEMBER'],
-                ['monitoring', 'TAB.MONITORING'],
-            ], context.parent),
+            tabs: computed(() => ([
+                { name: 'data', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
+                { name: 'member', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
+                { name: 'monitoring', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
+            ])),
             activeTab: 'data',
         });
 
