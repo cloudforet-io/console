@@ -32,9 +32,11 @@
         <template v-if="activeTab">
             <div class="step-head">
                 <div class="step-title">
-                    <span class="step">Step {{ proxyActiveIdx + 1 }}.</span>
+                    <span class="step">
+                        {{ $t('COMPONENT.PROGRESS_WIZARD.STEP', {step: proxyActiveIdx + 1 }) }}.
+                    </span>
                     <span class="title">{{ activeTab.label || activeTab.name }}</span>
-                    <span v-if="activeTab.optional" class="optional"> ({{ $t('PROGRESS_WIZARD.OPTIONAL') }})</span>
+                    <span v-if="activeTab.optional" class="optional"> ({{ $t('COMPONENT.PROGRESS_WIZARD.OPTIONAL') }})</span>
                 </div>
                 <div class="step-appendix">
                     <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />
@@ -52,20 +54,20 @@
                 <p-button v-bind="mergedCancelBtnBind"
                           class="txt-btn" @click="$emit('cancel', $event)"
                 >
-                    {{ $t('PROGRESS_WIZARD.CANCEL') }}
+                    {{ $t('COMPONENT.PROGRESS_WIZARD.CANCEL') }}
                 </p-button>
                 <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
                               v-bind="mergedNavBtnBind"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="transparent inherit" />{{ $t('PROGRESS_WIZARD.PREV') }}
+                        <p-i name="ic_back" color="transparent inherit" />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               v-bind="mergedNavBtnBind"
                               @click="onClickNext"
                     >
-                        {{ $t('PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
+                        {{ $t('COMPONENT.PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
                     <p-loading-button :button-bind="mergedConfirmBtnBind"
                                       :loading="loading"
@@ -73,7 +75,7 @@
                                       class="txt-btn"
                                       @click="$emit('confirm', tabs, $event)"
                     >
-                        {{ $t('PROGRESS_WIZARD.CONFIRM') }}
+                        {{ $t('COMPONENT.PROGRESS_WIZARD.CONFIRM') }}
                     </p-loading-button>
                 </div>
             </div>

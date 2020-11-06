@@ -41,7 +41,8 @@
 		"CONFIRM": "Confirm",
 		"NEXT": "Next",
 		"OPTIONAL": "Optional",
-		"PREV": "Prev"
+		"PREV": "Prev",
+		"STEP": "Step {step}"
 	},
 	"QUERY_SEARCH": {
 		"HELP": "help"

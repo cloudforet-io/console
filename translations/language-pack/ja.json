@@ -41,7 +41,8 @@
 		"CONFIRM": "",
 		"NEXT": "",
 		"OPTIONAL": "",
-		"PREV": ""
+		"PREV": "",
+		"STEP": ""
 	},
 	"QUERY_SEARCH": {
 		"HELP": ""
