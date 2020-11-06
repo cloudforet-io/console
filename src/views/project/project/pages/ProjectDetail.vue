@@ -204,7 +204,7 @@ export default {
                 ];
 
                 if (state.reportState) {
-                    items.push({ name: 'report', label: vm.$t('PROJECT.DETAIL.TAB_REPORT'), beta: true });
+                    items.push({ name: 'report', label: vm.$t('PROJECT.DETAIL.TAB_REPORT'), beta: true } as TabItem);
                 }
                 return items;
             }),
