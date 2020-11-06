@@ -1,12 +1,12 @@
 <template>
     <div class="plugin-filter-container">
         <div class="rows">
-            <p-search v-model="search" class="p-search" placeholder="Enter keyword"
+            <p-search v-model="search" class="p-search" :placeholder="$t('PLUGIN.COLLECTOR.PLUGINS.SEARCH_PLACEHOLDER')"
                       @search="$emit('search', $event)"
             />
         </div>
         <div class="rows">
-            <header>Repository</header>
+            <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.REPOSITORY_LABEL') }}</header>
             <div v-for="(repo, idx) in repositories" :key="idx"
                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
                  @click.stop="onClickRepoText(repo.repository_id)"
@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="rows">
-            <header>Resource Type</header>
+            <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.RESOURCE_TYPE_LABEL') }}</header>
             <div v-for="(checked, resource) in resourceOptions" :key="resource"
                  class="filter" :class="{selected: checked}"
                  @click.stop="onClickResourceText(resource)"
@@ -98,8 +98,8 @@ export default {
 .plugin-filter-container {
     padding: 0.5rem 1rem;
     .rows {
-         margin-top: 1.25rem;
-     }
+        margin-top: 1.25rem;
+    }
     .back-btn {
         @apply text-primary2;
         font-size: 0.875rem;
@@ -119,7 +119,7 @@ export default {
         line-height: 1.5rem;
         margin-bottom: 0.5rem;
         cursor: pointer;
-        font-size: .875rem;
+        font-size: 0.875rem;
         &.selected {
             @apply text-secondary;
         }

@@ -1,10 +1,9 @@
 <template>
-    <p-data-table
-        :items="schemaItems"
-        :fields="fields"
-        :sortable="false"
-        :selectable="false"
-        :loading="loading"
+    <p-data-table :items="schemaItems"
+                  :fields="fields"
+                  :sortable="false"
+                  :selectable="false"
+                  :loading="loading"
     >
         <template #col-count-format="{item}">
             <div v-if="supportedSchemaSet.has(item.name)"
@@ -36,12 +35,6 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { makeTrItems } from '@/lib/view-helper';
-
-interface Value {
-    name: string;
-    count: number;
-}
 
 export default {
     name: 'ConfirmCredentials',
@@ -59,17 +52,17 @@ export default {
             default: () => [],
         },
     },
-    setup(props, context) {
+    setup(props) {
         const state: any = reactive({
             supportedSchemaSet: computed(() => new Set(props.supportedSchema)),
             schemaItems: [] as any[],
             loading: true,
             secretCount: {},
-            fields: computed(() => makeTrItems([
-                ['name', 'COMMON.CREDENTIALS'],
-                ['count', 'COMMON.COUNT'],
-                ['supported', 'FIELD.SUPPORTED'],
-            ], context.parent)),
+            fields: [
+                { name: 'name', label: 'Credentials' },
+                { name: 'count', label: 'Count' },
+                { name: 'supported', label: 'Availability' },
+            ],
         });
 
         const getProviderSchemaList = async () => {

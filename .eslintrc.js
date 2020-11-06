@@ -49,7 +49,18 @@ module.exports = {
           "resource_group",
           "resource_group_id",
           "source_type",
-          "source_format"
+          "source_format",
+          "secret_id",
+          "secret_group_id",
+          "secret_type",
+          "created_at",
+          "last_collected_at",
+          "change_key",
+          "object_key",
+          "filter_format",
+          "collect_mode",
+          "service_type",
+          "repository_id"
         ]
       }
     ],

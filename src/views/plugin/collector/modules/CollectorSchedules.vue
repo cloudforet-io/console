@@ -26,7 +26,7 @@
                                     name="ic_plus_bold"
                                     @click="openEditModal(false)"
                 >
-                    {{ $t('BTN.ADD') }}
+                    {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ADD') }}
                 </p-icon-text-button>
 
                 <p-dropdown-menu-btn :menu="dropdown"
@@ -34,7 +34,7 @@
                                      @click-update="openEditModal(true)"
                                      @click-delete="deleteVisible = true"
                 >
-                    {{ $t('BTN.ACTION') }}
+                    {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ACTION') }}
                 </p-dropdown-menu-btn>
             </template>
             <template #col-schedule-format="{value}">
@@ -44,7 +44,7 @@
                     </span>
                 </span>
                 <span v-else>
-                    <p-lottie class="inline-block mr-1" style="display: inline-block" name="lottie_interval"
+                    <p-lottie class="inline-block mr-1" style="display: inline-block;" name="lottie_interval"
                               auto :size="1"
                     />
                     <span>{{ intervalFormatter(value.interval) }}</span>
@@ -67,8 +67,8 @@
         />
 
         <p-table-check-modal :visible.sync="deleteVisible"
-                             :header-title="$t('INVENTORY.DEL_SCHEDULE')"
-                             sub-title="Are you sure you want to DELETE Selected Schedule(s)?"
+                             :header-title="$tc('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE_CHECK_MODAL_TITLE', 1)"
+                             :sub-title="$tc('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE_CHECK_MODAL_DESC', 1)"
                              theme-color="alert"
                              :fields="multiFields"
                              size="lg"
@@ -87,7 +87,6 @@ import {
 } from '@vue/composition-api';
 import moment from 'moment';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
-import { makeTrItems } from '@/lib/view-helper';
 
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
@@ -98,6 +97,8 @@ import { store } from '@/store';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { DataTableField } from '@/components/organisms/tables/data-table/type';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 
 export default {
     name: 'CollectorSchedules',
@@ -115,7 +116,7 @@ export default {
             default: '',
         },
     },
-    setup(props, { root, parent, emit }) {
+    setup(props, { root }) {
         const vm: any = getCurrentInstance();
         const state = reactive({
             loading: true,
@@ -123,16 +124,22 @@ export default {
             selectIndex: [],
             editVisible: false,
             deleteVisible: false,
-            fields: makeTrItems([
-                ['schedule_id', 'COMMON.ID'],
-                ['name', 'COMMON.NAME'],
-                ['schedule', 'COMMON.SCHEDULE', { sortable: false, width: '25rem' }],
-                ['created_at', 'COMMON.CREATED'],
-            ], parent),
-            dropdown: computed(() => makeTrItems([
-                ['update', 'BTN.UPDATE', { disabled: state.selectIndex.length !== 1 }],
-                ['delete', 'BTN.DELETE', { disabled: state.selectIndex.length === 0 }],
-            ], parent, { type: 'item' })),
+            fields: [
+                { name: 'schedule_id', label: 'ID' },
+                { name: 'name', label: 'Name' },
+                {
+                    name: 'schedule', label: 'Schedule', sortable: false, width: '25rem',
+                },
+                { name: 'created_at', label: 'Created' },
+            ] as DataTableField[],
+            dropdown: computed<MenuItem[]>(() => [
+                {
+                    name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_UPDATE'), type: 'item', disabled: state.selectIndex.length !== 1,
+                },
+                {
+                    name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), type: 'item', disabled: state.selectIndex.length === 0,
+                },
+            ]),
             sortBy: '',
             sortDesc: '',
             totalCount: 0,
@@ -140,10 +147,10 @@ export default {
             thisPage: 1,
             allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             multiItems: computed(() => state.selectIndex.map(idx => state.items[idx])),
-            multiFields: makeTrItems([
-                ['schedule_id', 'COMMON.ID'],
-                ['name', 'COMMON.NAME'],
-            ], parent),
+            multiFields: [
+                { name: 'schedule_id', label: 'ID' },
+                { name: 'name', label: 'Name' },
+            ] as DataTableField[],
             isEditMode: false,
         });
 
@@ -195,11 +202,11 @@ export default {
                     collector_id: props.collectorId,
                     schedule_id: state.items[state.selectIndex[0]].schedule_id,
                 });
-                showSuccessMessage('success', 'Delete Schedule', root);
+                showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_SCHEDULE_TITLE', 1), '', vm.$root);
                 await listSchedules();
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Delete Schedule(s)', e, root);
+                showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1), e, vm.$root);
             } finally {
                 state.deleteVisible = false;
             }
@@ -223,7 +230,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-    .p-toolbox-table {
-        border-width: 0;
-    }
+.p-toolbox-table {
+    border-width: 0;
+}
 </style>

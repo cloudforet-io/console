@@ -1,7 +1,7 @@
 <template>
     <p-button-modal
         class="edit-schedule-modal-container"
-        :header-title="editMode ? $t('INVENTORY.UPT_SCHEDULE') : $t('INVENTORY.ADD_SCHEDULE')"
+        :header-title="editMode ? $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TITLE_UPDATE') : $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TITLE_ADD')"
         centered
         fade
         backdrop
@@ -11,22 +11,22 @@
         @confirm="onClickEditConfirm"
     >
         <template #body>
-            <p-field-group :label="$t('COMMON.NAME')">
+            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_LABEL')">
                 <br>
-                <p-text-input v-model="name" class="name" placeholder="Schedule Name" />
+                <p-text-input v-model="name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
             </p-field-group>
-            <p-field-group :label="$t('COMMON.TIMEZONE')">
+            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
                 <p-select-dropdown v-model="timezone" :items="timezones"
                                    class="timezone"
                                    @input="changeTimezone"
                 />
             </p-field-group>
-            <p-field-group :label="$t('COMMON.TIME_SCHEDULE')"
+            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"
                            required
                            :invalid="showValidation && !isValid"
                            :invalid-text="invalidText"
             >
-                <span class="label-help-text">Select Hourly or Interval.</span>
+                <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC') }}</span>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
                      class="time-schedule-wrapper block lg:flex h-48 lg:h-40"
                      :class="scheduleType === type ? 'selected' : ''"
@@ -61,12 +61,14 @@
                                       style-type="secondary"
                                       @click="onClickAllHours"
                             >
-                                {{ $t('COMMON.ALL') }}
+                                {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_ALL') }}
                             </p-button>
                         </div>
                         <div v-else class="interval-wrapper">
-                            <p-field-group label="Every" class="w-1/2">
-                                <p-text-input v-model="intervalTime" type="number" placeholder="Time" />
+                            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')" class="w-1/2">
+                                <p-text-input v-model="intervalTime" class="ml-4" type="number"
+                                              :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_PLACEHOLDER')"
+                                />
                             </p-field-group>
                             <div class="w-1/2">
                                 <p-select-dropdown v-model="intervalTimeType" :items="intervalTimeTypes" auto-height />
@@ -162,14 +164,14 @@ export default {
             showValidation: false,
             invalidText: computed(() => {
                 if (state.scheduleType === 'hourly' && state.selectedUTCHoursList.length === 0) {
-                    return 'Please select time';
+                    return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_INVALID_REQUIRED');
                 } if (state.scheduleType === 'interval') {
                     if (!state.intervalTimeInSeconds) {
-                        return 'Please enter interval time';
+                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_REQUIRED');
                     } if (state.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
-                        return 'Should be at least 30 seconds';
+                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MIN');
                     } if (state.intervalTimeInSeconds > INTERVAL_MAX_SECONDS) {
-                        return 'Should be less than 1 hour';
+                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MAX');
                     }
                 }
                 return '';
@@ -179,7 +181,10 @@ export default {
                 return state.intervalTimeInSeconds >= INTERVAL_MIN_SECONDS && state.intervalTimeInSeconds <= INTERVAL_MAX_SECONDS;
             }),
             //
-            scheduleTypes: { hourly: vm.$t('COMMON.HOURLY'), interval: vm.$t('COMMON.INTERVAL') },
+            scheduleTypes: computed(() => ({
+                hourly: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
+                interval: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL'),
+            })),
             scheduleType: 'hourly',
             intervalTime: undefined as undefined | number,
             intervalTimeInSeconds: computed(() => {
@@ -187,11 +192,11 @@ export default {
                 if (state.intervalTimeType === 'hours') return state.intervalTime * 3600;
                 return state.intervalTime;
             }),
-            intervalTimeTypes: [
-                { label: 'seconds', name: 'seconds', type: 'item' },
-                { label: 'minutes', name: 'minutes', type: 'item' },
-                { label: 'hour', name: 'hours', type: 'item' },
-            ],
+            intervalTimeTypes: computed(() => [
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_SECOND'), name: 'seconds', type: 'item' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_MINUTE'), name: 'minutes', type: 'item' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_HOUR'), name: 'hours', type: 'item' },
+            ]),
             intervalTimeType: 'minutes',
         });
 
@@ -267,18 +272,16 @@ export default {
                 await SpaceConnector.client.inventory.collector.schedule.add(params);
 
                 emit('success');
-                showSuccessMessage('Success', 'Add Schedule', root);
+                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Add Schedule', e, root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'), e, vm.$root);
             }
         };
         const updateSchedule = async () => {
             try {
                 const params: ScheduleUpdateParameter = {
-                    // eslint-disable-next-line camelcase
                     schedule_id: props.scheduleId,
-                    // eslint-disable-next-line camelcase
                     collector_id: props.collectorId,
                     name: state.name,
                     schedule: {},
@@ -289,10 +292,10 @@ export default {
                 await SpaceConnector.client.inventory.collector.schedule.update(params);
 
                 emit('success');
-                showSuccessMessage('Success', 'Updated Schedule', root);
+                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Update Schedule', e, root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, vm.$root);
             }
         };
 

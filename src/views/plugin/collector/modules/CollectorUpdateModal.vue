@@ -1,10 +1,11 @@
 <template>
     <p-button-modal class="collector-update-modal"
-                    :header-title="$t('INVENTORY.UPT_COL')"
+                    :header-title="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_TITLE')"
                     centered
                     size="xl"
                     fade
                     backdrop
+                    scrollable
                     :loading="loading"
                     :footer-cancel-button-bind="{
                         styleType: 'gray900',
@@ -23,9 +24,9 @@
                             width="5.5rem" height="5.5rem"
                 />
                 <div class="flex-grow">
-                    <p-field-group :label="$t('COMMON.NAME')"
+                    <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_LABEL')"
                                    :invalid-text="nameInvalidText"
-                                   :invalid="!isNameValid"
+                                   :invalid="showValidation && !isNameValid"
                                    :required="true"
                     >
                         <template #default="{invalid}">
@@ -36,9 +37,9 @@
                         </template>
                     </p-field-group>
 
-                    <p-field-group :label="$t('COMMON.PRIORITY')"
+                    <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_LABEL')"
                                    :invalid-text="priorityInvalidText"
-                                   :invalid="!isPriorityValid"
+                                   :invalid="showValidation && !isPriorityValid"
                                    :required="true"
                     >
                         <template #default="{invalid}">
@@ -49,7 +50,7 @@
                             />
                         </template>
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.VERSION')"
+                    <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_VERSION_LABEL')"
                                    :required="true"
                     >
                         <p-select-dropdown v-model="inputModel.version" :items="versions" />
@@ -66,7 +67,7 @@
                       :disabled="loading"
                       @click="onClickReset"
             >
-                {{ $t('BTN.RESET') }}
+                {{ $t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_RESET') }}
             </p-button>
         </template>
     </p-button-modal>
@@ -75,7 +76,9 @@
 <script lang="ts">
 import { get, cloneDeep } from 'lodash';
 
-import { toRefs, reactive, computed } from '@vue/composition-api';
+import {
+    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
+} from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
@@ -89,6 +92,12 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { CollectorPluginModel, CollectorUpdateParameter } from '@/views/plugin/collector/type';
 
+
+interface Props {
+    visible: boolean;
+    collectorId?: string;
+}
+
 export default {
     name: 'CollectorUpdateModal',
     components: {
@@ -100,13 +109,18 @@ export default {
         PSelectDropdown,
     },
     props: {
-        visible: Boolean, // sync prop
+        // sync prop
+        visible: {
+            type: Boolean,
+            required: true,
+        },
         collectorId: {
             type: String,
-            default: null,
+            default: undefined,
         },
     },
-    setup(props, { root, emit }) {
+    setup(props: Props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             collector: null,
@@ -118,7 +132,7 @@ export default {
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
-            //
+
             collectorUpdateParam: {} as CollectorUpdateParameter,
             collectorNames: [] as string[],
             versions: [],
@@ -131,23 +145,24 @@ export default {
             },
             nameInvalidText: computed(() => {
                 if (formState.inputModel.name.length < 2) {
-                    return 'should NOT be shorter than 2 characters';
+                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_INVALID');
                 } if (state.collectorNames.includes(formState.inputModel.name)) {
-                    return 'Name is duplicated';
+                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_DUPLICATED');
                 }
                 return '';
             }),
             isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
             priorityInvalidText: computed(() => {
                 if (formState.inputModel.priority < 1) {
-                    return 'should be >= 1';
+                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MIN');
                 } if (formState.inputModel.priority > 10) {
-                    return 'should be <= 10';
+                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MAX');
                 }
                 return '';
             }),
             isPriorityValid: computed(() => !(formState.inputModel.priority < 1 || formState.inputModel.priority > 10)),
             isValid: computed(() => formState.isNameValid && formState.isPriorityValid),
+            showValidation: false,
         });
 
         const getCollector = async (): Promise<void> => {
@@ -161,7 +176,7 @@ export default {
                 formState.inputModel.version = res.plugin_info.version;
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Get Collector', e, root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e, vm.$root);
             }
         };
         const getNames = async () => {
@@ -183,17 +198,20 @@ export default {
                     }
                 });
             } catch (e) {
-                showErrorMessage('Fail to Get Versions', e, root);
+                console.error(e);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'), e, vm.$root);
             }
         };
 
         const onClickReset = (): void => {
             if (state.loading) return;
+            formState.showValidation = false;
             formState.inputModel.name = get(state.collector, 'name', '');
             formState.inputModel.priority = get(state.collector, 'priority', null);
             formState.inputModel.version = get(state.collector, 'plugin_info.version', state.versions[0]);
         };
         const onClickConfirm = async (): Promise<void> => {
+            formState.showValidation = true;
             if (formState.isValid) {
                 state.loading = true;
 
@@ -211,9 +229,9 @@ export default {
                         collector_id: props.collectorId,
                         ...state.collectorUpdateParam,
                     });
-                    showSuccessMessage('success', 'Update Collector', root);
+                    showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage('Fail to Update Collector', e, root);
+                    showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'), e, vm.$root);
                 } finally {
                     state.loading = false;
                     state.proxyVisible = false;
@@ -221,14 +239,27 @@ export default {
             }
         };
 
+        const clearForm = () => {
+            formState.showValidation = false;
+            formState.inputModel.name = '';
+            formState.inputModel.priority = 10;
+            formState.inputModel.version = '';
+        };
+
         const init = async () => {
+            clearForm();
             state.loading = true;
             await getCollector();
             await getNames();
             await getVersions();
             state.loading = false;
         };
-        init();
+
+        watch([() => props.collectorId, () => props.visible], ([id, visible]) => {
+            if (id && visible) {
+                init();
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

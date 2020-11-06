@@ -1,7 +1,7 @@
-const Collector = () => import('@/views/plugin/collector/pages/Collector.vue');
+const CollectorPage = () => import('@/views/plugin/collector/pages/CollectorPage.vue');
 
-const CollectorPlugins = () => import('@/views/plugin/collector/pages/CollectorPlugins.vue');
-const CollectorCreator = () => import('@/views/plugin/collector/pages/CollectorCreator.vue');
+const CollectorPluginPage = () => import('@/views/plugin/collector/pages/CollectorPluginPage.vue');
+const CreateCollectorPage = () => import('@/views/plugin/collector/pages/CreateCollectorPage.vue');
 
 export default {
     path: 'plugin',
@@ -23,7 +23,7 @@ export default {
                     path: '/',
                     name: 'collectorMain',
                     props: true,
-                    component: Collector,
+                    component: CollectorPage,
                 },
                 {
                     path: 'create',
@@ -35,7 +35,7 @@ export default {
                         {
                             path: 'plugins',
                             name: 'collectorPlugins',
-                            component: CollectorPlugins,
+                            component: CollectorPluginPage,
                         },
                         {
                             path: 'collector-creator',
@@ -47,7 +47,7 @@ export default {
                                     path: ':pluginId',
                                     name: Symbol(':pluginId'),
                                     props: true,
-                                    component: CollectorCreator,
+                                    component: CreateCollectorPage,
                                 },
                             ],
                         },

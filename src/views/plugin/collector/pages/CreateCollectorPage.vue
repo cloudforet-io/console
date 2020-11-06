@@ -8,7 +8,7 @@
                             width="1.5rem" height="1.5rem"
                             @click="onClickBackButton"
         >
-            {{ $t('INVENTORY.CRT_COLL') }}
+            {{ $t('PLUGIN.COLLECTOR.CREATE.TITLE') }}
         </p-icon-text-button>
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
@@ -27,14 +27,14 @@
                                 width="5.5rem" height="5.5rem"
                     />
                     <div class="flex-grow">
-                        <p-field-group label="name" :invalid-text="nameInvalidText" :invalid="!isNameValid"
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')" :invalid-text="nameInvalidText" :invalid="!isNameValid"
                                        :required="true"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="inputModel.name" class="block" :class="{'is-invalid': invalid}" />
                             </template>
                         </p-field-group>
-                        <p-field-group label="priority" :invalid-text="priorityInvalidText" :invalid="!isPriorityValid"
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_LABEL')" :invalid-text="priorityInvalidText" :invalid="!isPriorityValid"
                                        :required="true"
                         >
                             <template #default="{invalid}">
@@ -43,7 +43,7 @@
                                 />
                             </template>
                         </p-field-group>
-                        <p-field-group label="version" :invalid="!isVersionValid" :required="true">
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL')" :invalid="!isVersionValid" :required="true">
                             <p-select-dropdown v-model="inputModel.version" :items="versions" auto-height />
                         </p-field-group>
                     </div>
@@ -86,7 +86,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
-    name: 'CollectorCreator',
+    name: 'CreateCollectorPage',
     components: {
         PSelectDropdown,
         PTextInput,
@@ -121,25 +121,25 @@ export default {
             },
             nameInvalidText: computed(() => {
                 if (formState.inputModel.name.length < 2) {
-                    return 'should NOT be shorter than 2 characters';
+                    return vm.$t('PLUGIN.COLLECTOR.CREATE.NAME_INVALID_MIN');
                 } if (state.collectorNames.includes(formState.inputModel.name)) {
-                    return 'Name is duplicated';
+                    return vm.$t('PLUGIN.COLLECTOR.CREATE.NAME_INVALID_DUPLICATED');
                 }
                 return '';
             }),
             isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
             priorityInvalidText: computed(() => {
                 if (formState.inputModel.priority < 1) {
-                    return 'should be >= 1';
+                    return vm.$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_INVALID_MIN');
                 } if (formState.inputModel.priority > 10) {
-                    return 'should be <= 10';
+                    return vm.$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_INVALID_MAX');
                 }
                 return '';
             }),
             isPriorityValid: computed(() => !(formState.inputModel.priority < 1 || formState.inputModel.priority > 10)),
             versionInvalidText: computed(() => {
                 if (formState.inputModel.version.length === 0) {
-                    return 'select version';
+                    return vm.$t('PLUGIN.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
                 }
                 return '';
             }),
@@ -155,15 +155,15 @@ export default {
             tabs: computed(() => [
                 {
                     name: 'conf',
-                    label: vm.$t('INVENTORY.TAB.CONF_COLLECTOR'),
+                    label: vm.$t('PLUGIN.COLLECTOR.CREATE.TAB_SET_COLLECTOR'),
                 },
                 {
                     name: 'credentials',
-                    label: vm.$t('INVENTORY.TAB.CONFIRM_CRD'),
+                    label: vm.$t('PLUGIN.COLLECTOR.CREATE.TAB_CONFIRM_CREDENTIALS'),
                 },
                 {
                     name: 'tags',
-                    label: vm.$t('INVENTORY.TAB.ADD_TAG'),
+                    label: vm.$t('PLUGIN.COLLECTOR.CREATE.TAB_ADD_TAG'),
                     optional: true,
                 },
             ]),
@@ -189,7 +189,7 @@ export default {
                 }
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Get Plugin', e, root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'), e, vm.$root);
             }
         };
         const getNames = async () => {
@@ -216,7 +216,7 @@ export default {
                 formState.inputModel.version = res.results[0];
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Get Versions', e, root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'), e, vm.$root);
             }
         };
 
@@ -262,11 +262,11 @@ export default {
             };
             try {
                 await SpaceConnector.client.inventory.collector.create(params);
-                showSuccessMessage('success', 'Create Collector', root);
+                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
                 await root.$router.push('/plugin/collector');
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Fail to Create Collector', e, root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'), e, vm.$root);
             } finally {
                 tabState.loading = false;
             }

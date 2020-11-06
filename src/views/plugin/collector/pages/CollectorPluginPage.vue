@@ -74,7 +74,7 @@
                                  :contents="item.tags.description"
                     >
                         <template #title>
-                            <span class="plugin-name">{{ item.name }}</span><span class="beta">{{ isBeta(item) ? 'BETA': '' }}</span>
+                            <span class="plugin-name">{{ item.name }}</span><span class="beta">{{ isBeta(item) ? $t('PLUGIN.COLLECTOR.PLUGINS.BETA'): '' }}</span>
                         </template>
                         <template #extra>
                             <div class="card-bottom">
@@ -91,7 +91,7 @@
                                                         name="ic_plus_bold"
                                                         @click="onPluginCreate(item)"
                                     >
-                                        {{ $t('BTN.CREATE') }}
+                                        {{ $t('PLUGIN.COLLECTOR.PLUGINS.CREATE') }}
                                     </p-icon-text-button>
                                 </div>
                             </div>
@@ -106,7 +106,7 @@
 <script lang="ts">
 import { get, range } from 'lodash';
 
-import { toRefs, reactive, watch } from '@vue/composition-api';
+import {toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy} from '@vue/composition-api';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
@@ -125,26 +125,12 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 
-enum REPOSITORY_TYPE {
-    remote = 'remote',
-    local = 'local'
-}
 
 enum PLUGIN_STATE {
     enabled = 'ENABLED',
     disabled = 'DISABLED'
 }
 
-enum MONITORING_TYPE {
-    metric = 'METRIC',
-    log = 'LOG',
-}
-
-interface PluginCapabilityModel {
-    supported_schema: string[];
-    use_resource_secret: boolean;
-    monitoring_type: MONITORING_TYPE;
-}
 
 interface PluginTemplateModel {
     [key: string]: {
@@ -157,22 +143,18 @@ interface PluginModel {
     name: string;
     state: PLUGIN_STATE;
     image: string;
-    registry_url: string;
     service_type: string;
     provider: string;
-    capability: PluginCapabilityModel;
     template: PluginTemplateModel;
-    repository_info: any;
     project_id: string;
     labels: string[];
     created_at: TimeStamp;
-    tags: object
+    tags: object;
 }
 
 interface RepositoryModel {
     repository_id: string;
     name: string;
-    repository_type: REPOSITORY_TYPE;
     endpoint: string;
     version: string;
     secret_id: string;
@@ -180,7 +162,7 @@ interface RepositoryModel {
 }
 
 export default {
-    name: 'CollectorPlugins',
+    name: 'CollectorPluginPage',
     components: {
         PVerticalPageLayout,
         PPageNavigation,
@@ -196,16 +178,17 @@ export default {
         PIconTextButton,
     },
     setup(props, { root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             totalCount: 0,
             keyword: '',
             thisPage: 1,
             pageSize: 24,
-            sortMenu: [
-                { type: 'item', label: 'Name', name: 'name' },
-                { type: 'item', label: 'Recent', name: 'created_at' },
-            ],
+            sortMenu: computed(() => [
+                { type: 'item', label: vm.$t('PLUGIN.COLLECTOR.PLUGINS.NAME'), name: 'name' },
+                { type: 'item', label: vm.$t('PLUGIN.COLLECTOR.PLUGINS.RECENT'), name: 'created_at' },
+            ]),
             sortBy: 'name',
             resourceTypeSearchTags: [],
             //
@@ -240,9 +223,7 @@ export default {
                     });
                 }
                 const params = {
-                    // eslint-disable-next-line camelcase
                     service_type: 'inventory.Collector',
-                    // eslint-disable-next-line camelcase
                     repository_id: state.selectedRepositoryId,
                     query: query.data,
                 };

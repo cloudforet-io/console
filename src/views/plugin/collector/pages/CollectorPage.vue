@@ -3,35 +3,34 @@
         <div class="page-navigation">
             <p-page-navigation :routes="routes" />
         </div>
-        <p-page-title :title="$t('WORD.COLLECTOR')"
+        <p-page-title :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
                       use-total-count
                       :total-count="totalCount"
         />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <p-query-search-table
-                    :fields="fields"
-                    :items="items"
-                    :key-items="querySearchHandlers.keyItems"
-                    :value-handler-map="querySearchHandlers.valueHandlerMap"
-                    :loading="loading"
-                    :total-count="totalCount"
-                    :query-tags="searchTags"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
-                    :style="{height: `${height}px`}"
-                    @select="onSelect"
-                    @change="onChange"
-                    @export="exportCollectorDataToExcel"
+                <p-query-search-table :fields="fields"
+                                      :items="items"
+                                      :key-items="querySearchHandlers.keyItems"
+                                      :value-handler-map="querySearchHandlers.valueHandlerMap"
+                                      :loading="loading"
+                                      :total-count="totalCount"
+                                      :query-tags="searchTags"
+                                      :sort-by.sync="sortBy"
+                                      :sort-desc.sync="sortDesc"
+                                      :this-page.sync="thisPage"
+                                      :page-size.sync="pageSize"
+                                      :style="{height: `${height}px`}"
+                                      @select="onSelect"
+                                      @change="onChange"
+                                      @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
                                             name="ic_plus_bold"
                                             @click="$router.push({path: '/plugin/collector/create/plugins'})"
                         >
-                            {{ $t('BTN.CREATE') }}
+                            {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn class="left-toolbox-item"
                                              :menu="dropdown"
@@ -41,7 +40,7 @@
                                              @click-delete="onClickDelete"
                                              @click-collectData="onClickCollectData"
                         >
-                            {{ $t('BTN.ACTION') }}
+                            {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
                         </p-dropdown-menu-btn>
                     </template>
                     <template #col-name-format="data">
@@ -64,11 +63,11 @@
         </p-horizontal-layout>
 
         <p-tab v-if="selectedItems.length === 1"
-               :tabs="singleItemTab.tabs"
-               :active-tab.sync="singleItemTab.activeTab"
+               :tabs="singleTabState.tabs"
+               :active-tab.sync="singleTabState.activeTab"
         >
-            <template #detail>
-                <collector-detail :collector-id="selectedItems[0].collector_id" />
+            <template #details>
+                <collector-details :collector-id="selectedItems[0].collector_id" />
             </template>
             <template #tag>
                 <s-tags-panel :resource-id="selectedItems[0].collector_id"
@@ -85,12 +84,12 @@
             </template>
         </p-tab>
         <p-tab v-else-if="selectedItems.length > 1"
-               :tabs="multiItemTab.tabs" :active-tab.sync="multiItemTab.activeTab"
+               :tabs="multiTabState.tabs" :active-tab.sync="multiTabState.activeTab"
         >
             <template #data>
                 <div>
-                    <p-panel-top :use-total-count="true" :total-count="selectedItems.length">
-                        <span>{{ $t('TAB.SELECTED_DATA') }}</span>
+                    <p-panel-top use-total-count :total-count="selectedItems.length">
+                        {{ $t('PLUGIN.COLLECTOR.MAIN.TAB_DATA') }}
                     </p-panel-top>
                     <p-data-table
                         :fields="selectedDataFields"
@@ -107,9 +106,8 @@
             </template>
         </p-tab>
 
-        <collector-update-modal v-if="updateModalVisible"
-                                :visible.sync="updateModalVisible"
-                                :collector-id="selectedItems[0].collector_id"
+        <collector-update-modal :visible.sync="updateModalVisible"
+                                :collector-id="selectedItems[0] ? selectedItems[0].collector_id : undefined"
         />
 
         <collect-data-modal v-if="collectDataModalVisible"
@@ -137,7 +135,7 @@ import { get } from 'lodash';
 
 import { Component } from 'vue/types/umd';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy, UnwrapRef, onMounted,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy
 } from '@vue/composition-api';
 
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
@@ -163,22 +161,23 @@ import {
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { makeTrItems } from '@/lib/view-helper';
 import config from '@/lib/config';
 import router from '@/routes';
+import { MenuItem } from '@/components/organisms/context-menu/type';
+import { TranslateResult } from 'vue-i18n';
 
 const GeneralPageLayout = (): Component => import('@/views/common/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/tags/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
-const CollectorDetail = (): Component => import('@/views/plugin/collector/modules/CollectorDetail.vue') as Component;
+const CollectorDetails = (): Component => import('@/views/plugin/collector/modules/CollectorDetails.vue') as Component;
 const CollectorCredentials = (): Component => import('@/views/plugin/collector/modules/CollectorCredentials.vue') as Component;
 const CollectorSchedules = (): Component => import('@/views/plugin/collector/modules/CollectorSchedules.vue') as Component;
 
-export type UrlQueryString = string | (string | null)[] | null | undefined;
+type UrlQueryString = string | (string | null)[] | null | undefined;
 
 export default {
-    name: 'Collector',
+    name: 'CollectorPage',
     components: {
         PPageTitle,
         PLazyImg,
@@ -195,7 +194,7 @@ export default {
         GeneralPageLayout,
         CollectorUpdateModal,
         CollectDataModal,
-        CollectorDetail,
+        CollectorDetails,
         CollectorCredentials,
         CollectorSchedules,
         STagsPanel,
@@ -203,57 +202,13 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        onMounted(async () => {
-        //     await vm.$store.dispatch('resource/loadAll');
-        //     console.log(vm.$store.state.resource.project.items['project-18655561c535']?.label);
-        //     console.log(vm.$store.state.resource.serviceAccount);
-        //     console.log(vm.$store.state.resource.secret.items);
-        //     console.log(vm.$store.state.resource.collector.items);
-        //     console.log(vm.$store.state.resource.provider.items);
-        //     vm.$store.dispatch('settings/setItem', { key: 'pageSize', value: 12 });
-        //     console.log(vm.$store.getters['settings/getItem']('pageSize'));
-        //     vm.$store.dispatch('settings/setItem', { key: 'pageSize', value: 24, path: '/plugin/collector' });
-        //     console.log(vm.$store.getters['settings/getItem']('pageSize', '/plugin/collector'));
-        });
         const state = reactive({
             fields: [
-                { name: 'name', label: 'Name', options: { width: '14rem' } },
-                {
-                    name: 'state',
-                    label: 'State',
-                    type: 'enum',
-                    options: {
-                        ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
-                        DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
-                        width: '7rem',
-                    },
-                },
-                { name: 'priority', label: 'Priority', options: { width: '5.5rem' } },
-                {
-                    name: 'last_collected_at',
-                    label: 'Last Collected',
-                    type: 'datetime',
-                    options: {
-                        // eslint-disable-next-line camelcase
-                        source_type: 'timestamp',
-                        // eslint-disable-next-line camelcase
-                        source_format: 'seconds',
-                        width: '9rem',
-                    },
-                },
-                {
-                    name: 'created_at',
-                    label: 'Created',
-                    width: '9rem',
-                    type: 'datetime',
-                    options: {
-                        // eslint-disable-next-line camelcase
-                        source_type: 'timestamp',
-                        // eslint-disable-next-line camelcase
-                        source_format: 'seconds',
-                        width: '9rem',
-                    },
-                },
+                { name: 'name', label: 'Name', width: '14rem' },
+                { name: 'state', label: 'State' },
+                { name: 'priority', label: 'Priority', width: '5.5rem' },
+                { name: 'last_collected_at', label: 'Last Collected', width: '9rem' },
+                { name: 'created_at', label: 'Created', width: '9rem' },
             ],
             excelFields: [
                 { key: 'name', name: 'Name' },
@@ -264,9 +219,7 @@ export default {
                     name: 'Last Collected',
                     type: 'datetime',
                     options: {
-                        // eslint-disable-next-line camelcase
                         source_type: 'timestamp',
-                        // eslint-disable-next-line camelcase
                         source_format: 'seconds',
                     },
                 },
@@ -275,9 +228,7 @@ export default {
                     name: 'Created',
                     type: 'datetime',
                     options: {
-                        // eslint-disable-next-line camelcase
                         source_type: 'timestamp',
-                        // eslint-disable-next-line camelcase
                         source_format: 'seconds',
                     },
                 },
@@ -293,15 +244,7 @@ export default {
             }),
             selectedDataFields: [
                 { name: 'name', label: 'Name' },
-                {
-                    name: 'state',
-                    label: 'State',
-                    type: 'enum',
-                    options: {
-                        ENABLED: { type: 'state', options: { icon: { color: 'safe' } } },
-                        DISABLED: { type: 'state', options: { icon: { color: 'alert' } } },
-                    },
-                },
+                { name: 'state', label: 'State' },
                 { name: 'priority', label: 'Priority' },
             ],
             // query
@@ -324,54 +267,60 @@ export default {
             sortBy: null,
             sortDesc: true,
             // dropdown action
-            dropdown: computed(() => (makeTrItems([
-                ['update', 'BTN.UPDATE', { disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0 }],
-                [null, null, { type: 'divider' }],
-                ['enable', 'BTN.ENABLE', { disabled: state.selectedIndexes.length === 0 }],
-                ['disable', 'BTN.DISABLE', { disabled: state.selectedIndexes.length === 0 }],
-                ['delete', 'BTN.DELETE', { disabled: state.selectedIndexes.length === 0 }],
-                [null, null, { type: 'divider' }],
-                ['collectData', 'BTN.COLLECT_DATA', { disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0 }],
-            ], null, { type: 'item' }))),
+            dropdown: computed<MenuItem[]>(() => [
+                {
+                    name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE'), type: 'item', disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0,
+                }, {
+                    type: 'divider',
+                }, {
+                    name: 'enable', label: vm.$t('PLUGIN.COLLECTOR.MAIN.ENABLE'), type: 'item', disabled: state.selectedIndexes.length === 0,
+                }, {
+                    name: 'disable', label: vm.$t('PLUGIN.COLLECTOR.MAIN.DISABLE'), type: 'item', disabled: state.selectedIndexes.length === 0,
+                }, {
+                    name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.DELETE'), type: 'item', disabled: state.selectedIndexes.length === 0,
+                }, {
+                    type: 'divider',
+                }, {
+                    name: 'collectData', label: vm.$t('PLUGIN.COLLECTOR.MAIN.COLLECT_DATA'), type: 'item', disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0,
+                },
+            ]),
             updateModalVisible: false,
             collectDataModalVisible: false,
         });
         const routeState = reactive({
             routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
         });
-        const checkModalState: UnwrapRef<{
-                visible: boolean; mode: string; title: string; subTitle: string; themeColor: string;
-            }> = reactive({
-                visible: false,
-                mode: '',
-                title: '',
-                subTitle: '',
-                themeColor: '',
-                tableCheckFields: computed(() => makeTrItems([
-                    ['name', 'COMMON.NAME'],
-                    ['state', 'COMMON.STATE'],
-                    ['priority', 'COMMON.PRIORITY'],
-                ])),
-            });
-
-        // Tab
-        const tabState = reactive({
-            singleItemTab: {
-                tabs: [
-                    { label: vm.$t('PANEL.DETAILS'), name: 'detail', keepAlive: true },
-                    { label: vm.$t('TAB.TAG'), name: 'tag', keepAlive: true },
-                    { label: vm.$t('PANEL.CREDENTIAL'), name: 'credentials', keepAlive: true },
-                    { label: vm.$t('PANEL.SCHEDULE'), name: 'schedules', keepAlive: true },
-                ] as TabItem[],
-                activeTab: 'detail',
-            },
-            multiItemTab: {
-                tabs: [
-                    { label: vm.$t('TAB.SELECTED_DATA'), name: 'data', keepAlive: true },
-                ] as TabItem[],
-                activeTab: 'data',
-            },
+        const checkModalState = reactive({
+            visible: false,
+            mode: '',
+            title: '' as TranslateResult,
+            subTitle: '' as TranslateResult,
+            themeColor: '',
+            tableCheckFields: [
+                { name: 'name', label: 'Name' },
+                { name: 'state', label: 'State' },
+                { name: 'priority', label: 'Priority' },
+            ],
         });
+
+        // Tabs
+        const singleTabState = reactive({
+            tabs: computed<TabItem[]>(() => [
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_DETAILS'), name: 'details', keepAlive: true },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_TAG'), name: 'tag', keepAlive: true },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_CREDENTIALS'), name: 'credentials', keepAlive: true },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_SCHEDULE'), name: 'schedules', keepAlive: true },
+            ]),
+            activeTab: 'details',
+        });
+
+        const multiTabState = reactive({
+            tabs: computed<TabItem[]>(() => [
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_DATA'), name: 'data', keepAlive: true },
+            ]),
+            activeTab: 'data',
+        });
+
 
         // Url query
         const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
@@ -451,21 +400,23 @@ export default {
                     await SpaceConnector.client.inventory.collector.enable({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                }
-                if (checkModalState.mode === 'disable') {
+                    showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_ENABLE_TITLE', state.selectedItems.length), '', vm.$root);
+                } else if (checkModalState.mode === 'disable') {
                     await SpaceConnector.client.inventory.collector.disable({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                }
-                if (checkModalState.mode === 'delete') {
+                    showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DISABLE_TITLE', state.selectedItems.length), '', vm.$root);
+                } else if (checkModalState.mode === 'delete') {
                     await SpaceConnector.client.inventory.collector.delete({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
+                    showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '', vm.$root);
                 }
-                showSuccessMessage('success', checkModalState.title, context.root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(`Fail to ${checkModalState.title}`, e, context.root);
+                if (checkModalState.mode === 'enable') showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length), e, vm.$root);
+                else if (checkModalState.mode === 'disable') showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length), e, vm.$root);
+                else if (checkModalState.mode === 'delete') showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length), e, vm.$root);
             } finally {
                 if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;
@@ -477,22 +428,22 @@ export default {
         };
         const onClickEnable = (): void => {
             checkModalState.mode = 'enable';
-            checkModalState.title = 'Enable Collector';
-            checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
+            checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_TITLE', state.selectedItems.length);
+            checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_DESC', state.selectedItems.length);
             checkModalState.themeColor = 'primary';
             checkModalState.visible = true;
         };
         const onClickDisable = (): void => {
             checkModalState.mode = 'disable';
-            checkModalState.title = 'Disable Collector';
-            checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
+            checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_TITLE', state.selectedItems.length);
+            checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_DESC', state.selectedItems.length);
             checkModalState.themeColor = 'primary';
             checkModalState.visible = true;
         };
         const onClickDelete = (): void => {
             checkModalState.mode = 'delete';
-            checkModalState.title = 'Delete Collector';
-            checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
+            checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DELETE_TITLE', state.selectedItems.length);
+            checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DELETE_DESC', state.selectedItems.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
@@ -539,7 +490,8 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(routeState),
-            ...toRefs(tabState),
+            multiTabState,
+            singleTabState,
             checkModalState,
             getIcon: (data): void => get(data, 'item.tags.icon', ''),
             onSelect,
@@ -558,17 +510,17 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item {
-        @apply mx-4;
-        &:last-child {
-            flex-grow: 1;
-        }
+.left-toolbox-item {
+    @apply mx-4;
+    &:last-child {
+        flex-grow: 1;
     }
+}
 
-    ul {
-        list-style-type: disc;
-    }
-    li {
-        display: list-item;
-    }
+ul {
+    list-style-type: disc;
+}
+li {
+    display: list-item;
+}
 </style>

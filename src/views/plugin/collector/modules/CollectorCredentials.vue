@@ -22,7 +22,7 @@
                 <p-panel-top use-total-count
                              :total-count="totalCount"
                 >
-                    {{ $t('PANEL.CREDENTIAL') }}
+                    {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_TITLE') }}
                 </p-panel-top>
             </template>
             <template #col-created_at-format="{value}">
@@ -33,14 +33,10 @@
                     :outline="true"
                     style-type="gray900" @click.stop="openCollectDataModal(item)"
                 >
-                    {{ $t('COMMON.COL_DATA') }}
+                    {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_COLLECT_DATA') }}
                 </p-button>
             </template>
         </p-toolbox-table>
-
-        <credential-verify-modal v-if="verifyModalVisible" :visible.sync="verifyModalVisible"
-                                 :items="selectedItems"
-        />
 
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
@@ -59,19 +55,16 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxT
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
-import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
+import { DataTableField } from '@/components/organisms/tables/data-table/type';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
-const CredentialVerifyModal = () => import('@/views/plugin/collector/modules/CredentialVerifyModal.vue');
 interface SecretModel {
-    // eslint-disable-next-line camelcase
     secret_id: string;
     name: string;
-    // eslint-disable-next-line camelcase
     secret_type: 'CREDENTIALS'|'CONFIG'|string;
     'secret_groups': string[];
     'schema': string ;
@@ -79,7 +72,6 @@ interface SecretModel {
     'service_account_id': string;
     'project_id': string;
     'domain_id': string;
-    // eslint-disable-next-line camelcase
     created_at: TimeStamp;
     tags: object;
 }
@@ -91,7 +83,6 @@ export default {
         PToolboxTable,
         PButton,
         CollectDataModal,
-        CredentialVerifyModal,
     },
     props: {
         collectorId: {
@@ -110,19 +101,18 @@ export default {
             loading: true,
             selectIndex: [],
             selectedItems: [],
-            fields: computed(() => [
-                ...makeTrItems([
-                    ['name', 'COMMON.NAME', { size: '400px' }],
-                    ['created_at', 'COMMON.CREATED', { size: '300px' }],
-                ], null),
-                { name: 'collect', label: ' ', sortable: false },
-            ]),
+            fields: [
+                { name: 'name', label: 'Name', width: '400px' },
+                { name: 'created_at', label: 'Created', width: '400px' },
+                {
+                    name: 'collect', label: ' ', width: '150px', sortable: false,
+                },
+            ] as DataTableField[],
             sortBy: '',
             sortDesc: '',
             pageSize: 10,
             thisPage: 1,
             allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
-            verifyModalVisible: false,
             collectDataVisible: false,
             targetCredentialId: null,
         });

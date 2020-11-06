@@ -22,7 +22,9 @@
 <script lang="ts">
 import { get } from 'lodash';
 
-import { computed, reactive, watch } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, watch,
+} from '@vue/composition-api';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
@@ -34,7 +36,7 @@ import { timestampFormatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
-    name: 'CollectorDetail',
+    name: 'CollectorDetails',
     components: {
         PTextList,
         PPanelTop,
@@ -49,29 +51,30 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
-            name: 'Base Information',
+            name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_TITLE')),
             loading: true,
             fields: computed(() => [
-                { label: 'ID', name: 'collector_id' },
-                { label: 'Name', name: 'name' },
-                { label: 'Provider', name: 'provider' },
-                { label: 'Priority', name: 'priority' },
-                { label: 'Resource Type', name: 'plugin_info.options.supported_resource_type' },
-                { label: 'Last Collected', name: 'last_collected_at', formatter: timestampFormatter },
-                { label: 'Created', name: 'created_at', formatter: timestampFormatter },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_ID'), name: 'collector_id' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_NAME'), name: 'name' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PROVIDER'), name: 'provider' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PRIORITY'), name: 'priority' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.options.supported_resource_type' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_LAST_COLLECTED'), name: 'last_collected_at', formatter: timestampFormatter },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_CREATED'), name: 'created_at', formatter: timestampFormatter },
             ]),
             data: {},
         });
 
         const filterState = reactive({
-            name: 'Filter Format',
-            fields: computed(() => [
+            name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_FILTER_TITLE')),
+            fields: [
                 { label: 'Name', name: 'name' },
                 { label: 'Key', name: 'key' },
                 { label: 'Type', name: 'type' },
                 { label: 'Resource Type', name: 'resource_type' },
-            ]),
+            ],
             rootPath: 'plugin_info.options.filter_format',
             items: computed(() => get(baseState.data, filterState.rootPath, [])),
         });
@@ -82,7 +85,6 @@ export default {
                 collector_id: props.collectorId,
             });
             baseState.loading = false;
-            console.log(res);
             if (res) baseState.data = res;
         };
         watch(() => props.collectorId, () => {
