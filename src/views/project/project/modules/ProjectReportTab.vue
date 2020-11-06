@@ -1,8 +1,8 @@
 <template>
     <div class="project-report-tab-container">
-        <p>SpaceONE offers Monthly Report based on this project. We will provide more content soon.</p>
+        <p>{{$t('PROJECT.DETAIL.REPORT_DESC')}}</p>
         <div class="input-wrapper">
-            <p-field-group label="Company Name on the Report Cover"
+            <p-field-group :label="$t('PROJECT.DETAIL.REPORT_LABEL_COMPANY_NAME')"
                            :invalid="!isValid"
                            :invalid-text="invalidText"
                            :required="true"
@@ -11,7 +11,7 @@
                     <p-text-input v-model="inputModel.companyName" class="block" :class="{'is-invalid': invalid}" />
                 </template>
             </p-field-group>
-            <p-field-group label="Period(Last one month)" class="pl-12" :required="true">
+            <p-field-group :label="$t('PROJECT.DETAIL.REPORT_PERIOD')" class="pl-12" :required="true">
                 <p-select-dropdown v-model="inputModel.period" :items="periodItems"
                                    disabled auto-height
                 />
@@ -26,10 +26,10 @@
                 :disabled="!isValid"
                 @click="onClickDownload"
             >
-                Download file
+                {{ $t('PROJECT.DETAIL.DOWNLOAD_FILE') }}
             </p-icon-text-button>
             <p class="help-text">
-                *We provide file formats (including PDF, PPTX, CSV)
+                {{ $t('PROJECT.DETAIL.REPORT_DOWNLOAD_FILE_DESC') }}
             </p>
         </div>
         <p-hr />

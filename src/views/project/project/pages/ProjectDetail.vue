@@ -13,7 +13,7 @@
             />
         </div>
         <p class="copy-project-id">
-            <b>Project ID:</b> {{ projectId }}
+            <b>{{ $t('PROJECT.DETAIL.PROJECT_ID') }}</b> {{ projectId }}
             <p-copy-button class="ml-2"
                            :value="projectId"
             />
@@ -38,14 +38,14 @@
                                 @change="onChangeMemberTable"
                 >
                     <template #toolbox-top>
-                        <p-panel-top :title="'Member'" use-total-count :total-count="memberTableState.totalCount" />
+                        <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="memberTableState.totalCount" />
                     </template>
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
                                             name="ic_plus_bold"
                                             @click="openMemberAddForm()"
                         >
-                            {{ $t('BTN.ADD') }}
+                            {{ $t('PROJECT.DETAIL.ADD') }}
                         </p-icon-text-button>
                         <p-button class="mr-4"
                                   :outline="true"
@@ -53,7 +53,7 @@
                                   :disabled="!memberTableState.selectedItems.length"
                                   @click="memberDeleteClick"
                         >
-                            Delete
+                            {{ $t('PROJECT.DETAIL.DELETE') }}
                         </p-button>
                     </template>
                 </p-search-table>
@@ -136,6 +136,7 @@ import { Options, SearchTableListeners } from '@/components/organisms/tables/sea
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
+import { TranslateResult } from 'vue-i18n';
 
 export default {
     name: 'ProjectDetail',
@@ -278,18 +279,18 @@ export default {
             projectDeleteFormVisible: false,
             projectEditFormVisible: false,
             updateMode: false,
-            headerTitle: '',
+            headerTitle: '' as TranslateResult,
             themeColor: '',
-            modalContent: '',
+            modalContent: '' as TranslateResult,
             memberAddFormVisible: false,
             memberDeleteFormVisible: false,
         });
 
         const openProjectDeleteForm = () => {
             formState.projectDeleteFormVisible = true;
-            formState.headerTitle = 'Delete Project';
+            formState.headerTitle = vm.$t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE');
             formState.themeColor = 'alert';
-            formState.modalContent = 'Are you sure you want to delete this Project?';
+            formState.modalContent = vm.$t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT');
         };
 
         const projectDeleteFormConfirm = async () => {
@@ -297,9 +298,9 @@ export default {
                 await SpaceConnector.client.identity.project.delete({
                     project_id: projectId.value,
                 });
-                showSuccessMessage('success', 'Delete Project', root);
+                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
             } catch (e) {
-                showErrorMessage('Delete Project Fail', e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e, root);
             } finally {
                 formState.projectDeleteFormVisible = false;
                 vm.$router.go(-1);
@@ -317,10 +318,10 @@ export default {
                     project_id: projectId.value,
                     ...input,
                 });
-                showSuccessMessage('success', 'Update Project', root);
+                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', root);
                 item.value.name = input.name;
             } catch (e) {
-                showErrorMessage('Update Project Fail', e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e, root);
             } finally {
                 formState.projectEditFormVisible = false;
             }

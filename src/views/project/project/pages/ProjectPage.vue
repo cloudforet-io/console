@@ -76,6 +76,7 @@
                                        :loading="listState.loading"
                                        :this-page.sync="listState.thisPage"
                                        :page-size.sync="listState.pageSize"
+                                       :total-count="listState.totalCount"
                                        @changePageNumber="getData()"
                                        @changePageSize="getData()"
                                        @clickRefresh="getData()"
@@ -499,7 +500,7 @@ export default {
 
                 const res = await getCard(resp);
                 listState.items = res.results;
-                listState.totalCount = res.results.length;
+                listState.totalCount = res.total_count;
             } catch (e) {
                 listState.items = [];
                 listState.totalCount = 0;

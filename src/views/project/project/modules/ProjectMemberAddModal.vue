@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        header-title="Add Member"
+        :header-title="$tc('PROJECT.DETAIL.MODAL_ADD_MEMBER', items.length)"
         :centered="true"
         size="lg"
         :fade="true"
@@ -12,20 +12,17 @@
             <p-search-table :fields="fields"
                             :items="items"
                             :total-count="totalCount"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
-                            :loading.sync="loading"
-                            :this-page.sync="thisPage"
-                            :page-size.sync="pageSize"
+                            :loading="loading"
                             :style="{
                                 height: '19rem', padding: '-1rem'
                             }"
                             :selectable="false"
                             @change="onChange"
+                            @init="onChange"
                             @rowLeftClick="onSelect"
             />
             <p class="tag-title">
-                Added Members
+                {{ $t('PROJECT.DETAIL.MODAL_ADDED_MEMBERS') }}
             </p>
             <p-box-layout class="tag-container">
                 <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
@@ -46,6 +43,8 @@ import {
 } from '@/lib/compostion-util';
 import PTag from '@/components/molecules/tags/PTag.vue';
 import {
+    ComponentRenderProxy,
+    getCurrentInstance,
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
@@ -54,6 +53,7 @@ import PSearchTable from '@/components/organisms/tables/search-table/PSearchTabl
 import { isEqual } from 'lodash';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { SearchTableListeners, Options } from '@/components/organisms/tables/search-table/type';
 
 const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus?: any, eventName?: string, addTagCallBack?: any) => {
     const tags: Ref<any[]> = proxyTags || ref([]);
@@ -132,6 +132,8 @@ export default {
         },
     },
     setup(props, { emit, root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             fields: [
                 { label: 'Name', name: 'name', type: 'item' },
@@ -140,13 +142,8 @@ export default {
             ],
             items: [] as any,
             loading: false,
-            pageSize: 15,
-            thisPage: 1,
-            sortBy: 'user_id',
-            sortDesc: true,
             totalCount: 0,
-            searchText: '',
-            keyword: '',
+            options: {} as Options,
         });
         const formState = reactive({
             tagTools: tagList(null),
@@ -154,22 +151,28 @@ export default {
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
 
-        const query = new QueryHelper()
-            .setPageStart(getPageStart(state.thisPage, state.pageSize))
-            .setPageLimit(state.pageSize)
-            .setKeyword(state.keyword);
+        const getQuery = () => new QueryHelper()
+            .setSort(state.options.sortBy, state.options.sortDesc)
+            .setPage(
+                getPageStart(state.options.thisPage, state.options.pageSize),
+                state.options.pageSize,
+            )
+            .setKeyword(state.options.searchText)
+            .data;
 
         // List api Handler for query search table
         const listUser = async () => {
+            state.loading = true;
             try {
                 const resp = await SpaceConnector.client.identity.user.list({
-                    query: query.data,
+                    query: getQuery(),
                 });
                 state.items = resp.results;
                 state.totalCount = resp.total_count || 0;
             } catch (e) {
-                state.items = [];
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -177,12 +180,10 @@ export default {
             formState.tagTools.addTag(item.user_id);
         };
 
-        const onChange = async (item) => {
-            try {
-                state.keyword = item.searchText;
+        const onChange: SearchTableListeners['change'] = async (options) => {
+            if (options) {
+                state.options = options;
                 await listUser();
-            } catch (e) {
-                console.error(e);
             }
         };
 
@@ -193,9 +194,9 @@ export default {
                     project_id: projectId,
                     users,
                 });
-                showSuccessMessage('success', 'Add Member', root);
+                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
             } catch (e) {
-                showErrorMessage('Fail to Add Member', e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_MEMBER'), e, root);
             } finally {
                 emit('confirm');
                 proxyVisible.value = false;
@@ -218,16 +219,16 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .tag-title {
-        @apply font-semibold leading-normal text-sm mb-1 mt-8;
-    }
-    .tag-container {
-        height: 7.5rem;
-        >>> .p-tag.deletable {
-            @apply bg-white border border-primary;
-            .p-i-icon {
-                @apply text-primary;
-            }
+.tag-title {
+    @apply font-semibold leading-normal text-sm mb-1 mt-8;
+}
+.tag-container {
+    height: 7.5rem;
+    >>> .p-tag.deletable {
+        @apply bg-white border border-primary;
+        .p-i-icon {
+            @apply text-primary;
         }
     }
+}
 </style>

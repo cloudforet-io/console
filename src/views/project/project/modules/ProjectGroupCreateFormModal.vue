@@ -149,14 +149,14 @@ export default {
                 const params = item;
                 if (props.id) params.project_group_id = props.id;
                 await SpaceConnector.client.identity.projectGroup.update(params);
-                showSuccessMessage('Success', 'Update Project Group', root);
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
 
                 emit('update', {
                     id: props.id,
                     name: item.name,
                 } as ProjectGroup, props);
             } catch (e) {
-                showErrorMessage('Fail to Update Project Group', e, root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, root);
             }
         };
         const confirm = async () => {
