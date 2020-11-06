@@ -7,7 +7,7 @@
                     404
                 </p>
                 <p class="error-message">
-                    Whoops! Nothing here. <br> Try going <a href="javascript:history.go(-1)">back.</a>
+                    {{ $t('COMMON.ERROR.MSG') }}<br> {{ $t('COMMON.ERROR.GO_BACK_1') }} <a href="javascript:history.go(-1)">{{ $t('COMMON.ERROR.GO_BACK_2') }}</a>
                 </p>
             </div>
         </div>
@@ -35,32 +35,32 @@ export default {
 
 
 <style lang="postcss" scoped>
-    .wrap {
-        @apply flex min-h-screen flex-col;
-    }
+.wrap {
+    @apply m-auto flex min-h-screen flex-col;
+}
 
-    .error {
-        @apply m-auto flex-1 text-center;
-        .error-contents {
-            padding-top: calc(70% - 2.5rem);
-            .error-img {
-                @apply mx-auto align-middle;
-            }
-            .error-code {
-                @apply font-bold text-6xl text-primary pb-4;
-                line-height: 120%;
-            }
-            .error-message {
-                @apply text-lg;
-                line-height: 150%;
-                a {
-                    @apply text-blue-700;
-                }
+.error {
+    @apply flex-1 text-center;
+    .error-contents {
+        padding-top: calc(70% - 2.5rem);
+        .error-img {
+            @apply mx-auto align-middle;
+        }
+        .error-code {
+            @apply font-bold text-6xl text-primary pb-4;
+            line-height: 120%;
+        }
+        .error-message {
+            @apply text-lg;
+            line-height: 150%;
+            a {
+                @apply text-blue-700;
             }
         }
     }
+}
 
-    .footer-img {
-        @apply mx-auto w-24 align-middle pb-8;
-    }
+.footer-img {
+    @apply mx-auto w-24 align-middle pb-8;
+}
 </style>

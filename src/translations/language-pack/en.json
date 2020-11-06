@@ -215,6 +215,11 @@
 		"DOMAIN_ID": "Domain ID",
 		"DR_SERV": "Service",
 		"EMAIL": "E-mail",
+		"ERROR": {
+			"GO_BACK_1": "Try going",
+			"GO_BACK_2": "back.",
+			"MSG": "Whoops! Nothing here."
+		},
 		"EVENT": "Event",
 		"EXECR": "Executor",
 		"EXPORT": "Export",
@@ -223,6 +228,10 @@
 		"FIND_PAST": "Found",
 		"FINISH": "Finished at",
 		"FINISHED": "Finished",
+		"FNB": {
+			"PRIVACY": "Privacy Policy",
+			"PRIVACY_MSG": "Will be updated"
+		},
 		"FORGPW": "",
 		"FQDN": "FQDN",
 		"GET_CONT": "",

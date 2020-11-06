@@ -215,6 +215,11 @@
 		"DOMAIN_ID": "도메인 아이디",
 		"DR_SERV": "서비스",
 		"EMAIL": "이메일",
+		"ERROR": {
+			"GO_BACK_1": "뒤로 ",
+			"GO_BACK_2": "가기.",
+			"MSG": "정상적인 경로에서 벗어난 것 같습니다."
+		},
 		"EVENT": "이벤트",
 		"EXECR": "실행자",
 		"EXPORT": "내보내기",
@@ -223,6 +228,10 @@
 		"FIND_PAST": "찾았습니다",
 		"FINISH": "완료 시간",
 		"FINISHED": "완료 시간",
+		"FNB": {
+			"PRIVACY": "개인정보처리방침 ",
+			"PRIVACY_MSG": "제공될 예정입니다. "
+		},
 		"FORGPW": "비밀번호 찾기?",
 		"FQDN": "FQDN",
 		"GET_CONT": "가져오는 (or 가져오는 중)",

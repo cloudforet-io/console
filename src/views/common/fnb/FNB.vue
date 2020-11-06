@@ -12,11 +12,11 @@
                     <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                 </span>
                 <span class="divider" />
-                <span class="policy" @click="showTemp">Privacy Policy</span>
+                <span class="policy" @click="showTemp">{{ $t('COMMON.FNB.PRIVACY') }}</span>
                 <transition name="fade">
                     <span v-if="temp" class="footerMsg" transition="expand"
                           @click="showTemp"
-                    >Will be updated</span>
+                    >{{ $t('COMMON.FNB.PRIVACY_MSG') }}</span>
                 </transition>
             </div>
         </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import PI from '@/components/atoms/icons/PI';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'FNB',

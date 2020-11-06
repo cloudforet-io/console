@@ -215,6 +215,11 @@
 		"DOMAIN_ID": "",
 		"DR_SERV": "",
 		"EMAIL": "",
+		"ERROR": {
+			"GO_BACK_1": "",
+			"GO_BACK_2": "",
+			"MSG": ""
+		},
 		"EVENT": "",
 		"EXECR": "",
 		"EXPORT": "",
@@ -223,6 +228,10 @@
 		"FIND_PAST": "",
 		"FINISH": "",
 		"FINISHED": "",
+		"FNB": {
+			"PRIVACY": "",
+			"PRIVACY_MSG": ""
+		},
 		"FORGPW": "",
 		"FQDN": "",
 		"GET_CONT": "",
