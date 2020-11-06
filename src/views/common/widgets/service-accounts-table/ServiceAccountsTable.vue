@@ -79,7 +79,6 @@ import {
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { makeTrItems } from '@/lib/view-helper';
 import { gray, secondary, secondary1 } from '@/styles/colors';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';

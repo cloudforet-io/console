@@ -579,7 +579,8 @@
 				"TAB_DATA": "Data",
 				"TAB_DETAILS": "Details",
 				"TAB_MEMBER": "Member",
-				"TAB_TAG": "Tag"
+				"TAB_TAG": "Tag",
+				"TITLE": "{provider} Accounts"
 			}
 		},
 		"TAB": {
@@ -690,7 +691,8 @@
 				"TAB_HISTORY": "History",
 				"TAB_MEMBER": "Member",
 				"TAB_MONITORING": "Monitoring",
-				"TAB_TAG": "Tag"
+				"TAB_TAG": "Tag",
+				"TITLE": "Server"
 			}
 		},
 		"TAB": {
@@ -729,6 +731,24 @@
 				"MODAL_TITLE": "Need to Set a Collector",
 				"SUCCESS": "Success",
 				"TITLE": "Collector History"
+			}
+		},
+		"SUPERVISOR_PLUGIN": {
+			"MAIN": {
+				"ALT_E_RECOVERY_TITLE": "Failed to Recovery Plugin",
+				"ALT_S_RECOVERY_TITLE": "Plugin has been successfully recovered. ",
+				"DETAILS_BASE_LABEL_ENDPOINT": "Endpoints",
+				"DETAILS_BASE_LABEL_MANAGED": "Managed",
+				"DETAILS_BASE_LABEL_PLUGIN_ID": "Plugin ID",
+				"DETAILS_BASE_LABEL_STATE": "State",
+				"DETAILS_BASE_LABEL_SUPERVISOR": "Supervisor",
+				"DETAILS_BASE_LABEL_SUPERVISOR_ID": "Supervisor ID",
+				"DETAILS_BASE_LABEL_VERSION": "Version",
+				"DETAILS_BASE_TITLE": "Base Information",
+				"RECOVERY": "Recovery",
+				"TAB_DATA": "Data",
+				"TAB_DETAILS": "Details",
+				"TITLE": "Installed Plugins"
 			}
 		}
 	},
@@ -881,7 +901,8 @@
 				"RECENT": "Recent",
 				"REPOSITORY_LABEL": "Repository",
 				"RESOURCE_TYPE_LABEL": "Resource Type",
-				"SEARCH_PLACEHOLDER": "Enter keyword"
+				"SEARCH_PLACEHOLDER": "Enter keyword",
+				"TITLE": "Plugins"
 			}
 		},
 		"TAB": {

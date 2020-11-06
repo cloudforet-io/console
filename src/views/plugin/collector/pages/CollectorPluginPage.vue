@@ -28,7 +28,7 @@
                                    @clickRefresh="getPlugins"
             >
                 <template #toolbox-left>
-                    <p-page-title title="Plugins" use-total-count :total-count="totalCount"
+                    <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')" use-total-count :total-count="totalCount"
                                   child @goBack="$router.go(-1)"
                     />
                 </template>

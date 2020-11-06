@@ -579,7 +579,8 @@
 				"TAB_DATA": "데이터",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_MEMBER": "구성원",
-				"TAB_TAG": "태그"
+				"TAB_TAG": "태그",
+				"TITLE": "{provider} 계정"
 			}
 		},
 		"TAB": {
@@ -690,7 +691,8 @@
 				"TAB_HISTORY": "변경 기록",
 				"TAB_MEMBER": "구성원",
 				"TAB_MONITORING": "모니터링",
-				"TAB_TAG": "태그"
+				"TAB_TAG": "태그",
+				"TITLE": "서버"
 			}
 		},
 		"TAB": {
@@ -729,6 +731,24 @@
 				"MODAL_TITLE": "컬렉터 생성 필요",
 				"SUCCESS": "성공",
 				"TITLE": "컬렉터 히스토리"
+			}
+		},
+		"SUPERVISOR_PLUGIN": {
+			"MAIN": {
+				"ALT_E_RECOVERY_TITLE": "플러그인 복구 실패",
+				"ALT_S_RECOVERY_TITLE": "플러그인 복구 완료",
+				"DETAILS_BASE_LABEL_ENDPOINT": "엔드 포인트",
+				"DETAILS_BASE_LABEL_MANAGED": "관리 여부",
+				"DETAILS_BASE_LABEL_PLUGIN_ID": "플러그인 아이디",
+				"DETAILS_BASE_LABEL_STATE": "상태",
+				"DETAILS_BASE_LABEL_SUPERVISOR": "감독자",
+				"DETAILS_BASE_LABEL_SUPERVISOR_ID": "감독자 아이디",
+				"DETAILS_BASE_LABEL_VERSION": "버전",
+				"DETAILS_BASE_TITLE": "기본 정보",
+				"RECOVERY": "복구",
+				"TAB_DATA": "데이터",
+				"TAB_DETAILS": "상세 정보",
+				"TITLE": "설치된 플러그인"
 			}
 		}
 	},
@@ -881,7 +901,8 @@
 				"RECENT": "최신",
 				"REPOSITORY_LABEL": "저장소",
 				"RESOURCE_TYPE_LABEL": "리소스 타입",
-				"SEARCH_PLACEHOLDER": "키워드 입력"
+				"SEARCH_PLACEHOLDER": "키워드 입력",
+				"TITLE": "플러그인 목록"
 			}
 		},
 		"TAB": {

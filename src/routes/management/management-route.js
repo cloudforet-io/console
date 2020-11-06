@@ -1,4 +1,4 @@
-const SupervisorPlugins = () => import('@/views/management/supervisor/pages/SupervisorPlugins.vue');
+const SupervisorPluginPage = () => import('@/views/management/supervisor/pages/SupervisorPluginPage.vue');
 const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
 
 export default {
@@ -22,7 +22,7 @@ export default {
                         label: 'Plugins',
                         isDomainOwnerOnly: true,
                     },
-                    component: SupervisorPlugins,
+                    component: SupervisorPluginPage,
                 },
             ],
         },

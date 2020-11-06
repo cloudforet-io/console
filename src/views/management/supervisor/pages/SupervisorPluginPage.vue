@@ -1,6 +1,6 @@
 <template>
     <general-page-layout>
-        <p-page-title title="Installed Plugins" />
+        <p-page-title :title="$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TITLE')" />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-query-search-table
@@ -14,7 +14,7 @@
                 >
                     <template #col-managed-format="data">
                         <p-button style-type="primary" :disabled="true" @click="onClickRecovery(data.item)">
-                            Recovery
+                            {{ $t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.RECOVERY') }}
                         </p-button>
                     </template>
                 </p-query-search-table>
@@ -37,12 +37,11 @@
                :active-tab.sync="multiItemTab.activeTab"
         >
             <template #data>
-                <p-data-table
-                    :fields="fields"
-                    :items="selectedItems"
-                    :sortable="false"
-                    :selectable="false"
-                    :col-copy="true"
+                <p-data-table :fields="fields"
+                              :items="selectedItems"
+                              :sortable="false"
+                              :selectable="false"
+                              :col-copy="true"
                 />
             </template>
         </p-tab>
@@ -70,7 +69,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
-    name: 'Supervisor',
+    name: 'SupervisorPluginPage',
     components: {
         PButton,
         PDataTable,
@@ -118,30 +117,30 @@ export default {
             ],
         });
         const pluginDetailState = reactive({
-            name: 'Base Information',
+            name: computed(() => vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_TITLE')),
             isLoading: true,
             fields: computed(() => [
-                { label: 'Plugin ID', name: 'plugin_id' },
-                { label: 'Version', name: 'version' },
-                { label: 'State', name: 'state' },
-                { label: 'Endpoints', name: 'endpoints' },
-                { label: 'Supervisor', name: 'supervisor_name' },
-                { label: 'Supervisor ID', name: 'supervisor_id' },
-                { label: 'Managed', name: 'managed' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_PLUGIN_ID'), name: 'plugin_id' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_VERSION'), name: 'version' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_STATE'), name: 'state' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_ENDPOINT'), name: 'endpoints' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_SUPERVISOR'), name: 'supervisor_name' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_SUPERVISOR_ID'), name: 'supervisor_id' },
+                { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_MANAGED'), name: 'managed' },
             ]),
             data: {},
         });
         const tabState = reactive({
             singleItemTab: {
-                tabs: [
-                    { label: vm.$t('COMMON.DETAILS'), name: 'detail', keepAlive: true },
-                ] as TabItem[],
+                tabs: computed<TabItem[]>(() => [
+                    { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TAB_DETAILS'), name: 'detail', keepAlive: true },
+                ]),
                 activeTab: 'detail',
             },
             multiItemTab: {
-                tabs: [
-                    { label: vm.$t('TAB.SELECTED_DATA'), name: 'data', keepAlive: true },
-                ] as TabItem[],
+                tabs: computed<TabItem[]>(() => [
+                    { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TAB_DATA'), name: 'data', keepAlive: true },
+                ]),
                 activeTab: 'data',
             },
         });
@@ -181,10 +180,10 @@ export default {
                     supervisor_id: item.supervisor_id,
                     plugin_id: item.plugin_id,
                     version: item.version,
-                })
-                showSuccessMessage('success', 'success', context.root);
+                });
+                showSuccessMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_S_RECOVERY_TITLE'), '', vm.$root);
             } catch (e) {
-                showErrorMessage('Fail to recover plugin', e, context.root);
+                showErrorMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_E_RECOVERY_TITLE'), e, vm.$root);
             }
         };
 

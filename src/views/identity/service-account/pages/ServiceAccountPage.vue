@@ -31,7 +31,7 @@
             <div class="page-navigation">
                 <p-page-navigation :routes="route" />
             </div>
-            <p-page-title :title="`${selectedProviderName} Accounts`"
+            <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
                           class="page-title"
             />
             <p-horizontal-layout>
@@ -158,7 +158,6 @@ import ServiceAccountMember from '@/views/identity/service-account/modules/Servi
 
 /* utils */
 import { replaceQuery } from '@/lib/router-query-string';
-import { makeTrItems } from '@/lib/view-helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

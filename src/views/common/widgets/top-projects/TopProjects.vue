@@ -146,7 +146,6 @@ import {
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import { makeTrItems } from '@/lib/view-helper';
 import {
     black, gray, secondary, secondary1,
 } from '@/styles/colors';

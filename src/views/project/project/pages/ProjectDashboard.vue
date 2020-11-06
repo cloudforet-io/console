@@ -70,7 +70,6 @@ import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashb
 import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
-import { makeTrItems } from '@/lib/view-helper';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;

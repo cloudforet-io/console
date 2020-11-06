@@ -579,7 +579,8 @@
 				"TAB_DATA": "",
 				"TAB_DETAILS": "",
 				"TAB_MEMBER": "",
-				"TAB_TAG": ""
+				"TAB_TAG": "",
+				"TITLE": ""
 			}
 		},
 		"TAB": {
@@ -690,7 +691,8 @@
 				"TAB_HISTORY": "",
 				"TAB_MEMBER": "",
 				"TAB_MONITORING": "",
-				"TAB_TAG": ""
+				"TAB_TAG": "",
+				"TITLE": ""
 			}
 		},
 		"TAB": {
@@ -728,6 +730,24 @@
 				"MODAL_DESC_2": "",
 				"MODAL_TITLE": "",
 				"SUCCESS": "",
+				"TITLE": ""
+			}
+		},
+		"SUPERVISOR_PLUGIN": {
+			"MAIN": {
+				"ALT_E_RECOVERY_TITLE": "",
+				"ALT_S_RECOVERY_TITLE": "",
+				"DETAILS_BASE_LABEL_ENDPOINT": "",
+				"DETAILS_BASE_LABEL_MANAGED": "",
+				"DETAILS_BASE_LABEL_PLUGIN_ID": "",
+				"DETAILS_BASE_LABEL_STATE": "",
+				"DETAILS_BASE_LABEL_SUPERVISOR": "",
+				"DETAILS_BASE_LABEL_SUPERVISOR_ID": "",
+				"DETAILS_BASE_LABEL_VERSION": "",
+				"DETAILS_BASE_TITLE": "",
+				"RECOVERY": "",
+				"TAB_DATA": "",
+				"TAB_DETAILS": "",
 				"TITLE": ""
 			}
 		}
@@ -881,7 +901,8 @@
 				"RECENT": "",
 				"REPOSITORY_LABEL": "",
 				"RESOURCE_TYPE_LABEL": "",
-				"SEARCH_PLACEHOLDER": ""
+				"SEARCH_PLACEHOLDER": "",
+				"TITLE": ""
 			}
 		},
 		"TAB": {

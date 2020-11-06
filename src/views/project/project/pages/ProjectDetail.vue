@@ -137,6 +137,7 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 export default {
     name: 'ProjectDetail',
@@ -196,15 +197,16 @@ export default {
         /** Tabs */
         const singleItemTabState = reactive({
             tabs: computed(() => {
-                const items: any[] = [
-                    ['summary', vm.$t('PROJECT.DETAIL.TAB_SUMMARY'), { keepAlive: true }],
-                    ['member', vm.$t('PROJECT.DETAIL.TAB_MEMBER')],
-                    ['tag', vm.$t('PROJECT.DETAIL.TAB_TAG')],
+                const items: TabItem[] = [
+                    { name: 'summary', label: vm.$t('PROJECT.DETAIL.TAB_SUMMARY'), keepAlive: true },
+                    { name: 'member', label: vm.$t('PROJECT.DETAIL.TAB_MEMBER') },
+                    { name: 'tag', label: vm.$t('PROJECT.DETAIL.TAB_TAG') },
                 ];
+
                 if (state.reportState) {
-                    items.push(['report', vm.$t('PROJECT.DETAIL.TAB_REPORT'), { beta: true }]);
+                    items.push({ name: 'report', label: vm.$t('PROJECT.DETAIL.TAB_REPORT'), beta: true });
                 }
-                return makeTrItems(items, parent);
+                return items;
             }),
             activeTab: 'summary',
         });

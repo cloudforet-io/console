@@ -3,7 +3,7 @@
         <div class="page-navigation">
             <p-page-navigation :routes="routeState.route" />
         </div>
-        <p-page-title title="Server"
+        <p-page-title :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
                       use-total-count use-selected-count
                       :total-count="typeOptionState.totalCount"
                       :selected-count="tableState.selectedItems.length"
