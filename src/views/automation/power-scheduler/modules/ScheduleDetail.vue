@@ -20,7 +20,7 @@
             <div v-if="mode === 'READ'" class="section-wrapper">
                 <div class="detail-wrapper">
                     <div class="info-group">
-                        <span class="title">{{ $t('PWR_SCHED.SETTING') }}</span>
+                        <span class="title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SETTING') }}</span>
                         <p-status v-if="DESIRED_STATES[desiredState]"
                                   v-bind="DESIRED_STATES[desiredState]"
                                   :icon="undefined"
@@ -28,7 +28,7 @@
                         />
                     </div>
                     <div class="info-group">
-                        <span class="title">{{ $t('PWR_SCHED.CURR_STATE') }}</span>
+                        <span class="title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CURRENT_STATE') }}</span>
                         <p-status v-if="BOOTING_STATES[jobStatus]"
                                   v-bind="BOOTING_STATES[jobStatus]"
                                   class="ml-4"
@@ -45,8 +45,8 @@
             >
                 <template #label>
                     <div class="name-field-label">
-                        <span class="label">{{ $t('PWR_SCHED.SET_NAME') }}</span>
-                        <span class="desc">{{ $t('PWR_SCHED.SET_NAME_DESC') }}</span>
+                        <span class="label">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SET_NAME_TITLE') }}</span>
+                        <span class="desc">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SET_NAME_DESC') }}</span>
                     </div>
                 </template>
                 <template #default="{invalid}">
@@ -82,13 +82,13 @@
                 <p-button v-if="!firstCreate" style-type="gray900" :outline="true"
                           @click="onClickCancel"
                 >
-                    {{ $t('PWR_SCHED.CANCEL') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CANCEL') }}
                 </p-button>
                 <p-button class="ml-4" style-type=" secondary"
                           :disabled="nameEditState.showValidation && !nameEditState.isValid"
                           @click="onClickSave"
                 >
-                    {{ $t('PWR_SCHED.SAVE') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SAVE') }}
                 </p-button>
             </div>
         </section>
@@ -106,12 +106,12 @@
         >
             <template #body>
                 <p class="delete-modal-content">
-                    {{ $t('PWR_SCHED.CHECK_DELETE_DESC') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_DELETE_MODAL_DESC') }}
                 </p>
             </template>
         </p-button-modal>
 
-        <p-button-modal :header-title="$t('PWR_SCHED.CHECK_TIME_SET')"
+        <p-button-modal :header-title="$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_TITLE')"
                         centered
                         size="md"
                         fade
@@ -125,16 +125,16 @@
         >
             <template #body>
                 <p class="delete-modal-content">
-                    {{ $t('PWR_SCHED.CHECK_TIME_SET_DESC') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_DESC_1') }}
                     <br>
-                    {{ $t('PWR_SCHED.CHECK_TIME_SET_DESC2') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_DESC_2') }}
                 </p>
             </template>
             <template #cancel-button>
-                {{ $t('PWR_SCHED.CHECK_TIME_SET_NO') }}
+                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_NO_TEXT') }}
             </template>
             <template #confirm-button>
-                {{ $t('PWR_SCHED.CHECK_TIME_SET_YES') }}
+                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_YES_TEXT') }}
             </template>
         </p-button-modal>
 
@@ -151,8 +151,8 @@
                 >
                     <template #label>
                         <div class="name-field-label">
-                            <span class="label">{{ $t('PWR_SCHED.SET_NAME') }}</span>
-                            <span class="desc">{{ $t('PWR_SCHED.SET_NAME_DESC') }}</span>
+                            <span class="label">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SET_NAME_TITLE') }}</span>
+                            <span class="desc">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SET_NAME_DESC') }}</span>
                         </div>
                     </template>
                     <template #default="{invalid}">
@@ -248,11 +248,11 @@ export default {
             isValid: computed(() => !!nameEditState.name),
             showValidation: false,
             loading: false,
-            headerTitle: computed(() => vm.$t('PWR_SCHED.EDIT_NAME')),
+            headerTitle: computed(() => vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.EDIT_NAME_MODAL_TITLE')),
         });
 
         const state = reactive({
-            title: computed(() => (props.mode === 'CREATE' ? vm.$t('PWR_SCHED.CREATE') : state.schedule.name)),
+            title: computed(() => (props.mode === 'CREATE' ? vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CREATE_SCHEDULER') : state.schedule.name)),
 
             schedule: { ...defaultSchedule } as Schedule,
             kanban: null,
@@ -277,7 +277,7 @@ export default {
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: computed(() => vm.$t('PWR_SCHED.CHECK_DELETE')),
+            headerTitle: computed(() => vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_DELETE_MODAL_TITLE')),
         });
 
         const onClickNameEdit = () => {
@@ -297,10 +297,10 @@ export default {
                     name: nameEditState.name,
                 });
                 state.schedule.name = nameEditState.name;
-                showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), nameEditState.headerTitle, root);
+                showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_NAME'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(`${checkDeleteState.headerTitle} ${vm.$t('PWR_SCHED.SUCCESS')}`, e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_NAME'), e, root);
             } finally {
                 nameEditState.visible = false;
                 nameEditState.loading = false;
@@ -317,10 +317,10 @@ export default {
                 await SpaceConnector.client.powerScheduler.schedule.delete({
                     schedule_id: props.scheduleId,
                 });
-                showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), checkDeleteState.headerTitle, root);
+                showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_DELETE_SCHEDULER'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(`${checkDeleteState.headerTitle} ${vm.$t('PWR_SCHED.SUCCESS')}`, e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_DELETE_SCHEDULER'), e, root);
             } finally {
                 checkDeleteState.visible = false;
                 emit('delete');
@@ -373,11 +373,11 @@ export default {
                     name: nameEditState.name,
                     project_id: props.projectId,
                 });
-                showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.CREATE_SUCCESS'), root);
+                showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_CREATE_SCHEDULER'), '', root);
                 return res.schedule_id;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PWR_SCHED.CREATE_FAIL'), e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_CREATE_SCHEDULER'), e, root);
             } finally {
                 state.createLoading = false;
             }

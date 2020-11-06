@@ -6,24 +6,26 @@
                 <p-pane-layout>
                     <section>
                         <div class="label">
-                            {{ $t('PWR_SCHED.RESRC_GRP.BASE_INFO') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.BASE_INFO_TITLE') }}
                         </div>
                         <div class="form">
-                            <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.NAME')" class="read-mode">
+                            <p-field-group v-if="readMode" :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME')" class="read-mode">
                                 <span class="read-value">{{ name }}</span>
                             </p-field-group>
-                            <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.NAME')"
+                            <p-field-group v-else required :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME')"
                                            :invalid="validState.showValidation && !validState.name"
                                            :invalid-text="validState.nameInvalidMsg"
                             >
                                 <template #help>
-                                    {{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC') }}
-                                    <span class="text-gray-500">{{ $t('PWR_SCHED.RESRC_GRP.NAME_DESC2') }}</span>
+                                    {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME_DESC_1') }}
+                                    <span class="text-gray-500">
+                                        {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME_DESC_2') }}
+                                    </span>
                                 </template>
                                 <p-text-input v-model="name" class="w-full"
                                               block
                                               :invalid="validState.showValidation && !validState.name"
-                                              :placeholder="$t('PWR_SCHED.RESRC_GRP.NAME')"
+                                              :placeholder="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME')"
                                               @input="validateName"
                                 />
                             </p-field-group>
@@ -63,18 +65,18 @@
                     <div class="separator" />
                     <section>
                         <div class="label">
-                            {{ $t('PWR_SCHED.RESRC_GRP.STANDARD') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.STANDARD') }}
                         </div>
                         <div class="form">
-                            <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE')" class="read-mode">
+                            <p-field-group v-if="readMode" :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE')" class="read-mode">
                                 <span class="read-value">{{ RESOURCE_GROUP_TYPES[selectedTypeIndex] ? RESOURCE_GROUP_TYPES[selectedTypeIndex].label : '' }}</span>
                             </p-field-group>
-                            <p-field-group v-else required :label="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_SELECT')">
+                            <p-field-group v-else required :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_SELECT')">
                                 <p-select-dropdown :select-item="selectedTypeIndex"
                                                    index-mode
                                                    class="w-1/2"
                                                    :items="RESOURCE_GROUP_TYPES"
-                                                   :placeholder="$t('PWR_SCHED.RESRC_GRP.RESRC_TYPE_DESC')"
+                                                   :placeholder="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_DESC')"
                                                    :disabled="resourceTypeReadOnly"
                                                    :invalid="validState.showValidation && !validState.resourceType"
                                                    @input="onSelectedTypeIndexChange"
@@ -87,11 +89,11 @@
                         <div class="separator" />
                         <section>
                             <div class="label">
-                                {{ $t('PWR_SCHED.RESRC_GRP.RESRC_LIST') }}
+                                {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_LIST') }}
                                 <span class="text-gray-500">({{ typeOptionState.totalCount }})</span>
                             </div>
                             <div class="table-form">
-                                <p-field-group v-if="!readMode" :label="$t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH')" />
+                                <p-field-group v-if="!readMode" :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_SEARCH')" />
                                 <p-query-search-tags v-if="readMode" read-only :tags="fetchOptionState.queryTags"
                                                      :timezone="typeOptionState.timezone"
                                 />
@@ -109,7 +111,7 @@
                                         <span :class="{
                                             'text-alert': validState.showValidation
                                         }"
-                                        >{{ $t('PWR_SCHED.RESRC_GRP.RESRC_SEARCH_INVALID') }}</span>
+                                        >{{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_SEARCH_INVALID') }}</span>
                                     </template>
                                 </p-dynamic-layout>
                             </div>
@@ -119,13 +121,13 @@
 
                 <div class="actions">
                     <p-button style-type="gray900" :outline="true" @click.stop="onClickCancel">
-                        {{ $t('PWR_SCHED.CANCEL') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CANCEL') }}
                     </p-button>
                     <p-button v-if="!readMode" class="ml-4" style-type="secondary"
                               :disabled="validState.showValidation && !validState.all"
                               @click.stop="onClickSave"
                     >
-                        {{ $t('PWR_SCHED.SAVE') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SAVE') }}
                     </p-button>
                 </div>
             </general-page-layout>
@@ -139,7 +141,7 @@
         >
             <template #sub-title-format>
                 <p class="check-title">
-                    {{ $t('PWR_SCHED.RESRC_GRP.CHECK_LIST_DESC') }} <span class="count">({{ typeOptionState.totalCount }})</span>
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.CHECK_LIST_MODAL_DESC') }} <span class="count">({{ typeOptionState.totalCount }})</span>
                 </p>
             </template>
             <p-query-search-tags read-only :tags="fetchOptionState.queryTags"
@@ -290,7 +292,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             resourceTypeReadOnly: computed(() => !!formState.resourceGroup),
-            title: computed(() => formState.resourceGroup?.name || vm.$t('PWR_SCHED.RESRC_GRP.CRT_NAME')),
+            title: computed(() => formState.resourceGroup?.name || vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.TITLE')),
 
             name: '',
             selectedTypeIndex: -1,
@@ -337,7 +339,7 @@ export default {
         });
 
         const listModalState = reactive({
-            headerTitle: computed(() => vm.$t('PWR_SCHED.RESRC_GRP.CHECK_LIST')),
+            headerTitle: computed(() => vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.CHECK_LIST_MODAL_TITLE')),
             visible: false,
         });
 
@@ -345,8 +347,8 @@ export default {
         const validateName = (val) => {
             validState.name = nameRegex.test(val);
             if (validState.name) validState.nameInvalidMsg = '';
-            else if (state.name.trim().length === 0) validState.nameInvalidMsg = vm.$t('PWR_SCHED.RESRC_GRP.NAME_REQUIRED');
-            else validState.nameInvalidMsg = vm.$t('PWR_SCHED.RESRC_GRP.NAME_INVALID');
+            else if (state.name.trim().length === 0) validState.nameInvalidMsg = vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME_REQUIRED');
+            else validState.nameInvalidMsg = vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME_INVALID');
         };
 
         // const validateTags = () => {
@@ -584,7 +586,7 @@ export default {
                 });
                 formState.resourceGroup = res;
             } catch (e) {
-                showErrorMessage(vm.$t('PWR_SCHED.RESRC_GRP.ID_INVALID'), vm.$t('PWR_SCHED.RESRC_GRP.ID_INVALID_DESC'), vm.$root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_TITLE'), vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_DESC'), vm.$root);
                 await vm.$router.replace({
                     name: 'powerScheduler',
                     params: {

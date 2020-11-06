@@ -1,15 +1,15 @@
 <template>
     <div class="page-information">
-        <span>반복 스케줄 설정 시간</span>
+        <span>{{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.LEGEND_TITLE') }}</span>
 
         <span id="circle1" />
-        <span class="text-gray-400 text">미설정 </span>
+        <span class="text-gray-400 text">{{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.LEGEND_UNSET') }} </span>
 
         <span id="circle3" />
-        <span class="text-primary1 text">12시간 미만 </span>
+        <span class="text-primary1 text">{{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.LEGEND_LESS_THEN_12') }} </span>
 
         <span id="circle5" />
-        <span class="text-primary-dark text">12시간 이상</span>
+        <span class="text-primary-dark text">{{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.LEGEND_GREATER_THEN_12') }}</span>
     </div>
 </template>
 

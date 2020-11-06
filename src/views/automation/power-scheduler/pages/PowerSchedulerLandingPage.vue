@@ -31,13 +31,13 @@
                     <div v-if="!loading && totalCount === 0" class="text-center empty-project">
                         <img class="empty-project-img" src="@/assets/images/illust_satellite.svg">
                         <p class="text-primary2 mb-12">
-                            {{ $t('PWR_SCHED.GO_TO_PROJ') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.GO_TO_PROJECT_HINT_TEXT') }}
                         </p>
                         <router-link :to="`/project`">
                             <p-icon-text-button style-type="primary" name="ic_plus_bold"
                                                 class="mx-auto text-center"
                             >
-                                {{ $t('BTN.GO_PROJECT') }}
+                                {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.GO_TO_PROJECT_BTN_TEXT') }}
                             </p-icon-text-button>
                         </router-link>
                     </div>
@@ -57,8 +57,8 @@
                                 <div class="resources">
                                     <div class="scheduled-resources">
                                         <p>
-                                            {{ $t('PWR_SCHED.APPLY_RESOURCE') }} / <span v-tooltip.bottom="{content: tooltip.resource, delay: {show: 500}}">
-                                                {{ $t('PWR_SCHED.AVAILABLE_RESOURCE') }}</span>
+                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.APPLIED_RESOURCE') }} / <span v-tooltip.bottom="{content: tooltip.resource, delay: {show: 500}}">
+                                                {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.APPLICABLE_RESOURCE') }}</span>
                                         </p>
 
                                         <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
@@ -72,11 +72,11 @@
                                     <div class="saving">
                                         <p class="saving-this-month">
                                             <span v-tooltip.bottom="{content: tooltip.cost, delay: {show: 500}}">
-                                                {{ $t('PWR_SCHED.MONTH_COST_SAVING') }}
+                                                {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ESTIMATED_SAVING') }}
                                             </span>
                                         </p>
                                         <p class="approximate">
-                                            {{ $t('PWR_SCHED.APPROX') }}
+                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ABOUT') }}
                                         </p>
                                         <span class="costs"><span>$ </span><span class="approx-costs">{{ item.savingCost }}</span></span>
                                     </div>
@@ -86,7 +86,7 @@
                             <div class="schedule" :class="{'no-schedule': item.scheduler.length === 0}">
                                 <div class="scheduler-list-wrapper">
                                     <p v-if="item.scheduler.length > 0" class="mb-4">
-                                        <span class="schedule-title">{{ $t('PWR_SCHED.SCHED') }}
+                                        <span class="schedule-title">{{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.SCHEDULE') }}
                                             <span v-if="item.scheduler.length < 4" class="schedule-title-num">({{ item.scheduler.length }})</span>
                                             <span v-else class="schedule-title-num">(+3)</span>
                                         </span>
@@ -110,7 +110,10 @@
                                                  class="add-btn-icon"
                                                  width="0.875rem" height="0.875rem"
                                             />
-                                        </div><span class="schedule-add-text">{{ $t('PWR_SCHED.NEED_SCHED') }}</span>
+                                        </div>
+                                        <span class="schedule-add-text">
+                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.NEED_SCHEDULER_HINT_TEXT') }}
+                                        </span>
                                     </div>
                                 </div>
                                 <div v-if="item.scheduler.length > 0" class="schedule-matrix">
@@ -131,6 +134,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -165,9 +169,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 interface Scheduler {
     name: string;
     rule: object;
-    // eslint-disable-next-line camelcase
     schedule_id: string;
-    // eslint-disable-next-line camelcase
     desired_state: string;
 }
 export default {
@@ -198,9 +200,7 @@ export default {
                 },
             ],
             valueHandlerMap: {
-                // eslint-disable-next-line camelcase
                 project_id: makeReferenceValueHandler('identity.Project'),
-                // eslint-disable-next-line camelcase
             },
         };
 
@@ -296,13 +296,10 @@ export default {
                 state.items = res.results.map(d => ({
                     ...d,
                     scheduledResources: {
-                        // eslint-disable-next-line camelcase
                         managed_count: 0,
-                        // eslint-disable-next-line camelcase
                         total_count: 0,
                     },
                     scheduler: {
-                        // eslint-disable-next-line camelcase
                         schedule_id: '',
                         name: '',
                         rule: [],

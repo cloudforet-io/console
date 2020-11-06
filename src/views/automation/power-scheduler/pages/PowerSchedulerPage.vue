@@ -7,12 +7,12 @@
                                     :disabled="mode === 'CREATE' || isEditing" block
                                     @click="onClickCreate"
                 >
-                    {{ $t('PWR_SCHED.CREATE') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CREATE_SCHEDULER') }}
                 </p-icon-text-button>
             </div>
             <section class="list-section" :style="{width: width}">
                 <p class="title">
-                    <strong>{{ $t('PWR_SCHED.LIST') }}</strong>&nbsp;({{ totalCount }})
+                    <strong>{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SCHEDULER_LIST') }}</strong>&nbsp;({{ totalCount }})
                 </p>
                 <p-hr />
                 <div class="my-6 mx-3">
@@ -31,7 +31,7 @@
                         </template>
                         <template #no-data>
                             <div class="no-data">
-                                {{ $t('PWR_SCHED.NO_SCHED') }}
+                                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.NO_DATA') }}
                             </div>
                         </template>
                         <template #contents="{item}">
@@ -50,7 +50,7 @@
         </template>
         <p-page-navigation :routes="routeState.route" />
         <div class="detail-container">
-            <template v-if="loading" >
+            <template v-if="loading">
                 <div class="loading-backdrop fade-in" />
                 <p-lottie name="thin-spinner" :size="2.5"
                           :auto="true" class="loading"
@@ -73,26 +73,27 @@
 </template>
 
 <script lang="ts">
-import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
-
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { store } from '@/store';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
-import { getTimezone, showErrorMessage, showSuccessMessage } from '@/lib/util';
-import VerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
-import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import { findIndex } from 'lodash';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
+
+import {
+    ComponentRenderProxy,
+    computed, reactive, toRefs, getCurrentInstance,
+} from '@vue/composition-api';
+
+import VerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
+import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
+import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
+
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getTimezone, showErrorMessage } from '@/lib/util';
+import { store } from '@/store';
 import router from '@/routes';
 
 dayjs.extend(timezone);
@@ -137,7 +138,11 @@ export default {
     beforeRouteEnter(to, from, next) {
         (async () => {
             if (!await validateProjectId(to.params.projectId)) {
-                showErrorMessage(router.app.$t('PWR_SCHED.PROJECT_INVALID'), router.app.$t('PWR_SCHED.PROJECT_INVALID_DESC'), router.app.$root);
+                showErrorMessage(
+                    router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_TITLE'),
+                    router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_DESC'),
+                    router.app.$root,
+                );
                 next({
                     name: 'powerSchedulerLanding',
                     params: {},
@@ -163,7 +168,7 @@ export default {
         });
 
         const state = reactive({
-            title: computed(() => state.selectedSchedule?.name || vm.$t('PWR_SCHED.CREATE')),
+            title: computed(() => state.selectedSchedule?.name || vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CREATE_SCHEDULER')),
             scheduleList: [] as Schedule[],
             totalCount: 0,
             loading: true,
@@ -237,12 +242,24 @@ export default {
         const initSelectedSchedule = async (init = false) => {
             if (state.scheduleList.length === 0) {
                 state.selectedIndexes = [];
-                if (init && props.scheduleId) showErrorMessage(vm.$t('PWR_SCHED.SCHED_INVALID'), vm.$t('PWR_SCHED.SCHED_INVALID_DESC'), root);
+                if (init && props.scheduleId) {
+                    showErrorMessage(
+                        vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_TITLE'),
+                        vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_DESC'),
+                        root,
+                    );
+                }
             } else {
                 const idx = findIndex(state.scheduleList, { schedule_id: props.scheduleId });
                 if (idx === -1) {
                     state.selectedIndexes = [0];
-                    if (init && props.scheduleId) showErrorMessage(vm.$t('PWR_SCHED.SCHED_INVALID'), vm.$t('PWR_SCHED.SCHED_INVALID_DESC'), root);
+                    if (init && props.scheduleId) {
+                        showErrorMessage(
+                            vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_TITLE'),
+                            vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_DESC'),
+                            root,
+                        );
+                    }
                 } else state.selectedIndexes = [idx];
             }
 

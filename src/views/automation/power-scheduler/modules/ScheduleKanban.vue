@@ -1,17 +1,20 @@
 <template>
     <div :class="{'edit-mode': isEditMode }" class="kanban">
         <div class="title-wrapper">
-            <span class="title">리소스 그룹</span>
-            <span class="sub-title">스케줄러를 적용할 리소스 그룹</span>
+            <span class="title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.RESOURCE_GROUP_TITLE') }}</span>
+            <span class="sub-title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.RESOURCE_GROUP_DESC') }}</span>
             <p-icon-text-button v-if="isEditMode || isCreateMode" style-type="gray900" outline
                                 name="ic_plus_bold"
                                 class="add-column-btn float-right" @click="addColumn"
             >
-                우선순위 추가
+                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ADD_PRIORITY') }}
             </p-icon-text-button>
             <p-button v-if="!isEditMode && !isCreateMode"
                       style-type="gray900 outline"
-                      class="edit-btn" @click="startEdit">편집하기</p-button>
+                      class="edit-btn" @click="startEdit"
+            >
+                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.EDIT') }}
+            </p-button>
         </div>
         <transition-group class="kanban-container">
             <div
@@ -23,12 +26,14 @@
                 <div class="resource-group-header">
                     <span id="header-number">{{ column.title }}</span>
                     <div v-if="column.title === '1'" class="header-decorator">
-                        높음
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.HIGH') }}
                     </div>
                     <div v-if="column.title === maxPriority.length.toString()" class="header-decorator">
-                        낮음
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.LOW') }}
                     </div>
-                    <span v-if="column.title === '1'" id="header-priority">우선순위</span>
+                    <span v-if="column.title === '1'" id="header-priority">
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.PRIORITY') }}
+                    </span>
                     <p-i v-if="column.title > 5 && (isCreateMode || isEditMode)" name="ic_delete" width="1.5rem"
                          color="transparent inherit"
                          class="header-button"
@@ -38,7 +43,8 @@
                 <div class="resource-item-wrapper">
                     <div v-if="(isCreateMode || isEditMode) && column.title === '1'" class="resource-group-item">
                         <div class="add-resource-group" @click="onClickResourceGroup()">
-                            <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />그룹 추가
+                            <p-i name="ic_plus_thin" width="0.875rem" class="mr-1" />
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ADD_RESOURCE_GROUP') }}
                         </div>
                     </div>
                     <div v-if="column.title === '3' && showGuide" class="kanban-guide-wrapper">
@@ -47,7 +53,9 @@
                         <div id="kanban-guide-text" />
                         <p-i id="kanban-guide-icon" name="cursor_drag-arrow--blue" width="1.375rem" />
                         <p class="kanban-guide-text">
-                            마우스로 리소스 그룹의 위치를 바꾸고<br> 우선 순위를 정하세요
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.KANBAN_HINT_TEXT_1') }}
+                            <br>
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.KANBAN_HINT_TEXT_2') }}
                         </p>
                     </div>
                     <draggable :list="column.items" :animation="200" ghost-class="ghost-card"
@@ -78,12 +86,12 @@
                                                @click.stop="deleteResourceGroup(column, item, index)"
                                 />
                                 <p v-if="isCreateMode && item.recommended" class="recommended-text">
-                                    추천
+                                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.RECOMMENDED') }}
                                 </p>
                                 <p-button v-if="isCreateMode && item.recommended"
                                           style-type="secondary" size="sm" class="add-btn"
                                 >
-                                    추가
+                                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ADD') }}
                                 </p-button>
                             </div>
                         </div>
@@ -93,12 +101,12 @@
         </transition-group>
         <div v-if="isEditMode" class="actions">
             <p-button style-type="gray900" :outline="true" @click="finishEdit">
-                {{ $t('PWR_SCHED.CANCEL') }}
+                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CANCEL') }}
             </p-button>
             <p-button class="ml-4" style-type=" secondary"
                       @click="onSave(scheduleId)"
             >
-                {{ $t('PWR_SCHED.SAVE') }}
+                {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SAVE') }}
             </p-button>
         </div>
         <router-view v-if="!isCreateMode && !isEditMode" />
@@ -127,24 +135,23 @@ import ResourceGroupPage from '@/views/automation/power-scheduler/pages/Resource
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import router from '@/routes';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 
-    interface ColumnType {
-        title: string;
-        items: KanbanItem[];
-        options: {
-            priority: number;
-            badge?: string;
-        };
-    }
+interface ColumnType {
+    title: string;
+    items: KanbanItem[];
+    options: {
+        priority: number;
+        badge?: string;
+    };
+}
 
-    interface Props {
-        scheduleId: string;
-        mode: ViewMode;
-        projectId: string;
-    }
+interface Props {
+    scheduleId: string;
+    mode: ViewMode;
+    projectId: string;
+}
 
 export default {
     name: 'ScheduleKanban',
@@ -171,7 +178,7 @@ export default {
             required: true,
         },
     },
-    setup(props: Props) {
+    setup(props: Props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             columns: [] as unknown as ColumnType[],
@@ -275,10 +282,12 @@ export default {
                     columns: state.columns,
                 });
 
-                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.RESRC_GRP.EDIT_SUCCESS'), vm.$root);
+                if (props.mode !== 'CREATE') {
+                    showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_RESOURCE_GROUP'), '', root);
+                }
             } catch (e) {
                 console.error(e);
-                if (props.mode !== 'CREATE') showErrorMessage(vm.$t('PWR_SCHED.RESRC_GRP.EDIT_FAIL'), e, vm.$root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_RESOURCE_GROUP'), e, root);
             } finally {
                 state.isEditMode = false;
             }

@@ -1,8 +1,8 @@
 <template>
     <div class="schedule-time-table-container">
         <div class="title-wrapper">
-            <span class="title">{{ $t('PWR_SCHED.TT.TITLE') }}</span>
-            <span class="sub-title">{{ $t('PWR_SCHED.TT.SUB_TITLE') }}</span>
+            <span class="title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SET_TIME_TITLE') }}</span>
+            <span class="sub-title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SET_TIME_DESC') }}</span>
             <div class="button-wrapper">
                 <p-date-pagination :date.sync="currentDate" :allow-future="true" type="week"
                                    :timezone="timezone"
@@ -11,7 +11,7 @@
                           :outline="true"
                           @click="onClickCurrentWeek"
                 >
-                    {{ $t('PWR_SCHED.TT.THIS_WEEK') }}
+                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.THIS_WEEK') }}
                 </p-button>
             </div>
         </div>
@@ -39,7 +39,7 @@
                             :class="{'today': weekday.format('YYYY-MM-DD') === today}"
                         >
                             <div class="weekday-text">
-                                {{ weekday.format('YYYY-MM-DD') === today ? $t('PWR_SCHED.TT.TODAY') : weekdayTexts[weekday.day()] }}
+                                {{ weekday.format('YYYY-MM-DD') === today ? $t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_TODAY') : weekdayTexts[weekday.day()] }}
                             </div>
                             <div class="weekday-number-text">
                                 {{ weekday.format('D') }}
@@ -85,8 +85,8 @@
                     </div>
                     <div v-if="showHelpBlock" class="help-block">
                         <p class="help-text">
-                            {{ $t('PWR_SCHED.TT.HELP_MSG_1') }}<br>
-                            <b class="text-base">{{ $t('PWR_SCHED.TT.HELP_MSG_2') }}</b>
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.TIME_TABLE_HINT_TEXT_1') }}<br>
+                            <b class="text-base">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.TIME_TABLE_HINT_TEXT_2') }}</b>
                         </p>
                         <p-i name="cursor_pointer--blue" class="cursor-icon"
                              width="2rem" height="2rem"
@@ -99,7 +99,7 @@
                 <!--timezone-->
                 <div class="pb-8" :class="isEditMode ? 'opacity-25' : ''">
                     <div class="title pt-0">
-                        {{ $t('PWR_SCHED.TT.TIMEZONE') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.TIMEZONE') }}
                     </div>
                     <div class="text-gray-400">
                         {{ timezone }}
@@ -108,52 +108,52 @@
                 <!--routine-->
                 <div class="pb-8" :class="{'opacity-25': isEditMode && editMode !== 'routine'}">
                     <div class="title">
-                        {{ $t('PWR_SCHED.TT.SCHED_ROUTINE') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ROUTINE_SCHEDULE') }}
                     </div>
                     <div class="legend-wrapper routine">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.TT.ROUTINE_ON') }}</span>
+                        <span>{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ROUTINE_ON') }}</span>
                         <p-button v-if="!isCreateMode && !isEditMode"
                                   class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('routine')"
                         >
-                            {{ $t('PWR_SCHED.TT.EDIT') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.EDIT') }}
                         </p-button>
                     </div>
                     <div class="legend-wrapper routine-off">
                         <span class="legend-icon" />
-                        <span v-if="!(isCreateMode || (isEditMode && editMode === 'routine'))">{{ $t('PWR_SCHED.TT.ROUTINE_OFF') }}</span>
+                        <span v-if="!(isCreateMode || (isEditMode && editMode === 'routine'))">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.OFF') }}</span>
                         <p-button v-if="isCreateMode || (isEditMode && editMode === 'routine')"
                                   class="edit-button gray900 sm" :outline="true"
                                   @click="onDeleteAllRoutine"
                         >
-                            {{ $t('PWR_SCHED.TT.DELETE_ALL') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.DELETE_ALL') }}
                         </p-button>
                     </div>
                 </div>
                 <!--one time ticket-->
                 <div v-if="!isCreateMode" :class="{'opacity-25': isEditMode && editMode === 'routine'}">
                     <div class="title">
-                        {{ $t('PWR_SCHED.TT.SCHED_ONE_TIME') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ONE_TIME_SCHEDULE') }}
                     </div>
                     <div class="legend-wrapper one-time-run" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeRun'}">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.TT.RUN') }}</span>
+                        <span>{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.ON') }}</span>
                         <p-button v-if="!isEditMode"
                                   class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('oneTimeRun')"
                         >
-                            {{ $t('PWR_SCHED.TT.EDIT') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.EDIT') }}
                         </p-button>
                     </div>
                     <div class="legend-wrapper one-time-stop" :class="{'opacity-25': isEditMode && editMode !== 'oneTimeStop'}">
                         <span class="legend-icon" />
-                        <span>{{ $t('PWR_SCHED.TT.STOP') }}</span>
+                        <span>{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.OFF') }}</span>
                         <p-button v-if="!isEditMode"
                                   class="edit-button gray900 sm ml-2" :outline="true"
                                   @click="onClickStartEditMode('oneTimeStop')"
                         >
-                            {{ $t('PWR_SCHED.TT.EDIT') }}
+                            {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.EDIT') }}
                         </p-button>
                     </div>
                 </div>
@@ -163,13 +163,13 @@
                               class="gray900 mr-4" :outline="true"
                               @click="onClickCancel"
                     >
-                        {{ $t('PWR_SCHED.CANCEL') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CANCEL') }}
                     </p-button>
                     <p-button v-if="isEditMode"
                               class="secondary"
                               @click="onClickSave"
                     >
-                        {{ $t('PWR_SCHED.SAVE') }}
+                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SAVE') }}
                     </p-button>
                 </div>
             </div>
@@ -257,13 +257,13 @@ export default {
             loading: false,
             // date
             weekdayTexts: [
-                vm.$t('PWR_SCHED.TT.DAY_SUN'),
-                vm.$t('PWR_SCHED.TT.DAY_MON'),
-                vm.$t('PWR_SCHED.TT.DAY_TUE'),
-                vm.$t('PWR_SCHED.TT.DAY_WED'),
-                vm.$t('PWR_SCHED.TT.DAY_THU'),
-                vm.$t('PWR_SCHED.TT.DAY_FRI'),
-                vm.$t('PWR_SCHED.TT.DAY_SAT'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_SUN'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_MON'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_TUE'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_WED'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_THU'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_FRI'),
+                vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_SAT'),
             ],
             timezones: [
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
@@ -461,10 +461,14 @@ export default {
                         rule: settings.ruleWithUTC,
                     });
                 }
-                if (props.mode !== 'CREATE') showSuccessMessage(vm.$t('PWR_SCHED.SUCCESS'), vm.$t('PWR_SCHED.TT.EDIT_SUCCESS'), root);
+                if (props.mode !== 'CREATE') {
+                    showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_SCHEDULER'), '', root);
+                }
             } catch (e) {
                 console.error(e);
-                if (props.mode !== 'CREATE') showErrorMessage(vm.$t('PWR_SCHED.TT.EDIT_FAIL'), e, root);
+                if (props.mode !== 'CREATE') {
+                    showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_SCHEDULER'), e, root);
+                }
             }
         };
         const create = async (settings: RuleSettings, scheduleId: string) => {
