@@ -4,11 +4,11 @@
             <template #content>
                 <div class="more-information-wrapper">
                     <div>
-                        <span class="info-title">Collector Name: </span>
+                        <span class="info-title">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR_NAME') }}: </span>
                         <span class="info-text">{{ collectorName }}</span>
                     </div>
                     <div>
-                        <span class="info-title">Provider: </span>
+                        <span class="info-title">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}: </span>
                         <span class="info-text">{{ provider }}</span>
                     </div>
                 </div>
@@ -59,11 +59,11 @@
         </p-horizontal-layout>
         <div v-if="selectedItem" class="error-list-wrapper">
             <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
-                Error List
+                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST') }}
             </p-panel-top>
             <div v-if="selectedItem.errors.length === 0">
                 <p-empty class="w-full h-full">
-                    No Data
+                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_DATA') }}
                 </p-empty>
             </div>
             <p-data-table v-else
@@ -88,9 +88,11 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { capitalize, find } from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
 
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
@@ -98,15 +100,15 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { timestampFormatter } from '@/lib/util';
 import {
     makeReferenceValueHandler, makeEnumValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { timestampFormatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
 
 enum JOB_TASK_STATUS {
@@ -158,6 +160,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             job: {} as JobModel,
@@ -190,13 +193,17 @@ export default {
                 { label: 'Resource ID', name: 'additional.resource_id' },
             ],
             statusList: [
-                { key: 'all', label: 'All', class: 'all' },
-                { key: 'inProgress', label: 'In-Progress', class: 'in-progress' },
                 {
-                    key: 'success', label: 'Success', class: 'success', icon: true,
+                    key: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'), class: 'all',
                 },
                 {
-                    key: 'failure', label: 'Failure', class: 'failure', icon: true,
+                    key: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'), class: 'in-progress',
+                },
+                {
+                    key: 'success', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.SUCCESS'), class: 'success', icon: true,
+                },
+                {
+                    key: 'failure', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILURE'), class: 'failure', icon: true,
                 },
             ],
             activatedStatus: 'all',
@@ -228,9 +235,7 @@ export default {
                     },
                 ],
                 valueHandlerMap: {
-                    // eslint-disable-next-line camelcase
                     service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
-                    // eslint-disable-next-line camelcase
                     project_id: makeReferenceValueHandler('identity.Project'),
                     status: makeEnumValueHandler(JOB_TASK_STATUS),
                 },
@@ -242,20 +247,18 @@ export default {
             return capitalize(status);
         };
         const convertServiceAccountName = (serviceAccountId) => {
-            // eslint-disable-next-line camelcase
             const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
             return serviceAccount?.name;
         };
         const convertProjectName = (projectId) => {
-            // eslint-disable-next-line camelcase
             const project = find(state.projects, { project_id: projectId });
             return project?.name;
         };
         const convertFinishedAtToDuration = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtMoment = moment(timestampFormatter(createdAt));
-                const finishedAtMoment = moment(timestampFormatter(finishedAt));
-                const duration = finishedAtMoment.diff(createdAtMoment, 'minutes');
+                const createdAtDatetime = dayjs(timestampFormatter(createdAt));
+                const finishedAtDatetime = dayjs(timestampFormatter(finishedAt));
+                const duration = finishedAtDatetime.diff(createdAtDatetime, 'minute');
                 return `${duration.toString()} min`;
             }
             return null;
@@ -265,17 +268,12 @@ export default {
             jobTasks.forEach((task, index) => {
                 const newTask = {
                     sequence: getPageStart(state.thisPage, state.pageSize) + index,
-                    // eslint-disable-next-line camelcase
                     service_account_id: convertServiceAccountName(task.service_account_id),
-                    // eslint-disable-next-line camelcase
                     project_id: convertProjectName(task.project_id),
                     status: convertStatus(task.status),
-                    // eslint-disable-next-line camelcase
                     created_count: task.created_count,
-                    // eslint-disable-next-line camelcase
                     updated_count: task.updated_count,
                     'errors.length': task.errors.length,
-                    // eslint-disable-next-line camelcase
                     created_at: timestampFormatter(task.created_at),
                     duration: convertFinishedAtToDuration(task.created_at, task.finished_at),
                 };
@@ -317,7 +315,6 @@ export default {
                 const query = getQuery();
                 const res = await SpaceConnector.client.inventory.jobTask.list({
                     query: query.data,
-                    // eslint-disable-next-line camelcase
                     job_id: props.jobId,
                 });
                 state.jobTasks = res.results;
@@ -332,7 +329,6 @@ export default {
         const getJob = async () => {
             state.loading = true;
             try {
-                // eslint-disable-next-line camelcase
                 const res = await SpaceConnector.client.inventory.job.list({ job_id: props.jobId });
                 state.job = res.results[0];
             } catch (e) {

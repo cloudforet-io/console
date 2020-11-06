@@ -691,6 +691,32 @@
 		"VERSION": "",
 		"ZONE_NM": ""
 	},
+	"MANAGEMENT": {
+		"COLLECTOR_HISTORY": {
+			"CHART": {
+				"FAILURE": "",
+				"JOB_COUNT": "",
+				"SUCCESS": ""
+			},
+			"JOB": {
+				"COLLECTOR_NAME": "",
+				"ERROR_LIST": "",
+				"NO_DATA": "",
+				"PROVIDER": ""
+			},
+			"MAIN": {
+				"ALL": "",
+				"FAILURE": "",
+				"IN_PROGRESS": "",
+				"MODAL_CREATE_COLLECTOR": "",
+				"MODAL_DESC_1": "",
+				"MODAL_DESC_2": "",
+				"MODAL_TITLE": "",
+				"SUCCESS": "",
+				"TITLE": ""
+			}
+		}
+	},
 	"ORGANISMS": {
 		"CREATE_ARG": "",
 		"DELETE_ARG": "",

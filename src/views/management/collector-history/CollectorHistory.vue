@@ -55,13 +55,13 @@
                         <span class="float-right">{{ value }}</span>
                     </template>
                     <template #col-status-format="{ value }">
-                        <p-lottie v-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
-                                  class="status-icon"
-                                  :size="1" :auto="true" name="lottie_error"
-                        />
-                        <p-lottie v-else-if="['IN_PROGRESS'].includes(value)"
+                        <p-lottie v-if="value === 'IN_PROGRESS'"
                                   class="status-icon"
                                   :size="1" :auto="true" name="lottie_working"
+                        />
+                        <p-lottie v-else-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
+                                  class="status-icon"
+                                  :size="1" :auto="true" name="lottie_error"
                         />
                         <p-i v-else name="ic_done"
                              width="1rem" height="1rem"
@@ -82,7 +82,7 @@
             </p-pane-layout>
             <p-button-modal
                 class="button-modal"
-                :header-title="modalHeaderTitle"
+                :header-title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
                 :centered="true"
                 :scrollable="false"
                 size="md"
@@ -91,7 +91,10 @@
                 :visible.sync="modalVisible"
             >
                 <template #body>
-                    <p class="modal-content" v-html="modalContent" />
+                    <p class="modal-content">
+                        <b>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_1') }}</b><br>
+                        {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_2') }}
+                    </p>
                 </template>
                 <template #confirm-button>
                     <p-icon-text-button
@@ -100,7 +103,7 @@
                         name="ic_plus_bold"
                         @click="$router.push({ name: 'createCollector' })"
                     >
-                        {{ $t('INVENTORY.CRT_COLL') }}
+                        {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
                     </p-icon-text-button>
                 </template>
             </p-button-modal>
@@ -116,6 +119,9 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { capitalize } from 'lodash';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
@@ -134,6 +140,7 @@ import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 
@@ -144,14 +151,9 @@ import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags
 import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 import { makeEnumValueHandler, makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import router from '@/routes';
-
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
-import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
-import { TimeStamp } from '@/models';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -164,7 +166,6 @@ enum JOB_STATUS {
     error = 'ERROR',
     timeout = 'TIMEOUT',
 }
-
 
 interface JobModel {
     job_id: string;
@@ -218,7 +219,6 @@ export default {
                 },
             ],
             valueHandlerMap: {
-                // eslint-disable-next-line camelcase
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
                 status: makeEnumValueHandler(JOB_STATUS),
             },
@@ -227,7 +227,7 @@ export default {
             loading: false,
             providers: [] as ProviderModel[],
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
-            pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : 'Collector History')),
+            pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE'))),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector Name', name: 'collector_info', sortable: false },
@@ -237,13 +237,17 @@ export default {
                 { label: 'Duration', name: 'duration', sortable: false },
             ]),
             statusList: [
-                { key: 'all', label: 'All', class: 'all' },
-                { key: 'inProgress', label: 'In-Progress', class: 'in-progress' },
                 {
-                    key: 'success', label: 'Success', class: 'success', icon: true,
+                    key: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'), class: 'all',
                 },
                 {
-                    key: 'failure', label: 'Failure', class: 'failure', icon: true,
+                    key: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'), class: 'in-progress',
+                },
+                {
+                    key: 'success', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.SUCCESS'), class: 'success', icon: true,
+                },
+                {
+                    key: 'failure', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILURE'), class: 'failure', icon: true,
                 },
             ],
             activatedStatus: 'all',
@@ -260,9 +264,7 @@ export default {
             selectedJobId: '',
             tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems as KeyItem[]),
             querySearchRef: null as null|QuerySearchTableFunctions,
-            modalHeaderTitle: 'Need to Set a Collector',
             modalVisible: false,
-            modalContent: '<b>Looks like you don\'t have any collector.</b><br/>Set a collector first and then use Collector History.',
         });
         const routeState = reactive({
             route: [
@@ -387,6 +389,16 @@ export default {
             state.thisPage = 1;
             getJobs();
         };
+        const onClickDate = (date) => {
+            const selectedDate = dayjs(date).format('YYYY-MM-DD');
+            state.querySearchRef.addTag(
+                {
+                    key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
+                    value: { label: selectedDate, name: selectedDate },
+                    operator: '=',
+                },
+            );
+        };
 
         const init = async () => {
             await getProviders();
@@ -404,17 +416,6 @@ export default {
         watch(() => vm.$route.hash, (after) => {
             if (after === '') onClickGoBack();
         });
-
-        const onClickDate = (date) => {
-            const selectedDate = dayjs(date).format('YYYY-MM-DD');
-            state.querySearchRef.addTag(
-                {
-                    key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
-                    value: { label: selectedDate, name: selectedDate },
-                    operator: '=',
-                },
-            );
-        };
 
         return {
             ...toRefs(state),

@@ -691,6 +691,32 @@
 		"VERSION": "Version",
 		"ZONE_NM": "Zone Name"
 	},
+	"MANAGEMENT": {
+		"COLLECTOR_HISTORY": {
+			"CHART": {
+				"FAILURE": "Failure",
+				"JOB_COUNT": "Job Count",
+				"SUCCESS": "Success"
+			},
+			"JOB": {
+				"COLLECTOR_NAME": "Collector Name",
+				"ERROR_LIST": "Error List",
+				"NO_DATA": "No Data",
+				"PROVIDER": "Provider"
+			},
+			"MAIN": {
+				"ALL": "All",
+				"FAILURE": "Failure",
+				"IN_PROGRESS": "In-Progress",
+				"MODAL_CREATE_COLLECTOR": "Create Collector",
+				"MODAL_DESC_1": "Looks like you don't have any collector.",
+				"MODAL_DESC_2": "Set a collector first and then use Collector History.",
+				"MODAL_TITLE": "Need to Set a Collector",
+				"SUCCESS": "Success",
+				"TITLE": "Collector History"
+			}
+		}
+	},
 	"ORGANISMS": {
 		"CREATE_ARG": "Create {0}",
 		"DELETE_ARG": "Delete {0}",

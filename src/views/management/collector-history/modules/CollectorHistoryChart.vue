@@ -6,7 +6,9 @@
         <div class="top-part">
             <p-date-pagination :date.sync="currentDate" :timezone="timezone" />
         </div>
-        <span class="y-label-text">Job Count</span>
+        <span class="y-label-text">
+            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.CHART.JOB_COUNT') }}
+        </span>
         <canvas ref="chartRef" />
     </p-chart-loader>
 </template>
@@ -16,9 +18,14 @@ import {
     orderBy, max, find,
 } from 'lodash';
 import numeral from 'numeral';
+import dayjs, { Dayjs } from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { ChartOptions } from 'chart.js';
 
 import {
-    reactive, watch, toRefs, computed,
+    reactive, watch, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
@@ -32,15 +39,10 @@ import {
     black, red, gray, primary,
 } from '@/styles/colors';
 
-import dayjs, { Dayjs } from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import { ChartOptions } from 'chart.js';
-
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 
 const TICKS_COUNT = 5;
 const DEFAULT_MAX = 600;
@@ -70,6 +72,7 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             chartRef: null as HTMLCanvasElement|null,
@@ -140,7 +143,7 @@ export default {
         const drawChart = (canvas) => {
             const datasets = [
                 {
-                    label: 'Success',
+                    label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.CHART.SUCCESS'),
                     data: state.chartData.map(d => d.success),
                     backgroundColor: 'transparent',
                     borderColor: LEGEND_COLORS.success,
@@ -148,7 +151,7 @@ export default {
                     pointBackgroundColor: LEGEND_COLORS.success,
                     pointRadius: 2,
                 }, {
-                    label: 'Failure',
+                    label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.CHART.FAILURE'),
                     data: state.chartData.map(d => d.failure),
                     backgroundColor: 'transparent',
                     borderColor: LEGEND_COLORS.failure,
@@ -156,7 +159,7 @@ export default {
                     pointBackgroundColor: LEGEND_COLORS.failure,
                     pointRadius: 2,
                 },
-            ];
+            ] as any;
             const maxNumber = state.noData ? DEFAULT_MAX : max(datasets.map(ds => max(ds.data as number[]))) as number;
             const stepSize = state.noData ? DEFAULT_STEP_SIZE : maxNumber / (TICKS_COUNT || 1);
             const tooltips = {
