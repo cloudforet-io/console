@@ -1,16 +1,16 @@
 <template>
     <div class="user-info">
         <p v-if="!loginFail" class="subtitle">
-            Multicloud Managed Service
+            {{ $t('COMMON.SIGN_IN.TITLE') }}
         </p>
         <p v-else-if="loginFail" id="errorMsg" class="subtitle">
-            Please Confirm your ID or Password.
+            {{ $t('COMMON.SIGN_IN.VALIDATION') }}
         </p>
         <div id="login-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
             <form class="form w-full">
                 <div class="flex flex-col form">
                     <p class="input-title">
-                        Admin ID
+                        {{ $t('COMMON.SIGN_IN.ADMIN_ID') }}
                     </p>
                     <PFieldGroup :invalid-text="invalidMsg.userId" :invalid="invalidState.userId">
                         <template #default="{invalid}">
@@ -29,7 +29,7 @@
                 </div>
                 <div class="flex flex-col mb-4 md:w-full">
                     <p class="input-title">
-                        Password
+                        {{ $t('COMMON.SIGN_IN.PASSWORD') }}
                     </p>
                     <PFieldGroup :invalid-text="invalidMsg.password" :invalid="invalidState.password">
                         <template v-slot:default="{invalid}">
@@ -52,10 +52,13 @@
         </div>
         <div class="flex flex-col mb-4 md:w-full">
             <p-button style-type="primary" type="submit" size="lg"
-                      @click="login"
+                      class="mb-8" @click="login"
             >
-                <span id="button-msg">Admin Sign in</span>
+                <span id="button-msg">{{ $t('COMMON.SIGN_IN.ADMIN_SIGN_IN') }}</span>
             </p-button>
+            <router-link to="/dashboard">
+                <span class="user-signin">{{ $t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}</span>
+            </router-link>
         </div>
     </div>
 </template>
@@ -72,7 +75,7 @@ import {
     requiredValidation,
 } from '@/lib/compostion-util';
 import { useStore } from '@/store/toolset';
-import {showErrorMessage} from "@/lib/util";
+import { showErrorMessage } from '@/lib/util';
 
 export default defineComponent({
     name: 'Admin',
@@ -159,30 +162,40 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .input-title {
-        font-size: 0.875rem;
-        font-weight: bold;
-        padding-bottom: 0.25rem;
-    }
-    .subtitle {
-        padding-top: 0.5rem;
-        font-weight: normal;
-        font-size: 0.875rem;
-        padding-bottom: 1.5rem;
-    }
+.input-title {
+    font-size: 0.875rem;
+    font-weight: bold;
+    padding-bottom: 0.25rem;
+}
+.subtitle {
+    padding-top: 0.5rem;
+    font-weight: normal;
+    font-size: 0.875rem;
+    padding-bottom: 1.5rem;
+}
 
-    #errorMsg {
-        color: red;
-    }
+#errorMsg {
+    color: red;
+}
 
-    .user-info {
-        @screen md {
-            min-width: 18rem;
-        }
+.user-info {
+    @screen md {
+        min-width: 18rem;
     }
+}
 
-    #button-msg {
-        font-size: 0.875rem;
+.user-signin {
+    @apply text-gray-400 text-sm;
+    &:hover {
+        @apply text-blue-500;
     }
+    &:active {
+        @apply text-blue-600;
+    }
+}
+
+#button-msg {
+    font-size: 0.875rem;
+}
 
 </style>

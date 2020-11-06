@@ -216,9 +216,12 @@
 		"DR_SERV": "",
 		"EMAIL": "",
 		"ERROR": {
-			"GO_BACK_1": "",
-			"GO_BACK_2": "",
-			"MSG": ""
+			"404_GO_BACK_1": "",
+			"404_GO_BACK_2": "",
+			"404_MSG": "",
+			"NO_RESOURCE_GO_BACK_1": "",
+			"NO_RESOURCE_GO_BACK_2": "",
+			"NO_RESOURCE_MSG": ""
 		},
 		"EVENT": "",
 		"EXECR": "",
@@ -329,6 +332,18 @@
 		"SE_TYPE": "",
 		"SG_ID": "",
 		"SG_NAME": "",
+		"SIGN_IN": {
+			"ADMIN_ID": "",
+			"ADMIN_SIGN_IN": "",
+			"MEMBER_SIGN_IN": "",
+			"OR": "",
+			"PASSWORD": "",
+			"ROOT_ACCOUNT": "",
+			"SIGN_IN": "",
+			"TITLE": "",
+			"USER_ID": "",
+			"VALIDATION": ""
+		},
 		"SIZE": "",
 		"SRC_DEST": "",
 		"STATE": "",

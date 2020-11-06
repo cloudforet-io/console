@@ -1,26 +1,26 @@
 <template>
     <div>
         <p v-if="!loginFail" class="subtitle">
-            Multicloud Managed Service
+            {{ $t('COMMON.SIGN_IN.TITLE') }}
         </p>
         <p v-else-if="loginFail" id="errorMsg" class="subtitle">
-            Please Confirm your ID or Password.
+            {{ $t('COMMON.SIGN_IN.VALIDATION') }}
         </p>
         <div class="user-info">
             <div class="g-signin2">
                 <div id="g-signin-btn" class="w-full" />
             </div>
             <div class="btn-divider">
-                <span>OR</span>
+                <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
             </div>
             <div class="flex flex-col mb-4 md:w-full">
                 <p-button :outline="true"
                           type="submit"
                           size="lg"
-                          @click="goToAdmin"
                           class="admin-btn"
+                          @click="goToAdmin"
                 >
-                    <span id="button-msg">Sign in using root account credentials</span>
+                    <span id="button-msg">{{ $t('COMMON.SIGN_IN.ROOT_ACCOUNT') }}</span>
                 </p-button>
             </div>
         </div>
@@ -28,9 +28,9 @@
 </template>
 
 <script lang="ts">
-    import {
-        defineComponent, getCurrentInstance, onMounted, reactive, toRefs,
-    } from '@vue/composition-api';
+import {
+    defineComponent, getCurrentInstance, onMounted, reactive, toRefs,
+} from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { useStore } from '@/store/toolset';
 
@@ -112,60 +112,60 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .subtitle {
-        padding-top: 0.5rem;
-        font-size: 0.875rem;
-    }
+.subtitle {
+    padding-top: 0.5rem;
+    font-size: 0.875rem;
+}
 
-    #errorMsg {
-        color: red;
-    }
+#errorMsg {
+    color: red;
+}
 
-    #g-signin-btn {
-        padding-top: 1.5rem;
-        padding-bottom: 3.5rem;
-    }
+#g-signin-btn {
+    padding-top: 1.5rem;
+    padding-bottom: 3.5rem;
+}
 
-    .btn-divider {
-        @apply text-gray-200;
-      display: flex;
-      flex-basis: 100%;
-      align-items: center;
-      font-style: normal;
-      font-weight: bold;
-      font-size: 0.875rem;
-      margin-bottom: 1em;
+.btn-divider {
+    @apply text-gray-200;
+    display: flex;
+    flex-basis: 100%;
+    align-items: center;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 0.875rem;
+    margin-bottom: 1em;
+}
+.btn-divider > span {
+    @apply text-gray-300;
+    margin: 0.5rem;
+}
+.btn-divider::before,
+.btn-divider::after {
+    @apply bg-gray-200;
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    font-size: 0;
+    line-height: 0px;
+    margin: 0 8px;
+}
+.admin-btn {
+    @apply border border-gray-300;
+    &:hover {
+        @apply bg-blue-100 text-blue-500 border-blue-500;
     }
-    .btn-divider > span {
-        @apply text-gray-300;
-        margin: 0.5rem;
+    &:active {
+        @apply bg-blue-200 text-blue-500 border-blue-500;
     }
-    .btn-divider::before,
-    .btn-divider::after {
-        @apply bg-gray-200;
-        content: "";
-        flex-grow: 1;
-        height: 1px;
-        font-size: 0;
-        line-height: 0px;
-        margin: 0 8px;
+}
+.user-info {
+    @screen md {
+        min-width: 18rem;
     }
-    .admin-btn {
-        @apply border border-gray-300;
-        &:hover {
-            @apply bg-blue-100 text-blue-500 border-blue-500;
-        }
-        &:active {
-            @apply bg-blue-200 text-blue-500 border-blue-500;
-        }
-    }
-    .user-info {
-        @screen md {
-            min-width: 18rem;
-        }
-    }
-    #button-msg {
-        @apply font-normal;
-        font-size: 0.875rem;
-    }
+}
+#button-msg {
+    @apply font-normal;
+    font-size: 0.875rem;
+}
 </style>

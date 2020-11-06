@@ -11,7 +11,7 @@
                           :size="20"
                 />
                 <p class="error-message">
-                    There are no matching resources. <br> <a href="/dashboard">Click here</a> to go back home.
+                    {{ $t('COMMON.ERROR.NO_RESOURCE_MSG') }}<br> <a href="/dashboard">{{ $t('COMMON.ERROR.NO_RESOURCE_GO_BACK_1') }}</a> {{ $t('COMMON.ERROR.NO_RESOURCE_GO_BACK_2') }}
                 </p>
                 <router-link :to="serviceRoute.path">
                     <p-button style-type="primary" class="redirect-button">
@@ -69,34 +69,34 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .wrap {
-        @apply flex flex-col;
-        height: 100%;
-    }
-    .page-navigation {
-        margin-top: 2rem;
-        margin-left: 1.5rem;
-    }
-    .page-title {
-        margin-left: 1.5rem;
-    }
-    .error {
-        @apply m-auto flex-1 text-center;
-        .error-contents {
-            padding-top: calc(50% - 2.5rem);
-            .error-message {
-                @apply text-lg;
-                line-height: 150%;
-                a {
-                    @apply text-blue-700;
-                }
-            }
-            .redirect-button {
-                margin-top: 2rem;
+.wrap {
+    @apply flex flex-col;
+    height: 100%;
+}
+.page-navigation {
+    margin-top: 2rem;
+    margin-left: 1.5rem;
+}
+.page-title {
+    margin-left: 1.5rem;
+}
+.error {
+    @apply m-auto flex-1 text-center;
+    .error-contents {
+        padding-top: calc(50% - 2.5rem);
+        .error-message {
+            @apply text-lg;
+            line-height: 150%;
+            a {
+                @apply text-blue-700;
             }
         }
+        .redirect-button {
+            margin-top: 2rem;
+        }
     }
-    .fnb {
-        width: 100%;
-    }
+}
+.fnb {
+    width: 100%;
+}
 </style>

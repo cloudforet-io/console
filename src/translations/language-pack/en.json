@@ -216,9 +216,12 @@
 		"DR_SERV": "Service",
 		"EMAIL": "E-mail",
 		"ERROR": {
-			"GO_BACK_1": "Try going",
-			"GO_BACK_2": "back.",
-			"MSG": "Whoops! Nothing here."
+			"404_GO_BACK_1": "Try going",
+			"404_GO_BACK_2": "back.",
+			"404_MSG": "Whoops! Nothing here.",
+			"NO_RESOURCE_GO_BACK_1": "Click here",
+			"NO_RESOURCE_GO_BACK_2": "메인 페이지로 이동하세요.",
+			"NO_RESOURCE_MSG": "There are no matching resources. "
 		},
 		"EVENT": "Event",
 		"EXECR": "Executor",
@@ -329,6 +332,18 @@
 		"SE_TYPE": "Server Type",
 		"SG_ID": "SG ID",
 		"SG_NAME": "SG Name",
+		"SIGN_IN": {
+			"ADMIN_ID": "Admin ID",
+			"ADMIN_SIGN_IN": "Admin Sign in",
+			"MEMBER_SIGN_IN": "Sign in using member account credentials",
+			"OR": "OR",
+			"PASSWORD": "Password",
+			"ROOT_ACCOUNT": "Sign in using root account credentials",
+			"SIGN_IN": "Sign in ",
+			"TITLE": "Multicloud Management Platform",
+			"USER_ID": "User ID",
+			"VALIDATION": "Please Confirm your ID or Password."
+		},
 		"SIZE": "Size",
 		"SRC_DEST": "Source / Destination",
 		"STATE": "State",

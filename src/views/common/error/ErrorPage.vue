@@ -7,7 +7,7 @@
                     404
                 </p>
                 <p class="error-message">
-                    {{ $t('COMMON.ERROR.MSG') }}<br> {{ $t('COMMON.ERROR.GO_BACK_1') }} <a href="javascript:history.go(-1)">{{ $t('COMMON.ERROR.GO_BACK_2') }}</a>
+                    {{ $t('COMMON.ERROR.404_MSG') }}<br> {{ $t('COMMON.ERROR.404_GO_BACK_1') }} <a href="javascript:history.go(-1)">{{ $t('COMMON.ERROR.404_GO_BACK_2') }}</a>
                 </p>
             </div>
         </div>

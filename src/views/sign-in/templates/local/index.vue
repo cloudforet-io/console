@@ -1,16 +1,16 @@
 <template>
     <div class="user-info">
         <p v-if="!loginFail" class="subtitle">
-            Multicloud Managed Service
+            {{ $t('COMMON.SIGN_IN.TITLE') }}
         </p>
         <p v-else-if="loginFail" id="errorMsg" class="subtitle">
-            Please Confirm your ID or Password.
+            {{ $t('COMMON.SIGN_IN.VALIDATION') }}
         </p>
         <div id="login-info" class="field-group text-left ">
             <form class="form">
                 <div class="flex flex-col w-full">
                     <p class="input-title">
-                        User ID
+                        {{ $t('COMMON.SIGN_IN.USER_ID') }}
                     </p>
                     <PFieldGroup :invalid-text="invalidMsg.userId" :invalid="invalidState.userId">
                         <template #default="{invalid}">
@@ -29,7 +29,7 @@
                 </div>
                 <div class="flex flex-col mb-4 w-full">
                     <p class="input-title">
-                        Password
+                        {{ $t('COMMON.SIGN_IN.PASSWORD') }}
                     </p>
                     <PFieldGroup :invalid-text="invalidMsg.password" :invalid="invalidState.password">
                         <template v-slot:default="{invalid}">
@@ -54,11 +54,11 @@
             <p-button style-type="primary" type="submit" size="lg"
                       @click="login"
             >
-                Sign in
+                {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
             </p-button>
         </div>
         <div class="btn-divider">
-            <span>OR</span>
+            <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
         </div>
         <div class="flex flex-col mb-4 w-full">
             <p-button
@@ -68,7 +68,7 @@
                 size="lg"
                 @click="goToAdmin"
             >
-                Sign in using root account credentials
+                {{ $t('COMMON.SIGN_IN.ROOT_ACCOUNT') }}
             </p-button>
         </div>
     </div>

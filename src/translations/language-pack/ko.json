@@ -216,9 +216,12 @@
 		"DR_SERV": "서비스",
 		"EMAIL": "이메일",
 		"ERROR": {
-			"GO_BACK_1": "뒤로 ",
-			"GO_BACK_2": "가기.",
-			"MSG": "정상적인 경로에서 벗어난 것 같습니다."
+			"404_GO_BACK_1": "뒤로 ",
+			"404_GO_BACK_2": "가기.",
+			"404_MSG": "정상적인 경로에서 벗어난 것 같습니다.",
+			"NO_RESOURCE_GO_BACK_1": "여기를 눌러서 ",
+			"NO_RESOURCE_GO_BACK_2": "to go back home.",
+			"NO_RESOURCE_MSG": "해당하는 자원이 없습니다. "
 		},
 		"EVENT": "이벤트",
 		"EXECR": "실행자",
@@ -329,6 +332,18 @@
 		"SE_TYPE": "서버 타입",
 		"SG_ID": "보안 그룹 아이디",
 		"SG_NAME": "보안 그룹 이름",
+		"SIGN_IN": {
+			"ADMIN_ID": "관리자 아이",
+			"ADMIN_SIGN_IN": "관리자 로그인 ",
+			"MEMBER_SIGN_IN": "사용자 계정으로 로그인",
+			"OR": "또는 ",
+			"PASSWORD": "암호 ",
+			"ROOT_ACCOUNT": "루트 계정으로 로그인 ",
+			"SIGN_IN": "로그인 ",
+			"TITLE": "멀티클라우드 관리 플랫폼 ",
+			"USER_ID": "사용자 아이디 ",
+			"VALIDATION": "ID나 Password를 확인하세요. "
+		},
 		"SIZE": "크기",
 		"SRC_DEST": "Source / Destination",
 		"STATE": "상태",
