@@ -113,11 +113,10 @@ export default {
         const projectFilter = `&filters=project_id%3A%3D${projectId.value}`;
 
         const tabData = reactive({
-            tabs: makeTrItems([
-                ['server', 'COMMON.SERVER', { keepAlive: true }],
-                ['cloud_service', 'FIELD.CLOUD_SERVICE'],
-            ],
-            context.parent),
+            tabs: computed(() => [
+                { name: 'server', label: vm.$t('COMMON.WIDGETS.RESOURCE_BY_REGION_SERVER') },
+                { name: 'cloud_service', label: vm.$t('COMMON.WIDGETS.RESOURCE_BY_REGION_CLOUD_SERVICE') },
+            ]),
             activeTab: 'server',
         });
 

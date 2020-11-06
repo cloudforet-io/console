@@ -44,21 +44,21 @@
                                 </div>
                                 <p v-if="item.created_count && item.deleted_count" class="state">
                                     <router-link :to="item.createdHref">
-                                        Created <span class="created-count">{{ item.created_count || 0 }}</span>
+                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }} <span class="created-count">{{ item.created_count || 0 }}</span>
                                     </router-link>
                                     <span class="divider">|</span>
                                     <router-link :to="item.deletedHref">
-                                        Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
+                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
                                     </router-link>
                                 </p>
                                 <p v-else-if="item.created_count && !item.deleted_count" class="state">
                                     <router-link :to="item.createdHref">
-                                        Created <span class="created-count">{{ item.created_count || 0 }}</span>
+                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }} <span class="created-count">{{ item.created_count || 0 }}</span>
                                     </router-link>
                                 </p>
                                 <p v-else class="state">
                                     <router-link :to="item.deletedHref">
-                                        Deleted <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
+                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
                                     </router-link>
                                 </p>
                             </div>

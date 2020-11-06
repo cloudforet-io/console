@@ -197,12 +197,12 @@ export default {
         const singleItemTabState = reactive({
             tabs: computed(() => {
                 const items: any[] = [
-                    ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
-                    ['member', 'COMMON.MEMBER'],
-                    ['tag', 'TAB.TAG'],
+                    ['summary', vm.$t('PROJECT.DETAIL.TAB_SUMMARY'), { keepAlive: true }],
+                    ['member', vm.$t('PROJECT.DETAIL.TAB_MEMBER')],
+                    ['tag', vm.$t('PROJECT.DETAIL.TAB_TAG')],
                 ];
                 if (state.reportState) {
-                    items.push(['report', 'TAB.REPORT', { beta: true }]);
+                    items.push(['report', vm.$t('PROJECT.DETAIL.TAB_REPORT'), { beta: true }]);
                 }
                 return makeTrItems(items, parent);
             }),
@@ -435,56 +435,56 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .p-page-title {
-        &::v-deep .title {
-             @apply text-2xl;
-         }
-        &::v-deep .extra {
-             @apply text-base text-gray-400 mt-1;
-         }
+.p-page-title {
+    &::v-deep .title {
+        @apply text-2xl;
     }
-    .p-tab {
-        &::v-deep {
-                .p-tab-bar {
-                    border-color: #f8f8fc;
-                }
-                .tab-pane {
-                    @apply pb-0;
-                }
-            }
+    &::v-deep .extra {
+        @apply text-base text-gray-400 mt-1;
+    }
+}
+.p-tab {
+    &::v-deep {
+        .p-tab-bar {
+            border-color: #f8f8fc;
         }
-
-    .tab-content {
-        border: none;
-    }
-
-    .copy-project-id {
-        @apply float-right text-gray-500 -my-6;
-        font-size: 0.875rem;
-    }
-
-    .delete-btn {
-        @apply ml-3 cursor-pointer;
-    }
-
-    .tab-bg {
-        @apply bg-white border border-gray-200 rounded-sm pb-8;
-    }
-
-    .member-tab {
-        @apply border border-gray-200;
-        >>> &.p-toolbox-table .toolbox {
-            @apply pt-0;
-        }
-        .p-panel-top {
-            @apply ml-0;
+        .tab-pane {
+            @apply pb-0;
         }
     }
+}
 
-    .toolbox-left {
-        @apply w-full flex pr-4 ;
-        .p-search {
-            @apply w-full;
-        }
+.tab-content {
+    border: none;
+}
+
+.copy-project-id {
+    @apply float-right text-gray-500 -my-6;
+    font-size: 0.875rem;
+}
+
+.delete-btn {
+    @apply ml-3 cursor-pointer;
+}
+
+.tab-bg {
+    @apply bg-white border border-gray-200 rounded-sm pb-8;
+}
+
+.member-tab {
+    @apply border border-gray-200;
+    >>> &.p-toolbox-table .toolbox {
+        @apply pt-0;
     }
+    .p-panel-top {
+        @apply ml-0;
+    }
+}
+
+.toolbox-left {
+    @apply w-full flex pr-4 ;
+    .p-search {
+        @apply w-full;
+    }
+}
 </style>

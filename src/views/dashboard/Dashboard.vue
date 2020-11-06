@@ -35,7 +35,9 @@
 <script lang="ts">
 import { Location } from 'vue-router';
 
-import { reactive } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive,
+} from '@vue/composition-api';
 
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
@@ -46,11 +48,12 @@ import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue'
 import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
 
 import { blue, secondary, secondary1 } from '@/styles/colors';
+import { TranslateResult } from 'vue-i18n';
 
 
 interface SummaryState {
     type: string;
-    title: string;
+    title: string | TranslateResult;
     to: Location | string;
     color: string;
 }
@@ -68,23 +71,25 @@ export default {
         Collectors,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const projectSummaryState: SummaryState = reactive({
             type: 'project',
-            title: 'projects',
+            title: computed(() => vm.$t('COMMON.WIDGETS.SERVICE_SUMMARY_PROJECT')),
             to: '/project',
             color: blue[600],
         });
 
         const serverSummaryState: SummaryState = reactive({
             type: 'server',
-            title: 'servers',
+            title: computed(() => vm.$t('COMMON.WIDGETS.SERVICE_SUMMARY_SERVER')),
             to: '/inventory/server',
             color: secondary,
         });
 
         const cloudServiceSummaryState: SummaryState = reactive({
             type: 'cloudService',
-            title: 'cloud services',
+            title: computed(() => vm.$t('COMMON.WIDGETS.SERVICE_SUMMARY_CLOUD_SERVICE')),
             to: '/inventory/cloud-service',
             color: secondary1,
         });
@@ -105,31 +110,31 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .dashboard::v-deep {
-        @apply bg-primary-dark;
+.dashboard::v-deep {
+    @apply bg-primary-dark;
+    .page-contents {
+        @apply grid gap-4 grid-flow-row grid-cols-12 p-4;
+    }
+
+    @screen md {
         .page-contents {
-            @apply grid gap-4 grid-flow-row grid-cols-12 p-4;
-        }
-
-        @screen md {
-            .page-contents {
-                @apply p-8;
-            }
-        }
-
-        @screen xl {
-            .page-contents {
-                @apply p-12;
-            }
+            @apply p-8;
         }
     }
+
+    @screen xl {
+        .page-contents {
+            @apply p-12;
+        }
+    }
+}
+.daily-updates {
+    height: 33.75rem;
+}
+
+@screen lg {
     .daily-updates {
-        height: 33.75rem;
+        height: 48rem;
     }
-
-    @screen lg {
-        .daily-updates {
-            height: 48rem;
-        }
-    }
+}
 </style>

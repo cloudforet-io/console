@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Top 5 Resource Managing Projects" :help="$t('DASHBOARD.ACTION.TOP_PROJECTS')"
+    <p-widget-layout :title="$t('COMMON.WIDGETS.TOP_PROJECT_TITLE')" :help="$t('COMMON.WIDGETS.TOP_PROJECT_HELP')"
                      class="top-projects"
     >
         <div class="flex flex-col h-full">
@@ -13,10 +13,10 @@
                  class="flex flex-col h-full justify-center items-center pt-16 pb-10"
             >
                 <p class="text-2xl font-bold capitalize mb-4 text-primary text-center leading-tight">
-                    {{ $t('DASHBOARD.ACTION.CRT_DBD') }}
+                    {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_DASHBOARD') }}
                 </p>
                 <p class="text-primary1 text-sm capitalize mb-4 text-center leading-normal">
-                    {{ $t('DASHBOARD.ACTION.CRT_GUIDE') }}
+                    {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_GUIDE') }}
                 </p>
                 <router-link to="/project" tag="div" class="">
                     <p-icon-text-button name="ic_back" icon-direction="right"
@@ -25,7 +25,7 @@
                                         width="1.5rem" height="1.5rem"
                                         class="getstarted"
                     >
-                        {{ $t('DASHBOARD.BTN.GET_START') }}
+                        {{ $t('COMMON.WIDGETS.TOP_PROJECT_GET_START') }}
                     </p-icon-text-button>
                 </router-link>
             </div>
@@ -157,6 +157,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import Chart, { ChartDataSets } from 'chart.js';
 import { SpaceConnector } from '@/lib/space-connector';
+import {TranslateResult} from "vue-i18n";
 
 const DATA_COUNT = 5;
 const DEFAULT_MAX = 1000;
@@ -193,7 +194,7 @@ export default {
                 servers: string;
                 cloud_services: string;
             };
-            fields: Ref<Readonly<string[]>>;
+            fields: Ref<Readonly<TranslateResult[]|unknown>>;
         }
 
         const state: UnwrapRef<InitDataType> = reactive({
@@ -205,12 +206,13 @@ export default {
                 servers: secondary,
                 cloud_services: secondary1,
             },
-            fields: computed(() => makeTrItems([['rank', 'FIELD.RANK'],
-                ['project_group', 'FIELD.PROJECT_GRP'],
-                ['project', 'FIELD.PROJECT'],
-                ['servers', 'FIELD.SERVER'],
-                ['cloud_services', 'FIELD.CLOUD_SERVICE'],
-            ])),
+            fields: computed(() => [
+                { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK') },
+                { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
+                { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
+                { name: 'servers', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
+                { name: 'cloud_services', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_CLOUD_SERVICE') },
+            ]),
         });
 
         const drawChart = (canvas) => {

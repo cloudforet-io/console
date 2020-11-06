@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Run Collectors">
+    <p-widget-layout :title="$t('COMMON.WIDGETS.RUN_COLLECTOR')">
         <template #extra>
             <div class="flex justify-end">
                 <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
@@ -20,7 +20,7 @@
             <template #no-data="{fields}">
                 <tr key="noData" class="bg-primary3">
                     <td :colspan="fields.length" class="text-gray">
-                        {{ $t('DASHBOARD.ACTION.NO_RUN') }}
+                        {{ $t('COMMON.WIDGETS.RUN_COLLECTOR_NO_RECENT_RUN') }}
                     </td>
                 </tr>
             </template>
@@ -106,9 +106,9 @@ export default {
             loading: false,
             items: [] as JobModel[],
             fields: [
-                { label: 'Collector', name: 'collector_info' },
-                { label: 'Completed / Total', name: 'progress' },
-                { label: 'Start Time', name: 'created_at' },
+                { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_COLLECTOR'), name: 'collector_info' },
+                { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_COMPLETED_TOTAL'), name: 'progress' },
+                { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_START_TIME'), name: 'created_at' },
             ],
             providers: [] as ProviderModel[],
         });

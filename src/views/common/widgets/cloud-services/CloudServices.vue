@@ -50,7 +50,7 @@
         <template #extra>
             <div v-if="moreInfo">
                 <router-link to="/inventory/cloud-service" class="more">
-                    see more
+                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
                     <p-i name="ic_arrow_right" width="1rem" height="1rem"
                          color="inherit transparent"
                     />

@@ -160,49 +160,49 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .color {
-        display: inline-block;
-        width: 0.75rem;
-        height: 0.75rem;
-        margin-right: 0.5rem;
-        border-radius: 2px;
-        background: currentColor;
-    }
-    .custom-th {
-        @apply flex items-center justify-center uppercase font-bold px-1;
-        font-size: 0.75rem;
-    }
-    .p-data-table::v-deep {
-        table-layout: fixed;
-        font-size: 0.875rem;
-        tr {
-            &:nth-child(2n+1) {
-                 @apply bg-primary4;
-             }
-        }
-        td {
-            @apply truncate cursor-pointer;
-            &:first-child {
-                 padding: 0;
-             }
-        }
-        th {
-            @apply relative border-0;
-            &:first-child {
-                 width: 5.6rem;
-             }
-            &:nth-child(2) {
-                 width: 5.6rem;
-             }
-            &:nth-child(3) {
-                 width: 4.6rem;
-             }
-            &:nth-child(4) {
-                 width: 4.6rem;
-             }
-            &:last-child {
-                 width: 4.6rem;
-             }
+.color {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 0.5rem;
+    border-radius: 2px;
+    background: currentColor;
+}
+.custom-th {
+    @apply flex items-center justify-center uppercase font-bold px-1;
+    font-size: 0.75rem;
+}
+.p-data-table::v-deep {
+    table-layout: fixed;
+    font-size: 0.875rem;
+    tr {
+        &:nth-child(2n+1) {
+            @apply bg-primary4;
         }
     }
+    td {
+        @apply truncate cursor-pointer;
+        &:first-child {
+            padding: 0;
+        }
+    }
+    th {
+        @apply relative border-0;
+        &:first-child {
+            width: 5.6rem;
+        }
+        &:nth-child(2) {
+            width: 5.6rem;
+        }
+        &:nth-child(3) {
+            width: 4.6rem;
+        }
+        &:nth-child(4) {
+            width: 4.6rem;
+        }
+        &:last-child {
+            width: 4.6rem;
+        }
+    }
+}
 </style>

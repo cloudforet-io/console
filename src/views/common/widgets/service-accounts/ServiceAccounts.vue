@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout title="Service Accounts">
+    <p-widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNTS')">
         <div class="chart-container">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
@@ -270,18 +270,18 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .chart {
-        height: 11.25rem;
-        width: 100%;
-    }
-    .count {
-        font-size: 0.875rem;
-        font-weight: bold;
-    }
-    .legends {
-        @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
-    }
-    .chart-container {
-        @apply flex justify-center items-center mb-4;
-    }
+.chart {
+    height: 11.25rem;
+    width: 100%;
+}
+.count {
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+.legends {
+    @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
+}
+.chart-container {
+    @apply flex justify-center items-center mb-4;
+}
 </style>

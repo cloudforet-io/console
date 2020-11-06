@@ -1,16 +1,16 @@
 <template>
     <p-widget-layout class="p-widget-layout-container">
         <template #title>
-            <b>History</b>
+            <b>{{ $t('COMMON.WIDGETS.COLLECTOR_HISTORY_LABEL') }}</b>
             <router-link to="/management/collector-history" class="see-more-text">
-                <span>see more</span>
+                <span>{{ $t('COMMON.WIDGETS.COLLECTOR_HISTORY_SEE_MORE') }}</span>
                 <p-i name="ic_arrow_right" width="1rem" height="1rem"
                      color="inherit transparent"
                 />
             </router-link>
         </template>
         <div class="text-gray text-xs mb-2">
-            Job Count
+            {{ $t('COMMON.WIDGETS.COLLECTOR_HISTORY_JOB_COUNT') }}
         </div>
         <p-chart-loader :loading="loading" class="chart">
             <template #loader>
@@ -120,14 +120,14 @@ export default {
             }
 
             const datasets = [{
-                label: 'Success',
+                label: vm.$t('COMMON.WIDGETS.COLLECTOR_HISTORY_LEGEND_SUCCESS') as string,
                 data: data.map(d => d.success) as number[],
                 barPercentage: 0.5,
                 categoryPercentage: 0.25,
                 backgroundColor: LEGEND_COLORS.success,
                 borderColor: LEGEND_COLORS.success,
             }, {
-                label: 'Failure',
+                label: vm.$t('COMMON.WIDGETS.COLLECTOR_HISTORY_LEGEND_FAILURE') as string,
                 data: data.map(d => d.failure) as number[],
                 barPercentage: 0.5,
                 categoryPercentage: 0.25,

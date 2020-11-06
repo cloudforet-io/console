@@ -4,6 +4,7 @@ import {
     ChartPoint, ChartTooltipOptions,
 } from 'chart.js';
 import { gray } from '@/styles/colors';
+import {TranslateResult} from "vue-i18n";
 
 
 export const tooltips: ChartTooltipOptions = {
