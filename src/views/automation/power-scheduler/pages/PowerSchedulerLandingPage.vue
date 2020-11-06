@@ -4,7 +4,7 @@
             <p-page-navigation :routes="route" />
         </div>
         <div class="page-title">
-            <p-page-title :title="'Power Scheduler'" :total-count="totalCount" />
+            <p-page-title :title="$t('AUTOMATION.POWER_SCHEDULER.LANDING.TITLE')" :total-count="totalCount" />
         </div>
         <p-hr class="cloud-service-divider" />
         <div class="power-scheduler-project">

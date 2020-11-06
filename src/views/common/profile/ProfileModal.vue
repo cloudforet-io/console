@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="$t('COMMON.PROFILE')"
+    <p-button-modal :header-title="$t('COMMON.PROFILE.TITLE')"
                     centered
                     fade
                     backdrop
@@ -18,11 +18,11 @@
         <template #body>
             <div class="profile-form grid grid-cols-2">
                 <div class="form-div col-span-1">
-                    <p-field-group :label="$t('COMMON.ID')">
+                    <p-field-group :label="$t('COMMON.PROFILE.ID')">
                         <br>
                         <p-text-input :value="userId" disabled block />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.EMAIL')"
+                    <p-field-group :label="$t('COMMON.PROFILE.EMAIL')"
                                    :invalid-text="invalidMsg.email"
                                    :invalid="invalidState.email"
                     >
@@ -46,7 +46,7 @@
                     </p-field-group>
                     <form class="form">
                         <p-field-group v-if="showPassword"
-                                       :label="$t('FORM.LABEL.PWD')"
+                                       :label="$t('COMMON.PROFILE.PASSWORD')"
                                        :invalid-text="invalidMsg.password"
                                        :invalid="invalidState.password"
                         >
@@ -59,7 +59,7 @@
                             </template>
                         </p-field-group>
                         <p-field-group v-if="showPassword"
-                                       :label="$t('FORM.LABEL.PWD_CHECK')"
+                                       :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
                                        :invalid-text="invalidMsg.passwordCheck"
                                        :invalid="invalidState.passwordCheck"
                         >
@@ -73,25 +73,25 @@
                     </form>
                 </div>
                 <div class="form-div col-span-1">
-                    <p-field-group :label="$t('COMMON.MOBILE')">
+                    <p-field-group :label="$t('COMMON.PROFILE.MOBILE')">
                         <br>
                         <p-text-input v-model="userState.mobile"
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.GROUP')">
+                    <p-field-group :label="$t('COMMON.PROFILE.GROUP')">
                         <br>
                         <p-text-input v-model="userState.group"
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.LANGUAGE')">
+                    <p-field-group :label="$t('COMMON.PROFILE.LANGUAGE')">
                         <p-select-dropdown v-model="userState.language"
                                            :items="languages"
                                            auto-height
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.TIMEZONE')">
+                    <p-field-group :label="$t('COMMON.PROFILE.TIMEZONE')">
                         <p-select-dropdown v-model="userState.timezone"
                                            :items="timezones"
                                            auto-height
@@ -106,17 +106,18 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import {
-    makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
-} from '@/lib/compostion-util';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+
+import {
+    makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
+} from '@/lib/compostion-util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
 
 export default {
@@ -137,9 +138,8 @@ export default {
             required: true,
         },
     },
-    setup(props, context) {
-        const vm: any = getCurrentInstance();
-
+    setup(props, { root, emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const userState = reactive({
             password: '',
             passwordCheck: '',
@@ -152,17 +152,17 @@ export default {
         });
 
         const updateUserValidations = {
-            name: [requiredValidation('Please enter name')],
-            email: [requiredValidation('Please enter email')],
+            name: [requiredValidation(vm.$t('COMMON.PROFILE.NAME_REQUIRED'))],
+            email: [requiredValidation(vm.$t('COMMON.PROFILE.EMAIL_REQUIRED'))],
             password: [lengthMinValidation(5), lengthMaxValidation(12)],
             passwordCheck: [
-                new Validation((value, data) => data.password === value, 'please enter same value again'),
+                new Validation((value, data) => data.password === value, vm.$t('COMMON.PROFILE.PASSWORD_CHECK_INVALID')),
             ],
         };
 
         const state = reactive({
             loading: false,
-            proxyVisible: makeProxy('visible', props, context.emit),
+            proxyVisible: makeProxy('visible', props, emit),
             showPassword: computed(() => state.isDomainOwner || state.isInternalAuth),
             userState,
             languages: [
@@ -195,10 +195,10 @@ export default {
         const updateProfile = async (parameters) => {
             try {
                 await store.dispatch('user/setUser', parameters);
-                showSuccessMessage('success', 'Update Profile', context.root);
+                showSuccessMessage(vm.$t('COMMON.PROFILE.ALT_S_UPDATE'), '', root);
                 state.proxyVisible = false;
             } catch (e) {
-                showErrorMessage('Fail to Update Profile', e, context.root);
+                showErrorMessage(vm.$t('COMMON.PROFILE.ALT_E_UPDATE'), e, root);
             }
         };
 

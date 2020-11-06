@@ -103,7 +103,8 @@
 				"LEGEND_TITLE": "",
 				"LEGEND_UNSET": "",
 				"NEED_SCHEDULER_HINT_TEXT": "",
-				"SCHEDULE": ""
+				"SCHEDULE": "",
+				"TITLE": ""
 			},
 			"RESOURCE": {
 				"ALT_E_ID_INVALID_DESC": "",
@@ -303,7 +304,22 @@
 		"PRIORITY": "",
 		"PRI_IP": "",
 		"PROCESSED": "",
-		"PROFILE": "",
+		"PROFILE": {
+			"ALT_E_UPDATE": "",
+			"ALT_S_UPDATE": "",
+			"EMAIL": "",
+			"EMAIL_REQUIRED": "",
+			"GROUP": "",
+			"ID": "",
+			"LANGUAGE": "",
+			"MOBILE": "",
+			"NAME_REQUIRED": "",
+			"PASSWORD": "",
+			"PASSWORD_CHECK": "",
+			"PASSWORD_CHECK_INVALID": "",
+			"TIMEZONE": "",
+			"TITLE": ""
+		},
 		"PROJECT": "",
 		"PROJECT_GRP": "",
 		"PROJECT_GRP_ID": "",

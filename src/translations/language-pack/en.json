@@ -103,7 +103,8 @@
 				"LEGEND_TITLE": "반복 스케줄 설정 시간",
 				"LEGEND_UNSET": "미설정",
 				"NEED_SCHEDULER_HINT_TEXT": "스케줄러 설정이 필요합니다.",
-				"SCHEDULE": "스케줄"
+				"SCHEDULE": "스케줄",
+				"TITLE": "Power Scheduler"
 			},
 			"RESOURCE": {
 				"ALT_E_ID_INVALID_DESC": "목록을 확인해주세요.",
@@ -303,7 +304,22 @@
 		"PRIORITY": "Priority",
 		"PRI_IP": "Primary IP",
 		"PROCESSED": "processed",
-		"PROFILE": "Profile",
+		"PROFILE": {
+			"ALT_E_UPDATE": "Failed to Update Profile",
+			"ALT_S_UPDATE": "Success to Update Profile",
+			"EMAIL": "E-mail",
+			"EMAIL_REQUIRED": "Please enter email",
+			"GROUP": "Group",
+			"ID": "ID",
+			"LANGUAGE": "Language",
+			"MOBILE": "Mobile",
+			"NAME_REQUIRED": "Please enter name",
+			"PASSWORD": "Password",
+			"PASSWORD_CHECK": "Password Check",
+			"PASSWORD_CHECK_INVALID": "Please enter same value again",
+			"TIMEZONE": "Timezone",
+			"TITLE": "Profile"
+		},
 		"PROJECT": "Project",
 		"PROJECT_GRP": "Project Group",
 		"PROJECT_GRP_ID": "Project Group ID",

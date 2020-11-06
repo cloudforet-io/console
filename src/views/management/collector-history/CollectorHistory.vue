@@ -112,7 +112,7 @@
             <p-page-navigation v-if="selectedJobId" :routes="subRoute" />
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
             <p-collector-history-job :job-id="selectedJobId" />
-        </div>
+        </div>ㅔ
     </general-page-layout>
 </template>
 
