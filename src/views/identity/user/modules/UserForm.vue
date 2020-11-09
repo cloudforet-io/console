@@ -23,14 +23,14 @@
                             <div>
                                 <p-text-input v-model="formState.user_id"
                                               v-focus
-                                              placeholder="Insert User ID here"
+                                              :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
                                               :disabled="updateMode"
                                               :class="{'is-invalid': invalid}"
                                 />
                                 <p-button style-type="primary-dark" :disabled="updateMode" class="user-id-check-button"
                                           @click="checkUserID"
                                 >
-                                    check user id
+                                    {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
                                 </p-button>
                             </div>
                         </template>
@@ -55,19 +55,19 @@
                             </template>
                         </p-field-group>
 
-                        <p-field-group :label="$t('COMMON.NAME')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')">
                             <p-text-input v-model="formState.name" class="block" />
                         </p-field-group>
 
-                        <p-field-group :label="$t('COMMON.MOBILE')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.MOBILE')">
                             <p-text-input v-model="formState.mobile" class="block" />
                         </p-field-group>
 
-                        <p-field-group :label="$t('COMMON.LANGUAGE')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.LANGUAGE')">
                             <p-select-dropdown v-model="formState.language" :items="languageSelectItems" />
                         </p-field-group>
 
-                        <p-field-group :label="$t('COMMON.TIMEZONE')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.TIMEZONE')">
                             <p-select-dropdown v-model="formState.timezone" :items="timezoneSelectItems" />
                         </p-field-group>
                     </div>
@@ -87,7 +87,7 @@
                             </template>
                         </p-field-group>
 
-                        <p-field-group :label="$t('COMMON.EMAIL')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')">
                             <p-text-input v-model="formState.email" class="block" />
                         </p-field-group>
 
@@ -109,10 +109,10 @@
     </p-button-modal>
 </template>
 
-<script>
+<script lang="ts">
 /* eslint-disable camelcase */
 import {
-    reactive, computed, ref, toRefs,
+    reactive, computed, toRefs, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
@@ -183,6 +183,7 @@ export default {
         },
     },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyVisible: makeProxy('visible', props, context.emit),
             modal: null,
@@ -194,7 +195,7 @@ export default {
             }),
         });
         const { domain } = useStore();
-        const dictRef = ref(null);
+        const dictRef: any = null;
         const formState = reactive({
             user_id: '',
             password1: '',
@@ -221,10 +222,10 @@ export default {
             { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
         ];
 
-        const pwdCheckValidation = new Validation((value, data) => data.password1 === value, 'please enter same value again');
+        const pwdCheckValidation = new Validation((value, data) => data.password1 === value, vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID'));
         const defaultValidation = {
             timezone: [checkTimeZoneValidation()],
-        };
+        } as any;
 
         const addUserValidations = { ...defaultValidation };
         const updateUserValidations = { ...defaultValidation };
@@ -245,10 +246,10 @@ export default {
                 }
             }).catch((error) => { console.error(error); });
             return result;
-        }, "ID doesn't exists!");
+        }, vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST'));
 
         if (!formState.is_local_auth) { // plugin auth type
-            addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation(context.parent)];
+            addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation()];
         } else {
             addUserValidations.user_id = [...userIdVds];
             addUserValidations.password1 = [requiredValidation(), noEmptySpaceValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
@@ -256,7 +257,7 @@ export default {
 
             updateUserValidations.password1 = [lengthMinValidation(5), lengthMaxValidation(12)];
             updateUserValidations.password2 = [
-                new Validation((value, data) => data.password1 === value, 'please enter same value again'),
+                new Validation((value, data) => data.password1 === value, vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID')),
             ];
         }
 
@@ -272,7 +273,7 @@ export default {
             formState.isLastCheck = false;
 
             if (result) {
-                const data = {};
+                const data = {} as any;
                 if (formState.is_local_auth) {
                     if (result) {
                         if (props.updateMode) {
@@ -289,8 +290,8 @@ export default {
                         data[key] = formState[key];
                     }
                 });
-                dictRef.value.allValidation();
-                data.tags = dictRef.value.getDict();
+                dictRef.allValidation();
+                data.tags = dictRef.getDict();
                 context.emit('confirm', data);
             }
         };

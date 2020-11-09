@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
+        <p-info-panel :info-title="$t('IDENTITY.USER.BASE_INFORMATION')" :defs="baseDefs" :item="item">
             <template #def-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)" />
             </template>
@@ -8,11 +8,11 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/PInfoPanel.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
-import { makeTrItems } from '@/lib/view-helper';
 
 export default {
     name: 'PUserDetail',
@@ -26,19 +26,19 @@ export default {
         },
 
     },
-    setup(props, { parent }) {
-        const baseDefs = makeTrItems([
-            ['user_id', 'COMMON.USER_ID'],
-            ['name', 'COMMON.NAME'],
-            ['email', 'COMMON.EMAIL'],
-            ['state', 'COMMON.STATE'],
-            ['mobile', 'COMMON.PHONE', { sortable: false }],
-            ['group', 'COMMON.GROUP'],
-            ['language', 'COMMON.LANGUAGE'],
-            ['domain_id', 'COMMON.DOMAIN_ID'],
-            ['timezone', 'COMMON.TIMEZONE'],
-        ], parent, { copyFlag: true });
-
+    setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const baseDefs = computed(() => ([
+            { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
+            { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
+            { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
+            { name: 'state', label: vm.$t('IDENTITY.USER.STATE') },
+            { name: 'mobile', label: vm.$t('IDENTITY.USER.MOBILE') },
+            { name: 'group', label: vm.$t('IDENTITY.USER.GROUP') },
+            { name: 'language', label: vm.$t('IDENTITY.USER.LANGUAGE') },
+            { name: 'domain_id', label: vm.$t('IDENTITY.USER.DOMAIN_ID') },
+            { name: 'timezone', label: vm.$t('IDENTITY.USER.TIMEZONE') },
+        ]));
 
         return {
             baseDefs,

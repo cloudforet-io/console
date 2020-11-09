@@ -1,7 +1,7 @@
 <template>
     <general-page-layout>
         <p-page-navigation :routes="routes" />
-        <p-page-title title="User" />
+        <p-page-title :title="$t('IDENTITY.USER.TITLE')" />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-query-search-table
@@ -29,7 +29,7 @@
                                             name="ic_plus_bold"
                                             @click="clickAdd"
                         >
-                            {{ $t('BTN.CREATE') }}
+                            {{ $t('IDENTITY.USER.CREATE') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="dropdown-btn"
@@ -40,7 +40,7 @@
                             @click-delete="clickDelete"
                             @click-update="clickUpdate"
                         >
-                            Action
+                            {{ $t('IDENTITY.USER.ACTION') }}
                         </p-dropdown-menu-btn>
                     </template>
                     <template #col-state-format="{value}">
@@ -73,7 +73,7 @@
         </p-tab>
 
         <div v-else id="empty-space">
-            Select a User above for details.
+            {{ $t('IDENTITY.USER.NO_SELECTED') }}
         </div>
         <p-table-check-modal
             v-if="!!modalState.mode"
@@ -99,6 +99,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { map } from 'lodash';
 
 import {
@@ -119,26 +120,27 @@ import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCh
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { showErrorMessage, showSuccessMessage, userStateFormatter } from '@/lib/util';
-import { makeTrItems } from '@/lib/view-helper';
-import { useStore } from '@/store/toolset';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { Options } from '@/components/organisms/tables/query-search-table/type';
+import { MenuItem } from '@/components/organisms/context-menu/type';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
+import { Timestamp } from '@/components/util/type';
+
+import { showErrorMessage, showSuccessMessage, userStateFormatter } from '@/lib/util';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-import { Timestamp } from '@/components/util/type';
+import { useStore } from '@/store/toolset';
+
 
 interface UserModel {
-    // eslint-disable-next-line camelcase
     created_at: Timestamp;
     domain_id: string;
     email: string;
     group: string;
     language: string;
-    // eslint-disable-next-line camelcase
     last_accessed_at: Timestamp;
     mobile: string;
     name: string;
@@ -146,7 +148,6 @@ interface UserModel {
     state: string;
     tags: {};
     timezone: string;
-    // eslint-disable-next-line camelcase
     user_id: string;
 }
 
@@ -194,7 +195,6 @@ export default {
                 },
             ],
             valueHandlerMap: {
-                // eslint-disable-next-line camelcase
                 user_id: makeDistinctValueHandler('identity.User', 'user_id'),
                 name: makeDistinctValueHandler('identity.User', 'name'),
                 group: makeDistinctValueHandler('identity.User', 'group'),
@@ -205,18 +205,16 @@ export default {
         const state = reactive({
             loading: false,
             users: [] as UserModel[],
-            fields: computed(() => [
-                ...makeTrItems([
-                    ['user_id', 'COMMON.USER_ID'],
-                    ['name', 'COMMON.NAME'],
-                    ['email', 'COMMON.EMAIL'],
-                    ['state', 'COMMON.STATE'],
-                    ['mobile', 'COMMON.PHONE', { sortable: false }],
-                    ['group', 'COMMON.GROUP'],
-                    ['language', 'COMMON.LANGUAGE'],
-                    ['timezone', 'COMMON.TIMEZONE'],
-                ], null),
-            ]),
+            fields: computed(() => ([
+                { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
+                { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
+                { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
+                { name: 'state', label: vm.$t('IDENTITY.USER.STATE') },
+                { name: 'mobile', label: vm.$t('IDENTITY.USER.MOBILE') },
+                { name: 'group', label: vm.$t('IDENTITY.USER.GROUP') },
+                { name: 'Language', label: vm.$t('IDENTITY.USER.LANGUAGE') },
+                { name: 'Timezone', label: vm.$t('IDENTITY.USER.TIMEZONE') },
+            ])),
             sortBy: '',
             sortDesc: '',
             pageSize: 15,
@@ -229,21 +227,31 @@ export default {
                 state.selectedIndex.map(d => users.push(state.users[d]));
                 return users;
             }),
-            multiSelectFields: computed(() => [
-                ...makeTrItems([
-                    ['user_id', 'COMMON.USER_ID'],
-                    ['name', 'COMMON.NAME'],
-                    ['email', 'COMMON.EMAIL'],
-                    ['group', 'COMMON.GROUP'],
-                ], null),
-            ]),
-            dropdownMenu: computed(() => (makeTrItems([
-                ['update', 'BTN.UPDATE', { disabled: state.selectedIndex.length > 1 || state.selectedIndex.length === 0 }],
-                ['delete', 'BTN.DELETE', { disabled: state.selectedIndex.length === 0 }],
-                [null, null, { type: 'divider' }],
-                ['enable', 'BTN.ENABLE', { disabled: state.selectedIndex.length === 0 }],
-                ['disable', 'BTN.DISABLE', { disabled: state.selectedIndex.length === 0 }],
-            ], parent, { type: 'item', disabled: true }))),
+            isSelected: computed(() => state.selectedIndex.length > 0),
+            multiSelectFields: computed(() => ([
+                { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
+                { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
+                { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
+                { name: 'group', label: vm.$t('IDENTITY.USER.GROUP') },
+            ])),
+            dropdownMenu: computed(() => ([
+                {
+                    type: 'item',
+                    name: 'update',
+                    label: vm.$t('IDENTITY.USER.UPDATE'),
+                    disabled: state.selectedIndex.length > 1 || !state.isSelected,
+                },
+                {
+                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.DELETE'), disabled: !state.isSelected,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.ENABLE'), disabled: !state.isSelected,
+                },
+                {
+                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.DISABLE'), disabled: !state.isSelected,
+                },
+            ] as MenuItem[])),
             keyItems: handlers.keyItems as KeyItem[],
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
@@ -266,16 +274,16 @@ export default {
         });
 
         const singleItemTabState = reactive({
-            tabs: computed(() => makeTrItems([
-                ['detail', 'COMMON.DETAILS', { keepAlive: true }],
-            ], parent)),
+            tabs: computed(() => ([
+                { name: 'detail', label: vm.$t('IDENTITY.USER.DETAILS'), keepAlive: true },
+            ] as TabItem[])),
             activeTab: 'detail',
         });
 
         const multiItemTabState = reactive({
-            tabs: makeTrItems([
-                ['data', 'TAB.SELECTED_DATA', { keepAlive: true }],
-            ], parent),
+            tabs: computed(() => ([
+                { name: 'data', label: vm.$t('IDENTITY.USER.SELECTED_DATA'), keepAlive: true },
+            ] as TabItem[])),
             activeTab: 'data',
         });
 
@@ -332,34 +340,34 @@ export default {
         const clickAdd = () => {
             userFormState.visible = true;
             userFormState.updateMode = false;
-            userFormState.headerTitle = 'Add User';
+            userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
             userFormState.item = undefined;
         };
         const clickUpdate = () => {
             userFormState.visible = true;
             userFormState.updateMode = true;
-            userFormState.headerTitle = 'Update User';
+            userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
             userFormState.item = state.users[state.selectedIndex[0]];
             userFormState.visible = true;
         };
         const clickDelete = () => {
             modalState.mode = 'delete';
-            modalState.title = 'User Delete';
-            modalState.subTitle = 'Are you sure you want to delete selected User(s) below?';
+            modalState.title = vm.$t('IDENTITY.USER.DELETE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.DELETE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
             modalState.visible = true;
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
-            modalState.title = 'Enable User';
-            modalState.subTitle = 'Are you sure you want to Enable selected User(s) below?';
+            modalState.title = vm.$t('IDENTITY.USER.ENABLE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.ENABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'safe';
             modalState.visible = true;
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
-            modalState.title = 'User Disable';
-            modalState.subTitle = 'Are you sure you want to Disable selected User(s) below?';
+            modalState.title = vm.$t('IDENTITY.USER.DISABLE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.DISABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
             modalState.visible = true;
         };
@@ -370,9 +378,9 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                showSuccessMessage('Success', 'User has been successfully added.', root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_ADD_USER'), '', root);
             } catch (e) {
-                showErrorMessage('Fail to Add User', e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_ADD_USER'), e, root);
             }
             userFormState.visible = false;
         };
@@ -385,9 +393,9 @@ export default {
                     await user.setUser('USER', item.user_id, vm);
                     vm.$i18n.locale = item.language;
                 }
-                showSuccessMessage('Success', 'User has been successfully updated.', root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                showErrorMessage('Fail to Update User', e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_UPDATE_USER'), e, root);
             }
             userFormState.visible = false;
         };
@@ -402,9 +410,9 @@ export default {
         const deleteUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                showSuccessMessage('Success', 'Success to Delete Users', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage('Fail to Delete User', e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
                 modalState.visible = false;
@@ -413,10 +421,10 @@ export default {
         const enableUser = async (items) => {
             try {
                 await parent.$http.post('/identity/user/enable', getUsersParam(items)).then(async () => {
-                    showSuccessMessage('Success', 'enable users', root);
+                    showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_ENABLE', state.selectedIndex.length), '', root);
                 });
-            } catch (error) {
-                showErrorMessage('Fail to Enable User', error, root);
+            } catch (e) {
+                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_ENABLE', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
                 modalState.visible = false;
@@ -425,10 +433,10 @@ export default {
         const disableUser = async (items) => {
             try {
                 await parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async () => {
-                    showSuccessMessage('Success to Disable User', 'disable users', root);
+                    showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DISABLE', state.selectedIndex.length), '', root);
                 });
             } catch (e) {
-                showErrorMessage('Fail to Disable User', e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DISABLE', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
                 modalState.visible = false;

@@ -152,10 +152,10 @@ export const noEmptySpaceValidation = (invalidMessage?: message) => new Validati
 
 export const lengthMinValidation = (min: number, invalidMessage?: message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
 export const lengthMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
-export const checkTimeZoneValidation = (invalidMessage: message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
+export const checkTimeZoneValidation = (invalidMessage?: message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
 
 
-export const userIDValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
+export const userIDValidation = (parent: any, invalidMessage?: message) => new Validation(async (value) => {
     let result = false;
     // eslint-disable-next-line camelcase
     await parent.$http.post('/identity/user/get', { user_id: value }).catch((error) => {
@@ -165,4 +165,3 @@ export const userIDValidation = (parent: any, invalidMessage: message) => new Va
     });
     return result;
 }, invalidMessage || 'same ID exists!');
-
