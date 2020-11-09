@@ -59,6 +59,10 @@
 		"STEP_3": "아래의 {operator} 설정을 지원합니다.",
 		"TITLE": "검색 가이드"
 	},
+	"QUERY_SEARCH_TAGS": {
+		"CLEAR_ALL": "모두 지우기",
+		"FILTER": "필터"
+	},
 	"SEARCH": {
 		"PLACEHOLDER": "검색"
 	}

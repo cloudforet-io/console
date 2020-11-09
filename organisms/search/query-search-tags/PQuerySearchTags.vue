@@ -1,12 +1,12 @@
 <template>
     <div v-if="_tags.length > 0" class="p-query-search-tags">
         <div class="left">
-            <span class="filter">Filter: </span>
+            <span class="filter">{{ $t('COMPONENT.QUERY_SEARCH_TAGS.FILTER') }}: </span>
             <div v-if="!readOnly" class="delete-btn">
                 <p-badge class="tag" outline style-type="gray900"
                          @click="deleteAllTags"
                 >
-                    Clear all
+                    {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
                 </p-badge>
             </div>
             <div v-if="!readOnly" class="divider" />

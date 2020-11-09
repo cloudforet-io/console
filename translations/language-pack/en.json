@@ -59,6 +59,10 @@
 		"STEP_3": "We support below {operator}.",
 		"TITLE": "Search Guide"
 	},
+	"QUERY_SEARCH_TAGS": {
+		"CLEAR_ALL": "Clear all",
+		"FILTER": "Filter"
+	},
 	"SEARCH": {
 		"PLACEHOLDER": "Search"
 	}
