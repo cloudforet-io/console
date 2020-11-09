@@ -14,6 +14,9 @@
 		"MONTH": "월 ",
 		"YEAR": "년 "
 	},
+	"DEFINITION_TABLE": {
+		"NO_DATA": " 데이터가 없습니다."
+	},
 	"DICT_INPUT": {
 		"KEY": "키 ",
 		"VALUE": "값 "

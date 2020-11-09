@@ -5,6 +5,7 @@ import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { VNodeData } from 'vue';
 import { EnumOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { EnumDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/enum/type';
+import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldEnum',
@@ -41,6 +42,7 @@ export default {
             props.options, props.data,
             { type: 'text' },
         );
+
         return h(PDynamicField, {
             props: {
                 ...option,

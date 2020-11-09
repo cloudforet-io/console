@@ -14,6 +14,9 @@
 		"MONTH": "Month",
 		"YEAR": "Year"
 	},
+	"DEFINITION_TABLE": {
+		"NO_DATA": "No Data"
+	},
 	"DICT_INPUT": {
 		"KEY": "Key",
 		"VALUE": "Value"

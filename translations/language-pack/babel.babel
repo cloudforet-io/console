@@ -183,6 +183,32 @@
                 </children>
             </folder_node>
             <folder_node>
+                <name>DEFINITION_TABLE</name>
+                <children>
+                    <concept_node>
+                        <name>NO_DATA</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description></description>
+                        <comment></comment>
+                        <default_text></default_text>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>false</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>false</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>false</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                </children>
+            </folder_node>
+            <folder_node>
                 <name>DICT_INPUT</name>
                 <children>
                     <concept_node>
