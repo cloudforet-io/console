@@ -340,14 +340,14 @@ export default {
 
         const checkMemberDeleteState = reactive({
             fields: computed(() => [
-                { name: 'user_info.user_id', label: vm?.$t('FIELD.ID') },
-                { name: 'user_info.name', label: vm?.$t('FIELD.NAME') },
-                { name: 'user_info.email', label: vm?.$t('FIELD.EMAIL') },
+                { name: 'user_info.user_id', label: 'ID' },
+                { name: 'user_info.name', label: 'Name' },
+                { name: 'user_info.email', label: 'Email' },
             ]),
             mode: '',
             items: [] as any[],
-            headerTitle: '',
-            subTitle: '',
+            headerTitle: '' as TranslateResult,
+            subTitle: '' as TranslateResult,
             themeColor: '',
             visible: false,
             action: null as any,
@@ -357,8 +357,8 @@ export default {
             checkMemberDeleteState.mode = 'delete';
             // checkMemberDeleteState.action = memberDeleteAction;
             checkMemberDeleteState.items = memberTableState.selectedItems as any[];
-            checkMemberDeleteState.headerTitle = 'Delete Member';
-            checkMemberDeleteState.subTitle = 'Are you sure want to remove a following members from Project?';
+            checkMemberDeleteState.headerTitle = vm.$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE');
+            checkMemberDeleteState.subTitle = vm.$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT');
             checkMemberDeleteState.themeColor = 'alert';
             checkMemberDeleteState.visible = true;
         };
@@ -370,9 +370,9 @@ export default {
                     users: items.map(it => it.user_info.user_id),
                 });
                 // await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute();
-                showSuccessMessage('success', 'Successfully Deleted', root);
+                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
             } catch (e) {
-                showErrorMessage('Fail to Delete Member', e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'), e, root);
             } finally {
                 checkMemberDeleteState.visible = false;
                 await listMembers();

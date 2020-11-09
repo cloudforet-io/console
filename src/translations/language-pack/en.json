@@ -1,29 +1,4 @@
 {
-	"ACTION": {
-		"DICT": {
-			"ADD_TAG": "Add associated tags.",
-			"ADD_TAG_BY": "Set {name}'s tag.",
-			"CLICK_ADD_BTN_MSG": "Click a button to add tag.",
-			"HELPMSG": "The Key - Value pair is a required field. Enter a combination of letters, numbers and underscores.",
-			"INVALID": {
-				"KEY_DUPL": "Duplicate keys are not allowed.",
-				"KEY_EMPTY": "Enter the Key.",
-				"VAL_EMPTY": "Enter the Value."
-			},
-			"NO_TAG": "No associated tags found."
-		},
-		"DICT_FORM_HELPMSG": "",
-		"LIMIT_OF": "{itemName} limit:  {limitCount}",
-		"NONE": "",
-		"PROJECT": {
-			"ITEM_WILL_SELECT_FOR": "The {item} is/ are in {project}.",
-			"NO_PROJECT": "There is no project.",
-			"SELECT_PROJECT_FOR": "Select a project to match with {resource}.",
-			"SELECT_PROJECT_OR_RELEASE": "Select a project to attach 'service account' to or detach 'service account' to"
-		},
-		"SELECTED_OF": "{selectedCount} / {totalCount}",
-		"TIMEZONE_OF": "Every metric time displays in  {timezone}."
-	},
 	"AUTOMATION": {
 		"POWER_SCHEDULER": {
 			"DETAILS": {
@@ -127,33 +102,6 @@
 				"TITLE": "리소스 그룹 만들기"
 			}
 		}
-	},
-	"BTN": {
-		"ACTION": "Action",
-		"ADD": "Add",
-		"ADD_TAG": "Add Tag",
-		"BACK": "Back",
-		"CANCEL": "Cancel",
-		"CHG_POOL": "Change Pool",
-		"CHG_REGION": "Change Region",
-		"COLLECT_DATA": "Collect Data",
-		"CONFIRM": "Confirm",
-		"COPY": "Copy",
-		"CREATE": "Create",
-		"CREATE_PROJECT": "Create Project",
-		"DELETE": "Delete",
-		"DISABLE": "Disable",
-		"EDIT": "Edit",
-		"ENABLE": "Enable",
-		"EXPORT": "Export",
-		"FIND": "Find",
-		"NO": "No",
-		"OK": "OK",
-		"REFRESH": "Refresh",
-		"RESET": "Reset",
-		"SAVE": "Save",
-		"UPDATE": "Update",
-		"YES": "Yes"
 	},
 	"COMMON": {
 		"ALL": "All",
@@ -312,9 +260,8 @@
 			"GROUP": "Group",
 			"ID": "ID",
 			"LANGUAGE": "Language",
-			"MAX_LENGTH_INVALID": "please enter no more than {max} characters",
-			"MIN_LENGTH_INVALID": "please enter at least {min} characters.",
 			"MOBILE": "Mobile",
+			"NAME": "Name",
 			"NAME_REQUIRED": "Please enter name",
 			"PASSWORD": "Password",
 			"PASSWORD_CHECK": "Password Check",
@@ -353,16 +300,13 @@
 		"SIGN_IN": {
 			"ADMIN_ID": "Admin ID",
 			"ADMIN_SIGN_IN": "Admin Sign in",
-			"ALT_E_LOGIN": "Please Confirm your ID or Password",
 			"MEMBER_SIGN_IN": "Sign in using member account credentials",
 			"OR": "OR",
 			"PASSWORD": "Password",
-			"PASSWORD_REQUIRED": "please enter password",
 			"ROOT_ACCOUNT": "Sign in using root account credentials",
 			"SIGN_IN": "Sign in ",
 			"TITLE": "Multicloud Management Platform",
 			"USER_ID": "User ID",
-			"USER_ID_REQUIRED": "please enter user ID",
 			"VALIDATION": "Please Confirm your ID or Password."
 		},
 		"SIZE": "Size",
@@ -468,84 +412,7 @@
 		"ZE_NM": "Zone Name",
 		"ZONE": "Zone"
 	},
-	"DASHBOARD": {
-		"ACTION": {
-			"CLOUD_SERVICES": "Major services under management",
-			"COLLECTORS": "Manage resources by custom plugins",
-			"CRT_DBD": "create your dashboard!",
-			"CRT_GUIDE": "Create Project Group first & Register Service Account",
-			"DAILY_UPDATES": "Check your resource updates on daily usage.",
-			"HEALTH_DASHBOARD": "You can see the status of AWS services and notifications.",
-			"NO_RUN": "No Recent Collecting Run",
-			"RECENT_COLLECTING": "Check your collecting history with the plugin list.",
-			"TOP_PROJECTS": "Check project ranking with most resources and services."
-		},
-		"BTN": {
-			"GET_START": "Get Started"
-		},
-		"RES_REGION": "Resources by Region",
-		"SERVER_STATE": "Server States",
-		"SERVER_TYPE": "Servers by Type",
-		"SUMMARY": "Summary"
-	},
-	"ERROR": {
-		"None": ""
-	},
-	"FIELD": {
-		"ACCOUNT_NAME": "Account Name",
-		"CLOUD_SERVICE": "Cloud Service",
-		"COLLECTOR": "Collector",
-		"CREDENTIALS": "Credentials",
-		"EMAIL": "Email",
-		"ID": "ID",
-		"NAME": "Name",
-		"PROJECT": "Project",
-		"PROJECT_GRP": "Project Group",
-		"RANK": "Rank",
-		"SERVER": "Server",
-		"SERVICE_PROVIDER": "Service Provider",
-		"START_TIME": "Start Time",
-		"STATE": "State",
-		"SUPPORTED": "Availability"
-	},
-	"FORM": {
-		"LABEL": {
-			"EMAIL": "E-Mail",
-			"GROUP": "Group",
-			"LANG": "Language",
-			"NAME": "Name",
-			"NEW_PWD": "New Password",
-			"PHONE": "Phone",
-			"PWD": "Password",
-			"PWD_CHECK": "Password Check",
-			"TAG": "Tag",
-			"TIME": "Timezone",
-			"USERID": "User ID"
-		},
-		"None": ""
-	},
 	"IDENTITY": {
-		"ADD_ARG": "Add {0}",
-		"BTN": {
-			"None": ""
-		},
-		"CHECK_HASH": "Please, Check Hash Tag format.",
-		"CRT_FAIL_ARG": "Fail to create {0}. Please, check your action.",
-		"CRT_GRP": "Create Group",
-		"CRT_PROJ": "Create Project",
-		"CRT_PROJ_GRP": "Create Project Group",
-		"CRT_SUCC_ARG": "New {0} is successfully created.",
-		"DEL_ARG": "Delete {0}",
-		"DEL_FAIL_ARG": "Delete {0} has failed.\nPlease, check your action.",
-		"DEL_FAIL_CHI_ARG": "Delete has failed. The request resources is in use at {0}",
-		"DEL_MEMBER_PRJ": "Are you sure remove a following member from {0} ?",
-		"DEL_SUCC_ARG": "{0} is successfully deleted.",
-		"NO_PROJECT_SEL": "No item selected.",
-		"NO_PROJECT_SEL_DT": "Select a item first on the left panel.",
-		"PARENT_ARG": "Parent {0}",
-		"REQ_FIELD": "{0} is require field!",
-		"SCH_PAC_DT": "Search members by user ID, email, and name",
-		"SELECT_ARG": "Selected {0}",
 		"SERVICE_ACCOUNT": {
 			"ADD": {
 				"ACCOUNT": "Account",
@@ -604,11 +471,6 @@
 				"TITLE": "{provider} Accounts"
 			}
 		},
-		"UPDATE_PROJ": "Update Project",
-		"UPDATE_PROJ_GRP": "Update Project Group",
-		"UPT_ARG": "Update {0}",
-		"UPT_FAIL_ARG": "Fail to delete {0}. Please, check your action.",
-		"UPT_SUCC_ARG": "{0} has successfully updated.",
 		"USER": {
 			"ACTION": "Action",
 			"ALT_E_ADD_USER": "Failed to Add User",
@@ -639,24 +501,16 @@
 				"ADD_TITLE": "Add User",
 				"CHECK_USER_ID": "check user id",
 				"EMAIL": "E-mail",
-				"EMPTY_SPACE_INVALID": "You Must Remove Empty Space",
 				"GROUP": "Group",
 				"LANGUAGE": "Language",
-				"MAX_LENGTH_INVALID": "please enter no more than {max} characters",
-				"MIN_LENGTH_INVALID": "please enter at least {min} characters.",
 				"MOBILE": "Mobile",
 				"NAME": "Name",
 				"NAME_PLACEHOLDER": "Insert User ID here",
-				"NAME_VALID": "you can use this ID",
 				"PASSWORD_CHECK_INVALID": "Please enter same value again",
-				"PASSWORD_INVALID": "Your Password must be 5 ~ 12 characters long",
-				"REQUIRED_FIELD": "Required field!",
-				"TAGS": "Tags",
 				"TIMEZONE": "Timezone",
 				"TIMEZONE_INVALID": "can not find timezone",
 				"UPDATE_TITLE": "Update User",
 				"USER_ID": "User ID",
-				"USER_ID_INVALID": "same ID exists",
 				"USER_ID_NOT_EXIST": "ID doesn't exists"
 			},
 			"GROUP": "Group",
@@ -673,20 +527,6 @@
 		}
 	},
 	"INVENTORY": {
-		"ACTION": {
-			"COLLECT_ALL": "Get all resources",
-			"COLLECT_CREATE": "Get newly updated"
-		},
-		"ADD_SCHEDULE": "Add Schedule",
-		"ADD_TAG": "Add Tag",
-		"BACK_COL": "Back to Collector",
-		"BTN": {
-			"None": "",
-			"SET_CLOSE": "Set Close",
-			"SET_INSERVICE": "Set In-Service",
-			"SET_MAINTENANCE": "Set Maintenance"
-		},
-		"CHOOSE_CRD": "Choose Credentials",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "Member"
@@ -720,36 +560,6 @@
 				"TAB_TAG": "Tag"
 			}
 		},
-		"COLL_TIME": "Collecting Time",
-		"COL_NAME": "Collector Name",
-		"COL_NAME_VD": "Please enter Collector name.",
-		"COL_OPS": "Collect Options",
-		"COL_PRIORITY_VD": "Set priority level: 1(high) to 10 (low)",
-		"CONF_COL": "Configure Collector",
-		"CRT_COLL": "Create Collector",
-		"CRT_CRD": "Create new credentials.",
-		"CRT_FAIL_ARG": "Fail to create {0}. Please, check your action.",
-		"CRT_PROJ": "Create Project",
-		"CRT_SUCC_ARG": "New {0} has successfully created.",
-		"DEL_COL": "Delete Collectors",
-		"DEL_FAIL_ARG": "Delete {0} has failed.\nPlease, check your action.",
-		"DEL_FAIL_CHI_ARG": "Delete has failed. The request resources is in use at {0}",
-		"DEL_SCHEDULE": "Delete Schedule",
-		"DEL_SUCC_ARG": "{0} is successfully deleted.",
-		"DISABLE_COL": "Disable Collector",
-		"ENABLE_COL": "Enable Collector",
-		"FILTERS": "Filter",
-		"MANAGE_CRD": "Manage Credentials",
-		"NO_DT_CEN_DT": "Please, Click an item from left tree panel.",
-		"NO_DT_CEN_SEL": "No Selected Data Center",
-		"OPTIONS": "Option",
-		"PARENT_ARG": "Parent {0}",
-		"POOL_NM": "Pool Name",
-		"PRIORITY": "Priority",
-		"REGION_NM": "Region Name",
-		"REQ_FIELD": "{0} is require field!",
-		"SCHEDULE": "Collecting Schedule",
-		"SELECT_ARG": "Selected {0}",
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "Action",
@@ -774,19 +584,7 @@
 				"TAB_TAG": "Tag",
 				"TITLE": "Server"
 			}
-		},
-		"TAB": {
-			"ADD_TAG": "Add Tag",
-			"CONFIRM_CRD": "Confirm Credentials",
-			"CONF_COLLECTOR": "Configure Collector"
-		},
-		"UPT_COL": "Update Collector",
-		"UPT_FAIL_ARG": "Fail to delete {0}. Please, check your action.",
-		"UPT_SCHEDULE": "Update Schedule",
-		"UPT_SUCC_ARG": "{0} has been successfully updated.",
-		"VERIFY_CRD": "Verify Credentials",
-		"VERSION": "Version",
-		"ZONE_NM": "Zone Name"
+		}
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
@@ -832,36 +630,7 @@
 			}
 		}
 	},
-	"ORGANISMS": {
-		"CREATE_ARG": "Create {0}",
-		"DELETE_ARG": "Delete {0}",
-		"NO_DATA": "No Data",
-		"NO_TAG": "No Tag",
-		"TAG": "Tag",
-		"TAG_EMPTY": "Tag's key can' be blank. Please, input your key.",
-		"UPDATE_ARG": "Update {0}"
-	},
-	"PANEL": {
-		"BASE_INFO": "Base Information",
-		"COMPUTE": "Compute",
-		"CREDENTIAL": "Credentials",
-		"DATA": "Data",
-		"DETAILS": "Detail",
-		"FILTER_FORMAT": "Filter Format",
-		"INFO": "Info",
-		"JOBS": "Job",
-		"LOCAL": "Local",
-		"NONE_TR": "",
-		"RAWDATA": "Raw Data",
-		"SCHEDULE": "Schedules",
-		"TAG": "Tag",
-		"TAGS": "Tag",
-		"VM": "VM"
-	},
 	"PLUGIN": {
-		"BTN": {
-			"RECOVERY": "recovery"
-		},
 		"COLLECTOR": {
 			"CREATE": {
 				"ALT_E_CREATE_TITLE": "Failed to Create Collector",
@@ -984,9 +753,6 @@
 				"SEARCH_PLACEHOLDER": "Enter keyword",
 				"TITLE": "Plugins"
 			}
-		},
-		"TAB": {
-			"PLUGIN": "Plugin"
 		}
 	},
 	"PROJECT": {
@@ -997,6 +763,7 @@
 			"ALT_E_DELETE_PROJECT": "Fail to delete Project.",
 			"ALT_E_UPDATE_PROJECT": "Fail to update a project.",
 			"ALT_S_ADD_MEMBER": "New members have successfully added.",
+			"ALT_S_DELETE_MEMBER": "Member(s) have been successfully deleted.",
 			"ALT_S_DELETE_PROJECT": "Project is successfully deleted.",
 			"ALT_S_UPDATE_PROJECT": "Project is successfully updated.",
 			"DELETE": "Delete",
@@ -1007,6 +774,8 @@
 			"MODAL_CREATE_PROJECT_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "Project Name",
 			"MODAL_CREATE_PROJECT_TITLE": "Create Project",
+			"MODAL_DELETE_MEMBER_CONTENT": "Are you sure remove following members from Project? ",
+			"MODAL_DELETE_MEMBER_TITLE": "Delete Member",
 			"MODAL_DELETE_PROJECT_CONTENT": "Are you sure you want to delete this Project?",
 			"MODAL_DELETE_PROJECT_TITLE": "Delete Project",
 			"MODAL_UPDATE_PROJECT_TITLE": "Update Project",
@@ -1014,6 +783,7 @@
 			"MODAL_VALIDATION_LENGTH": "Should not be longer than 40 characters",
 			"MODAL_VALIDATION_REQUIRED": "Should have required property 'name'",
 			"PROJECT_ID": "Project ID:",
+			"REPORT_CANCEL": "Cancel",
 			"REPORT_DESC": "SpaceONE offers Monthly Report based on this project. We will provide more content soon.",
 			"REPORT_DOWNLOAD_FILE_DESC": "*We provide file formats (including PDF, PPTX, CSV)",
 			"REPORT_LABEL_COMPANY_NAME": "Company Name on the Report Cover",
@@ -1060,92 +830,5 @@
 			"SHOW_ALL": "Show All Project",
 			"SHOW_ALL_TOOLTIP": "Show All Projects of Sub Project Groups"
 		}
-	},
-	"PWR_SCHED": {
-		"RESRC_GRP": {
-			"ADD_TAG": "태그 추가",
-			"TAG": "그룹 태그",
-			"TAG_DESC": "관련된 태그를 추가합니다. ",
-			"TAG_DESC2": "키는 문자, 숫자 및 밑줄만 포함할 수 있습니다."
-		}
-	},
-	"SECRET": {
-		"BTN": {
-			"None": ""
-		},
-		"JSON_ALERT": "Please, Check Json Format (Use double quotation( \\\" ) mark instead of single quotation (').",
-		"NO_FORMAT": "No Template found.",
-		"SECRET_TYPE": "Secret Type",
-		"TAB": {
-			"None": ""
-		}
-	},
-	"SERVICE": {
-		"IDENTITY": "Identity",
-		"INVENTORY": "Inventory",
-		"PLUGIN": "Plugin",
-		"PROVIDER": "Provider",
-		"REPOSITORY": "Repository",
-		"SECRET": "Secret",
-		"SUPERVISOR": "Supervisor"
-	},
-	"SIGNIN": {
-		"AUTH_G_FAIL_BODY": "Please confirm your Google Account",
-		"PASS_EMPTY": "Password can't be blank.",
-		"ROOT_CREDENTIALS": "Sign-in using root account credentials",
-		"SIGN_FAIL_BODY": "Please confirm your Username or Password.",
-		"SIGN_IN": "Sign In",
-		"SIGN_IN_MSG": "Sign in to your Account.",
-		"USER_EMPTY": "User ID can't be blank.",
-		"WELCOME_MSG": "Welcome to {0}",
-		"WELCOME_MSG_P": "Welcome to {0} SpaceONE conssole"
-	},
-	"SUCCESS": {
-		"None": ""
-	},
-	"TAB": {
-		"ADMIN": "Admin",
-		"CREDENTIALS": "Credentials",
-		"DATA": "Data",
-		"DETAILS": "Detail",
-		"HISTORY": "History",
-		"MEMBER": "Member",
-		"MONITORING": "Monitoring",
-		"RAW_DATA": "Raw Data",
-		"REPORT": "Report",
-		"SECRET": "Secret",
-		"SELECTED_DATA": "Selected Data",
-		"TAG": "Tag"
-	},
-	"TREE_TYPE": {
-		"CREATE": "Create {0}",
-		"CREATE_GRP": "Create Sub Project Group",
-		"DELETE": "Delete Selected",
-		"POOL": "Pool",
-		"PROJ": "Project",
-		"PROJECT_GROUP": "Project Group",
-		"REGION": "Region",
-		"UPDATE": "Update {0}",
-		"ZONE": "Zone"
-	},
-	"WORD": {
-		"BASE_INFO": "Base Information",
-		"CIDR": "CIDR",
-		"CLOUDSERVICE": "cloud service",
-		"COLLECTOR": "Collector",
-		"ID": "ID",
-		"KEY": "Key",
-		"LOCAL_TIME": "Local Time",
-		"RESOURCE": "Resource",
-		"SERVER": "server",
-		"SERVICE_ACCOUNT": "Service Account",
-		"STATISTICS": "Statistics",
-		"TAG": "Tag",
-		"TAGS": "Tags",
-		"TIME_RANGE": "Time Range",
-		"USER": "user",
-		"VALUE": "Value",
-		"VERSION": "Version",
-		"VM": "VM"
 	}
 }

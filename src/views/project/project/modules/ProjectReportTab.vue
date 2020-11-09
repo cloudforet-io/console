@@ -65,7 +65,7 @@
             lottie-name="lottie_interval"
             header-title="Loading..."
             body-text="Please wait around 10 seconds!"
-            :button-text="$t('BTN.CANCEL')"
+            :button-text="$t('PROJECT.DETAIL.REPORT_CANCEL')"
             @clickButton="onClickCancel"
         />
     </div>

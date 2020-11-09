@@ -33,7 +33,7 @@
                             />
                         </template>
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.NAME')"
+                    <p-field-group :label="$t('COMMON.PROFILE.NAME')"
                                    :invalid-text="invalidMsg.name"
                                    :invalid="invalidState.name"
                     >
