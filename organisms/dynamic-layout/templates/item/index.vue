@@ -123,8 +123,7 @@ export default {
                     extraData: { ...ds, index: i },
                 };
 
-                if (item.options.translation_id) console.debug('delete item.options.translation_id', item.options.translation_id);
-                delete item.options.translation_id;
+                if (item.options.translation_id) delete item.options.translation_id;
 
                 if (ds.type === 'datetime') {
                     item.typeOptions = { timezone: state.timezone };

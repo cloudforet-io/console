@@ -166,9 +166,11 @@ export default {
             props.options.fields.forEach((ds: DynamicField, i) => {
                 const item: Omit<DynamicFieldProps, 'data'> = {
                     type: ds.type || 'text',
-                    options: ds.options || {},
+                    options: { ...ds.options },
                     extraData: { ...ds, index: i },
                 };
+
+                if (item.options.translation_id) delete item.options.translation_id;
 
                 if (ds.type === 'datetime') {
                     item.typeOptions = { timezone };
