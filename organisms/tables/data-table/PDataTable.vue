@@ -401,21 +401,32 @@ export default {
                 let sortDesc: undefined|boolean = proxyState.sortDesc;
 
                 // when clicked the same thead
+                // if (sortBy === clickedKey) {
+                //     // set reverse mode
+                //     if (sortDesc) {
+                //         sortDesc = false;
+                //     // set default mode (sort nothing)
+                //     } else if (sortDesc === false) {
+                //         sortBy = '';
+                //         sortDesc = undefined;
+                //     }
+                //
+                // // when clicked the other thead
+                // } else {
+                //     sortBy = clickedKey;
+                //     sortDesc = true;
+                // }
+
                 if (sortBy === clickedKey) {
                     // set reverse mode
-                    if (sortDesc) {
-                        sortDesc = false;
-                    // set default mode (sort nothing)
-                    } else if (sortDesc === false) {
-                        sortBy = '';
-                        sortDesc = undefined;
-                    }
+                    sortDesc = !sortDesc;
 
-                // when clicked the other thead
+                    // when clicked the other thead
                 } else {
                     sortBy = clickedKey;
                     sortDesc = true;
                 }
+
 
                 // set changed values
                 proxyState.sortBy = sortBy;
@@ -534,9 +545,6 @@ export default {
             if (typeof field === 'string') res = item[field];
             else res = item[field.name];
 
-            if (trElements.value) {
-                // console.debug('tbodyEl.', trElements.value);
-            }
             // let result = '';
             // const arr = Array.from(copyTargetElement.value as any[]);
             // arr.forEach((el) => {
