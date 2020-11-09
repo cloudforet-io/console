@@ -25,7 +25,8 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
@@ -47,6 +48,7 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { TranslateResult } from 'vue-i18n';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -82,6 +84,8 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const layoutSchemaCacheMap = {};
         const fetchOptionsMap = {};
         const dataMap = {};
@@ -97,7 +101,10 @@ export default {
             language: computed(() => store.state.user.language),
 
             // button tab
-            tabs: computed<string[]>(() => state.layouts.map(d => d.name)),
+            tabs: computed<TranslateResult[]>(() => state.layouts.map((d) => {
+                if (d.options?.translation_id) return vm.$t(d.options?.translation_id) || d.name;
+                return d.name;
+            })),
             activeTab: '',
 
             // schema

@@ -60,7 +60,10 @@ module.exports = {
           "filter_format",
           "collect_mode",
           "service_type",
-          "repository_id"
+          "repository_id",
+          "translation_id",
+          "key_path",
+          "root_path"
         ]
       }
     ],
