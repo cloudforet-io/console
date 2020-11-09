@@ -101,10 +101,13 @@ export default {
             language: computed(() => store.state.user.language),
 
             // button tab
-            tabs: computed<TranslateResult[]>(() => state.layouts.map((d) => {
-                if (d.options?.translation_id) return vm.$t(d.options?.translation_id) || d.name;
-                return d.name;
-            })),
+            tabs: computed<TranslateResult[]>(() => {
+                const local = vm.$i18n.locale;
+                return state.layouts.map((d) => {
+                    if (d.options?.translation_id) return vm.$t(d.options?.translation_id, local) || d.name;
+                    return d.name;
+                });
+            }),
             activeTab: '',
 
             // schema
