@@ -66,7 +66,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs, ComponentRenderProxy,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
@@ -86,7 +86,7 @@ export default defineComponent({
         PFieldGroup,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance() as any;
         const store = useStore();
         const state = reactive({
             userId: '',
