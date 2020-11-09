@@ -541,6 +541,7 @@
 		"PRIMARY_IP_ADDRESS": "대표 IP 주소",
 		"PROJECT": "프로젝트",
 		"PROVIDER": "서비스 제공자",
+		"RAW_DATA": "원시 데이터",
 		"REGION": "지역",
 		"RESOURCE_ID": "자원 아이디",
 		"SECRET": "암호화키",

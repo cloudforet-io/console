@@ -46,7 +46,8 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { TranslateResult } from 'vue-i18n';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
+import { find } from 'lodash';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -87,12 +88,12 @@ export default {
             language: computed(() => store.state.user.language),
 
             // button tab
-            tabs: computed<TranslateResult[]>(() => {
+            tabs: computed<TabItem[]>(() => {
                 const local = vm.$i18n.locale;
-                return state.layouts.map((d) => {
-                    if (d.options?.translation_id) return vm.$t(d.options?.translation_id, local) || d.name;
-                    return d.name;
-                });
+                return state.layouts.map(d => ({
+                    label: vm.$t(d.options?.translation_id, local) || d.name,
+                    name: d.name,
+                }));
             }),
             activeTab: '',
 
@@ -140,7 +141,7 @@ export default {
 
             layoutSchemaCacheMap[props.serverId] = layouts;
             state.layouts = layouts || [];
-            if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
+            if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
             if (state.currentLayout.options?.search) setSearchOptions();
         };
 
@@ -222,10 +223,26 @@ export default {
         };
 
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
+            // if (field.extraData?.reference) {
+            //     return referenceFieldFormatter(field.extraData.reference, field.data);
+            // }
+            // return {}
+
+            // TODO: remove test code below
+            let data = { options: {} };
             if (field.extraData?.reference) {
-                return referenceFieldFormatter(field.extraData.reference, field.data);
+                data = {
+                    ...data,
+                    ...referenceFieldFormatter(field.extraData.reference, field.data),
+                };
             }
-            return {};
+            return {
+                ...data,
+                options: {
+                    ...data.options,
+                    description: 'This is test tooltip for Server Details\' data',
+                },
+            };
         };
 
         const loadSchemaAndData = async (forceLoadData = true) => {

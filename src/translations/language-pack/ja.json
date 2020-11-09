@@ -541,6 +541,7 @@
 		"PRIMARY_IP_ADDRESS": "Primary IP Address",
 		"PROJECT": "Project",
 		"PROVIDER": "Provider",
+		"RAW_DATA": "",
 		"REGION": "Region",
 		"RESOURCE_ID": "Resource ID",
 		"SECRET": "Secrets",

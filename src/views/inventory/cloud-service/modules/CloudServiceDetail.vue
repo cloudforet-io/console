@@ -48,7 +48,8 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { TranslateResult } from 'vue-i18n';
+import { TabItem } from '@/components/organisms/tabs/tab/type';
+import { find } from 'lodash';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -101,12 +102,12 @@ export default {
             language: computed(() => store.state.user.language),
 
             // button tab
-            tabs: computed<TranslateResult[]>(() => {
+            tabs: computed<TabItem[]>(() => {
                 const local = vm.$i18n.locale;
-                return state.layouts.map((d) => {
-                    if (d.options?.translation_id) return vm.$t(d.options?.translation_id, local) || d.name;
-                    return d.name;
-                });
+                return state.layouts.map(d => ({
+                    label: vm.$t(d.options?.translation_id, local) || d.name,
+                    name: d.name,
+                }));
             }),
             activeTab: '',
 
@@ -153,7 +154,7 @@ export default {
 
             layoutSchemaCacheMap[props.cloudServiceId] = layouts;
             state.layouts = layouts || [];
-            if (!state.tabs.includes(state.activeTab)) state.activeTab = state.tabs[0];
+            if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
             if (state.currentLayout.options?.search) setSearchOptions();
         };
 
