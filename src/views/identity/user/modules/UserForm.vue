@@ -12,12 +12,12 @@
         <template #body>
             <div class="user-input-wrapper">
                 <div class="top-part">
-                    <p-field-group :label="$t('COMMON.USER_ID')"
+                    <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
                                    :required="true"
-                                   :invalid-text="invalidMsg.user_id"
-                                   :invalid="invalidState.user_id"
-                                   :valid-text="$t('IDENTITY.USER.FORM.NAME_VALID')"
-                                   :valid="validState.user_id"
+                                   :invalid="!validationState.isUserIdValid"
+                                   :invalid-text="validationState.userIdInvalidText"
+                                   :valid="validationState.isUserIdValid"
+                                   :valid-text="validationState.userIdValidText"
                     >
                         <template #default="{invalid}">
                             <div>
@@ -39,12 +39,12 @@
                 <p-hr class="p-divider" />
                 <div class="bottom-part">
                     <div class="bottom-left-part">
-                        <p-field-group v-if="formState.is_local_auth"
-                                       label="Password"
-                                       :invalid-text="invalidMsg.password1"
-                                       :invalid="invalidState.password1"
+                        <p-field-group v-if="isInternalAuth"
+                                       :label="$t('IDENTITY.USER.FORM.PASSWORD')"
+                                       :invalid="!validationState.isPassword1Valid"
+                                       :invalid-text="validationState.password1InvalidText"
                                        :required="true"
-                                       :help-text="$t('IDENTITY.USER.FORM.PASSWORD_INVALID')"
+                                       :help-text="$t('IDENTITY.USER.FORM.PASSWORD_HELP_TEXT')"
                         >
                             <template v-slot:default="{invalid}">
                                 <p-text-input v-model="formState.password1"
@@ -72,10 +72,10 @@
                         </p-field-group>
                     </div>
                     <div class="bottom-right-part">
-                        <p-field-group v-if="formState.is_local_auth"
-                                       label="Password Check"
-                                       :invalid-text="invalidMsg.password2"
-                                       :invalid="invalidState.password2"
+                        <p-field-group v-if="isInternalAuth"
+                                       :label="$t('IDENTITY.USER.FORM.PASSWORD_CHECK')"
+                                       :invalid="!validationState.isPassword2Valid"
+                                       :invalid-text="validationState.password2InvalidText"
                                        :required="true"
                         >
                             <template v-slot:default="{invalid}">
@@ -96,7 +96,7 @@
                         </p-field-group>
 
                         <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')">
-                            <p-dict-input-group ref="dictRef"
+                            <p-dict-input-group ref="tagInputRef"
                                                 :dict="formState.tags"
                                                 show-validation
                                                 class="tag-input"
@@ -111,8 +111,10 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { TranslateResult } from 'vue-i18n';
+
 import {
-    reactive, computed, toRefs, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
@@ -123,17 +125,9 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
-import {
-    formValidation,
-    makeProxy,
-    requiredValidation,
-    userIDValidation,
-    Validation,
-    lengthMaxValidation,
-    lengthMinValidation,
-    checkTimeZoneValidation, noEmptySpaceValidation,
-} from '@/lib/compostion-util';
-import { useStore } from '@/store/toolset';
+import { makeProxy } from '@/lib/compostion-util';
+import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
 
 export default {
     name: 'PUserForm',
@@ -164,43 +158,33 @@ export default {
         },
         item: {
             type: Object,
-            default: () => ({
-                user_id: '',
-                password1: '',
-                password2: '',
-                name: '',
-                email: '',
-                mobile: '',
-                group: '',
-                language: 'korean',
-                timezone: 'Asia/Seoul',
-                tags: {},
-            }),
+            default: undefined,
         },
         updateMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, context) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, context.emit),
-            modal: null,
-            allBodyClass: computed(() => {
-                const res = props.bodyClass ? [...props.bodyClass] : [];
-                if (props.size) res.push(props.size);
-                if (props.scrollable) res.push('scrollable');
-                return res;
-            }),
+            proxyVisible: makeProxy('visible', props, emit),
+            isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
+            tagInputRef: null as any,
+            languageSelectItems: [
+                { type: 'item', label: 'English', name: 'en' },
+                { type: 'item', label: '한국어', name: 'ko' },
+            ],
+            timezoneSelectItems: [
+                { type: 'item', label: 'UTC', name: 'UTC' },
+                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
+            ],
         });
-        // const formState = reactive()
-        const { domain } = useStore();
-        const dictRef: any = null;
         const formState = reactive({
-            user_id: '',
-            password1: '',
-            password2: '',
+            user_id: undefined as undefined | string,
+            password1: undefined as undefined | string,
+            password2: undefined as undefined | string,
             name: '',
             email: '',
             mobile: '',
@@ -208,119 +192,138 @@ export default {
             language: 'en',
             timezone: 'UTC',
             tags: {},
-            isLastCheck: false,
-            is_local_auth: computed(() => domain.state.isLocalType),
-            ...props.item,
         });
-        const languageSelectItems = [
-            { type: 'item', label: 'English', name: 'en' },
-            {
-                type: 'item', label: '한국어', name: 'ko',
-            },
-        ];
-        const timezoneSelectItems = [
-            { type: 'item', label: 'UTC', name: 'UTC' },
-            { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
-        ];
+        const validationState = reactive({
+            isUserIdValid: undefined as undefined | boolean,
+            userIdInvalidText: '' as TranslateResult | string,
+            userIdValidText: vm.$t('IDENTITY.USER.FORM.NAME_VALID'),
+            //
+            isPassword1Valid: undefined as undefined | boolean,
+            password1InvalidText: '' as TranslateResult | string,
+            isPassword2Valid: undefined as undefined | boolean,
+            password2InvalidText: '' as TranslateResult | string,
+        });
 
-        const pwdCheckValidation = new Validation((value, data) => data.password1 === value, vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID'));
-        const defaultValidation = {
-            timezone: [checkTimeZoneValidation(vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID'))],
-        } as any;
-
-        const addUserValidations = { ...defaultValidation };
-        const updateUserValidations = { ...defaultValidation };
-        const userIdVds = [
-            requiredValidation(vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD')),
-            noEmptySpaceValidation(vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID')),
-            userIDValidation(context.parent, vm.$t('IDENTITY.USER.FORM.USER_ID_INVALID')),
-        ];
-
-        const pluginAuthIDValidation = () => new Validation(async (value) => {
-            let result = false;
-            await context.parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: domain.state.domainId }).then((res) => {
-                if (res.data.total_count >= 1) {
-                    result = true;
-                    if (!formState.isLastCheck && res.data.total_count === 1) {
-                        const data = res.data.results[0];
-                        if (!formState.name) { formState.name = data.name; }
-                        if (!formState.email) { formState.email = data.email; }
-                        if (!formState.mobile) { formState.mobile = data.mobile; }
-                        if (!formState.group) { formState.group = data.group; }
-                    }
-                }
-            }).catch((error) => { console.error(error); });
-            return result;
-        }, vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST'));
-
-        if (!formState.is_local_auth) { // plugin auth type
-            addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation()];
-        } else {
-            addUserValidations.user_id = [...userIdVds];
-            addUserValidations.password1 = [
-                requiredValidation(vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD')),
-                noEmptySpaceValidation(vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID')),
-                lengthMinValidation(5, vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 })),
-                lengthMaxValidation(12, vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 })),
-            ];
-            addUserValidations.password2 = [
-                requiredValidation(vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD')),
-                pwdCheckValidation,
-            ];
-
-            updateUserValidations.password1 = [
-                lengthMinValidation(5, vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 })),
-                lengthMaxValidation(12, vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 })),
-            ];
-            updateUserValidations.password2 = [
-                new Validation((value, data) => data.password1 === value, vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID')),
-            ];
-        }
-
-        const validateAPI = formValidation(formState, props.updateMode ? updateUserValidations : addUserValidations);
-
+        /* util */
         const checkUserID = async () => {
-            const result = await validateAPI.fieldValidation('user_id');
-            return result;
-        };
-        const confirm = async () => {
-            formState.isLastCheck = true;
-            const result = await validateAPI.allValidation();
-            formState.isLastCheck = false;
+            validationState.isUserIdValid = undefined;
+            validationState.userIdInvalidText = '';
 
-            if (result) {
-                const data = {} as any;
-                if (formState.is_local_auth) {
-                    if (result) {
-                        if (props.updateMode) {
-                            if (formState.password1) {
-                                data.password = formState.password1;
-                            }
-                        } else {
-                            data.password = formState.password1;
-                        }
-                    }
+            if (formState.user_id) {
+                if (formState.user_id.replace(/ /g, '').length !== formState.user_id.length) {
+                    validationState.isUserIdValid = false;
+                    validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
+                    return;
                 }
-                ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone'].forEach((key) => {
-                    if (formState[key]) {
-                        data[key] = formState[key];
-                    }
-                });
-                dictRef.allValidation();
-                data.tags = dictRef.getDict();
-                context.emit('confirm', data);
+                if (!state.isInternalAuth) {
+                    await SpaceConnector.client.identity.user.find({
+                        search: { user_id: formState.user_id },
+                        domain_id: store.state.domain.domainId,
+                    }).catch(() => {
+                        validationState.isUserIdValid = false;
+                        validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
+                    });
+                }
+                await SpaceConnector.client.identity.user.get({ user_id: formState.user_id })
+                    .then(() => {
+                        validationState.isUserIdValid = false;
+                        validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
+                    })
+                    .catch(() => {});
+                if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
+            } else {
+                validationState.isUserIdValid = false;
+                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            }
+        };
+        const checkPassword = () => {
+            // password1
+            if (typeof formState.password1 === 'undefined') {
+                validationState.isPassword1Valid = false;
+                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else if (formState.password1.replace(/ /g, '').length !== formState.password1.length) {
+                validationState.isPassword1Valid = false;
+                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
+            } else if (formState.password1.length < 5) {
+                validationState.isPassword1Valid = false;
+                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
+            } else if (formState.password1.length > 12) {
+                validationState.isPassword1Valid = false;
+                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
+            } else {
+                validationState.isPassword1Valid = true;
+                validationState.password1InvalidText = '';
+            }
+
+            // password2
+            if (typeof formState.password2 === 'undefined') {
+                validationState.isPassword2Valid = false;
+                validationState.password2InvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else if (formState.password1 !== formState.password2) {
+                validationState.isPassword2Valid = false;
+                validationState.password2InvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
+            } else {
+                validationState.isPassword2Valid = true;
+                validationState.password2InvalidText = '';
             }
         };
 
+        const confirm = async () => {
+            if (!props.updateMode) {
+                await checkUserID();
+                if (!validationState.isUserIdValid) {
+                    return;
+                }
+            }
+
+            if (state.isInternalAuth) {
+                await checkPassword();
+                if (!validationState.isPassword1Valid || !validationState.isPassword2Valid) {
+                    return;
+                }
+            }
+
+            const data = {} as any;
+            if (state.isInternalAuth) {
+                if (props.updateMode) {
+                    if (formState.password1) {
+                        data.password = formState.password1;
+                    }
+                } else {
+                    data.password = formState.password1;
+                }
+            }
+            ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone'].forEach((key) => {
+                if (formState[key]) {
+                    data[key] = formState[key];
+                }
+            });
+            state.tagInputRef.allValidation();
+            data.tags = state.tagInputRef.getDict();
+            emit('confirm', data);
+        };
+
+        const init = () => {
+            if (props.updateMode) {
+                formState.user_id = props.item.user_id;
+                formState.password1 = props.item.password1;
+                formState.password2 = props.item.password2;
+                formState.name = props.item.name;
+                formState.email = props.item.email;
+                formState.mobile = props.item.mobile;
+                formState.group = props.item.group;
+                formState.language = props.item.language;
+                formState.timezone = props.item.timezone;
+                formState.tags = props.item.tags;
+            }
+        };
+        init();
+
         return {
             ...toRefs(state),
-            dictRef,
             formState,
-            languageSelectItems,
-            timezoneSelectItems,
-            proxyVisible: makeProxy('visible', props, context.emit),
+            validationState,
             confirm,
-            ...validateAPI,
             checkUserID,
         };
     },
@@ -334,6 +337,7 @@ export default {
             padding-bottom: 0.25rem;
         }
         .bottom-part {
+            padding-bottom: 2rem;
             .bottom-left-part {
                 display: inline-grid;
                 width: 50%;
