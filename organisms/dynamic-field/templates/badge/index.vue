@@ -6,6 +6,7 @@ import { BadgeDynamicFieldProps } from '@/components/organisms/dynamic-field/tem
 import { Badge, BADGE_SHAPE } from '@/components/atoms/badges/type';
 import { getColor } from '@/components/util/helpers';
 import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
+import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldBadge',
@@ -43,6 +44,8 @@ export default {
         const outline = get(options, ['outline_color'], null);
         const shape = get(options, ['shape'], null);
         const link = get(options, 'link', null);
+        const data = vm.$t(get(options, 'translation_id', '')) || props.data;
+
         const badge: Badge = {} as any;
         if (shape) {
             badge.shape = BADGE_SHAPE[shape];
@@ -55,14 +58,19 @@ export default {
             badge.backgroundColor = getColor(get(options, ['background_color'], null));
             badge.textColor = getColor(get(options, ['text_color'], null));
         }
+
         if (link) {
             badge.link = link;
             badge.target = '_blank';
         }
-        if (props.data === undefined || props.data === null) return undefined;
 
-        const translationId = get(options, 'translation_id', '');
-        return h(PBadge, { props: badge }, vm.$t(translationId) || props.data);
+        if (data === undefined || data === null) return undefined;
+        if (!options.description) return h(PBadge, { props: badge }, data);
+
+        const abbrEl = h(PAbbreviation, {
+            attrs: { description: options.description },
+        }, data);
+        return h(PBadge, { props: badge }, [abbrEl]);
     },
 };
 </script>

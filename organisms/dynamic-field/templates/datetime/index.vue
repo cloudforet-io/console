@@ -3,6 +3,7 @@ import moment, { Moment } from 'moment';
 import { DatetimeOptions, TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { DatetimeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/datetime/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
+import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldDatetime',
@@ -57,13 +58,23 @@ export default {
                 result = time.format('YYYY-MM-DD HH:mm:ss');
             }
         }
-        if (props.options.link) {
-            return h(PAnchor, {
+
+        let datetimeEl = h('span', data, result);
+
+        if (options.description) {
+            datetimeEl = h(PAbbreviation, {
+                attrs: { description: options.description },
+            }, [datetimeEl]);
+        }
+
+        if (options.link) {
+            datetimeEl = h(PAnchor, {
                 ...data,
                 attrs: { href: (props.options as TextOptions).link, target: '_blank' },
-            }, result);
+            }, [datetimeEl]);
         }
-        return h('span', data, result);
+
+        return datetimeEl;
     },
 };
 </script>
