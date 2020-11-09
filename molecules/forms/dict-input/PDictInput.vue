@@ -4,7 +4,7 @@
                        :invalid="keyInvalid"
                        class="input-box key"
         >
-            <p-input-text v-focus="focused"
+            <p-input-text v-focus.lazy="focused"
                           :class="{invalid: keyInvalid}"
                           :value="name"
                           :placeholder="$t('COMPONENT.DICT_INPUT.KEY')"
@@ -32,14 +32,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { focus } from 'vue-focus';
 import PInputText from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import { DictInputProps } from '@/components/molecules/forms/dict-input/type';
 
-export default defineComponent({
+export default {
     name: 'PDictInput',
     components: { PInputText, PFieldGroup },
+    directives: { focus },
     props: {
         name: {
             type: String,
@@ -84,7 +85,7 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
