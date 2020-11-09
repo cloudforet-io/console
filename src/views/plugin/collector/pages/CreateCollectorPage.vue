@@ -148,8 +148,8 @@ export default {
             isValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
         });
         const routeState = reactive({
-            routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' },
-                { name: 'Create collector', path: '/plugin/collector/create/plugins' }],
+            routes: [{ name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' }, { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
+                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR'), path: '/plugin/collector/create/plugins' }],
         });
         const tabState = reactive({
             tabs: computed(() => [

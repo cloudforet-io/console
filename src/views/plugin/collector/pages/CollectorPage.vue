@@ -288,7 +288,7 @@ export default {
             collectDataModalVisible: false,
         });
         const routeState = reactive({
-            routes: [{ name: 'Plugin', path: '/plugin' }, { name: 'Collector', path: '/plugin/collector' }],
+            routes: [{ name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' }, { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' }],
         });
         const checkModalState = reactive({
             visible: false,

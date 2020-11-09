@@ -424,7 +424,7 @@ export default {
         };
 
         const routeState = reactive({
-            route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' }],
+            route: [{ name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' }, { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' }],
         });
 
         const checkProvider = async (queryStringForCheck) => {

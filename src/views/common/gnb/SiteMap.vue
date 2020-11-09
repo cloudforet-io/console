@@ -37,9 +37,11 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import vClickOutside from 'v-click-outside';
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
@@ -61,55 +63,56 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             allMenu: [
                 {
-                    label: 'Dashboard', link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
+                    label: vm.$t('MENU.DASHBOARD.DASHBOARD'), link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
                 },
                 {
-                    label: 'Project', link: '/project', subMenus: [], icon: 'ic_project',
+                    label: vm.$t('MENU.PROJECT.PROJECT'), link: '/project', subMenus: [], icon: 'ic_project',
                 },
                 {
-                    label: 'Inventory',
+                    label: vm.$t('MENU.INVENTORY.INVENTORY'),
                     link: '/inventory',
                     icon: 'ic_inventory',
                     subMenus: [
-                        { label: 'Server', link: '/inventory/server' },
-                        { label: 'Cloud Service', link: '/inventory/cloud-service' },
+                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server' },
+                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service' },
                     ],
                 },
                 {
-                    label: 'Identity',
+                    label: vm.$t('MENU.IDENTITY.IDENTITY'),
                     link: '/identity',
                     icon: 'ic_identity',
                     subMenus: [
-                        { label: 'Service Account', link: '/identity/service-account' },
-                        { label: 'User', link: '/identity/user' },
+                        { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account' },
+                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user' },
                     ],
                 },
                 {
-                    label: 'Automation',
+                    label: vm.$t('MENU.AUTOMATION.AUTOMATION'),
                     link: '/automation',
                     icon: 'ic_automation',
                     subMenus: [
-                        { label: 'Power Scheduler', link: '/automation/power-scheduler', isNew: true },
+                        { label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true },
                     ],
                 },
                 {
-                    label: 'Plugin',
+                    label: vm.$t('MENU.PLUGIN.PLUGIN'),
                     link: '/plugin',
                     icon: 'ic_plugin',
                     subMenus: [
-                        { label: 'Collector', link: '/plugin/collector' },
+                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector' },
                     ],
                 },
                 {
-                    label: 'Management',
+                    label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
                     link: '/management/collector-history',
                     icon: 'ic_management',
                     subMenus: [
-                        { label: 'Plugin (admin)', link: '/management/supervisor/plugins', isAdminMenu: true },
-                        { label: 'Collector History', link: '/management/collector-history', isNew: true },
+                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins', isAdminMenu: true },
+                        { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true },
                     ],
                 },
             ],

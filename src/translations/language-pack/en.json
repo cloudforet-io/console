@@ -380,7 +380,8 @@
 				"REGION": "Region",
 				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Provider",
-				"SHOW_ALL": "Show All"
+				"SHOW_ALL": "Show All",
+				"TITLE": "{provider} Cloud Service"
 			},
 			"PAGE": {
 				"ACTION": "Action",
@@ -469,6 +470,41 @@
 				"TAB_DETAILS": "Details",
 				"TITLE": "Installed Plugins"
 			}
+		}
+	},
+	"MENU": {
+		"AUTOMATION": {
+			"AUTOMATION": "Automation",
+			"POWER_SCHEDULER": "Power Scheduler"
+		},
+		"DASHBOARD": {
+			"DASHBOARD": "Dashboard"
+		},
+		"IDENTITY": {
+			"IDENTITY": "Identity",
+			"ROLE": "Role",
+			"SERVICE_ACCOUNT": "Service Accounts",
+			"SERVICE_ACCOUNT_ADD_ACCOUNT": "Add Account",
+			"USER": "User"
+		},
+		"INVENTORY": {
+			"CLOUD_SERVICE": "Cloud Service",
+			"INVENTORY": "Inventory",
+			"SERVER": "Server"
+		},
+		"MANAGEMENT": {
+			"COLLECTOR_HISTORY": "Collector History",
+			"COLLECTOR_HISTORY_JOB_MANAGEMENT": "Job Management",
+			"MANAGEMENT": "Management",
+			"PLUGIN": "Plugin (admin)"
+		},
+		"PLUGIN": {
+			"COLLECTOR": "Collector",
+			"CREATE_COLLECTOR": "Create Collector",
+			"PLUGIN": "Plugin"
+		},
+		"PROJECT": {
+			"PROJECT": "Project"
 		}
 	},
 	"PAGE_SCHEMA": {

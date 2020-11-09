@@ -161,8 +161,8 @@ export default {
         const routeState = reactive({
             projectName: computed(() => store.state.resource.project.items[props.projectId]?.label || props.projectId),
             route: computed(() => [
-                { name: 'Automation', path: '/automation' },
-                { name: 'Power Scheduler', path: '/automation/power-scheduler' },
+                { name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' },
+                { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), path: '/automation/power-scheduler' },
                 { name: `${routeState.projectName}` },
             ]),
         });

@@ -248,7 +248,7 @@ export default {
 
         /** Breadcrumb */
         const routeState = reactive({
-            route: [{ name: 'Inventory', path: '/inventory' }, { name: 'Cloud Service', path: '/inventory/cloud-service' },
+            route: [{ name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' }, { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' },
                 { name: `${props.name}`, path: `/inventory/cloud-service/${props.provider}/${props.group}/${props.name}` }],
         });
 

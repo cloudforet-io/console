@@ -157,7 +157,7 @@
 			"TITLE": "프로필"
 		},
 		"SIGN_IN": {
-			"ADMIN_ID": "관리자 아이",
+			"ADMIN_ID": "관리자 아이디 ",
 			"ADMIN_SIGN_IN": "관리자 로그인 ",
 			"ALT_E_LOGIN": "아이디나 암호를 확인해주세요",
 			"MEMBER_SIGN_IN": "사용자 계정으로 로그인",
@@ -198,7 +198,7 @@
 			"CLOUD_SERVICE_TITLE": "클라우드 서비스 ",
 			"COLLECTOR_HELP": "커스텀 플러그인으로 리소스 관리를 모니터링 합니다.",
 			"COLLECTOR_HISTORY_JOB_COUNT": "작업 개수 ",
-			"COLLECTOR_HISTORY_LABEL": "히스토리 ",
+			"COLLECTOR_HISTORY_LABEL": "수집 내역 ",
 			"COLLECTOR_HISTORY_LEGEND_FAILURE": "실패 ",
 			"COLLECTOR_HISTORY_LEGEND_SUCCESS": "성공 ",
 			"COLLECTOR_HISTORY_SEE_MORE": "더보기 ",
@@ -228,7 +228,7 @@
 			"SERVICE_ACCOUNT_TABLE_CLOUD_SERVICE": "클라우드 서비스 ",
 			"SERVICE_ACCOUNT_TABLE_CREDENTIALS": "암호화 키 ",
 			"SERVICE_ACCOUNT_TABLE_SERVER": "서버 ",
-			"SERVICE_ACCOUNT_TABLE_SERVICE_PROVIDER": "서비스 공급자 ",
+			"SERVICE_ACCOUNT_TABLE_SERVICE_PROVIDER": "서비스 제공자 ",
 			"SERVICE_ACCOUNT_TABLE_TITLE": "서비스 어카운트 ",
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "클라우드 서비스 ",
 			"SERVICE_SUMMARY_PROJECT": "프로젝트 ",
@@ -295,7 +295,7 @@
 				"CONSOLE": "콘솔",
 				"DELETE": "삭제",
 				"NO_SELECTED_ACCOUNT": "자세한 내용은 위에서 서비스 계정을 선택하세요.",
-				"PROVIDERS_TITLE": "서비스 프로바이더 목록",
+				"PROVIDERS_TITLE": "서비스 제공자",
 				"TAB_CREDENTIALS": "암호화 키",
 				"TAB_DATA": "데이터",
 				"TAB_DETAILS": "상세 정보",
@@ -377,10 +377,11 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
-				"REGION": "Region",
+				"REGION": "리전 ",
 				"SERVICE_CATEGORY": "서비스 카테고리",
-				"SERVICE_PROVIDER": "서비스 공급자",
-				"SHOW_ALL": "모두 보기"
+				"SERVICE_PROVIDER": "서비스 제공자",
+				"SHOW_ALL": "모두 보기",
+				"TITLE": "{provider} 클라우드 서비스 "
 			},
 			"PAGE": {
 				"ACTION": "작업",
@@ -469,6 +470,41 @@
 				"TAB_DETAILS": "상세 정보",
 				"TITLE": "설치된 플러그인"
 			}
+		}
+	},
+	"MENU": {
+		"AUTOMATION": {
+			"AUTOMATION": "자동화 ",
+			"POWER_SCHEDULER": "파워 스케쥴러 "
+		},
+		"DASHBOARD": {
+			"DASHBOARD": "대시보드 "
+		},
+		"IDENTITY": {
+			"IDENTITY": "인증 ",
+			"ROLE": "역할 ",
+			"SERVICE_ACCOUNT": "서비스 계정 ",
+			"SERVICE_ACCOUNT_ADD_ACCOUNT": "계정 추가 ",
+			"USER": "사용자 "
+		},
+		"INVENTORY": {
+			"CLOUD_SERVICE": "클라우드 서비스 ",
+			"INVENTORY": "인벤토리 ",
+			"SERVER": "서버 "
+		},
+		"MANAGEMENT": {
+			"COLLECTOR_HISTORY": "수집 내역 ",
+			"COLLECTOR_HISTORY_JOB_MANAGEMENT": "작업 내역 ",
+			"MANAGEMENT": "관리 ",
+			"PLUGIN": "플러그인 (관리자)"
+		},
+		"PLUGIN": {
+			"COLLECTOR": "컬렉터 ",
+			"CREATE_COLLECTOR": "컬렉터 생성 ",
+			"PLUGIN": "플러그인 "
+		},
+		"PROJECT": {
+			"PROJECT": "프로젝트 "
 		}
 	},
 	"PAGE_SCHEMA": {

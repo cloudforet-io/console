@@ -128,7 +128,6 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 
-import { makeTrItems } from '@/lib/view-helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
@@ -399,7 +398,7 @@ export default {
                 query: query.data,
             });
             state.pageNavigation = [
-                { name: 'Project', path: '/project' },
+                { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },
                 ...projectGroupName.results.map(d => ({
                     name: d.name,
                     path: `/project?select_pg=${d.project_group_id}`,

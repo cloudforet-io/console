@@ -380,7 +380,8 @@
 				"REGION": "",
 				"SERVICE_CATEGORY": "",
 				"SERVICE_PROVIDER": "",
-				"SHOW_ALL": ""
+				"SHOW_ALL": "",
+				"TITLE": ""
 			},
 			"PAGE": {
 				"ACTION": "",
@@ -469,6 +470,41 @@
 				"TAB_DETAILS": "",
 				"TITLE": ""
 			}
+		}
+	},
+	"MENU": {
+		"AUTOMATION": {
+			"AUTOMATION": "",
+			"POWER_SCHEDULER": ""
+		},
+		"DASHBOARD": {
+			"DASHBOARD": ""
+		},
+		"IDENTITY": {
+			"IDENTITY": "",
+			"ROLE": "",
+			"SERVICE_ACCOUNT": "",
+			"SERVICE_ACCOUNT_ADD_ACCOUNT": "",
+			"USER": ""
+		},
+		"INVENTORY": {
+			"CLOUD_SERVICE": "",
+			"INVENTORY": "",
+			"SERVER": ""
+		},
+		"MANAGEMENT": {
+			"COLLECTOR_HISTORY": "",
+			"COLLECTOR_HISTORY_JOB_MANAGEMENT": "",
+			"MANAGEMENT": "",
+			"PLUGIN": ""
+		},
+		"PLUGIN": {
+			"COLLECTOR": "",
+			"CREATE_COLLECTOR": "",
+			"PLUGIN": ""
+		},
+		"PROJECT": {
+			"PROJECT": ""
 		}
 	},
 	"PAGE_SCHEMA": {

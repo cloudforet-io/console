@@ -177,70 +177,70 @@ export default {
             profileVisible: false,
             defaultMenuList: [
                 {
-                    key: 'project',
+                    key: vm.$t('MENU.PROJECT.PROJECT'),
                     link: '/project',
                     parentRoutes: ['project'],
                     menu: [],
                 },
                 {
-                    key: 'inventory',
+                    key: vm.$t('MENU.INVENTORY.INVENTORY'),
                     link: '/inventory',
                     parentRoutes: ['inventory'],
                     menu: [
                         {
-                            type: 'item', label: 'Server', name: 'server', link: '/inventory/server',
+                            type: 'item', label: vm.$t('MENU.INVENTORY.SERVER'), name: 'server', link: '/inventory/server',
                         },
                         {
-                            type: 'item', label: 'Cloud Service', name: 'cloud-service', link: '/inventory/cloud-service',
+                            type: 'item', label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), name: 'cloud-service', link: '/inventory/cloud-service',
                         },
                     ],
                 },
                 {
-                    key: 'identity',
+                    key: vm.$t('MENU.IDENTITY.IDENTITY'),
                     link: '/identity',
                     parentRoutes: ['identity'],
                     menu: [
                         {
-                            type: 'item', label: 'Service Account', name: 'service-account', link: '/identity/service-account',
+                            type: 'item', label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), name: 'service-account', link: '/identity/service-account',
                         },
                         {
-                            type: 'item', label: 'User', name: 'user', link: '/identity/user',
+                            type: 'item', label: vm.$t('MENU.IDENTITY.USER'), name: 'user', link: '/identity/user',
                         },
                         {
-                            type: 'item', label: 'Role', name: 'role', disabled: true, link: '',
+                            type: 'item', label: vm.$t('MENU.IDENTITY.ROLE'), name: 'role', disabled: true, link: '',
                         },
                     ],
                 },
                 {
-                    key: 'automation',
+                    key: vm.$t('MENU.AUTOMATION.AUTOMATION'),
                     link: '/automation',
                     parentRoutes: ['automation'],
                     menu: [
                         {
-                            type: 'item', label: 'Power Scheduler', name: 'power-scheduler', link: '/automation/power-scheduler', isNew: true,
+                            type: 'item', label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), name: 'power-scheduler', link: '/automation/power-scheduler', isNew: true,
                         },
                     ],
                 },
                 {
-                    key: 'plugin',
+                    key: vm.$t('MENU.PLUGIN.PLUGIN'),
                     link: '/plugin',
                     parentRoutes: ['plugin'],
                     menu: [
                         {
-                            type: 'item', label: 'Collector', name: 'collector', link: '/plugin/collector',
+                            type: 'item', label: vm.$t('MENU.PLUGIN.COLLECTOR'), name: 'collector', link: '/plugin/collector',
                         },
                     ],
                 },
                 {
-                    key: 'management',
+                    key: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
                     link: '/management/collector-history',
                     parentRoutes: ['management'],
                     menu: [
                         {
-                            type: 'item', label: 'Plugin (admin)', name: 'plugin', link: '/management/supervisor/plugins',
+                            type: 'item', label: vm.$t('MENU.MANAGEMENT.PLUGIN'), name: 'plugin', link: '/management/supervisor/plugins',
                         },
                         {
-                            type: 'item', label: 'Collector History', name: 'collector-history', link: '/management/collector-history', isNew: true,
+                            type: 'item', label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), name: 'collector-history', link: '/management/collector-history', isNew: true,
                         },
                     ],
                 },

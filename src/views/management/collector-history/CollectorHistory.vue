@@ -268,15 +268,15 @@ export default {
         });
         const routeState = reactive({
             route: [
-                { name: 'Management', path: '/management/collector-history' },
-                { name: 'Collector History', path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
             ],
         });
         const subRouteState = reactive({
             subRoute: computed(() => [
-                { name: 'Management', path: '/management/collector-history' },
-                { name: 'Collector History', path: '/management/collector-history' },
-                { name: 'Job Management', path: `/management/collector-history#${state.selectedJobId}` },
+                { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY_JOB_MANAGEMENT'), path: `/management/collector-history#${state.selectedJobId}` },
             ]),
         });
 

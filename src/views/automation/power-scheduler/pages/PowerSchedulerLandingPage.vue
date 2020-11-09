@@ -233,7 +233,7 @@ export default {
          * Page Navigation
          * */
         const routeState = reactive({
-            route: [{ name: 'Automation', path: '/automation' }, { name: 'Power Scheduler', path: '/automation/power-scheduler' }],
+            route: [{ name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' }, { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), path: '/automation/power-scheduler' }],
         });
 
         /**

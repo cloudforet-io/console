@@ -370,7 +370,7 @@ export default {
                 }
                 return [
                     {
-                        name: 'Project',
+                        name: vm.$t('MENU.PROJECT.PROJECT'),
                         data: null as any,
                     },
                     ...result,
