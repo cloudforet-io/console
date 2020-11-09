@@ -75,6 +75,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     getCurrentInstance,
     reactive,
@@ -105,8 +106,8 @@ export default defineComponent({
         });
 
         const requireFieldValidations = {
-            userId: [requiredValidation('Please enter user ID')],
-            password: [requiredValidation('Please enter password')],
+            userId: [requiredValidation(vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED'))],
+            password: [requiredValidation(vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED'))],
         };
         const validateAPI = formValidation(state, requireFieldValidations);
         const checkUserId = async () => {
@@ -125,7 +126,6 @@ export default defineComponent({
                 await vm.$store.dispatch('user/signIn', {
                     domain_id: vm.$store.state.domain.domainId,
                     credentials: {
-                        // eslint-disable-next-line camelcase
                         user_id: state.userId,
                         password: state.password,
                     },
@@ -133,9 +133,7 @@ export default defineComponent({
 
                 const response = await vm.$http.post('/identity/token/issue', {
                     credentials: {
-                        // eslint-disable-next-line camelcase
                         user_type: 'USER',
-                        // eslint-disable-next-line camelcase
                         user_id: state.userId,
                         password: state.password,
                     },

@@ -16,7 +16,7 @@
                                    :required="true"
                                    :invalid-text="invalidMsg.user_id"
                                    :invalid="invalidState.user_id"
-                                   valid-text="you can use this ID"
+                                   :valid-text="$t('IDENTITY.USER.FORM.NAME_VALID')"
                                    :valid="validState.user_id"
                     >
                         <template #default="{invalid}">
@@ -44,7 +44,7 @@
                                        :invalid-text="invalidMsg.password1"
                                        :invalid="invalidState.password1"
                                        :required="true"
-                                       help-text="Your Password must be 5 ~ 12 characters long"
+                                       :help-text="$t('IDENTITY.USER.FORM.PASSWORD_INVALID')"
                         >
                             <template v-slot:default="{invalid}">
                                 <p-text-input v-model="formState.password1"
@@ -91,11 +91,11 @@
                             <p-text-input v-model="formState.email" class="block" />
                         </p-field-group>
 
-                        <p-field-group :label="$t('COMMON.GROUP')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.GROUP')">
                             <p-text-input v-model="formState.group" class="block" />
                         </p-field-group>
 
-                        <p-field-group :label="$t('WORD.TAGS')">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')">
                             <p-dict-input-group ref="dictRef"
                                                 :dict="formState.tags"
                                                 show-validation
@@ -194,6 +194,7 @@ export default {
                 return res;
             }),
         });
+        // const formState = reactive()
         const { domain } = useStore();
         const dictRef: any = null;
         const formState = reactive({
@@ -224,12 +225,16 @@ export default {
 
         const pwdCheckValidation = new Validation((value, data) => data.password1 === value, vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID'));
         const defaultValidation = {
-            timezone: [checkTimeZoneValidation()],
+            timezone: [checkTimeZoneValidation(vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID'))],
         } as any;
 
         const addUserValidations = { ...defaultValidation };
         const updateUserValidations = { ...defaultValidation };
-        const userIdVds = [requiredValidation(), noEmptySpaceValidation(), userIDValidation(context.parent)];
+        const userIdVds = [
+            requiredValidation(vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD')),
+            noEmptySpaceValidation(vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID')),
+            userIDValidation(context.parent, vm.$t('IDENTITY.USER.FORM.USER_ID_INVALID')),
+        ];
 
         const pluginAuthIDValidation = () => new Validation(async (value) => {
             let result = false;
@@ -252,10 +257,21 @@ export default {
             addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation()];
         } else {
             addUserValidations.user_id = [...userIdVds];
-            addUserValidations.password1 = [requiredValidation(), noEmptySpaceValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
-            addUserValidations.password2 = [requiredValidation(), pwdCheckValidation];
+            addUserValidations.password1 = [
+                requiredValidation(vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD')),
+                noEmptySpaceValidation(vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID')),
+                lengthMinValidation(5, vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 })),
+                lengthMaxValidation(12, vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 })),
+            ];
+            addUserValidations.password2 = [
+                requiredValidation(vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD')),
+                pwdCheckValidation,
+            ];
 
-            updateUserValidations.password1 = [lengthMinValidation(5), lengthMaxValidation(12)];
+            updateUserValidations.password1 = [
+                lengthMinValidation(5, vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 })),
+                lengthMaxValidation(12, vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 })),
+            ];
             updateUserValidations.password2 = [
                 new Validation((value, data) => data.password1 === value, vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID')),
             ];

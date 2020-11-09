@@ -154,7 +154,10 @@ export default {
         const updateUserValidations = {
             name: [requiredValidation(vm.$t('COMMON.PROFILE.NAME_REQUIRED'))],
             email: [requiredValidation(vm.$t('COMMON.PROFILE.EMAIL_REQUIRED'))],
-            password: [lengthMinValidation(5), lengthMaxValidation(12)],
+            password: [
+                lengthMinValidation(5, vm.$t('COMMON.PROFILE.MIN_LENGTH_INVALID', { min: 5 })),
+                lengthMaxValidation(12, vm.$t('COMMON.PROFILE.MAX_LENGTH_INVALID', { max: 12 })),
+            ],
             passwordCheck: [
                 new Validation((value, data) => data.password === value, vm.$t('COMMON.PROFILE.PASSWORD_CHECK_INVALID')),
             ],
