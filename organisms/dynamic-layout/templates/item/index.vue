@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p-panel-top v-if="name">
-            {{ name }}
+        <p-panel-top v-if="layoutName">
+            {{ layoutName }}
         </p-panel-top>
         <p-definition-table :fields="fields" :data="rootData" :loading="loading"
                             v-on="$listeners"
@@ -20,7 +20,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
@@ -70,13 +70,18 @@ export default {
             default: undefined,
         },
     },
-    setup(props: ItemDynamicLayoutProps, { emit, refs }) {
+    setup(props: ItemDynamicLayoutProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
+            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             fields: computed<DefinitionField[]>(() => {
                 if (!props.options.fields) return [];
+                const locale = vm.$i18n.locale;
                 return props.options.fields.map((d, i) => {
                     const res = {
-                        label: d.name, name: d.key,
+                        label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
+                        name: d.key,
                     } as DefinitionField;
 
                     // in case of type 'list', it generate html elements recursively.
@@ -114,9 +119,12 @@ export default {
             props.options.fields.forEach((ds: DynamicField, i) => {
                 const item: Omit<DynamicFieldProps, 'data'> = {
                     type: ds.type || 'text',
-                    options: ds.options || {},
+                    options: { ...ds.options },
                     extraData: { ...ds, index: i },
                 };
+
+                if (item.options.translation_id) console.debug('delete item.options.translation_id', item.options.translation_id);
+                delete item.options.translation_id;
 
                 if (ds.type === 'datetime') {
                     item.typeOptions = { timezone: state.timezone };

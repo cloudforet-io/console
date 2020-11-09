@@ -2,6 +2,8 @@
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { TextDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/text/type';
+import {ComponentRenderProxy, getCurrentInstance} from "@vue/composition-api";
+import {TranslateResult} from "vue-i18n";
 
 export default {
     name: 'PDynamicFieldText',
@@ -34,8 +36,10 @@ export default {
         },
     },
     render(h, { props, data }: {props: TextDynamicFieldProps; data: any}) {
-        let text: string;
-        if (props.data === null || props.data === undefined) text = '';
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        let text: TranslateResult;
+        if (props.options.translation_id) text = vm.$t(props.options.translation_id);
+        else if (props.data === null || props.data === undefined) text = '';
         else text = typeof props.data === 'string' ? props.data : JSON.stringify(props.data);
 
         const textEl = h('span', data, text);

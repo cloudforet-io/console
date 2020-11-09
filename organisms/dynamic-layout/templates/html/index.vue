@@ -1,7 +1,7 @@
 <template>
     <div class="p-dynamic-layout-html">
-        <p-panel-top v-if="name">
-            {{ name }}
+        <p-panel-top v-if="layoutName">
+            {{ layoutName }}
         </p-panel-top>
         <div v-html="iframeData" />
     </div>
@@ -9,7 +9,8 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import { HtmlDynamicLayoutProps, HtmlFetchOptions } from '@/components/organisms/dynamic-layout/templates/html/type';
@@ -41,7 +42,9 @@ export default {
         },
     },
     setup(props: HtmlDynamicLayoutProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
                     return get(props.data, props.options.root_path, '');

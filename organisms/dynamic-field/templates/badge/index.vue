@@ -4,14 +4,14 @@ import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { BadgeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { BadgeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/badge/type';
 import { Badge, BADGE_SHAPE } from '@/components/atoms/badges/type';
-import {getColor} from "@/components/util/helpers";
+import { getColor } from '@/components/util/helpers';
+import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
 
 export default {
     name: 'PDynamicFieldBadge',
     functional: true,
     components: { PBadge },
     props: {
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
         options: {
             type: Object,
             default: () => ({}),
@@ -38,6 +38,7 @@ export default {
         },
     },
     render(h, { props }: {props: BadgeDynamicFieldProps}) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const options: BadgeOptions = props.options;
         const outline = get(options, ['outline_color'], null);
         const shape = get(options, ['shape'], null);
@@ -59,7 +60,9 @@ export default {
             badge.target = '_blank';
         }
         if (props.data === undefined || props.data === null) return undefined;
-        return h(PBadge, { props: badge }, props.data);
+
+        const translationId = get(options, 'translation_id', '');
+        return h(PBadge, { props: badge }, vm.$t(translationId) || props.data);
     },
 };
 </script>

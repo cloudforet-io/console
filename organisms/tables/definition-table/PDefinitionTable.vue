@@ -2,7 +2,7 @@
     <div class="p-definition-table">
         <slot v-if="!loading && isNoData" name="empty">
             <p-empty class="py-8">
-                No Data
+                {{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}
             </p-empty>
         </slot>
         <table v-else-if="!isNoData">

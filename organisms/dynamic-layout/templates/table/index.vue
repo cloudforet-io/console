@@ -1,10 +1,10 @@
 <template>
     <div class="p-dynamic-layout-table">
-        <p-panel-top v-if="name" class="panel-top"
+        <p-panel-top v-if="layoutName" class="panel-top"
                      :use-total-count="true"
                      :total-count="totalCount"
         >
-            {{ name }}
+            {{ layoutName }}
         </p-panel-top>
         <p-search-table :fields="fields"
                         :items="rootData"
@@ -109,10 +109,11 @@ export default {
             default: undefined,
         },
     },
-    setup(props: TableDynamicLayoutProps, { emit, slots }) {
+    setup(props: TableDynamicLayoutProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             /** table */
             fields: computed(() => {
                 if (!props.options.fields) return [];

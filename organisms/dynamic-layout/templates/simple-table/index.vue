@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p-panel-top v-if="name">
-            {{ name }}
+        <p-panel-top v-if="layoutName">
+            {{ layoutName }}
         </p-panel-top>
         <p-data-table :items="rootData"
                       :fields="fields"
@@ -25,7 +25,8 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
@@ -78,7 +79,12 @@ export default {
         },
     },
     setup(props: SimpleTableDynamicLayoutProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
+            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
+
+            /** table */
             fields: computed(() => {
                 if (!props.options.fields) return [];
 

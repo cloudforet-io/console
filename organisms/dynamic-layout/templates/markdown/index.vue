@@ -1,7 +1,7 @@
 <template>
     <div class="p-dynamic-layout-markdown">
-        <p-panel-top v-if="name">
-            {{ name }}
+        <p-panel-top v-if="layoutName">
+            {{ layoutName }}
         </p-panel-top>
         <p-markdown :markdown="options.markdown || ''"
                     :data="rootData"
@@ -12,7 +12,8 @@
 
 <script lang="ts">
 import {
-    computed,
+    ComponentRenderProxy,
+    computed, getCurrentInstance,
     reactive, toRefs,
 } from '@vue/composition-api';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
@@ -52,7 +53,9 @@ export default {
         },
     },
     setup(props: MarkdownDynamicLayoutProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
                     return get(props.data, props.options.root_path);

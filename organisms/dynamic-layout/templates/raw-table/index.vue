@@ -2,7 +2,8 @@
     <p-dynamic-layout-table class="p-dynamic-layout-raw-table"
                             :name="name"
                             :options="{
-                                fields
+                                fields,
+                                translation_id: options.translation_id
                             }"
                             :data="rootData"
                             :fetch-options="fetchOptions"
@@ -64,16 +65,12 @@ export default {
             default: undefined,
         },
     },
-    setup(props: RawTableDynamicLayoutProps, { emit, listeners }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
+    setup(props: RawTableDynamicLayoutProps) {
         const state = reactive({
             fields: computed(() => {
                 if (state.rootData[0]) {
                     const firstItem = state.rootData[0];
-                    console.debug('fields', firstItem);
                     const res = map(firstItem, (d, k) => ({ key: k, name: k }));
-                    console.debug('fields', firstItem, 'res', state.rootData);
                     return res;
                 }
                 return [];

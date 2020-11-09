@@ -5,7 +5,9 @@ import { StatusProps } from '@/components/molecules/status/type';
 import { StateOptions, TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { StateDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/state/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
-import {getColor} from "@/components/util/helpers";
+import { getColor } from '@/components/util/helpers';
+import { TranslateResult } from 'vue-i18n';
+import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
 
 export default {
     name: 'PDynamicFieldState',
@@ -39,12 +41,17 @@ export default {
         },
     },
     render(h, { props }: {props: StateDynamicFieldProps}) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const options: StateOptions = props.options;
+        let text: TranslateResult;
+        if (options.translation_id) text = vm.$t(options.translation_id);
+        else text = props.data === null || props.data === undefined ? '' : String(props.data);
+
         const statusProps: StatusProps = {
             icon: get(options, ['icon', 'image'], null),
             iconColor: getColor(get(options, ['icon', 'color'], null)),
             textColor: getColor(get(options, ['text_color'], null)),
-            text: props.data === null || props.data === undefined ? '' : String(props.data),
+            text,
         };
 
         const statusEl = h(PStatus, {

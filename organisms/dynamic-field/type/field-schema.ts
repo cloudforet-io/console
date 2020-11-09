@@ -12,6 +12,7 @@ export interface CommonOptions {
     sortable?: boolean;
     sort_key?: string;
     width?: string;
+    translation_id?: string;
 }
 
 export interface BadgeOptions extends CommonOptions {
