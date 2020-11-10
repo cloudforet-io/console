@@ -13,33 +13,33 @@
         <template #body>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_LABEL')">
                 <br>
-                <p-text-input v-model="name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
+                <p-text-input v-model="formState.name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
-                <p-select-dropdown v-model="timezone" :items="timezones"
+                <p-select-dropdown v-model="formState.timezone" :items="timezones"
                                    class="timezone"
                                    @input="changeTimezone"
                 />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"
                            required
-                           :invalid="showValidation && !isValid"
-                           :invalid-text="invalidText"
+                           :invalid="validationState.showValidation && !validationState.isValid"
+                           :invalid-text="validationState.invalidText"
             >
                 <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC') }}</span>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
                      class="time-schedule-wrapper block lg:flex h-48 lg:h-40"
-                     :class="scheduleType === type ? 'selected' : ''"
-                     @click="scheduleType = type"
+                     :class="formState.scheduleType === type ? 'selected' : ''"
+                     @click="formState.scheduleType = type"
                 >
                     <div class="w-full lg:w-1/3 pb-4 lg:pb-0">
                         <p-radio
-                            v-model="scheduleType"
+                            v-model="formState.scheduleType"
                             :value="type"
                         >
                             <template #icon>
                                 <p-i class="radio-icon" width="1.25rem" height="1.25rem"
-                                     :name="scheduleType === type ? 'ic_checkbox_circle--checked' : 'ic_radio'"
+                                     :name="formState.scheduleType === type ? 'ic_checkbox_circle--checked' : 'ic_radio'"
                                 />
                             </template>
                         </p-radio>
@@ -51,7 +51,7 @@
                         <div v-if="type === 'hourly'" class="hourly-schedule-wrapper">
                             <span v-for="(hour) in hoursMatrix" :key="hour"
                                   class="time-block"
-                                  :class="{active: selectedHours[hour] }"
+                                  :class="{active: formState.selectedHours[hour] }"
                                   @click="onClickHour(hour)"
                             >
                                 {{ hour }}
@@ -66,12 +66,12 @@
                         </div>
                         <div v-else class="interval-wrapper">
                             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')" class="w-1/2">
-                                <p-text-input v-model="intervalTime" class="ml-4" type="number"
+                                <p-text-input v-model="formState.intervalTime" class="ml-2" type="number"
                                               :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_PLACEHOLDER')"
                                 />
                             </p-field-group>
                             <div class="w-1/2">
-                                <p-select-dropdown v-model="intervalTimeType" :items="intervalTimeTypes" auto-height />
+                                <p-select-dropdown v-model="formState.intervalTimeType" :items="intervalTimeTypes" auto-height />
                             </div>
                         </div>
                     </div>
@@ -83,9 +83,9 @@
 
 <script lang="ts">
 import {
-    range, flatMap, get, forEach,
+    range, get, forEach, size,
 } from 'lodash';
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
@@ -105,18 +105,9 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { makeProxy } from '@/lib/compostion-util';
 import { store } from '@/store';
 
-class MenuItem {
-    name: string;
 
-    label: string;
-
-    type: string;
-
-    constructor(name, label?) {
-        this.name = name;
-        this.label = label || name;
-        this.type = 'item';
-    }
+interface ScheduleHours {
+    [time: string]: Dayjs;
 }
 
 const INTERVAL_MAX_SECONDS = 3600;
@@ -149,80 +140,99 @@ export default {
             default: true,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const formState = reactive({
+            name: '',
+            timezone: store.state.user.timezone || 'UTC',
+            selectedHours: {} as ScheduleHours,
+            selectedUTCHoursList: computed(() => {
+                const utcHours = [] as number[];
+                forEach(formState.selectedHours, (time) => {
+                    utcHours.push(time.utc().hour());
+                });
+                return utcHours;
+            }),
+            scheduleType: 'hourly',
+            intervalTimeType: 'minutes',
+            intervalTime: undefined as undefined | number,
+            intervalTimeInSeconds: computed(() => {
+                if (formState.intervalTime) {
+                    if (formState.intervalTimeType === 'minutes') return formState.intervalTime * 60;
+                    if (formState.intervalTimeType === 'hours') return formState.intervalTime * 3600;
+                }
+                return formState.intervalTime;
+            }),
+        });
         const state = reactive({
             loading: false,
             schedule: null,
             proxyVisible: makeProxy('visible', props, emit),
-            name: '',
-            timezone: store.state.user.timezone || 'UTC',
-            hoursMatrix: range(24),
-            selectedHours: {},
-            selectedUTCHoursList: computed(() => flatMap(state.selectedHours, time => moment.utc(time).hour())),
-            isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
-            showValidation: false,
-            invalidText: computed(() => {
-                if (state.scheduleType === 'hourly' && state.selectedUTCHoursList.length === 0) {
-                    return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_INVALID_REQUIRED');
-                } if (state.scheduleType === 'interval') {
-                    if (!state.intervalTimeInSeconds) {
-                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_REQUIRED');
-                    } if (state.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
-                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MIN');
-                    } if (state.intervalTimeInSeconds > INTERVAL_MAX_SECONDS) {
-                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MAX');
-                    }
-                }
-                return '';
-            }),
-            isValid: computed(() => {
-                if (state.scheduleType === 'hourly') return state.selectedUTCHoursList.length !== 0;
-                return state.intervalTimeInSeconds >= INTERVAL_MIN_SECONDS && state.intervalTimeInSeconds <= INTERVAL_MAX_SECONDS;
-            }),
             //
+            hoursMatrix: range(24),
+            timezones: [
+                { type: 'item', label: 'UTC (default)', name: 'UTC' },
+                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
+            ],
             scheduleTypes: computed(() => ({
                 hourly: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
                 interval: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL'),
             })),
-            scheduleType: 'hourly',
-            intervalTime: undefined as undefined | number,
-            intervalTimeInSeconds: computed(() => {
-                if (state.intervalTimeType === 'minutes') return state.intervalTime * 60;
-                if (state.intervalTimeType === 'hours') return state.intervalTime * 3600;
-                return state.intervalTime;
-            }),
             intervalTimeTypes: computed(() => [
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_SECOND'), name: 'seconds', type: 'item' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_MINUTE'), name: 'minutes', type: 'item' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_HOUR'), name: 'hours', type: 'item' },
             ]),
-            intervalTimeType: 'minutes',
+            isAllHours: computed(() => size(formState.selectedHours) === 24),
+            sizeof: computed(() => size(formState.selectedHours)),
         });
-
-        const timezones = state.timezone === 'UTC'
-            ? [new MenuItem(state.timezone)] : [
-                new MenuItem(state.timezone),
-                new MenuItem('UTC'),
-            ];
+        const validationState = reactive({
+            showValidation: false,
+            isValid: computed(() => {
+                if (formState.scheduleType === 'hourly') {
+                    return size(formState.selectedHours) !== 0;
+                }
+                if (formState.intervalTimeInSeconds) {
+                    return formState.intervalTimeInSeconds >= INTERVAL_MIN_SECONDS && formState.intervalTimeInSeconds <= INTERVAL_MAX_SECONDS;
+                }
+                return false;
+            }),
+            invalidText: computed(() => {
+                if (formState.scheduleType === 'hourly' && size(formState.selectedHours) === 0) {
+                    return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_INVALID_REQUIRED');
+                } if (formState.scheduleType === 'interval') {
+                    if (!formState.intervalTimeInSeconds) {
+                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_REQUIRED');
+                    } if (formState.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
+                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MIN');
+                    } if (formState.intervalTimeInSeconds > INTERVAL_MAX_SECONDS) {
+                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MAX');
+                    }
+                }
+                return '';
+            }),
+        });
 
         const initSelectedHours = () => {
             const res = {};
             get(state, 'schedule.schedule.hours', []).forEach((hour) => {
-                const time = moment.tz(moment.utc({ hour }), state.timezone);
+                let time = dayjs().utc().hour(hour);
+                if (formState.timezone !== 'UTC') time = time.tz(formState.timezone);
                 res[time.hour()] = time;
             });
-            state.selectedHours = res;
+            formState.selectedHours = res;
         };
         initSelectedHours();
 
         const changeTimezone = () => {
             const res = {};
-            forEach(state.selectedHours, (time) => {
-                const newTime = moment.tz(time, state.timezone);
-                res[newTime.hour()] = newTime;
+            forEach(formState.selectedHours, (day) => {
+                let time = day.utc();
+                if (formState.timezone !== 'UTC') time = day.tz(formState.timezone);
+                res[time.hour()] = time;
             });
-            state.selectedHours = res;
+            formState.selectedHours = { ...res };
         };
 
         const getSchedule = async (): Promise<void> => {
@@ -234,22 +244,22 @@ export default {
                     collector_id: props.collectorId,
                 });
                 state.schedule = res;
-                state.name = res.name;
+                formState.name = res.name;
                 if (res.schedule.hours.length > 0) {
-                    state.scheduleType = 'hourly';
+                    formState.scheduleType = 'hourly';
                     initSelectedHours();
                 } else {
-                    state.scheduleType = 'interval';
+                    formState.scheduleType = 'interval';
                     const interval = res.schedule.interval;
 
-                    state.intervalTimeType = 'seconds';
-                    state.intervalTime = interval;
+                    formState.intervalTimeType = 'seconds';
+                    formState.intervalTime = interval;
                     if (interval >= 60 && interval < 3600 && interval % 60 === 0) {
-                        state.intervalTimeType = 'minutes';
-                        state.intervalTime = Math.trunc(interval / 60);
+                        formState.intervalTimeType = 'minutes';
+                        formState.intervalTime = Math.trunc(interval / 60);
                     } else if (interval === 3600) {
-                        state.intervalTimeType = 'hours';
-                        state.intervalTime = Math.trunc(interval / 3600);
+                        formState.intervalTimeType = 'hours';
+                        formState.intervalTime = Math.trunc(interval / 3600);
                     }
                 }
             } catch (e) {
@@ -263,11 +273,11 @@ export default {
                 const params: ScheduleAddParameter = {
                     // eslint-disable-next-line camelcase
                     collector_id: props.collectorId,
-                    name: state.name,
+                    name: formState.name,
                     schedule: {},
                 };
-                if (state.scheduleType === 'hourly') params.schedule = { hours: state.selectedUTCHoursList };
-                else params.schedule = { interval: state.intervalTimeInSeconds };
+                if (formState.scheduleType === 'hourly') params.schedule = { hours: formState.selectedUTCHoursList };
+                else params.schedule = { interval: formState.intervalTimeInSeconds };
 
                 await SpaceConnector.client.inventory.collector.schedule.add(params);
 
@@ -283,11 +293,14 @@ export default {
                 const params: ScheduleUpdateParameter = {
                     schedule_id: props.scheduleId,
                     collector_id: props.collectorId,
-                    name: state.name,
+                    name: formState.name,
                     schedule: {},
                 };
-                if (state.scheduleType === 'hourly') params.schedule = { hours: state.selectedUTCHoursList };
-                else params.schedule = { interval: state.intervalTimeInSeconds };
+                if (formState.scheduleType === 'hourly') {
+                    params.schedule = { hours: formState.selectedUTCHoursList };
+                } else {
+                    params.schedule = { interval: formState.intervalTimeInSeconds };
+                }
 
                 await SpaceConnector.client.inventory.collector.schedule.update(params);
 
@@ -300,8 +313,8 @@ export default {
         };
 
         const onClickEditConfirm = async () => {
-            state.showValidation = true;
-            if (!state.isValid) return;
+            validationState.showValidation = true;
+            if (!validationState.isValid) return;
 
             state.loading = true;
             if (props.editMode) await updateSchedule();
@@ -310,17 +323,24 @@ export default {
             state.proxyVisible = false;
         };
         const onClickHour = (hour) => {
-            if (state.selectedHours[hour]) delete state.selectedHours[hour];
-            else state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
-            state.selectedHours = { ...state.selectedHours };
+            if (formState.selectedHours[hour]) {
+                delete formState.selectedHours[hour];
+            } else {
+                let time = dayjs().utc().hour(hour);
+                if (formState.timezone !== 'UTC') time = dayjs().tz(formState.timezone).hour(hour);
+                formState.selectedHours[hour] = time;
+            }
+            formState.selectedHours = { ...formState.selectedHours };
         };
         const onClickAllHours = () => {
-            if (state.isAllHours) state.selectedHours = {};
+            if (state.isAllHours) formState.selectedHours = {};
             else {
                 state.hoursMatrix.forEach((hour) => {
-                    state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
+                    let time = dayjs().utc().hour(hour);
+                    if (formState.timezone !== 'UTC') time = dayjs().tz(formState.timezone).hour(hour);
+                    formState.selectedHours[hour] = time;
                 });
-                state.selectedHours = { ...state.selectedHours };
+                formState.selectedHours = { ...formState.selectedHours };
             }
         };
 
@@ -331,11 +351,12 @@ export default {
 
         return {
             ...toRefs(state),
-            timezones,
-            changeTimezone,
+            formState,
+            validationState,
             onClickHour,
             onClickAllHours,
             onClickEditConfirm,
+            changeTimezone,
         };
     },
 };

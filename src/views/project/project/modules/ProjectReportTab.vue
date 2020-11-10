@@ -1,6 +1,6 @@
 <template>
     <div class="project-report-tab-container">
-        <p>{{$t('PROJECT.DETAIL.REPORT_DESC')}}</p>
+        <p>{{ $t('PROJECT.DETAIL.REPORT_DESC') }}</p>
         <div class="input-wrapper">
             <p-field-group :label="$t('PROJECT.DETAIL.REPORT_LABEL_COMPANY_NAME')"
                            :invalid="!isValid"
@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import { range } from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import axios, { CancelTokenSource } from 'axios';
 
@@ -93,6 +93,8 @@ import {
 } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
+import { store } from '@/store';
+
 
 export default {
     name: 'ProjectReportTab',
@@ -117,6 +119,7 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             loading: false,
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
             inputModel: {
                 companyName: props.projectName,
                 period: '',
@@ -128,16 +131,20 @@ export default {
             }),
             isValid: computed(() => !(state.inputModel.companyName.length === 0 || state.inputModel.companyName.length > 60)),
             periodItems: computed(() => {
-                const sixMonthAgo = moment().tz(getTimezone()).subtract(6, 'months');
-                const now = moment().tz(getTimezone());
+                let sixMonthAgo = dayjs().subtract(6, 'month');
+                let now = dayjs();
+                if (state.timezone !== 'UTC') {
+                    sixMonthAgo = dayjs().tz(getTimezone()).subtract(6, 'month');
+                    now = dayjs().tz(getTimezone());
+                }
                 const periods = [] as MenuItem[];
-                while (now.isAfter(sixMonthAgo)) {
+                while (now.isAfter(sixMonthAgo, 'day')) {
                     periods.push({
                         name: now.format('YYYY-MM'),
                         label: now.format('YYYY-MM'),
                         type: 'item',
                     });
-                    now.subtract(1, 'month');
+                    now = now.subtract(1, 'month');
                 }
                 return periods;
             }),

@@ -29,13 +29,12 @@
 
 <script lang="ts">
 import Chart from 'chart.js';
-import moment from 'moment';
 import _, { orderBy, chain, range } from 'lodash';
 import numeral from 'numeral';
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, watch, UnwrapRef, getCurrentInstance, ComponentRenderProxy,
+    computed, reactive, toRefs, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
@@ -51,18 +50,14 @@ import { queryTagsToQueryString } from '@/lib/router-query-string';
 import {
     coral, gray, primary2, black,
 } from '@/styles/colors';
+import { store } from '@/store';
 
 interface Data {
     date: string;
     success: number;
     failure: number;
 }
-interface State {
-    chartRef: HTMLCanvasElement|null;
-    chart: Chart|null;
-    data: Data[];
-    loading: boolean;
-}
+
 const TICKS_COUNT = 5;
 const DAY_COUNT = 7;
 const DEFAULT_MAX = 600;
@@ -83,11 +78,12 @@ export default {
             success: primary2,
         };
 
-        const state: UnwrapRef<State> = reactive({
-            chartRef: null,
-            chart: null,
-            data: [],
+        const state = reactive({
             loading: true,
+            chartRef: null as HTMLCanvasElement | null,
+            chart: null as Chart | null,
+            data: [] as Data[],
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
         });
 
         const onClickChart = (point, event) => {
@@ -95,7 +91,7 @@ export default {
             if (item) {
                 const clickedData = state.data[item._index];
                 const queryTags: QueryTag[] = [];
-                const selectedDate = moment(clickedData.date).format('YYYY-MM-DD');
+                const selectedDate = dayjs(clickedData.date).format('YYYY-MM-DD');
                 queryTags.push({
                     key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
                     value: { label: selectedDate, name: selectedDate },
@@ -113,7 +109,7 @@ export default {
                     .map(i => ({
                         failure: 0,
                         success: 0,
-                        date: moment().subtract(i, 'days').toISOString(),
+                        date: dayjs().subtract(i, 'day').toISOString(),
                     }))
                     .orderBy(['date'], ['asc'])
                     .value();
@@ -144,7 +140,7 @@ export default {
             state.chart = new SpaceChart(canvas, {
                 type: 'bar',
                 data: {
-                    labels: data.map(d => moment(d.date).format('MM/DD')),
+                    labels: data.map(d => dayjs(d.date).format('MM/DD')),
                     datasets,
                 },
                 options: {
@@ -240,17 +236,22 @@ export default {
             state.loading = true;
             state.data = [];
             try {
-                const today = dayjs().tz(getTimezone());
+                let today = dayjs();
+                if (state.timezone !== 'UTC') today = dayjs().tz(getTimezone());
                 const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
                     start: today.subtract(6, 'day').toISOString(),
                     end: today.toISOString(),
                 });
                 const orderedData = orderBy(res.results, ['date'], ['asc']);
-                state.data = orderedData.map(d => ({
-                    date: moment(d.date).tz(getTimezone()).subtract(1, 'day').format('YYYY-MM-DD'),
-                    success: d.success,
-                    failure: d.failure,
-                }));
+                state.data = orderedData.map((d) => {
+                    let date = dayjs(d.date);
+                    if (state.timezone !== 'UTC') date = dayjs(d.date).tz(state.timezone);
+                    return {
+                        date: date.subtract(1, 'day').format('YYYY-MM-DD'),
+                        success: d.success,
+                        failure: d.failure,
+                    };
+                });
             } catch (e) {
                 console.error(e);
             } finally {

@@ -2,7 +2,6 @@ import {
     computed, onUnmounted, reactive, ref, onMounted, getCurrentInstance, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
 import { isNotEmpty } from '@/lib/util';
 

@@ -39,9 +39,7 @@
             </template>
             <template #col-schedule-format="{value}">
                 <span v-if="value.hours.length > 0">
-                    <span v-for="(hour, idx) in value.hours" :key="idx">
-                        {{ getUtcHour(hour) }}:00{{ value.hours.length - 1 === idx ? '' : ', ' }}
-                    </span>
+                    {{ getTimezoneHours(value.hours) }}
                 </span>
                 <span v-else>
                     <p-lottie class="inline-block mr-1" style="display: inline-block;" name="lottie_interval"
@@ -82,23 +80,25 @@
 
 <script lang="ts">
 import { debounce } from 'lodash';
+import dayjs from 'dayjs';
+
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
-import moment from 'moment';
-import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import { store } from '@/store';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
+
+import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { store } from '@/store';
 
 export default {
     name: 'CollectorSchedules',
@@ -116,7 +116,7 @@ export default {
             default: '',
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm: any = getCurrentInstance();
         const state = reactive({
             loading: true,
@@ -155,7 +155,16 @@ export default {
         });
 
         const timezone = store.state.user.timezone || 'UTC';
-        const getUtcHour = hour => moment.tz(moment.utc({ hour }), timezone).hour();
+        const getTimezoneHours = (hours) => {
+            const timezoneHours = hours.map((hour) => {
+                let newHour = dayjs().utc().hour(hour);
+                if (timezone !== 'UTC') {
+                    newHour = newHour.tz(timezone);
+                }
+                return newHour.format('HH:00');
+            });
+            return timezoneHours.join(', ');
+        };
         const intervalFormatter = (interval) => {
             if (interval < 60) {
                 return `${interval} sec`;
@@ -219,7 +228,7 @@ export default {
 
         return {
             ...toRefs(state),
-            getUtcHour,
+            getTimezoneHours,
             openEditModal,
             listSchedules,
             onConfirmDelete,

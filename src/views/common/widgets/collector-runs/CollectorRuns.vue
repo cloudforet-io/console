@@ -44,10 +44,11 @@
 </template>
 
 <script lang="ts">
-import moment from 'moment';
+/* eslint-disable camelcase */
+import dayjs from 'dayjs';
 
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
@@ -57,11 +58,11 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { getTimezone } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
+import { store } from '@/store';
 
 
 enum JOB_STATE {
@@ -104,6 +105,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
             items: [] as JobModel[],
             fields: [
                 { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_COLLECTOR'), name: 'collector_info' },
@@ -113,6 +115,7 @@ export default {
             providers: [] as ProviderModel[],
         });
 
+        /* util */
         const convertJobsToFieldItem = (jobs) => {
             const items = [] as JobModel[];
             jobs.forEach((job) => {
@@ -124,6 +127,15 @@ export default {
             });
             return items;
         };
+        const timeFormatter = (value) => {
+            let time = dayjs(dayjs.unix(value.seconds)).utc();
+            if (state.timezone !== 'UTC') {
+                time = dayjs(dayjs.unix(value.seconds)).tz(state.timezone);
+            }
+            return time.format('MM-DD HH:mm ~');
+        };
+
+        /* api */
         const getData = async () => {
             state.loading = true;
             try {
@@ -159,9 +171,7 @@ export default {
 
         return {
             ...toRefs(state),
-            timeFormatter(value) {
-                return moment.tz(moment.unix(value.seconds), getTimezone()).format('MM-DD HH:mm ~');
-            },
+            timeFormatter,
             getData,
             onRowClick() {
                 vm.$router.push('/plugin/collector');
