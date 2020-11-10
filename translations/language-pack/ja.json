@@ -25,7 +25,9 @@
 		"ADD": "",
 		"INVALID_DUPLICATED_KEY": "",
 		"INVALID_NO_KEY": "",
-		"INVALID_NO_VALUE": ""
+		"INVALID_NO_VALUE": "",
+		"KEY_LABEL": "",
+		"VALUE_LABEL": ""
 	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "",

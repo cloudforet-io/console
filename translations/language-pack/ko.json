@@ -25,7 +25,9 @@
 		"ADD": "추가 ",
 		"INVALID_DUPLICATED_KEY": "키가 중복됩니다.",
 		"INVALID_NO_KEY": "키가 없습니다.",
-		"INVALID_NO_VALUE": "값이 없습니다."
+		"INVALID_NO_VALUE": "값이 없습니다.",
+		"KEY_LABEL": "키",
+		"VALUE_LABEL": "값"
 	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "확인을 위해 {text}를 입력하세요.",

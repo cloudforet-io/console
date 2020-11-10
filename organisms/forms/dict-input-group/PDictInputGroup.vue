@@ -10,27 +10,29 @@
         </slot>
         <div v-if="showHeader" class="tag-header">
             <div class="key">
-                Key
+                {{ $t('COMPONENT.DICT_INPUT_GROUP.KEY_LABEL') }}
             </div>
             <div class="value">
-                Value
+                {{ $t('COMPONENT.DICT_INPUT_GROUP.VALUE_LABEL') }}
             </div>
         </div>
-        <span v-for="(d, idx) in items" :key="idx" class="dict-group">
-            <p-dict-input :name.sync="d.key" :value.sync="d.value"
-                          :key-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].key"
-                          :value-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].value"
-                          :key-invalid-text="invalidMessages[idx] && invalidMessages[idx].key"
-                          :value-invalid-text="invalidMessages[idx] && invalidMessages[idx].value"
-                          :disabled="disabled"
-                          :focused="focused"
-                          @change:key="onChangeKey(idx, d, $event)"
-                          @change:value="onChangeValue(idx, d, $event)"
-            />
-            <p-icon-button name="ic_delete" :disabled="disabled"
-                           @click="deletePair(idx, d)"
-            />
-        </span>
+        <div :class="{'mt-8': !showHeader}">
+            <span v-for="(d, idx) in items" :key="idx" class="dict-group">
+                <p-dict-input :name.sync="d.key" :value.sync="d.value"
+                              :key-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].key"
+                              :value-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].value"
+                              :key-invalid-text="invalidMessages[idx] && invalidMessages[idx].key"
+                              :value-invalid-text="invalidMessages[idx] && invalidMessages[idx].value"
+                              :disabled="disabled"
+                              :focused="focused"
+                              @change:key="onChangeKey(idx, d, $event)"
+                              @change:value="onChangeValue(idx, d, $event)"
+                />
+                <p-icon-button name="ic_delete" :disabled="disabled"
+                               @click="deletePair(idx, d)"
+                />
+            </span>
+        </div>
     </div>
 </template>
 

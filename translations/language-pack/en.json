@@ -25,7 +25,9 @@
 		"ADD": "Add",
 		"INVALID_DUPLICATED_KEY": "duplicated key",
 		"INVALID_NO_KEY": "no key",
-		"INVALID_NO_VALUE": "no value"
+		"INVALID_NO_VALUE": "no value",
+		"KEY_LABEL": "Key",
+		"VALUE_LABEL": "Value"
 	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "Type {text} to Confirm.",
