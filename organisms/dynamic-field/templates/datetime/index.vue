@@ -1,8 +1,13 @@
 <script lang="ts">
-import moment, { Moment } from 'moment';
 import { DatetimeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { DatetimeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/datetime/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
+import dayjs, {Dayjs} from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(tz);
 
 export default {
     name: 'PDynamicFieldDatetime',
@@ -41,16 +46,16 @@ export default {
         let result = '';
         const options: DatetimeOptions = props.options;
         if (props.data) {
-            let time: Moment;
+            let time: Dayjs;
             if (options.source_type === 'iso8601') {
-                time = moment(props.data, options.source_format);
+                time = dayjs(props.data, options.source_format);
             } else if (options.source_format === 'seconds') {
-                time = moment.unix(props.data);
+                time = dayjs.unix(props.data);
             } else {
-                time = moment(props.data);
+                time = dayjs(props.data);
             }
 
-            time = moment.tz(time, props.typeOptions?.timezone || 'UTC');
+            time = dayjs.tz(time, props.typeOptions?.timezone || 'UTC');
             if (options.display_format) {
                 result = time.format(options.display_format);
             } else {

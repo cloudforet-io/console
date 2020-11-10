@@ -33,9 +33,13 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { ChartColor, ChartDataSets } from 'chart.js';
 import { PChart, tooltips } from '@/components/organisms/charts/chart-helper';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
-const chartTimestampFormatter = (value, timezone) => moment.tz(moment.unix(value.seconds), timezone).format('M/DD[\n]HH:mm');
+dayjs.extend(utc);
+
+
+const chartTimestampFormatter = (value, timezone) => dayjs.tz(dayjs.unix(value.seconds), timezone).format('M/DD[\n]HH:mm');
 
 export default {
     name: 'MetricChart',
