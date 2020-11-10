@@ -1,10 +1,13 @@
-import moment, { Moment } from 'moment';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
 import { ColorBindFactory } from '@/lib/view-helper';
 import { getCurrentInstance } from '@vue/composition-api';
 import { store } from '@/store';
+import dayjs from 'dayjs';
+import tz from 'dayjs/plugin/timezone';
+
+dayjs.extend(tz);
 
 // color set
 /**
@@ -65,10 +68,6 @@ export const userStateColor = Object.freeze({
 
 export const getTimezone = () => store.state.user.timezone || 'UTC';
 export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' for display Timezone
-export const getTimestamp = (momentTime: Moment) => ({
-    seconds: `${momentTime.unix()}`,
-    nanos: 0,
-});
 
 // formatter
 export const timestampFormatter = (value) => {
@@ -76,7 +75,7 @@ export const timestampFormatter = (value) => {
     return '';
 };
 export const iso8601Formatter = (time?: string, timezone?: string) => {
-    if (time) return moment.tz(moment(time), timezone || getTimezone()).format('YYYY-MM-DD HH:mm:ss');
+    if (time) return dayjs.tz(dayjs(time), timezone || getTimezone()).format('YYYY-MM-DD HH:mm:ss');
     return '';
 };
 

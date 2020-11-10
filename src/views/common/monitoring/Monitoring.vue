@@ -95,8 +95,7 @@ import {
     some, debounce, find, capitalize, chain, range, sortBy,
 } from 'lodash';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import moment, { Moment } from 'moment';
-import { getTimestamp, getTimezone } from '@/lib/util';
+import { getTimezone } from '@/lib/util';
 import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChart.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
@@ -104,6 +103,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { MonitoringProps } from '@/views/common/monitoring/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
+import dayjs, {Dayjs} from "dayjs";
 
 
 export enum DataSourceState {
@@ -166,6 +166,11 @@ interface DataToolType {
 const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
 const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
 const LOAD_LIMIT = 12;
+
+const getTimestamp = (dayjsTime: Dayjs) => ({
+    seconds: `${dayjsTime.unix()}`,
+    nanos: 0,
+});
 
 export default {
     name: 'Monitoring',
@@ -264,7 +269,7 @@ export default {
             };
         };
 
-        const getStartTimestamp = (end: Moment): TimeStamp => {
+        const getStartTimestamp = (end: Dayjs): TimeStamp => {
             const units = state.selectedTimeRange.match(/[^0-9]/g) || [];
             return getTimestamp(end.subtract(
                 parseInt(state.selectedTimeRange),
@@ -291,7 +296,7 @@ export default {
         };
 
         const getChartMetricParam = () => {
-            const now = moment();
+            const now = dayjs();
             return {
                 data_source_id: state.selectedToolId,
                 resource_type: props.resourceType,
@@ -403,39 +408,39 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    section {
-        @apply px-4;
-    }
-    .toolbox-section {
-        @apply flex justify-between border-t border-b border-gray-200 py-4;
-    }
-    .title {
-        @apply text-sm font-bold capitalize;
-    }
-    .legend {
-        @apply inline-flex items-center text-sm leading-normal mr-4;
-        max-width: 17rem;
-        margin-top: 0.625rem;
-    }
-    .time-range::v-deep {
-        &.p-select-btn-group .select-btn {
-            margin-right: 0;
-            padding: 0 0.75rem;
-            font-weight: normal;
-            font-size: 0.875rem;
-            &.active {
-                @apply text-secondary font-bold;
-            }
+section {
+    @apply px-4;
+}
+.toolbox-section {
+    @apply flex justify-between border-t border-b border-gray-200 py-4;
+}
+.title {
+    @apply text-sm font-bold capitalize;
+}
+.legend {
+    @apply inline-flex items-center text-sm leading-normal mr-4;
+    max-width: 17rem;
+    margin-top: 0.625rem;
+}
+.time-range::v-deep {
+    &.p-select-btn-group .select-btn {
+        margin-right: 0;
+        padding: 0 0.75rem;
+        font-weight: normal;
+        font-size: 0.875rem;
+        &.active {
+            @apply text-secondary font-bold;
         }
     }
-    .more-btn::v-deep {
-        @apply border-gray-300 mt-12 block mx-auto;
-        max-width: 38rem;
-        width: 40%;
-    }
-    .loader {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+}
+.more-btn::v-deep {
+    @apply border-gray-300 mt-12 block mx-auto;
+    max-width: 38rem;
+    width: 40%;
+}
+.loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 </style>
