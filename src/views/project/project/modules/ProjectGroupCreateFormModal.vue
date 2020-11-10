@@ -133,14 +133,14 @@ export default {
                 const params = item;
                 if (props.parent) params.parent_project_group_id = props.parent.id;
                 const res = await SpaceConnector.client.identity.projectGroup.create(params);
-                showSuccessMessage('Success', 'Create Project Group', root);
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
 
                 emit('create', {
                     id: res.project_group_id,
                     name: item.name,
                 } as ProjectGroup, props);
             } catch (e) {
-                showErrorMessage('Fail to Create Project Group', e, root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e, root);
             }
         };
 

@@ -26,7 +26,7 @@
                                     :dict="tags"
                                     :disabled="loading"
                                     :show-validation="showValidation"
-                                    :show-header="true"
+                                    :show-header="false"
                 >
                     <template #addButton="scope">
                         <p-icon-text-button

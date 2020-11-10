@@ -367,8 +367,7 @@ export default {
                 }
                 if (tabState.activeTab === 'input') await createSecretWithForm();
                 vm.$router.back();
-                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'),
-                    vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_DESC'), vm.$root);
+                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm.$root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
                 await deleteServiceAccount();
