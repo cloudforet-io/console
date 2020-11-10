@@ -3,7 +3,6 @@ import PDictList from '@/components/molecules/lists/PDictList.vue';
 import { DictDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/dict/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
-import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldDict',
@@ -41,12 +40,6 @@ export default {
                 dict: props.data,
             },
         });
-
-        if (props.options.description) {
-            dictEl = h(PAbbreviation, {
-                attrs: { description: props.options.description },
-            }, [dictEl]);
-        }
 
         if (props.options.link) {
             dictEl = h(PAnchor, {

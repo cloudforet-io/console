@@ -1,9 +1,8 @@
 <script lang="ts">
 import moment, { Moment } from 'moment';
-import { DatetimeOptions, TextOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import { DatetimeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { DatetimeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/datetime/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
-import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldDatetime',
@@ -61,16 +60,11 @@ export default {
 
         let datetimeEl = h('span', data, result);
 
-        if (options.description) {
-            datetimeEl = h(PAbbreviation, {
-                attrs: { description: options.description },
-            }, [datetimeEl]);
-        }
 
         if (options.link) {
             datetimeEl = h(PAnchor, {
                 ...data,
-                attrs: { href: (props.options as TextOptions).link, target: '_blank' },
+                attrs: { href: props.options.link, target: '_blank' },
             }, [datetimeEl]);
         }
 

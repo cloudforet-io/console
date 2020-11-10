@@ -32,6 +32,4 @@ export interface Badge {
     backgroundColor?: string;
     shape: keyof typeof BADGE_SHAPE;
     outline: boolean;
-    link?: string;
-    target?: string;
 }

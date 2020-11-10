@@ -33,14 +33,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        link: {
-            type: String,
-            default: undefined,
-        },
-        target: {
-            type: String,
-            default: undefined,
-        },
     },
     render(h, { props, data, children }) {
         const newData = {
@@ -67,12 +59,7 @@ export default {
         }
         if (props.outline) newData.class.outline = true;
 
-        let tag: any = 'span';
-        if (props.link) {
-            tag = PAnchor;
-            newData.attrs = { href: props.link, target: props.target };
-        }
-        return h(tag, newData, children);
+        return h('span', newData, children);
     },
 };
 </script>

@@ -8,7 +8,6 @@ import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { getColor } from '@/components/util/helpers';
 import { TranslateResult } from 'vue-i18n';
 import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
-import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldState',
@@ -45,9 +44,7 @@ export default {
 
         const options: StateOptions = props.options;
 
-        let text: TranslateResult;
-        if (options.translation_id) text = vm.$t(options.translation_id);
-        else text = props.data === null || props.data === undefined ? '' : String(props.data);
+        const text: TranslateResult = props.data === null || props.data === undefined ? '' : String(props.data);
 
         const statusProps: StatusProps = {
             icon: get(options, ['icon', 'image'], null),
@@ -57,12 +54,6 @@ export default {
         };
 
         let statusEl = h(PStatus, { props: statusProps });
-
-        if (options.description) {
-            statusEl = h(PAbbreviation, {
-                attrs: { description: options.description },
-            }, [statusEl]);
-        }
 
         if (options.link) {
             statusEl = h(PAnchor, {

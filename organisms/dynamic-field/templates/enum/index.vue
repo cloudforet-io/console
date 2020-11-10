@@ -1,11 +1,9 @@
 <script lang="ts">
 import { get } from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { VNodeData } from 'vue';
 import { EnumOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { EnumDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/enum/type';
-import PAbbreviation from '@/components/atoms/abbreviation/PAbbreviation.vue';
 
 export default {
     name: 'PDynamicFieldEnum',
