@@ -3,9 +3,9 @@
         <div class="chart-container">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
-                    <div ref="loaderRef" class="w-full h-full" />
+                    <canvas ref="loaderRef" />
                 </template>
-                <div ref="chartRef" class="w-full h-full" />
+                <canvas ref="chartRef" />
             </p-chart-loader>
         </div>
         <div class="legends">
@@ -25,9 +25,7 @@
                                            default-icon="ic_provider_other"
                         >
                             <template #contents>
-                                <div class="truncate">
-                                    {{ item.name }}
-                                </div>
+                                <div class="truncate">{{ item.name }}</div>
                             </template>
                             <template #extra>
                                 <p-badge :background-color="item.color" class="count">
@@ -48,7 +46,6 @@ import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
 import Color from 'color';
 
 import {
-    onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -66,11 +63,6 @@ import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
-
-am4core.useTheme(am4themes_animated);
 
 const DEFAULT_COUNT = 4;
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
@@ -100,54 +92,121 @@ export default {
             loading: true,
             //
             loaderRef: null,
-            chartRef: null as HTMLElement|null,
+            chartRef: null,
             data: [] as Data[],
-            chart: null as null|any,
+            chart: null as null|Chart,
         });
 
-        const drawChart = (element, isLoading = false) => {
-            const chart = am4core.create(element, am4charts.PieChart);
-            chart.responsive.enabled = true;
-            chart.logo.disabled = true;
-            chart.innerRadius = am4core.percent(60);
+        const drawChart = (canvas, isLoading = false) => {
+            const colors = map(state.data, d => d.color);
+            let labels = map(state.data, d => d.name);
+            let totalCount = 0;
+            const data = map(state.data, (d) => {
+                totalCount += d.count;
+                return d.count;
+            });
+            let datasets: ChartDataSets[] = [{
+                label: 'Account',
+                data,
+                backgroundColor: colors,
+                borderColor: white,
+                borderWidth: 2,
+            }];
+            let options: ChartOptions = {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: -10,
+                        bottom: -10,
+                    },
+                },
+                legend: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                            display: false,
+                        },
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                            display: false,
+                        },
+                    }],
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 0,
+                    },
+                },
+                responsive: true,
+                cutoutPercentage: 70,
+                aspectRatio: 1,
+                tooltips,
+            };
 
+            // if it's loading, set configs for loading pie chart.
             if (isLoading) {
-                chart.data = [{
-                    name: 'Dummy',
-                    count: 1000,
-                    color: DEFAULT_COLORS[0],
+                labels = [];
+                datasets = [{
+                    data: [8, 2],
+                    backgroundColor: DEFAULT_COLORS,
+                    borderWidth: 0,
                 }];
-            } else {
-                chart.data = state.data;
+                options = {
+                    ...options,
+                    animation: {
+                        duration: 0,
+                    },
+                    tooltips: { enabled: false },
+                };
+                // if all total count of data is 0, set configs for default pie chart.
+            } else if (!totalCount) {
+                datasets = [{
+                    data: range(DEFAULT_COUNT).fill(1),
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                }];
+                options = {
+                    ...options,
+                    animation: {
+                        duration: 0,
+                    },
+                    tooltips: { enabled: false },
+                };
             }
 
-            const series = chart.series.create();
-            series.dataFields.value = 'count';
-            series.dataFields.category = 'name';
-            series.slices.template.propertyFields.fill = 'color';
+            state.chart = new SpaceChart(canvas, {
+                type: 'pie',
+                data: {
+                    labels,
+                    datasets,
+                },
+                options,
+                plugins: [{
+                    beforeDraw(chart): void {
+                        const ctx: CanvasRenderingContext2D = chart.ctx as CanvasRenderingContext2D;
+                        if (isLoading || !ctx) return;
 
-            if (isLoading) {
-                series.slices.template.tooltipText = '';
-            } else {
-                series.slices.template.tooltipText = '{category}: {value}';
-                if (series.tooltip) {
-                    series.tooltip.fontSize = 12;
-                    series.tooltip.fontFamily = 'Noto Sans';
-                }
-            }
+                        const txt = `${totalCount}`;
+                        ctx.font = '2rem Roboto';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        const centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+                        const centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+                        ctx.fillStyle = black;
 
-            const label = new am4core.Label();
-            label.parent = series;
-            label.horizontalCenter = 'middle';
-            label.verticalCenter = 'middle';
-            label.fontSize = 30;
-            if (isLoading) {
-                label.text = '';
-            } else {
-                label.text = '{values.value.sum}';
-            }
-
-            state.chart = chart;
+                        ctx.fillText(txt, centerX, centerY);
+                    },
+                }],
+            });
         };
 
         const getData = async () => {
@@ -200,14 +259,8 @@ export default {
         watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
             if (loaderCtx) {
                 drawChart(loaderCtx, true);
-            } else if (chartCtx) {
-                drawChart(chartCtx, false);
-            }
+            } else if (chartCtx) drawChart(chartCtx, false);
         }, { immediate: true });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
 
         return {
             ...toRefs(state),

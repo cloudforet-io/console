@@ -223,26 +223,10 @@ export default {
         };
 
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
-            // if (field.extraData?.reference) {
-            //     return referenceFieldFormatter(field.extraData.reference, field.data);
-            // }
-            // return {}
-
-            // TODO: remove test code below
-            let data = { options: {} };
             if (field.extraData?.reference) {
-                data = {
-                    ...data,
-                    ...referenceFieldFormatter(field.extraData.reference, field.data),
-                };
+                return referenceFieldFormatter(field.extraData.reference, field.data);
             }
-            return {
-                ...data,
-                options: {
-                    ...data.options,
-                    description: 'This is test tooltip for Server Details\' data',
-                },
-            };
+            return {};
         };
 
         const loadSchemaAndData = async (forceLoadData = true) => {
