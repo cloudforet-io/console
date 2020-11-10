@@ -1,4 +1,6 @@
 type UserType = 'USER' | 'DOMAIN_OWNER';
+export type LanguageCode = 'ko' | 'en' | string;
+export type Timezone = 'UTC' | 'Asia/Seoul' | string;
 
 export interface UserState {
     userId?: string;

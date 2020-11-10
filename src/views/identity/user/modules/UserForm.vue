@@ -41,13 +41,13 @@
                     <div class="bottom-left-part">
                         <p-field-group v-if="isInternalAuth"
                                        :label="$t('IDENTITY.USER.FORM.PASSWORD')"
-                                       :invalid="!validationState.isPassword1Valid"
-                                       :invalid-text="validationState.password1InvalidText"
+                                       :invalid="!validationState.isPasswordValid"
+                                       :invalid-text="validationState.passwordInvalidText"
                                        :required="true"
                                        :help-text="$t('IDENTITY.USER.FORM.PASSWORD_HELP_TEXT')"
                         >
                             <template v-slot:default="{invalid}">
-                                <p-text-input v-model="formState.password1"
+                                <p-text-input v-model="formState.password"
                                               type="password"
                                               class="block"
                                               :class="{'is-invalid':invalid}"
@@ -64,22 +64,22 @@
                         </p-field-group>
 
                         <p-field-group :label="$t('IDENTITY.USER.FORM.LANGUAGE')">
-                            <p-select-dropdown v-model="formState.language" :items="languageSelectItems" />
+                            <p-select-dropdown v-model="formState.language" :items="languages" />
                         </p-field-group>
 
                         <p-field-group :label="$t('IDENTITY.USER.FORM.TIMEZONE')">
-                            <p-select-dropdown v-model="formState.timezone" :items="timezoneSelectItems" />
+                            <p-select-dropdown v-model="formState.timezone" :items="timezones" />
                         </p-field-group>
                     </div>
                     <div class="bottom-right-part">
                         <p-field-group v-if="isInternalAuth"
                                        :label="$t('IDENTITY.USER.FORM.PASSWORD_CHECK')"
-                                       :invalid="!validationState.isPassword2Valid"
-                                       :invalid-text="validationState.password2InvalidText"
+                                       :invalid="!validationState.isPasswordCheckValid"
+                                       :invalid-text="validationState.passwordCheckInvalidText"
                                        :required="true"
                         >
                             <template v-slot:default="{invalid}">
-                                <p-text-input v-model="formState.password2"
+                                <p-text-input v-model="formState.passwordCheck"
                                               type="password"
                                               class="block"
                                               :class="{'is-invalid':invalid}"
@@ -172,19 +172,19 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
             tagInputRef: null as any,
-            languageSelectItems: [
+            languages: [
                 { type: 'item', label: 'English', name: 'en' },
                 { type: 'item', label: '한국어', name: 'ko' },
             ],
-            timezoneSelectItems: [
+            timezones: [
                 { type: 'item', label: 'UTC', name: 'UTC' },
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
             ],
         });
         const formState = reactive({
-            user_id: undefined as undefined | string,
-            password1: undefined as undefined | string,
-            password2: undefined as undefined | string,
+            user_id: '',
+            password: '',
+            passwordCheck: '',
             name: '',
             email: '',
             mobile: '',
@@ -198,10 +198,10 @@ export default {
             userIdInvalidText: '' as TranslateResult | string,
             userIdValidText: vm.$t('IDENTITY.USER.FORM.NAME_VALID'),
             //
-            isPassword1Valid: undefined as undefined | boolean,
-            password1InvalidText: '' as TranslateResult | string,
-            isPassword2Valid: undefined as undefined | boolean,
-            password2InvalidText: '' as TranslateResult | string,
+            isPasswordValid: undefined as undefined | boolean,
+            passwordInvalidText: '' as TranslateResult | string,
+            isPasswordCheckValid: undefined as undefined | boolean,
+            passwordCheckInvalidText: '' as TranslateResult | string,
         });
 
         /* util */
@@ -238,33 +238,33 @@ export default {
         };
         const checkPassword = () => {
             // password1
-            if (typeof formState.password1 === 'undefined') {
-                validationState.isPassword1Valid = false;
-                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (formState.password1.replace(/ /g, '').length !== formState.password1.length) {
-                validationState.isPassword1Valid = false;
-                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (formState.password1.length < 5) {
-                validationState.isPassword1Valid = false;
-                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
-            } else if (formState.password1.length > 12) {
-                validationState.isPassword1Valid = false;
-                validationState.password1InvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
+            if (!formState.password) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else if (formState.password.replace(/ /g, '').length !== formState.password.length) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
+            } else if (formState.password.length < 5) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
+            } else if (formState.password.length > 12) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
             } else {
-                validationState.isPassword1Valid = true;
-                validationState.password1InvalidText = '';
+                validationState.isPasswordValid = true;
+                validationState.passwordInvalidText = '';
             }
 
             // password2
-            if (typeof formState.password2 === 'undefined') {
-                validationState.isPassword2Valid = false;
-                validationState.password2InvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (formState.password1 !== formState.password2) {
-                validationState.isPassword2Valid = false;
-                validationState.password2InvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
+            if (!formState.passwordCheck) {
+                validationState.isPasswordCheckValid = false;
+                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else if (formState.password !== formState.passwordCheck) {
+                validationState.isPasswordCheckValid = false;
+                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
             } else {
-                validationState.isPassword2Valid = true;
-                validationState.password2InvalidText = '';
+                validationState.isPasswordCheckValid = true;
+                validationState.passwordCheckInvalidText = '';
             }
         };
 
@@ -278,7 +278,7 @@ export default {
 
             if (state.isInternalAuth) {
                 await checkPassword();
-                if (!validationState.isPassword1Valid || !validationState.isPassword2Valid) {
+                if (!validationState.isPasswordValid || !validationState.isPasswordCheckValid) {
                     return;
                 }
             }
@@ -286,11 +286,11 @@ export default {
             const data = {} as any;
             if (state.isInternalAuth) {
                 if (props.updateMode) {
-                    if (formState.password1) {
-                        data.password = formState.password1;
+                    if (formState.password) {
+                        data.password = formState.password;
                     }
                 } else {
-                    data.password = formState.password1;
+                    data.password = formState.password;
                 }
             }
             ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone'].forEach((key) => {
@@ -306,8 +306,8 @@ export default {
         const init = () => {
             if (props.updateMode) {
                 formState.user_id = props.item.user_id;
-                formState.password1 = props.item.password1;
-                formState.password2 = props.item.password2;
+                formState.password = props.item.password1;
+                formState.passwordCheck = props.item.password2;
                 formState.name = props.item.name;
                 formState.email = props.item.email;
                 formState.mobile = props.item.mobile;

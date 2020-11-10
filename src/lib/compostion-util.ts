@@ -146,22 +146,3 @@ export const formValidation = (data: any, validation: object) => {
 };
 
 export const requiredValidation = (invalidMessage?: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
-// eslint-disable-next-line max-len
-export const noEmptySpaceValidation = (invalidMessage?: message) => new Validation((value: string) => isNotEmpty(value) && value.trim().length === value.length, invalidMessage || 'You Must Remove Empty Space');
-
-
-export const lengthMinValidation = (min: number, invalidMessage?: message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
-export const lengthMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
-export const checkTimeZoneValidation = (invalidMessage?: message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
-
-
-export const userIDValidation = (parent: any, invalidMessage?: message) => new Validation(async (value) => {
-    let result = false;
-    // eslint-disable-next-line camelcase
-    await parent.$http.post('/identity/user/get', { user_id: value }).catch((error) => {
-        if (error.response.data.error.code === 'ERROR_NOT_FOUND') {
-            result = true;
-        }
-    });
-    return result;
-}, invalidMessage || 'same ID exists!');

@@ -23,22 +23,22 @@
                         <p-text-input :value="userId" disabled block />
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.EMAIL')"
-                                   :invalid-text="invalidMsg.email"
-                                   :invalid="invalidState.email"
+                                   :invalid="!validationState.isEmailValid"
+                                   :invalid-text="validationState.emailInvalidText"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="userState.email"
+                            <p-text-input v-model="formState.email"
                                           class="disabled block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.NAME')"
-                                   :invalid-text="invalidMsg.name"
-                                   :invalid="invalidState.name"
+                                   :invalid="!validationState.isNameValid"
+                                   :invalid-text="validationState.nameInvalidText"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="userState.name" block
+                            <p-text-input v-model="formState.name" block
                                           class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
                             />
@@ -47,11 +47,11 @@
                     <form class="form">
                         <p-field-group v-if="showPassword"
                                        :label="$t('COMMON.PROFILE.PASSWORD')"
-                                       :invalid-text="invalidMsg.password"
-                                       :invalid="invalidState.password"
+                                       :invalid="!validationState.isPasswordValid"
+                                       :invalid-text="validationState.passwordInvalidText"
                         >
                             <template #default="{invalid}">
-                                <p-text-input v-model="userState.password" block type="password"
+                                <p-text-input v-model="formState.password" block type="password"
                                               class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
 
                                               :class="{'is-invalid': invalid}"
@@ -60,11 +60,11 @@
                         </p-field-group>
                         <p-field-group v-if="showPassword"
                                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                                       :invalid-text="invalidMsg.passwordCheck"
-                                       :invalid="invalidState.passwordCheck"
+                                       :invalid="!validationState.isPasswordCheckValid"
+                                       :invalid-text="validationState.passwordCheckInvalidText"
                         >
                             <template #default="{invalid}">
-                                <p-text-input v-model="userState.passwordCheck" block type="password"
+                                <p-text-input v-model="formState.passwordCheck" block type="password"
                                               class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                               :class="{'is-invalid': invalid}"
                                 />
@@ -75,24 +75,24 @@
                 <div class="form-div col-span-1">
                     <p-field-group :label="$t('COMMON.PROFILE.MOBILE')">
                         <br>
-                        <p-text-input v-model="userState.mobile"
+                        <p-text-input v-model="formState.mobile"
                                       block
                         />
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.GROUP')">
                         <br>
-                        <p-text-input v-model="userState.group"
+                        <p-text-input v-model="formState.group"
                                       block
                         />
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.LANGUAGE')">
-                        <p-select-dropdown v-model="userState.language"
+                        <p-select-dropdown v-model="formState.language"
                                            :items="languages"
                                            auto-height
                         />
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.TIMEZONE')">
-                        <p-select-dropdown v-model="userState.timezone"
+                        <p-select-dropdown v-model="formState.timezone"
                                            :items="timezones"
                                            auto-height
                         />
@@ -105,6 +105,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { TranslateResult } from 'vue-i18n';
+
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
@@ -114,10 +116,9 @@ import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vu
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 
-import {
-    makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
-} from '@/lib/compostion-util';
+import { makeProxy } from '@/lib/compostion-util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { UpdateUserRequest, LanguageCode, Timezone } from '@/store/modules/user/type';
 import { store } from '@/store';
 
 export default {
@@ -140,34 +141,11 @@ export default {
     },
     setup(props, { root, emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const userState = reactive({
-            password: '',
-            passwordCheck: '',
-            name: '',
-            email: '',
-            mobile: '',
-            group: '',
-            language: '',
-            timezone: '',
-        });
-
-        const updateUserValidations = {
-            name: [requiredValidation(vm.$t('COMMON.PROFILE.NAME_REQUIRED'))],
-            email: [requiredValidation(vm.$t('COMMON.PROFILE.EMAIL_REQUIRED'))],
-            password: [
-                lengthMinValidation(5, vm.$t('COMMON.PROFILE.MIN_LENGTH_INVALID', { min: 5 })),
-                lengthMaxValidation(12, vm.$t('COMMON.PROFILE.MAX_LENGTH_INVALID', { max: 12 })),
-            ],
-            passwordCheck: [
-                new Validation((value, data) => data.password === value, vm.$t('COMMON.PROFILE.PASSWORD_CHECK_INVALID')),
-            ],
-        };
 
         const state = reactive({
             loading: false,
             proxyVisible: makeProxy('visible', props, emit),
             showPassword: computed(() => state.isDomainOwner || state.isInternalAuth),
-            userState,
             languages: [
                 { type: 'item', label: 'English (default)', name: 'en' },
                 { type: 'item', label: '한국어', name: 'ko' },
@@ -176,21 +154,86 @@ export default {
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
             ],
-            showValidation: false,
-            ...formValidation(userState, updateUserValidations),
             isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
+        const formState = reactive({
+            password: '',
+            passwordCheck: '',
+            name: '' as string | undefined,
+            email: '' as string | undefined,
+            mobile: '' as string | undefined,
+            group: '' as string | undefined,
+            language: '' as LanguageCode | undefined,
+            timezone: '' as Timezone | undefined,
+        });
+        const validationState = reactive({
+            isNameValid: undefined as undefined | boolean,
+            nameInvalidText: '' as TranslateResult | string,
+            isEmailValid: undefined as undefined | boolean,
+            emailInvalidText: '' as TranslateResult | string,
+            //
+            isPasswordValid: undefined as undefined | boolean,
+            passwordInvalidText: '' as TranslateResult | string,
+            isPasswordCheckValid: undefined as undefined | boolean,
+            passwordCheckInvalidText: '' as TranslateResult | string,
+        });
 
+        /* util */
+        const checkName = () => {
+            if (!formState.name) {
+                validationState.isNameValid = false;
+                validationState.nameInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else {
+                validationState.isNameValid = true;
+                validationState.nameInvalidText = '';
+            }
+        };
+        const checkEmail = () => {
+            if (!formState.email) {
+                validationState.isEmailValid = false;
+                validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else {
+                validationState.isEmailValid = true;
+                validationState.emailInvalidText = '';
+            }
+        };
+        const checkPassword = () => {
+            // password1
+            if (formState.password.replace(/ /g, '').length !== formState.password.length) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
+            } else if (formState.password && formState.password.length < 5) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
+            } else if (formState.password.length > 12) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
+            } else {
+                validationState.isPasswordValid = true;
+                validationState.passwordInvalidText = '';
+            }
+
+            // password2
+            if (formState.password !== formState.passwordCheck) {
+                validationState.isPasswordCheckValid = false;
+                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
+            } else {
+                validationState.isPasswordCheckValid = true;
+                validationState.passwordCheckInvalidText = '';
+            }
+        };
+
+        /* api */
         const getProfile = async (id) => {
             try {
                 await store.dispatch('user/getUser', id);
-                state.userState.name = store.state.user.name;
-                state.userState.email = store.state.user.email;
-                state.userState.mobile = store.state.user.mobile;
-                state.userState.group = store.state.user.group;
-                state.userState.language = store.state.user.language;
-                state.userState.timezone = store.state.user.timezone;
+                formState.name = store.state.user.name;
+                formState.email = store.state.user.email;
+                formState.mobile = store.state.user.mobile;
+                formState.group = store.state.user.group;
+                formState.language = store.state.user.language;
+                formState.timezone = store.state.user.timezone;
             } catch (e) {
                 console.error(e);
             }
@@ -205,29 +248,43 @@ export default {
             }
         };
 
-        getProfile(props.userId);
-
         const onClickConfirm = async () => {
-            state.showValidation = true;
-            const result = await state.allValidation();
-            if (!result) return;
+            // check validation
+            checkName();
+            checkEmail();
+            if (state.showPassword) checkPassword();
+            if (!validationState.isNameValid || !validationState.isEmailValid) {
+                return;
+            }
+            if (state.showPassword && !(validationState.isPasswordValid && validationState.isPasswordCheckValid)) {
+                return;
+            }
 
-            const userParam = { ...state.userState };
-            delete userParam.passwordCheck;
-            if (!state.showPassword) delete userParam.password;
-
-            if (state.isDomainOwner) {
-                userParam.owner_id = props.userId;
-            } else {
-                userParam.user_id = props.userId;
+            // update profile
+            const userParam: UpdateUserRequest = {
+                password: formState.password,
+                name: formState.name,
+                email: formState.email,
+                mobile: formState.mobile,
+                group: formState.group,
+                language: formState.language,
+                timezone: formState.timezone,
+            };
+            if (state.showPassword) {
+                userParam.password = formState.password;
             }
             await updateProfile(userParam);
-
-            state.proxyVisible = false;
         };
+
+        const init = () => {
+            getProfile(props.userId);
+        };
+        init();
 
         return {
             ...toRefs(state),
+            formState,
+            validationState,
             onClickConfirm,
         };
     },
