@@ -23,6 +23,7 @@ import { fontUrls, webFonts } from '@/components/styles/web-fonts';
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
+import "@/components/styles/reset.pcss";
 import "@/components/styles/style.pcss";
 
 
