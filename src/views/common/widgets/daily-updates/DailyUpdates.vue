@@ -12,8 +12,8 @@
                 </div>
             </div>
             <div v-if="!loading" class="card-wrapper">
-                <div class="daily-update-card-alert">
-                    <div v-for="(item, index) in filteredData" :key="index"
+                <div v-if="alertData.length > 0" class="daily-update-card-alert">
+                    <div v-for="(item, index) in alertData" :key="index"
                          class="daily-update-card"
                     >
                         <div v-if="!item.isServer">
@@ -33,12 +33,18 @@
                         </p>
                         <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                            <span class="text-blue-500 font-bold text-sm">{{ item.created_count || 0 }}</span>
+                            <span class="text-blue-500 font-bold text-sm">{{ item.created_count || 0 }}
+                                <p-i v-if="item.create_warning" name="ic_state_duplicated" width="0.75rem"
+                                     height="0.75rem"
+                                />
+                            </span>
                         </router-link>
-                        <router-link :to="item.deletedHref" class="daily-deleted-count">
+                        <router-link v-if="item.deleted_count" :to="item.deletedHref" class="daily-deleted-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
                             <span class="text-red-500 font-bold text-sm"> {{ item.deleted_count || 0 }}
-                                <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem" />
+                                <p-i v-if="item.delete_warning" name="ic_state_duplicated" width="0.75rem"
+                                     height="0.75rem"
+                                />
                             </span>
                         </router-link>
                     </div>
@@ -134,11 +140,11 @@ interface Data {
 interface State {
     serverData: Server[];
     cloudServiceData: CloudService[];
-    data: unknown;
+    data: any;
     loading: boolean;
     widgetRef: any;
     dailyUpdates: boolean;
-    filteredData: unknown;
+    alertData: any;
 }
 
 const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
@@ -167,7 +173,7 @@ export default {
             serverData: [],
             cloudServiceData: [],
             data: [],
-            filteredData: [],
+            alertData: [],
             loading: true,
             widgetRef: null,
             dailyUpdates: false,
@@ -247,20 +253,27 @@ export default {
             return state.data;
         };
 
+        const getAlertData = (dataForFilter) => {
+            const alertData = [] as any[];
+            find(dataForFilter, (d) => {
+                if (d.create_warning || d.delete_warning) {
+                    alertData.push(d);
+                }
+            });
+            state.alertData = alertData;
+            state.data = state.data.filter(x => !state.alertData.includes(x));
+        };
+
+
         const getData = async (): Promise<void> => {
             state.loading = true;
             await Promise.all([store.dispatch('resource/provider/load'), getServerData(), getCloudServiceData()]);
             if (props.projectFilter) {
-                await setProjectDashboardData();
+                const dataForFilter = await setProjectDashboardData() as any[];
+                await getAlertData(dataForFilter);
             } else {
                 const dataForFilter = await setDashboardData() as any[];
-                const filteredData = [] as any[];
-                find(dataForFilter, (d) => {
-                    if (d.create_warning || d.delete_warning) {
-                        filteredData.push(d);
-                    }
-                });
-                state.filteredData = filteredData;
+                await getAlertData(dataForFilter);
             }
             state.loading = false;
         };
