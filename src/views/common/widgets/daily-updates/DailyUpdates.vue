@@ -11,61 +11,67 @@
                     <p-skeleton width="100%" height="0.625rem" />
                 </div>
             </div>
+            <div v-if="!loading" class="card-wrapper">
+                <div class="daily-update-card-alert">
+                    <div v-for="(item, index) in filteredData" :key="index"
+                         class="daily-update-card"
+                    >
+                        <div v-if="!item.isServer">
+                            <p-lazy-img :src="iconUrl(item)"
+                                        width="2rem" height="2rem"
+                                        class="rounded-sm flex-shrink-0"
+                            />
+                        </div>
+                        <div v-else-if="item.isServer">
+                            <p-i name="ic_server"
+                                 width="2rem" height="2rem"
+                                 class="rounded-sm flex-shrink-0"
+                            />
+                        </div>
+                        <p v-if="item.created_count || item.deleted_count" class="daily-service">
+                            {{ item.title }}<br> <span class="text-sm">{{ item.total_count || 0 }}</span>
+                        </p>
+                        <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
+                            {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
+                            <span class="text-blue-500 font-bold text-sm">{{ item.created_count || 0 }}</span>
+                        </router-link>
+                        <router-link :to="item.deletedHref" class="daily-deleted-count">
+                            {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
+                            <span class="text-red-500 font-bold text-sm"> {{ item.deleted_count || 0 }}
+                                <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem" />
+                            </span>
+                        </router-link>
+                    </div>
+                </div>
+                <div v-for="(item, index) in data" :key="index" class="daily-update-card">
+                    <div v-if="!item.isServer">
+                        <p-lazy-img :src="iconUrl(item)"
+                                    width="2rem" height="2rem"
+                                    class="rounded-sm flex-shrink-0"
+                        />
+                    </div>
+                    <div v-else-if="item.isServer">
+                        <p-i name="ic_server"
+                             width="2rem" height="2rem"
+                             class="rounded-sm flex-shrink-0"
+                        />
+                    </div>
+                    <p v-if="item.created_count || item.deleted_count" class="daily-service">
+                        {{ item.title }}<br> <span class="text-sm">{{ item.total_count || 0 }}</span>
+                    </p>
+                    <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
+                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
+                        <span class="text-blue-500 font-bold text-sm">{{ item.created_count || 0 }}</span>
+                    </router-link>
+                    <router-link v-if="item.deleted_count" :to="item.deletedHref" class="daily-deleted-count">
+                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
+                        <span class="text-red-500 font-bold text-sm"> {{ item.deleted_count || 0 }}</span>
+                    </router-link>
+                </div>
+            </div>
             <div v-if="!loading && data.length === 0" class="h-full flex flex-col justify-center">
                 <img :src="'./images/illust_no-update.svg'" class="no-data-img">
             </div>
-            <p-grid-layout :items="data"
-                           row-gap="0" column-gap="0"
-                           :fix-column="1" card-height="auto"
-                           card-min-width="0"
-                           :card-class="() => []"
-            >
-                <template #card="{item, index}">
-                    <router-link :to="item.href">
-                        <hr v-if="item.created_count || item.deleted_count" style="width: 100%;">
-                        <div v-if="item.created_count || item.deleted_count" class="card-contents">
-                            <div v-if="!item.isServer">
-                                <p-lazy-img :src="iconUrl(item)"
-                                            width="2rem" height="2rem"
-                                            class="mr-2"
-                                />
-                            </div>
-                            <div v-else-if="item.isServer">
-                                <p-i name="ic_server"
-                                     width="2rem" height="2rem"
-                                     class="mr-2 rounded-sm"
-                                />
-                            </div>
-                            <div class="daily-update-contents">
-                                <div class="top">
-                                    <span v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group">{{ item.group }}</span>
-                                    <span class="count">({{ item.count || 0 }})</span>
-                                    <span v-tooltip.bottom="{content: item.type, delay: {show: 500}}" class="type">{{ item.type }}</span>
-                                </div>
-                                <p v-if="item.created_count && item.deleted_count" class="state">
-                                    <router-link :to="item.createdHref">
-                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }} <span class="created-count">{{ item.created_count || 0 }}</span>
-                                    </router-link>
-                                    <span class="divider">|</span>
-                                    <router-link :to="item.deletedHref">
-                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
-                                    </router-link>
-                                </p>
-                                <p v-else-if="item.created_count && !item.deleted_count" class="state">
-                                    <router-link :to="item.createdHref">
-                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }} <span class="created-count">{{ item.created_count || 0 }}</span>
-                                    </router-link>
-                                </p>
-                                <p v-else class="state">
-                                    <router-link :to="item.deletedHref">
-                                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <span class="deleted-count">{{ item.deleted_count || 0 }}</span>
-                                    </router-link>
-                                </p>
-                            </div>
-                        </div>
-                    </router-link>
-                </template>
-            </p-grid-layout>
         </template>
     </p-widget-layout>
 </template>
@@ -80,13 +86,13 @@ import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { store } from '@/store';
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import { find } from 'lodash';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -100,6 +106,8 @@ interface CloudService {
     icon: string;
     created_count: number;
     deleted_count: number;
+    create_warning: boolean;
+    delete_warning: boolean;
 }
 
 interface Server {
@@ -107,6 +115,8 @@ interface Server {
     total_count: number;
     created_count: number;
     deleted_count: number;
+    create_warning: boolean;
+    delete_warning: boolean;
 }
 
 interface Data {
@@ -117,15 +127,18 @@ interface Data {
     icon?: string;
     provider?: string;
     defaultIcon?: string;
+    create_warning?: boolean;
+    delete_warning?: boolean;
 }
 
 interface State {
     serverData: Server[];
     cloudServiceData: CloudService[];
-    data: Data[];
+    data: unknown;
     loading: boolean;
     widgetRef: any;
     dailyUpdates: boolean;
+    filteredData: unknown;
 }
 
 const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
@@ -135,7 +148,6 @@ export default {
     name: 'DailyUpdates',
     components: {
         PWidgetLayout,
-        PGridLayout,
         PLazyImg,
         PI,
         PSkeleton,
@@ -155,6 +167,7 @@ export default {
             serverData: [],
             cloudServiceData: [],
             data: [],
+            filteredData: [],
             loading: true,
             widgetRef: null,
             dailyUpdates: false,
@@ -190,62 +203,64 @@ export default {
             }
         };
 
+        const setProjectDashboardData = async () => {
+            state.data = [
+                ...state.serverData.map(d => ({
+                    title: d.server_type,
+                    isServer: true,
+                    href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
+                    createdHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getCreatedAtFilters()}`,
+                    deletedHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getDeletedAtFilters()}`,
+                    ...d,
+                })),
+                ...state.cloudServiceData.map(d => ({
+                    title: d.cloud_service_group,
+                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
+                    createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getCreatedAtFilters()}`,
+                    deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getDeletedAtFilters()}`,
+                    ...d,
+                })),
+            ];
+            return state.data;
+        };
+
+        const setDashboardData = async () => {
+            state.data = [
+                ...state.serverData.map(d => ({
+                    title: d.server_type,
+                    isServer: true,
+                    href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
+                    createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
+                    deletedHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getDeletedAtFilters()}`,
+                    ...d,
+                })),
+                ...state.cloudServiceData.map(d => ({
+                    title: d.cloud_service_group,
+                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
+                    createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getCreatedAtFilters()}`,
+                    deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getDeletedAtFilters()}`,
+                    ...d,
+                })),
+            ];
+            return state.data;
+        };
 
         const getData = async (): Promise<void> => {
             state.loading = true;
             await Promise.all([store.dispatch('resource/provider/load'), getServerData(), getCloudServiceData()]);
             if (props.projectFilter) {
-                state.data = [
-                    ...state.serverData.map(d => ({
-                        group: 'Server',
-                        type: d.server_type,
-                        count: d.total_count,
-                        isServer: true,
-                        created_count: d.created_count,
-                        deleted_count: d.deleted_count,
-                        href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
-                        createdHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getCreatedAtFilters()}`,
-                        deletedHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getDeletedAtFilters()}`,
-                    })),
-                    ...state.cloudServiceData.map(d => ({
-                        group: d.cloud_service_group,
-                        type: d.cloud_service_type,
-                        count: d.total_count,
-                        provider: d.provider,
-                        created_count: d.created_count,
-                        deleted_count: d.deleted_count,
-                        icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
-                        href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
-                        createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getCreatedAtFilters()}`,
-                        deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getDeletedAtFilters()}`,
-                    })),
-                ];
+                await setProjectDashboardData();
             } else {
-                state.data = [
-                    ...state.serverData.map(d => ({
-                        group: 'Server',
-                        type: d.server_type,
-                        count: d.total_count,
-                        isServer: true,
-                        created_count: d.created_count,
-                        deleted_count: d.deleted_count,
-                        href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
-                        createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
-                        deletedHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getDeletedAtFilters()}`,
-                    })),
-                    ...state.cloudServiceData.map(d => ({
-                        group: d.cloud_service_group,
-                        type: d.cloud_service_type,
-                        count: d.total_count,
-                        created_count: d.created_count,
-                        deleted_count: d.deleted_count,
-                        provider: d.provider,
-                        icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
-                        href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
-                        createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getCreatedAtFilters()}`,
-                        deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getDeletedAtFilters()}`,
-                    })),
-                ];
+                const dataForFilter = await setDashboardData() as any[];
+                const filteredData = [] as any[];
+                find(dataForFilter, (d) => {
+                    if (d.create_warning || d.delete_warning) {
+                        filteredData.push(d);
+                    }
+                });
+                state.filteredData = filteredData;
             }
             state.loading = false;
         };
@@ -295,43 +310,80 @@ export default {
     @apply mx-auto mb-4 flex-shrink-0;
     max-width: 14rem;
 }
-.card-contents {
-    @apply flex items-center w-full content-between p-4 overflow-hidden;
-    &:hover {
-        background-color: rgba(theme('colors.blue.200'), 0.8);
+
+.card-wrapper {
+    @apply overflow-hidden whitespace-no-wrap w-full px-4;
+    .daily-update-card {
+        @apply flex items-center w-full content-between overflow-hidden;
+        padding-left: 1rem;
+        height: 4rem;
+        border-radius: 0.25rem;
+
+        .daily-service {
+            @apply font-bold text-xs truncate flex-shrink-0;
+            margin-left: 0.75rem;
+            width: 24%;
+            max-width: 6.5rem;
+            padding: 0.5rem;
+            @media screen and (1024px < width < 1280px) {
+                margin-left: 0;
+            }
+        }
+        .daily-created-count {
+            @apply text-xs flex-shrink-0;
+            padding: 0.5rem;
+            margin-right: 0.75rem;
+            width: 24%;
+            max-width: 6.5rem;
+            &:hover {
+                @apply bg-white cursor-pointer underline text-blue-500;
+                opacity: 0.75;
+                border-radius: 0.25rem;
+            }
+        }
+        .daily-deleted-count {
+            @apply text-xs flex-shrink-0;
+            padding: 0.5rem;
+            margin-right: 0.75rem;
+            width: 24%;
+            max-width: 6.5rem;
+            &:hover {
+                @apply bg-white cursor-pointer underline text-red-500;
+                opacity: 0.75;
+                border-radius: 0.25rem;
+            }
+        }
+        .p-i-icon {
+            @media screen and (1024px < width < 1280px) {
+                display: none;
+            }
+        }
+        &:nth-of-type(odd) {
+            background-color: rgba(theme('colors.primary4'), 0.5);
+        }
     }
-    .daily-update-contents {
-        @apply overflow-hidden text-sm whitespace-no-wrap w-full;
-        line-height: 150%;
-        .top {
-            width: 100%;
-            display: flex;
+}
+
+.card-wrapper .daily-update-card-alert {
+    @apply flex items-center w-full content-between border;
+    flex-wrap: wrap;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    border-color: rgba(theme('colors.yellow.500'), 0.75);
+    background: linear-gradient(90deg, rgba(theme('colors.yellow.100'), 0.75) 23.96%, rgba(theme('colors.yellow.300'), 0.75) 49.48%, rgba(theme('colors.yellow.100'), 0.75) 74.48%);
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
         }
-        .group {
-            @apply font-bold pr-1;
+        100% {
+            background-position: 100% 50%;
         }
-        .count {
-            @apply font-bold;
-        }
-        .type {
-            @apply truncate text-xs font-light text-gray-500 pl-2 w-full;
-        }
-        .state {
-            @apply text-xs;
-            line-height: 120%;
-        }
-        .created-count {
-            @apply text-green-500 text-xs font-bold pl-1;
-            line-height: 120%;
-        }
-        .deleted-count {
-            @apply text-gray-500 text-xs font-bold pl-1;
-            line-height: 120%;
-        }
-        .divider {
-            @apply pl-3 pr-2 text-xs text-gray-300;
-            line-height: 120%;
-        }
+    }
+
+    .daily-update-card {
+        background-color: rgba(theme('colors.yellow.100'), 0.75);
     }
 }
 </style>

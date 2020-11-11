@@ -31,9 +31,9 @@
                     <div v-if="column.title === maxPriority.length.toString()" class="header-decorator">
                         {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.LOW') }}
                     </div>
-                    <span v-if="column.title === '1'" id="header-priority">
-                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.PRIORITY') }}
-                    </span>
+<!--                    <span v-if="column.title === '1'" id="header-priority">-->
+<!--                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.PRIORITY') }}-->
+<!--                    </span>-->
                     <p-i v-if="column.title > 5 && (isCreateMode || isEditMode)" name="ic_delete" width="1.5rem"
                          color="transparent inherit"
                          class="header-button"
@@ -375,209 +375,208 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .title-wrapper {
-        @apply w-full;
-        margin-bottom: 1.5rem;
-        .title {
-            @apply text-gray-900;
-            font-size: 1.125rem;
-            font-weight: bold;
-            padding-right: 0.5rem;
-        }
-        .sub-title {
-            @apply text-gray-400;
-            font-size: 0.75rem;
-        }
-        .edit-btn {
-            @apply float-right cursor-pointer;
-            font-size: 0.875rem;
-        }
+.title-wrapper {
+    @apply w-full;
+    margin-bottom: 1.5rem;
+    .title {
+        @apply text-gray-900;
+        font-size: 1.125rem;
+        font-weight: bold;
+        padding-right: 0.5rem;
     }
-    .v-enter-active, .v-leave-active, .v-move {
-        transition: all ease 0.5s;
+    .sub-title {
+        @apply text-gray-400;
+        font-size: 0.75rem;
     }
-    .v-leave-active {
-        position: relative;
+    .edit-btn {
+        @apply float-right cursor-pointer;
+        font-size: 0.875rem;
     }
-    .v-enter, .v-leave-to {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+}
+.v-enter-active, .v-leave-active, .v-move {
+    transition: all ease 0.5s;
+}
+.v-leave-active {
+    position: relative;
+}
+.v-enter, .v-leave-to {
+    opacity: 0;
+    transform: translateY(20px);
+}
 
-    .kanban {
-        .kanban-container {
-            @apply grid w-full h-full;
-            row-gap: 0.5rem;
-            column-gap: 0.5rem;
-            grid-template-columns: repeat(auto-fit, minmax(11.75rem, 1fr));
-            .resource-group-box {
-                @apply border border-violet-200 bg-white box-border;
-                border-radius: 2px;
-                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
-                .resource-group-header {
-                    @apply bg-violet-100;
-                    height: 2.5rem;
-                    padding-top: 0.75rem;
-                    padding-bottom: 0.625rem;
-                    margin-bottom: 1rem;
-                    #header-number {
-                        @apply text-gray-700 font-bold;
-                        padding-left: 1rem;
-                        font-size: 0.875rem;
+.kanban {
+    .kanban-container {
+        @apply grid w-full h-full;
+        row-gap: 0.5rem;
+        column-gap: 0.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(11.75rem, 1fr));
+        .resource-group-box {
+            @apply border border-violet-200 bg-white box-border;
+            border-radius: 2px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
+            .resource-group-header {
+                @apply bg-violet-100;
+                height: 2.5rem;
+                padding-top: 0.75rem;
+                padding-bottom: 0.625rem;
+                margin-bottom: 1rem;
+                #header-number {
+                    @apply text-gray-700 font-bold;
+                    padding-left: 1rem;
+                    font-size: 0.875rem;
+                }
+                .header-decorator {
+                    @apply inline-block bg-primary3 text-primary;
+                    border-radius: 2px;
+                    width: 4.5rem;
+                    padding: 0.2rem;
+                    margin-left: 0.5rem;
+                    font-size: 0.75rem;
+                    text-align: center;
+                }
+                #header-priority {
+                    @apply float-right text-gray-700;
+                    padding-right: 1rem;
+                    font-size: 0.75rem;
+                    line-height: 1.5;
+                }
+                .header-button {
+                    @apply float-right text-gray-300;
+                    margin-right: 0.5rem;
+                    margin-top: -0.2rem;
+                }
+            }
+
+            .resource-item-wrapper {
+                @apply overflow-y-auto overflow-x-hidden px-4 pb-4;
+                height: 13rem;
+                .list-group {
+                    height: calc(100% - 5.7rem);
+                }
+                .kanban-guide-wrapper {
+                    @apply flex-col;
+                    #kanban-guide-card {
+                        @apply bg-blue-100 m-auto;
+                        height: 3.25rem;
+                        border-radius: 0.25rem;
+                        z-index: 1;
                     }
-                    .header-decorator {
-                        @apply inline-block bg-primary3 text-primary;
-                        border-radius: 2px;
-                        width: 2.4375rem;
-                        height: 1.25rem;
-                        margin-left: 0.5rem;
-                        font-size: 0.75rem;
-                        line-height: 1.5;
-                        text-align: center;
+                    #kanban-guide-square {
+                        @apply bg-blue-300;
+                        opacity: 0.4;
+                        border-radius: 0.25rem;
+                        width: 2rem;
+                        height: 2rem;
+                        z-index: 2;
+                        margin-top: -2.625rem;
+                        margin-left: 0.625rem;
                     }
-                    #header-priority {
-                        @apply float-right text-gray-700;
-                        padding-right: 1rem;
-                        font-size: 0.75rem;
-                        line-height: 1.5;
+                    #kanban-guide-icon {
+                        float: right;
+                        z-index: 2;
+                        margin-right: 0.25rem;
+                        margin-top: -1.15rem;
                     }
-                    .header-button {
-                        @apply float-right text-gray-300;
-                        margin-right: 0.5rem;
-                        margin-top: -0.2rem;
+                    .kanban-guide-text {
+                        @apply text-center text-xs text-blue-500;
+                        padding-top: 1rem;
                     }
                 }
-
-                .resource-item-wrapper {
-                    @apply overflow-y-auto overflow-x-hidden px-4 pb-4;
-                    height: 13rem;
-                    .list-group {
-                        height: calc(100% - 5.7rem);
-                    }
-                    .kanban-guide-wrapper {
-                        @apply flex-col;
-                        #kanban-guide-card {
-                            @apply bg-blue-100 m-auto;
-                            height: 3.25rem;
-                            border-radius: 0.25rem;
-                            z-index: 1;
+                .resource-group-item {
+                    @apply w-full block;
+                    .add-resource-group {
+                        @apply border border-dashed border-gray-200 flex items-center w-full justify-center text-xs cursor-pointer content-between p-2 overflow-hidden leading-normal;
+                        height: 3.25rem;
+                        border-radius: 0.25rem;
+                        margin-bottom: 0.5rem;
+                        &:hover {
+                            @apply border-blue-500 border border-solid bg-blue-100;
                         }
-                        #kanban-guide-square {
-                            @apply bg-blue-300;
-                            opacity: 0.4;
-                            border-radius: 0.25rem;
-                            width: 2rem;
-                            height: 2rem;
-                            z-index: 2;
-                            margin-top: -2.625rem;
-                            margin-left: 0.625rem;
-                        }
-                        #kanban-guide-icon {
-                            float: right;
-                            z-index: 2;
-                            margin-right: 0.25rem;
-                            margin-top: -1.15rem;
-                        }
-                        .kanban-guide-text {
-                            @apply text-center text-xs text-blue-500;
-                            padding-top: 1rem;
+                        &:active {
+                            @apply cursor-default bg-blue-200;
                         }
                     }
-                    .resource-group-item {
-                        @apply w-full block;
-                        .add-resource-group {
-                            @apply border border-dashed border-gray-200 flex items-center w-full justify-center text-xs cursor-pointer content-between p-2 overflow-hidden leading-normal;
-                            height: 3.25rem;
-                            border-radius: 0.25rem;
-                            margin-bottom: 0.5rem;
-                            &:hover {
-                                @apply border-blue-500 border border-solid bg-blue-100;
-                            }
-                            &:active {
-                                @apply cursor-default bg-blue-200;
-                            }
-                        }
-                        .resource {
-                            @apply border border-gray-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal whitespace-no-wrap;
-                            height: 3.25rem;
-                            border-radius: 0.25rem;
-                            margin-bottom: 0.5rem;
-                            line-height: 1.5;
-                            position: relative;
-                            cursor: pointer;
-                            &:hover {
-                                @apply border-blue-500 border border-solid bg-blue-100;
-                                .add-btn {
-                                    display: inline;
-                                    position: absolute;
-                                    right: 0.5rem;
-                                    line-height: 1.8;
-                                }
-                            }
-                            &:active {
-                                @apply cursor-move bg-blue-200;
-                            }
-                            .resource-description {
-                                @apply ml-2;
-                                flex-grow: 1;
-                                overflow-x: hidden;
-                                font-size: 0.75rem;
-                            }
-                            .resource-image {
-                                flex-shrink: 0;
-                            }
-                            .resource-name {
-                                @apply truncate w-full;
-                            }
+                    .resource {
+                        @apply border border-gray-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal whitespace-no-wrap;
+                        height: 3.25rem;
+                        border-radius: 0.25rem;
+                        margin-bottom: 0.5rem;
+                        line-height: 1.5;
+                        position: relative;
+                        cursor: pointer;
+                        &:hover {
+                            @apply border-blue-500 border border-solid bg-blue-100;
                             .add-btn {
-                                display: none;
+                                display: inline;
+                                position: absolute;
+                                right: 0.5rem;
+                                line-height: 1.8;
                             }
                         }
+                        &:active {
+                            @apply cursor-move bg-blue-200;
+                        }
+                        .resource-description {
+                            @apply ml-2;
+                            flex-grow: 1;
+                            overflow-x: hidden;
+                            font-size: 0.75rem;
+                        }
+                        .resource-image {
+                            flex-shrink: 0;
+                        }
+                        .resource-name {
+                            @apply truncate w-full;
+                        }
+                        .add-btn {
+                            display: none;
+                        }
+                    }
 
-                        &.recommended {
-                            .resource {
-                                @apply border border-dashed border-gray-300;
-                            }
-                            .resource-image {
+                    &.recommended {
+                        .resource {
+                            @apply border border-dashed border-gray-300;
+                        }
+                        .resource-image {
+                            opacity: 0.5;
+                        }
+                        .recommended-text {
+                            @apply text-blue-500;
+                            opacity: 0.5;
+                            font-size: 0.75rem;
+                            flex-shrink: 0;
+                            margin-right: 0.5rem;
+                        }
+                        .resource-description {
+                            .resource-name, .resource-count {
                                 opacity: 0.5;
-                            }
-                            .recommended-text {
-                                @apply text-blue-500;
-                                opacity: 0.5;
-                                font-size: 0.75rem;
-                                flex-shrink: 0;
-                                margin-right: 0.5rem;
-                            }
-                            .resource-description {
-                                .resource-name, .resource-count {
-                                    opacity: 0.5;
-                                }
                             }
                         }
                     }
                 }
             }
         }
-        &.edit-mode {
-            .kanban-container .resource-group-box .resource-group-header {
-                @apply bg-blue-100;
-            }
-            .kanban-container .resource-group-box .resource-group-header .header-decorator {
-                @apply bg-blue-200 text-blue-500;
-            }
-            .kanban-container .resource-group-box .resource-item-wrapper {
-                height: 17rem;
-            }
+    }
+    &.edit-mode {
+        .kanban-container .resource-group-box .resource-group-header {
+            @apply bg-blue-100;
+        }
+        .kanban-container .resource-group-box .resource-group-header .header-decorator {
+            @apply bg-blue-200 text-blue-500;
+        }
+        .kanban-container .resource-group-box .resource-item-wrapper {
+            height: 17rem;
         }
     }
-    .actions {
-        @apply flex justify-end;
-        margin-top: 1.5rem;
+}
+.actions {
+    @apply flex justify-end;
+    margin-top: 1.5rem;
+}
+.p-button.gray900 {
+    @apply border-gray-300;
+    &:hover {
+        @apply border-gray-900;
     }
-    .p-button.gray900 {
-        @apply border-gray-300;
-        &:hover {
-            @apply border-gray-900;
-        }
-    }
+}
 </style>
