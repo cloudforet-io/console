@@ -19,7 +19,7 @@
                         <div v-if="!item.isServer">
                             <p-lazy-img :src="iconUrl(item)"
                                         width="2rem" height="2rem"
-                                        class="rounded-sm flex-shrink-0"
+                                        class="rounded-sm flex-shrink-0 service-img"
                             />
                         </div>
                         <div v-else-if="item.isServer">
@@ -53,7 +53,7 @@
                     <div v-if="!item.isServer">
                         <p-lazy-img :src="iconUrl(item)"
                                     width="2rem" height="2rem"
-                                    class="rounded-sm flex-shrink-0"
+                                    class="rounded-sm flex-shrink-0 service-img"
                         />
                     </div>
                     <div v-else-if="item.isServer">
@@ -75,7 +75,7 @@
                     </router-link>
                 </div>
             </div>
-            <div v-if="!loading && data.length === 0" class="h-full flex flex-col justify-center">
+            <div v-if="!loading && ( data.length === 0 && alertData.length === 0) " class="h-full flex flex-col justify-center">
                 <img :src="'./images/illust_no-update.svg'" class="no-data-img">
             </div>
         </template>
@@ -366,7 +366,7 @@ export default {
                 border-radius: 0.25rem;
             }
         }
-        .p-i-icon {
+        .p-i-icon, .service-img {
             @media screen and (1024px < width < 1280px) {
                 display: none;
             }
