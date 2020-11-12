@@ -63,6 +63,7 @@
                                      :mode="mode"
                                      @edit-start="onEditStart('time-table')"
                                      @edit-finish="onEditFinish('time-table')"
+                                     @open-check-modal="checkModalState.visible = true"
                 />
                 <div v-if="disabledState.visible && disabledState.current !== 'time-table'" class="section-disabled" @click.prevent />
             </div>

@@ -500,6 +500,12 @@ export default {
             }
         };
 
+        /* etc */
+        const isRuleExist = () => {
+            const settings = getRuleSettings();
+            return settings.ruleWithUTC.some(d => d.times.length > 0);
+        };
+
         /* event */
         const onClickCurrentWeek = () => {
             state.currentDate = dayjs();
@@ -608,6 +614,11 @@ export default {
             emit('edit-start');
         };
         const onClickSave = async () => {
+            if (!isRuleExist()) {
+                emit('open-check-modal');
+                return;
+            }
+
             await createOrUpdate(props.scheduleId);
             await getScheduleRule();
 
@@ -626,12 +637,6 @@ export default {
         };
         const onMouseLeaveTimeBlock = () => {
             state.hoveredTime = null;
-        };
-
-        /* etc */
-        const isRuleExist = () => {
-            const settings = getRuleSettings();
-            return settings.ruleWithUTC.length > 0;
         };
 
         watch(() => props.scheduleId, async (after, before) => {
