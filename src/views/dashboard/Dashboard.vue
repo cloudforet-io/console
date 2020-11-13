@@ -3,20 +3,20 @@
         <all-summary class="col-start-1 col-end-13
                                 lg:col-end-10"
         />
-        <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
-                                 row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
-        />
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
-        <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
-                             lg:row-start-2"
+        <resource-map class="col-start-1 col-end-13 lg:col-end-10" />
+        <top-projects class="col-start-1 col-end-13 lg:col-end-13"
         />
-        <collectors class="col-start-1 col-end-13" />
+        <service-accounts class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13
+                                 row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
+        />
         <cloud-services class="col-start-1 col-end-13"
                         :more-info="true"
         />
+        <collectors class="col-start-1 col-end-13" />
     </general-page-layout>
 </template>
 
@@ -28,11 +28,13 @@ import AllSummary from '@/views/common/widgets/all-summary/AllSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
 import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
+import ResourceMap from '@/views/common/widgets/resource-map/ResourceMap.vue';
 
 
 export default {
     name: 'Dashboard',
     components: {
+        ResourceMap,
         GeneralPageLayout,
         CloudServices,
         DailyUpdates,

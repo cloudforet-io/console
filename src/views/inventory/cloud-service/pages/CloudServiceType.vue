@@ -109,7 +109,7 @@
                                         </span>
                                         <span class="sub-title-name">{{ item.cloud_service_type }}</span>
                                         <span class="sub-title-count">
-                                            {{ item.cloud_service_count }}
+                                            {{ item.count }}
                                         </span>
                                     </div>
                                 </div>
