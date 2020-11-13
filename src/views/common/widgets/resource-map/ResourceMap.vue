@@ -4,37 +4,36 @@
             Regions
         </div>
         <div class="chart-wrapper">
-<!--                <template #loader>-->
-<!--                    <p-skeleton width="100%" height="80%" />-->
-<!--                </template>-->
             <div class="chart-loader">
                 <div id="chartRef" ref="chartRef" />
             </div>
             <div v-if="!loading" class="resource-info-wrapper">
                 <div class="resource-info-title">
-                    <span class="resource-info-provider">{{ selectedProvider }}  </span>
+                    <span class="resource-info-provider"
+                          :style="{ color: providerColor }"
+                    >
+                        {{ selectedProvider }}  </span>
                     <span class="resource-info-region">{{ selectedRegion }}</span> <br>
                     Resources
                 </div>
                 <div v-if="Object.keys(filteredData).length > 10">
-                    <div v-for="i in 10" class="progress-bar" :key="i">
+                    <div v-for="i in 10" :key="i" class="progress-bar">
                         <div class="progress-bar-label">
                             <span class="label-text">{{ Object.keys(filteredData)[i] }}</span>
                             <span class="label-number">{{ Object.values(filteredData)[i] }}</span>
                         </div>
                         <p-progress-bar :percentage="(Object.values(filteredData)[i] / maxValue) * 100"
-                                        class="progress-bar"
+                                        class="progress-bar" :class="selectedProvider.toLowerCase()"
                         />
                     </div>
                 </div>
                 <div v-else-if="0 < Object.keys(filteredData).length && Object.keys(filteredData).length < 10">
-                    <div v-for="i in (Object.keys(filteredData).length)" class="progress-bar" :key="i">
+                    <div v-for="i in (Object.keys(filteredData).length)" :key="i" class="progress-bar">
                         <div class="progress-bar-label">
                             <span class="label-text">{{ Object.keys(filteredData)[i-1] }}</span>
                             <span class="label-number">{{ Object.values(filteredData)[i-1] }}</span>
                         </div>
-                        <p-progress-bar :percentage="(Object.values(filteredData)[i-1] / maxValue) * 100"
-                        />
+                        <p-progress-bar :percentage="(Object.values(filteredData)[i-1] / maxValue) * 100" :class="selectedProvider.toLowerCase()" />
                     </div>
                 </div>
             </div>
@@ -53,13 +52,16 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodata_worldLow from '@amcharts/amcharts4-geodata/worldLow';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PLottie from "@/components/molecules/lottie/PLottie.vue";
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
 const colorSet = new am4core.ColorSet();
@@ -80,8 +82,10 @@ export default {
             filteredData: [] as any,
             selectedProvider: 'AWS',
             selectedRegion: 'Asia Pacific (Seoul)',
+            providerColor: '#FF9900',
             loading: true,
             maxValue: 0,
+            providers: computed(() => store.state.resource.provider.items),
         });
         /* Create map instance */
 
@@ -164,6 +168,7 @@ export default {
                 const target = event.target.dataItem?.dataContext as any;
                 state.selectedProvider = target.region_type;
                 state.selectedRegion = target.name;
+                state.providerColor = state.providers[state.selectedProvider.toLowerCase()].color as string;
                 await getFilteredData(target.region_code);
             });
 
@@ -172,6 +177,7 @@ export default {
 
         const init = async () => {
             state.loading = true;
+            await store.dispatch('resource/provider/load');
             await getFilteredData('ap-northeast-2');
             await drawChart();
             state.loading = false;
@@ -203,7 +209,7 @@ export default {
     font-weight: bold;
     line-height: 120%;
     margin-top: 1rem;
-    margin-left: 1rem;
+    margin-left: 1.5rem;
 }
 .chart-wrapper {
     height: 90%;
@@ -238,6 +244,21 @@ export default {
 
     .progress-bar {
         margin-bottom: 0.5rem;
+        &.aws {
+            >>> .tracker-bar {
+                background-color: #f90;
+            }
+        }
+        &.google_cloud {
+            >>> .tracker-bar {
+                background-color: #4285f4;
+            }
+        }
+        &.azure {
+            >>> .tracker-bar {
+                background-color: #00bcf2;
+            }
+        }
 
         &:hover {
             @apply bg-blue-100;

@@ -128,7 +128,7 @@ export default {
             });
             state.data = [
                 ...res.results.map(d => ({
-                    count: d.cloud_service_count,
+                    count: d.count,
                     group: d.cloud_service_group,
                     icon: d.icon,
                     name: d.cloud_service_type,
@@ -155,7 +155,7 @@ export default {
                     });
                     state.data = [
                         ...res.results.map(d => ({
-                            count: d.cloud_service_count,
+                            count: d.count,
                             group: d.cloud_service_group,
                             icon: d.icon,
                             name: d.cloud_service_type,
