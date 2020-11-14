@@ -1,0 +1,49 @@
+$row: blue;
+$node: #ff5900;
+$toggle: #e63bff;
+$icon: #00c3ff;
+$left-extra: chartreuse;
+$data: purple;
+$right-extra: #0b5500;
+
+@mixin slot($name, $color) {
+    .#{$name} {
+        border: 2px solid $color;
+    }
+}
+
+.tree-node-story {
+    .slot-case {
+        //.toggle {
+        //    display: inline-block;
+        //    overflow-y: hidden;
+        //}
+        @include slot(row, $row);
+        @include slot(node, $node);
+        @include slot(left-extra, $left-extra);
+        @include slot(toggle, $toggle);
+        @include slot(icon, $icon);
+        @include slot(data, $data);
+        @include slot(right-extra, $right-extra);
+    }
+
+    @mixin color($name, $color) {
+        &.#{$name} {
+            background-color: $color;
+        }
+    }
+
+    .color {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        @include color(row, $row);
+        @include color(node, $node);
+        @include color(left-extra, $left-extra);
+        @include color(toggle, $toggle);
+        @include color(icon, $icon);
+        @include color(data, $data);
+        @include color(right-extra, $right-extra);
+    }
+}
+
