@@ -12,7 +12,7 @@
                     <p class="input-title">
                         {{ $t('COMMON.SIGN_IN.ADMIN_ID') }}
                     </p>
-                    <PFieldGroup :invalid-text="invalidMsg.userId" :invalid="invalidState.userId">
+                    <p-field-group :invalid-text="invalidMsg.userId" :invalid="invalidState.userId">
                         <template #default="{invalid}">
                             <p-text-input
                                 v-model="userId"
@@ -25,13 +25,13 @@
                                 @input="checkUserId"
                             />
                         </template>
-                    </PFieldGroup>
+                    </p-field-group>
                 </div>
                 <div class="flex flex-col mb-4 md:w-full">
                     <p class="input-title">
                         {{ $t('COMMON.SIGN_IN.PASSWORD') }}
                     </p>
-                    <PFieldGroup :invalid-text="invalidMsg.password" :invalid="invalidState.password">
+                    <p-field-group :invalid-text="invalidMsg.password" :invalid="invalidState.password">
                         <template v-slot:default="{invalid}">
                             <p-text-input
                                 v-model="password"
@@ -46,7 +46,7 @@
                                 @keyup.enter="login"
                             />
                         </template>
-                    </PFieldGroup>
+                    </p-field-group>
                 </div>
             </form>
         </div>

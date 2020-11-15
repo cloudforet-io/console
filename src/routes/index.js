@@ -58,7 +58,6 @@ const router = new VueRouter({
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
-
                     },
                     component: SignIn,
                     props: route => ({

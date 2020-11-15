@@ -57,6 +57,15 @@ export default {
             default: '/',
         },
     },
+    beforeRouteEnter(to, from, next) {
+        if (from.meta.isSignInPage) {
+            next((vm) => {
+                vm.$router.replace({
+                    query: { ...to.query, nextPath: from.query.nextPath },
+                }).catch(() => {});
+            });
+        } else next();
+    },
     setup(props: any, context: any) {
         const vm = (getCurrentInstance() as any);
         const store = useStore();
@@ -96,67 +105,67 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    @define-mixin background-theme $theme, $background {
-        &.$(theme) {
-            background: $background;
-            background-size: cover;
-
-            /* background-position: center center; */
-        }
-    }
-
-    .wrapper {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        bottom: 0;
-        overflow: hidden;
-        background: url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg') no-repeat center center fixed;
+@define-mixin background-theme $theme, $background {
+    &.$(theme) {
+        background: $background;
         background-size: cover;
 
-        /* background-color: theme('colors.white'); */
-        @mixin background-theme 'default-theme', theme('colors.white');
-        @mixin background-theme 'color-theme', theme('colors.gray.default');
-        @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
-        @mixin background-theme 'video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
+        /* background-position: center center; */
     }
+}
 
-    #login-container {
-        max-width: 26.5rem;
-        bottom: 0;
-    }
+.wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    background: url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg') no-repeat center center fixed;
+    background-size: cover;
 
-    #logo {
-        display: inline-block;
-        text-align: center;
-        vertical-align: middle;
-        margin: 0 auto;
-        width: 100px;
-        height: 100px;
-    }
+    /* background-color: theme('colors.white'); */
+    @mixin background-theme 'default-theme', theme('colors.white');
+    @mixin background-theme 'color-theme', theme('colors.gray.default');
+    @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
+    @mixin background-theme 'video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
+}
 
-    #logo-text {
-        text-align: center;
-        margin: 0 auto;
-        width: 217px;
-        height: auto;
-    }
+#login-container {
+    max-width: 26.5rem;
+    bottom: 0;
+}
 
-    .header {
-        padding-top: 1.5rem;
-        text-align: center;
-        #title {
-            font-weight: bold;
-            font-size: 1.5rem;
-            padding-bottom: 8px;
-        }
-    }
+#logo {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0 auto;
+    width: 100px;
+    height: 100px;
+}
 
-    .version {
-        @apply text-primary3;
-        margin-top: 1rem;
-        font-size: 0.875rem;
-        opacity: 0.75;
+#logo-text {
+    text-align: center;
+    margin: 0 auto;
+    width: 217px;
+    height: auto;
+}
+
+.header {
+    padding-top: 1.5rem;
+    text-align: center;
+    #title {
+        font-weight: bold;
+        font-size: 1.5rem;
+        padding-bottom: 8px;
     }
+}
+
+.version {
+    @apply text-primary3;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    opacity: 0.75;
+}
 </style>

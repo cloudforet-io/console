@@ -1,9 +1,9 @@
 <template>
     <div class="project-search">
-        <p-autocomplete-search v-model="proxySearchText"
+        <p-autocomplete-search v-model="searchText"
                                theme="secondary"
-                               :placeholder="selectedProjectGroup ? $t('PROJECT.LANDING.PLACE_HOLDER_PROJECT') : $t('PROJECT.LANDING.PLACE_HOLDER_EXAMPLE')"
-                               :disable-icon="!!selectedProjectGroup"
+                               :placeholder="groupId ? $t('PROJECT.LANDING.PLACE_HOLDER_PROJECT') : $t('PROJECT.LANDING.PLACE_HOLDER_EXAMPLE')"
+                               :disable-icon="!!groupId"
                                :menu="menu"
                                :visible-menu.sync="visibleMenu"
                                :is-focused.sync="isFocused"
@@ -16,10 +16,10 @@
                                @keydown.delete="onDeletePrefix"
         >
             <template #search-left>
-                <div v-if="selectedProjectGroup" class="prefix-tag"
+                <div v-if="groupId" class="prefix-tag"
                      :class="{active: isFocused || visibleMenu}"
                 >
-                    <span class="text">{{ selectedProjectGroup.name }}</span>
+                    <span class="text">{{ groupName }}</span>
                 </div>
             </template>
             <template #menu-no-data>
@@ -55,7 +55,7 @@
                     <p-i name="ic_search" color="inherit" height="1rem"
                          width="1rem"
                     />
-                    <span class="text">{{$t('PROJECT.LANDING.PLACE_HOLDER_SHOW_MORE')}}</span>
+                    <span class="text">{{ $t('PROJECT.LANDING.PLACE_HOLDER_SHOW_MORE') }}</span>
                 </div>
             </template>
         </p-autocomplete-search>
@@ -65,17 +65,17 @@
 <script lang="ts">
 import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import {
-    computed, reactive, toRefs, UnwrapRef, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/components/util/composition-helpers';
 import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { fluentApi, ProjectGroupInfo } from '@/lib/fluent-api';
-import { ProjectModel } from '@/views/project/project/type';
 import {
-    ProjectGroup, Props, DataType, SearchResult,
+    ProjectGroup, DataType, SearchResult,
 } from './ProjectSearch.toolset';
+import {ProjectState} from "@/views/project/project/type";
 
 const LIMIT = 5;
 
@@ -125,22 +125,11 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
     return items;
 };
 
-
-interface State {
-    proxySearchText?: string;
-    trimmedValue: string;
-    regex: RegExp;
-    selectedProjectGroup: null|ProjectGroup;
-    projectGroupItems: ProjectGroupInfo[];
-    projectItems: ProjectModel[];
-    projectGroupTotalCount: number;
-    projectTotalCount: number;
-    projectGroupStart: number;
-    projectStart: number;
-    menu: Readonly<MenuItem[]>;
-    visibleMenu: boolean;
-    isFocused: boolean;
+interface Props {
+    groupId?: string;
+    groupName?: string;
 }
+
 
 export default {
     name: 'ProjectSearch',
@@ -149,31 +138,26 @@ export default {
         PAutocompleteSearch,
     },
     props: {
-        searchText: {
+        groupId: {
             type: String,
-            default: '',
+            default: undefined,
         },
-        projectGroup: {
-            type: Object,
-            default: null,
-            validator(pg) {
-                if (pg === null) return true;
-                if (pg) return pg.name && pg.id;
-                return false;
-            },
+        groupName: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props: Props, { emit }) {
-        const state: UnwrapRef<State> = reactive({
-            proxySearchText: makeProxy('searchText', props, emit),
-            trimmedValue: computed<string>(() => (typeof state.proxySearchText === 'string' ? state.proxySearchText.trim() : '')),
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            searchText: vm.$route.query.search as string,
+            trimmedValue: computed<string>(() => (typeof state.searchText === 'string' ? state.searchText.trim() : '')),
             regex: computed(() => {
                 if (state.trimmedValue) {
                     return RegExp(state.trimmedValue, 'i');
                 }
                 return RegExp(/./);
             }),
-            selectedProjectGroup: null,
             projectGroupItems: [],
             projectItems: [],
             projectGroupTotalCount: 0,
@@ -182,7 +166,7 @@ export default {
             projectStart: 1,
             menu: computed<MenuItem[]>(() => {
                 const menuOptions: MenuOption[] = [];
-                if (state.selectedProjectGroup === null) {
+                if (!props.groupId) {
                     menuOptions.push({
                         title: 'Project group',
                         items: state.projectGroupItems,
@@ -213,7 +197,6 @@ export default {
             return '';
         };
 
-        // const projectGroupApi = fluentApi.identity().projectGroup().get();
         const projectGroupListApi = fluentApi.identity().projectGroup().list()
             .setPageSize(LIMIT)
             .setOnly('project_group_id', 'name');
@@ -223,17 +206,13 @@ export default {
         const projectListApi = fluentApi.identity().project().list()
             .setPageSize(LIMIT);
 
-        // const getProjectGroup = async (): Promise<ProjectGroupInfo> => {
-        //     const res = await projectGroupApi.setId(props.projectGroupId).execute();
-        //     return res.data;
-        // };
 
         const listProjectGroups = async () => {
             let api = projectGroupListApi;
-            if (state.proxySearchText) {
+            if (state.searchText) {
                 api = projectGroupListApi.setFilter({
                     key: 'name',
-                    value: state.proxySearchText,
+                    value: state.searchText,
                     operator: '',
                 });
             }
@@ -244,13 +223,13 @@ export default {
         };
 
         const listProjects = async () => {
-            let api = props.projectGroup
-                ? scopedProjectListApi.setProjectGroupId(props.projectGroup.id)
+            let api = props.groupId
+                ? scopedProjectListApi.setProjectGroupId(props.groupId)
                 : projectListApi;
-            if (state.proxySearchText) {
+            if (state.searchText) {
                 api = api.setFilter({
                     key: 'name',
-                    value: state.proxySearchText,
+                    value: state.searchText,
                     operator: '',
                 });
             }
@@ -280,45 +259,34 @@ export default {
             await listItems();
         }, 300);
 
-        watch(() => props.projectGroup, async (pg) => {
-            if (pg) {
-                state.selectedProjectGroup = pg;
-            } else state.selectedProjectGroup = null;
+        watch(() => props.groupId, async () => {
             if (state.visibleMenu) await listItems();
         }, { immediate: true });
 
 
-        const emitSearch = (value?: string, projectGroup: ProjectGroup|null = null, hide = true) => {
-            let val = value;
-            if (typeof value === 'string') val = value.trim();
+        const emitSearch = (groupId?: string, searchText?: string, hide = true) => {
+            let val = searchText;
+            if (typeof searchText === 'string') val = searchText.trim();
             if (!val) val = '';
-            const res: SearchResult = {
-                projectGroup: projectGroup || null,
-                value: val,
-            };
-            emit('search', res);
+            emit('search', groupId, val);
             if (hide) hideMenu();
             state.isFocused = false;
         };
 
-        const onSearch = (e) => {
-            emitSearch(state.proxySearchText, props.projectGroup);
+        const onSearch = () => {
+            emitSearch(props.groupId, state.searchText);
         };
 
         const onMenuSelect = (value: string, idx: number) => {
             const item = state.menu[idx];
             if (item.dataType === 'PROJECT_GROUP') {
-                const projectGroup = {
-                    id: item.name as string,
-                    name: item.label as string,
-                };
-                state.proxySearchText = '';
-                emitSearch(value, projectGroup, false);
+                state.searchText = '';
+                emitSearch(item.name, value, false);
                 state.projectGroupStart = 1;
                 listProjectGroups();
                 state.isFocused = true;
             } else {
-                state.proxySearchText = '';
+                state.searchText = '';
             }
         };
 
@@ -334,12 +302,12 @@ export default {
 
         const onDeletePrefix = (e: KeyboardEvent) => {
             if (!(e.target as HTMLInputElement).value) {
-                emitSearch('');
+                emitSearch();
             }
         };
 
         const onDeleteAll = () => {
-            emitSearch('');
+            emitSearch();
         };
 
 

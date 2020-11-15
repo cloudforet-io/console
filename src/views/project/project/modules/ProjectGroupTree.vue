@@ -10,15 +10,12 @@
                 />
             </template>
         </p-tree-node>
-        <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
-                     v-bind="treeApiHandler.ts.state"
-                     :data.sync="node.data"
-                     :children.sync="node.children"
-                     :state.sync="node.state"
-                     @toggle:click="treeApiHandler.toggle"
-                     @node:click="onNodeClick"
-                     @row:mouseenter="onHoverItem(...arguments, true)"
-                     @row:mouseleave="onHoverItem(...arguments, false)"
+
+        <p-tree ref="treeRef"
+                @toggle:click="toggle"
+                @node:click="onNodeClick"
+                @row:mouseenter="onHoverItem(...arguments, true)"
+                @row:mouseleave="onHoverItem(...arguments, false)"
         >
             <template #data="{data}">
                 {{ data.name }}
@@ -35,150 +32,303 @@
             </template>
             <template #right-extra="{data}">
                 <div v-if="hoveredNode && data.id === hoveredNode.node.data.id">
-                    <!--                    <div v-tooltip.top="{content: $t('TREE_TYPE.CREATE_GRP'), delay: {show: 500}}"-->
-                    <!--                         class="float-right text-base truncate leading-tight"-->
-                    <!--                    >-->
                     <p-icon-button :name="'ic_plus'" class="group-add-btn"
                                    width="1rem" height="1rem"
                                    @click.stop="$emit('create', hoveredNode)"
                     />
-                    <!--                    </div>-->
                 </div>
             </template>
-        </p-tree-node>
+        </p-tree>
     </div>
 </template>
 
 <script lang="ts">
 
-import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
+import PTreeNode from '@/components/molecules/tree-node/PTreeNode.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { getBaseNodeState, getDefaultNode } from '@/components/molecules/tree/PTreeNode.toolset';
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
-import { ProjectTreeFluentAPI } from '@/lib/api/tree-node';
 import {
-    computed, reactive, toRefs, watch,
+    TreeItem, TreeNode,
+} from '@/components/molecules/tree-node/type';
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { fluentApi } from '@/lib/fluent-api';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import { ProjectGroup, ProjectTreeItem } from '@/views/project/project/modules/ProjectSearch.toolset';
+import PTree from '@/components/organisms/tree/PTree.vue';
+import { Tree } from '@/components/organisms/tree/type';
+import { getTreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
+import { findIndex, reverse } from 'lodash';
+import { SpaceConnector } from '@/lib/space-connector';
+import {
+    ProjectGroup, ProjectItemResp, ProjectState, ProjectTreeItem,
+} from '@/views/project/project/type';
 
+interface TreeSearchResp {
+    // eslint-disable-next-line camelcase
+    open_path: string[];
+}
+
+const toNodes = (resp): TreeNode[]|boolean => {
+    if (resp.items.length === 0) {
+        return false;
+    }
+    return resp.items.map(d => ({
+        data: d,
+        children: d.has_child,
+        state: {
+            expanded: false,
+            selected: false,
+            loading: false,
+        },
+    }));
+};
+
+interface Props {
+    projectState: ProjectState;
+}
+
+const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): ProjectGroup[] => {
+    if (item) {
+        res.push(item.node.data);
+        if (item.parent) return getParentGroup(item.parent, res);
+        return res;
+    }
+    return res;
+};
 
 export default {
     name: 'ProjectGroupTree',
-    components: { PIconButton, PI, PTreeNode },
-    setup(props, { emit }) {
-        const projectAPI = fluentApi.identity().project();
-        const treeAction = projectAPI.tree()
-            .setSortBy('name')
-            .setSortDesc(false)
-            .setExcludeProject();
-        const treeSearchAction = projectAPI.treeSearch();
-        const treeApiHandler = new ProjectTreeFluentAPI({
-            treeAction, treeSearchAction,
-        });
-
-        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after, before) => {
-            if ((after && !before) || (after && after.node.data.id !== before?.node.data.id)) {
-                emit('select', after);
-            } else if (!after && before) {
-                emit('select', null);
-            }
-        }, { immediate: true });
-
-        const onNodeClick = (item: ProjectTreeItem) => {
-            if (treeApiHandler.ts.metaState.firstSelectedNode) {
-                if (treeApiHandler.ts.metaState.firstSelectedNode.node.data.id !== item.node.data.id) {
-                    treeApiHandler.ts.setNodeState(treeApiHandler.ts.metaState.firstSelectedNode, { selected: false });
-                }
-            }
-            treeApiHandler.ts.setNodeState(item, { selected: true });
-            treeApiHandler.ts.metaState.selectedNodes = [item];
-        };
-
-        const resetSelectedNodes = () => {
-            if (treeApiHandler.ts.metaState.firstSelectedNode) {
-                treeApiHandler.ts.metaState.firstSelectedNode.node.state.selected = false;
-                treeApiHandler.ts.applyState(treeApiHandler.ts.metaState.firstSelectedNode);
-                treeApiHandler.ts.metaState.selectedNodes = [];
-            }
-        };
-
-        // watch(() => props.projectGroup, debounce(async (group) => {
-        //     if (group) {
-        //         if (treeApiHandler.ts.metaState.firstSelectedNode
-        //         && treeApiHandler.ts.metaState.firstSelectedNode.node.data.id === group.id) {
-        //             return;
-        //         }
-        //         await treeApiHandler.getSearchData(group.id, 'PROJECT_GROUP');
-        //     } else {
-        //         resetSelectedNodes();
-        //     }
-        // }, 30));
-
+    components: {
+        PTree, PIconButton, PI, PTreeNode,
+    },
+    props: {
+        projectState: {
+            type: Object,
+            required: true,
+        },
+    },
+    setup(props: Props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            treeRef: null as unknown as Tree,
+            firstSelectedNode: computed<TreeItem|null>(() => (state.treeRef ? state.treeRef.firstSelectedNode : null)),
             treeAllState: computed(() => ({
-                selected: !treeApiHandler.ts.metaState.firstSelectedNode,
+                selected: !state.firstSelectedNode,
                 expanded: false,
             })),
             hoveredNode: (null as (ProjectTreeItem|null)),
         });
 
 
+        const emitSelect = (item?: TreeItem) => {
+            let parents = [] as ProjectGroup[];
+            if (item && item.parent) parents = reverse(getParentGroup(item.parent));
+            emit('select', item?.node.data.id, item?.node.data.name, parents);
+        };
+
+        watch(() => state.firstSelectedNode, (after, before) => {
+            if ((after && !before) || (after && after.node.data.id !== before?.node.data.id)) {
+                emitSelect(after);
+            } else if (!after && before) {
+                emitSelect(null);
+            }
+        }, { immediate: true });
+
+        const onNodeClick = (item: ProjectTreeItem) => {
+            if (state.treeRef.firstSelectedNode) {
+                if (state.treeRef.firstSelectedNode.node.data.id !== item.node.data.id) {
+                    state.treeRef.setNodeState(state.treeRef.firstSelectedNode, { selected: false });
+                }
+            }
+            state.treeRef.setNodeState(item, { selected: true });
+            state.treeRef.selectedNodes = [item];
+        };
+
+        const resetSelectedNodes = () => {
+            if (state.treeRef.firstSelectedNode) {
+                state.treeRef.firstSelectedNode.node.state.selected = false;
+                state.treeRef.applyState(state.treeRef.firstSelectedNode);
+                state.treeRef.selectedNodes = [];
+            }
+        };
+
         const onHoverItem = (item: ProjectTreeItem, matched, e, isHovered: boolean) => {
-            // formState.isRoot = false;
-            // state.isHover = isHovered;
-            // state.hoveredId = item.node.data.id;
             state.hoveredNode = isHovered ? item : null;
         };
 
         const deleteSelectedNode = () => {
-            treeApiHandler.ts.deleteNode(treeApiHandler.ts.metaState.firstSelectedNode);
-            treeApiHandler.ts.metaState.selectedNodes = [];
+            if (!state.treeRef) return;
+            state.treeRef.deleteNode(state.treeRef.firstSelectedNode);
+            state.treeRef.selectedNodes = [];
         };
 
         const updateSelectedNode = (item: ProjectGroup) => {
-            treeApiHandler.ts.metaState.firstSelectedNode.node.data = {
-                ...treeApiHandler.ts.metaState.firstSelectedNode.node.data,
+            if (!state.firstSelectedNode) return;
+            state.firstSelectedNode.node.data = {
+                ...state.firstSelectedNode.node.data,
                 name: item.name,
             };
         };
 
         const addNode = async (item: ProjectItemResp, parentNode: null|ProjectTreeItem) => {
-            const newNode = getDefaultNode(item, {
+            const newNode = {
+                data: item,
                 children: item.has_child,
-                state: {
-                    ...getBaseNodeState(),
-                    loading: false,
-                },
-            });
+                state: { expanded: false, selected: false, loading: false },
+            };
 
             // add to root
-            if (parentNode === null) treeApiHandler.ts.metaState.nodes.push(newNode);
+            if (parentNode === null) state.treeRef.nodes.push(newNode);
             else if (Array.isArray(parentNode.node.children)) {
                 parentNode.node.children.push(newNode);
-                treeApiHandler.ts.setNodeState(parentNode, { expanded: true });
+                state.treeRef.setNodeState(parentNode, { expanded: true });
             } else {
-                await treeApiHandler.getData(parentNode);
-                treeApiHandler.ts.setNodeState(parentNode, { expanded: true });
+                // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
+                await getData(parentNode);
+                state.treeRef.setNodeState(parentNode, { expanded: true });
             }
         };
 
-        const findNode = async (groupId: string) => {
-            await treeApiHandler.getSearchData(groupId, 'PROJECT_GROUP');
+        const getSearchPath = async (id: string, type: string): Promise<TreeSearchResp> => {
+            const res = await SpaceConnector.client.identity.project.tree.search({
+                item_id: id,
+                item_type: type,
+            });
+            return res;
+        };
+
+        const getParam = (id?: string, type?: string) => {
+            const param: any = {
+                exclude_type: 'PROJECT',
+                sort: { key: 'name', desc: false },
+                item_type: 'ROOT',
+            };
+            if (id && type) {
+                param.item_id = id;
+                param.item_type = type;
+            }
+            return param;
+        };
+
+        const requestTreeSearchData = async (id?: string, type?: string): Promise<TreeNode[]|boolean> => {
+            try {
+                const res = await SpaceConnector.client.identity.project.tree(getParam(id, type));
+                return toNodes(res);
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        };
+
+        const getRecursiveData = async (ids: string[], idx = 0, parent?: TreeItem): Promise<TreeNode[]|boolean> => {
+            if (parent) {
+                // Leaf case - end
+                if (idx === ids.length - 1) {
+                    parent.node.state.selected = true;
+                    state.treeRef.selectedNodes = [parent];
+                    return parent.node.children;
+                }
+
+                let children = await requestTreeSearchData(ids[idx], parent.node.data.item_type);
+                if (Array.isArray(children)) {
+                    children = children.map(d => reactive(d)) as TreeNode[];
+                    const key = findIndex(children, d => d.data.id === ids[idx + 1]);
+                    if (key !== -1) {
+                        const nextParent = getTreeItem(key, idx + 1, children[key], parent);
+                        nextParent.node.children = await getRecursiveData(ids, idx + 1, nextParent);
+                        nextParent.node.state.expanded = (idx < ids.length - 2);
+                    }
+                }
+                return children;
+            }
+
+            // Root case - start
+            let rootItems = await requestTreeSearchData(undefined, 'ROOT') as TreeNode[];
+            rootItems = rootItems.map(d => reactive(d)) as TreeNode[];
+            const itemIdx = findIndex(rootItems, d => d.data.id === ids[idx]);
+            if (itemIdx !== -1) {
+                const item = getTreeItem(itemIdx, 0, rootItems[itemIdx]);
+                item.node.children = await getRecursiveData(ids, idx, item);
+                item.node.state.expanded = (idx !== ids.length - 1);
+            }
+            return rootItems;
+        };
+
+        const findNode = async (id: string) => {
+            const res = await getSearchPath(id, 'PROJECT_GROUP');
+            state.treeRef.nodes = await getRecursiveData(res.open_path) as TreeNode[];
+            if (state.treeRef.nodes.length === 0) emit('empty');
+        };
+
+        const resetSelectedNode = (item: TreeItem, compare?: TreeItem) => {
+            if (compare) {
+                if (compare.node.data.id === item.node.data.id) {
+                    state.treeRef.selectedNodes = [item];
+                    item.node.state.selected = true;
+                } else if (compare.parent) resetSelectedNode(item, compare.parent);
+            } else {
+                if (!state.treeRef.firstSelectedNode) return;
+                if (!state.treeRef.firstSelectedNode.parent) return;
+                if (state.treeRef.firstSelectedNode.level <= item.level) return;
+                resetSelectedNode(item, state.treeRef.firstSelectedNode.parent);
+            }
+        };
+
+
+        const requestTreeData = async (node?: TreeNode): Promise<TreeNode[]|boolean> => {
+            try {
+                const res = await SpaceConnector.client.identity.project.tree(getParam(node?.data.id, node?.data.item_type));
+                return toNodes(res);
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        };
+
+        const getData = async (item?: TreeItem): Promise<void> => {
+            if (item) {
+                item.node.state.expanded = true;
+                item.node.state.loading = true;
+                state.treeRef.applyState(item);
+
+                item.node.children = await requestTreeData(item.node);
+
+                item.node.state.loading = false;
+                state.treeRef.applyState(item);
+            } else {
+                const res = await requestTreeData();
+                state.treeRef.nodes = Array.isArray(res) ? res : [];
+                if (state.treeRef.nodes.length === 0) emit('empty');
+            }
+        };
+
+        const toggle = async (item: TreeItem, matched: TreeItem[], e: MouseEvent) => {
+            e.stopPropagation();
+            if (item.node.state.expanded) {
+                resetSelectedNode(item);
+                item.node.state.expanded = false;
+                if (state.treeRef) state.treeRef.applyState(item);
+                item.node.children = !!item.node.children;
+                return;
+            }
+
+            await getData(item);
         };
 
         const listNodes = async () => {
             resetSelectedNodes();
-            await treeApiHandler.getData();
+            await getData();
         };
 
-        listNodes();
+        onMounted(() => {
+            vm.$nextTick(() => {
+                emit('mounted');
+            });
+        });
 
 
         return {
-            treeApiHandler,
             ...toRefs(state),
             onNodeClick,
             resetSelectedNodes,
@@ -188,32 +338,31 @@ export default {
             addNode,
             findNode,
             listNodes,
+            toggle,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-    ::v-deep .basic {
-        @apply mx-3 mt-1;
+::v-deep .basic {
+    @apply mx-3 mt-1;
+}
+.all-project-button {
+    @apply mr-1;
+}
+.project-group-icon {
+    @apply mx-1;
+}
+.group-add-btn {
+    @apply float-right mr-1;
+    max-width: 1.5rem;
+    max-height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    &:hover {
+        @apply bg-blue-300 border-blue-300;
+        color: inherit;
     }
-    .all-project-button {
-        @apply mr-1;
-    }
-    .project-group-icon {
-        @apply mx-1;
-    }
-    .group-add-btn {
-         @apply float-right mr-1;
-         max-width: 1.5rem;
-         max-height: 1.5rem;
-         min-width: 1.5rem;
-         min-height: 1.5rem;
-         &:hover {
-             color: inherit;
-         }
-         &:hover {
-             @apply bg-blue-300 border-blue-300;
-         }
-     }
+}
 </style>
