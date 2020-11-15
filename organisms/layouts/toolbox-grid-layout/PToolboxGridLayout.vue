@@ -5,7 +5,7 @@
                 <slot name="toolbox-top" />
             </div>
             <div class="toolbox-middle">
-                <div class="left" :style="{width: '100%'}">
+                <div class="left">
                     <slot name="toolbox-left" />
                 </div>
                 <div v-if="$slots['toolbox-center']" class="center">
@@ -229,23 +229,18 @@ export default {
         @apply absolute;
         transition: opacity 0.25s;
     }
-    .fade-in-leave-to, .fade-in-enter {
-        opacity: 0;
-    }
-    .fade-in-enter-to, .fade-in-leave {
-        opacity: 1;
+
+    .toolbox {
+        @apply w-full;
     }
 
-    /* .toolbox { */
-
-    /*    margin-top: 0.5rem; */
     .toolbox-middle {
-        @apply flex flex-no-wrap justify-between items-center mb-6;
+        @apply flex items-center mb-6 overflow-x-hidden;
         .left {
-            @apply inline-flex flex-wrap w-auto justify-start;
+            @apply flex-grow flex-shrink-0 inline-flex justify-start;
         }
         .right {
-            @apply inline-flex flex-no-wrap w-auto justify-end;
+            @apply flex-shrink-0 inline-flex justify-end;
             .page-size-dropdown::v-deep {
                 .p-dropdown-btn {
                     min-width: 6rem;

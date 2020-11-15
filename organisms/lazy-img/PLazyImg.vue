@@ -1,44 +1,45 @@
 <template>
-    <span class="p-lazy-img" :style="{height, width}">
-        <transition-group name="fade-in">
-            <span v-if="loading || (imgLoading && !isError)" key="loader" class="img-container">
-                <slot name="preloader" :height="height" :width="width"
+    <transition-group name="fade-in" tag="span" class="p-lazy-img"
+                      :style="{height, width}"
+    >
+        <span v-if="loading || (imgLoading && !isError)" key="loader" class="img-container"
+        >
+            <slot name="preloader" :height="height" :width="width"
+                  :imgLoading="imgLoading"
+            >
+
+                <p-lottie name="thin-spinner"
+                          auto
+                          :height="height"
+                          :width="width"
+                          class="w-full h-full"
+                />
+            </slot>
+        </span>
+        <transition-group v-if="!loading" key="images" tag="span"
+                          name="fade-in" class="img-container"
+        >
+            <img v-show="!imgLoading && !isError"
+                 key="img"
+                 :style="{height, width}"
+                 :src="src"
+                 :alt="alt"
+                 class="absolute"
+                 @load="onLoad"
+                 @error="onError"
+            >
+            <span v-if="isError" key="error-img" class="img-container error">
+                <slot name="error" :height="height" :width="width"
                       :imgLoading="imgLoading"
                 >
-
-                    <p-lottie name="thin-spinner"
-                              auto
-                              :height="height"
-                              :width="width"
-                              class="w-full h-full"
+                    <p-i :name="errorIcon || 'ic_collector_tags'" :style="{height, width}"
+                         height="height"
+                         width="width"
                     />
                 </slot>
             </span>
-            <span v-if="!loading" key="images" class="img-container">
-                <transition-group name="fade-in">
-                    <img v-show="!imgLoading && !isError"
-                         key="img"
-                         :style="{height, width}"
-                         :src="src"
-                         :alt="alt"
-                         class="absolute"
-                         @load="onLoad"
-                         @error="onError"
-                    >
-                    <span v-if="isError" key="error-img" class="img-container error">
-                        <slot name="error" :height="height" :width="width"
-                              :imgLoading="imgLoading"
-                        >
-                            <p-i :name="errorIcon || 'ic_collector_tags'" :style="{height, width}"
-                                 height="height"
-                                 width="width"
-                            />
-                        </slot>
-                    </span>
-                </transition-group>
-            </span>
         </transition-group>
-    </span>
+    </transition-group>
 </template>
 
 <script lang="ts">
