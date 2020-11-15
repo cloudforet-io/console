@@ -1,27 +1,26 @@
 <template>
-    <p-button
-        class="icon-text-button"
-        :style-type="styleType"
-        :disabled="disabled"
-        :size="size"
-        :outline="outline"
-        :link="link"
-        :block="block"
-        v-on="$listeners"
-        @mouseenter="onHover(true)"
-        @mouseleave="onHover(false)"
+    <p-button class="p-icon-text-button"
+              :style-type="styleType"
+              :disabled="disabled"
+              :size="size"
+              :outline="outline"
+              :link="link"
+              :block="block"
+              v-on="$listeners"
+              @mouseenter="onHover(true)"
+              @mouseleave="onHover(false)"
     >
         <slot v-if="iconDirection === 'right'" name="default" />
         <slot name="icon">
-            <p-i
-                :class="iconStyleClass"
-                :name="name"
-                :dir="dir"
-                :fill="fill"
-                :width="width"
-                :height="height"
-                :scale="scale"
-                :color="iconColor || defaultIconColor"
+            <p-i :class="iconStyleClass"
+                 :name="name"
+                 :dir="dir"
+                 :fill="fill"
+                 :width="width"
+                 :height="height"
+                 :scale="scale"
+                 :color="iconColor || defaultIconColor"
+                 class="flex-shrink-0"
             />
         </slot>
         <slot v-if="iconDirection === 'left'" name="default" />
@@ -151,3 +150,9 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss">
+.p-icon-text-button {
+    @apply inline-flex items-center truncate;
+}
+</style>

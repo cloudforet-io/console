@@ -10,16 +10,15 @@
         @mouseleave="onHover(false)"
     >
         <slot>
-            <p-i
-                :name="name"
-                :dir="dir"
-                :fill="fill"
-                :width="width"
-                :height="height"
-                :scale="scale"
-                :color="color"
-                :original="original"
-                :title="title"
+            <p-i :name="name"
+                 :dir="dir"
+                 :fill="fill"
+                 :width="width"
+                 :height="height"
+                 :scale="scale"
+                 :color="color"
+                 :original="original"
+                 :title="title"
             />
         </slot>
     </p-button>
@@ -94,8 +93,8 @@ export default {
         },
         size: {
             type: String,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     setup(props: IconButtonProps) {
         const state = reactive({

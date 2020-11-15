@@ -4,7 +4,7 @@
              :key="index"
              :class="cardClass(item, index)"
              :style="cardStyle(item, index)"
-             @click="$emit('card:click',item,$event)"
+             v-on="$listeners"
         >
             <slot name="card" :item="item" :index="index">
                 {{ item }}

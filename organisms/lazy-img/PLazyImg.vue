@@ -2,7 +2,8 @@
     <transition-group name="fade-in" tag="span" class="p-lazy-img"
                       :style="{height, width}"
     >
-        <span v-if="loading || (imgLoading && !isError)" key="loader" class="img-container"
+        <span v-if="loading || (imgLoading && !isError)" key="loader"
+              class="img-container" v-on="$listeners"
         >
             <slot name="preloader" :height="height" :width="width"
                   :imgLoading="imgLoading"
@@ -27,8 +28,11 @@
                  class="absolute"
                  @load="onLoad"
                  @error="onError"
+                 v-on="$listeners"
             >
-            <span v-if="isError" key="error-img" class="img-container error">
+            <span v-if="isError" key="error-img" class="img-container error"
+                  v-on="$listeners"
+            >
                 <slot name="error" :height="height" :width="width"
                       :imgLoading="imgLoading"
                 >
