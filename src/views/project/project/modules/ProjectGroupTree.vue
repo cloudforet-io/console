@@ -121,7 +121,7 @@ export default {
         });
 
 
-        const emitSelect = (item?: TreeItem) => {
+        const emitSelect = (item: TreeItem|null) => {
             let parents = [] as ProjectGroup[];
             if (item && item.parent) parents = reverse(getParentGroup(item.parent));
             emit('select', item?.node.data.id, item?.node.data.name, parents);

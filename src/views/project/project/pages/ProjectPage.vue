@@ -66,7 +66,9 @@
                                             name="ic_plus_bold"
                                             @click="openProjectForm"
                         >
-                            <div class="truncate">{{ $t('PROJECT.LANDING.CREATE_PROJECT') }}</div>
+                            <div class="truncate">
+                                {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                            </div>
                         </p-icon-text-button>
                     </div>
                 </template>
@@ -294,12 +296,10 @@ export default {
 
         /** Search */
         const onSearch = async (id, text) => {
-            if ((id && !projectState.groupId)
-                || (id && projectState.groupId && id !== projectState.groupId)) {
-                await state.treeRef.findNode(id);
-            } else if (!id && projectState.groupId) {
-                await state.treeRef.listNodes();
-            }
+            if (id) {
+                if (id !== projectState.groupId) await state.treeRef.findNode(id);
+            } else if (projectState.groupId) await state.treeRef.listNodes();
+
             projectState.groupId = id;
             projectState.searchText = text;
         };

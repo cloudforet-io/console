@@ -201,13 +201,21 @@ export default {
             return params;
         };
 
+
+        let getCardToken: CancelTokenSource | undefined;
         const getCardSummary = async (items) => {
-            const ids = items.map(item => item.project_id);
+            if (getCardToken) {
+                getCardToken.cancel('Next request has been called.');
+                getCardToken = undefined;
+            }
+
+            getCardToken = axios.CancelToken.source();
             const cardSummary = {};
             try {
+                const ids = items.map(item => item.project_id);
                 const res = await SpaceConnector.client.statistics.topic.projectPage({
                     projects: ids,
-                });
+                }, { cancelToken: getCardToken.token });
 
                 res.results.forEach((d) => {
                     cardSummary[d.project_id] = {
