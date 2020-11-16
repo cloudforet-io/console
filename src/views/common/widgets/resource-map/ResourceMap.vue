@@ -111,17 +111,35 @@ export default {
             } finally {
                 state.loading = false;
             }
-            // forEach(resp2, (value, key) => {
-            //     state.filteredData.push({ name: key, count: value });
-            // });
         };
 
         const animateBullet = (circle) => {
-            const animation = circle.animate([{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }], 1000, am4core.ease.circleOut);
+            const animation = circle.animate([{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }],
+                1000, am4core.ease.circleOut);
             animation.events.on('animationended', (event) => {
                 animateBullet(event.target.object);
             });
         };
+
+        const drawMarker = (coords, chart) => {
+            const mapImageSeries = chart.series.push(new am4maps.MapImageSeries());
+            const mapImage = mapImageSeries.mapImages;
+            const mapImageTemplate = mapImage.template;
+            const mapMarker = mapImageTemplate.createChild(am4core.Sprite);
+            mapMarker.path = 'M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z';
+            mapMarker.width = 32;
+            mapMarker.height = 32;
+            mapMarker.scale = 0.7;
+            mapMarker.fill = am4core.color('#F55A2F');
+            mapMarker.fillOpacity = 0.8;
+            mapMarker.horizontalCenter = 'middle';
+            mapMarker.verticalCenter = 'bottom';
+
+            const marker = mapImage.create();
+            marker.latitude = coords.latitude;
+            marker.longitude = coords.longitude;
+        };
+
 
         const drawChart = async () => {
             const chart = am4core.create('chartRef', am4maps.MapChart);
@@ -142,11 +160,10 @@ export default {
                     title: d.name,
                     latitude: parseInt(d.tags.latitude),
                     longitude: parseInt(d.tags.longitude),
-                    color: colorSet.next(),
+                    color: state.providers[d.region_type.toLowerCase()].color as string,
                     ...d,
                 })),
             ];
-
             const imageSeries = chart.series.push(new am4maps.MapImageSeries());
             imageSeries.mapImages.template.propertyFields.longitude = 'longitude';
             imageSeries.mapImages.template.propertyFields.latitude = 'latitude';
@@ -164,13 +181,21 @@ export default {
                 animateBullet(event.target);
             });
 
+            const originCoords = { longitude: 126.871867, latitude: 37.528547 };
+
             circle2.events.on('hit', async (event) => {
                 const target = event.target.dataItem?.dataContext as any;
                 state.selectedProvider = target.region_type;
                 state.selectedRegion = target.name;
                 state.providerColor = state.providers[state.selectedProvider.toLowerCase()].color as string;
                 await getFilteredData(target.region_code);
+                const coords = chart.svgPointToGeo(event.svgPoint);
+                if (originCoords !== coords) {
+                    drawMarker(coords, chart);
+                }
             });
+
+            drawMarker(originCoords, chart);
 
             imageSeries.data = state.data;
         };
