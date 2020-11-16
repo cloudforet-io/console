@@ -1,5 +1,6 @@
 export interface ResourceItem {
     label?: string;
+    name?: string;
     color?: string;
     icon?: string;
     linkTemplate?: string;

@@ -12,6 +12,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
     response.results.forEach((secretInfo: any): void => {
         secrets[secretInfo.secret_id] = {
             label: secretInfo.name,
+            name: secretInfo.name,
         };
     });
 

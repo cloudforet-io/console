@@ -1,6 +1,11 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 
+const SPECIAL_LABEL_MAP = {
+    // eslint-disable-next-line camelcase
+    google_cloud: 'Google',
+};
+
 export const load = async ({ commit }): Promise<void|Error> => {
     const response = await SpaceConnector.client.identity.provider.list({
         query: {
@@ -11,7 +16,8 @@ export const load = async ({ commit }): Promise<void|Error> => {
 
     response.results.forEach((providerInfo: any): void => {
         providers[providerInfo.provider] = {
-            label: providerInfo.name,
+            label: SPECIAL_LABEL_MAP[providerInfo.name] || providerInfo.name,
+            name: providerInfo.name,
             color: providerInfo.tags.color,
             icon: providerInfo.tags.icon,
             // eslint-disable-next-line camelcase
