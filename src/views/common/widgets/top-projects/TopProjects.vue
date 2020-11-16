@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.TOP_PROJECT_TITLE')" :help="$t('COMMON.WIDGETS.TOP_PROJECT_HELP')"
+    <p-widget-layout :title="$t('COMMON.WIDGETS.TOP_PROJECT_TITLE')"
                      class="top-projects"
     >
         <div class="flex flex-col h-full">
@@ -7,9 +7,9 @@
                 <template #loader>
                     <p-skeleton width="100%" height="100%" />
                 </template>
-                <canvas ref="chartRef" />
+                <div ref="chartRef" class="chart" />
             </p-chart-loader>
-            <div v-if="!loading && data.length === 0"
+            <div v-if="!loading && chartData.length === 0"
                  class="flex flex-col h-full justify-center items-center pt-16 pb-10"
             >
                 <p class="text-2xl font-bold capitalize mb-4 text-primary text-center leading-tight">
@@ -23,187 +23,85 @@
                                         size="lg" dir="down"
                                         style-type="primary" icon-color="transparent inherit"
                                         width="1.5rem" height="1.5rem"
-                                        class="getstarted"
+                                        class="get-started"
                     >
                         {{ $t('COMMON.WIDGETS.TOP_PROJECT_GET_START') }}
                     </p-icon-text-button>
                 </router-link>
             </div>
-            <p-data-table v-else
-                          :fields="fields"
-                          :sortable="false"
-                          :selectable="false"
-                          :loading="loading"
-                          :items="data"
-                          :bordered="false"
-                          :style="{marginTop: '1rem'}"
-            >
-                <template #skeleton-rank>
-                    <p-skeleton width="1.5rem" height="1.5rem" />
-                </template>
-
-                <!-- th -->
-                <template #th-rank="{field}">
-                    <div class="text-center text-gray">
-                        {{ field.label }}
-                    </div>
-                </template>
-                <template #th-servers="{field}">
-                    <div class="custom-th"
-                         :style="{color: colors.servers}"
-                    >
-                        <span class="color" />
-                        {{ field.label }}
-                    </div>
-                </template>
-                <template #th-cloud_services="{field}">
-                    <div class="custom-th"
-                         :style="{color: colors.cloud_services}"
-                    >
-                        <span class="color" />
-                        {{ field.label }}
-                    </div>
-                </template>
-
-                <!-- top 1 row -->
-                <template #row-0="{index, fields, item}">
-                    <tr>
-                        <td class="text-center">
-                            <p-i name="ic_top1" />
-                        </td>
-
-                        <td class="project-field">
-                            <router-link :to="`/project?select_pg=${item.project_group_id}`">
-                                {{ item.project_group }}
-                            </router-link>
-                        </td>
-                        <td class="project-field">
-                            <router-link :to="`/project/${item.project_id}?st=summary`">
-                                {{ item.project }}
-                            </router-link>
-                        </td>
-                        <td class="text-center">
-                            <p-badge :background-color="colors.servers">
-                                <router-link :to="`/inventory/server?p=1&ps=15&filters=project_id%3A%3D${item.project_id}`">
-                                    {{ item.servers || 0 }}
-                                </router-link>
-                            </p-badge>
-                        </td>
-                        <td class="text-center">
-                            <p-badge :background-color="colors.cloud_services">
-                                <router-link :to="`/inventory/cloud-service?filters=project_id%3A%3D${item.project_id}`">
-                                    {{ item.cloud_services || 0 }}
-                                </router-link>
-                            </p-badge>
-                        </td>
-                    </tr>
-                </template>
-
-                <!-- others -->
-                <template #col-project_group="{index, field, item}">
-                    <td>
-                        <router-link :to="`/project?select_pg=${item.project_group_id}`">
-                            {{ item.project_group }}
-                        </router-link>
-                    </td>
-                </template>
-                <template #col-project="{index, field, item}">
-                    <td>
-                        <router-link :to="`/project/${item.project_id}?st=summary`">
-                            {{ item.project }}
-                        </router-link>
-                    </td>
-                </template>
-                <template #col-rank-format="{index}">
-                    <div class="text-center">
-                        {{ index + 1 }}
-                    </div>
-                </template>
-                <template #col-servers-format="{index, field, item}">
-                    <div class="text-center font-bold" :style="{color: colors.servers}">
-                        <router-link :to="`/inventory/server?filters=project_id%3A%3D${item.project_id}`">
-                            {{ item.servers || 0 }}
-                        </router-link>
-                    </div>
-                </template>
-                <template #col-cloud_services-format="{index, field, item}">
-                    <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        <router-link :to="`/inventory/cloud-service?filters=project_id%3A%3D${item.project_id}`">
-                            {{ item.cloud_services || 0 }}
-                        </router-link>
-                    </div>
-                </template>
-            </p-data-table>
+            <template v-else></template>
         </div>
     </p-widget-layout>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {
-    computed, getCurrentInstance, reactive, Ref, toRefs, UnwrapRef, watch,
-} from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import {
-    black, gray, secondary, secondary1,
-} from '@/styles/colors';
-import PI from '@/components/atoms/icons/PI.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
-import Chart, { ChartDataSets } from 'chart.js';
-import { SpaceConnector } from '@/lib/space-connector';
-import {TranslateResult} from "vue-i18n";
+import { orderBy, range } from 'lodash';
 
-const DATA_COUNT = 5;
-const DEFAULT_MAX = 1000;
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+} from '@vue/composition-api';
+
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+
+import { SpaceConnector } from '@/lib/space-connector';
+import {
+    gray, primary, primary1, primary2, primary3,
+} from '@/styles/colors';
+
+am4core.useTheme(am4themes_animated);
+
+
+interface ChartData {
+    project: string;
+    server: number;
+    cloud_service: number;
+}
+interface ProjectData {
+    project_id: string;
+    project: string;
+    project_group: string;
+    project_group_id: string;
+    servers?: number;
+    cloud_services?: number;
+    total?: number;
+}
+
+const SERVER_COLOR = primary;
+const DATABASE_COLOR = primary1;
+const STORAGE_COLOR = primary2;
+const CLOUD_SERVICE_COLOR = primary3;
+
 
 export default {
     name: 'TopProjects',
     components: {
         PIconTextButton,
         PWidgetLayout,
-        PBadge,
-        PDataTable,
-        PI,
         PChartLoader,
         PSkeleton,
     },
     setup() {
-        const vm: any = getCurrentInstance();
-        interface Value {
-            project_id: string;
-            project: string;
-            project_group: string;
-            project_group_id: string;
-            servers?: number;
-            cloud_services?: number;
-            total?: number;
-        }
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        interface InitDataType {
-            chartRef: HTMLCanvasElement|null;
-            chart: Chart|null;
-            data: Value[];
-            loading: boolean;
-            colors: {
-                servers: string;
-                cloud_services: string;
-            };
-            fields: Ref<Readonly<TranslateResult[]|unknown>>;
-        }
-
-        const state: UnwrapRef<InitDataType> = reactive({
-            chartRef: null,
-            chart: null,
-            data: [],
+        const state = reactive({
             loading: true,
+            data: [] as ProjectData[],
+            chartRef: null as HTMLElement | null,
+            chart: null as HTMLElement | null,
+            chartData: [] as ChartData[],
             colors: {
-                servers: secondary,
-                cloud_services: secondary1,
+                server: SERVER_COLOR,
+                database: DATABASE_COLOR,
+                storage: STORAGE_COLOR,
+                cloud_service: CLOUD_SERVICE_COLOR,
             },
             fields: computed(() => [
                 { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK') },
@@ -214,127 +112,107 @@ export default {
             ]),
         });
 
-        const drawChart = (canvas) => {
-            let data;
+        const drawChart = (chartContext) => {
+            const chart = am4core.create(chartContext, am4charts.XYChart);
+            chart.responsive.enabled = true;
+            chart.logo.disabled = true;
+            chart.paddingRight = 20;
+            chart.paddingLeft = -5;
+            chart.paddingTop = 5;
+            chart.paddingBottom = 0;
 
-            if (state.data.length > 0) {
-                data = state.data;
-            } else {
-                data = new Array(DATA_COUNT).fill({ cloud_services: 0, servers: 0 });
-            }
+            const projectAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+            projectAxis.renderer.minGridDistance = 0;
+            projectAxis.dataFields.category = 'project';
 
-            const datasets: ChartDataSets[] = [{
-                label: 'Server',
-                data: data.map(d => d.servers) as number[],
-                backgroundColor: state.colors.servers,
-                borderColor: state.colors.servers,
-            }, {
-                label: 'Cloud Service',
-                data: data.map(d => d.cloud_services) as number[],
-                backgroundColor: state.colors.cloud_services,
-                borderColor: state.colors.cloud_services,
-            }];
+            projectAxis.renderer.grid.template.location = 0;
+            projectAxis.renderer.grid.template.strokeOpacity = 1;
+            projectAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            projectAxis.renderer.labels.template.fill = am4core.color(gray[500]);
+            projectAxis.renderer.labels.template.fontSize = 12;
+            projectAxis.renderer.cellStartLocation = 0.3;
+            projectAxis.renderer.cellEndLocation = 0.7;
 
-            state.chart = new SpaceChart(canvas,
-                {
-                    type: 'horizontalBar',
-                    data: {
-                        labels: data.map((d, i) => `Top ${i + 1}`),
-                        datasets,
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        legend: {
-                            display: false,
-                        },
-                        responsive: true,
-                        tooltips,
-                        scales: {
-                            yAxes: [{
-                                stacked: true,
-                                gridLines: {
-                                    drawTicks: false,
-                                    drawBorder: false,
-                                    color: gray[200],
-                                    zeroLineColor: gray[200],
-                                },
-                                ticks: {
-                                    display: true,
-                                    beginAtZero: true,
-                                    padding: 10,
-                                },
-                            }],
-                            xAxes: [{
-                                stacked: true,
-                                gridLines: {
-                                    drawTicks: false,
-                                    drawBorder: false,
-                                    color: gray[200],
-                                    zeroLineColor: gray[200],
-                                },
-                                ticks: {
-                                    padding: 10,
-                                    fontColor: black,
-                                    max: state.data.length === 0 ? DEFAULT_MAX : undefined,
-                                },
-                                afterTickToLabelConversion(scaleInstance): void {
-                                    scaleInstance.ticks[0] = null;
-                                    scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
-                                },
-                            }],
-                        },
-                    },
-                    plugins: [{
-                        beforeDraw(chart: SpaceChart): void {
-                            const ctx: CanvasRenderingContext2D | null = chart.ctx;
-                            if (!ctx) return;
+            const valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+            valueAxis.renderer.minGridDistance = 60;
+            valueAxis.renderer.baseGrid.strokeOpacity = 0;
+            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            valueAxis.renderer.grid.template.strokeOpacity = 1;
+            valueAxis.renderer.labels.template.adapter.add('text', (label, target) => {
+                // @ts-ignore
+                if (target.dataItem && (target.dataItem.value === 0)) return '';
+                return label;
+            });
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[500]);
+            valueAxis.fontSize = 12;
 
-                            ctx.save();
+            const createSeries = (field, name) => {
+                const series = chart.series.push(new am4charts.ColumnSeries());
+                series.name = name;
+                series.dataFields.categoryY = 'project';
+                series.dataFields.valueX = field;
+                series.fill = am4core.color(state.colors[field]);
+                series.strokeWidth = 0;
+                series.stacked = true;
+            };
 
-                            ctx.strokeStyle = gray[200];
-                            ctx.lineWidth = 1;
+            chart.data = state.chartData;
+            createSeries('server', 'Server');
+            createSeries('database', 'Database');
+            createSeries('storage', 'Storage');
+            createSeries('cloud_service', 'Cloud Service');
 
-                            ctx.beginPath();
-                            ctx.moveTo(chart.chartArea.left, chart.chartArea.bottom);
-                            ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
-                            ctx.moveTo(chart.chartArea.right, chart.chartArea.top);
-                            ctx.lineTo(chart.chartArea.right, chart.chartArea.bottom);
-                            ctx.moveTo(chart.chartArea.left, chart.chartArea.top);
-                            ctx.lineTo(chart.chartArea.left, chart.chartArea.bottom);
-                            ctx.stroke();
-
-                            ctx.restore();
-                        },
-                    }],
-                }, {
-                    borderWidth: 0,
-                    categoryPercentage: 0.75,
-                    barPercentage: 0.5,
-                });
+            chart.legend = new am4charts.Legend();
+            chart.legend.position = 'bottom';
+            chart.legend.contentAlign = 'left';
+            chart.legend.paddingTop = -10;
+            chart.legend.paddingLeft = 20;
+            chart.legend.fontSize = 12;
+            chart.legend.labels.template.fill = am4core.color(gray[500]);
+            chart.legend.markers.template.width = 8;
+            chart.legend.markers.template.height = 8;
         };
 
-        watch([() => state.chartRef, () => state.loading], ([ctx, loading]) => {
-            if (ctx && !loading) {
-                drawChart(ctx);
-            }
-        }, {
-            immediate: false,
-        });
-
-        const getData = async (): Promise<void> => {
+        const getData = async () => {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.topProject();
-                state.data = res.results;
+                const data = res.results;
+                const orderedData = orderBy(data, ['total'], ['desc']);
+                const chartData = [] as ChartData[];
+                range(1, 6).forEach((idx) => {
+                    chartData.push({
+                        project: `#${idx}`,
+                        server: 0,
+                        cloud_service: 0,
+                    });
+                });
+                orderedData.forEach((d, idx) => {
+                    chartData.splice(idx, 1, {
+                        project: `#${idx + 1}`,
+                        server: d.servers,
+                        cloud_service: d.cloud_services,
+                    });
+                });
+                state.chartData = chartData.reverse();
             } catch (e) {
                 console.error(e);
-                state.data = [];
+                state.chartData = [];
             } finally {
                 state.loading = false;
             }
         };
 
-        getData();
+        const init = async () => {
+            await getData();
+        };
+        init();
+
+        watch([() => state.chartRef, () => state.chartData], ([chartContext, data]) => {
+            if (chartContext && data) {
+                drawChart(chartContext);
+            }
+        });
 
         return {
             ...toRefs(state),
@@ -351,9 +229,7 @@ export default {
     padding-bottom: 1.5rem;
 }
 .chart {
-    height: 180px;
-    width: 100%;
-    flex-shrink: 0;
+    height: 13rem;
 }
 .color {
     display: inline-block;
@@ -373,45 +249,7 @@ export default {
 .p-badge {
     @apply font-bold;
 }
-.p-data-table::v-deep {
-    table-layout: fixed;
-    font-size: 0.875rem;
-    tbody {
-        tr {
-            &:nth-child(2n+1) {
-                @apply bg-primary4;
-            }
-        }
-    }
-    td {
-        @apply truncate cursor-pointer;
-        &:first-child {
-            padding: 0;
-        }
-    }
-    th {
-        @apply relative border-0;
-        .th-contents {
-            @apply text-gray;
-        }
-        &:first-child {
-            width: 2.75rem;
-        }
-        &:nth-child(2) {
-            width: 8.875rem;
-        }
-        &:nth-child(3) {
-            width: 6.25rem;
-        }
-        &:nth-child(4) {
-            width: 6rem;
-        }
-        &:last-child {
-            width: 9rem;
-        }
-    }
-}
-.getstarted {
+.get-started {
     padding-left: 1.2rem;
     width: 100%;
     max-width: 12rem;

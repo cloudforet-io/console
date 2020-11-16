@@ -1,15 +1,12 @@
 <template>
     <general-page-layout class="dashboard">
-        <all-summary class="col-start-1 col-end-13
-                                lg:col-end-10"
-        />
+        <all-summary class="col-start-1 col-end-13 lg:col-end-10" />
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
         <resource-map class="col-start-1 col-end-13 lg:col-end-10" />
-        <top-projects class="col-start-1 col-end-13 lg:col-end-13"
-        />
+        <top-projects class="col-start-1 col-end-13 lg:col-end-10" />
         <service-accounts class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13
                                  row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
         />
@@ -58,7 +55,7 @@ export default {
 
 <style lang="postcss" scoped>
 .dashboard::v-deep {
-    background: rgba(theme('colors.gray.100'), 0.5);
+    @apply bg-gray-100;
 
     .page-contents {
         @apply grid gap-4 grid-flow-row grid-cols-12 p-4;

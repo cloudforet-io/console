@@ -1,6 +1,6 @@
 <template>
     <div class="all-summary-page">
-        <div class="top-part grid grid-cols-12 gap-2">
+        <div class="top-part grid grid-cols-12 gap-3">
             <div v-for="(data, idx) of serviceDataList" :key="idx"
                  class="box col-span-3"
                  :class="[{'activated': idx === activatedIndex}, data.type]"
@@ -13,7 +13,7 @@
                         <router-link :to="data.to">
                             <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
                             <span>{{ numberCommaFormatter(data.count) }}</span>
-                            <span class="suffix">{{ data.suffix }}</span>
+                            <span class="suffix" :class="data.type">{{ data.suffix }}</span>
                         </router-link>
                     </div>
                     <div class="title">
@@ -23,11 +23,7 @@
             </div>
         </div>
         <div class="bottom-part">
-            <div class="top-line" :class="serviceDataList[activatedIndex].type" />
             <div class="carousel-wrapper">
-                <div class="triangle-wrapper" :class="serviceDataList[activatedIndex].type">
-                    <div class="triangle" />
-                </div>
                 <carousel
                     ref="carousel"
                     :speed="500"
@@ -54,11 +50,19 @@
                             <div class="title">
                                 {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_SERVER')}) }}
                             </div>
-                            <div v-for="(data, idx) of serverData" :key="idx" class="summary-row">
-                                <span class="provider" :class="data.label.toLowerCase()">{{ data.label }}</span>
-                                <span class="type">{{ data.type }}</span>
-                                <span class="count">{{ data.count }}</span>
-                            </div>
+                            <template v-if="!loading">
+                                <div v-for="(data, idx) of serverData" :key="idx" class="summary-row">
+                                    <span class="provider" :class="data.label.toLowerCase()">{{ data.label }}</span>
+                                    <span class="type">{{ data.type }}</span>
+                                    <span class="count">{{ data.count }}</span>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
+                                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                                    <p-skeleton class="flex-grow" />
+                                </div>
+                            </template>
                         </div>
                     </slide>
                     <slide class="grid grid-cols-12 gap-4">
@@ -109,7 +113,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    chain, orderBy, range, forEach, find, rangeRight,
+    orderBy, forEach, find, range,
 } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -143,7 +147,6 @@ interface TypeData {
     type?: string;
 }
 
-
 enum PROVIDER {
     aws = 'AWS',
     google_cloud = 'GCP',
@@ -151,15 +154,6 @@ enum PROVIDER {
 }
 
 const DAY_COUNT = 14;
-
-const SERVER_COLOR = indigo[400];
-const SERVER_HOVER_COLOR = indigo[600];
-const DATABASE_COLOR = primary1;
-const DATABASE_HOVER_COLOR = primary;
-const STORAGE_COLOR = coral[400];
-const STORAGE_HOVER_COLOR = coral[600];
-const SPENDINGS_COLOR = peacock[500];
-const SPENDINGS_HOVER_COLOR = peacock[700];
 
 
 export default {
@@ -170,15 +164,15 @@ export default {
     },
     props: {
     },
-    setup(props, { refs }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            loading: true,
+            loading: false,
             serverChartRef: null as HTMLElement | null,
             databaseChartRef: null as HTMLElement | null,
             storageChartRef: null as HTMLElement | null,
-            // countLoading: false,
+            skeletons: range(3),
             activatedIndex: 0,
             serverCount: 0,
             databaseCount: 0,
@@ -219,7 +213,6 @@ export default {
         });
         const chartState = reactive({
             loading: false,
-            loaderRef: null,
             serverData: [] as ChartData[],
             databaseData: [] as ChartData[],
             storageData: [] as ChartData[],
@@ -254,18 +247,21 @@ export default {
         };
         const getTrend = async (type) => {
             try {
-                chartState.loading = true;
-
                 let res;
-                if (type === 'server') res = await SpaceConnector.client.statistics.topic.dailyServerCount();
-                else if (type === 'database') res = await SpaceConnector.client.statistics.topic.dailyDatabaseCount();
-                else res = await SpaceConnector.client.statistics.topic.dailyStorageCount();
+                if (type === 'server') {
+                    chartState.loading = true;
+                    res = await SpaceConnector.client.statistics.topic.dailyServerCount();
+                } else if (type === 'database') {
+                    res = await SpaceConnector.client.statistics.topic.dailyDatabaseCount();
+                } else {
+                    res = await SpaceConnector.client.statistics.topic.dailyStorageCount();
+                }
 
                 const chartData = res.results.map(d => ({
                     date: dayjs(d.date).format('MM/DD'),
                     count: d.count,
                 }));
-                forEach(rangeRight(0, DAY_COUNT), (i) => {
+                forEach(range(0, DAY_COUNT), (i) => {
                     const date = dayjs().subtract(i, 'day').format('MM/DD');
                     if (!find(chartData, { date })) {
                         chartData.push({ date, count: null });
@@ -318,7 +314,7 @@ export default {
                     show_all: false,
                 });
                 const databaseData: TypeData[] = [
-                    { provider: 'all', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_DATABASE'), count: state.databaseCount },
+                    { provider: 'all', label: vm?.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_DATABASE'), count: state.databaseCount },
                 ];
                 res.results.forEach((d) => {
                     databaseData.push({
@@ -363,7 +359,7 @@ export default {
         };
 
         /* util */
-        const drawChart = (chartContext, type, color, hoverColor) => {
+        const drawChart = (chartContext, type) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
@@ -382,8 +378,7 @@ export default {
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.renderer.minGridDistance = 30;
-            valueAxis.renderer.grid.template.strokeWidth = 1;
-            valueAxis.renderer.grid.template.strokeOpacity = 0.7;
+            valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[500]);
             valueAxis.fontSize = 10;
@@ -392,62 +387,57 @@ export default {
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
             series.dataFields.categoryX = 'date';
-            series.fill = am4core.color(color);
+            series.fill = am4core.color(indigo[700]);
             series.strokeWidth = 0;
-            series.columns.template.width = am4core.percent(50);
-            series.columns.template.cursorOverStyle = am4core.MouseCursorStyle.pointer;
-            series.columns.template.events.on('over', (ev) => {
-                ev.target.fill = am4core.color(hoverColor);
-            });
-            series.columns.template.events.on('out', (ev) => {
-                ev.target.fill = am4core.color(color);
-            });
+            series.columns.template.width = am4core.percent(40);
+            // series.columns.template.cursorOverStyle = am4core.MouseCursorStyle.pointer;
+            // series.columns.template.events.on('over', (ev) => {
+            //     ev.target.fill = am4core.color(hoverColor);
+            // });
+            // series.columns.template.events.on('out', (ev) => {
+            //     ev.target.fill = am4core.color(color);
+            // });
 
             const bullet = series.bullets.push(new am4charts.LabelBullet());
             bullet.label.text = '{count}';
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(color);
+            bullet.label.fill = am4core.color(indigo[600]);
             bullet.label.dy = -10;
-            // bullet.label.adapter.add('text', (text, target) => {
-            //     if (target.dataItem && target.dataItem.valueY === 0) {
-            //         return '';
-            //     }
-            //     return text;
-            // });
         };
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-        const init = async () => {
+        const init = () => {
+            getTrend('server');
+            getTrend('database');
+            getTrend('storage');
+        };
+        const asyncInit = async () => {
             state.loading = true;
             await getCount();
             //
-            await getTrend('server');
-            await getTrend('database');
-            await getTrend('storage');
-            //
             await getServerInfo();
+            state.loading = false;
             await getDatabaseInfo();
             await getStorageInfo();
-            //
-            state.loading = false;
         };
         init();
+        asyncInit();
 
         watch([() => state.serverChartRef, () => chartState.serverData], ([chartContext, data]) => {
             if (chartContext && data) {
-                drawChart(state.serverChartRef, 'server', SERVER_COLOR, SERVER_HOVER_COLOR);
+                drawChart(state.serverChartRef, 'server');
             }
         });
         watch([() => state.databaseChartRef, () => chartState.databaseData], ([chartContext, data]) => {
             if (chartContext && data) {
-                drawChart(state.databaseChartRef, 'database', DATABASE_COLOR, DATABASE_HOVER_COLOR);
+                drawChart(state.databaseChartRef, 'database');
             }
         });
         watch([() => state.storageChartRef, () => chartState.storageData], ([chartContext, data]) => {
             if (chartContext && data) {
-                drawChart(state.storageChartRef, 'storage', STORAGE_COLOR, STORAGE_HOVER_COLOR);
+                drawChart(state.storageChartRef, 'storage');
             }
         });
 
@@ -461,163 +451,82 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
-@define-mixin box-theme $color, $hover-color {
-    .count {
-        color: $color;
-    }
-
-    &:hover {
-        background-color: $hover-color;
-    }
-    &.server:not(.activated):hover {
-        background-color: rgba(theme('colors.indigo.400'), 0.1)
-    }
-    &.activated {
-        @apply text-white;
-        background-color: $color;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-
-        .suffix {
-            @apply text-white;
-        }
-        .count {
-            color: white;
-        }
-    }
-}
-
 .all-summary-page {
     .top-part {
         height: 8rem;
 
         .box {
-            @apply bg-white border border-gray-100;
+            @apply bg-white;
+            position: relative;
             display: flex;
             height: 100%;
             cursor: pointer;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             padding: 1.375rem;
-
             .count {
+                @apply text-gray-700;
                 font-size: 2.5rem;
                 font-weight: bold;
                 line-height: 2.5rem;
                 margin-bottom: 1rem;
 
                 .suffix {
-                    @apply text-gray-700;
+                    @apply text-gray-400;
                     font-size: 1rem;
                     font-weight: normal;
                     padding-left: 0.5rem;
+                    &.storage {
+                        font-size: 0.875rem;
+                    }
                 }
                 .dollar-sign {
                     font-size: 2rem;
                     font-weight: normal;
                 }
             }
-
             .title {
-                font-size: 1rem;
+                @apply text-gray-500;
+                font-size: 0.875rem;
                 text-transform: capitalize;
             }
 
-            &.server {
-                @mixin box-theme theme('colors.indigo.400'), rgba(theme('colors.indigo.400'), 0.1);
-            }
-            &.database {
-                @mixin box-theme theme('colors.primary1'), theme('colors.primary3');
-            }
-            &.storage {
-                @mixin box-theme theme('colors.coral.400'), theme('colors.coral.100');
-            }
-            &.spendings {
-                @mixin box-theme theme('colors.peacock.500'), theme('colors.peacock.100');
+            &.activated {
+                @apply bg-indigo-700 text-white;
+                .count {
+                    @apply text-white;
+                    .suffix {
+                        @apply text-white;
+                    }
+                }
+                .title {
+                    @apply text-white;
+                }
+                &:after {
+                    position: absolute;
+                    display: block;
+                    content: '';
+                    width: 0;
+                    border-style: solid;
+                    border-color: theme('colors.indigo.700') transparent;
+                    border-width: 0.5rem 0.5rem 0;
+                    bottom: -0.5rem;
+                    left: 50%;
+                    margin-left: -0.5rem;
+                }
             }
         }
     }
 
     .bottom-part {
-        @apply border border-gray-100;
-        border-top-width: 0;
-        margin-top: 1.375rem;
-
-        .top-line {
-            width: 100%;
-            height: 0.15625rem;
-            &.server {
-                @apply bg-indigo-400;
-            }
-            &.database {
-                @apply bg-primary1;
-            }
-            &.storage {
-                @apply bg-coral-400;
-            }
-            &.spendings {
-                @apply bg-peacock-500;
-            }
-        }
+        margin-top: 1rem;
     }
 
     .carousel-wrapper {
         @apply bg-white;
+        border-radius: 0.375rem;
         position: relative;
         padding: 1rem 1.5rem;
-
-        .triangle-wrapper {
-            position: absolute;
-            width: 25%;
-            height: 16px;
-            top: -1rem;
-            transition: left 0.3s linear;
-
-            &.server {
-                left: 0;
-                .triangle {
-                    border-bottom-color: theme('colors.indigo.400');
-                }
-            }
-            &.database {
-                left: 25%;
-                .triangle {
-                    border-bottom-color: theme('colors.primary1');
-                }
-            }
-            &.storage {
-                left: 50%;
-                .triangle {
-                    border-bottom-color: theme('colors.coral.400');
-                }
-            }
-            &.spendings {
-                left: 75%;
-                .triangle {
-                    border-bottom-color: theme('colors.peacock.500');
-                }
-            }
-            .triangle {
-                position: relative;
-                width: 0;
-                height: 0;
-                margin: 0 auto;
-                border-left: 12px solid transparent;
-                border-right: 12px solid transparent;
-                border-bottom: 14px solid;
-
-                &:before {
-                    position: absolute;
-                    width: 0;
-                    height: 0;
-                    top: 4px;
-                    left: -12px;
-                    content: '';
-                    border-left: 12px solid transparent;
-                    border-right: 12px solid transparent;
-                    border-bottom: 14px solid white;
-                }
-            }
-        }
 
         .title {
             font-size: 1rem;
