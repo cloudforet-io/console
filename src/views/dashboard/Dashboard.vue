@@ -1,6 +1,9 @@
 <template>
     <general-page-layout class="dashboard">
-        <all-summary class="col-start-1 col-end-13 lg:col-end-10" />
+        <all-summary
+            :providers="providers"
+            class="col-start-1 col-end-13 lg:col-end-10"
+        />
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
@@ -18,6 +21,10 @@
 </template>
 
 <script lang="ts">
+import {
+    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+
 import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
@@ -26,6 +33,8 @@ import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
 import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
 import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
 import ResourceMap from '@/views/common/widgets/resource-map/ResourceMap.vue';
+
+import { store } from '@/store';
 
 
 export default {
@@ -41,13 +50,19 @@ export default {
         Collectors,
     },
     setup() {
-        const topics = ({
-            server: api => api.setTopic('daily_server_updates'),
-            cloudService: api => api.setTopic('daily_cloud_service_updates'),
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            providers: {},
         });
 
+        const init = async () => {
+            await vm.$store.dispatch('resource/provider/load');
+            state.providers = store.state.resource.provider.items;
+        };
+        init();
+
         return {
-            topics,
+            ...toRefs(state),
         };
     },
 };

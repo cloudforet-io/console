@@ -52,7 +52,7 @@
                             </div>
                             <template v-if="!loading">
                                 <div v-for="(data, idx) of serverData" :key="idx" class="summary-row">
-                                    <span class="provider" :class="data.label.toLowerCase()">{{ data.label }}</span>
+                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                     <span class="count">{{ data.count }}</span>
                                 </div>
@@ -77,7 +77,7 @@
                                 {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE')}) }}
                             </div>
                             <div v-for="(data, idx) of databaseData" :key="idx" class="summary-row">
-                                <span class="provider" :class="data.label.toLowerCase()">{{ data.label }}</span>
+                                <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                 <span class="type">{{ data.type }}</span>
                                 <span class="count">{{ data.count }}</span>
                             </div>
@@ -95,7 +95,7 @@
                                 {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE')}) }}
                             </div>
                             <div v-for="(data, idx) of storageData" :key="idx" class="summary-row">
-                                <span class="provider" :class="data.label.toLowerCase()">{{ data.label }}</span>
+                                <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                 <span class="type">{{ data.type }}</span>
                                 <span class="count">{{ data.count }}</span>
                             </div>
@@ -130,9 +130,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import {
-    gray, indigo, primary, primary1, coral, peacock,
-} from '@/styles/colors';
+import { gray, indigo } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
 
@@ -149,7 +147,7 @@ interface TypeData {
 
 enum PROVIDER {
     aws = 'AWS',
-    google_cloud = 'GCP',
+    google_cloud = 'Google',
     azure = 'Azure',
 }
 
@@ -163,8 +161,12 @@ export default {
         PChartLoader,
     },
     props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
     },
-    setup() {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -216,6 +218,11 @@ export default {
             serverData: [] as ChartData[],
             databaseData: [] as ChartData[],
             storageData: [] as ChartData[],
+        });
+        const colorState = reactive({
+            aws: computed(() => props.providers.aws.color),
+            google: computed(() => props.providers.google_cloud.color),
+            azure: computed(() => props.providers.azure.color),
         });
 
         /* api */
@@ -444,6 +451,7 @@ export default {
         return {
             ...toRefs(state),
             chartState,
+            colorState,
             numberCommaFormatter,
         };
     },
@@ -547,18 +555,7 @@ export default {
                 font-size: 0.875rem;
                 padding: 0.5rem 0;
                 .provider {
-                    &.aws {
-                        font-weight: bold;
-                        color: #FF9900;
-                    }
-                    &.gcp {
-                        font-weight: bold;
-                        color: #4285F4;
-                    }
-                    &.azure {
-                        font-weight: bold;
-                        color: #00BCF2;
-                    }
+                    font-weight: bold;
                 }
                 .type {
                     padding-left: 0.5rem;
