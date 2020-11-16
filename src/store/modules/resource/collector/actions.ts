@@ -12,6 +12,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
     response.results.forEach((collectorInfo: any): void => {
         collectors[collectorInfo.collector_id] = {
             label: collectorInfo.name,
+            name: collectorInfo.name,
             icon: collectorInfo.tags.icon,
         };
     });

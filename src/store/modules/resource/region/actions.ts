@@ -13,6 +13,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
     response.results.forEach((regionInfo: any): void => {
         regions[regionInfo.region_code] = {
             label: `${regionInfo.name} | ${regionInfo.region_code}`,
+            name: regionInfo.name,
         };
     });
 

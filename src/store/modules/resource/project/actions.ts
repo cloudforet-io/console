@@ -12,6 +12,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
     response.results.forEach((projectInfo: any): void => {
         projects[projectInfo.project_id] = {
             label: `${projectInfo.project_group_info.name} > ${projectInfo.name}`,
+            name: projectInfo.name,
         };
     });
 

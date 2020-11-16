@@ -12,6 +12,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
     response.results.forEach((serviceAccountInfo: any): void => {
         serviceAccounts[serviceAccountInfo.service_account_id] = {
             label: serviceAccountInfo.name,
+            name: serviceAccountInfo.name,
         };
     });
 
