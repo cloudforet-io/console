@@ -82,6 +82,17 @@ const palette = {
         800: '#3C2C84',
         900: '#371E62',
     },
+    indigo: {
+        100: '#EBF4FF',
+        200: '#C3DAFE',
+        300: '#A3BFFA',
+        400: '#7F9CF5',
+        500: '#667EEA',
+        600: '#5A67D8',
+        700: '#6439DE',
+        800: '#434190',
+        900: '#3C366B',
+    },
 };
 const colorSet = {
     transparent: 'transparent',
@@ -122,7 +133,7 @@ const colorSet = {
         default: colors.teal[500],
     },
     indigo: {
-        ...colors.indigo,
+        ...palette.indigo,
         default: colors.indigo[500],
     },
 };
