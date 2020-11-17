@@ -64,7 +64,7 @@ export default {
 
 <style lang="postcss">
 .p-page-title {
-    @apply mb-6 flex w-full items-start overflow-x-hidden;
+    @apply mb-6 flex w-full items-start;
     .back-btn {
         @apply flex-shrink-0 mr-1;
     }
