@@ -1,5 +1,11 @@
 <template>
     <p-widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNTS')">
+        <template #extra>
+            <span class="add-btn">
+                <p-i name="ic_plus_bold" width="0.75rem" height="0.75rem"
+                     color="inherit"
+                /> add</span>
+        </template>
         <div class="chart-container">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
@@ -15,29 +21,41 @@
                     <p-skeleton class="flex-grow" />
                 </div>
             </template>
-            <p-grid-layout v-else :items="data" row-gap="0.5rem"
-                           column-gap="0" :fix-column="1" card-min-width="0"
-                           card-height="auto" :card-class="() => []"
+            <p-data-table v-else
+                          :loading="loading"
+                          :fields="fields"
+                          :items="data"
+                          :bordered="false"
             >
-                <template #card="{item, index}">
-                    <router-link :to="item.href">
-                        <p-selectable-item :icon-url="item.icon" theme="card"
-                                           default-icon="ic_provider_other"
-                        >
-                            <template #contents>
-                                <div class="truncate">
-                                    {{ item.name }}
-                                </div>
-                            </template>
-                            <template #extra>
-                                <p-badge :background-color="item.color" class="count">
-                                    {{ item.count }}
-                                </p-badge>
-                            </template>
-                        </p-selectable-item>
+                <template #col-provider-format="{ index, field, item }">
+                    <router-link :to="`/identity/service-account?provider=${item.provider}`">
+                        <span :style="{color: data[index].color}">{{ item.providerLabel }}</span>
                     </router-link>
                 </template>
-            </p-grid-layout>
+            </p-data-table>
+            <!--            <p-grid-layout v-else :items="data" row-gap="0.5rem"-->
+            <!--                           column-gap="0" :fix-column="1" card-min-width="0"-->
+            <!--                           card-height="auto" :card-class="() => []"-->
+            <!--            >-->
+            <!--                <template #card="{item, index}">-->
+            <!--                    <router-link :to="item.href">-->
+            <!--                        <p-selectable-item :icon-url="item.icon" theme="card"-->
+            <!--                                           default-icon="ic_provider_other"-->
+            <!--                        >-->
+            <!--                            <template #contents>-->
+            <!--                                <div class="truncate">-->
+            <!--                                    {{ item.name }}-->
+            <!--                                </div>-->
+            <!--                            </template>-->
+            <!--                            <template #extra>-->
+            <!--                                <p-badge :background-color="item.color" class="count">-->
+            <!--                                    {{ item.count }}-->
+            <!--                                </p-badge>-->
+            <!--                            </template>-->
+            <!--                        </p-selectable-item>-->
+            <!--                    </router-link>-->
+            <!--                </template>-->
+            <!--            </p-grid-layout>-->
         </div>
     </p-widget-layout>
 </template>
@@ -48,19 +66,18 @@ import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
 import Color from 'color';
 
 import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance,
     onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 
 import {
-    black, violet, white, yellow,
+    black, gray, violet, white, yellow,
 } from '@/styles/colors';
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -69,6 +86,8 @@ import { store } from '@/store';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 am4core.useTheme(am4themes_animated);
 
@@ -76,9 +95,10 @@ const DEFAULT_COUNT = 4;
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 
 interface Data {
+    providerLabel?: string;
     provider?: string;
-    name: string;
-    icon: string;
+    // name: string;
+    // icon: string;
     color: string;
     count: number;
     href: string;
@@ -87,14 +107,15 @@ interface Data {
 export default {
     name: 'ServiceAccounts',
     components: {
+        PI,
+        PDataTable,
         PWidgetLayout,
-        PBadge,
-        PGridLayout,
-        PSelectableItem,
         PSkeleton,
         PChartLoader,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             skeletons: range(4),
             loading: true,
@@ -103,13 +124,18 @@ export default {
             chartRef: null as HTMLElement|null,
             data: [] as Data[],
             chart: null as null|any,
+            fields: computed(() => [
+                { name: 'provider', label: 'Provider' },
+                { name: 'project', label: 'Project' },
+                { name: 'count', label: 'Service Account' },
+            ]),
         });
 
         const drawChart = (element, isLoading = false) => {
             const chart = am4core.create(element, am4charts.PieChart);
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
-            chart.innerRadius = am4core.percent(60);
+            chart.innerRadius = am4core.percent(68);
 
             if (isLoading) {
                 chart.data = [{
@@ -125,6 +151,9 @@ export default {
             series.dataFields.value = 'count';
             series.dataFields.category = 'name';
             series.slices.template.propertyFields.fill = 'color';
+            series.slices.template.stroke = am4core.color(white);
+            series.slices.template.strokeWidth = 2;
+            series.slices.template.strokeOpacity = 1;
 
             if (isLoading) {
                 series.slices.template.tooltipText = '';
@@ -140,7 +169,9 @@ export default {
             label.parent = series;
             label.horizontalCenter = 'middle';
             label.verticalCenter = 'middle';
-            label.fontSize = 30;
+            label.fontSize = 25;
+            label.fontWeight = 'lighter';
+            label.fill = am4core.color(gray[500]);
             if (isLoading) {
                 label.text = '';
             } else {
@@ -156,34 +187,36 @@ export default {
             await store.dispatch('resource/provider/load');
             try {
                 const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider();
-                const others: Data = {
-                    name: 'Others',
-                    icon: 'ic_provider_other',
-                    color: yellow[500],
-                    count: 0,
-                    provider: '',
-                    href: '/identity/service-account',
-                };
+                // const others: Data = {
+                //     name: 'Others',
+                //     icon: 'ic_provider_other',
+                //     color: yellow[500],
+                //     count: 0,
+                //     provider: '',
+                //     href: '/identity/service-account',
+                // };
                 const providers = store.state.resource.provider.items;
 
                 if (res.results.length > 0) {
                     forEach(res.results, (d) => {
                         if (providers[d.provider]) {
                             state.data.push({
-                                name: providers[d.provider].label || d.provider,
-                                icon: providers[d.provider].icon || '',
+                                providerLabel: providers[d.provider].label || d.provider,
+                                provider: d.provider,
+                                // icon: providers[d.provider].icon || '',
                                 color: providers[d.provider].color || '',
                                 href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
                                 count: d.count,
                             });
-                        } else others.count += d.count;
+                        }
+                        // else others.count += d.count;
                     });
                 } else {
                     state.data = map(providers, p => ({
-                        name: p.label || '', icon: p.icon || '', color: p.color || '', count: 0, href: '',
+                        name: p.label || '', color: p.color || '', count: 0, href: '',
                     }));
                 }
-                state.data.push(others);
+                // state.data.push(others);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -225,10 +258,25 @@ export default {
     font-size: 0.875rem;
     font-weight: bold;
 }
+.add-btn {
+    @apply text-blue-500 float-right;
+}
 .legends {
     @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
 }
 .chart-container {
     @apply flex justify-center items-center mb-4;
+}
+.p-data-table::v-deep {
+    margin-top: 1rem;
+    .default th {
+        @apply bg-gray-100 text-gray-400;
+        height: 1.5rem;
+        border: none;
+        font-size: 0.75rem;
+    }
+    td {
+        height: 2rem;
+    }
 }
 </style>
