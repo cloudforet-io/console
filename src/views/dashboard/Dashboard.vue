@@ -4,19 +4,19 @@
             :providers="providers"
             class="col-start-1 col-end-13 lg:col-end-10"
         />
-        <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
-                              row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
+        <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
         <resource-map class="col-start-1 col-end-13 lg:col-end-10" />
-        <top-projects class="col-start-1 col-end-13 lg:col-end-10" />
         <service-accounts class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13
-                                 row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
+                                 sm:row-start-3 sm:row-end-4"
         />
-        <cloud-services class="col-start-1 col-end-13"
+        <top-projects class="col-start-1 col-end-13 lg:col-end-10" />
+        <cloud-services class="col-start-1 col-end-10"
                         :more-info="true"
         />
-        <collectors class="col-start-1 col-end-13" />
+        <collector-progress class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13 collector-progress" />
+<!--        <collectors class="col-start-1 col-end-13" />-->
     </general-page-layout>
 </template>
 
@@ -35,11 +35,13 @@ import Collectors from '@/views/common/components/widgets/collectors/Collectors.
 import ResourceMap from '@/views/common/components/widgets/resource-map/ResourceMap.vue';
 
 import { store } from '@/store';
+import CollectorProgress from "@/views/common/components/widgets/collector-progress/CollectorProgress.vue";
 
 
 export default {
     name: 'Dashboard',
     components: {
+        CollectorProgress,
         ResourceMap,
         GeneralPageLayout,
         CloudServices,

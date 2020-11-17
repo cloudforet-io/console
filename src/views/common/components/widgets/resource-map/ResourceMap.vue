@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout class="resource-map">
-        <div class="title">
-            Regions
-        </div>
+        <p class="title">
+            Region
+        </p>
         <div class="chart-wrapper">
             <div class="chart-loader">
                 <div id="chartRef" ref="chartRef" />
@@ -70,8 +70,6 @@ export default {
     name: 'ResourceMap',
     components: {
         PLottie,
-        PChartLoader,
-        PSkeleton,
         PPaneLayout,
         PProgressBar,
     },
@@ -148,10 +146,12 @@ export default {
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
             chart.chartContainer.wheelable = true;
+            chart.zoomControl = new am4maps.ZoomControl();
 
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['AQ'];
+            polygonSeries.mapPolygons.template.fill = am4core.color('#E5E5E8');
             polygonSeries.calculateVisualCenter = true;
 
             const resp = await SpaceConnector.client.inventory.region.list();
@@ -164,19 +164,17 @@ export default {
                     ...d,
                 })),
             ];
+
             const imageSeries = chart.series.push(new am4maps.MapImageSeries());
             imageSeries.mapImages.template.propertyFields.longitude = 'longitude';
             imageSeries.mapImages.template.propertyFields.latitude = 'latitude';
             imageSeries.mapImages.template.tooltipText = '{title}';
-
             const circle = imageSeries.mapImages.template.createChild(am4core.Circle);
             circle.radius = 3;
             circle.propertyFields.fill = 'color';
-
             const circle2 = imageSeries.mapImages.template.createChild(am4core.Circle);
             circle2.radius = 3;
             circle2.propertyFields.fill = 'color';
-
             circle2.events.on('inited', (event) => {
                 animateBullet(event.target);
             });
@@ -184,19 +182,20 @@ export default {
             const originCoords = { longitude: 126.871867, latitude: 37.528547 };
 
             circle2.events.on('hit', async (event) => {
+                const originTarget = state.selectedRegion;
                 const target = event.target.dataItem?.dataContext as any;
+                console.log(event.target.dataItem?.sprites);
                 state.selectedProvider = target.region_type;
                 state.selectedRegion = target.name;
                 state.providerColor = state.providers[state.selectedProvider.toLowerCase()].color as string;
                 await getFilteredData(target.region_code);
                 const coords = chart.svgPointToGeo(event.svgPoint);
-                if (originCoords !== coords) {
+                if (originTarget !== state.selectedRegion) {
                     drawMarker(coords, chart);
                 }
             });
 
             drawMarker(originCoords, chart);
-
             imageSeries.data = state.data;
         };
 
@@ -227,6 +226,8 @@ export default {
 <style lang="postcss" scoped>
 .resource-map {
     @apply border border-gray-100;
+    border-radius: 0.375rem;
+    height: 30rem;
 }
 .title {
     @apply text-gray-900;
@@ -241,8 +242,9 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-left: 1rem;
-    margin-top: 1.125rem;
+    margin-left: 1.5rem;
+    margin-top: 1.1875rem;
+    padding-bottom: 2rem;
     .chart-loader {
         flex-shrink: 0;
         width: 70%;
@@ -253,7 +255,7 @@ export default {
 }
 .resource-info-wrapper {
     margin-right: 1.5rem;
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     width: 100%;
     height: 100%;
     .resource-info-title {
