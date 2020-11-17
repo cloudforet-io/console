@@ -80,13 +80,14 @@ export default {
     }
 
     .title {
-        @apply text-lg capitalize font-bold mr-2;
+        @apply capitalize font-bold mr-2;
+        font-size: 1rem;
         line-height: 120%;
     }
 
     .sub-title {
-        @apply mx-6 text-xs mb-4;
-        margin-top: -1.5rem;
+        @apply mx-6 text-xs mb-4 text-gray-500;
+        margin-top: -1.2rem;
     }
 
     .help {
