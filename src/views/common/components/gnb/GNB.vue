@@ -142,8 +142,8 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import ProfileModal from '@/views/common/profile/ProfileModal.vue';
-import SiteMap from '@/views/common/gnb/SiteMap.vue';
+import ProfileModal from '@/views/common/components/profile/ProfileModal.vue';
+import SiteMap from '@/views/common/components/gnb/SiteMap.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 

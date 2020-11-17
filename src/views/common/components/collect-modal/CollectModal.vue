@@ -73,7 +73,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import { CollectModalProps } from '@/views/common/collect-modal/type';
+import { CollectModalProps } from '@/views/common/components/collect-modal/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/components/util/composition-helpers';

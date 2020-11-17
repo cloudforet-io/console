@@ -53,7 +53,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';

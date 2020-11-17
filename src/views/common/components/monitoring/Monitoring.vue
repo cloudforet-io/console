@@ -100,7 +100,7 @@ import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChar
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { MonitoringProps } from '@/views/common/monitoring/type';
+import { MonitoringProps } from '@/views/common/components/monitoring/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
 import dayjs, {Dayjs} from "dayjs";

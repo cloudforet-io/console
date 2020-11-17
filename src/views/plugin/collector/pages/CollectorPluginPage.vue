@@ -109,7 +109,7 @@ import { get, range } from 'lodash';
 import {toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy} from '@vue/composition-api';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
-import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';

@@ -173,7 +173,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';

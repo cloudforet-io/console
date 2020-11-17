@@ -157,7 +157,7 @@ import {
     getCurrentInstance,
 } from '@vue/composition-api';
 
-import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';

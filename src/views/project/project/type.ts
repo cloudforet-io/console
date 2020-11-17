@@ -1,5 +1,6 @@
 import { TimeStamp } from '@/models';
 import { TreeItem } from '@/components/molecules/tree-node/type';
+import {FavoriteItem} from "@/store/modules/favorite/type";
 
 export interface ProjectGroupInfo {
     // eslint-disable-next-line camelcase
@@ -53,3 +54,10 @@ export interface ProjectGroup {
 }
 
 export type ProjectTreeItem = TreeItem<ProjectItemResp>
+
+export interface FavoriteButtonProps {
+    itemId: string;
+    favoriteType: string;
+    resourceType: string;
+    itemMap: any;
+}

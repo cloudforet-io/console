@@ -25,14 +25,14 @@ import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
-import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
-import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
-import AllSummary from '@/views/common/widgets/all-summary/AllSummary.vue';
-import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
-import Collectors from '@/views/common/widgets/collectors/Collectors.vue';
-import ResourceMap from '@/views/common/widgets/resource-map/ResourceMap.vue';
+import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
+import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyUpdates.vue';
+import ServiceAccounts from '@/views/common/components/widgets/service-accounts/ServiceAccounts.vue';
+import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
+import TopProjects from '@/views/common/components/widgets/top-projects/TopProjects.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import Collectors from '@/views/common/components/widgets/collectors/Collectors.vue';
+import ResourceMap from '@/views/common/components/widgets/resource-map/ResourceMap.vue';
 
 import { store } from '@/store';
 

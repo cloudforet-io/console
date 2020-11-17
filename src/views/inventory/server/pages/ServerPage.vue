@@ -65,7 +65,7 @@
             </template>
             <template #monitoring>
                 <monitoring :resource-type="monitoringState.resourceType"
-                              :resources="monitoringState.resources"
+                            :resources="monitoringState.resources"
                 />
             </template>
         </p-tab>
@@ -92,7 +92,7 @@
             </template>
             <template #monitoring>
                 <monitoring :resource-type="monitoringState.resourceType"
-                              :resources="monitoringState.resources"
+                            :resources="monitoringState.resources"
                 />
             </template>
         </p-tab>
@@ -145,19 +145,19 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 
 /* Page Modules */
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ServerDetails from '@/views/inventory/server/modules/ServerDetails.vue';
 import ServerMember from '@/views/inventory/server/modules/ServerMember.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
-import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';
-import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
-import Monitoring from '@/views/common/monitoring/Monitoring.vue';
-import STagsPanel from '@/views/common/tags/TagsPanel.vue';
+import SProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
+import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
+import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
+import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 
 /* types */
 import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
+import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { ServerModel } from '@/models/inventory/server';
 

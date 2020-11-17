@@ -3,8 +3,8 @@ const AddServiceAccountPage = () => import('@/views/identity/service-account/pag
 const User = () => import('@/views/identity/user/User');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage');
 const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage');
-const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
-const NoResource = () => import('@/views/common/error/NoResource.vue');
+const TagsPage = () => import('@/views/common/components/tags/TagsPage.vue');
+const NoResource = () => import('@/views/common/pages/NoResource.vue');
 
 export default {
     path: 'identity',

@@ -15,7 +15,7 @@ import automationRoute from '@/routes/automation/automation-route';
 
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
-import ErrorPage from '@/views/common/error/ErrorPage.vue';
+import ErrorPage from '@/views/common/pages/ErrorPage.vue';
 
 Vue.use(VueRouter);
 

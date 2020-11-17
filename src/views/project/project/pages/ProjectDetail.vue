@@ -111,8 +111,8 @@ import {
     computed, reactive, ref, toRefs, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
-import STagsPanel from '@/views/common/tags/TagsPanel.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';

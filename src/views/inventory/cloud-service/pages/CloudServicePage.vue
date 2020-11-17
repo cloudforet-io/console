@@ -123,23 +123,23 @@ import {
     reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
-import SProjectTreeModal from '@/views/common/tree-modal/ProjectTreeModal.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import SProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
 import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
-import SCollectModal from '@/views/common/collect-modal/CollectModal.vue';
-import STagsPanel from '@/views/common/tags/TagsPanel.vue';
+import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
+import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import Monitoring from '@/views/common/monitoring/Monitoring.vue';
+import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { MonitoringProps, MonitoringResourceType } from '@/views/common/monitoring/type';
+import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import {

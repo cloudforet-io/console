@@ -116,7 +116,6 @@
 
             <project-create-form-modal v-if="projectFormVisible && projectState.groupId"
                                        :visible.sync="projectFormVisible"
-                                       :current-project="projectState.groupId"
                                        :project-group-id="projectState.groupId"
                                        @confirm="projectFormConfirm($event)"
             />
@@ -129,7 +128,7 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
@@ -193,6 +192,13 @@ export default {
             totalCount: 0,
             projectListRef: null as unknown as any,
             noProjectGroup: false,
+            projectGroupFavorites: computed(() => {
+                const res = {};
+                vm.$store.state.favorite.projectGroup.items.forEach((d) => {
+                    res[d.id] = d;
+                });
+                return res;
+            }),
         });
 
         const formState = reactive({
@@ -205,6 +211,22 @@ export default {
             updateMode: false,
             createTargetNode: null as ProjectTreeItem|null,
         });
+
+        const listProject = async (id?, text?, reset?) => {
+            await state.projectListRef.listProjects(id, text, reset);
+        };
+
+        const listProjectGroup = async (id?) => {
+            if (id) await state.treeRef.findNode(id);
+            else await state.treeRef.listNodes();
+        };
+
+        const listAll = async (id?) => {
+            await Promise.all([
+                listProjectGroup(id),
+                listProject(id, projectState.searchText),
+            ]);
+        };
 
 
         /** Handling Form */
@@ -263,9 +285,9 @@ export default {
             if (item.data) {
                 projectState.groupId = item.data.id;
                 projectState.groupName = item.data.name;
-                await state.treeRef.findNode(item.data.id);
+                await listAll(item.data.id);
             } else {
-                await state.treeRef.listNodes();
+                await listAll();
             }
         };
 
@@ -284,7 +306,7 @@ export default {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, root);
             } finally {
                 formState.projectFormVisible = false;
-                await state.projectListRef.listProjects();
+                await listProject(projectState.groupId, projectState.searchText);
             }
         };
 
@@ -296,18 +318,22 @@ export default {
 
         /** Search */
         const onSearch = async (id, text) => {
-            if (id) {
-                if (id !== projectState.groupId) await state.treeRef.findNode(id);
-            } else if (projectState.groupId) await state.treeRef.listNodes();
-
-            projectState.groupId = id;
             projectState.searchText = text;
+
+            if (projectState.groupId !== id) {
+                projectState.groupId = id;
+                await listAll(id);
+            }
         };
 
         const onSelectTreeItem = async (id, name, parents: ProjectGroup[] = []) => {
-            projectState.groupId = id;
             projectState.groupName = name;
             state.parentGroups = parents;
+
+            if (projectState.groupId !== id) {
+                projectState.groupId = id;
+                await listAll(id);
+            }
         };
 
         const onProjectGroupEmpty = () => {
@@ -334,15 +360,11 @@ export default {
             const groupId = vm.$route.query.select_pg as string;
 
             if (groupId) {
-                await Promise.all([state.treeRef.findNode(groupId), setGroupName(groupId)]);
                 projectState.groupId = groupId;
+                await Promise.all([listAll(groupId), setGroupName(groupId)]);
             } else {
-                await state.treeRef.listNodes();
+                await listAll();
             }
-
-            watch([() => projectState.groupId, () => projectState.searchText], async () => {
-                await state.projectListRef.listProjects();
-            }, { immediate: true });
         };
 
 

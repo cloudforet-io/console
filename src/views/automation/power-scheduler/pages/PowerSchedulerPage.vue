@@ -82,7 +82,7 @@ import {
     computed, reactive, toRefs, getCurrentInstance,
 } from '@vue/composition-api';
 
-import VerticalPageLayout from '@/views/common/page-layout/VerticalPageLayout.vue';
+import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';

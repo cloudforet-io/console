@@ -140,7 +140,7 @@ import {
 } from '@vue/composition-api';
 
 /* Components */
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';

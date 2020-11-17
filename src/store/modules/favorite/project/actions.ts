@@ -12,7 +12,7 @@ const createUserConfig = async (userType: string, userId: string, favoriteItem: 
     );
 };
 
-const deleteUserConfig = async (userType: string, userId: string, favoriteItem: FavoriteItem): Promise<void|Error> => {
+const deleteUserConfig = async (userType: string, userId: string, favoriteItem: Partial<FavoriteItem>): Promise<void|Error> => {
     await SpaceConnector.client.config.userConfig.delete(
         {
             name: `console:${userType}:${userId}:favorite:${FAVORITE_TYPE}:${favoriteItem.id}`,
@@ -29,7 +29,7 @@ export const addItem = async ({ commit, state, rootState }, favoriteItem: Favori
     }
 };
 
-export const removeItem = async ({ commit, state, rootState }, favoriteItem: FavoriteItem): Promise<void> => {
+export const removeItem = async ({ commit, state, rootState }, favoriteItem: Partial<FavoriteItem>): Promise<void> => {
     const isExists = state.items.find((item: FavoriteItem) => item.id === favoriteItem.id);
 
     if (isExists) {

@@ -37,7 +37,7 @@ import {
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import STagsPage from '@/views/common/tags/TagsPage.vue';
+import STagsPage from '@/views/common/components/tags/TagsPage.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {

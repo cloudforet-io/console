@@ -27,7 +27,7 @@ import {
 
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
-import GNB from '@/views/common/gnb/GNB.vue';
+import GNB from '@/views/common/components/gnb/GNB.vue';
 
 
 export default defineComponent({

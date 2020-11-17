@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import CollectorHistory from '@/views/common/widgets/collector-history/CollectorHistory.vue';
-import CollectorRuns from '@/views/common/widgets/collector-runs/CollectorRuns.vue';
+import CollectorHistory from '@/views/common/components/widgets/collector-history/CollectorHistory.vue';
+import CollectorRuns from '@/views/common/components/widgets/collector-runs/CollectorRuns.vue';
 
 export default {
     name: 'Collectors',

@@ -166,8 +166,8 @@ import router from '@/routes';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 
-const GeneralPageLayout = (): Component => import('@/views/common/page-layout/GeneralPageLayout.vue') as Component;
-const STagsPanel = (): Component => import('@/views/common/tags/TagsPanel.vue') as Component;
+const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
+const STagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
 const CollectorDetails = (): Component => import('@/views/plugin/collector/modules/CollectorDetails.vue') as Component;

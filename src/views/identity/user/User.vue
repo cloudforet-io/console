@@ -107,7 +107,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/common/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';
 import PUserDetail from '@/views/identity/user/modules/UserDetail.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';

@@ -78,10 +78,6 @@ export default {
             type: String,
             default: '',
         },
-        currentProject: {
-            type: String,
-            default: '',
-        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

@@ -81,17 +81,19 @@
                     <div class="accounts">
                         <span v-if="item.providers.length" class="label">{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
                         <div class="provider-icon-wrapper">
-                            <router-link v-for="(provider, index) in item.providers" :key="index"
-                                         :to="{
-                                             name: 'serviceAccount',
-                                             query: { provider: getProvider(provider) ? provider : null },
-                                         }"
-                                         class="link"
-                            >
-                                <p-lazy-img :src="getProvider(provider).icon"
-                                            height="1.25rem" width="1.25rem"
+                            <div class="provider">
+                                <router-link v-for="(provider, index) in item.providers"
+                                             :key="index"
+                                             :to="{
+                                                 name: 'serviceAccount',
+                                                 query: { provider: getProvider(provider) ? provider : null },
+                                             }"
+                                             class="link"
+                                             :style="{
+                                                 backgroundImage: `url('${getProvider(provider).icon}')`
+                                             }"
                                 />
-                            </router-link>
+                            </div>
                         </div>
                         <div class="account-add">
                             <router-link class="icon-wrapper" :to="{name: 'serviceAccount',}">
@@ -100,8 +102,11 @@
                             <span v-if="item.providers.length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                         </div>
                     </div>
-                    <div class="favorite">
-                        <p-i name="ic_bookmark" width="1rem" height="1rem" />
+                    <div class="favorite-wrapper">
+                        <favorite-button :item-id="item.project_id"
+                                         favorite-type="project"
+                                         resource-type="identity.Project"
+                        />
                     </div>
                 </div>
             </router-link>
@@ -120,12 +125,13 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { range } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
+import { FavoriteItem } from '@/store/modules/favorite/type';
+import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
 interface Props {
     searchText: string;
@@ -137,10 +143,10 @@ interface Props {
 export default {
     name: 'ProjectCardList',
     components: {
+        FavoriteButton,
         PI,
         PButton,
         PSkeleton,
-        PLazyImg,
         PCheckBox,
         PToolboxGridLayout,
     },
@@ -174,6 +180,8 @@ export default {
             cardSummary: {},
             showAllProjects: false,
             noProject: computed(() => !state.loading && state.totalCount === 0),
+            hoveredProjectId: '',
+            hoveredGroupId: '',
         });
 
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
@@ -184,18 +192,22 @@ export default {
             });
         };
 
+        const loadProjectFavorites = async () => {
+            await vm.$store.dispatch('favorite/project/load');
+        };
+
         const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
         const listAllProjectApi = SpaceConnector.client.identity.project.list;
         const listQuery = new QueryHelper();
 
-        const getParams = () => {
+        const getParams = (id?, text?) => {
             listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize);
 
-            if (props.searchText) listQuery.setFilter({ k: 'name', v: props.searchText, o: 'contain' });
+            if (text) listQuery.setFilter({ k: 'name', v: props.searchText, o: 'contain' });
 
             const params: any = { include_provider: true, query: listQuery.data };
-            if (props.groupId) params.project_group_id = props.groupId;
+            if (id) params.project_group_id = id;
             if (state.showAllProjects) params.recursive = true;
 
             return params;
@@ -229,7 +241,7 @@ export default {
         };
 
         let listProjectToken: CancelTokenSource | undefined;
-        const getData = async () => {
+        const getData = async (id?, text?) => {
             // if request is already exist, cancel the request
             if (listProjectToken) {
                 listProjectToken.cancel('Next request has been called.');
@@ -240,21 +252,23 @@ export default {
             state.loading = true;
             try {
                 let res;
-                if (props.groupId) res = await listProjectApi(getParams(), { cancelToken: listProjectToken.token });
-                else res = await listAllProjectApi(getParams(), { cancelToken: listProjectToken.token });
+                if (id) res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
+                else res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
 
                 state.cardSummary = await getCardSummary(res.results);
                 state.items = res.results;
                 state.totalCount = res.total_count;
                 state.loading = false;
                 listProjectToken = undefined;
+
                 vm.$emit('list', state.totalCount);
             } catch (e) {
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
-                }
+                    vm.$emit('list', state.totalCount);
+                } else console.error(e);
             }
         };
 
@@ -265,22 +279,21 @@ export default {
             state.pageSize = 24;
         };
 
-        const listProjects = async (reset = false) => {
+        const listProjects = async (groupId?, searchText?, reset = false) => {
             if (reset) resetAll();
-            await getData();
+            await getData(groupId, searchText);
         };
 
         watch(() => state.showAllProjects, async (after, before) => {
             if (after !== before) {
-                await listProjects(true);
+                await listProjects(props.groupId, props.searchText, true);
             }
         }, { immediate: false });
 
-        watch(() => state.showAllProjects, async (after, before) => {
-            if (after !== before) {
-                await listProjects(true);
-            }
-        }, { immediate: false });
+        /* Init */
+        (async () => {
+            await loadProjectFavorites();
+        })();
 
         return {
             ...toRefs(state),
@@ -350,11 +363,8 @@ export default {
         }
     }
 }
-.card-separator {
-    @apply border-t border-gray-100;
-}
 .card-bottom-wrapper {
-    @apply flex-shrink-0 flex-grow-0 flex items-center justify-between text-xs text-gray-500;
+    @apply flex-shrink-0 flex-grow-0 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500;
     height: 3rem;
     .accounts {
         @apply flex-grow-0 overflow-x-hidden flex items-center justify-between px-4;
@@ -363,8 +373,18 @@ export default {
         }
         .provider-icon-wrapper {
             @apply flex-shrink inline-flex items-center truncate;
+            .provider {
+                @apply truncate;
+                min-width: 0;
+            }
             .link {
-                @apply flex-shrink-0 mr-2;
+                @apply flex-shrink-0 inline-block mr-2;
+                height: 1.25rem;
+                width: 1.25rem;
+                background-repeat: no-repeat;
+                background-size: 100%;
+                background-position: bottom;
+                line-height: 1.25rem;
             }
         }
         .account-add {
@@ -385,8 +405,8 @@ export default {
             }
         }
     }
-    .favorite {
-        @apply flex-shrink-0 h-full px-4 border-l border-gray-100 inline-flex items-center h-full;
+    .favorite-wrapper {
+        @apply flex-shrink-0 h-full px-4 border-l border-gray-100 inline-flex items-center;
     }
 }
 </style>

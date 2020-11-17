@@ -62,12 +62,12 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import CloudServices from '@/views/common/widgets/cloud-services/CloudServices.vue';
-import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue';
-import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
-import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
-import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
-import ResourcesByRegion from '@/views/common/widgets/resources-by-region/ResourcesByRegion.vue';
+import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
+import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyUpdates.vue';
+import ServiceSummary from '@/views/common/components/widgets/service-summary/ServiceSummary.vue';
+import ServiceAccountsTable from '@/views/common/components/widgets/service-accounts-table/ServiceAccountsTable.vue';
+import HealthDashboard from '@/views/common/components/widgets/health-dashboard/HealthDashboard.vue';
+import ResourcesByRegion from '@/views/common/components/widgets/resources-by-region/ResourcesByRegion.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
 import VueI18n from 'vue-i18n';

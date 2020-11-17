@@ -3,7 +3,7 @@ const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/C
 
 const Server = () => import('@/views/inventory/server/pages/ServerPage.vue');
 const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
-const NoResource = () => import('@/views/common/error/NoResource.vue');
+const NoResource = () => import('@/views/common/pages/NoResource.vue');
 
 export default {
     path: 'inventory',
