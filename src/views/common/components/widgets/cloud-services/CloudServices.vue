@@ -24,7 +24,7 @@
                     <p-i name="ic_plus_square" width="1rem" height="1rem"
                          class="mr-2" color="inherit white"
                     />
-                    {{$t('COMMON.WIDGETS.CLOUD_SERVICE_CREATE_COLLECTOR')}}
+                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_CREATE_COLLECTOR') }}
                 </router-link>
                 <template v-else>
                     <router-link v-for="(item, index) in data" :key="index" :to="item.href">
@@ -198,6 +198,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.widget-layout::v-deep {
+    border-radius: 0.375rem;
+}
 .group-name {
     @apply text-base font-bold mb-1 truncate leading-tight;
 }
