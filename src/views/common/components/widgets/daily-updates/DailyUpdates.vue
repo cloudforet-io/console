@@ -1,8 +1,10 @@
 <template>
     <p-widget-layout ref="widgetRef" class="daily-updates" :title="$t('COMMON.WIDGETS.DAILY_UPDATE_TITLE')"
                      :sub-title="$t('COMMON.WIDGETS.DAILY_UPDATE_DESC')"
-                     :help="$t('COMMON.WIDGETS.DAILY_UPDATE_HELP')"
     >
+        <template #extra>
+            <span class="managed-resources">(Managed Resources)</span>
+        </template>
         <template #default>
             <div v-if="loading" class="mr-10 flex items-center overflow-hidden">
                 <p-skeleton width="2rem" height="2rem" class="mx-10" />
@@ -19,13 +21,13 @@
                         <div v-if="!item.isServer">
                             <p-lazy-img :src="iconUrl(item)"
                                         width="2rem" height="2rem"
-                                        class="rounded-sm flex-shrink-0 service-img"
+                                        class="rounded flex-shrink-0 service-img"
                             />
                         </div>
                         <div v-else-if="item.isServer">
                             <p-i name="ic_server"
                                  width="2rem" height="2rem"
-                                 class="rounded-sm flex-shrink-0"
+                                 class="rounded flex-shrink-0"
                             />
                         </div>
                         <p v-if="item.created_count || item.deleted_count" class="daily-service">
@@ -53,13 +55,13 @@
                     <div v-if="!item.isServer">
                         <p-lazy-img :src="iconUrl(item)"
                                     width="2rem" height="2rem"
-                                    class="rounded-sm flex-shrink-0 service-img"
+                                    class="rounded flex-shrink-0 service-img"
                         />
                     </div>
                     <div v-else-if="item.isServer">
                         <p-i name="ic_server"
                              width="2rem" height="2rem"
-                             class="rounded-sm flex-shrink-0"
+                             class="rounded flex-shrink-0"
                         />
                     </div>
                     <p v-if="item.created_count || item.deleted_count" class="daily-service">
@@ -292,6 +294,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.widget-layout::v-deep {
+    border-radius: 0.375rem;
+}
 .daily-updates {
     @apply bg-white;
     &::v-deep {
@@ -302,7 +307,13 @@ export default {
         .item-container.card {
             background-color: transparent;
         }
+        .p-lazy-img .img-container {
+            @apply rounded;
+        }
     }
+    min-height: 37rem;
+    max-height: 47rem;
+    overflow-y: scroll;
 }
 
 @screen lg {
@@ -311,12 +322,16 @@ export default {
             background-color: rgba(theme('colors.white'), 0.8);
         }
         .title {
-            @apply text-sm leading-normal -mt-2;
-        }
-        .help {
-            @apply -mt-2;
+            @apply text-sm leading-normal;
         }
     }
+}
+
+.managed-resources {
+    @apply text-gray-700;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: -0.5rem;
 }
 
 .no-data-img {
@@ -338,6 +353,7 @@ export default {
             width: 24%;
             max-width: 6.5rem;
             padding: 0.5rem;
+
             @media screen and (1024px < width < 1280px) {
                 margin-left: 0;
             }
@@ -367,6 +383,8 @@ export default {
             }
         }
         .p-i-icon, .service-img {
+            @apply rounded;
+
             @media screen and (1024px < width < 1280px) {
                 display: none;
             }
@@ -386,6 +404,7 @@ export default {
     background: linear-gradient(90deg, rgba(theme('colors.yellow.100'), 0.75) 23.96%, rgba(theme('colors.yellow.300'), 0.75) 49.48%, rgba(theme('colors.yellow.100'), 0.75) 74.48%);
     background-size: 200% 200%;
     animation: gradient 3s ease infinite;
+
     @keyframes gradient {
         0% {
             background-position: 0% 50%;
