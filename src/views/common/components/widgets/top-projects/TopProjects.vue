@@ -29,7 +29,18 @@
                     </p-icon-text-button>
                 </router-link>
             </div>
-            <template v-else></template>
+            <template v-else>
+                <p-data-table
+                    :loading="loading"
+                    :fields="fields"
+                    :items="data"
+                    :bordered="false"
+                >
+                    <template #col-rank-format="{ index }">
+                        {{ `# ${index + 1}` }}
+                    </template>
+                </p-data-table>
+            </template>
         </div>
     </p-widget-layout>
 </template>
@@ -37,7 +48,6 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { orderBy, range } from 'lodash';
-
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -48,20 +58,23 @@ import {
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    gray, primary, primary1, primary2, primary3,
+    gray, indigo, blue,
 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
 
 
 interface ChartData {
-    project: string;
+    rank: string;
     server: number;
+    database: number;
+    storage: number;
     cloud_service: number;
 }
 interface ProjectData {
@@ -74,15 +87,17 @@ interface ProjectData {
     total?: number;
 }
 
-const SERVER_COLOR = primary;
-const DATABASE_COLOR = primary1;
-const STORAGE_COLOR = primary2;
-const CLOUD_SERVICE_COLOR = primary3;
+const DATA_COUNT = 5;
+const SERVER_COLOR = indigo[700];
+const DATABASE_COLOR = indigo[600];
+const STORAGE_COLOR = indigo[400];
+const CLOUD_SERVICE_COLOR = blue[300];
 
 
 export default {
     name: 'TopProjects',
     components: {
+        PDataTable,
         PIconTextButton,
         PWidgetLayout,
         PChartLoader,
@@ -94,9 +109,9 @@ export default {
         const state = reactive({
             loading: true,
             data: [] as ProjectData[],
+            chartData: [] as ChartData[],
             chartRef: null as HTMLElement | null,
             chart: null as HTMLElement | null,
-            chartData: [] as ChartData[],
             colors: {
                 server: SERVER_COLOR,
                 database: DATABASE_COLOR,
@@ -108,6 +123,8 @@ export default {
                 { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
                 { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
                 { name: 'servers', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
+                { name: 'database', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
+                { name: 'storage', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
                 { name: 'cloud_services', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_CLOUD_SERVICE') },
             ]),
         });
@@ -123,15 +140,15 @@ export default {
 
             const projectAxis = chart.yAxes.push(new am4charts.CategoryAxis());
             projectAxis.renderer.minGridDistance = 0;
-            projectAxis.dataFields.category = 'project';
+            projectAxis.dataFields.category = 'rank';
 
             projectAxis.renderer.grid.template.location = 0;
             projectAxis.renderer.grid.template.strokeOpacity = 1;
             projectAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            projectAxis.renderer.labels.template.fill = am4core.color(gray[500]);
-            projectAxis.renderer.labels.template.fontSize = 12;
+            projectAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             projectAxis.renderer.cellStartLocation = 0.3;
             projectAxis.renderer.cellEndLocation = 0.7;
+            projectAxis.fontSize = 11;
 
             const valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
             valueAxis.renderer.minGridDistance = 60;
@@ -144,12 +161,12 @@ export default {
                 return label;
             });
             valueAxis.renderer.labels.template.fill = am4core.color(gray[500]);
-            valueAxis.fontSize = 12;
+            valueAxis.fontSize = 11;
 
             const createSeries = (field, name) => {
                 const series = chart.series.push(new am4charts.ColumnSeries());
                 series.name = name;
-                series.dataFields.categoryY = 'project';
+                series.dataFields.categoryY = 'rank';
                 series.dataFields.valueX = field;
                 series.fill = am4core.color(state.colors[field]);
                 series.strokeWidth = 0;
@@ -168,7 +185,7 @@ export default {
             chart.legend.paddingTop = -10;
             chart.legend.paddingLeft = 20;
             chart.legend.fontSize = 12;
-            chart.legend.labels.template.fill = am4core.color(gray[500]);
+            chart.legend.labels.template.fill = am4core.color(gray[400]);
             chart.legend.markers.template.width = 8;
             chart.legend.markers.template.height = 8;
         };
@@ -179,18 +196,24 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.topProject();
                 const data = res.results;
                 const orderedData = orderBy(data, ['total'], ['desc']);
+                state.data = orderedData;
+
                 const chartData = [] as ChartData[];
-                range(1, 6).forEach((idx) => {
+                range(0, DATA_COUNT).forEach((idx) => {
                     chartData.push({
-                        project: `#${idx}`,
+                        rank: `#${idx + 1}`,
                         server: 0,
+                        database: 0,
+                        storage: 0,
                         cloud_service: 0,
                     });
                 });
                 orderedData.forEach((d, idx) => {
                     chartData.splice(idx, 1, {
-                        project: `#${idx + 1}`,
+                        rank: `#${idx + 1}`,
                         server: d.servers,
+                        database: 0, // todo
+                        storage: 0, // todo
                         cloud_service: d.cloud_services,
                     });
                 });
@@ -231,23 +254,17 @@ export default {
 .chart {
     height: 13rem;
 }
-.color {
-    display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    margin-right: 0.5rem;
-    border-radius: 2px;
-    background-color: currentColor;
-}
-.custom-th {
-    @apply flex items-center justify-center font-bold px-1;
-    font-size: 0.875rem;
-}
-.project-field {
-    @apply truncate font-bold;
-}
-.p-badge {
-    @apply font-bold;
+.p-data-table::v-deep {
+    margin-top: 1rem;
+    th {
+        @apply bg-gray-100 text-gray-400;
+        height: 1.5rem;
+        border: none;
+        font-size: 0.75rem;
+    }
+    td {
+        height: 2rem;
+    }
 }
 .get-started {
     padding-left: 1.2rem;

@@ -192,11 +192,11 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ALL_SUMMARY_ALL_COMPUTE": "All Compute",
 			"ALL_SUMMARY_ALL_DATABASE": "All Database",
-			"ALL_SUMMARY_ALL_SERVERS": "All Servers",
 			"ALL_SUMMARY_ALL_STORAGE": "All Storage",
+			"ALL_SUMMARY_COMPUTE": "Compute",
 			"ALL_SUMMARY_DATABASE": "Database",
-			"ALL_SUMMARY_SERVER": "Servers",
 			"ALL_SUMMARY_SPENDINGS": "Overall-Spendings",
 			"ALL_SUMMARY_STORAGE": "Storage",
 			"ALL_SUMMARY_TREND_TITLE": "Trend",
@@ -245,12 +245,14 @@
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_CREATE_DASHBOARD": "Create your dashboard!",
 			"TOP_PROJECT_CREATE_GUIDE": "Create Project Group first & Register Service Account",
+			"TOP_PROJECT_DATABASE": "Database",
 			"TOP_PROJECT_GET_START": "Get Started",
 			"TOP_PROJECT_HELP": "Check project ranking with most resources and services.",
 			"TOP_PROJECT_PROJECT": "Project",
 			"TOP_PROJECT_PROJECT_GROUP": "Project Group",
 			"TOP_PROJECT_RANK": "Rank",
 			"TOP_PROJECT_SERVER": "Server",
+			"TOP_PROJECT_STORAGE": "Storage",
 			"TOP_PROJECT_TITLE": "Top 5 Resource Managing Projects"
 		}
 	},

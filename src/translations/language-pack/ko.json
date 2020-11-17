@@ -192,11 +192,11 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ALL_SUMMARY_ALL_COMPUTE": "모든 컴퓨트",
 			"ALL_SUMMARY_ALL_DATABASE": "모든 데이터베이스",
-			"ALL_SUMMARY_ALL_SERVERS": "모든 서버",
 			"ALL_SUMMARY_ALL_STORAGE": "모든 저장소",
+			"ALL_SUMMARY_COMPUTE": "컴퓨트",
 			"ALL_SUMMARY_DATABASE": "데이터베이스",
-			"ALL_SUMMARY_SERVER": "서버",
 			"ALL_SUMMARY_SPENDINGS": "전체 지출",
 			"ALL_SUMMARY_STORAGE": "저장소",
 			"ALL_SUMMARY_TREND_TITLE": "Trend",
@@ -245,12 +245,14 @@
 			"TOP_PROJECT_CLOUD_SERVICE": "클라우드 서비스 ",
 			"TOP_PROJECT_CREATE_DASHBOARD": "대시보드를 만드세요! ",
 			"TOP_PROJECT_CREATE_GUIDE": "프로젝트를 만든 후 서비스 계정을 등록하세요. ",
+			"TOP_PROJECT_DATABASE": "데이터베이스",
 			"TOP_PROJECT_GET_START": "시작하기 ",
 			"TOP_PROJECT_HELP": "운영중인 서비스 리소스의 순위를 프로젝트 단위로 보여 줍니다.",
 			"TOP_PROJECT_PROJECT": "프로젝트 ",
 			"TOP_PROJECT_PROJECT_GROUP": "프로젝트 그룹 ",
 			"TOP_PROJECT_RANK": "순위 ",
 			"TOP_PROJECT_SERVER": "서버 ",
+			"TOP_PROJECT_STORAGE": "저장소",
 			"TOP_PROJECT_TITLE": "상위 5 자원 관리 프로젝트 "
 		}
 	},

@@ -43,15 +43,15 @@
                                 <template #loader>
                                     <p-skeleton width="100%" height="100%" />
                                 </template>
-                                <div ref="serverChartRef" class="chart" />
+                                <div ref="computeChartRef" class="chart" />
                             </p-chart-loader>
                         </div>
                         <div class="summary-wrapper col-span-3">
                             <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_SERVER')}) }}
+                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE')}) }}
                             </div>
                             <template v-if="!loading">
-                                <div v-for="(data, idx) of serverData" :key="idx" class="summary-row">
+                                <div v-for="(data, idx) of computeData" :key="idx" class="summary-row">
                                     <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                     <span class="count">{{ data.count }}</span>
@@ -171,20 +171,20 @@ export default {
 
         const state = reactive({
             loading: false,
-            serverChartRef: null as HTMLElement | null,
+            computeChartRef: null as HTMLElement | null,
             databaseChartRef: null as HTMLElement | null,
             storageChartRef: null as HTMLElement | null,
             skeletons: range(3),
             activatedIndex: 0,
-            serverCount: 0,
+            computeCount: 0,
             databaseCount: 0,
             storageCount: 0,
             overallSpendings: 500,
             serviceDataList: computed(() => ([
                 {
-                    type: 'server',
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_SERVER'),
-                    count: state.serverCount,
+                    type: 'compute',
+                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
+                    count: state.computeCount,
                     suffix: 'ea',
                     to: '/inventory/server',
                 },
@@ -209,13 +209,13 @@ export default {
                     to: '/',
                 },
             ])),
-            serverData: [] as TypeData[],
+            computeData: [] as TypeData[],
             databaseData: [] as TypeData[],
             storageData: [] as TypeData[],
         });
         const chartState = reactive({
             loading: false,
-            serverData: [] as ChartData[],
+            computeData: [] as ChartData[],
             databaseData: [] as ChartData[],
             storageData: [] as ChartData[],
         });
@@ -229,7 +229,7 @@ export default {
         const getCount = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.serverCount();
-                state.serverCount = res.results[0]?.count || 0;
+                state.computeCount = res.results[0]?.count || 0;
             } catch (e) {
                 console.error(e);
             }
@@ -255,7 +255,7 @@ export default {
         const getTrend = async (type) => {
             try {
                 let res;
-                if (type === 'server') {
+                if (type === 'compute') {
                     chartState.loading = true;
                     res = await SpaceConnector.client.statistics.topic.dailyServerCount();
                 } else if (type === 'database') {
@@ -280,7 +280,7 @@ export default {
                     count: d.count,
                 }));
 
-                if (type === 'server') chartState.serverData = formattedData;
+                if (type === 'compute') chartState.computeData = formattedData;
                 else if (type === 'database') chartState.databaseData = formattedData;
                 else chartState.storageData = formattedData;
             } catch (e) {
@@ -292,18 +292,18 @@ export default {
         const getServerInfo = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.serverByProvider();
-                const serverData: TypeData[] = [
-                    { provider: 'all', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_SERVERS'), count: state.serverCount },
+                const computeData: TypeData[] = [
+                    { provider: 'all', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_COMPUTE'), count: state.computeCount },
                 ];
                 res.results.forEach((d) => {
-                    serverData.push({
+                    computeData.push({
                         provider: d.provider,
                         label: PROVIDER[d.provider],
                         type: d.server_type,
                         count: d.count,
                     });
                 });
-                state.serverData = serverData;
+                state.computeData = computeData;
             } catch (e) {
                 console.error(e);
             }
@@ -372,31 +372,33 @@ export default {
             chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = 0;
-            if (type === 'server') chart.data = chartState.serverData;
+            if (type === 'compute') chart.data = chartState.computeData;
             else if (type === 'database') chart.data = chartState.databaseData;
             else if (type === 'storage') chart.data = chartState.storageData;
 
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'date';
-            dateAxis.renderer.grid.template.disabled = true;
             dateAxis.renderer.minGridDistance = 10;
-            dateAxis.renderer.labels.template.fill = am4core.color(gray[500]);
-            dateAxis.fontSize = 12;
+            dateAxis.renderer.grid.template.disabled = true;
+            dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            dateAxis.fontSize = 11;
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.renderer.minGridDistance = 30;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            valueAxis.renderer.labels.template.fill = am4core.color(gray[500]);
-            valueAxis.fontSize = 10;
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            valueAxis.fontSize = 11;
             valueAxis.min = 0;
 
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
             series.dataFields.categoryX = 'date';
             series.fill = am4core.color(indigo[700]);
+            series.columns.template.width = am4core.percent(35);
+            series.columns.template.column.cornerRadiusTopLeft = 5;
+            series.columns.template.column.cornerRadiusTopRight = 5;
             series.strokeWidth = 0;
-            series.columns.template.width = am4core.percent(40);
             // series.columns.template.cursorOverStyle = am4core.MouseCursorStyle.pointer;
             // series.columns.template.events.on('over', (ev) => {
             //     ev.target.fill = am4core.color(hoverColor);
@@ -416,7 +418,7 @@ export default {
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
         const init = () => {
-            getTrend('server');
+            getTrend('compute');
             getTrend('database');
             getTrend('storage');
         };
@@ -432,9 +434,9 @@ export default {
         init();
         asyncInit();
 
-        watch([() => state.serverChartRef, () => chartState.serverData], ([chartContext, data]) => {
+        watch([() => state.computeChartRef, () => chartState.computeData], ([chartContext, data]) => {
             if (chartContext && data) {
-                drawChart(state.serverChartRef, 'server');
+                drawChart(state.computeChartRef, 'compute');
             }
         });
         watch([() => state.databaseChartRef, () => chartState.databaseData], ([chartContext, data]) => {
@@ -472,12 +474,14 @@ export default {
             border-radius: 0.375rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             padding: 1.375rem;
+            .content {
+                margin: auto 0;
+            }
             .count {
                 @apply text-gray-700;
-                font-size: 2.5rem;
+                font-size: 2rem;
                 font-weight: bold;
                 line-height: 2.5rem;
-                margin-bottom: 1rem;
 
                 .suffix {
                     @apply text-gray-400;
@@ -495,7 +499,7 @@ export default {
             }
             .title {
                 @apply text-gray-500;
-                font-size: 0.875rem;
+                font-size: 1rem;
                 text-transform: capitalize;
             }
 
@@ -509,6 +513,7 @@ export default {
                 }
                 .title {
                     @apply text-white;
+                    font-weight: bold;
                 }
                 &:after {
                     position: absolute;
