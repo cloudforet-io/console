@@ -17,23 +17,23 @@ jobs:
           fi
       - name: get existing official version
         run: |
-          echo "::set-env name=current::$(cat src/VERSION | cut -c 2-6)"
-          echo "::set-env name=new_ver::$(echo ${{ env.VERSION }} | cut -c 2-6)"
+          echo "current=$(cat src/VERSION | cut -c 2-6)" >> $GITHUB_ENV
+          echo "new_ver=$(echo ${{ env.VERSION }} | cut -c 2-6)" >> $GITHUB_ENV
       - name: Is new_ver is latest?
         run: |
           if [ $(echo ${{ env.current }} | cut -c 1) \> $(echo ${{ env.new_ver }} | cut -c 1) ]
           then
-            echo "::set-env name=LATEST_TAG::false"
+            echo "LATEST_TAG=false" >> $GITHUB_ENV
           else
             if [ $(echo ${{ env.current }} | cut -c 3) \> $(echo ${{ env.new_ver }} | cut -c 3) ]
             then
-              echo "::set-env name=LATEST_TAG::false"
+              echo "LATEST_TAG=false" >> $GITHUB_ENV
             else
               if [ $(echo ${{ env.current }} | cut -c 5) \> $(echo ${{ env.new_ver }} | cut -c 5) ]
               then
-                echo "::set-env name=LATEST_TAG::false"
+                echo "LATEST_TAG=false" >> $GITHUB_ENV
               else
-                echo "::set-env name=LATEST_TAG::true"
+                echo "LATEST_TAG=true" >> $GITHUB_ENV
               fi
             fi
           fi
