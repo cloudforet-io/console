@@ -4,6 +4,19 @@
             <div class="sidebar-container">
                 <div class="sidebar-item-wrapper">
                     <header>
+                        <span class="title">{{ $t('PROJECT.LANDING.FAVORITES') }}</span>
+                    </header>
+                    <favorite-list :items="favoriteItems" @delete="onFavoriteDelete">
+                        <template #icon="{item}">
+                            <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
+                                 width="1rem" height="1rem" color="inherit transparent"
+                            />
+                        </template>
+                    </favorite-list>
+                </div>
+
+                <div class="sidebar-item-wrapper">
+                    <header>
                         <span class="title">{{ $t('PROJECT.LANDING.SEARCH') }}</span>
                     </header>
                     <project-search :group-id="projectState.groupId"
@@ -24,7 +37,7 @@
                     <project-group-tree ref="treeRef"
                                         :search-text="projectState.searchText"
                                         :project-state="projectState"
-                                        @empty="onProjectGroupEmpty"
+                                        @list="onProjectGroupList"
                                         @select="onSelectTreeItem"
                                         @create="openProjectGroupForm"
                                         @mounted="init"
@@ -38,8 +51,7 @@
                     <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
                 </span>
             </div>
-            <p-page-title :title="projectState.groupName ? projectState.groupName
-                              : $t('PROJECT.LANDING.ALL_PROJECT')"
+            <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
                           use-total-count
                           :total-count="totalCount"
             >
@@ -152,15 +164,18 @@ import { MenuItem } from '@/components/organisms/context-menu/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TranslateResult } from 'vue-i18n';
 import {
-    ProjectGroup, ProjectItemResp, ProjectState, ProjectTreeItem,
+    ProjectGroup, ProjectItemResp, ProjectTreeItem,
 } from '@/views/project/project/type';
 import ProjectCardList from '@/views/project/project/modules/ProjectCardList.vue';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+import { FavoriteItem } from '@/store/modules/favorite/type';
+import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
 
 
 export default {
     name: 'ProjectPage',
     components: {
+        FavoriteList,
         FavoriteButton,
         ProjectCardList,
         PPageNavigation,
@@ -185,6 +200,10 @@ export default {
         });
 
         const state = reactive({
+            favoriteItems: computed<FavoriteItem[]>(() => [
+                ...vm.$store.getters['favorite/projectGroup/sortedItems'],
+                ...vm.$store.getters['favorite/project/sortedItems'],
+            ]),
             settingMenu: computed(() => [
                 { name: 'edit', label: vm.$t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
                 { name: 'delete', label: vm.$t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
@@ -235,6 +254,11 @@ export default {
                 listProjectGroup(id),
                 listProject(id, projectState.searchText),
             ]);
+        };
+
+        const onFavoriteDelete = (item: FavoriteItem) => {
+            if (item.id.startsWith('project')) vm.$store.dispatch('favorite/project/removeItem', item);
+            else vm.$store.dispatch('favorite/projectGroup/removeItem', item);
         };
 
 
@@ -345,8 +369,8 @@ export default {
             }
         };
 
-        const onProjectGroupEmpty = () => {
-            state.noProjectGroup = 0;
+        const onProjectGroupList = (count) => {
+            state.noProjectGroup = !count;
         };
 
         const onProjectList = (count) => {
@@ -366,6 +390,8 @@ export default {
         const init = async () => {
             await Promise.all([
                 vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('resource/projectGroup/load'),
+                vm.$store.dispatch('resource/project/load'),
                 vm.$store.dispatch('favorite/projectGroup/load'),
                 vm.$store.dispatch('favorite/project/load'),
             ]);
@@ -385,6 +411,7 @@ export default {
             projectState,
             ...toRefs(state),
             ...toRefs(formState),
+            onFavoriteDelete,
             openProjectForm,
             openProjectGroupDeleteForm,
             projectGroupDeleteFormConfirm,
@@ -396,7 +423,7 @@ export default {
             onProjectGroupUpdate,
             onProjectGroupCreate,
             onProjectGroupNavClick,
-            onProjectGroupEmpty,
+            onProjectGroupList,
             onProjectList,
             init,
         };

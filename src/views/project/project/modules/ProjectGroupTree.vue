@@ -40,7 +40,7 @@
             </template>
             <template #right-extra="{data}">
                 <div v-if="hoveredNode && data.id === hoveredNode.node.data.id">
-                    <p-icon-button :name="'ic_plus'" class="group-add-btn"
+                    <p-icon-button name="ic_plus" class="group-add-btn"
                                    width="1rem" height="1rem"
                                    @click.stop="$emit('create', hoveredNode)"
                     />
@@ -271,7 +271,7 @@ export default {
         const findNode = async (id: string) => {
             const res = await getSearchPath(id, 'PROJECT_GROUP');
             state.treeRef.nodes = await getRecursiveData(res.open_path) as TreeNode[];
-            if (state.treeRef.nodes.length === 0) emit('empty');
+            emit('list', state.treeRef.nodes.length)
         };
 
         const resetSelectedNode = (item: TreeItem, compare?: TreeItem) => {
@@ -312,7 +312,7 @@ export default {
             } else {
                 const res = await requestTreeData();
                 state.treeRef.nodes = Array.isArray(res) ? res : [];
-                if (state.treeRef.nodes.length === 0) emit('empty');
+                emit('list', state.treeRef.nodes.length)
             }
         };
 

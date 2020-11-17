@@ -175,7 +175,7 @@ export default {
             openedMenu: null,
             sitemapVisible: false,
             profileVisible: false,
-            defaultMenuList: [
+            defaultMenuList: computed(() => [
                 {
                     key: vm.$t('MENU.PROJECT.PROJECT'),
                     link: '/project',
@@ -244,7 +244,7 @@ export default {
                         },
                     ],
                 },
-            ],
+            ]),
             supportMenu: [
                 {
                     type: 'item',

@@ -115,6 +115,13 @@
 			"SELECT_COLLECTOR": "Select a Collector.",
 			"TITLE": "Collect Data"
 		},
+		"COMPONENTS": {
+			"FAVORITES": {
+				"FAVORITE_LIST": {
+					"NO_ITEM": "No Favorites"
+				}
+			}
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "Try going",
 			"404_GO_BACK_2": "back.",
@@ -747,6 +754,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER": "<b>1.</b> Name your project group first. <br>\n<b>2.</b> Register your project.",
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "Let's begin your resource management!",
 			"EMPTY_PROJECT_MSG": "Looks like you don't have any Project.",
+			"FAVORITES": "Favorites",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "Project Group Name",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "Create Project Group",

@@ -42,7 +42,7 @@ export const load = async ({ commit, state, rootState }): Promise<void|Error> =>
     const queryHelper = new QueryHelper() as QueryHelper;
     queryHelper.setFilter({
         k: 'name',
-        v: `console:${rootState.user.userType}:${rootState.user.userId}:favorite:${FAVORITE_TYPE}`,
+        v: `console:${rootState.user.userType}:${rootState.user.userId}:favorite:${FAVORITE_TYPE}:`,
         o: 'contain',
     }).setOnly('data');
 

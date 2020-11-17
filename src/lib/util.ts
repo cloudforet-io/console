@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
-import { ColorBindFactory } from '@/lib/view-helper';
-import { getCurrentInstance } from '@vue/composition-api';
 import { store } from '@/store';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
@@ -79,8 +77,13 @@ export const iso8601Formatter = (time?: string, timezone?: string) => {
     return '';
 };
 
-export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
-export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());
+const colorBindFactory = (colorMapping, textFnc) => value => ({
+    text: textFnc(value),
+    ...colorMapping[value],
+});
+
+export const serverStateFormatter = colorBindFactory(serverStateColor, value => value.toLowerCase());
+export const userStateFormatter = colorBindFactory(userStateColor, value => value.toLowerCase());
 
 export const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
@@ -137,13 +140,12 @@ export const isNotEmpty = (value): boolean => {
  *   @param root
  *   @returns
  */
-export const showErrorMessage = (errorTitle, error, root?) => {
-    const vmRoot = root || getCurrentInstance();
+export const showErrorMessage = (errorTitle, error, root) => {
     let errorMsg = '';
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
-    if (vmRoot) {
-        vmRoot.$notify({
+    if (root) {
+        root.$notify({
             group: 'toastTopCenter',
             type: 'alert',
             title: errorTitle,
@@ -161,10 +163,8 @@ export const showErrorMessage = (errorTitle, error, root?) => {
  *   @returns
  */
 export const showSuccessMessage = (successTitle, successMessage, root) => {
-    const vm = getCurrentInstance();
-    const vmRoot = root || vm;
-    if (vmRoot) {
-        vmRoot.$notify({
+    if (root) {
+        root.$notify({
             group: 'toastTopCenter',
             type: 'success',
             title: successTitle,

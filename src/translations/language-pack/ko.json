@@ -115,6 +115,13 @@
 			"SELECT_COLLECTOR": "컬렉터를 선택하세요.",
 			"TITLE": "데이터 수집"
 		},
+		"COMPONENTS": {
+			"FAVORITES": {
+				"FAVORITE_LIST": {
+					"NO_ITEM": "즐겨찾기가 설정되지 않았습니다."
+				}
+			}
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "뒤로 ",
 			"404_GO_BACK_2": "가기.",
@@ -747,6 +754,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER": "<b>1.</b> 프로젝트 그룹 이름을 지으세요. <br>\n<b>2.</b> 프로젝트를 등록하세요. ",
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "자원 관리를 시작해보세요! ",
 			"EMPTY_PROJECT_MSG": "프로젝트가 없습니다. ",
+			"FAVORITES": "즐겨찾기",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "프로젝트 그룹 이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 생성 ",
