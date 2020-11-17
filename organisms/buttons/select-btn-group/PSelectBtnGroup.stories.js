@@ -1,7 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { reactive, toRefs } from '@vue/composition-api';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
-import { makeItems } from '@/components/util/generator';
 
 export default {
     title: 'organisms/buttons/select-btn-group',
@@ -99,17 +98,26 @@ export const withTrHelper = () => ({
 </div>`,
     setup(_, { parent }) {
         const state = reactive({
-            btns: makeItems([
-                ['ip', 'IP'],
-                ['cidr', 'CIDR'],
-                ['mac', 'MAC'],
-                ['network', 'NETWORK'],
-                ['project', 'PROJECT'],
-                ['region', 'REGION', { disabled: true }],
-            ], {
-                styleType: 'primary',
-                outline: true,
-            }),
+            btns: [
+                {
+                    name: 'ip', label: 'IP', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'cidr', label: 'CIDR', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'mac', label: 'MAC', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'network', label: 'NETWORK', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'project', label: 'PROJECT', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'region', label: 'REGION', disabled: true, styleType: 'primary', outline: true,
+                },
+            ],
             selected: 'ip',
         });
         return {
@@ -138,17 +146,26 @@ export const scroll = () => ({
 </div>`,
     setup(_, { parent }) {
         const state = reactive({
-            btns: makeItems([
-                ['ip', 'IP'],
-                ['cidr', 'CIDR'],
-                ['mac', 'MAC'],
-                ['network', 'NETWORK'],
-                ['project', 'PROJECT'],
-                ['region', 'REGION', { disabled: true }],
-            ], {
-                styleType: 'primary',
-                outline: true,
-            }),
+            btns: [
+                {
+                    name: 'ip', label: 'IP', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'cidr', label: 'CIDR', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'mac', label: 'MAC', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'network', label: 'NETWORK', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'project', label: 'PROJECT', styleType: 'primary', outline: true,
+                },
+                {
+                    name: 'region', label: 'REGION', disabled: true, styleType: 'primary', outline: true,
+                },
+            ],
             selected: 'ip',
         });
         return {

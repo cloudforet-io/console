@@ -4,7 +4,6 @@ import {
 } from '@storybook/addon-knobs/vue';
 import PInfoPanel from '@/components/organisms/panels/info-panel/PInfoPanel.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import { makeItems } from '@/components/util/generator';
 
 export default {
     title: 'organisms/panel/InfoPanel',
@@ -75,13 +74,13 @@ export const withTRHelper = () => ({
 
     setup(props, context) {
         const sampleDefs = ref([
-            ['name', 'NAME'],
-            ['state', 'STATE', { copyFlag: true }],
-            ['primary_ip_address', 'P', { copyFlag: true }],
+            { name: 'id', label: 'ID', copyFlag: true },
+            { name: 'name', label: 'NAME', copyFlag: true },
+            { name: 'state', label: 'STATE', copyFlag: true },
         ]);
         return {
             renderTitle: 'Information',
-            defs: makeItems(sampleDefs.value),
+            defs: sampleDefs.value,
             item: {
                 name: '펭수',
                 state: '하태하태',

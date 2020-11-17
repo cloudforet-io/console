@@ -1,7 +1,6 @@
 import { computed, ref } from '@vue/composition-api';
 import PanelContent from '@/components/molecules/panel/panel-content/PPanelContent.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import { makeItems } from '@/components/util/generator';
 
 export default {
     title: 'molecules/panel/panelContents',
@@ -65,10 +64,9 @@ export const CaseInUseTrHelper = () => ({
                 </div>`,
     setup(props, context) {
         const sampleDefs = ref([
-            ['id', 'ID', { copyFlag: true }],
-            ['name', 'NAME', { copyFlag: true }],
-            ['state', 'STATE', { copyFlag: true }],
-
+            { name: 'id', label: 'ID', copyFlag: true },
+            { name: 'name', label: 'NAME', copyFlag: true },
+            { name: 'state', label: 'STATE', copyFlag: true },
         ]);
         return {
             item: {
@@ -76,7 +74,7 @@ export const CaseInUseTrHelper = () => ({
                 state: 'Disabled',
                 name: 'Project Group APAC',
             },
-            defs: computed(() => makeItems(sampleDefs.value)),
+            defs: computed(() => sampleDefs.value),
         };
     },
 
