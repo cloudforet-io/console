@@ -60,4 +60,6 @@ export interface FavoriteButtonProps {
     favoriteType: string;
     resourceType: string;
     itemMap: any;
+    scale?: string;
+    readOnly?: boolean;
 }

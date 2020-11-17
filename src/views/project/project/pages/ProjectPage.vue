@@ -43,7 +43,14 @@
                           use-total-count
                           :total-count="totalCount"
             >
-                <template #extra-area>
+                <template #extra>
+                    <span class="favorite-btn-wrapper">
+                        <favorite-button v-if="projectState.groupId" :item-id="projectState.groupId"
+                                         favorite-type="projectGroup"
+                                         resource-type="identity.Project"
+                                         scale="0.75"
+                        />
+                    </span>
                     <div class="btns">
                         <p-icon-text-button v-if="!projectState.groupId"
                                             style-type="primary-dark"
@@ -148,11 +155,13 @@ import {
     ProjectGroup, ProjectItemResp, ProjectState, ProjectTreeItem,
 } from '@/views/project/project/type';
 import ProjectCardList from '@/views/project/project/modules/ProjectCardList.vue';
+import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
 
 export default {
     name: 'ProjectPage',
     components: {
+        FavoriteButton,
         ProjectCardList,
         PPageNavigation,
         PDropdownMenuBtn,
@@ -355,7 +364,11 @@ export default {
 
 
         const init = async () => {
-            await vm.$store.dispatch('resource/provider/load');
+            await Promise.all([
+                vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('favorite/projectGroup/load'),
+                vm.$store.dispatch('favorite/project/load'),
+            ]);
 
             const groupId = vm.$route.query.select_pg as string;
 
@@ -420,9 +433,12 @@ export default {
 }
 
 .p-page-title::v-deep {
-    @apply flex w-full pb-5 border-b border-gray-200;
+    @apply pb-5 border-b border-gray-200;
     .extra {
-        @apply inline-flex flex-grow justify-between items-center;
+        @apply justify-between;
+    }
+    .favorite-btn-wrapper {
+        @apply ml-2;
     }
     .btns {
         @apply inline-flex items-center;

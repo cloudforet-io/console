@@ -1,20 +1,18 @@
 <template>
     <div>
-        <header>
-            <p-page-title :title="title"
-                          :child="mode === 'READ' || firstCreate"
-                          @goBack="$router.go(-1)"
-            >
-                <template #extra>
-                    <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
-                                   :disabled="disabledState.visible" @click="onClickDelete"
-                    />
-                    <p-icon-button v-if="mode === 'READ'" name="ic_edit-text"
-                                   :disabled="disabledState.visible" @click="onClickNameEdit"
-                    />
-                </template>
-            </p-page-title>
-        </header>
+        <p-page-title :title="title"
+                      :child="mode === 'READ' || firstCreate"
+                      @goBack="$router.go(-1)"
+        >
+            <template #extra>
+                <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
+                               :disabled="disabledState.visible" @click="onClickDelete"
+                />
+                <p-icon-button v-if="mode === 'READ'" name="ic_edit-text"
+                               :disabled="disabledState.visible" @click="onClickNameEdit"
+                />
+            </template>
+        </p-page-title>
 
         <section>
             <div v-if="mode === 'READ'" class="section-wrapper">

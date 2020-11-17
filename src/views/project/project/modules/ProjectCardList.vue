@@ -130,7 +130,6 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { range } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
-import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
 interface Props {
@@ -190,10 +189,6 @@ export default {
                 name: 'serviceAccount',
                 query: { provider: getProvider(provider) ? provider : null },
             });
-        };
-
-        const loadProjectFavorites = async () => {
-            await vm.$store.dispatch('favorite/project/load');
         };
 
         const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
@@ -290,10 +285,6 @@ export default {
             }
         }, { immediate: false });
 
-        /* Init */
-        (async () => {
-            await loadProjectFavorites();
-        })();
 
         return {
             ...toRefs(state),

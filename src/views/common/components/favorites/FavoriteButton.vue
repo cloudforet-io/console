@@ -1,8 +1,11 @@
 <template>
-    <p-i name="ic_bookmark" width="1rem" height="1rem"
+    <p-i v-show="readOnly ? active : true"
+         name="ic_bookmark"
+         width="1rem" height="1rem"
+         :scale="scale"
          color="transparent inherit"
          class="favorite-btn"
-         :class="{active}"
+         :class="{active, 'read-only': readOnly}"
          @click.prevent="onClickProjectFavorite"
     />
 </template>
@@ -30,6 +33,14 @@ export default {
             type: String,
             required: true,
         },
+        scale: {
+            type: String,
+            default: '1',
+        },
+        readOnly: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: FavoriteButtonProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -39,6 +50,7 @@ export default {
         });
 
         const onClickProjectFavorite = async () => {
+            if (props.readOnly) return;
             if (state.itemMap[props.itemId]) {
                 await vm.$store.dispatch(`favorite/${props.favoriteType}/removeItem`, { id: props.itemId });
             } else {
@@ -59,11 +71,18 @@ export default {
 <style lang="postcss" scoped>
 .favorite-btn {
     @apply text-gray-200;
+    transition: transform 0.5s;
+    &:not(.read-only) {
+        cursor: pointer;
+        &:hover {
+            transform: scale(1.4);
+            &:not(.active) {
+                @apply text-gray-300;
+            }
+        }
+    }
     &.active {
         @apply text-yellow-500;
-    }
-    &:hover {
-        transform: scale(1.4);
     }
 }
 </style>

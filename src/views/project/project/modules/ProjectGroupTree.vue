@@ -25,7 +25,15 @@
                      :height="toggleSize"
                 />
             </template>
-            <template #toggle-right>
+            <template #toggle-right="{data}">
+                <favorite-button :item-id="data.id"
+                                 favorite-type="projectGroup"
+                                 resource-type="identity.Project"
+                                 scale="0.75"
+                                 read-only
+                />
+            </template>
+            <template #icon>
                 <p-i name="ic_tree_project-group" class="project-group-icon"
                      width="1rem" height="1rem" color="inherit transparent"
                 />
@@ -62,6 +70,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import {
     ProjectGroup, ProjectItemResp, ProjectState, ProjectTreeItem,
 } from '@/views/project/project/type';
+import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
 interface TreeSearchResp {
     // eslint-disable-next-line camelcase
@@ -99,7 +108,11 @@ const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): Projec
 export default {
     name: 'ProjectGroupTree',
     components: {
-        PTree, PIconButton, PI, PTreeNode,
+        FavoriteButton,
+        PTree,
+        PIconButton,
+        PI,
+        PTreeNode,
     },
     props: {
         projectState: {

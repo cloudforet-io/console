@@ -4,19 +4,16 @@
             <p-page-navigation :routes="routeState.routes" />
         </div>
         <p-page-title class="mb-6"
-                      :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
                       child
                       @goBack="onClickGoBack"
         >
-            <template #before-title>
-                <div class="icon">
-                    <img v-if="providerIcon"
-                         width="32px" height="32px"
-                         :src="providerIcon" :alt="provider"
-                    >
-                    <p-i v-else name="ic_provider_other"
-                         width="32px" height="32px"
+            <template #title>
+                <div class="page-title">
+                    <p-lazy-img class="icon" :src="providerIcon" :alt="provider"
+                                :loading="providerLoading"
+                                error-icon="ic_provider_other"
                     />
+                    {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE') }}
                 </div>
             </template>
         </p-page-title>
@@ -162,10 +159,12 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        PLazyImg,
         PTab,
         PTextInput,
         PJsonSchemaForm,
@@ -193,6 +192,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            providerLoading: true,
             providerObj: {} as ProviderModel,
             serviceAccountId: '',
             providerIcon: computed(() => get(state.providerObj, 'tags.icon', '')),
@@ -278,11 +278,20 @@ export default {
         const projectRef = ref<any>(null);
 
         const getProvider = async () => {
-            const res = await SpaceConnector.client.identity.provider.get({
-                provider: props.provider,
-            });
-            state.providerObj = res;
-            state.selectedSecretType = res.capability.supported_schema[0];
+            state.providerLoading = true;
+            try {
+                const res = await SpaceConnector.client.identity.provider.get({
+                    provider: props.provider,
+                });
+                state.providerObj = res;
+                state.selectedSecretType = res.capability.supported_schema[0];
+            } catch (e) {
+                console.error(e);
+                state.providerObj = {};
+                state.selectedSecretType = ''
+            } finally {
+                state.providerLoading = false;
+            }
         };
         const getCredentialNames = async () => {
             const res = await SpaceConnector.client.secret.secret.list({
@@ -426,12 +435,10 @@ export default {
 
 <style lang="postcss" scoped>
 .add-service-account-container {
-    .p-page-title {
+    .page-title {
+        @apply flex items-center;
         .icon {
-            display: inline-block;
-            margin-left: 0.5rem;
             margin-right: 0.5rem;
-            margin-top: -0.25rem;
         }
     }
     .p-pane-layout {
