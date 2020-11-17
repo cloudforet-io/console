@@ -58,6 +58,7 @@ export default {
             fields: computed(() => [
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_ID'), name: 'collector_id' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_NAME'), name: 'name' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_VERSION'), name: 'plugin_info.version' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PROVIDER'), name: 'provider' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PRIORITY'), name: 'priority' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.options.supported_resource_type' },

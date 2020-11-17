@@ -397,6 +397,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"FAVORITES": "Favorites",
 				"REGION": "Region",
 				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Provider",
@@ -636,6 +637,7 @@
 				"DETAILS_BASE_LABEL_PRIORITY": "Priority",
 				"DETAILS_BASE_LABEL_PROVIDER": "Provider",
 				"DETAILS_BASE_LABEL_RESOURCE_TYPE": "Resource Type",
+				"DETAILS_BASE_LABEL_VERSION": "Version",
 				"DETAILS_BASE_TITLE": "Base Information",
 				"DETAILS_FILTER_TITLE": "Filter Format",
 				"DISABLE": "Disable",

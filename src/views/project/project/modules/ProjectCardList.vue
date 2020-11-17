@@ -62,18 +62,18 @@
                         {{ item.name }}
                     </p>
                     <div class="project-summary">
-                        <div v-if="cardSummary[item.project_id]" class="summary-item">
-                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
-                            <span class="summary-item-num">{{ cardSummary[item.project_id].serverCount }}</span>
-                            <span class="mx-2 text-gray-300 divider">|</span>
-                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}
-                                <span class="summary-item-num">{{ cardSummary[item.project_id].cloudServiceCount }}</span></span><br>
-                        </div>
-                        <template v-else>
+                        <template v-if="cardSummaryLoading">
                             <div v-for="v in skeletons" :key="v" class="skeleton-loading">
                                 <p-skeleton />
                             </div>
                         </template>
+                        <span v-else>
+                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
+                            <span class="summary-item-num">{{ cardSummary[item.project_id] ? cardSummary[item.project_id].serverCount : 'N/A' }}</span>
+                            <span class="mx-2 text-gray-300 divider">|</span>
+                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
+                            <span class="summary-item-num">{{ cardSummary[item.project_id] ? cardSummary[item.project_id].cloudServiceCount : 'N/A' }}</span>
+                        </span>
                     </div>
                 </div>
 
@@ -173,6 +173,7 @@ export default {
             items: [],
             totalCount: 0,
             loading: true,
+            cardSummaryLoading: true,
             thisPage: 1,
             pageSize: 24,
             allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
@@ -232,6 +233,7 @@ export default {
                     };
                 });
             } catch (e) { console.error(e); }
+
             return cardSummary;
         };
 
@@ -245,15 +247,18 @@ export default {
             // create a new token for upcoming request (overwrite the previous one)
             listProjectToken = axios.CancelToken.source();
             state.loading = true;
+            state.cardSummaryLoading = true;
             try {
                 let res;
                 if (id) res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 else res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
+                state.loading = false;
 
                 state.cardSummary = await getCardSummary(res.results);
+                state.cardSummaryLoading = false;
+
                 state.items = res.results;
                 state.totalCount = res.total_count;
-                state.loading = false;
                 listProjectToken = undefined;
 
                 vm.$emit('list', state.totalCount);
@@ -262,6 +267,7 @@ export default {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
+                    state.cardSummaryLoading = false;
                     vm.$emit('list', state.totalCount);
                 } else console.error(e);
             }

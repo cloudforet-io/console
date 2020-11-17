@@ -397,6 +397,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
+				"FAVORITES": "즐겨찾기",
 				"REGION": "리전 ",
 				"SERVICE_CATEGORY": "서비스 카테고리",
 				"SERVICE_PROVIDER": "서비스 제공자",
@@ -636,6 +637,7 @@
 				"DETAILS_BASE_LABEL_PRIORITY": "우선 순위",
 				"DETAILS_BASE_LABEL_PROVIDER": "프로바이더",
 				"DETAILS_BASE_LABEL_RESOURCE_TYPE": "리소스 타입",
+				"DETAILS_BASE_LABEL_VERSION": "버전",
 				"DETAILS_BASE_TITLE": "기본 정보",
 				"DETAILS_FILTER_TITLE": "필터 포맷",
 				"DISABLE": "비활성화",

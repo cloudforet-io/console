@@ -135,7 +135,7 @@ import { get } from 'lodash';
 
 import { Component } from 'vue/types/umd';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
@@ -203,13 +203,14 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            fields: [
+            fields: computed(() => [
                 { name: 'name', label: 'Name', width: '14rem' },
                 { name: 'state', label: 'State' },
+                { name: 'plugin_info.version', label: 'Version', width: '5.5rem' },
                 { name: 'priority', label: 'Priority', width: '5.5rem' },
                 { name: 'last_collected_at', label: 'Last Collected', width: '9rem' },
                 { name: 'created_at', label: 'Created', width: '9rem' },
-            ],
+            ]),
             excelFields: [
                 { key: 'name', name: 'Name' },
                 { key: 'state', name: 'State' },

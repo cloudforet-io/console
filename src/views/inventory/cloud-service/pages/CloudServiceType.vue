@@ -1,66 +1,85 @@
 <template>
     <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <p class="sidebar-title">
-                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
-            </p>
-            <p-hr class="sidebar-divider" />
-            <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                <p-hr v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
-                <p-radio v-model="selectedProvider" :value="provider.provider">
-                    <template #radio-left>
-                        <img v-if="provider.icon"
-                             :src="provider.icon"
-                             :alt="provider.provider"
-                             class="provider-icon"
-                        >
-                        <p-i v-else name="ic_provider_other"
-                             class="provider-icon"
-                        />
-                        <span class="provider-name">{{ provider.label }}</span>
-                    </template>
-                    <template #icon="{ iconName }">
-                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
-                             :name="iconName"
-                        />
-                    </template>
-                </p-radio>
-            </div>
-            <p class="sidebar-title">
-                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY') }}
-            </p>
-            <p-hr class="sidebar-divider" />
-            <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
-                 :class="{selected: checked}"
-                 class="service-categories"
-            >
-                <p-check-box :selected="filterState.serviceFilter" :value="service"
-                             @change="onClickService(service, ...arguments)"
-                >
-                    <span class="service">{{ service }}</span>
-                </p-check-box>
-            </div>
-            <p id="region-title">
-                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.REGION') }}
-            </p>
-            <p-hr class="sidebar-divider" />
-            <div v-if="filterState.regionList.length === 0">
-                <p class="no-region">
-                    No Region
+            <div :style="{width}">
+                <p class="sidebar-title">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }}
                 </p>
-            </div>
-            <div v-for="(region, idx) in filterState.regionList" :key="idx"
-                 :class="{selected: region}" class="region-list"
-            >
-                <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
-                             @change="onClickRegion(region, ...arguments)"
-                />
-                <span class="region-list-text">
-                    <span class="region-type">
-                        [{{ region.region_type }}] {{ region.name }} <br>
+                <p-hr class="sidebar-divider" />
+                <favorite-list :items="favoriteItems" @delete="onFavoriteDelete">
+                    <template #icon="{item}">
+                        <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
+                             width="1rem" height="1rem" color="inherit transparent"
+                        />
+                    </template>
+                </favorite-list>
+
+                <p class="sidebar-title">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
+                </p>
+                <p-hr class="sidebar-divider" />
+                <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
+                    <p-hr v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
+                    <p-radio v-model="selectedProvider" :value="provider.provider">
+                        <template #radio-left>
+                            <img v-if="provider.icon"
+                                 :src="provider.icon"
+                                 :alt="provider.provider"
+                                 class="provider-icon"
+                            >
+                            <p-i v-else name="ic_provider_other"
+                                 class="provider-icon"
+                            />
+                            <span class="provider-name">{{ provider.label }}</span>
+                        </template>
+                        <template #icon="{ iconName }">
+                            <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
+                                 :name="iconName"
+                            />
+                        </template>
+                    </p-radio>
+                </div>
+                <p class="sidebar-title">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY') }}
+                </p>
+                <p-hr class="sidebar-divider" />
+                <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
+                     :class="{selected: checked}"
+                     class="service-categories"
+                >
+                    <p-check-box :selected="filterState.serviceFilter" :value="service"
+                                 @change="onClickService(service, ...arguments)"
+                    >
+                        <span class="service">{{ service }}</span>
+                    </p-check-box>
+                </div>
+                <p id="region-title">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.REGION') }}
+                </p>
+                <p-hr class="sidebar-divider" />
+                <div v-if="filterState.regionList.length === 0">
+                    <p class="no-region">
+                        No Region
+                    </p>
+                </div>
+                <div v-for="(region, idx) in getSortedRegions(filterState.regionList)" :key="idx"
+                     :class="{selected: region}" class="region-list"
+                >
+                    <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
+                                 @change="onClickRegion(region, ...arguments)"
+                    />
+                    <span class="region-list-text">
+                        <div class="region-type">
+                            <span class="region-provider"
+                                  :style="{color: providers[region.region_type.toLocaleLowerCase()] ? providers[region.region_type.toLocaleLowerCase()].color : undefined}"
+                            >
+                                {{ providers[region.region_type.toLocaleLowerCase()] ? providers[region.region_type.toLocaleLowerCase()].label : region.region_type }}
+                            </span>
+                            {{ region.name }}
+                        </div>
+                        <span class="region-code">{{ region.region_code }} </span>
                     </span>
-                    <span class="region-code">{{ region.region_code }} </span>
-                </span>
+                </div>
             </div>
         </template>
         <template #default>
@@ -71,19 +90,18 @@
                           class="page-title"
             />
             <p-hr class="cloud-service-divider" />
-            <div class="cloud-services">
-                <p-search-grid-layout
-                    :items="items"
-                    :card-class="cardClass"
-                    :loading="loading"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
-                    :total-count="totalCount"
-                    :query-tags="tags"
-                    :key-items="keyItems"
-                    :value-handler-map="valueHandlerMap"
-                    @change="onChange"
-                    @refresh="onChange"
+            <div class="cloud-service-list-container">
+                <p-search-grid-layout :items="items"
+                                      :card-class="cardClass"
+                                      :loading="loading"
+                                      :this-page.sync="thisPage"
+                                      :page-size.sync="pageSize"
+                                      :total-count="totalCount"
+                                      :query-tags="tags"
+                                      :key-items="keyItems"
+                                      :value-handler-map="valueHandlerMap"
+                                      @change="onChange"
+                                      @refresh="onChange"
                 >
                     <template #toolbox-left>
                         <p-check-box v-model="filterState.showAllCloudServices">
@@ -91,29 +109,32 @@
                         </p-check-box>
                     </template>
                     <template #card="{item}">
-                        <router-link :to="getToCloudService(item)">
-                            <div class="left">
-                                <p-lazy-img width="3rem" height="3rem"
-                                            :src="item.icon || (providers[item.provider] ? providers[item.provider].icon : '')"
-                                            error-icon="ic_provider_other"
-                                            :alt="item.name"
-                                />
-                                <div class="text-content">
-                                    <div class="title">
-                                        {{ item.cloud_service_group }}
-                                    </div>
-                                    <div class="sub-title">
-                                        <span class="sub-title-provider"> {{ item.provider }} </span>
-                                        <span class="sub-title-divider">
-                                            |
-                                        </span>
-                                        <span class="sub-title-name">{{ item.cloud_service_type }}</span>
-                                        <span class="sub-title-count">
-                                            {{ item.count }}
-                                        </span>
-                                    </div>
+                        <router-link :to="getToCloudService(item)" class="item-wrapper">
+                            <p-lazy-img width="3rem" height="3rem"
+                                        :src="item.icon || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                        error-icon="ic_provider_other"
+                                        :alt="item.name"
+                                        class="icon"
+                            />
+                            <div class="text-content">
+                                <div class="title">
+                                    {{ item.cloud_service_group }}
+                                </div>
+                                <div class="sub-title">
+                                    <span class="sub-title-provider"
+                                          :style="{color: providers[item.provider] ? providers[item.provider].color : undefined }"
+                                    > {{ providers[item.provider] ? providers[item.provider].label : item.provider }} </span>
+                                    <span class="sub-title-name">{{ item.cloud_service_type }}</span>
+                                    <span class="sub-title-count">
+                                        {{ item.count }}
+                                    </span>
                                 </div>
                             </div>
+                            <favorite-button :item-id="item.cloud_service_type_id || ''"
+                                             favorite-type="cloudServiceType"
+                                             resource-type="identity.CloudService"
+                                             class="favorite-btn"
+                            />
                         </router-link>
                     </template>
                     <template #no-data>
@@ -148,7 +169,9 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { Location } from 'vue-router';
-import { zipObject, debounce, range } from 'lodash';
+import {
+    zipObject, debounce, range, sortBy,
+} from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 
 import {
@@ -182,6 +205,9 @@ import {
 import { Filter } from '@/lib/space-connector/type';
 import { Tags, TimeStamp } from '@/models';
 import { store } from '@/store';
+import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
+import { FavoriteItem } from '@/store/modules/favorite/type';
+import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
 
 interface RegionModel extends Tags {
@@ -199,6 +225,8 @@ interface RegionModel extends Tags {
 export default {
     name: 'CloudServiceType',
     components: {
+        FavoriteButton,
+        FavoriteList,
         PLazyImg,
         PPagination,
         PHr,
@@ -255,7 +283,7 @@ export default {
         const state = reactive({
             items: [] as any,
             providerName: 'All',
-            cardClass: () => ['card-item', 'cloud-service-type-list'],
+            cardClass: () => ['card-item', 'cloud-service-type-item'],
             loading: true,
             keyItems: handlers.keyItems as KeyItem[],
             valueHandlerMap: handlers.valueHandlerMap,
@@ -263,8 +291,15 @@ export default {
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => vm.$store.state.resource.provider.items),
+            favoriteItems: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
         });
+
+        const getSortedRegions = items => sortBy(items, d => d.region_type);
+
+        const onFavoriteDelete = (item: FavoriteItem) => {
+            vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
+        };
 
         const getRegionQuery = (value) => {
             const regionQuery = new QueryHelper();
@@ -450,7 +485,7 @@ export default {
         };
 
         const init = async () => {
-            await store.dispatch('resource/provider/load');
+            await Promise.all([vm.$store.dispatch('resource/provider/load'), vm.$store.dispatch('favorite/cloudServiceType/load')]);
             const providerQueryString = await initProvider();
             if (providerQueryString) {
                 selectedProvider.value = providerQueryString.toString();
@@ -476,6 +511,8 @@ export default {
             onClickRegion,
             ...toRefs(routeState),
             ...toRefs(state),
+            getSortedRegions,
+            onFavoriteDelete,
             selectedProvider,
             providerState,
             getToCloudService,
@@ -489,169 +526,163 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .sidebar-title {
-        @apply text-gray-500 text-sm font-bold;
-        padding-top: 2rem;
-        padding-left: 1rem;
-    }
-    #region-title {
-        @apply text-gray-500 text-sm font-bold;
-        padding-top: 1.375rem;
-        padding-left: 1rem;
-    }
-    .sidebar-divider {
-        @apply w-full;
-        padding-left: 0;
-        margin-top: 0.5625rem;
-        margin-bottom: 1rem;
-    }
+.sidebar-title {
+    @apply text-gray-500 text-sm font-bold;
+    padding-top: 2rem;
+    padding-left: 1rem;
+}
+#region-title {
+    @apply text-gray-500 text-sm font-bold;
+    padding-top: 1.375rem;
+    padding-left: 1rem;
+}
+.sidebar-divider {
+    @apply w-full;
+    padding-left: 0;
+    margin-top: 0.5625rem;
+    margin-bottom: 1rem;
+}
 
-    .provider-list {
-        @apply justify-between text-sm;
-        padding-left: 1rem;
-        padding-right: 1.1875rem;
-        line-height: 1.5rem;
-        .provider-divider {
-            @apply bg-gray-100;
-            margin-top: 0.625rem;
-            margin-bottom: 0.5625rem;
-        }
-        .provider-name {
-            display: inline-block;
-            cursor: pointer;
-        }
-        .provider-icon {
-            @apply inline justify-start;
-            width: 1.5rem;
-            height: 1.5rem;
-            cursor: pointer;
-            margin-right: 0.5625rem;
-        }
-        .provider-radio-btn {
-            @apply float-right;
-        }
+.provider-list {
+    @apply justify-between text-sm;
+    padding-left: 1rem;
+    padding-right: 1.1875rem;
+    line-height: 1.5rem;
+    .provider-divider {
+        @apply bg-gray-100;
+        margin-top: 0.625rem;
+        margin-bottom: 0.5625rem;
     }
-    .no-region {
-        @apply text-gray-400 text-sm;
-        padding-left: 1rem;
+    .provider-name {
+        display: inline-block;
+        cursor: pointer;
     }
-    .region-list {
-        display: flex;
-        margin-left: 1rem;
+    .provider-icon {
+        @apply inline justify-start;
+        width: 1.5rem;
+        height: 1.5rem;
+        cursor: pointer;
+        margin-right: 0.5625rem;
     }
-    .region-list-text {
-        @apply text-sm;
-        margin-bottom: 0.875rem;
-        display: flex;
-        flex-direction: column;
+    .provider-radio-btn {
+        @apply float-right;
+    }
+}
+.no-region {
+    @apply text-gray-400 text-sm;
+    padding-left: 1rem;
+}
+.region-list {
+    display: flex;
+    padding-left: 1rem;
+    width: 100%;
+}
+.region-list-text {
+    @apply text-sm;
+    margin-bottom: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    &:hover {
+        @apply text-secondary cursor-pointer;
+    }
+    .region-type {
+        padding-left: 0.25rem;
+    }
+    .region-provider {
+        @apply mr-1;
+    }
+    .region-code {
+        @apply text-gray-400;
+        padding-left: 0.25rem;
+    }
+}
+.service-categories {
+    @apply text-sm;
+    margin-left: 1rem;
+    padding-bottom: 0.625rem;
+    .service {
+        padding-left: 0.25rem;
         &:hover {
             @apply text-secondary cursor-pointer;
         }
-        .region-type {
-            padding-left: 0.25rem;
-        }
-        .region-code {
-            @apply text-gray-400;
-            padding-left: 0.25rem;
-        }
     }
-    .service-categories {
-        @apply text-sm;
-        margin-left: 1rem;
-        padding-bottom: 0.625rem;
-        .service {
-            padding-left: 0.25rem;
-            &:hover {
-                @apply text-secondary cursor-pointer;
+}
+.show-all {
+    @apply text-sm mr-2;
+    line-height: 2rem;
+}
+.cloud-service-divider {
+    @apply w-full;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.cloud-service-list-container {
+    >>> .cloud-service-type-item {
+        @apply px-6 bg-white border border-gray-200;
+        height: 6rem;
+        filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
+        border-radius: 4px;
+        &:hover {
+            @apply bg-blue-100;
+            cursor: pointer;
+        }
+        .item-wrapper {
+            @apply flex w-full h-full items-center;
+            .icon {
+                @apply overflow-hidden flex-shrink-0;
+                border-radius: 4px;
             }
-        }
-    }
-    .show-all {
-        @apply text-sm mr-2;
-        line-height: 2rem;
-    }
-    .cloud-service-divider {
-        @apply w-full;
-        margin-top: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    .cloud-services {
-        >>> .cloud-service-type-list {
-            @apply border border-gray-200 rounded overflow-visible;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-
-            a {
-                @apply px-6 py-6 pb-5 bg-white flex flex-row justify-between items-center rounded overflow-hidden;
-
-                &:hover {
-                    @apply bg-blue-100;
-                    cursor: pointer;
+            .text-content {
+                @apply ml-4 flex-grow overflow-hidden;
+                .title {
+                    @apply mb-1 w-full truncate;
+                    font-size: 1rem;
+                    line-height: 1.2;
                 }
-            }
+                .sub-title {
+                    @apply w-full flex items-center;
+                    font-size: 0.875rem;
+                    line-height: 1.5;
 
-            .left {
-                @apply flex items-center w-full content-between;
-
-                img {
-                    @apply rounded-sm overflow-hidden flex-shrink-0;
-                }
-
-                .text-content {
-                    @apply ml-4 flex-grow overflow-hidden;
-
-                    .title {
-                        padding-bottom: 0.3rem;
-                        font-size: 1rem;
+                    .sub-title-provider {
+                        @apply mr-2;
+                        flex-shrink: 0;
                     }
 
-                    .sub-title {
-                        @apply text-gray-500 flex;
-                        font-size: 0.875rem;
-                        line-height: 150%;
+                    .sub-title-name {
+                        @apply mr-2 inline-block truncate;
+                        font-size: 0.75rem;
+                        flex-shrink: 1;
+                    }
 
-                        .sub-title-provider {
-                            @apply text-gray-300;
-                            flex-shrink: 2;
-                            margin-right: 0.125rem;
-                        }
-
-                        .sub-title-divider {
-                            @apply text-gray-200;
-                            margin-right: 0.125rem;
-                        }
-
-                        .sub-title-name {
-                            @apply text-gray-500 truncate inline-block;
-                            flex-shrink: 1;
-                            margin-right: 0.125rem;
-                        }
-
-                        .sub-title-count {
-                            @apply font-bold text-base;
-                            flex-shrink: 2;
-                        }
+                    .sub-title-count {
+                        flex-shrink: 0;
+                        font-size: 0.75rem;
+                        font-weight: bold;
                     }
                 }
             }
-
-            &:hover {
-                @apply border-gray-200 bg-blue-100;
-                cursor: pointer;
+            .favorite-btn {
+                @apply ml-2;
+                flex-shrink: 0;
             }
         }
     }
-    .page-title {
-        margin-bottom: 0;
+}
+
+
+.page-title {
+    margin-bottom: 0;
+}
+.empty-cloud-service {
+    @apply w-full h-full;
+    .empty-cloud-service-img {
+        @apply w-48 mx-auto pt-19 mb-8;
     }
-    .empty-cloud-service {
-        @apply w-full h-full;
-        .empty-cloud-service-img {
-            @apply w-48 mx-auto pt-19 mb-8;
-        }
-    }
-    .pagination {
-        text-align: center;
-        padding-top: 1.5rem;
-        bottom: 0;
-    }
+}
+.pagination {
+    text-align: center;
+    padding-top: 1.5rem;
+    bottom: 0;
+}
 </style>
