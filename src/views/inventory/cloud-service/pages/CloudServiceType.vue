@@ -71,9 +71,9 @@
                     <span class="region-list-text">
                         <div class="region-type">
                             <span class="region-provider"
-                                  :style="{color: providers[region.region_type.toLocaleLowerCase()] ? providers[region.region_type.toLocaleLowerCase()].color : undefined}"
+                                  :style="{color: providers[region.provider] ? providers[region.provider].color : undefined}"
                             >
-                                {{ providers[region.region_type.toLocaleLowerCase()] ? providers[region.region_type.toLocaleLowerCase()].label : region.region_type }}
+                                {{ providers[region.provider] ? providers[region.provider].label : region.provider }}
                             </span>
                             {{ region.name }}
                         </div>
@@ -218,7 +218,7 @@ interface RegionModel extends Tags {
     domain_id: string;
     deleted_at: TimeStamp;
     region_code: string;
-    region_type: string;
+    provider: string;
     collection_info: object;
 }
 
@@ -295,7 +295,7 @@ export default {
             favoriteItems: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
         });
 
-        const getSortedRegions = items => sortBy(items, d => d.region_type);
+        const getSortedRegions = items => sortBy(items, d => d.provider);
 
         const onFavoriteDelete = (item: FavoriteItem) => {
             vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
@@ -304,7 +304,7 @@ export default {
         const getRegionQuery = (value) => {
             const regionQuery = new QueryHelper();
             regionQuery.setFilter({
-                k: 'region_type',
+                k: 'provider',
                 v: value,
                 o: 'contain',
             });

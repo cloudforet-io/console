@@ -10,9 +10,9 @@
             <div v-if="!loading" class="resource-info-wrapper">
                 <div class="resource-info-title">
                     <span class="resource-info-provider"
-                          :style="{color: providers[selectedProvider.toLowerCase()] ? providers[selectedProvider.toLowerCase()].color : undefined }"
+                          :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
                     >
-                        {{ providers[selectedProvider.toLowerCase()].label }} </span>
+                        {{ providers[selectedProvider].label }} </span>
                     <span class="resource-info-region">{{ selectedRegion }}</span>
                 </div>
                 <div v-if="Object.keys(filteredData).length > 10">
@@ -22,7 +22,7 @@
                             <span class="label-number">{{ Object.values(filteredData)[i] }}</span>
                         </div>
                         <p-progress-bar :percentage="(Object.values(filteredData)[i] / maxValue) * 100"
-                                        class="progress-bar" :class="selectedProvider.toLowerCase()"
+                                        class="progress-bar" :class="selectedProvider"
                         />
                     </div>
                 </div>
@@ -32,7 +32,7 @@
                             <span class="label-text">{{ Object.keys(filteredData)[i-1] }}</span>
                             <span class="label-number">{{ Object.values(filteredData)[i-1] }}</span>
                         </div>
-                        <p-progress-bar :percentage="(Object.values(filteredData)[i-1] / maxValue) * 100" :class="selectedProvider.toLowerCase()" />
+                        <p-progress-bar :percentage="(Object.values(filteredData)[i-1] / maxValue) * 100" :class="selectedProvider" />
                     </div>
                 </div>
             </div>
@@ -61,10 +61,9 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
-import { coral } from '@/components/styles/colors';
+import { coral, gray } from '@/components/styles/colors';
 
 am4core.useTheme(am4themes_animated);
-const colorSet = new am4core.ColorSet();
 
 export default {
     name: 'ResourceMap',
@@ -84,7 +83,7 @@ export default {
             chartRef: null as HTMLElement|null,
             data: [] as any,
             filteredData: [] as any,
-            selectedProvider: 'AWS',
+            selectedProvider: 'aws',
             selectedRegion: 'Asia Pacific (Seoul)',
             providerColor: '#FF9900',
             loading: true,
@@ -124,7 +123,7 @@ export default {
             });
         };
 
-        const toggleMarker = (coords, marker) => {
+        const drawMarker = (coords, marker) => {
             marker.latitude = coords.latitude;
             marker.longitude = coords.longitude;
         };
@@ -141,7 +140,7 @@ export default {
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['AQ'];
-            polygonSeries.mapPolygons.template.fill = am4core.color('#E5E5E8');
+            polygonSeries.mapPolygons.template.fill = am4core.color(gray[200]);
             polygonSeries.calculateVisualCenter = true;
 
             const resp = await SpaceConnector.client.inventory.region.list();
@@ -150,7 +149,7 @@ export default {
                     title: d.name,
                     latitude: parseInt(d.tags.latitude),
                     longitude: parseInt(d.tags.longitude),
-                    color: props.providers[d.region_type.toLowerCase()].color as string,
+                    color: props.providers[d.provider].color as string,
                     ...d,
                 })),
             ];
@@ -179,27 +178,31 @@ export default {
             mapMarker.height = 34;
             mapMarker.scale = 0.7;
             mapMarker.fill = am4core.color(coral[600]);
-            mapMarker.fillOpacity = 0.8;
+            mapMarker.fillOpacity = 1;
             mapMarker.horizontalCenter = 'middle';
             mapMarker.verticalCenter = 'bottom';
 
-            const marker = mapImage.create();
+            // const mapLabel = mapImageTemplate.createChild(am4core.Label);
 
-            const originCoords = { longitude: 126.871867, latitude: 37.528547 };
+            // mapLabel.horizontalCenter = 'middle';
+            // mapLabel.text = state.selectedRegion;
+            const marker = mapImage.create();
 
             circle2.events.on('hit', async (event) => {
                 const originTarget = state.selectedRegion;
                 const target = event.target.dataItem?.dataContext as any;
-                state.selectedProvider = target.region_type;
+                state.selectedProvider = target.provider;
                 state.selectedRegion = target.name;
                 await getFilteredData(target.region_code);
                 const coords = chart.svgPointToGeo(event.svgPoint);
                 if (originTarget !== state.selectedRegion) {
-                    toggleMarker(coords, marker);
+                    // mapLabel.text = state.selectedRegion;
+                    drawMarker(coords, marker);
                 }
             });
 
-            toggleMarker(originCoords, marker);
+            const originCoords = { longitude: 126.871867, latitude: 37.528547 };
+            drawMarker(originCoords, marker);
             imageSeries.data = state.data;
         };
 
