@@ -201,7 +201,9 @@
 		"WIDGETS": {
 			"ALL_SUMMARY_ALL": "All",
 			"ALL_SUMMARY_COMPUTE": "Compute",
+			"ALL_SUMMARY_DAILY": "Daily",
 			"ALL_SUMMARY_DATABASE": "Database",
+			"ALL_SUMMARY_MONTHLY": "Monthly",
 			"ALL_SUMMARY_NO_DATA_1": "Billing service is not supported yet.",
 			"ALL_SUMMARY_NO_DATA_2": "We are getting ready to support the billing service.",
 			"ALL_SUMMARY_SPENDINGS": "Overall-Spendings",

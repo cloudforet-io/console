@@ -29,6 +29,15 @@
                         <div class="title">
                             {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
                         </div>
+                        <div class="toggle-button-group">
+                            <p-button v-for="(d, idx) in dateTypes"
+                                      :key="idx"
+                                      :class="{'selected': selectedDateType === d.name}"
+                                      @click="selectedDateType = d.name"
+                            >
+                                {{ d.label }}
+                            </p-button>
+                        </div>
                         <p-chart-loader :loading="chartState.loading">
                             <template #loader>
                                 <p-skeleton width="100%" height="100%" />
@@ -98,10 +107,10 @@ import {
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { gray, primary1 } from '@/styles/colors';
-import PLazyImg from "@/components/organisms/lazy-img/PLazyImg.vue";
+import { gray, primary, primary1 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
 
@@ -117,10 +126,9 @@ interface TypeData {
     to: string;
 }
 
-enum PROVIDER {
-    aws = 'AWS',
-    google_cloud = 'Google',
-    azure = 'Azure',
+enum DATE_TYPE {
+    daily = 'daily',
+    monthly = 'monthly',
 }
 
 const DAY_COUNT = 14;
@@ -129,7 +137,7 @@ const DAY_COUNT = 14;
 export default {
     name: 'AllSummary',
     components: {
-        PLazyImg,
+        PButton,
         PSkeleton,
         PChartLoader,
     },
@@ -146,8 +154,15 @@ export default {
             loading: false,
             chartRef: null as HTMLElement | null,
             skeletons: range(3),
+            //
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
+            selectedDateType: 'daily' as keyof DATE_TYPE,
+            dateTypes: computed(() => ([
+                { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAILY') },
+                { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTHLY') },
+            ])),
+            //
             computeCount: 0,
             databaseCount: 0,
             storageCount: 0,
@@ -411,7 +426,7 @@ export default {
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(primary1);
+            bullet.label.fill = am4core.color(primary);
             bullet.label.dy = -10;
         };
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -420,6 +435,7 @@ export default {
             getTrend('compute');
             getTrend('database');
             getTrend('storage');
+            drawChart();
         };
         const asyncInit = async () => {
             state.loading = true;
@@ -472,6 +488,7 @@ export default {
             }
             &.selected {
                 @apply bg-primary1 text-white;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 .count {
                     @apply text-white;
                     .dollar-sign {
@@ -494,7 +511,7 @@ export default {
                     border-style: solid;
                     border-color: theme('colors.primary1') transparent;
                     border-width: 0.5rem 0.5rem 0;
-                    bottom: -0.5rem;
+                    bottom: -0.45rem;
                     left: 50%;
                     margin-left: -0.5rem;
                 }
@@ -515,7 +532,7 @@ export default {
                 line-height: 2.5rem;
                 &:hover {
                     .anchor {
-                        border-bottom: 1px solid;
+                        border-bottom: 2px solid;
                         &.spendings {
                             border: none;
                         }
@@ -555,8 +572,8 @@ export default {
 
         .content-wrapper {
             @apply bg-white;
-            border-radius: 0.375rem;
             position: relative;
+            border-radius: 0.375rem;
             height: 17.5rem;
             padding: 1.25rem 1.5rem;
 
@@ -566,6 +583,23 @@ export default {
                 margin-bottom: 1rem;
             }
             .chart-wrapper {
+                position: relative;
+                .toggle-button-group {
+                    position: absolute;
+                    right: 0.5rem;
+                    top: 0;
+                    .p-button {
+                        @apply text-gray-400;
+                        min-width: auto;
+                        font-size: 0.625rem;
+                        font-weight: normal;
+                        padding: 0.25rem;
+                        &.selected {
+                            @apply text-gray-700;
+                            font-weight: bold;
+                        }
+                    }
+                }
                 .chart {
                     height: 13rem;
                 }

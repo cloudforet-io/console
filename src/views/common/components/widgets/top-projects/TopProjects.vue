@@ -137,7 +137,7 @@ export default {
             projectAxis.renderer.grid.template.location = 0;
             projectAxis.renderer.grid.template.strokeOpacity = 1;
             projectAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            projectAxis.renderer.baseGrid.strokeWidth = 0;
+            projectAxis.renderer.baseGrid.disabled = true;
             projectAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             projectAxis.renderer.cellStartLocation = 0.3;
             projectAxis.renderer.cellEndLocation = 0.7;
