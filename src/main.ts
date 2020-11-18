@@ -15,7 +15,6 @@ import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import Codemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
-import VueCarousel from 'vue-carousel';
 import '@/styles/style.pcss';
 import config from '@/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -36,7 +35,6 @@ Vue.use(LiquorTree);
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(Codemirror);
-Vue.use(VueCarousel);
 
 Vue.prototype.$velocity = velocity;
 

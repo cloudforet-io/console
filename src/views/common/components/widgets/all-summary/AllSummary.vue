@@ -1,20 +1,20 @@
 <template>
     <div class="all-summary-page">
         <div class="top-part grid grid-cols-12 gap-3">
-            <div v-for="(data, idx) of serviceDataList" :key="idx"
+            <div v-for="(data, idx) of dataList" :key="idx"
                  class="box col-span-3"
-                 :class="[{'activated': idx === activatedIndex}, data.type]"
-                 @click="activatedIndex = idx"
+                 :class="[{'selected': idx === selectedIndex}, data.type]"
+                 @click="selectedIndex = idx"
             >
                 <div class="content">
                     <div class="count">
-                        <!--                        숫자 마우스오버 했을 때 밑줄 링크 router-link나 a tag-->
-                        <!--                        클라우드 서비스의 database 라벨 셀렉-->
-                        <router-link :to="data.to">
-                            <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
-                            <span>{{ numberCommaFormatter(data.count) }}</span>
-                            <span class="suffix" :class="data.type">{{ data.suffix }}</span>
+                        <router-link :to="data.to" class="anchor" :class="data.type">
+                            <span class="number">
+                                <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
+                                <span>{{ numberCommaFormatter(data.count) }}</span>
+                            </span>
                         </router-link>
+                        <span class="suffix" :class="data.type">{{ data.suffix }}</span>
                     </div>
                     <div class="title">
                         {{ data.title }}
@@ -23,88 +23,56 @@
             </div>
         </div>
         <div class="bottom-part">
-            <div class="carousel-wrapper">
-                <carousel
-                    ref="carousel"
-                    :speed="500"
-                    :per-page="1"
-                    :mouse-drag="false"
-                    :touch-drag="false"
-                    :loop="true"
-                    :pagination-enabled="false"
-                    :navigate-to="activatedIndex"
-                >
-                    <slide class="grid grid-cols-12 gap-4">
-                        <div class="chart-wrapper col-span-9">
-                            <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
-                            </div>
-                            <p-chart-loader :loading="chartState.loading">
-                                <template #loader>
-                                    <p-skeleton width="100%" height="100%" />
-                                </template>
-                                <div ref="computeChartRef" class="chart" />
-                            </p-chart-loader>
+            <div class="content-wrapper grid grid-cols-12 gap-4">
+                <template v-if="selectedType !== 'spendings'">
+                    <div class="chart-wrapper col-span-9">
+                        <div class="title">
+                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
                         </div>
-                        <div class="summary-wrapper col-span-3">
-                            <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE')}) }}
-                            </div>
-                            <template v-if="!loading">
-                                <div v-for="(data, idx) of computeData" :key="idx" class="summary-row">
-                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
-                                    <span class="type">{{ data.type }}</span>
-                                    <span class="count">{{ data.count }}</span>
-                                </div>
+                        <p-chart-loader :loading="chartState.loading">
+                            <template #loader>
+                                <p-skeleton width="100%" height="100%" />
                             </template>
-                            <template v-else>
-                                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
-                                    <p-skeleton class="flex-grow" />
-                                </div>
-                            </template>
+                            <div ref="chartRef" class="chart" />
+                        </p-chart-loader>
+                    </div>
+                    <div class="summary-wrapper col-span-3">
+                        <div class="title">
+                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
                         </div>
-                    </slide>
-                    <slide class="grid grid-cols-12 gap-4">
-                        <div class="chart-wrapper col-span-9">
-                            <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
-                            </div>
-                            <div ref="databaseChartRef" class="chart" />
-                        </div>
-                        <div class="summary-wrapper col-span-3">
-                            <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE')}) }}
-                            </div>
-                            <div v-for="(data, idx) of databaseData" :key="idx" class="summary-row">
+                        <template v-if="!loading">
+                            <router-link v-for="(data, idx) of dataList[selectedIndex].data" :key="idx"
+                                         :to="data.to"
+                                         class="summary-row"
+                            >
                                 <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                 <span class="type">{{ data.type }}</span>
                                 <span class="count">{{ data.count }}</span>
+                            </router-link>
+                        </template>
+                        <template v-else>
+                            <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
+                                <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                                <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="empty-wrapper col-span-12">
+                        <div class="content">
+                            <img src="@/assets/images/illust_spaceship.svg" class="empty-image">
+                            <div class="empty-text-group">
+                                <span class="empty-text large">
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_DATA_1') }}
+                                </span>
+                                <span class="empty-text small">
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_DATA_2') }}
+                                </span>
                             </div>
                         </div>
-                    </slide>
-                    <slide class="grid grid-cols-12 gap-4">
-                        <div class="chart-wrapper col-span-9">
-                            <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
-                            </div>
-                            <div ref="storageChartRef" class="chart" />
-                        </div>
-                        <div class="summary-wrapper col-span-3">
-                            <div class="title">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE')}) }}
-                            </div>
-                            <div v-for="(data, idx) of storageData" :key="idx" class="summary-row">
-                                <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
-                                <span class="type">{{ data.type }}</span>
-                                <span class="count">{{ data.count }}</span>
-                            </div>
-                        </div>
-                    </slide>
-                    <slide>
-                        spendings
-                    </slide>
-                </carousel>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -130,7 +98,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { gray, indigo } from '@/styles/colors';
+import { gray, primary1 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
 
@@ -143,6 +111,7 @@ interface TypeData {
     label: string | TranslateResult;
     count: number;
     type?: string;
+    to: string;
 }
 
 enum PROVIDER {
@@ -171,20 +140,20 @@ export default {
 
         const state = reactive({
             loading: false,
-            computeChartRef: null as HTMLElement | null,
-            databaseChartRef: null as HTMLElement | null,
-            storageChartRef: null as HTMLElement | null,
+            chartRef: null as HTMLElement | null,
             skeletons: range(3),
-            activatedIndex: 0,
+            selectedIndex: 0,
+            selectedType: computed(() => state.dataList[state.selectedIndex].type),
             computeCount: 0,
             databaseCount: 0,
             storageCount: 0,
-            overallSpendings: 500,
-            serviceDataList: computed(() => ([
+            overallSpendings: computed(() => vm.$t('COMMON.WIDGETS.ALL_SUMMARY_UPCOMING')),
+            dataList: computed(() => ([
                 {
                     type: 'compute',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
                     count: state.computeCount,
+                    data: state.computeData,
                     suffix: 'ea',
                     to: '/inventory/server',
                 },
@@ -192,21 +161,24 @@ export default {
                     type: 'database',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE'),
                     count: state.databaseCount,
+                    data: state.databaseData,
                     suffix: 'ea',
-                    to: '/',
+                    to: '/inventory/cloud-service?provider=all&service=Database',
                 },
                 {
                     type: 'storage',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
                     count: state.storageCount,
+                    data: state.storageData,
                     suffix: 'TB',
-                    to: '/',
+                    to: '/inventory/cloud-service?provider=all&service=Storage',
                 },
                 {
                     type: 'spendings',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_SPENDINGS'),
                     count: state.overallSpendings,
                     to: '/',
+                    beta: true,
                 },
             ])),
             computeData: [] as TypeData[],
@@ -214,7 +186,8 @@ export default {
             storageData: [] as TypeData[],
         });
         const chartState = reactive({
-            loading: false,
+            loading: true,
+            registry: {},
             computeData: [] as ChartData[],
             databaseData: [] as ChartData[],
             storageData: [] as ChartData[],
@@ -256,7 +229,6 @@ export default {
             try {
                 let res;
                 if (type === 'compute') {
-                    chartState.loading = true;
                     res = await SpaceConnector.client.statistics.topic.dailyServerCount();
                 } else if (type === 'database') {
                     res = await SpaceConnector.client.statistics.topic.dailyDatabaseCount();
@@ -289,18 +261,24 @@ export default {
                 chartState.loading = false;
             }
         };
-        const getServerInfo = async () => {
+        const getComputeInfo = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.serverByProvider();
                 const computeData: TypeData[] = [
-                    { provider: 'all', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_COMPUTE'), count: state.computeCount },
+                    {
+                        provider: 'all',
+                        label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
+                        count: state.computeCount,
+                        to: '/inventory/server',
+                    },
                 ];
                 res.results.forEach((d) => {
                     computeData.push({
                         provider: d.provider,
-                        label: PROVIDER[d.provider],
+                        label: props.providers[d.provider].label,
                         type: d.server_type,
                         count: d.count,
+                        to: `/inventory/server?filters=provider%3A${d.provider}`,
                     });
                 });
                 state.computeData = computeData;
@@ -321,14 +299,20 @@ export default {
                     show_all: false,
                 });
                 const databaseData: TypeData[] = [
-                    { provider: 'all', label: vm?.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_DATABASE'), count: state.databaseCount },
+                    {
+                        provider: 'all',
+                        label: vm?.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
+                        count: state.databaseCount,
+                        to: '/inventory/cloud-service?provider=all&service=Database',
+                    },
                 ];
                 res.results.forEach((d) => {
                     databaseData.push({
                         provider: d.provider,
-                        label: PROVIDER[d.provider],
-                        type: d.cloud_service_type,
+                        label: props.providers[d.provider].label,
+                        type: d.cloud_service_group,
                         count: d.count,
+                        to: `/inventory/cloud-service?provider=${d.provider}&service=Database`,
                     });
                 });
                 state.databaseData = databaseData;
@@ -349,14 +333,20 @@ export default {
                     show_all: false,
                 });
                 const storageData: TypeData[] = [
-                    { provider: 'all', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL_STORAGE'), count: state.storageCount },
+                    {
+                        provider: 'all',
+                        label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
+                        count: state.storageCount,
+                        to: '/inventory/cloud-service?provider=all&service=Storage',
+                    },
                 ];
                 res.results.forEach((d) => {
                     storageData.push({
                         provider: d.provider,
-                        label: PROVIDER[d.provider],
-                        type: d.cloud_service_type,
+                        label: props.providers[d.provider].label,
+                        type: d.cloud_service_group,
                         count: d.count,
+                        to: `/inventory/cloud-service?provider=${d.provider}&service=Storage`,
                     });
                 });
                 state.storageData = storageData;
@@ -366,19 +356,31 @@ export default {
         };
 
         /* util */
-        const drawChart = (chartContext, type) => {
-            const chart = am4core.create(chartContext, am4charts.XYChart);
+        const drawChart = () => {
+            const disposeChart = () => {
+                if (chartState.registry[state.chartRef]) {
+                    chartState.registry[state.chartRef].dispose();
+                    delete chartState.registry[state.chartRef];
+                }
+            };
+            const createChart = () => {
+                disposeChart();
+                chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
+                return chartState.registry[state.chartRef];
+            };
+            const chart = createChart();
+
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = 0;
-            if (type === 'compute') chart.data = chartState.computeData;
-            else if (type === 'database') chart.data = chartState.databaseData;
-            else if (type === 'storage') chart.data = chartState.storageData;
+            if (state.selectedType === 'compute') chart.data = chartState.computeData;
+            else if (state.selectedType === 'database') chart.data = chartState.databaseData;
+            else if (state.selectedType === 'storage') chart.data = chartState.storageData;
 
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'date';
-            dateAxis.renderer.minGridDistance = 10;
+            dateAxis.renderer.minGridDistance = 20;
             dateAxis.renderer.grid.template.disabled = true;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             dateAxis.fontSize = 11;
@@ -394,25 +396,18 @@ export default {
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
             series.dataFields.categoryX = 'date';
-            series.fill = am4core.color(indigo[700]);
-            series.columns.template.width = am4core.percent(35);
-            series.columns.template.column.cornerRadiusTopLeft = 5;
-            series.columns.template.column.cornerRadiusTopRight = 5;
+            series.fill = am4core.color(primary1);
+            series.columns.template.width = am4core.percent(30);
+            series.columns.template.column.cornerRadiusTopLeft = 3;
+            series.columns.template.column.cornerRadiusTopRight = 3;
             series.strokeWidth = 0;
-            // series.columns.template.cursorOverStyle = am4core.MouseCursorStyle.pointer;
-            // series.columns.template.events.on('over', (ev) => {
-            //     ev.target.fill = am4core.color(hoverColor);
-            // });
-            // series.columns.template.events.on('out', (ev) => {
-            //     ev.target.fill = am4core.color(color);
-            // });
 
             const bullet = series.bullets.push(new am4charts.LabelBullet());
             bullet.label.text = '{count}';
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(indigo[600]);
+            bullet.label.fill = am4core.color(primary1);
             bullet.label.dy = -10;
         };
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -426,7 +421,7 @@ export default {
             state.loading = true;
             await getCount();
             //
-            await getServerInfo();
+            await getComputeInfo();
             state.loading = false;
             await getDatabaseInfo();
             await getStorageInfo();
@@ -434,21 +429,14 @@ export default {
         init();
         asyncInit();
 
-        watch([() => state.computeChartRef, () => chartState.computeData], ([chartContext, data]) => {
-            if (chartContext && data) {
-                drawChart(state.computeChartRef, 'compute');
+        watch([() => state.chartRef, () => chartState.loading], ([chartContext, loading]) => {
+            if (chartContext && !loading) {
+                drawChart();
             }
         });
-        watch([() => state.databaseChartRef, () => chartState.databaseData], ([chartContext, data]) => {
-            if (chartContext && data) {
-                drawChart(state.databaseChartRef, 'database');
-            }
-        });
-        watch([() => state.storageChartRef, () => chartState.storageData], ([chartContext, data]) => {
-            if (chartContext && data) {
-                drawChart(state.storageChartRef, 'storage');
-            }
-        });
+        watch(() => state.selectedType, () => {
+            drawChart();
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
@@ -473,42 +461,21 @@ export default {
             cursor: pointer;
             border-radius: 0.375rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            padding: 1.375rem;
-            .content {
-                margin: auto 0;
-            }
-            .count {
-                @apply text-gray-700;
-                font-size: 2rem;
-                font-weight: bold;
-                line-height: 2.5rem;
+            padding-left: 1.5rem;
 
-                .suffix {
-                    @apply text-gray-400;
-                    font-size: 1rem;
-                    font-weight: normal;
-                    padding-left: 0.5rem;
-                    &.storage {
-                        font-size: 0.875rem;
-                    }
-                }
-                .dollar-sign {
-                    font-size: 2rem;
-                    font-weight: normal;
-                }
+            &:hover {
+                background-color: rgba(theme('colors.indigo.400'), 0.1);
             }
-            .title {
-                @apply text-gray-500;
-                font-size: 1rem;
-                text-transform: capitalize;
-            }
-
-            &.activated {
-                @apply bg-indigo-700 text-white;
+            &.selected {
+                @apply bg-primary1 text-white;
                 .count {
                     @apply text-white;
+                    .dollar-sign {
+                        @apply text-white;
+                    }
                     .suffix {
                         @apply text-white;
+                        opacity: 1;
                     }
                 }
                 .title {
@@ -521,53 +488,143 @@ export default {
                     content: '';
                     width: 0;
                     border-style: solid;
-                    border-color: theme('colors.indigo.700') transparent;
+                    border-color: theme('colors.primary1') transparent;
                     border-width: 0.5rem 0.5rem 0;
                     bottom: -0.5rem;
                     left: 50%;
                     margin-left: -0.5rem;
                 }
             }
+            &.spendings {
+                .count .number {
+                    font-size: 1.375rem;
+                }
+            }
+
+            .content {
+                margin: auto 0;
+            }
+            .count {
+                @apply text-indigo-400;
+                position: relative;
+                display: inline-block;
+                line-height: 2.5rem;
+                &:hover {
+                    .anchor {
+                        border-bottom: 1px solid;
+                        &.spendings {
+                            border: none;
+                        }
+                    }
+                }
+                .dollar-sign {
+                    @apply text-gray-500;
+                    font-size: 1.5rem;
+                    font-weight: normal;
+                    padding-right: 0.25rem;
+                }
+                .number {
+                    font-size: 2rem;
+                    font-weight: bold;
+                }
+                .suffix {
+                    @apply text-gray-300;
+                    font-size: 1rem;
+                    font-weight: normal;
+                    opacity: 0.7;
+                    padding-left: 0.5rem;
+                    &.storage {
+                        font-size: 0.875rem;
+                    }
+                }
+            }
+            .title {
+                @apply text-gray-500;
+                font-size: 1rem;
+                text-transform: capitalize;
+            }
         }
     }
 
     .bottom-part {
         margin-top: 1rem;
-    }
 
-    .carousel-wrapper {
-        @apply bg-white;
-        border-radius: 0.375rem;
-        position: relative;
-        padding: 1rem 1.5rem;
+        .content-wrapper {
+            @apply bg-white;
+            border-radius: 0.375rem;
+            position: relative;
+            height: 17.5rem;
+            padding: 1.25rem 1.5rem;
 
-        .title {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .chart-wrapper {
-            .chart {
-                height: 15rem;
-            }
-        }
-        .summary-wrapper {
             .title {
-                margin-bottom: 1.25rem;
+                font-size: 1rem;
+                font-weight: bold;
+                margin-bottom: 1rem;
             }
-            .summary-row {
-                font-size: 0.875rem;
-                padding: 0.5rem 0;
-                .provider {
-                    font-weight: bold;
+            .chart-wrapper {
+                .chart {
+                    height: 13rem;
                 }
-                .type {
-                    padding-left: 0.5rem;
+            }
+            .summary-wrapper {
+                .title {
+                    padding: 0 0.5rem;
+                    margin-bottom: 1.25rem;
                 }
-                .count {
-                    @apply text-gray-700;
-                    float: right;
+                .summary-row {
+                    display: block;
+                    font-size: 0.875rem;
+                    line-height: 1.5rem;
+                    cursor: pointer;
+                    padding: 0.25rem 0.5rem;
+                    &:hover {
+                        @apply bg-secondary2;
+                        .provider {
+                            text-decoration: underline;
+                        }
+                        .type {
+                            text-decoration: underline;
+                        }
+                        .count {
+                            text-decoration: underline;
+                        }
+                    }
+                    .type {
+                        padding-left: 0.5rem;
+                    }
+                    .count {
+                        @apply text-gray-600;
+                        float: right;
+                    }
+                }
+            }
+            .empty-wrapper {
+                position: relative;
+                display: flex;
+                height: 100%;
+
+                .content {
+                    display: block;
+                    margin: auto;
+                    .empty-image {
+                        margin: auto;
+                    }
+                    .empty-text-group {
+                        text-align: center;
+                        line-height: 2rem;
+                        padding-top: 0.875rem;
+                        .empty-text {
+                            display: block;
+                            &.large {
+                                @apply text-primary;
+                                font-size: 1rem;
+                            }
+                            &.small {
+                                @apply text-gray;
+                                font-size: 0.875rem;
+                            }
+                        }
+                    }
                 }
             }
         }

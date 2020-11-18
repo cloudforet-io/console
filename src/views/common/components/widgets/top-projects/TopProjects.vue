@@ -64,7 +64,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    gray, indigo, blue,
+    gray, indigo, coral,
 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
@@ -74,8 +74,6 @@ interface ChartData {
     rank: string;
     server: number;
     database: number;
-    storage: number;
-    cloud_service: number;
 }
 interface ProjectData {
     project_id: string;
@@ -83,15 +81,12 @@ interface ProjectData {
     project_group: string;
     project_group_id: string;
     servers?: number;
-    cloud_services?: number;
     total?: number;
 }
 
 const DATA_COUNT = 5;
-const SERVER_COLOR = indigo[700];
-const DATABASE_COLOR = indigo[600];
-const STORAGE_COLOR = indigo[400];
-const CLOUD_SERVICE_COLOR = blue[300];
+const COMPUTE_COLOR = indigo[600];
+const DATABASE_COLOR = coral[500];
 
 
 export default {
@@ -113,19 +108,16 @@ export default {
             chartRef: null as HTMLElement | null,
             chart: null as HTMLElement | null,
             colors: {
-                server: SERVER_COLOR,
+                server: COMPUTE_COLOR,
                 database: DATABASE_COLOR,
-                storage: STORAGE_COLOR,
-                cloud_service: CLOUD_SERVICE_COLOR,
             },
             fields: computed(() => [
-                { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK') },
+                { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK'), width: 3 },
                 { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
                 { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
                 { name: 'servers', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
                 { name: 'database', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
                 { name: 'storage', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
-                { name: 'cloud_services', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_CLOUD_SERVICE') },
             ]),
         });
 
@@ -145,6 +137,7 @@ export default {
             projectAxis.renderer.grid.template.location = 0;
             projectAxis.renderer.grid.template.strokeOpacity = 1;
             projectAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            projectAxis.renderer.baseGrid.strokeWidth = 0;
             projectAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             projectAxis.renderer.cellStartLocation = 0.3;
             projectAxis.renderer.cellEndLocation = 0.7;
@@ -176,8 +169,6 @@ export default {
             chart.data = state.chartData;
             createSeries('server', 'Server');
             createSeries('database', 'Database');
-            createSeries('storage', 'Storage');
-            createSeries('cloud_service', 'Cloud Service');
 
             chart.legend = new am4charts.Legend();
             chart.legend.position = 'bottom';
@@ -204,17 +195,14 @@ export default {
                         rank: `#${idx + 1}`,
                         server: 0,
                         database: 0,
-                        storage: 0,
-                        cloud_service: 0,
                     });
                 });
+                console.log(orderedData);
                 orderedData.forEach((d, idx) => {
                     chartData.splice(idx, 1, {
                         rank: `#${idx + 1}`,
                         server: d.servers,
                         database: 0, // todo
-                        storage: 0, // todo
-                        cloud_service: d.cloud_services,
                     });
                 });
                 state.chartData = chartData.reverse();
@@ -255,7 +243,7 @@ export default {
     height: 13rem;
 }
 .p-data-table::v-deep {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     th {
         @apply bg-gray-100 text-gray-400;
         height: 1.5rem;
