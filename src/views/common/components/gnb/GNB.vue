@@ -31,7 +31,7 @@
                              color="inherit transparent"
                         />
                     </span>
-                    <router-link v-else :to="dItem.link">
+                    <router-link v-else :to="dItem.link" class="block">
                         <span>{{ dItem.key }}</span>
                     </router-link>
                 </div>
