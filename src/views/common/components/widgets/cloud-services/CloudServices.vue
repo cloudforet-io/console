@@ -200,6 +200,9 @@ export default {
 <style lang="postcss" scoped>
 .widget-layout::v-deep {
     border-radius: 0.375rem;
+    .item-container.card .contents {
+        padding: 1rem 1rem 1rem 0.75rem;
+    }
 }
 .group-name {
     @apply text-base font-bold mb-1 truncate leading-tight;
@@ -208,7 +211,7 @@ export default {
     @apply text-xs text-gray truncate leading-tight;
 }
 .count {
-    @apply text-lg font-bold ml-1;
+    @apply text-lg ml-1;
 }
 .more {
     @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;

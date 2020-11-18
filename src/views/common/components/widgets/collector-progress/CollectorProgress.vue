@@ -28,11 +28,11 @@
                 </tr>
             </template>
             <template #col-collector_info-format="{index, field, item}">
-                <span class="text-sm collector-title">{{ item.collector_info.provider.toUpperCase() }} {{ item.collector_info.name }}
-                    <br><span class="time">{{ timeFormatter(item.created_at)}}</span></span>
-            </template>
-            <template #col-created_at-format="{value}">
-                {{ timeFormatter(value) }}
+                <span class="collector-provider"
+                      :style="{color: providers[item.collector_info.provider] ? providers[item.collector_info.provider].color : undefined }"
+                >{{ providers[item.collector_info.provider].label }}</span>
+                <span class="collector-title">{{ item.collector_info.name }}</span>
+                <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
             </template>
         </p-data-table>
     </p-widget-layout>
@@ -48,12 +48,10 @@ import {
 
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { ProviderModel } from '@/views/identity/service-account/type';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
@@ -88,13 +86,18 @@ export interface JobModel {
 export default {
     name: 'CollectorRuns',
     components: {
-        PLazyImg,
         PSkeleton,
         PWidgetLayout,
         PI,
         PDataTable,
     },
-    setup() {
+    props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
@@ -104,7 +107,6 @@ export default {
                 { label: 'Title / Time', name: 'collector_info' },
                 { label: 'Status', name: 'progress' },
             ],
-            providers: [] as ProviderModel[],
         });
 
         /* util */
@@ -112,7 +114,7 @@ export default {
             const items = [] as JobModel[];
             jobs.forEach((job) => {
                 const newJob = {
-                    progress: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
+                    progress: `${((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100}%`,
                     ...job,
                 };
                 items.push(newJob);
@@ -144,19 +146,8 @@ export default {
                 state.loading = false;
             }
         };
-        const getProviders = async () => {
-            try {
-                const query = new QueryHelper();
-                query.setOnly('provider', 'tags.icon');
-                const res = await SpaceConnector.client.identity.provider.list({ query: query.data });
-                state.providers = res.results;
-            } catch (e) {
-                console.error(e);
-            }
-        };
 
         const init = async () => {
-            await getProviders();
             await getData();
         };
         init();
@@ -174,13 +165,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.status-icon {
-    display: inline-flex;
-}
 .p-data-table::v-deep {
     .default th {
         @apply bg-gray-100 text-gray-400;
@@ -198,10 +182,18 @@ export default {
         @apply text-secondary underline;
     }
 }
-.collector-title {
+.collector-provider {
+    @apply text-sm;
     margin-top: 0.5rem;
     margin-bottom: 0.75rem;
+    margin-right: 0.25rem;
 }
+
+.collector-title {
+    @apply text-sm inline-block truncate;
+    max-width: 9rem;
+}
+
 .time {
     @apply text-gray-500;
     font-size: 0.75rem;

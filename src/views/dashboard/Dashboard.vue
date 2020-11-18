@@ -15,8 +15,10 @@
         <cloud-services class="col-start-1 col-end-10"
                         :more-info="true"
         />
-        <collector-progress class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13 collector-progress" />
-<!--        <collectors class="col-start-1 col-end-13" />-->
+        <collector-progress :providers="providers"
+                            class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13 collector-progress"
+        />
+        <!--        <collectors class="col-start-1 col-end-13" />-->
     </general-page-layout>
 </template>
 
@@ -31,11 +33,10 @@ import ServiceAccounts from '@/views/common/components/widgets/service-accounts/
 import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
 import TopProjects from '@/views/common/components/widgets/top-projects/TopProjects.vue';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import Collectors from '@/views/common/components/widgets/collectors/Collectors.vue';
 import ResourceMap from '@/views/common/components/widgets/resource-map/ResourceMap.vue';
+import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectorProgress.vue';
 
 import { store } from '@/store';
-import CollectorProgress from "@/views/common/components/widgets/collector-progress/CollectorProgress.vue";
 
 
 export default {
@@ -49,7 +50,6 @@ export default {
         ServiceAccounts,
         AllSummary,
         TopProjects,
-        Collectors,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;

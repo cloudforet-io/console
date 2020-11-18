@@ -30,7 +30,7 @@
                             <p-i v-else name="ic_provider_other"
                                  class="provider-icon"
                             />
-                            <span class="provider-name">{{ provider.label }}</span>
+                            <span class="provider-name">{{ provider.name }}</span>
                         </template>
                         <template #icon="{ iconName }">
                             <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
@@ -247,7 +247,7 @@ export default {
         const providerState = reactive({
             items: computed(() => [
                 {
-                    provider: 'all', icon: '', color: '', label: 'All',
+                    provider: 'all', icon: '', color: '', label: 'All', name: 'All',
                 },
                 ...Object.keys(store.state.resource.provider.items).map(k => ({
                     provider: k,

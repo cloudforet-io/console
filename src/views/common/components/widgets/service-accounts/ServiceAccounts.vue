@@ -126,7 +126,6 @@ export default {
             chart: null as null|any,
             fields: computed(() => [
                 { name: 'provider', label: 'Provider' },
-                { name: 'project', label: 'Project' },
                 { name: 'count', label: 'Service Account' },
             ]),
         });
@@ -269,6 +268,7 @@ export default {
 }
 .p-data-table::v-deep {
     margin-top: 1rem;
+    overflow-x: hidden;
     .default th {
         @apply bg-gray-100 text-gray-400;
         height: 1.5rem;
