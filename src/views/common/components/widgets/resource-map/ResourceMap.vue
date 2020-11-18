@@ -10,11 +10,10 @@
             <div v-if="!loading" class="resource-info-wrapper">
                 <div class="resource-info-title">
                     <span class="resource-info-provider"
-                          :style="{ color: providerColor }"
+                          :style="{color: providers[selectedProvider.toLowerCase()] ? providers[selectedProvider.toLowerCase()].color : undefined }"
                     >
-                        {{ selectedProvider }}  </span>
-                    <span class="resource-info-region">{{ selectedRegion }}</span> <br>
-                    Resources
+                        {{ providers[selectedProvider.toLowerCase()].label }} </span>
+                    <span class="resource-info-region">{{ selectedRegion }}</span>
                 </div>
                 <div v-if="Object.keys(filteredData).length > 10">
                     <div v-for="i in 10" :key="i" class="progress-bar">
@@ -62,6 +61,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
+import { coral } from '@/components/styles/colors';
 
 am4core.useTheme(am4themes_animated);
 const colorSet = new am4core.ColorSet();
@@ -73,7 +73,13 @@ export default {
         PPaneLayout,
         PProgressBar,
     },
-    setup() {
+    props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const state = reactive({
             chartRef: null as HTMLElement|null,
             data: [] as any,
@@ -83,7 +89,6 @@ export default {
             providerColor: '#FF9900',
             loading: true,
             maxValue: 0,
-            providers: computed(() => store.state.resource.provider.items),
         });
         /* Create map instance */
 
@@ -119,25 +124,10 @@ export default {
             });
         };
 
-        const drawMarker = (coords, chart) => {
-            const mapImageSeries = chart.series.push(new am4maps.MapImageSeries());
-            const mapImage = mapImageSeries.mapImages;
-            const mapImageTemplate = mapImage.template;
-            const mapMarker = mapImageTemplate.createChild(am4core.Sprite);
-            mapMarker.path = 'M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z';
-            mapMarker.width = 32;
-            mapMarker.height = 32;
-            mapMarker.scale = 0.7;
-            mapMarker.fill = am4core.color('#F55A2F');
-            mapMarker.fillOpacity = 0.8;
-            mapMarker.horizontalCenter = 'middle';
-            mapMarker.verticalCenter = 'bottom';
-
-            const marker = mapImage.create();
+        const toggleMarker = (coords, marker) => {
             marker.latitude = coords.latitude;
             marker.longitude = coords.longitude;
         };
-
 
         const drawChart = async () => {
             const chart = am4core.create('chartRef', am4maps.MapChart);
@@ -160,7 +150,7 @@ export default {
                     title: d.name,
                     latitude: parseInt(d.tags.latitude),
                     longitude: parseInt(d.tags.longitude),
-                    color: state.providers[d.region_type.toLowerCase()].color as string,
+                    color: props.providers[d.region_type.toLowerCase()].color as string,
                     ...d,
                 })),
             ];
@@ -179,23 +169,37 @@ export default {
                 animateBullet(event.target);
             });
 
+            const mapImageSeries = chart.series.push(new am4maps.MapImageSeries());
+            const mapImage = mapImageSeries.mapImages;
+            const mapImageTemplate = mapImage.template;
+
+            const mapMarker = mapImageTemplate.createChild(am4core.Sprite);
+            mapMarker.path = 'M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z';
+            mapMarker.width = 24;
+            mapMarker.height = 34;
+            mapMarker.scale = 0.7;
+            mapMarker.fill = am4core.color(coral[600]);
+            mapMarker.fillOpacity = 0.8;
+            mapMarker.horizontalCenter = 'middle';
+            mapMarker.verticalCenter = 'bottom';
+
+            const marker = mapImage.create();
+
             const originCoords = { longitude: 126.871867, latitude: 37.528547 };
 
             circle2.events.on('hit', async (event) => {
                 const originTarget = state.selectedRegion;
                 const target = event.target.dataItem?.dataContext as any;
-                console.log(event.target.dataItem?.sprites);
                 state.selectedProvider = target.region_type;
                 state.selectedRegion = target.name;
-                state.providerColor = state.providers[state.selectedProvider.toLowerCase()].color as string;
                 await getFilteredData(target.region_code);
                 const coords = chart.svgPointToGeo(event.svgPoint);
                 if (originTarget !== state.selectedRegion) {
-                    drawMarker(coords, chart);
+                    toggleMarker(coords, marker);
                 }
             });
 
-            drawMarker(originCoords, chart);
+            toggleMarker(originCoords, marker);
             imageSeries.data = state.data;
         };
 
