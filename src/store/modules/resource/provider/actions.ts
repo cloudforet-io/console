@@ -4,6 +4,7 @@ import { ResourceMap } from '@/store/modules/resource/type';
 const SPECIAL_LABEL_MAP = {
     // eslint-disable-next-line camelcase
     google_cloud: 'Google',
+    azure: 'Azure',
 };
 
 export const load = async ({ commit }): Promise<void|Error> => {
