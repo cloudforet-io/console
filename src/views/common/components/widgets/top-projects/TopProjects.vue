@@ -197,7 +197,6 @@ export default {
                         database: 0,
                     });
                 });
-                console.log(orderedData);
                 orderedData.forEach((d, idx) => {
                     chartData.splice(idx, 1, {
                         rank: `#${idx + 1}`,

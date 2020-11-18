@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="bottom-part">
-            <div class="content-wrapper grid grid-cols-12 gap-4">
+            <div class="content-wrapper grid grid-cols-12 gap-2">
                 <template v-if="selectedType !== 'spendings'">
                     <div class="chart-wrapper col-span-9">
                         <div class="title">
@@ -45,8 +45,10 @@
                                          :to="data.to"
                                          class="summary-row"
                             >
-                                <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
-                                <span class="type">{{ data.type }}</span>
+                                <div class="text-group">
+                                    <span :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                    <span class="type">{{ data.type }}</span>
+                                </div>
                                 <span class="count">{{ data.count }}</span>
                             </router-link>
                         </template>
@@ -99,6 +101,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary1 } from '@/styles/colors';
+import PLazyImg from "@/components/organisms/lazy-img/PLazyImg.vue";
 
 am4core.useTheme(am4themes_animated);
 
@@ -126,6 +129,7 @@ const DAY_COUNT = 14;
 export default {
     name: 'AllSummary',
     components: {
+        PLazyImg,
         PSkeleton,
         PChartLoader,
     },
@@ -572,9 +576,10 @@ export default {
                     margin-bottom: 1.25rem;
                 }
                 .summary-row {
+                    position: relative;
                     display: block;
                     font-size: 0.875rem;
-                    line-height: 1.5rem;
+                    line-height: 1.2rem;
                     cursor: pointer;
                     padding: 0.25rem 0.5rem;
                     &:hover {
@@ -589,12 +594,21 @@ export default {
                             text-decoration: underline;
                         }
                     }
-                    .type {
-                        padding-left: 0.5rem;
+
+                    .text-group {
+                        display: inline-block;
+                        width: 90%;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        .type {
+                            padding-left: 0.5rem;
+                        }
                     }
                     .count {
                         @apply text-gray-600;
-                        float: right;
+                        position: absolute;
+                        right: 0.5rem;
                     }
                 }
             }
