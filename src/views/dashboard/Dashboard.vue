@@ -7,7 +7,9 @@
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
-        <resource-map class="col-start-1 col-end-13 lg:col-end-10" />
+        <resource-map :providers="providers"
+                      class="col-start-1 col-end-13 lg:col-end-10"
+        />
         <service-accounts class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13
                                  sm:row-start-3 sm:row-end-4"
         />
