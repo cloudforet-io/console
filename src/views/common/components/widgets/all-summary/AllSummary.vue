@@ -4,7 +4,7 @@
             <div v-for="(data, idx) of dataList" :key="idx"
                  class="box col-span-3"
                  :class="[{'selected': idx === selectedIndex}, data.type]"
-                 @click="selectedIndex = idx"
+                 @click="onClickBox(idx)"
             >
                 <div class="content">
                     <div class="count">
@@ -375,13 +375,13 @@ export default {
         };
 
         /* util */
+        const disposeChart = () => {
+            if (chartState.registry[state.chartRef]) {
+                chartState.registry[state.chartRef].dispose();
+                delete chartState.registry[state.chartRef];
+            }
+        };
         const drawChart = () => {
-            const disposeChart = () => {
-                if (chartState.registry[state.chartRef]) {
-                    chartState.registry[state.chartRef].dispose();
-                    delete chartState.registry[state.chartRef];
-                }
-            };
             const createChart = () => {
                 disposeChart();
                 chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
@@ -431,6 +431,12 @@ export default {
         };
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+        /* event */
+        const onClickBox = (idx) => {
+            disposeChart();
+            state.selectedIndex = idx;
+        };
+
         const init = () => {
             getTrend('compute');
             getTrend('database');
@@ -462,6 +468,7 @@ export default {
             ...toRefs(state),
             chartState,
             colorState,
+            onClickBox,
             numberCommaFormatter,
         };
     },
