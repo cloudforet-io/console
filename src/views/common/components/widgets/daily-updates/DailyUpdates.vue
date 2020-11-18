@@ -65,7 +65,7 @@
                         />
                     </div>
                     <p v-if="item.created_count || item.deleted_count" class="daily-service">
-                        {{ item.title }}<br> <span class="text-sm">{{ item.total_count || 0 }}</span>
+                        {{ item.title }}<br> <span class="text-sm font-bold">{{ item.total_count || 0 }}</span>
                     </p>
                     <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
@@ -348,7 +348,7 @@ export default {
         border-radius: 0.25rem;
 
         .daily-service {
-            @apply font-bold text-xs truncate flex-shrink-0;
+            @apply text-xs truncate flex-shrink-0;
             margin-left: 0.75rem;
             width: 24%;
             max-width: 6.5rem;
