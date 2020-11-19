@@ -215,6 +215,7 @@ export default {
 <style lang="postcss">
 .p-toolbox-grid-layout {
     $min-height: 16.875rem;
+    overflow: hidden;
 
     @apply relative flex flex-col w-full h-full;
     min-height: $min-height;
@@ -235,7 +236,7 @@ export default {
     }
 
     .toolbox-middle {
-        @apply flex items-center mb-6 overflow-x-hidden;
+        @apply flex items-center mb-6;
         .left {
             @apply flex-grow flex-shrink-0 inline-flex justify-start;
         }
