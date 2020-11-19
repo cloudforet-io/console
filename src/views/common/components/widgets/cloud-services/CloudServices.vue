@@ -143,7 +143,7 @@ export default {
             await store.dispatch('resource/provider/load');
             const query = new QueryHelper()
                 .setSort('created_at')
-                .setPage(1, 12);
+                .setPage(1, 9);
             try {
                 if (props.projectFilter) {
                     await getDataInProject();
@@ -178,7 +178,7 @@ export default {
 
         return {
             ...toRefs(state),
-            skeletons: range(12),
+            skeletons: range(9),
             iconUrl: (item: Value): string => item.icon || state.providers[item.provider]?.icon || '',
             // onSelected(item): void {
             //     if (props.projectFilter) {
@@ -198,12 +198,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.widget-layout::v-deep {
-    border-radius: 0.375rem;
-    .item-container.card .contents {
-        padding: 1rem 1rem 1rem 0.75rem;
-    }
-}
+
 .group-name {
     @apply text-base font-bold mb-1 truncate leading-tight;
 }

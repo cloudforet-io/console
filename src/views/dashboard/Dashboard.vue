@@ -96,6 +96,14 @@ export default {
     height: 33.75rem;
 }
 
+.widget-layout::v-deep {
+    @apply border border-gray-100;
+    border-radius: 0.375rem;
+    .item-container.card .contents {
+        padding: 1rem 1rem 1rem 0.75rem;
+    }
+}
+
 @screen lg {
     .daily-updates {
         height: 48rem;
