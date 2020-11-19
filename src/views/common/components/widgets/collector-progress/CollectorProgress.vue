@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.RUN_COLLECTOR')">
+    <p-widget-layout :title="$t('COMMON.WIDGETS.COLLECTING_PROGRESS')">
         <template #extra>
             <div class="flex justify-end">
                 <router-link to="/management/collector-history" class="more">
@@ -23,7 +23,7 @@
             <template #no-data="{fields}">
                 <tr key="noData" class="bg-primary3">
                     <td :colspan="fields.length" class="text-gray">
-                        {{ $t('COMMON.WIDGETS.RUN_COLLECTOR_NO_RECENT_RUN') }}
+                        {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS') }}
                     </td>
                 </tr>
             </template>
@@ -103,10 +103,10 @@ export default {
             loading: false,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             items: [] as JobModel[],
-            fields: [
-                { label: 'Title / Time', name: 'collector_info' },
-                { label: 'Status', name: 'progress' },
-            ],
+            fields: computed(() => [
+                { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_TITLE_TIME'), name: 'collector_info' },
+                { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_STATUS'), name: 'progress' },
+            ]),
         });
 
         /* util */
