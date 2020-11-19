@@ -2,9 +2,6 @@
     <p-widget-layout ref="widgetRef" class="daily-updates" :title="$t('COMMON.WIDGETS.DAILY_UPDATE_TITLE')"
                      :sub-title="$t('COMMON.WIDGETS.DAILY_UPDATE_DESC')"
     >
-        <template #extra>
-            <span class="managed-resources">(Managed Resources)</span>
-        </template>
         <template #default>
             <div v-if="loading" class="mr-10 flex items-center overflow-hidden">
                 <p-skeleton width="2rem" height="2rem" class="mx-10" />
@@ -18,18 +15,18 @@
                     <div v-for="(item, index) in alertData" :key="index"
                          class="daily-update-card"
                     >
-                        <div v-if="!item.isServer">
+                        <div>
                             <p-lazy-img :src="iconUrl(item)"
                                         width="2rem" height="2rem"
                                         class="rounded flex-shrink-0 service-img"
                             />
                         </div>
-                        <div v-else-if="item.isServer">
-                            <p-i name="ic_server"
-                                 width="2rem" height="2rem"
-                                 class="rounded flex-shrink-0"
-                            />
-                        </div>
+<!--                        <div v-else-if="item.isServer">-->
+<!--                            <p-i name="ic_server"-->
+<!--                                 width="2rem" height="2rem"-->
+<!--                                 class="rounded flex-shrink-0"-->
+<!--                            />-->
+<!--                        </div>-->
                         <p v-if="item.created_count || item.deleted_count" class="daily-service">
                             {{ item.title }}<br> <span class="text-sm">{{ item.total_count || 0 }}</span>
                         </p>
@@ -119,8 +116,10 @@ interface CloudService {
 }
 
 interface Server {
-    server_type: string;
+    cloud_service_group: string;
     total_count: number;
+    icon: string;
+    provider: string;
     created_count: number;
     deleted_count: number;
     create_warning: boolean;
@@ -214,11 +213,12 @@ export default {
         const setProjectDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
-                    title: d.server_type,
+                    title: d.cloud_service_group,
                     isServer: true,
-                    href: `/inventory/server?&filters=server_type%3A${d.server_type}${props.projectFilter}`,
-                    createdHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getCreatedAtFilters()}`,
-                    deletedHref: `/inventory/server?filters=server_type%3A${d.server_type}${props.projectFilter}&${getDeletedAtFilters()}`,
+                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    href: `/inventory/server?&filters=provider%3A${d.provider}${props.projectFilter}`,
+                    createdHref: `/inventory/server?filters=provider%3A${d.provider}${props.projectFilter}&${getCreatedAtFilters()}`,
+                    deletedHref: `/inventory/server?filters=provider%3A${d.provider}${props.projectFilter}&${getDeletedAtFilters()}`,
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
@@ -236,11 +236,12 @@ export default {
         const setDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
-                    title: d.server_type,
+                    title: d.cloud_service_group,
                     isServer: true,
-                    href: `/inventory/server?&filters=server_type%3A${d.server_type}`,
-                    createdHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getCreatedAtFilters()}`,
-                    deletedHref: `/inventory/server?&filters=server_type%3A${d.server_type}&${getDeletedAtFilters()}`,
+                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    href: `/inventory/server?&filters=provider%3A${d.provider}`,
+                    createdHref: `/inventory/server?&filters=provider%3A${d.provider}&${getCreatedAtFilters()}`,
+                    deletedHref: `/inventory/server?&filters=provider%3A${d.provider}&${getDeletedAtFilters()}`,
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({

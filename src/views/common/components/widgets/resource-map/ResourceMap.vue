@@ -1,7 +1,7 @@
 <template>
     <p-pane-layout class="resource-map">
         <p class="title">
-            Region
+            {{$t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS')}}
         </p>
         <div class="flex-wrap sm:flex-wrap md:flex-wrap lg:flex-no-wrap xl:flex-no-wrap chart-wrapper">
             <div class="chart-loader">
@@ -235,7 +235,7 @@ export default {
 .resource-map {
     @apply border border-gray-100;
     border-radius: 0.375rem;
-    height: 33rem;
+    height: 40rem;
 
     @screen 2xs {
         height: 52rem;
@@ -282,8 +282,12 @@ export default {
         width: 72%;
         flex-grow: 1;
         margin-right: 1rem;
+        height: 21rem;
         #chartRef {
             @apply w-full h-full;
+        }
+        @screen 2xs {
+            height: 18.75rem;
         }
         @screen xs {
             height: 18.75rem;

@@ -1,4 +1,4 @@
-<babeledit_project be_version="2.6.1" version="1.2">
+<babeledit_project version="1.2" be_version="2.6.1">
     <!--
 
     BabelEdit project file
@@ -3966,6 +3966,69 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>COLLECTING_PROGRESS</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>COLLECTING_PROGRESS_STATUS</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>COLLECTING_PROGRESS_TITLE_TIME</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>COLLECTOR_HELP</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description></description>
@@ -4193,6 +4256,27 @@
                                     <translation>
                                         <language>ko-KR</language>
                                         <approved>true</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>DAILY_UPDATE_MANAGED_RESOURCE</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
                                     </translation>
                                 </translations>
                             </concept_node>
@@ -4517,6 +4601,27 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>RESOURCE_BY_REGION_REGIONS</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>RESOURCE_BY_REGION_SERVER</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description></description>
@@ -4681,6 +4786,69 @@
                                     <translation>
                                         <language>ko-KR</language>
                                         <approved>true</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>SERVICE_ACCOUNTS_ACCOUNT</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>SERVICE_ACCOUNTS_PROJECT</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>SERVICE_ACCOUNTS_PROVIDER</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
                                     </translation>
                                 </translations>
                             </concept_node>

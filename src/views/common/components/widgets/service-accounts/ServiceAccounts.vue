@@ -125,8 +125,9 @@ export default {
             data: [] as Data[],
             chart: null as null|any,
             fields: computed(() => [
-                { name: 'provider', label: 'Provider' },
-                { name: 'count', label: 'Service Account' },
+                { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
+                { name: 'count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
+                { name: 'project', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROJECT') },
             ]),
         });
 
@@ -206,6 +207,7 @@ export default {
                                 color: providers[d.provider].color || '',
                                 href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
                                 count: d.count,
+                                ...d,
                             });
                         }
                         // else others.count += d.count;
