@@ -61,7 +61,7 @@
                 <p-hr class="sidebar-divider" />
                 <div v-if="filterState.regionList.length === 0">
                     <p class="no-region">
-                        No Region
+                        {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.NO_REGION') }}
                     </p>
                 </div>
                 <div v-for="(region, idx) in filterState.regionList" :key="idx"

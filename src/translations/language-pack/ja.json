@@ -118,7 +118,9 @@
 		"COMPONENTS": {
 			"FAVORITES": {
 				"FAVORITE_LIST": {
-					"NO_ITEM": ""
+					"NO_ITEM": "",
+					"TOGGLE_HIDE": "",
+					"TOGGLE_MORE": ""
 				}
 			}
 		},
@@ -409,6 +411,7 @@
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "",
 				"FAVORITES": "",
+				"NO_REGION": "",
 				"REGION": "",
 				"SERVICE_CATEGORY": "",
 				"SERVICE_PROVIDER": "",

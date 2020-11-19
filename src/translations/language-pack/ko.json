@@ -118,7 +118,9 @@
 		"COMPONENTS": {
 			"FAVORITES": {
 				"FAVORITE_LIST": {
-					"NO_ITEM": "즐겨찾기가 설정되지 않았습니다."
+					"NO_ITEM": "즐겨찾기가 설정되지 않았습니다.",
+					"TOGGLE_HIDE": "숨기기",
+					"TOGGLE_MORE": "더보기"
 				}
 			}
 		},
@@ -409,6 +411,7 @@
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
 				"FAVORITES": "즐겨찾기",
+				"NO_REGION": "리전이 없습니다.",
 				"REGION": "리전 ",
 				"SERVICE_CATEGORY": "서비스 카테고리",
 				"SERVICE_PROVIDER": "서비스 제공자",

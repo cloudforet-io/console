@@ -118,7 +118,9 @@
 		"COMPONENTS": {
 			"FAVORITES": {
 				"FAVORITE_LIST": {
-					"NO_ITEM": "No Favorites"
+					"NO_ITEM": "No Favorites",
+					"TOGGLE_HIDE": "hide",
+					"TOGGLE_MORE": "show more"
 				}
 			}
 		},
@@ -409,6 +411,7 @@
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
 				"FAVORITES": "Favorites",
+				"NO_REGION": "No Region",
 				"REGION": "Region",
 				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Provider",
