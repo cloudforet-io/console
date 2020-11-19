@@ -231,7 +231,8 @@
 			"DAILY_UPDATE_DELETED": "Deleted",
 			"DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
-			"DAILY_UPDATE_TITLE": "Daily Updates (Managed Resources)",
+			"DAILY_UPDATE_MANAGED_RESOURCE": "Managed Resources",
+			"DAILY_UPDATE_TITLE": "Daily Updates",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",
 				"LABEL_PROJECT": "Project",

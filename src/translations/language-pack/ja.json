@@ -231,6 +231,7 @@
 			"DAILY_UPDATE_DELETED": "削除",
 			"DAILY_UPDATE_DESC": "00:00〜現在（ローカル時間基準）",
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
+			"DAILY_UPDATE_MANAGED_RESOURCE": "",
 			"DAILY_UPDATE_TITLE": "日別リソースのアップデート",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "",
