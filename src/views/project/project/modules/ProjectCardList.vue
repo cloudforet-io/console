@@ -329,6 +329,18 @@ export default {
 
 .project-card-container {
     @apply flex flex-col w-full h-full;
+    .favorite-wrapper .favorite-btn::v-deep:not(.active) {
+        display: none;
+    }
+    &:hover {
+        .favorite-wrapper .favorite-btn::v-deep:not(.active) {
+            display: block;
+        }
+    }
+}
+.favorite-wrapper {
+    @apply flex-shrink-0 h-full inline-flex items-center justify-center;
+    width: 3rem;
 }
 
 .card-top-wrapper {
@@ -364,7 +376,7 @@ export default {
     @apply flex-shrink-0 flex-grow-0 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500;
     height: 3rem;
     .accounts {
-        @apply flex-grow-0 overflow-x-hidden flex items-center justify-between px-4;
+        @apply flex-grow-0 overflow-x-hidden flex items-center justify-between pl-4;
         .label {
             @apply flex-shrink-0 flex-grow-0 mr-2;
         }
@@ -402,8 +414,6 @@ export default {
             }
         }
     }
-    .favorite-wrapper {
-        @apply flex-shrink-0 h-full px-4 border-l border-gray-100 inline-flex items-center;
-    }
+
 }
 </style>

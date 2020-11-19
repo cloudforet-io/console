@@ -61,7 +61,7 @@
 
             <template #tag>
                 <s-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
-                              resource-type="inventory.CloudService"
+                              resource-type="inventory.CloudServiceType"
                               resource-key="cloud_service_id"
                 />
             </template>

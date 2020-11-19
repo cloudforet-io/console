@@ -120,6 +120,8 @@ import { makeProxy } from '@/lib/compostion-util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { UpdateUserRequest, LanguageCode, Timezone } from '@/store/modules/user/type';
 import { store } from '@/store';
+import { map } from 'lodash';
+import { languages } from '@/store/modules/user/config';
 
 export default {
     name: 'ProfileModalTemplate',
@@ -146,11 +148,9 @@ export default {
             loading: false,
             proxyVisible: makeProxy('visible', props, emit),
             showPassword: computed(() => state.isDomainOwner || state.isInternalAuth),
-            languages: [
-                { type: 'item', label: 'English (default)', name: 'en' },
-                { type: 'item', label: '한국어', name: 'ko' },
-                { type: 'item', label: '日本', name: 'jp' },
-            ],
+            languages: map(languages, (d, k) => ({
+                type: 'item', label: d === 'en' ? `${d} (default)` : d, name: k,
+            })),
             timezones: [
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },

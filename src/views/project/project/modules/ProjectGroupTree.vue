@@ -28,7 +28,7 @@
             <template #toggle-right="{data}">
                 <favorite-button :item-id="data.id"
                                  favorite-type="projectGroup"
-                                 resource-type="identity.Project"
+                                 resource-type="identity.ProjectGroup"
                                  scale="0.75"
                                  read-only
                 />

@@ -10,7 +10,6 @@ export const load = async ({ commit }): Promise<void|Error> => {
     const cloudServiceTypes: ResourceMap = {};
 
     response.results.forEach((cloudServiceTypeInfo: any): void => {
-        console.debug('cloudServiceTypeInfo.cloud_service_type_id', cloudServiceTypeInfo.cloud_service_type_id, 'cloudServiceTypeInfo', cloudServiceTypeInfo);
         cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
             label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
             name: cloudServiceTypeInfo.group,

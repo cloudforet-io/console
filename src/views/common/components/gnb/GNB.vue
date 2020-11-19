@@ -166,7 +166,7 @@ export default {
         const userState = reactive({
             name: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
-            language: computed(() => store.state.user.language),
+            language: computed(() => store.getters['user/languageLabel']),
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),

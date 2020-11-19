@@ -5,10 +5,15 @@
             {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM') }}
         </div>
         <template v-else>
-            <div v-for="item in displayItems" :key="item.id" class="item"
-                 :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
-                 @mouseenter="hoveredItem = item"
-                 @mouseleave="hoveredItem = null"
+            <a v-for="item in displayItems" :key="item.id" class="item"
+               :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
+               :href="referenceRouter(
+                   item.id, {
+                       resource_type: item.resourceType,
+                   })"
+               @click="onClickItem(item, $event)"
+               @mouseenter="hoveredItem = item"
+               @mouseleave="hoveredItem = null"
             >
                 <span class="icon"><slot name="icon" :item="item" /></span>
                 <span class="name">{{ item.name }}</span>
@@ -17,9 +22,9 @@
                                class="delete-btn"
                                @click="onClickDelete(item)"
                 />
-            </div>
+            </a>
             <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click="onClickToggle">
-                {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_HIDE') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
+                {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
                 <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                      height="1rem" width="1rem" color="inherit transparent"
                 />
@@ -36,6 +41,7 @@ import { FavoriteItem } from '@/store/modules/favorite/type';
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { FavoriteListProps } from '@/views/common/components/favorites/type';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 const LIMIT_COUNT = 5;
 export default {
@@ -49,6 +55,10 @@ export default {
         loading: {
             type: Boolean,
             default: false,
+        },
+        beforeRoute: {
+            type: Function,
+            default: undefined,
         },
     },
     setup(props: FavoriteListProps) {
@@ -70,11 +80,20 @@ export default {
             state.isExpanded = !state.isExpanded;
         };
 
+        const onClickItem = async (item, e) => {
+            if (props.beforeRoute) {
+                const res = props.beforeRoute(item, e);
+                if (res) await res;
+            }
+        };
+
 
         return {
             ...toRefs(state),
             onClickDelete,
             onClickToggle,
+            onClickItem,
+            referenceRouter,
             LIMIT_COUNT,
         };
     },
@@ -95,6 +114,7 @@ export default {
     cursor: default;
     height: 2rem;
     border-radius: 2px;
+    cursor: pointer;
     &.hovered {
         @apply bg-secondary2 text-secondary;
     }

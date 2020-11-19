@@ -119,7 +119,7 @@
 			"FAVORITES": {
 				"FAVORITE_LIST": {
 					"NO_ITEM": "No Favorites",
-					"TOGGLE_HIDE": "hide",
+					"TOGGLE_LESS": "show less",
 					"TOGGLE_MORE": "show more"
 				}
 			}
@@ -238,7 +238,7 @@
 				"LABEL_PROJECT": "Project",
 				"NO_DATA": "None",
 				"TITLE": "Favorites",
-				"TOGGLE_HIDE": "hide",
+				"TOGGLE_LESS": "show less",
 				"TOGGLE_MORE": "show more"
 			},
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",

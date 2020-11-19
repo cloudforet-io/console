@@ -4,9 +4,9 @@
             <div class="sidebar-container">
                 <div class="sidebar-item-wrapper">
                     <header>
-                        <span class="title">{{ $t('PROJECT.LANDING.FAVORITES') }}</span>
+                        <span class="title">{{ $t('PROJECT.LANDING.FAVORITES') }}&nbsp;<span class="count">({{ favoriteItems.length }})</span></span>
                     </header>
-                    <favorite-list :items="favoriteItems" @delete="onFavoriteDelete">
+                    <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
                         <template #icon="{item}">
                             <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
                                  width="1rem" height="1rem" color="inherit transparent"
@@ -59,8 +59,7 @@
                     <span class="favorite-btn-wrapper">
                         <favorite-button v-if="projectState.groupId" :item-id="projectState.groupId"
                                          favorite-type="projectGroup"
-                                         resource-type="identity.Project"
-                                         scale="0.75"
+                                         resource-type="identity.ProjectGroup"
                         />
                     </span>
                     <div class="btns">
@@ -261,6 +260,16 @@ export default {
             else vm.$store.dispatch('favorite/projectGroup/removeItem', item);
         };
 
+        const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
+            if (item.resourceType === 'identity.ProjectGroup') {
+                e.preventDefault();
+                if (projectState.groupId !== item.id) {
+                    projectState.groupId = item.id;
+                    await listAll(item.id);
+                }
+            }
+        };
+
 
         /** Handling Form */
         const openProjectGroupDeleteForm = () => {
@@ -412,6 +421,7 @@ export default {
             ...toRefs(state),
             ...toRefs(formState),
             onFavoriteDelete,
+            beforeFavoriteRoute,
             openProjectForm,
             openProjectGroupDeleteForm,
             projectGroupDeleteFormConfirm,
@@ -442,6 +452,9 @@ export default {
     .title {
         @apply text-sm text-gray-500 font-semibold capitalize;
         line-height: 1.2;
+    }
+    .count {
+        font-weight: normal;
     }
     .icon-help {
         @apply ml-2;

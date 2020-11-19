@@ -132,7 +132,7 @@
                             </div>
                             <favorite-button :item-id="item.cloud_service_type_id || ''"
                                              favorite-type="cloudServiceType"
-                                             resource-type="identity.CloudService"
+                                             resource-type="inventory.CloudServiceType"
                                              class="favorite-btn"
                             />
                         </router-link>

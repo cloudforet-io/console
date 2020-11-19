@@ -119,7 +119,7 @@
 			"FAVORITES": {
 				"FAVORITE_LIST": {
 					"NO_ITEM": "",
-					"TOGGLE_HIDE": "",
+					"TOGGLE_LESS": "",
 					"TOGGLE_MORE": ""
 				}
 			}
@@ -238,7 +238,7 @@
 				"LABEL_PROJECT": "",
 				"NO_DATA": "",
 				"TITLE": "",
-				"TOGGLE_HIDE": "",
+				"TOGGLE_LESS": "",
 				"TOGGLE_MORE": ""
 			},
 			"HEALTH_DASHBOARD_DESC_1": "AWSビジネス若しくはエンタープライズサポートプランを使用している場合、AWS Health Dashboardが利用できます",
