@@ -294,9 +294,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.widget-layout::v-deep {
-    border-radius: 0.375rem;
-}
 .daily-updates {
     @apply bg-white;
     &::v-deep {

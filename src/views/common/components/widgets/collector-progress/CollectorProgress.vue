@@ -165,6 +165,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.widget-layout::v-deep {
+    @apply border border-gray-100;
+    border-radius: 0.375rem;
+}
 .p-data-table::v-deep {
     .default th {
         @apply bg-gray-100 text-gray-400;

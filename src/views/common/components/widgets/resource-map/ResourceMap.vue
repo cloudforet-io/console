@@ -85,7 +85,6 @@ export default {
             filteredData: [] as any,
             selectedProvider: 'aws',
             selectedRegion: 'Asia Pacific (Seoul)',
-            providerColor: '#FF9900',
             loading: true,
             maxValue: 0,
         });
