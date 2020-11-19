@@ -2,9 +2,6 @@
     <p-widget-layout ref="widgetRef" class="daily-updates" :title="$t('COMMON.WIDGETS.DAILY_UPDATE_TITLE')"
                      :sub-title="$t('COMMON.WIDGETS.DAILY_UPDATE_DESC')"
     >
-        <template #extra>
-            <span class="managed-resources">(Managed Resources)</span>
-        </template>
         <template #default>
             <div v-if="loading" class="mr-10 flex items-center overflow-hidden">
                 <p-skeleton width="2rem" height="2rem" class="mx-10" />
