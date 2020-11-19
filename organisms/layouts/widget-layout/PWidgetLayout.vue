@@ -69,7 +69,7 @@ export default {
 
 <style lang="postcss" scoped>
 .widget-layout {
-    @apply border border-gray-100;
+    /*@apply border border-gray-100;*/
     display: inline-flex;
     flex-direction: column;
     width: 100%;
