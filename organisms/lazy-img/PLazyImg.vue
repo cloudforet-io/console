@@ -23,7 +23,7 @@
             <img v-show="!imgLoading && !isError"
                  key="img"
                  :style="{height, width}"
-                 :src="src"
+                 :src="proxySrc"
                  :alt="alt"
                  class="absolute"
                  @load="onLoad"
@@ -48,12 +48,14 @@
 
 <script lang="ts">
 import {
-    computed,
+    ComponentRenderProxy,
+    computed, getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { LazyImgPropsType } from '@/components/organisms/lazy-img/type';
 import PI from '@/components/atoms/icons/PI.vue';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
 
 export default {
     name: 'PLazyImg',
@@ -72,7 +74,7 @@ export default {
         },
         src: {
             type: String,
-            required: true,
+            default: undefined,
         },
         errorIcon: {
             type: String,
@@ -88,9 +90,11 @@ export default {
         },
     },
     setup(props: LazyImgPropsType, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             imgLoading: true,
             isError: false,
+            proxySrc: makeOptionalProxy('src', vm, ''),
         });
 
         // watch(() => props.src, (val) => {
