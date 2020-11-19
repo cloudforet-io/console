@@ -57,7 +57,7 @@
 		"FILTER": "filters",
 		"HELP": "Need more help? {contact}",
 		"OPERATOR": "operators",
-		"QUERY_KEY": "query(key)",
+		"QUERY_KEY": "Query Key",
 		"STEP_1": "Select a refined filter {queryKey} and use specific words.",
 		"STEP_2_1": "Add and Delete {filter} to narrow your results.",
 		"STEP_2_2": "OR Search for the same filters, And Search for different filters.",

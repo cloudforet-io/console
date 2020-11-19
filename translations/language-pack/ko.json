@@ -15,7 +15,7 @@
 		"YEAR": "년 "
 	},
 	"DEFINITION_TABLE": {
-		"NO_DATA": " 데이터가 없습니다."
+		"NO_DATA": "데이터가 없습니다."
 	},
 	"DICT_INPUT": {
 		"KEY": "키 ",
@@ -23,9 +23,9 @@
 	},
 	"DICT_INPUT_GROUP": {
 		"ADD": "추가 ",
-		"INVALID_DUPLICATED_KEY": "키가 중복됩니다.",
-		"INVALID_NO_KEY": "키가 없습니다.",
-		"INVALID_NO_VALUE": "값이 없습니다.",
+		"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
+		"INVALID_NO_KEY": "키가 입력되지 않았습니다.",
+		"INVALID_NO_VALUE": "값이 입력되지 않았습니다.",
 		"KEY_LABEL": "키",
 		"VALUE_LABEL": "값"
 	},
@@ -56,12 +56,12 @@
 		"CONTACT": "여기로 문의해주세요",
 		"FILTER": "필터",
 		"HELP": "도움이 필요하면 {contact}",
-		"OPERATOR": "검색조건",
-		"QUERY_KEY": "필터(key)",
-		"STEP_1": "빠른 검색을 위해 {queryKey}를 선택하고 구체적인 검색어를 사용하세요.",
+		"OPERATOR": "연산자들",
+		"QUERY_KEY": "검색 키",
+		"STEP_1": "제공되는 {queryKey}를 선택하고 값을 입력하세요.",
 		"STEP_2_1": "검색한 {filter}를 삭제, 추가 하면서 원하는 검색 결과의 범위를 좁히세요.",
 		"STEP_2_2": "같은 필터일 경우 OR 검색을 하고, 다른 필터일 경우 AND 검색을 합니다.",
-		"STEP_3": "아래의 {operator} 설정을 지원합니다.",
+		"STEP_3": "아래의 검색 {operator}을 지원합니다.",
 		"TITLE": "검색 가이드"
 	},
 	"QUERY_SEARCH_TAGS": {
