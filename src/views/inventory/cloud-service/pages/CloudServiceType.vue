@@ -3,13 +3,15 @@
         <template #sidebar="{width}">
             <div :style="{width}">
                 <p class="sidebar-title">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }}
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }} <span class="count">({{ favoriteItems.length }})</span>
                 </p>
                 <p-hr class="sidebar-divider" />
                 <favorite-list :items="favoriteItems" @delete="onFavoriteDelete">
                     <template #icon="{item}">
-                        <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
-                             width="1rem" height="1rem" color="inherit transparent"
+                        <p-lazy-img :src="item.icon || ''"
+                                    error-icon="ic_provider_other"
+                                    :alt="item.name" width="1rem" height="1rem"
+                                    class="icon"
                         />
                     </template>
                 </favorite-list>
@@ -62,7 +64,7 @@
                         No Region
                     </p>
                 </div>
-                <div v-for="(region, idx) in getSortedRegions(filterState.regionList)" :key="idx"
+                <div v-for="(region, idx) in filterState.regionList" :key="idx"
                      :class="{selected: region}" class="region-list"
                 >
                     <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
@@ -121,9 +123,7 @@
                                     {{ item.cloud_service_group }}
                                 </div>
                                 <div class="sub-title">
-                                    <span class="sub-title-provider"
-                                          :style="{color: providers[item.provider] ? providers[item.provider].color : undefined }"
-                                    > {{ providers[item.provider] ? providers[item.provider].label : item.provider }} </span>
+                                    <span class="sub-title-provider"> {{ providers[item.provider] ? providers[item.provider].label : item.provider }} </span>
                                     <span class="sub-title-name">{{ item.cloud_service_type }}</span>
                                     <span class="sub-title-count">
                                         {{ item.count }}
@@ -294,8 +294,6 @@ export default {
             providers: computed(() => vm.$store.state.resource.provider.items),
             favoriteItems: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
         });
-
-        const getSortedRegions = items => sortBy(items, d => d.provider);
 
         const onFavoriteDelete = (item: FavoriteItem) => {
             vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
@@ -484,8 +482,14 @@ export default {
             return queryString;
         };
 
-        const init = async () => {
-            await Promise.all([vm.$store.dispatch('resource/provider/load'), vm.$store.dispatch('favorite/cloudServiceType/load')]);
+        /** Init */
+        (async () => {
+            await Promise.all([
+                vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('resource/cloudServiceType/load'),
+                vm.$store.dispatch('favorite/cloudServiceType/load'),
+            ]);
+
             const providerQueryString = await initProvider();
             if (providerQueryString) {
                 selectedProvider.value = providerQueryString.toString();
@@ -499,9 +503,8 @@ export default {
                 }, 50), { immediate: true });
                 await listCloudServiceType();
             }
-        };
+        })();
 
-        init();
 
         return {
             filterState,
@@ -511,7 +514,6 @@ export default {
             onClickRegion,
             ...toRefs(routeState),
             ...toRefs(state),
-            getSortedRegions,
             onFavoriteDelete,
             selectedProvider,
             providerState,
@@ -530,6 +532,9 @@ export default {
     @apply text-gray-500 text-sm font-bold;
     padding-top: 2rem;
     padding-left: 1rem;
+    .count {
+        font-weight: normal;
+    }
 }
 #region-title {
     @apply text-gray-500 text-sm font-bold;
@@ -665,11 +670,18 @@ export default {
             .favorite-btn {
                 @apply ml-2;
                 flex-shrink: 0;
+                &:not(.active) {
+                    display: none;
+                }
+            }
+            &:hover {
+                .favorite-btn:not(.active) {
+                    display: block;
+                }
             }
         }
     }
 }
-
 
 .page-title {
     margin-bottom: 0;

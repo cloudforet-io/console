@@ -227,6 +227,14 @@
 			"DAILY_UPDATE_DESC": "00:00 ~ 현재 (현지 시간) ",
 			"DAILY_UPDATE_HELP": "자원의 사용 증감을 1일 단위로 확인합니다. ",
 			"DAILY_UPDATE_TITLE": "일별 업데이트 ",
+			"FAVORITES_WIDGET": {
+				"LABEL_CLOUD_SERVICE": "클라우드 서비스",
+				"LABEL_PROJECT": "프로젝트",
+				"NO_DATA": "없음",
+				"TITLE": "즐겨찾기",
+				"TOGGLE_HIDE": "숨기기",
+				"TOGGLE_MORE": "더보기"
+			},
 			"HEALTH_DASHBOARD_DESC_1": "AWS의 비즈니스 또는 엔터프라이즈 플랜을 사용하는 경우 AWS Health Dashboard를 사용할 수 있습니다. ",
 			"HEALTH_DASHBOARD_DESC_1_2": "",
 			"HEALTH_DASHBOARD_DESC_2": "계속 이 위젯을 사용할 수 없습니까? 만약 적합한 플랜을 이용중이라면, 아래의 계정으로 문의를 주시길 바랍니다. ",

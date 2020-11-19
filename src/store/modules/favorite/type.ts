@@ -3,6 +3,7 @@ export interface FavoriteItem {
     resourceType: string;
     name?: string;
     label?: string;
+    icon?: string;
 }
 
 

@@ -1,5 +1,7 @@
  // { INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
  const path = require('path');
+ const forkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+
 const postCssLoader = {
         loader: 'postcss-loader',
         options: require('./postcss.config'),
@@ -29,16 +31,19 @@ module.exports = {
 
     /* Typescript settings */
     config.module.rules.push({
-      test: /\.(ts|tsx)$/,
-      loader: 'ts-loader',
-    include: [
-        path.resolve(__dirname, '../src/components'),
-    ],
-      exclude: /node_modules/,
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-      },
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        use: [
+            {
+                loader: 'ts-loader',
+                options: {
+                    appendTsSuffixTo: [/\.vue$/],
+                    transpileOnly: true,
+                },
+            }
+        ],
     });
+
     config.resolve.extensions.push('.ts', '.tsx');
 
     /* alis settings */
@@ -70,6 +75,8 @@ module.exports = {
               include: path.resolve(__dirname, '../'),
           }
       );
+
+      config.plugins.push(new forkTsCheckerWebpackPlugin());
 
     return config;
   },

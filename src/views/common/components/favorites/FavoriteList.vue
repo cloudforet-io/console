@@ -5,12 +5,12 @@
             {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM') }}
         </div>
         <template v-else>
-            <div v-for="item in items" :key="item.id" class="item"
+            <div v-for="item in displayItems" :key="item.id" class="item"
                  :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
                  @mouseenter="hoveredItem = item"
                  @mouseleave="hoveredItem = null"
             >
-                <slot name="icon" :item="item" />
+                <span class="icon"><slot name="icon" :item="item" /></span>
                 <span class="name">{{ item.name }}</span>
                 <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id" name="ic_delete"
                                width="1rem" height="1rem"
@@ -18,6 +18,12 @@
                                @click="onClickDelete(item)"
                 />
             </div>
+            <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click="onClickToggle">
+                {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_HIDE') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
+                <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                     height="1rem" width="1rem" color="inherit transparent"
+                />
+            </summary>
         </template>
     </div>
 </template>
@@ -31,9 +37,10 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { FavoriteListProps } from '@/views/common/components/favorites/type';
 
+const LIMIT_COUNT = 5;
 export default {
     name: 'FavoriteList',
-    components: { PIconButton },
+    components: { PI, PIconButton },
     props: {
         items: {
             type: Array,
@@ -47,17 +54,28 @@ export default {
     setup(props: FavoriteListProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            displayItems: computed(() => {
+                if (state.isExpanded) return props.items;
+                return props.items.slice(0, LIMIT_COUNT);
+            }),
             hoveredItem: null as null|FavoriteItem,
+            isExpanded: false,
         });
 
         const onClickDelete = (item: FavoriteItem) => {
             vm.$emit('delete', item);
         };
 
+        const onClickToggle = () => {
+            state.isExpanded = !state.isExpanded;
+        };
+
 
         return {
             ...toRefs(state),
             onClickDelete,
+            onClickToggle,
+            LIMIT_COUNT,
         };
     },
 };
@@ -73,12 +91,23 @@ export default {
     line-height: 1.2;
 }
 .item {
-    @apply flex items-center;
+    @apply pl-1 flex items-center;
     cursor: default;
     height: 2rem;
     border-radius: 2px;
     &.hovered {
         @apply bg-secondary2 text-secondary;
+    }
+    .icon {
+        @apply flex-shrink-0 flex overflow-hidden;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 3px;
+    }
+    .name {
+        @apply ml-1 flex-grow truncate;
+        line-height: 1.5;
+        font-size: 0.75rem;
     }
     .delete-btn {
         @apply float-right mr-1;
@@ -88,9 +117,12 @@ export default {
         min-height: 1.5rem;
     }
 }
-.name {
-    @apply ml-1 flex-grow truncate;
-    line-height: 1.5;
+.toggle-btn {
+    @apply mt-3 text-blue-600;
+    cursor: pointer;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1;
     font-size: 0.75rem;
 }
 </style>

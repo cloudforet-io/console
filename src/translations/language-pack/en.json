@@ -227,6 +227,14 @@
 			"DAILY_UPDATE_DESC": "00:00 ~ present (Local time)",
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"FAVORITES_WIDGET": {
+				"LABEL_CLOUD_SERVICE": "Cloud Service",
+				"LABEL_PROJECT": "Project",
+				"NO_DATA": "None",
+				"TITLE": "Favorites",
+				"TOGGLE_HIDE": "hide",
+				"TOGGLE_MORE": "show more"
+			},
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard<br> if you have a Business or Enterprise support plan of AWS.",
 			"HEALTH_DASHBOARD_DESC_1_2": "if you have a Business or Enterprise support plan of AWS.",
 			"HEALTH_DASHBOARD_DESC_2": "Still cannot use this? If you have a proper plan, let us know.",

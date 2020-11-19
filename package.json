@@ -122,6 +122,7 @@
     "eslint": "^5.16.0",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-vue": "^5.0.0",
+    "fork-ts-checker-webpack-plugin": "^6.0.3",
     "https-proxy-agent": "^2.2.4",
     "node-sass": "^4.13.1",
     "postcss": "^7.0.30",

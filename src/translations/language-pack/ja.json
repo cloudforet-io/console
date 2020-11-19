@@ -227,6 +227,14 @@
 			"DAILY_UPDATE_DESC": "",
 			"DAILY_UPDATE_HELP": "",
 			"DAILY_UPDATE_TITLE": "",
+			"FAVORITES_WIDGET": {
+				"LABEL_CLOUD_SERVICE": "",
+				"LABEL_PROJECT": "",
+				"NO_DATA": "",
+				"TITLE": "",
+				"TOGGLE_HIDE": "",
+				"TOGGLE_MORE": ""
+			},
 			"HEALTH_DASHBOARD_DESC_1": "",
 			"HEALTH_DASHBOARD_DESC_1_2": "",
 			"HEALTH_DASHBOARD_DESC_2": "",

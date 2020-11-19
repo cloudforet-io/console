@@ -1,9 +1,9 @@
 <template>
     <general-page-layout class="dashboard">
-        <all-summary
-            :providers="providers"
-            class="col-start-1 col-end-13 lg:col-end-10"
+        <all-summary :providers="providers"
+                     class="col-start-1 col-end-13 lg:col-end-10"
         />
+        <favorites-widget :project="project" :cloud-service="cloudService" />
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
@@ -39,11 +39,13 @@ import ResourceMap from '@/views/common/components/widgets/resource-map/Resource
 import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectorProgress.vue';
 
 import { store } from '@/store';
+import FavoritesWidget from '@/views/common/components/widgets/favorites/FavoritesWidget.vue';
 
 
 export default {
     name: 'Dashboard',
     components: {
+        FavoritesWidget,
         CollectorProgress,
         ResourceMap,
         GeneralPageLayout,
@@ -56,14 +58,23 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            providers: {},
+            providers: computed(() => vm.$store.state.resource.provider.items),
+            project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
+            cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
         });
 
-        const init = async () => {
-            await vm.$store.dispatch('resource/provider/load');
-            state.providers = store.state.resource.provider.items;
-        };
-        init();
+        /** Init */
+        (async () => {
+            await Promise.all([
+                vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('resource/projectGroup/load'),
+                vm.$store.dispatch('resource/project/load'),
+                vm.$store.dispatch('resource/cloudServiceType/load'),
+                vm.$store.dispatch('favorite/projectGroup/load'),
+                vm.$store.dispatch('favorite/project/load'),
+                vm.$store.dispatch('favorite/cloudServiceType/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),
