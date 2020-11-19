@@ -1,11 +1,16 @@
 <template>
     <p-pane-layout class="resource-map">
         <p class="title">
-            {{$t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS')}}
+            {{ $t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS') }} ({{ data.length }})
         </p>
         <div class="flex-wrap sm:flex-wrap md:flex-wrap lg:flex-no-wrap xl:flex-no-wrap chart-wrapper">
             <div class="chart-loader">
                 <div id="chartRef" ref="chartRef" />
+                <div v-if="!loading" class="circle-wrapper">
+                    <p class="circle" :style="{background: providers['aws'].color }" /><span>AWS</span>
+                    <p class="circle" :style="{background: providers['google_cloud'].color }" /><span>Google</span>
+                    <p class="circle" :style="{background: providers['azure'].color }" /><span>Azure</span>
+                </div>
             </div>
             <div v-if="!loading" class="resource-info-wrapper">
                 <div class="resource-info-title">
@@ -18,8 +23,8 @@
                 <div class="grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 progress-bar-wrapper">
                     <div v-for="(item, index) in filteredData" :key="index" class="progress-bar">
                         <div class="progress-bar-label">
-                            <span class="label-text">{{ item.cloud_service_group }}</span>
-                            <span class="label-number">{{ item.count }}</span>
+                            <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
+                            <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
                         </div>
                         <p-progress-bar :percentage="(item.count / maxValue) * 100"
                                         class="progress-bar" :class="selectedProvider"
@@ -164,7 +169,7 @@ export default {
             circle.radius = 3;
             circle.propertyFields.fill = 'color';
             const circle2 = imageSeries.mapImages.template.createChild(am4core.Circle);
-            circle2.radius = 3;
+            circle2.radius = 2;
             circle2.propertyFields.fill = 'color';
             circle2.events.on('inited', (event) => {
                 animateBullet(event.target);
@@ -196,9 +201,8 @@ export default {
                 state.selectedProvider = target.provider;
                 state.selectedRegion = target.name;
                 await getFilteredData(target.region_code);
-                const coords = chart.svgPointToGeo(event.svgPoint);
                 if (originTarget !== state.selectedRegion) {
-                    drawMarker(coords, marker, mapLabel);
+                    drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker, mapLabel);
                 }
             });
 
@@ -283,6 +287,21 @@ export default {
         flex-grow: 1;
         margin-right: 1rem;
         height: 21rem;
+        .circle-wrapper {
+            @apply mt-3;
+            .circle {
+                @apply inline-block;
+                margin-right: 0.25rem;
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 50%;
+            }
+            span {
+                @apply mr-4 text-gray-500;
+                font-size: 0.75rem;
+                line-height: 1.5;
+            }
+        }
         #chartRef {
             @apply w-full h-full;
         }

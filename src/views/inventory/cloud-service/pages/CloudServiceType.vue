@@ -107,7 +107,7 @@
                 >
                     <template #toolbox-left>
                         <p-check-box v-model="filterState.showAllCloudServices">
-                            <span class="show-all">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_ALL') }}</span>
+                            <span class="show-all">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_MAJOR') }}</span>
                         </p-check-box>
                     </template>
                     <template #card="{item}">
@@ -264,7 +264,7 @@ export default {
             regionList: [] as RegionModel[],
             selectedRegionIdx: [] as number[],
             regionFilter: [] as string[],
-            showAllCloudServices: false,
+            showAllCloudServices: true,
         });
         const handlers = makeQuerySearchPropsWithSearchSchema(
             {
@@ -335,6 +335,8 @@ export default {
          * Card click event
          * */
         const getToCloudService = (item) => {
+            console.log(item)
+            let res: Location;
             const filters: QueryTag[] = [];
             state.tags.forEach((tag: QueryTag) => {
                 if (tag.key) {
@@ -343,17 +345,31 @@ export default {
                     if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
                 }
             });
-            const res: Location = {
-                name: 'cloudServicePage',
-                params: {
-                    provider: item.provider,
-                    group: item.cloud_service_group,
-                    name: item.cloud_service_type,
-                },
-                query: {
-                    filters: queryTagsToQueryString(filters),
-                },
-            };
+            if (item.resource_type === 'inventory.Server') {
+                res = {
+                    name: 'server',
+                    params: {
+                        provider: item.provider,
+                        group: item.cloud_service_group,
+                        name: item.cloud_service_type,
+                    },
+                    query: {
+                        filters: queryTagsToQueryString(filters),
+                    },
+                };
+            } else {
+                res = {
+                    name: 'cloudServicePage',
+                    params: {
+                        provider: item.provider,
+                        group: item.cloud_service_group,
+                        name: item.cloud_service_type,
+                    },
+                    query: {
+                        filters: queryTagsToQueryString(filters),
+                    },
+                };
+            }
             return res;
         };
 
@@ -390,7 +406,7 @@ export default {
             else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
-                show_all: filterState.showAllCloudServices,
+                is_primary: filterState.showAllCloudServices,
                 labels,
                 query: query.data,
             };
@@ -408,7 +424,7 @@ export default {
             listCloudServiceRequest = axios.CancelToken.source();
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage(
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
                     getParams(isTriggeredBySideFilter),
                     { cancelToken: listCloudServiceRequest.token },
                 );

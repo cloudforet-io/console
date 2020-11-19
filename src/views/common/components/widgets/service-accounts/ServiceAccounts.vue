@@ -100,7 +100,7 @@ interface Data {
     // name: string;
     // icon: string;
     color: string;
-    count: number;
+    service_account_count: number;
     href: string;
 }
 
@@ -119,15 +119,14 @@ export default {
         const state = reactive({
             skeletons: range(4),
             loading: true,
-            //
             loaderRef: null,
             chartRef: null as HTMLElement|null,
             data: [] as Data[],
             chart: null as null|any,
             fields: computed(() => [
                 { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
-                { name: 'count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
-                { name: 'project', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROJECT') },
+                { name: 'service_account_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
+                { name: 'project_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROJECT') },
             ]),
         });
 
@@ -148,7 +147,7 @@ export default {
             }
 
             const series = chart.series.create();
-            series.dataFields.value = 'count';
+            series.dataFields.value = 'service_account_count';
             series.dataFields.category = 'name';
             series.slices.template.propertyFields.fill = 'color';
             series.slices.template.stroke = am4core.color(white);
@@ -187,14 +186,7 @@ export default {
             await store.dispatch('resource/provider/load');
             try {
                 const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider();
-                // const others: Data = {
-                //     name: 'Others',
-                //     icon: 'ic_provider_other',
-                //     color: yellow[500],
-                //     count: 0,
-                //     provider: '',
-                //     href: '/identity/service-account',
-                // };
+
                 const providers = store.state.resource.provider.items;
 
                 if (res.results.length > 0) {
@@ -206,7 +198,7 @@ export default {
                                 // icon: providers[d.provider].icon || '',
                                 color: providers[d.provider].color || '',
                                 href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
-                                count: d.count,
+                                service_account_count: d.service_account_count,
                                 ...d,
                             });
                         }
@@ -214,7 +206,7 @@ export default {
                     });
                 } else {
                     state.data = map(providers, p => ({
-                        name: p.label || '', color: p.color || '', count: 0, href: '',
+                        name: p.label || '', color: p.color || '', service_account_count: 0, href: '',
                     }));
                 }
                 // state.data.push(others);

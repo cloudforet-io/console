@@ -433,7 +433,7 @@ export default {
 
         /* event */
         const onClickBox = (idx) => {
-            disposeChart();
+            if (idx !== state.selectedIndex) disposeChart();
             state.selectedIndex = idx;
         };
 

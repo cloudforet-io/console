@@ -115,9 +115,9 @@ export default {
                 { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK'), width: 3 },
                 { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
                 { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
-                { name: 'servers', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
-                { name: 'database', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
-                { name: 'storage', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
+                { name: 'server_count', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
+                { name: 'database_count', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
+                { name: 'storage_size', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
             ]),
         });
 
@@ -181,11 +181,27 @@ export default {
             chart.legend.markers.template.height = 8;
         };
 
+        const formatBytes = (bytes, decimals = 2) => {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        };
+
         const getData = async () => {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.topProject();
-                const data = res.results;
+                const data = res.results.map(d => ({
+                    storage_size: formatBytes(d.storage_size, 2),
+                    rank: d.rank,
+                    project_group: d.project_group,
+                    project: d.project,
+                    server_count: d.server_count,
+                    database_count: d.database_count,
+                }));
                 const orderedData = orderBy(data, ['total'], ['desc']);
                 state.data = orderedData;
 
@@ -200,8 +216,8 @@ export default {
                 orderedData.forEach((d, idx) => {
                     chartData.splice(idx, 1, {
                         rank: `#${idx + 1}`,
-                        server: d.servers,
-                        database: 0, // todo
+                        server: d.server_count,
+                        database: d.database_count,
                     });
                 });
                 state.chartData = chartData.reverse();

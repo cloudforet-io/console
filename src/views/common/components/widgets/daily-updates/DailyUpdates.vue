@@ -49,16 +49,10 @@
                     </div>
                 </div>
                 <div v-for="(item, index) in data" :key="index" class="daily-update-card">
-                    <div v-if="!item.isServer">
+                    <div>
                         <p-lazy-img :src="iconUrl(item)"
                                     width="2rem" height="2rem"
                                     class="rounded flex-shrink-0 service-img"
-                        />
-                    </div>
-                    <div v-else-if="item.isServer">
-                        <p-i name="ic_server"
-                             width="2rem" height="2rem"
-                             class="rounded flex-shrink-0"
                         />
                     </div>
                     <p v-if="item.created_count || item.deleted_count" class="daily-service">
@@ -363,7 +357,7 @@ export default {
             width: 24%;
             max-width: 6.5rem;
             &:hover {
-                @apply bg-white cursor-pointer underline text-blue-500;
+                @apply bg-blue-100 cursor-pointer underline text-blue-500;
                 opacity: 0.75;
                 border-radius: 0.25rem;
             }
@@ -375,7 +369,7 @@ export default {
             width: 24%;
             max-width: 6.5rem;
             &:hover {
-                @apply bg-white cursor-pointer underline text-red-500;
+                @apply bg-blue-100 cursor-pointer underline text-red-500;
                 opacity: 0.75;
                 border-radius: 0.25rem;
             }

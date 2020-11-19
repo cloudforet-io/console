@@ -425,7 +425,7 @@
 				"REGION": "Region",
 				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Provider",
-				"SHOW_ALL": "Show All",
+				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "{provider} Cloud Service"
 			},
 			"PAGE": {

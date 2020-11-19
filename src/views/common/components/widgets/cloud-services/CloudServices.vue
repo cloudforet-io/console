@@ -121,10 +121,10 @@ export default {
             const query = new QueryHelper()
                 .setSort('created_at')
                 .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
-            const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage({
+            const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                 query: query.data,
                 // eslint-disable-next-line camelcase
-                show_all: false,
+                is_primary: true,
             });
             state.data = [
                 ...res.results.map(d => ({
@@ -148,10 +148,10 @@ export default {
                 if (props.projectFilter) {
                     await getDataInProject();
                 } else {
-                    const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage({
+                    const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                         query: query.data,
                         // eslint-disable-next-line camelcase
-                        show_all: false,
+                        is_primary: true,
                     });
                     state.data = [
                         ...res.results.map(d => ({
