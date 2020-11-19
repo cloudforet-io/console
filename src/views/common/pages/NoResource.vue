@@ -11,7 +11,7 @@
                           :size="20"
                 />
                 <p class="error-message">
-                    {{ $t('COMMON.ERROR.NO_RESOURCE_MSG') }}<br> <a href="/dashboard">{{ $t('COMMON.ERROR.NO_RESOURCE_GO_BACK_1') }}</a> {{ $t('COMMON.ERROR.NO_RESOURCE_GO_BACK_2') }}
+                    {{ $t('COMMON.ERROR.NO_RESOURCE_MSG') }}
                 </p>
                 <router-link :to="serviceRoute.path">
                     <p-button style-type="primary" class="redirect-button">

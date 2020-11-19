@@ -7,8 +7,9 @@
                     404
                 </p>
                 <p class="error-message">
-                    {{ $t('COMMON.ERROR.404_MSG') }}<br> {{ $t('COMMON.ERROR.404_GO_BACK_1') }} <a href="javascript:history.go(-1)">{{ $t('COMMON.ERROR.404_GO_BACK_2') }}</a>
+                    {{ $t('COMMON.ERROR.404_MSG') }}
                 </p>
+                <p-button />
             </div>
         </div>
         <footer><img src="@/assets/images/SpaceONE_logo_bottom.png" class="footer-img"></footer>
@@ -17,9 +18,11 @@
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
+import PButton from '@/components/atoms/buttons/PButton';
 
 export default {
     name: 'ErrorPage',
+    components: { PButton },
     setup() {
         const state = reactive({
             errorStatus: '404',
