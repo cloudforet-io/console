@@ -1,26 +1,23 @@
 <template>
     <general-page-layout class="dashboard">
-        <all-summary :providers="providers"
-                     class="col-start-1 col-end-13 lg:col-end-10"
-        />
-        <favorites-widget :project="project" :cloud-service="cloudService" />
-        <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13 sm:row-start-2 sm:row-end-3 lg:row-start-1
-                              daily-updates"
-        />
-        <resource-map :providers="providers"
-                      class="col-start-1 col-end-13 lg:col-end-10"
-        />
-        <service-accounts class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13
-                                 sm:row-start-3 sm:row-end-4"
-        />
-        <top-projects class="col-start-1 col-end-13 lg:col-end-10" />
-        <cloud-services class="col-start-1 col-end-10"
-                        :more-info="true"
-        />
-        <collector-progress :providers="providers"
-                            class="col-start-1 col-end-13 sm:col-start-6 col-end-7 lg:col-start-10 col-end-13 collector-progress"
-        />
-        <!--        <collectors class="col-start-1 col-end-13" />-->
+        <div class="col-span-12 lg:col-span-9
+                    widget-wrapper"
+        >
+            <all-summary :providers="providers" />
+            <resource-map :providers="providers" />
+            <top-projects />
+            <cloud-services :more-info="true" />
+        </div>
+        <div class="col-span-12 lg:col-span-3
+                    widget-wrapper"
+        >
+            <favorites-widget :project="project" :cloud-service="cloudService" />
+            <daily-updates class="daily-updates" />
+            <service-accounts class="" />
+            <collector-progress :providers="providers"
+                                class="collector-progress"
+            />
+        </div>
     </general-page-layout>
 </template>
 
@@ -103,6 +100,11 @@ export default {
         }
     }
 }
+
+.widget-wrapper {
+    @apply grid gap-4 grid-flow-row grid-cols-1;
+}
+
 .daily-updates {
     height: 33.75rem;
 }

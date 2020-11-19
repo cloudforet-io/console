@@ -149,6 +149,7 @@ export default {
             languages: [
                 { type: 'item', label: 'English (default)', name: 'en' },
                 { type: 'item', label: '한국어', name: 'ko' },
+                { type: 'item', label: '日本', name: 'jp' },
             ],
             timezones: [
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
