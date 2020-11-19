@@ -3,7 +3,7 @@
         <p class="title">
             Region
         </p>
-        <div class="chart-wrapper">
+        <div class="flex-wrap sm:flex-wrap md:flex-wrap lg:flex-no-wrap xl:flex-no-wrap chart-wrapper">
             <div class="chart-loader">
                 <div id="chartRef" ref="chartRef" />
             </div>
@@ -15,24 +15,15 @@
                         {{ providers[selectedProvider].label }} </span>
                     <span class="resource-info-region">{{ selectedRegion }}</span>
                 </div>
-                <div v-if="Object.keys(filteredData).length > 10">
-                    <div v-for="i in 10" :key="i" class="progress-bar">
+                <div class="grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 progress-bar-wrapper">
+                    <div v-for="(item, index) in filteredData" :key="index" class="progress-bar">
                         <div class="progress-bar-label">
-                            <span class="label-text">{{ Object.keys(filteredData)[i] }}</span>
-                            <span class="label-number">{{ Object.values(filteredData)[i] }}</span>
+                            <span class="label-text">{{ item.cloud_service_group }}</span>
+                            <span class="label-number">{{ item.count }}</span>
                         </div>
-                        <p-progress-bar :percentage="(Object.values(filteredData)[i] / maxValue) * 100"
+                        <p-progress-bar :percentage="(item.count / maxValue) * 100"
                                         class="progress-bar" :class="selectedProvider"
                         />
-                    </div>
-                </div>
-                <div v-else-if="0 < Object.keys(filteredData).length && Object.keys(filteredData).length < 10">
-                    <div v-for="i in (Object.keys(filteredData).length)" :key="i" class="progress-bar">
-                        <div class="progress-bar-label">
-                            <span class="label-text">{{ Object.keys(filteredData)[i-1] }}</span>
-                            <span class="label-number">{{ Object.values(filteredData)[i-1] }}</span>
-                        </div>
-                        <p-progress-bar :percentage="(Object.values(filteredData)[i-1] / maxValue) * 100" :class="selectedProvider" />
                     </div>
                 </div>
             </div>
@@ -93,18 +84,19 @@ export default {
         const getFilteredData = async (regionCode) => {
             state.loading = true;
             try {
-                const resp = await SpaceConnector.client.inventory.cloudService.list({
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                     query: new QueryHelper()
-                        .setFilter({ k: 'region_code', v: regionCode, o: 'eq' })
-                        .setOnly('cloud_service_group', 'cloud_service_type', 'provider')
+                        .setFilter({ k: 'region_code', v: regionCode, o: 'eq' }, { k: 'provider', v: state.selectedProvider, o: 'eq' })
+
+                        .setPageLimit(10)
+                        .setSort('count', true, 'name')
                         .data,
+                    is_major: true,
+                    is_primary: true,
                 });
-                state.filteredData = resp.results.map(d => d.cloud_service_group).reduce((x, y) => {
-                    x[y] = ++x[y] || 1;
-                    return x;
-                }, {});
+                state.filteredData = res.results;
                 if (state.filteredData) {
-                    const countArray = Object.values(state.filteredData) as number[];
+                    const countArray = state.filteredData.map(d => d.count) as number[];
                     state.maxValue = Math.max(...countArray);
                 } else state.maxValue = 0;
             } catch (e) {
@@ -122,9 +114,10 @@ export default {
             });
         };
 
-        const drawMarker = (coords, marker) => {
+        const drawMarker = (coords, marker, mapLabel) => {
             marker.latitude = coords.latitude;
             marker.longitude = coords.longitude;
+            mapLabel.text = state.selectedRegion;
         };
 
         const drawChart = async () => {
@@ -142,7 +135,17 @@ export default {
             polygonSeries.mapPolygons.template.fill = am4core.color(gray[200]);
             polygonSeries.calculateVisualCenter = true;
 
-            const resp = await SpaceConnector.client.inventory.region.list();
+            const resp = await SpaceConnector.client.inventory.region.list({
+                query: {
+                    filter: [
+                        {
+                            k: 'region_code',
+                            v: 'global',
+                            o: 'not',
+                        },
+                    ],
+                },
+            });
             state.data = [
                 ...resp.results.map(d => ({
                     title: d.name,
@@ -181,10 +184,10 @@ export default {
             mapMarker.horizontalCenter = 'middle';
             mapMarker.verticalCenter = 'bottom';
 
-            // const mapLabel = mapImageTemplate.createChild(am4core.Label);
+            const mapLabel = mapImageTemplate.createChild(am4core.Label);
 
-            // mapLabel.horizontalCenter = 'middle';
-            // mapLabel.text = state.selectedRegion;
+            mapLabel.horizontalCenter = 'middle';
+
             const marker = mapImage.create();
 
             circle2.events.on('hit', async (event) => {
@@ -195,13 +198,12 @@ export default {
                 await getFilteredData(target.region_code);
                 const coords = chart.svgPointToGeo(event.svgPoint);
                 if (originTarget !== state.selectedRegion) {
-                    // mapLabel.text = state.selectedRegion;
-                    drawMarker(coords, marker);
+                    drawMarker(coords, marker, mapLabel);
                 }
             });
 
             const originCoords = { longitude: 126.871867, latitude: 37.528547 };
-            drawMarker(originCoords, marker);
+            drawMarker(originCoords, marker, mapLabel);
             imageSeries.data = state.data;
         };
 
@@ -233,7 +235,30 @@ export default {
 .resource-map {
     @apply border border-gray-100;
     border-radius: 0.375rem;
-    height: 30rem;
+    height: 33rem;
+
+    @screen 2xs {
+        height: 52rem;
+    }
+    @screen xs {
+        height: 52rem;
+    }
+    @screen sm {
+        height: 52rem;
+    }
+    @screen md {
+        height: 42rem;
+    }
+    @screen lg {
+        height: 34rem;
+    }
+    @screen xl {
+        height: 34rem;
+    }
+
+    @screen 2xl {
+        height: 34rem;
+    }
 }
 .title {
     @apply text-gray-900;
@@ -251,13 +276,35 @@ export default {
     margin-left: 1.5rem;
     margin-top: 1.1875rem;
     padding-bottom: 2rem;
+
     .chart-loader {
         flex-shrink: 0;
-        width: 70%;
+        width: 72%;
+        flex-grow: 1;
+        margin-right: 1rem;
         #chartRef {
             @apply w-full h-full;
         }
+        @screen xs {
+            height: 18.75rem;
+        }
+        @screen sm {
+            height: 18.75rem;
+        }
+        @screen md {
+            height: 21.625rem;
+        }
+        @screen lg {
+            height: 28rem;
+        }
+        @screen xl {
+            height: 28rem;
+        }
+        @screen 2xl {
+            height: 28rem;
+        }
     }
+
 }
 .resource-info-wrapper {
     margin-right: 1.5rem;
@@ -269,33 +316,40 @@ export default {
         margin-bottom: 1rem;
         line-height: 1.5;
     }
-    .progress-bar-label {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.25rem;
-    }
-
-    .progress-bar {
-        margin-bottom: 0.5rem;
-        &.aws {
-            >>> .tracker-bar {
-                background-color: #f90;
-            }
-        }
-        &.google_cloud {
-            >>> .tracker-bar {
-                background-color: #4285f4;
-            }
-        }
-        &.azure {
-            >>> .tracker-bar {
-                background-color: #00bcf2;
-            }
+    .progress-bar-wrapper {
+        display: grid;
+        column-gap: 2rem;
+        .progress-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
         }
 
-        &:hover {
-            @apply bg-blue-100;
-            border-radius: 0.125rem;
+        .progress-bar {
+            margin-bottom: 0.5rem;
+
+            &.aws {
+                >>> .tracker-bar {
+                    background-color: #f90;
+                }
+            }
+
+            &.google_cloud {
+                >>> .tracker-bar {
+                    background-color: #4285f4;
+                }
+            }
+
+            &.azure {
+                >>> .tracker-bar {
+                    background-color: #00bcf2;
+                }
+            }
+
+            &:hover {
+                @apply bg-blue-100;
+                border-radius: 0.125rem;
+            }
         }
     }
 }

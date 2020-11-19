@@ -69,9 +69,9 @@ class QueryHelper {
         return this;
     }
 
-    setSort(key: string, desc = false): QueryHelper {
+    setSort(key: string, desc = false, field: 'key' | 'name' = 'key'): QueryHelper {
         this._data.sort = {
-            key,
+            [field]: key,
             desc,
         };
         return this;

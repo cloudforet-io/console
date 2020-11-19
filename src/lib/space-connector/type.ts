@@ -32,7 +32,8 @@ export interface Query {
         limit?: number;
     };
     sort?: {
-        key: string;
+        key?: string;
+        name?: string;
         desc?: boolean;
     };
     only?: Array<string>;
