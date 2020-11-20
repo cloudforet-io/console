@@ -8,9 +8,9 @@
                            :this-page.sync="thisPage"
                            :page-size.sync="pageSize"
                            :total-count="totalCount"
-                           @changePageNumber="getData"
-                           @changePageSize="getData"
-                           @clickRefresh="getData"
+                           @changePageNumber="getData()"
+                           @changePageSize="getData()"
+                           @clickRefresh="getData()"
     >
         <template #toolbox-left>
             <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}" class="show-all-wrapper">
@@ -253,14 +253,13 @@ export default {
                 let res;
                 if (id) res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 else res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
+                state.items = res.results;
+                state.totalCount = res.total_count;
                 state.loading = false;
+                listProjectToken = undefined;
 
                 state.cardSummary = await getCardSummary(res.results);
                 state.cardSummaryLoading = false;
-
-                state.items = res.results;
-                state.totalCount = res.total_count;
-                listProjectToken = undefined;
 
                 vm.$emit('list', state.totalCount);
             } catch (e) {
