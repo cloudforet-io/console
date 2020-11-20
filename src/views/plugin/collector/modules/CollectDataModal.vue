@@ -253,7 +253,7 @@ export default {
             state.showValidation = true;
             try {
                 await collectorApi(getCollectParams());
-                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_TITLE'), '', vm.$root);
+                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'), e, vm.$root);

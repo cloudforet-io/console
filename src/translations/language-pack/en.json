@@ -632,7 +632,7 @@
 				"ALT_E_UPDATE_SCHEDULE_TITLE": "Update schedule failure",
 				"ALT_E_UPDATE_TITLE": "Update collector failure",
 				"ALT_S_ADD_SCHEDULE_TITLE": "Add schedule success",
-				"ALT_S_COLLECT_TITLE": "Collect data success",
+				"ALT_S_COLLECT_START_TITLE": "Data collection started",
 				"ALT_S_DELETE_SCHEDULE_TITLE": "Delete schedule success",
 				"ALT_S_DELETE_TITLE": "Delete collector success",
 				"ALT_S_DISABLE_TITLE": "Set disabled collector success",
