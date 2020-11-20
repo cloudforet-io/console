@@ -181,7 +181,7 @@ export default {
     }
 }
 .more {
-    @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
+    @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer;
     &:hover {
         @apply text-secondary underline;
     }

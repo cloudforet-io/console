@@ -204,16 +204,18 @@ export default {
 <style lang="postcss" scoped>
 
 .group-name {
-    @apply text-base font-bold mb-1 truncate leading-tight;
+    @apply font-bold mb-1 truncate leading-tight;
+    font-size: 0.875rem;
 }
 .name {
     @apply text-xs text-gray truncate leading-tight;
 }
 .count {
-    @apply text-lg ml-1;
+    @apply ml-1;
+    font-size: 0.875rem;
 }
 .more {
-    @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
+    @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer;
     &:hover {
         @apply text-secondary underline;
     }
