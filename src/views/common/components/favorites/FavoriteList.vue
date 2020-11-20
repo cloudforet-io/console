@@ -20,10 +20,10 @@
                 <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id" name="ic_delete"
                                width="1rem" height="1rem"
                                class="delete-btn"
-                               @click="onClickDelete(item)"
+                               @click.prevent.stop="onClickDelete(item)"
                 />
             </a>
-            <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click="onClickToggle">
+            <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click.stop="onClickToggle">
                 {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
                 <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                      height="1rem" width="1rem" color="inherit transparent"
@@ -111,7 +111,6 @@ export default {
 }
 .item {
     @apply pl-1 flex items-center;
-    cursor: default;
     height: 2rem;
     border-radius: 2px;
     cursor: pointer;

@@ -643,9 +643,19 @@ export default {
         height: 6rem;
         filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
         border-radius: 4px;
+        .favorite-btn {
+            @apply ml-2;
+            flex-shrink: 0;
+            &:not(.active) {
+                display: none;
+            }
+        }
         &:hover {
             @apply bg-blue-100;
             cursor: pointer;
+            .favorite-btn:not(.active) {
+                display: block;
+            }
         }
         .item-wrapper {
             @apply flex w-full h-full items-center;
@@ -681,18 +691,6 @@ export default {
                         font-size: 0.75rem;
                         font-weight: bold;
                     }
-                }
-            }
-            .favorite-btn {
-                @apply ml-2;
-                flex-shrink: 0;
-                &:not(.active) {
-                    display: none;
-                }
-            }
-            &:hover {
-                .favorite-btn:not(.active) {
-                    display: block;
                 }
             }
         }
