@@ -2,15 +2,26 @@
     <general-page-layout>
         <p-page-navigation :routes="pageNavigation" />
         <div class="top flex">
-            <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
-            <p-icon-button name="ic_transhcan"
-                           width="1.5rem" height="1.5rem" class="delete-btn"
-                           @click="openProjectDeleteForm"
-            />
-            <p-icon-button name="ic_edit-text"
-                           width="1.5rem" height="1.5rem" class="edit-btn"
-                           @click="openProjectEditForm"
-            />
+            <p-page-title :title="item.name" child @goBack="$router.go(-1)">
+                <template #extra>
+                    <span class="favorite-btn-wrapper">
+                        <favorite-button :item-id="projectId"
+                                         favorite-type="project"
+                                         resource-type="identity.Project"
+                        />
+                    </span>
+                    <div class="btns">
+                        <p-icon-button name="ic_transhcan"
+                                       width="1.5rem" height="1.5rem" class="delete-btn"
+                                       @click="openProjectDeleteForm"
+                        />
+                        <p-icon-button name="ic_edit-text"
+                                       width="1.5rem" height="1.5rem" class="edit-btn"
+                                       @click="openProjectEditForm"
+                        />
+                    </div>
+                </template>
+            </p-page-title>
         </div>
         <p class="copy-project-id">
             <b>{{ $t('PROJECT.DETAIL.PROJECT_ID') }}</b> {{ projectId }}
@@ -137,10 +148,12 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
+import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
 export default {
     name: 'ProjectDetail',
     components: {
+        FavoriteButton,
         PSearchTable,
         PPanelTop,
         ProjectReportTab,
@@ -407,12 +420,15 @@ export default {
             ] as any;
         };
 
-        const init = () => {
-            getPageNavigation();
-        };
 
-        init();
-
+        /** Init */
+        (async () => {
+            await Promise.all([
+                getPageNavigation(),
+                vm.$store.dispatch('resource/project/load'),
+                vm.$store.dispatch('favorite/project/load'),
+            ]);
+        })();
         return {
             ...toRefs(state),
             ...toRefs(formState),
@@ -437,11 +453,22 @@ export default {
 
 <style lang="postcss" scoped>
 .p-page-title {
-    &::v-deep .title {
-        @apply text-2xl;
-    }
-    &::v-deep .extra {
-        @apply text-base text-gray-400 mt-1;
+    &::v-deep {
+        .extra {
+            @apply justify-between text-base text-gray-400 mt-1;
+        }
+        .title {
+            @apply text-2xl;
+        }
+        .favorite-btn-wrapper {
+            @apply ml-2;
+        }
+        .btns {
+            @apply inline-flex items-center;
+            .p-icon-text-button {
+                @apply ml-4;
+            }
+        }
     }
 }
 .p-tab {

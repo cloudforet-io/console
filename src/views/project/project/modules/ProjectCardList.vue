@@ -79,10 +79,10 @@
 
                 <div class="card-bottom-wrapper">
                     <div class="accounts">
-                        <span v-if="item.providers.length" class="label">{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
+                        <span v-if="getDistinctProviders(item.providers).length" class="label">{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
                         <div class="provider-icon-wrapper">
                             <div class="provider">
-                                <router-link v-for="(provider, index) in item.providers"
+                                <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
                                              :key="index"
                                              :to="{
                                                  name: 'serviceAccount',
@@ -99,7 +99,7 @@
                             <router-link class="icon-wrapper" :to="{name: 'serviceAccount',}">
                                 <p-i name="ic_plus_thin" scale="0.8" />
                             </router-link>
-                            <span v-if="item.providers.length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
+                            <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                         </div>
                     </div>
                     <div class="favorite-wrapper">
@@ -128,7 +128,7 @@ import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { range } from 'lodash';
+import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 
@@ -191,6 +191,7 @@ export default {
                 query: { provider: getProvider(provider) ? provider : null },
             });
         };
+        const getDistinctProviders = (items: string[]) => uniq(items);
 
         const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
         const listAllProjectApi = SpaceConnector.client.identity.project.list;
@@ -296,6 +297,7 @@ export default {
             ...toRefs(state),
             getProvider,
             goToServiceAccount,
+            getDistinctProviders,
             getData,
             skeletons: range(1),
             listProjects,

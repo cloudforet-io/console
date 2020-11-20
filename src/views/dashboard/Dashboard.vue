@@ -1,6 +1,6 @@
 <template>
     <general-page-layout class="dashboard">
-        <div class="col-span-12 lg:col-span-9
+        <div class="col-span-12 md:col-span-6 lg:col-span-9
                     widget-wrapper"
         >
             <all-summary :providers="providers" />
@@ -8,14 +8,17 @@
             <top-projects />
             <cloud-services :more-info="true" />
         </div>
-        <div class="col-span-12 lg:col-span-3
+        <div class="col-span-12 md:col-span-6 lg:col-span-3
                     widget-wrapper"
         >
-            <favorites-widget :project="project" :cloud-service="cloudService" />
+            <favorites-widget class="hidden md:block"
+                              :project="project" :cloud-service="cloudService"
+            />
+
             <daily-updates class="daily-updates" />
-            <service-accounts class="" />
-            <collector-progress :providers="providers"
-                                class="collector-progress"
+            <service-accounts />
+            <collector-progress class="collector-progress"
+                                :providers="providers"
             />
         </div>
     </general-page-layout>
@@ -85,19 +88,7 @@ export default {
     @apply bg-gray-100;
 
     .page-contents {
-        @apply grid gap-4 grid-flow-row grid-cols-12 p-4;
-    }
-
-    @screen md {
-        .page-contents {
-            @apply p-8;
-        }
-    }
-
-    @screen xl {
-        .page-contents {
-            @apply p-12;
-        }
+        @apply grid gap-4 grid-cols-12 p-6;
     }
 }
 
