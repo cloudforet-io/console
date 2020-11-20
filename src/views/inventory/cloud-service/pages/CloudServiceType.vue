@@ -106,7 +106,7 @@
                                       @refresh="onChange"
                 >
                     <template #toolbox-left>
-                        <p-check-box v-model="filterState.showAllCloudServices">
+                        <p-check-box v-model="filterState.isPrimary">
                             <span class="show-all">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_MAJOR') }}</span>
                         </p-check-box>
                     </template>
@@ -264,7 +264,7 @@ export default {
             regionList: [] as RegionModel[],
             selectedRegionIdx: [] as number[],
             regionFilter: [] as string[],
-            showAllCloudServices: true,
+            isPrimary: true,
         });
         const handlers = makeQuerySearchPropsWithSearchSchema(
             {
@@ -402,7 +402,7 @@ export default {
             else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
-                is_primary: filterState.showAllCloudServices,
+                is_primary: filterState.isPrimary,
                 labels,
                 query: query.data,
             };
@@ -444,9 +444,10 @@ export default {
             }
         }, { immediate: false });
 
-        watch<boolean, boolean>(() => filterState.showAllCloudServices, async (after, before) => {
+        watch<boolean, boolean>(() => filterState.isPrimary, async (after, before) => {
             if (after !== before) {
                 await listCloudServiceType();
+                await replaceQuery('primary', filterState.isPrimary.toString());
             }
         }, { immediate: false });
 
@@ -510,6 +511,7 @@ export default {
                 selectedProvider.value = providerQueryString.toString();
                 filterState.serviceFilter = queryStringToStringArray(vm.$route.query.service);
                 filterState.regionFilter = queryStringToStringArray(vm.$route.query.region);
+                filterState.isPrimary = JSON.parse(vm.$route.query.primary as string);
                 watch<string, boolean>(() => selectedProvider.value, debounce((after) => {
                     if (!after) return;
                     if (after) {
