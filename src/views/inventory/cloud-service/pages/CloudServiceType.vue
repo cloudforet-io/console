@@ -675,19 +675,17 @@ export default {
                     line-height: 1.5;
 
                     .sub-title-provider {
-                        @apply mr-2;
+                        @apply mr-2 text-gray-400;
                         flex-shrink: 0;
                     }
 
                     .sub-title-name {
                         @apply mr-2 inline-block truncate;
-                        font-size: 0.75rem;
                         flex-shrink: 1;
                     }
 
                     .sub-title-count {
                         flex-shrink: 0;
-                        font-size: 0.75rem;
                         font-weight: bold;
                     }
                 }

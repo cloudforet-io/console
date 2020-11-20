@@ -154,6 +154,7 @@ export default {
             timezones: [
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
+                { type: 'item', label: 'Asia/Tokyo', name: 'Asia/Tokyo' },
             ],
             isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),

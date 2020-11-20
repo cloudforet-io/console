@@ -285,6 +285,7 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.delete({
                     project_group_id: projectState.groupId,
                 });
+                await vm.$store.dispatch('favorite/projectGroup/removeItem', { id: projectState.groupId });
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', root);
                 state.treeRef.deleteSelectedNode();
             } catch (e) {
