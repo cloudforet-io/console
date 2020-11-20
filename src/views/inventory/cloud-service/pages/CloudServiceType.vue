@@ -345,13 +345,10 @@ export default {
                 }
             });
             if (item.resource_type === 'inventory.Server') {
+                filters.push({ key: { label: 'Provider', name: 'provider' }, operator: '=', value: { label: item.provider, name: item.provider } },
+                    { key: { label: 'Cloud Service Type', name: 'cloud_service_type' }, operator: '=', value: { label: item.cloud_service_type, name: item.cloud_service_type } });
                 res = {
                     name: 'server',
-                    params: {
-                        provider: item.provider,
-                        group: item.cloud_service_group,
-                        name: item.cloud_service_type,
-                    },
                     query: {
                         filters: queryTagsToQueryString(filters),
                     },
@@ -399,8 +396,8 @@ export default {
                 .setPageLimit(state.pageSize)
                 .setKeyword(...keywords)
                 .setFilterOr(...orFilters)
-                .setFilter(...andFilters, ...filters);
-
+                .setFilter(...andFilters, ...filters)
+                .setSort('count', true, 'name');
             if (isTriggeredBySideFilter) state.thisPage = 1;
             else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
 

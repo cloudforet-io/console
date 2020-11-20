@@ -305,7 +305,7 @@ export default {
     }
     min-height: 37rem;
     max-height: 47rem;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 @screen lg {

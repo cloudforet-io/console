@@ -117,6 +117,23 @@ export default {
             providers: computed(() => store.state.resource.provider.items),
         });
 
+        const getLink = (data, projectFilter?) => {
+            let link = '';
+            if (data.resource_type === 'inventory.Server' && !projectFilter) {
+                link = `/inventory/server?filters=provider%3A${data.provider}&filters=cloud_service_type%3A${data.cloud_service_type}`;
+            }
+            if (data.resource_type === 'inventory.Server' && projectFilter) {
+                link = `/inventory/server?filters=provider%3A${data.provider}&filters=cloud_service_type%3A${data.cloud_service_type}${projectFilter}`;
+            }
+            if (data.resource_type === 'inventory.CloudService' && !projectFilter) {
+                link = `/inventory/cloud-service/${data.provider}/${data.cloud_service_group}/${data.cloud_service_type}?provider=${data.provider}`;
+            }
+            if (data.resource_type === 'inventory.CloudService' && projectFilter) {
+                link = `/inventory/cloud-service/${data.provider}/${data.cloud_service_group}/${data.cloud_service_type}?provider=${data.provider}${projectFilter}`;
+            }
+            return link;
+        };
+
         const getDataInProject = async () => {
             const query = new QueryHelper()
                 .setSort('created_at')
@@ -126,14 +143,16 @@ export default {
                 // eslint-disable-next-line camelcase
                 is_primary: true,
             });
+
             state.data = [
                 ...res.results.map(d => ({
                     count: d.count,
                     group: d.cloud_service_group,
                     icon: d.icon,
                     name: d.cloud_service_type,
+                    type: d.resource_type,
                     provider: d.provider,
-                    href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}?provider=${d.provider}${props.projectFilter}`,
+                    href: getLink(d, props.projectFilter),
                 })),
             ];
         };
@@ -160,10 +179,7 @@ export default {
                             icon: d.icon,
                             name: d.cloud_service_type,
                             provider: d.provider,
-                            href: {
-                                path: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}`,
-                                query: { provider: d.provider },
-                            },
+                            href: getLink(d),
                         })),
                     ];
                 }
@@ -180,18 +196,6 @@ export default {
             ...toRefs(state),
             skeletons: range(9),
             iconUrl: (item: Value): string => item.icon || state.providers[item.provider]?.icon || '',
-            // onSelected(item): void {
-            //     if (props.projectFilter) {
-            //         vm.$router.push({
-            //             path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}?provider=${item.provider}${props.projectFilter}`,
-            //         });
-            //     } else {
-            //         vm.$router.push({
-            //             path: `/inventory/cloud-service/${item.provider}/${item.group}/${item.name}`,
-            //             query: { provider: item.provider },
-            //         });
-            //     }
-            // },
         };
     },
 };
