@@ -26,28 +26,6 @@ export const colorset = Object.freeze([
     styles.primary1,
 ]);
 
-export const serverStateColor = Object.freeze({
-    INSERVICE: {
-        iconColor: styles.safe,
-        textColor: styles.gray[900],
-    },
-    PENDING: {
-        iconColor: styles.coral.default,
-        textColor: styles.gray[900],
-    },
-    MAINTENANCE: {
-        iconColor: styles.yellow.default,
-        textColor: styles.gray[900],
-    },
-    CLOSED: {
-        iconColor: styles.alert,
-        textColor: styles.alert,
-    },
-    DELETED: {
-        iconColor: styles.gray,
-        textColor: styles.gray,
-    },
-});
 
 export const userStateColor = Object.freeze({
     ENABLED: {
@@ -82,7 +60,6 @@ const colorBindFactory = (colorMapping, textFnc) => value => ({
     ...colorMapping[value],
 });
 
-export const serverStateFormatter = colorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = colorBindFactory(userStateColor, value => value.toLowerCase());
 
 export const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');

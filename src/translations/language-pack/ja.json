@@ -632,7 +632,7 @@
 				"ALT_E_UPDATE_SCHEDULE_TITLE": "スケジュール変更に失敗",
 				"ALT_E_UPDATE_TITLE": "コレクタ変更に失敗",
 				"ALT_S_ADD_SCHEDULE_TITLE": "スケジュールの追加完了",
-				"ALT_S_COLLECT_TITLE": "データ収集が完了されました",
+				"ALT_S_COLLECT_START_TITLE": "",
 				"ALT_S_DELETE_SCHEDULE_TITLE": "スケジュールの削除完了",
 				"ALT_S_DELETE_TITLE": "コレクタが削除されました",
 				"ALT_S_DISABLE_TITLE": "コレクタが非活性化されました",

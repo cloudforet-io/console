@@ -103,6 +103,7 @@ export default {
 <style lang="postcss" scoped>
 .project-favorites {
     @apply px-3;
+    min-height: 7.5rem;
 }
 .empty {
     @apply pt-2 text-gray-300;
@@ -126,7 +127,7 @@ export default {
     .name {
         @apply ml-1 flex-grow truncate;
         line-height: 1.5;
-        font-size: 0.75rem;
+        font-size: 0.875rem;
     }
     .delete-btn {
         @apply float-right mr-1;

@@ -1,25 +1,37 @@
 <template>
     <general-page-layout class="dashboard">
-        <div class="col-span-12 md:col-span-6 lg:col-span-9
+        <div class="col-span-12 lg:col-span-9
                     widget-wrapper"
         >
-            <all-summary :providers="providers" />
-            <resource-map :providers="providers" />
-            <top-projects />
-            <cloud-services :more-info="true" />
+            <all-summary class="col-span-12" :providers="providers" />
+            <resource-map class="col-span-12" :providers="providers" />
+            <top-projects class="col-span-12" />
+            <cloud-services class="col-span-12" :more-info="true" />
         </div>
-        <div class="col-span-12 md:col-span-6 lg:col-span-3
+        <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
         >
-            <favorites-widget class="hidden md:block"
-                              :project="project" :cloud-service="cloudService"
-            />
+            <div class="col-span-12 md:col-span-6 lg:col-span-12
+                        widget-wrapper"
+            >
+                <favorites-widget class="hidden lg:block
+                                         col-span-12"
+                                  :project="project" :cloud-service="cloudService"
+                />
 
-            <daily-updates class="daily-updates" />
-            <service-accounts />
-            <collector-progress class="collector-progress"
-                                :providers="providers"
-            />
+                <daily-updates class="col-span-12
+                                      daily-updates"
+                />
+            </div>
+            <div class="col-span-12 md:col-span-6 lg:col-span-12
+                        widget-wrapper"
+            >
+                <service-accounts class="col-span-12" />
+                <collector-progress class="col-span-12
+                                       collector-progress"
+                                    :providers="providers"
+                />
+            </div>
         </div>
     </general-page-layout>
 </template>
@@ -88,12 +100,14 @@ export default {
     @apply bg-gray-100;
 
     .page-contents {
-        @apply grid gap-4 grid-cols-12 p-6;
+        @apply grid grid-flow-row grid-cols-12 p-6;
+        grid-gap: 1.25rem;
     }
 }
 
 .widget-wrapper {
-    @apply grid gap-4 grid-flow-row grid-cols-1;
+    @apply grid grid-cols-12;
+    grid-gap: 1.25rem;
 }
 
 .daily-updates {

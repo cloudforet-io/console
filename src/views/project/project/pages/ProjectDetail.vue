@@ -4,13 +4,13 @@
         <div class="top flex">
             <p-page-title :title="item.name" child @goBack="$router.go(-1)">
                 <template #extra>
-                    <span class="favorite-btn-wrapper">
-                        <favorite-button :item-id="projectId"
-                                         favorite-type="project"
-                                         resource-type="identity.Project"
-                        />
-                    </span>
                     <div class="btns">
+                        <span class="favorite-btn-wrapper">
+                            <favorite-button :item-id="projectId"
+                                             favorite-type="project"
+                                             resource-type="identity.Project"
+                            />
+                        </span>
                         <p-icon-button name="ic_transhcan"
                                        width="1.5rem" height="1.5rem" class="delete-btn"
                                        @click="openProjectDeleteForm"
@@ -20,15 +20,16 @@
                                        @click="openProjectEditForm"
                         />
                     </div>
+                    <p class="copy-project-id">
+                        <b>{{ $t('PROJECT.DETAIL.PROJECT_ID') }}</b> {{ projectId }}
+                        <p-copy-button class="ml-2"
+                                       :value="projectId"
+                        />
+                    </p>
                 </template>
             </p-page-title>
         </div>
-        <p class="copy-project-id">
-            <b>{{ $t('PROJECT.DETAIL.PROJECT_ID') }}</b> {{ projectId }}
-            <p-copy-button class="ml-2"
-                           :value="projectId"
-            />
-        </p>
+
         <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
                class="tab-content"
         >
@@ -455,19 +456,23 @@ export default {
 .p-page-title {
     &::v-deep {
         .extra {
-            @apply justify-between text-base text-gray-400 mt-1;
+            @apply justify-between text-base text-gray-400;
         }
         .title {
             @apply text-2xl;
         }
-        .favorite-btn-wrapper {
-            @apply ml-2;
-        }
         .btns {
-            @apply inline-flex items-center;
-            .p-icon-text-button {
-                @apply ml-4;
+            @apply flex-shrink-0 flex-grow flex items-center;
+            .favorite-btn-wrapper {
+                @apply ml-2;
             }
+            .p-icon-text-button {
+                @apply flex-shrink-0 ml-4;
+            }
+        }
+        .copy-project-id {
+            @apply flex-shrink-0 inline-flex items-center text-gray-500;
+            font-size: 0.875rem;
         }
     }
 }
@@ -484,11 +489,6 @@ export default {
 
 .tab-content {
     border: none;
-}
-
-.copy-project-id {
-    @apply float-right text-gray-500 -my-6;
-    font-size: 0.875rem;
 }
 
 .delete-btn {

@@ -632,7 +632,7 @@
 				"ALT_E_UPDATE_SCHEDULE_TITLE": "스케줄 변경 실패",
 				"ALT_E_UPDATE_TITLE": "컬렉터 변경 실패",
 				"ALT_S_ADD_SCHEDULE_TITLE": "스케줄 추가 완료",
-				"ALT_S_COLLECT_TITLE": "데이터 수집 완료",
+				"ALT_S_COLLECT_START_TITLE": "데이터 수집 시작",
 				"ALT_S_DELETE_SCHEDULE_TITLE": "스케줄 삭제 완료",
 				"ALT_S_DELETE_TITLE": "컬렉터 삭제",
 				"ALT_S_DISABLE_TITLE": "컬렉터 비활성화 완료",

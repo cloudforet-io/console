@@ -87,7 +87,7 @@
                                   type="simple-table"
                                   :field-handler="fieldHandler"
                                   :options="tableState.schema.options"
-                                  :type-options="{ colCopy: true }"
+                                  :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
                                   :data="tableState.selectedItems"
                 />
             </template>

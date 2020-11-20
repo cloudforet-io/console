@@ -79,12 +79,11 @@
                               :sortable="false"
                               :selectable="false"
                               :items="tableState.selectedItems"
-                              :col-copy="true"
+                              col-copy
                 >
-                    <template v-slot:col-state-format="data">
-                        <p-status v-bind="serverStateFormatter(data.value)" />
+                    <template #col-updated_at-format="{value}">
+                        {{ timeFormatter(value) }}
                     </template>
-                    <template />
                 </p-data-table>
             </template>
             <template #member>
@@ -164,7 +163,7 @@ import { ServerModel } from '@/models/inventory/server';
 
 import { get } from 'lodash';
 import {
-    serverStateFormatter, showErrorMessage, showSuccessMessage,
+    showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import {
     queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
@@ -181,6 +180,7 @@ import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search'
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
+import dayjs from 'dayjs';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -234,6 +234,7 @@ const serverStore = {
     },
 };
 
+
 export default {
     name: 'Server',
     components: {
@@ -241,7 +242,6 @@ export default {
         ServerMember,
         PDynamicLayout,
         GeneralPageLayout,
-        PStatus,
         PHorizontalLayout,
         PDropdownMenuBtn,
         ServerDetails,
@@ -305,13 +305,24 @@ export default {
             ]),
             collectModalVisible: false,
             multiFields: computed<MenuItem[]>(() => [
+                { name: 'server_id', label: 'Server ID', type: 'item' },
                 { name: 'name', label: 'Name', type: 'item' },
-                { name: 'state', label: 'State', type: 'item' },
-                { name: 'primary_ip_address', label: 'IP', type: 'item' },
+                { name: ' primary_ip_address', label: 'Primary IP', type: 'item' },
+                { name: 'server_type', label: 'Server Type', type: 'item' },
                 { name: 'os_type', label: 'OS Type', type: 'item' },
+                { name: 'provider', label: 'Provider', type: 'item' },
+                { name: 'updated_at', label: 'Updated', type: 'item' },
             ]),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
+
+        const timeFormatter = (value) => {
+            let time = dayjs(dayjs.unix(value.seconds));
+            if (typeOptionState.timezone !== 'UTC') {
+                time = dayjs(dayjs.unix(value.seconds)).tz(typeOptionState.timezone);
+            }
+            return time.format('YYYY-MM-DD HH:mm:ss');
+        };
 
         const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
@@ -616,7 +627,7 @@ export default {
             /* Monitoring Tab */
             monitoringState,
 
-            serverStateFormatter,
+            timeFormatter,
         };
     },
 };
