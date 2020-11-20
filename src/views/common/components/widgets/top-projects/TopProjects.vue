@@ -37,10 +37,42 @@
                     :bordered="false"
                 >
                     <template #col-rank-format="{ index }">
-                        {{ `# ${index + 1}` }}
+                        <span class="col-rank">{{ `# ${index + 1}` }}</span>
+                    </template>
+                    <template #col-project_group-format="{ value }">
+                        <router-link class="link-text" :to="value.link">
+                            {{ value.label }}
+                        </router-link>
+                    </template>
+                    <template #col-project-format="{ value }">
+                        <router-link class="link-text" :to="value.link">
+                            {{ value.label }}
+                        </router-link>
+                    </template>
+                    <template #col-server-format="{ value }">
+                        <router-link class="link-text" :to="value.link">
+                            {{ value.label }}
+                        </router-link>
+                    </template>
+                    <template #col-database-format="{ value }">
+                        <router-link class="link-text" :to="value.link">
+                            {{ value.label }}
+                        </router-link>
+                    </template>
+                    <template #col-storage-format="{ value }">
+                        <router-link class="link-text" :to="value.link">
+                            {{ value.label }}
+                        </router-link>
                     </template>
                 </p-data-table>
             </template>
+            <div class="button-wrapper">
+                <p-button class="create-project-button" @click="goToProjectPage">
+                    <p-i name="ic_plus" width="1rem" height="1rem"
+                         color="transparent inherit"
+                    /> {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_PROJECT') }}
+                </p-button>
+            </div>
         </div>
     </p-widget-layout>
 </template>
@@ -61,7 +93,10 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     gray, indigo, peacock,
@@ -92,11 +127,13 @@ const DATABASE_COLOR = indigo[400];
 export default {
     name: 'TopProjects',
     components: {
+        PButton,
         PDataTable,
         PIconTextButton,
         PWidgetLayout,
         PChartLoader,
         PSkeleton,
+        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -115,9 +152,9 @@ export default {
                 { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK'), width: 3 },
                 { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
                 { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
-                { name: 'server_count', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
-                { name: 'database_count', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
-                { name: 'storage_size', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
+                { name: 'server', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
+                { name: 'database', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
+                { name: 'storage', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
             ]),
         });
 
@@ -196,12 +233,27 @@ export default {
             try {
                 const res = await SpaceConnector.client.statistics.topic.topProject();
                 const data = res.results.map(d => ({
-                    storage_size: formatBytes(d.storage_size, 2),
                     rank: d.rank,
-                    project_group: d.project_group,
-                    project: d.project,
-                    server_count: d.server_count,
-                    database_count: d.database_count,
+                    project_group: {
+                        label: d.project_group,
+                        link: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),
+                    },
+                    project: {
+                        label: d.project,
+                        link: referenceRouter(d.project_id, { resource_type: 'identity.Project' }),
+                    },
+                    server: {
+                        label: d.server_count,
+                        link: `/inventory/server?filters=project_id%3A${d.project_id}`,
+                    },
+                    database: {
+                        label: d.database_count,
+                        link: `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A${d.project_id}`,
+                    },
+                    storage: {
+                        label: formatBytes(d.storage_size, 2),
+                        link: `/inventory/cloud-service?provider=all&service=Storage&primary=false&filters=project_id%3A${d.project_id}`,
+                    },
                 }));
                 const orderedData = orderBy(data, ['total'], ['desc']);
                 state.data = orderedData;
@@ -217,8 +269,8 @@ export default {
                 orderedData.forEach((d, idx) => {
                     chartData.splice(idx, 1, {
                         rank: `#${idx + 1}`,
-                        server: d.server_count,
-                        database: d.database_count,
+                        server: d.server.label,
+                        database: d.database.label,
                     });
                 });
                 state.chartData = chartData.reverse();
@@ -228,6 +280,11 @@ export default {
             } finally {
                 state.loading = false;
             }
+        };
+
+        /* event */
+        const goToProjectPage = () => {
+            vm.$router.push(referenceRouter('', { resource_type: 'identity.Project' }));
         };
 
         const init = async () => {
@@ -246,6 +303,7 @@ export default {
             onRowClick(item) {
                 vm.$router.push(`/project/${item.project_id}`);
             },
+            goToProjectPage,
         };
     },
 };
@@ -254,6 +312,17 @@ export default {
 <style lang="postcss" scoped>
 .top-projects::v-deep .widget-contents {
     padding-bottom: 1.5rem;
+}
+.top-projects {
+    .create-project-button {
+        @apply text-secondary;
+        font-weight: normal;
+        line-height: 1.2;
+        padding: 0;
+        &:hover {
+            @apply text-blue-800;
+        }
+    }
 }
 .chart {
     height: 13rem;
@@ -268,6 +337,14 @@ export default {
     }
     td {
         height: 2rem;
+        .col-rank {
+            @apply text-gray-600;
+        }
+        .link-text {
+            &:hover {
+                text-decoration: underline;
+            }
+        }
     }
 }
 .get-started {

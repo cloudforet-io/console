@@ -55,7 +55,7 @@
                                          class="summary-row"
                             >
                                 <div class="text-group">
-                                    <span :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                 </div>
                                 <span class="count">{{ data.count }}</span>
@@ -190,7 +190,7 @@ export default {
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
                     count: state.storageCount,
                     data: state.storageData,
-                    suffix: 'TB',
+                    suffix: '', // todo
                     to: '/inventory/cloud-service?provider=all&service=Storage',
                 },
                 {
@@ -346,114 +346,92 @@ export default {
                 chartState.loading = false;
             }
         };
-        const getComputeInfo = async () => {
+        const getSummaryInfo = async (type) => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    labels: ['Compute'],
-                    resource_type: 'inventory.Server',
-                    is_major: true,
-                    query: {
-                        sort: {
-                            name: 'count',
-                            desc: true,
+                let param;
+                let count;
+                let to;
+                if (type === 'compute') {
+                    param = {
+                        labels: ['Compute'],
+                        resource_type: 'inventory.Server',
+                        is_major: true,
+                        query: {
+                            sort: {
+                                name: 'count',
+                                desc: true,
+                            },
                         },
-                    },
-                });
-                const computeData: TypeData[] = [
+                    };
+                    count = state.computeCount;
+                    to = referenceRouter('', { resource_type: 'inventory.Server' });
+                } else if (type === 'database') {
+                    param = {
+                        labels: ['Database'],
+                        is_major: true,
+                        query: {
+                            sort: {
+                                name: 'count',
+                                desc: true,
+                            },
+                        },
+                    };
+                    count = state.databaseCount;
+                    to = '/inventory/cloud-service?provider=all&service=Database';
+                } else {
+                    param = {
+                        labels: ['Storage'],
+                        is_major: true,
+                        query: {
+                            sort: {
+                                name: 'size',
+                                desc: true,
+                            },
+                        },
+                        fields: [
+                            {
+                                name: 'size',
+                                operator: 'sum',
+                                key: 'data.size',
+                            },
+                        ],
+                    };
+                    count = formatBytes(state.storageCount, 1);
+                    to = '/inventory/cloud-service?provider=all&service=Storage';
+                }
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
+                const summaryData: TypeData[] = [
                     {
                         provider: 'all',
                         label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
-                        count: state.computeCount,
-                        to: referenceRouter('', { resource_type: 'inventory.Server' }),
+                        count,
+                        to,
                     },
                 ];
                 res.results.forEach((d) => {
-                    computeData.push({
+                    let detailLink;
+                    if (type === 'compute') {
+                        detailLink = `/inventory/server?filters=provider%3A${d.provider}`;
+                    } else {
+                        detailLink = referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' });
+                    }
+                    summaryData.push({
                         provider: d.provider,
                         label: props.providers[d.provider].label,
                         type: d.cloud_service_group,
-                        count: d.count,
-                        to: `/inventory/server?filters=provider%3A${d.provider}`,
+                        count: type === 'storage' ? formatBytes(d.size, 1) : d.count,
+                        to: detailLink,
                     });
                 });
-                state.computeData = computeData;
+                if (type === 'compute') {
+                    state.computeData = summaryData;
+                } else if (type === 'database') {
+                    state.databaseData = summaryData;
+                } else {
+                    state.storageData = summaryData;
+                }
             } catch (e) {
-                console.error(e);
-            }
-        };
-        const getDatabaseInfo = async () => {
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    labels: ['Database'],
-                    is_major: true,
-                    query: {
-                        sort: {
-                            name: 'count',
-                            desc: true,
-                        },
-                    },
-                });
-                const databaseData: TypeData[] = [
-                    {
-                        provider: 'all',
-                        label: vm?.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
-                        count: state.databaseCount,
-                        to: '/inventory/cloud-service?provider=all&service=Database',
-                    },
-                ];
-                res.results.forEach((d) => {
-                    databaseData.push({
-                        provider: d.provider,
-                        label: props.providers[d.provider].label,
-                        type: d.cloud_service_group,
-                        count: d.count,
-                        to: referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' }),
-                    });
-                });
-                state.databaseData = databaseData;
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        const getStorageInfo = async () => {
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    labels: ['Storage'],
-                    is_major: true,
-                    query: {
-                        sort: {
-                            name: 'size',
-                            desc: true,
-                        },
-                    },
-                    fields: [
-                        {
-                            name: 'size',
-                            operator: 'sum',
-                            key: 'data.size',
-                        },
-                    ],
-                });
-                const storageData: TypeData[] = [
-                    {
-                        provider: 'all',
-                        label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
-                        count: formatBytes(state.storageCount, 1),
-                        to: '/inventory/cloud-service?provider=all&service=Storage',
-                    },
-                ];
-                res.results.forEach((d) => {
-                    storageData.push({
-                        provider: d.provider,
-                        label: props.providers[d.provider].label,
-                        type: d.cloud_service_group,
-                        count: formatBytes(d.size, 1),
-                        to: referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' }),
-                    });
-                });
-                state.storageData = storageData;
-            } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         };
 
@@ -473,10 +451,10 @@ export default {
             state.loading = true;
             await getCount();
             //
-            await getComputeInfo();
+            await getSummaryInfo('compute');
             state.loading = false;
-            await getDatabaseInfo();
-            await getStorageInfo();
+            await getSummaryInfo('database');
+            await getSummaryInfo('storage');
         };
         init();
         asyncInit();
