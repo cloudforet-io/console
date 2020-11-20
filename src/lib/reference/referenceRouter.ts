@@ -15,7 +15,7 @@ export const projectGroupLinkFormatter: ReferenceLinkFormatter = (baseUrl, data,
 };
 
 export const serverLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}?filters=server_id%3A${data}`;
+    const queryString = data ? `${baseUrl}?filters=server_id%3A${data}` : `${baseUrl}`;
     return queryString;
 };
 

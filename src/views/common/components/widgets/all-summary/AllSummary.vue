@@ -109,6 +109,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
 
@@ -121,14 +122,14 @@ interface ChartData {
 interface TypeData {
     provider: string;
     label: string | TranslateResult;
-    count: number;
+    count: number | string;
     type?: string;
     to: string;
 }
 
 enum DATE_TYPE {
-    daily = 'daily',
-    monthly = 'monthly',
+    day = 'day',
+    month = 'month',
 }
 
 const DAY_COUNT = 14;
@@ -157,10 +158,10 @@ export default {
             //
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
-            selectedDateType: 'daily' as keyof DATE_TYPE,
+            selectedDateType: 'day' as keyof DATE_TYPE,
             dateTypes: computed(() => ([
-                { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAILY') },
-                { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTHLY') },
+                { name: 'day', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAY') },
+                { name: 'month', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTH') },
             ])),
             //
             computeCount: 0,
@@ -174,7 +175,7 @@ export default {
                     count: state.computeCount,
                     data: state.computeData,
                     suffix: 'ea',
-                    to: '/inventory/server',
+                    to: referenceRouter('', { resource_type: 'inventory.Server' }),
                 },
                 {
                     type: 'database',
@@ -216,6 +217,71 @@ export default {
             google: computed(() => props.providers.google_cloud.color),
             azure: computed(() => props.providers.azure.color),
         });
+
+        /* util */
+        const formatBytes = (bytes, decimals = 2) => {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / (k ** i)).toFixed(dm))} ${sizes[i]}`;
+        };
+        const disposeChart = () => {
+            if (chartState.registry[state.chartRef]) {
+                chartState.registry[state.chartRef].dispose();
+                delete chartState.registry[state.chartRef];
+            }
+        };
+        const drawChart = () => {
+            const createChart = () => {
+                disposeChart();
+                chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
+                return chartState.registry[state.chartRef];
+            };
+            const chart = createChart();
+
+            chart.responsive.enabled = true;
+            chart.logo.disabled = true;
+            chart.paddingLeft = -5;
+            chart.paddingBottom = 0;
+            if (state.selectedType === 'compute') chart.data = chartState.computeData;
+            else if (state.selectedType === 'database') chart.data = chartState.databaseData;
+            else if (state.selectedType === 'storage') chart.data = chartState.storageData;
+
+            const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+            dateAxis.dataFields.category = 'date';
+            dateAxis.renderer.minGridDistance = 20;
+            dateAxis.renderer.grid.template.disabled = true;
+            dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            dateAxis.fontSize = 11;
+
+            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.renderer.minGridDistance = 30;
+            valueAxis.renderer.grid.template.strokeOpacity = 1;
+            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            valueAxis.fontSize = 11;
+            valueAxis.min = 0;
+
+            const series = chart.series.push(new am4charts.ColumnSeries());
+            series.dataFields.valueY = 'count';
+            series.dataFields.categoryX = 'date';
+            series.fill = am4core.color(primary1);
+            series.columns.template.width = am4core.percent(30);
+            series.columns.template.column.cornerRadiusTopLeft = 3;
+            series.columns.template.column.cornerRadiusTopRight = 3;
+            series.strokeWidth = 0;
+
+            const bullet = series.bullets.push(new am4charts.LabelBullet());
+            bullet.label.text = '{count}';
+            bullet.label.fontSize = 14;
+            bullet.label.truncate = false;
+            bullet.label.hideOversized = false;
+            bullet.label.fill = am4core.color(primary);
+            bullet.label.dy = -10;
+        };
+        const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
         /* api */
         const getCount = async () => {
@@ -282,20 +348,30 @@ export default {
         };
         const getComputeInfo = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.serverByProvider();
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
+                    labels: ['Compute'],
+                    resource_type: 'inventory.Server',
+                    is_major: true,
+                    query: {
+                        sort: {
+                            name: 'count',
+                            desc: true,
+                        },
+                    },
+                });
                 const computeData: TypeData[] = [
                     {
                         provider: 'all',
                         label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
                         count: state.computeCount,
-                        to: '/inventory/server',
+                        to: referenceRouter('', { resource_type: 'inventory.Server' }),
                     },
                 ];
                 res.results.forEach((d) => {
                     computeData.push({
                         provider: d.provider,
                         label: props.providers[d.provider].label,
-                        type: d.server_type,
+                        type: d.cloud_service_group,
                         count: d.count,
                         to: `/inventory/server?filters=provider%3A${d.provider}`,
                     });
@@ -307,15 +383,15 @@ export default {
         };
         const getDatabaseInfo = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage({
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                     labels: ['Database'],
+                    is_major: true,
                     query: {
                         sort: {
                             name: 'count',
                             desc: true,
                         },
                     },
-                    show_all: false,
                 });
                 const databaseData: TypeData[] = [
                     {
@@ -331,7 +407,7 @@ export default {
                         label: props.providers[d.provider].label,
                         type: d.cloud_service_group,
                         count: d.count,
-                        to: `/inventory/cloud-service?provider=${d.provider}&service=Database`,
+                        to: referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' }),
                     });
                 });
                 state.databaseData = databaseData;
@@ -341,21 +417,28 @@ export default {
         };
         const getStorageInfo = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceTypePage({
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                     labels: ['Storage'],
+                    is_major: true,
                     query: {
                         sort: {
-                            name: 'count',
+                            name: 'size',
                             desc: true,
                         },
                     },
-                    show_all: false,
+                    fields: [
+                        {
+                            name: 'size',
+                            operator: 'sum',
+                            key: 'data.size',
+                        },
+                    ],
                 });
                 const storageData: TypeData[] = [
                     {
                         provider: 'all',
                         label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
-                        count: state.storageCount,
+                        count: formatBytes(state.storageCount, 1),
                         to: '/inventory/cloud-service?provider=all&service=Storage',
                     },
                 ];
@@ -364,8 +447,8 @@ export default {
                         provider: d.provider,
                         label: props.providers[d.provider].label,
                         type: d.cloud_service_group,
-                        count: d.count,
-                        to: `/inventory/cloud-service?provider=${d.provider}&service=Storage`,
+                        count: formatBytes(d.size, 1),
+                        to: referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' }),
                     });
                 });
                 state.storageData = storageData;
@@ -373,63 +456,6 @@ export default {
                 console.error(e);
             }
         };
-
-        /* util */
-        const disposeChart = () => {
-            if (chartState.registry[state.chartRef]) {
-                chartState.registry[state.chartRef].dispose();
-                delete chartState.registry[state.chartRef];
-            }
-        };
-        const drawChart = () => {
-            const createChart = () => {
-                disposeChart();
-                chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
-                return chartState.registry[state.chartRef];
-            };
-            const chart = createChart();
-
-            chart.responsive.enabled = true;
-            chart.logo.disabled = true;
-            chart.paddingLeft = -5;
-            chart.paddingBottom = 0;
-            if (state.selectedType === 'compute') chart.data = chartState.computeData;
-            else if (state.selectedType === 'database') chart.data = chartState.databaseData;
-            else if (state.selectedType === 'storage') chart.data = chartState.storageData;
-
-            const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            dateAxis.dataFields.category = 'date';
-            dateAxis.renderer.minGridDistance = 20;
-            dateAxis.renderer.grid.template.disabled = true;
-            dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
-            dateAxis.fontSize = 11;
-
-            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-            valueAxis.renderer.minGridDistance = 30;
-            valueAxis.renderer.grid.template.strokeOpacity = 1;
-            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
-            valueAxis.fontSize = 11;
-            valueAxis.min = 0;
-
-            const series = chart.series.push(new am4charts.ColumnSeries());
-            series.dataFields.valueY = 'count';
-            series.dataFields.categoryX = 'date';
-            series.fill = am4core.color(primary1);
-            series.columns.template.width = am4core.percent(30);
-            series.columns.template.column.cornerRadiusTopLeft = 3;
-            series.columns.template.column.cornerRadiusTopRight = 3;
-            series.strokeWidth = 0;
-
-            const bullet = series.bullets.push(new am4charts.LabelBullet());
-            bullet.label.text = '{count}';
-            bullet.label.fontSize = 14;
-            bullet.label.truncate = false;
-            bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(primary);
-            bullet.label.dy = -10;
-        };
-        const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
         /* event */
         const onClickBox = (idx) => {
@@ -596,14 +622,16 @@ export default {
                     right: 0.5rem;
                     top: 0;
                     .p-button {
-                        @apply text-gray-400;
-                        min-width: auto;
-                        font-size: 0.625rem;
+                        @apply border border-gray-200 text-gray-300;
+                        height: 1.25rem;
+                        min-width: 2rem;
+                        font-size: 0.75rem;
                         font-weight: normal;
+                        border-radius: 0.125rem;
                         padding: 0.25rem;
+                        margin-left: 0.25rem;
                         &.selected {
-                            @apply text-gray-700;
-                            font-weight: bold;
+                            @apply bg-gray-600 border-gray-600 text-white;
                         }
                     }
                 }
@@ -638,7 +666,7 @@ export default {
 
                     .text-group {
                         display: inline-block;
-                        width: 90%;
+                        width: 80%;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
