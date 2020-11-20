@@ -65,7 +65,7 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            allMenu: [
+            allMenu: computed(() => ([
                 {
                     label: vm.$t('MENU.DASHBOARD.DASHBOARD'), link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
                 },
@@ -115,7 +115,7 @@ export default {
                         { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true },
                     ],
                 },
-            ],
+            ])),
         });
 
         return {

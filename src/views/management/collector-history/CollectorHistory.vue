@@ -236,7 +236,7 @@ export default {
                 { label: 'Start Time', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ]),
-            statusList: [
+            statusList: computed(() => ([
                 {
                     key: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'), class: 'all',
                 },
@@ -249,7 +249,7 @@ export default {
                 {
                     key: 'failure', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILURE'), class: 'failure', icon: true,
                 },
-            ],
+            ])),
             activatedStatus: 'all',
             jobs: [] as JobModel[],
             items: [],

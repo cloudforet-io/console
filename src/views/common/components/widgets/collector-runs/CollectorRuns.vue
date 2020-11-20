@@ -107,11 +107,11 @@ export default {
             loading: false,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             items: [] as JobModel[],
-            fields: [
+            fields: computed(() => ([
                 { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_COLLECTOR'), name: 'collector_info' },
                 { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_COMPLETED_TOTAL'), name: 'progress' },
                 { label: vm.$t('COMMON.WIDGETS.RUN_COLLECTOR_START_TIME'), name: 'created_at' },
-            ],
+            ])),
             providers: [] as ProviderModel[],
         });
 

@@ -79,7 +79,10 @@
 				"LEGEND_UNSET": "未設定",
 				"NEED_SCHEDULER_HINT_TEXT": "スケジュルを登録してください。",
 				"SCHEDULE": "スケジュール",
-				"TITLE": "パワースケジューラ"
+				"TITLE": "パワースケジューラ",
+				"TOOLTIP_COST_1": "",
+				"TOOLTIP_COST_2": "",
+				"TOOLTIP_RESOURCE": ""
 			},
 			"RESOURCE": {
 				"ALT_E_ID_INVALID_DESC": "リソースグループリストを確認してください",
@@ -203,9 +206,9 @@
 		"WIDGETS": {
 			"ALL_SUMMARY_ALL": "",
 			"ALL_SUMMARY_COMPUTE": "",
-			"ALL_SUMMARY_DAILY": "",
 			"ALL_SUMMARY_DATABASE": "",
-			"ALL_SUMMARY_MONTHLY": "",
+			"ALL_SUMMARY_DAY": "",
+			"ALL_SUMMARY_MONTH": "",
 			"ALL_SUMMARY_NO_DATA_1": "",
 			"ALL_SUMMARY_NO_DATA_2": "",
 			"ALL_SUMMARY_SPENDINGS": "",

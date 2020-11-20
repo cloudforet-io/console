@@ -270,7 +270,10 @@ export default {
             item: undefined,
         });
         const routeState = reactive({
-            routes: [{ name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' }, { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user' }],
+            routes: computed(() => ([
+                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user' },
+            ])),
         });
 
         const singleItemTabState = reactive({

@@ -335,7 +335,6 @@ export default {
          * Card click event
          * */
         const getToCloudService = (item) => {
-            console.log(item)
             let res: Location;
             const filters: QueryTag[] = [];
             state.tags.forEach((tag: QueryTag) => {
@@ -473,7 +472,10 @@ export default {
         };
 
         const routeState = reactive({
-            route: [{ name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' }, { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' }],
+            route: computed(() => ([
+                { name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
+                { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' },
+            ])),
         });
 
         const checkProvider = async (queryStringForCheck) => {

@@ -219,21 +219,23 @@ export default {
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
             currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
-            tooltip: {
-                resource: `적용 가능한 자원 종류 <br>
+            tooltip: computed(() => ({
+                resource: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_RESOURCE')} <br>
                                 [ALL] Server <br>
                                 [AWS] RDS <br>
                                 [AWS] Auto Scaling Group`,
-                cost: `파워 스케줄러를 통해 절감된 이 달의 비용 <br>
-                            (기준: 이번 달 1일 ~ 현재)`,
-            },
+                cost: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_COST_1')} <br>${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_COST_2')}`,
+            })),
         });
 
         /**
          * Page Navigation
          * */
         const routeState = reactive({
-            route: [{ name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' }, { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), path: '/automation/power-scheduler' }],
+            route: computed(() => ([
+                { name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' },
+                { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), path: '/automation/power-scheduler' },
+            ])),
         });
 
         /**

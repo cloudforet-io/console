@@ -79,7 +79,10 @@
 				"LEGEND_UNSET": "Unset",
 				"NEED_SCHEDULER_HINT_TEXT": "Please register a schedule.",
 				"SCHEDULE": "Schedule",
-				"TITLE": "Power Scheduler"
+				"TITLE": "Power Scheduler",
+				"TOOLTIP_COST_1": "파워 스케줄러를 통해 절감된 이 달의 비용",
+				"TOOLTIP_COST_2": "(기준: 이번 달 1일 ~ 현재)",
+				"TOOLTIP_RESOURCE": "Applicable Resource Types"
 			},
 			"RESOURCE": {
 				"ALT_E_ID_INVALID_DESC": "Please confirm the resource group list.",
@@ -203,9 +206,9 @@
 		"WIDGETS": {
 			"ALL_SUMMARY_ALL": "All",
 			"ALL_SUMMARY_COMPUTE": "Compute",
-			"ALL_SUMMARY_DAILY": "Daily",
 			"ALL_SUMMARY_DATABASE": "Database",
-			"ALL_SUMMARY_MONTHLY": "Monthly",
+			"ALL_SUMMARY_DAY": "Day",
+			"ALL_SUMMARY_MONTH": "Month",
 			"ALL_SUMMARY_NO_DATA_1": "Billing service is not supported yet.",
 			"ALL_SUMMARY_NO_DATA_2": "We are getting ready to support the billing service.",
 			"ALL_SUMMARY_SPENDINGS": "Overall-Spendings",
