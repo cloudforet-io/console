@@ -21,7 +21,7 @@ export default {
         (async () => {
             try {
                 const result = await SpaceConnector.client.addOns.pageDiscovery.get({
-                    resource_type: 'inventory.CloudService',
+                    resource_type: 'inventory.CloudServiceType',
                     search: to.params.id,
                 });
                 if (result.url === DEFAULT_URL) {

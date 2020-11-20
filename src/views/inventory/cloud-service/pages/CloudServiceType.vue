@@ -498,6 +498,12 @@ export default {
             return queryString;
         };
 
+        const initPrimary = async () => {
+            let queryString: RouteQueryString = vm.$route.query.primary;
+            if (typeof queryString === 'undefined' || !queryString) queryString = 'true';
+            return queryString as string;
+        };
+
         /** Init */
         (async () => {
             await Promise.all([
@@ -507,11 +513,12 @@ export default {
             ]);
 
             const providerQueryString = await initProvider();
+            const primaryQueryString = await initPrimary();
             if (providerQueryString) {
                 selectedProvider.value = providerQueryString.toString();
                 filterState.serviceFilter = queryStringToStringArray(vm.$route.query.service);
                 filterState.regionFilter = queryStringToStringArray(vm.$route.query.region);
-                filterState.isPrimary = JSON.parse(vm.$route.query.primary as string);
+                filterState.isPrimary = JSON.parse(primaryQueryString);
                 watch<string, boolean>(() => selectedProvider.value, debounce((after) => {
                     if (!after) return;
                     if (after) {

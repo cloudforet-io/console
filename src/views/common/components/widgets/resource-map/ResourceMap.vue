@@ -6,7 +6,7 @@
         <div class="flex-wrap sm:flex-wrap md:flex-wrap lg:flex-no-wrap xl:flex-no-wrap chart-wrapper">
             <div class="chart-loader">
                 <div id="chartRef" ref="chartRef" />
-                <div v-if="!loading" class="circle-wrapper">
+                <div v-if="!loading" class="block 2xs:hidden xs:hidden sm:hidden lg:block xl:block 2xl:block 3xl:block circle-wrapper">
                     <p class="circle" :style="{background: providers['aws'].color }" /><span>AWS</span>
                     <p class="circle" :style="{background: providers['google_cloud'].color }" /><span>Google</span>
                     <p class="circle" :style="{background: providers['azure'].color }" /><span>Azure</span>
@@ -22,13 +22,15 @@
                 </div>
                 <div class="grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 progress-bar-wrapper">
                     <div v-for="(item, index) in filteredData" :key="index" class="progress-bar">
-                        <div class="progress-bar-label">
-                            <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
-                            <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
-                        </div>
-                        <p-progress-bar :percentage="(item.count / maxValue) * 100"
-                                        class="progress-bar" :class="selectedProvider"
-                        />
+                        <router-link :to="referenceRouter(item.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' })">
+                            <div class="progress-bar-label">
+                                <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
+                                <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
+                            </div>
+                            <p-progress-bar :percentage="(item.count / maxValue) * 100"
+                                            class="progress-bar" :class="selectedProvider"
+                            />
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -58,6 +60,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
 import { coral, gray } from '@/components/styles/colors';
+import referenceRouter from '@/lib/reference/referenceRouter';
 
 am4core.useTheme(am4themes_animated);
 
@@ -229,7 +232,7 @@ export default {
 
         return {
             ...toRefs(state),
-
+            referenceRouter,
         };
     },
 };
@@ -370,7 +373,7 @@ export default {
             }
 
             &:hover {
-                @apply bg-blue-100;
+                @apply bg-blue-100 cursor-pointer underline;
                 border-radius: 0.125rem;
             }
         }

@@ -9,7 +9,7 @@
                :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
                :href="referenceRouter(
                    item.id, {
-                       resource_type: item.resourceType,
+                       resource_type: 'inventory.CloudServiceType',
                    })"
                @click="onClickItem(item, $event)"
                @mouseenter="hoveredItem = item"
