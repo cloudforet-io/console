@@ -277,6 +277,7 @@
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_CREATE_DASHBOARD": "Create your own dashboard!!",
 			"TOP_PROJECT_CREATE_GUIDE": "Create project group first then register Service Account.",
+			"TOP_PROJECT_CREATE_PROJECT": "Create Project",
 			"TOP_PROJECT_DATABASE": "Database",
 			"TOP_PROJECT_GET_START": "Get Started",
 			"TOP_PROJECT_HELP": "Check project ranking with most resources and services.",
@@ -285,7 +286,7 @@
 			"TOP_PROJECT_RANK": "Rank",
 			"TOP_PROJECT_SERVER": "Server",
 			"TOP_PROJECT_STORAGE": "Storage",
-			"TOP_PROJECT_TITLE": "Top 5 Resource Managing Projects"
+			"TOP_PROJECT_TITLE": "Top Resource Managing Projects"
 		}
 	},
 	"IDENTITY": {
