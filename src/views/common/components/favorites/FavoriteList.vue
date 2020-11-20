@@ -143,5 +143,8 @@ export default {
     bottom: 1rem;
     z-index: 1;
     font-size: 0.75rem;
+    &:hover {
+        text-decoration: underline;
+    }
 }
 </style>

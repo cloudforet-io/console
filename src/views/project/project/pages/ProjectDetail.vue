@@ -312,12 +312,13 @@ export default {
                 await SpaceConnector.client.identity.project.delete({
                     project_id: projectId.value,
                 });
+                await vm.$store.dispatch('favorite/project/removeItem', { id: projectId.value });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
+                vm.$router.go(-1);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e, root);
             } finally {
                 formState.projectDeleteFormVisible = false;
-                vm.$router.go(-1);
             }
         };
 
@@ -381,7 +382,6 @@ export default {
                     project_id: projectId.value,
                     users: items.map(it => it.user_info.user_id),
                 });
-                // await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute();
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'), e, root);
