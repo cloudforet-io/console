@@ -2,7 +2,7 @@
     <div class="all-summary-page">
         <div class="top-part grid grid-cols-12 gap-3">
             <div v-for="(data, idx) of dataList" :key="idx"
-                 class="box col-span-3"
+                 class="box col-span-6 sm:col-span-3 md:col-span-3 lg:col-span-3"
                  :class="[{'selected': idx === selectedIndex}, data.type]"
                  @click="onClickBox(idx)"
             >
@@ -25,7 +25,7 @@
         <div class="bottom-part">
             <div class="content-wrapper grid grid-cols-12 gap-2">
                 <template v-if="selectedType !== 'spendings'">
-                    <div class="chart-wrapper col-span-9">
+                    <div class="chart-wrapper col-span-12 lg:col-span-9">
                         <div class="title">
                             {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
                         </div>
@@ -45,28 +45,30 @@
                             <div ref="chartRef" class="chart" />
                         </p-chart-loader>
                     </div>
-                    <div class="summary-wrapper col-span-3">
-                        <div class="title">
-                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
-                        </div>
-                        <template v-if="!loading">
-                            <router-link v-for="(data, idx) of dataList[selectedIndex].data" :key="idx"
-                                         :to="data.to"
-                                         class="summary-row"
-                            >
-                                <div class="text-group">
-                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
-                                    <span class="type">{{ data.type }}</span>
-                                </div>
-                                <span class="count">{{ data.count }}</span>
-                            </router-link>
-                        </template>
-                        <template v-else>
-                            <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                                <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
-                                <p-skeleton class="flex-grow" />
+                    <div class="summary-wrapper col-span-12 lg:col-span-3">
+                        <div class="grid grid-cols-3">
+                            <div class="title col-span-3">
+                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
                             </div>
-                        </template>
+                            <template v-if="!loading" class="">
+                                <router-link v-for="(data, idx) of dataList[selectedIndex].data" :key="idx"
+                                             :to="data.to"
+                                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                >
+                                    <div class="text-group">
+                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                        <span class="type">{{ data.type }}</span>
+                                    </div>
+                                    <span class="count">{{ data.count }}</span>
+                                </router-link>
+                            </template>
+                            <template v-else>
+                                <div v-for="v in skeletons" :key="v" class="flex items-center p-4 col-span-3">
+                                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                                    <p-skeleton class="flex-grow" />
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </template>
                 <template v-else>
@@ -92,7 +94,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    orderBy, forEach, find, range,
+    orderBy, forEach, find, range, forIn,
 } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -114,6 +116,8 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
+am4core.options.autoSetClassName = true;
+am4core.options.classNamePrefix = 'allSummary';
 
 interface ChartData {
     date: string;
@@ -128,12 +132,17 @@ interface TypeData {
 }
 
 enum DATE_TYPE {
-    day = 'day',
-    month = 'month',
+    daily = 'daily',
+    monthly = 'monthly',
+}
+enum CLOUD_SERVICE_LABEL {
+    compute = 'Compute',
+    database = 'Database',
+    storage = 'Storage',
 }
 
 const DAY_COUNT = 14;
-
+const BOX_SWITCH_INTERVAL = 5000;
 
 export default {
     name: 'AllSummary',
@@ -147,6 +156,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -156,41 +169,49 @@ export default {
             chartRef: null as HTMLElement | null,
             skeletons: range(3),
             //
+            selectedIndexInterval: undefined,
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
-            selectedDateType: 'day' as keyof DATE_TYPE,
+            selectedDateType: 'daily' as keyof DATE_TYPE,
             dateTypes: computed(() => ([
-                { name: 'day', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAY') },
-                { name: 'month', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTH') },
+                { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAY') },
+                { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTH') },
             ])),
             //
-            computeCount: 0,
-            databaseCount: 0,
-            storageCount: 0,
+            count: {
+                compute: 0,
+                database: 0,
+                storage: 0,
+            },
+            suffix: {
+                compute: 'ea',
+                database: 'ea',
+                storage: 'TB',
+            },
             overallSpendings: computed(() => vm.$t('COMMON.WIDGETS.ALL_SUMMARY_UPCOMING')),
             dataList: computed(() => ([
                 {
                     type: 'compute',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
-                    count: state.computeCount,
+                    count: state.count.compute,
                     data: state.computeData,
-                    suffix: 'ea',
+                    suffix: state.suffix.compute,
                     to: referenceRouter('', { resource_type: 'inventory.Server' }),
                 },
                 {
                     type: 'database',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE'),
-                    count: state.databaseCount,
+                    count: state.count.database,
                     data: state.databaseData,
-                    suffix: 'ea',
+                    suffix: state.suffix.database,
                     to: '/inventory/cloud-service?provider=all&service=Database',
                 },
                 {
                     type: 'storage',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
-                    count: state.storageCount,
+                    count: state.count.storage,
                     data: state.storageData,
-                    suffix: '', // todo
+                    suffix: state.suffix.storage,
                     to: '/inventory/cloud-service?provider=all&service=Storage',
                 },
                 {
@@ -219,13 +240,26 @@ export default {
         });
 
         /* util */
-        const formatBytes = (bytes, decimals = 2) => {
+        const setBoxInterval = () => {
+            state.selectedIndexInterval = setInterval(() => {
+                if (state.selectedIndex < 3) {
+                    state.selectedIndex += 1;
+                } else {
+                    state.selectedIndex = 0;
+                }
+            }, BOX_SWITCH_INTERVAL);
+        };
+        const formatBytes: any = (bytes, decimals = 2, toString = true) => {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
             const dm = decimals < 0 ? 0 : decimals;
             const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / (k ** i)).toFixed(dm))} ${sizes[i]}`;
+            if (toString) return `${parseFloat((bytes / (k ** i)).toFixed(dm))} ${sizes[i]}`;
+            return {
+                count: parseFloat((bytes / (k ** i)).toFixed(dm)),
+                unit: sizes[i],
+            };
         };
         const disposeChart = () => {
             if (chartState.registry[state.chartRef]) {
@@ -241,17 +275,17 @@ export default {
             };
             const chart = createChart();
 
-            chart.responsive.enabled = true;
             chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = 0;
+            chart.paddingTop = 10;
             if (state.selectedType === 'compute') chart.data = chartState.computeData;
             else if (state.selectedType === 'database') chart.data = chartState.databaseData;
             else if (state.selectedType === 'storage') chart.data = chartState.storageData;
 
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'date';
-            dateAxis.renderer.minGridDistance = 20;
+            dateAxis.renderer.minGridDistance = 40;
             dateAxis.renderer.grid.template.disabled = true;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             dateAxis.fontSize = 11;
@@ -263,6 +297,7 @@ export default {
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             valueAxis.fontSize = 11;
             valueAxis.min = 0;
+            valueAxis.extraMax = 0.1;
 
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
@@ -284,46 +319,37 @@ export default {
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
         /* api */
-        const getCount = async () => {
-            try {
-                const res = await SpaceConnector.client.statistics.topic.serverCount();
-                state.computeCount = res.results[0]?.count || 0;
-            } catch (e) {
-                console.error(e);
-            }
-
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceCount({
-                    category: 'Database',
-                });
-                state.databaseCount = res.results[0]?.count || 0;
-            } catch (e) {
-                console.error(e);
-            }
-
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceCount({
-                    category: 'Storage',
-                });
-                state.storageCount = res.results[0]?.count || 0;
-            } catch (e) {
-                console.error(e);
-            }
+        const getCount = () => {
+            forIn(CLOUD_SERVICE_LABEL, async (val, key) => {
+                try {
+                    const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                        label: val,
+                        project_id: props.projectId,
+                    });
+                    console.log(res.results);
+                    const count = res.results[0]?.total || 0;
+                    if (key === 'storage') {
+                        const formattedSize = formatBytes(count, 1, false);
+                        state.count[key] = formattedSize.count;
+                        state.suffix[key] = formattedSize.unit;
+                    } else {
+                        state.count[key] = count;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            });
         };
         const getTrend = async (type) => {
             try {
-                let res;
-                if (type === 'compute') {
-                    res = await SpaceConnector.client.statistics.topic.dailyServerCount();
-                } else if (type === 'database') {
-                    res = await SpaceConnector.client.statistics.topic.dailyDatabaseCount();
-                } else {
-                    res = await SpaceConnector.client.statistics.topic.dailyStorageCount();
-                }
-
+                const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
+                    label: CLOUD_SERVICE_LABEL[type],
+                    aggregate: state.selectedDateType,
+                    project_id: props.projectId,
+                });
                 const chartData = res.results.map(d => ({
                     date: dayjs(d.date).format('MM/DD'),
-                    count: d.count,
+                    count: type === 'storage' ? formatBytes(d.total, 1, false).count : d.total,
                 }));
                 forEach(range(0, DAY_COUNT), (i) => {
                     const date = dayjs().subtract(i, 'day').format('MM/DD');
@@ -363,7 +389,7 @@ export default {
                             },
                         },
                     };
-                    count = state.computeCount;
+                    count = state.count.compute;
                     to = referenceRouter('', { resource_type: 'inventory.Server' });
                 } else if (type === 'database') {
                     param = {
@@ -376,7 +402,7 @@ export default {
                             },
                         },
                     };
-                    count = state.databaseCount;
+                    count = state.count.database;
                     to = '/inventory/cloud-service?provider=all&service=Database';
                 } else {
                     param = {
@@ -396,7 +422,7 @@ export default {
                             },
                         ],
                     };
-                    count = formatBytes(state.storageCount, 1);
+                    count = `${state.count.storage} ${state.suffix.storage}`;
                     to = '/inventory/cloud-service?provider=all&service=Storage';
                 }
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
@@ -418,7 +444,7 @@ export default {
                     summaryData.push({
                         provider: d.provider,
                         label: props.providers[d.provider].label,
-                        type: d.cloud_service_group,
+                        type: d.display_name || d.cloud_service_group,
                         count: type === 'storage' ? formatBytes(d.size, 1) : d.count,
                         to: detailLink,
                     });
@@ -439,6 +465,7 @@ export default {
         const onClickBox = (idx) => {
             if (idx !== state.selectedIndex) disposeChart();
             state.selectedIndex = idx;
+            clearInterval(state.selectedIndexInterval);
         };
 
         const init = () => {
@@ -453,6 +480,7 @@ export default {
             //
             await getSummaryInfo('compute');
             state.loading = false;
+            setBoxInterval();
             await getSummaryInfo('database');
             await getSummaryInfo('storage');
         };
@@ -465,6 +493,9 @@ export default {
             }
         });
         watch(() => state.selectedType, () => {
+            drawChart();
+        }, { immediate: false });
+        watch(() => state.selectedDateType, () => {
             drawChart();
         }, { immediate: false });
 
@@ -482,17 +513,18 @@ export default {
 <style lang="postcss" scoped>
 .all-summary-page {
     .top-part {
-        height: 8rem;
-
         .box {
             @apply bg-white;
             position: relative;
             display: flex;
-            height: 100%;
+            height: 7.25rem;
             cursor: pointer;
             border-radius: 0.375rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            padding-left: 1.5rem;
+            padding-left: 1rem;
+            @screen lg {
+                padding-left: 1.25rem;
+            }
 
             &:hover {
                 background-color: rgba(theme('colors.indigo.400'), 0.1);
@@ -516,7 +548,7 @@ export default {
                 }
                 &:after {
                     position: absolute;
-                    display: block;
+                    display: none;
                     content: '';
                     width: 0;
                     border-style: solid;
@@ -525,11 +557,14 @@ export default {
                     bottom: -0.45rem;
                     left: 50%;
                     margin-left: -0.5rem;
+                    @screen sm {
+                        display: block;
+                    }
                 }
             }
             &.spendings {
                 .count .number {
-                    font-size: 1.375rem;
+                    font-size: 1.25rem;
                 }
             }
 
@@ -585,8 +620,16 @@ export default {
             @apply bg-white;
             position: relative;
             border-radius: 0.375rem;
-            height: 17.5rem;
             padding: 1.25rem 1.5rem;
+            @screen sm {
+                min-height: 27rem;
+            }
+            @screen md {
+                min-height: 23.625rem;
+            }
+            @screen lg {
+                min-height: 17.5rem;
+            }
 
             .title {
                 font-size: 1rem;
@@ -626,7 +669,7 @@ export default {
                     position: relative;
                     display: block;
                     font-size: 0.875rem;
-                    line-height: 1.2rem;
+                    line-height: 1.2;
                     cursor: pointer;
                     padding: 0.25rem 0.5rem;
                     &:hover {
@@ -689,6 +732,18 @@ export default {
                 }
             }
         }
+    }
+}
+</style>
+
+<style lang="postcss">
+.allSummaryLabelBullet-group {
+    display: none;
+    &:last-child {
+        display: block;
+    }
+    @screen sm {
+        display: block;
     }
 }
 </style>
