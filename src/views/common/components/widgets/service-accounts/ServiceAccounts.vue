@@ -13,7 +13,7 @@
                 <template #loader>
                     <div ref="loaderRef" class="w-full h-full" />
                 </template>
-                <div ref="chartRef" class="w-full h-full chart-ref" @click.prevent="$event" />
+                <div ref="chartRef" class="w-full h-full chart-ref" />
             </p-chart-loader>
         </div>
         <div class="legends">
@@ -113,7 +113,7 @@ export default {
             const chart = am4core.create(element, am4charts.PieChart);
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
-            chart.innerRadius = am4core.percent(68);
+            chart.innerRadius = am4core.percent(63);
 
             if (isLoading) {
                 chart.data = [{
@@ -234,6 +234,8 @@ export default {
 }
 .add-btn {
     @apply text-blue-500 float-right;
+    line-height: 1.2;
+    font-size: 0.75rem;
 }
 .legends {
     @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;

@@ -20,7 +20,7 @@
                         <router-link v-for="d in item.favorites" :key="d.id"
                                      :to="referenceRouter(
                                          d.id, {
-                                             resource_type: d.resourceType,
+                                             resource_type: 'inventory.CloudServiceType',
                                          })"
                                      class="item"
                         >
