@@ -311,7 +311,7 @@ export default {
 @screen lg {
     .daily-updates::v-deep {
         &.p-pane-layout {
-            background-color: rgba(theme('colors.white'), 0.8);
+            background-color: rgba(theme('colors.white'));
         }
         .title {
             @apply text-sm leading-normal;

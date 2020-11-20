@@ -48,7 +48,7 @@ import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary
 import TopProjects from '@/views/common/components/widgets/top-projects/TopProjects.vue';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ResourceMap from '@/views/common/components/widgets/resource-map/ResourceMap.vue';
-import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectorProgress.vue';
+import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectingProgress.vue';
 
 import { store } from '@/store';
 import FavoritesWidget from '@/views/common/components/widgets/favorites/FavoritesWidget.vue';
