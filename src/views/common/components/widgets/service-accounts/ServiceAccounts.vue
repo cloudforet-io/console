@@ -1,17 +1,19 @@
 <template>
     <p-widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNTS')">
         <template #extra>
-            <span class="add-btn">
-                <p-i name="ic_plus_bold" width="0.75rem" height="0.75rem"
-                     color="inherit"
-                /> add</span>
+            <router-link :to="'/identity/service-account'">
+                <span class="add-btn">
+                    <p-i name="ic_plus_bold" width="0.75rem" height="0.75rem"
+                         color="inherit"
+                    /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}</span>
+            </router-link>
         </template>
         <div class="chart-container">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
                     <div ref="loaderRef" class="w-full h-full" />
                 </template>
-                <div ref="chartRef" class="w-full h-full" />
+                <div ref="chartRef" class="w-full h-full chart-ref" @click.prevent="$event" />
             </p-chart-loader>
         </div>
         <div class="legends">
@@ -33,29 +35,6 @@
                     </router-link>
                 </template>
             </p-data-table>
-            <!--            <p-grid-layout v-else :items="data" row-gap="0.5rem"-->
-            <!--                           column-gap="0" :fix-column="1" card-min-width="0"-->
-            <!--                           card-height="auto" :card-class="() => []"-->
-            <!--            >-->
-            <!--                <template #card="{item, index}">-->
-            <!--                    <router-link :to="item.href">-->
-            <!--                        <p-selectable-item :icon-url="item.icon" theme="card"-->
-            <!--                                           default-icon="ic_provider_other"-->
-            <!--                        >-->
-            <!--                            <template #contents>-->
-            <!--                                <div class="truncate">-->
-            <!--                                    {{ item.name }}-->
-            <!--                                </div>-->
-            <!--                            </template>-->
-            <!--                            <template #extra>-->
-            <!--                                <p-badge :background-color="item.color" class="count">-->
-            <!--                                    {{ item.count }}-->
-            <!--                                </p-badge>-->
-            <!--                            </template>-->
-            <!--                        </p-selectable-item>-->
-            <!--                    </router-link>-->
-            <!--                </template>-->
-            <!--            </p-grid-layout>-->
         </div>
     </p-widget-layout>
 </template>
@@ -147,6 +126,8 @@ export default {
             }
 
             const series = chart.series.create();
+            series.slices.template.togglable = false;
+            series.slices.template.clickable = false;
             series.dataFields.value = 'service_account_count';
             series.dataFields.category = 'name';
             series.slices.template.propertyFields.fill = 'color';
@@ -157,7 +138,7 @@ export default {
             if (isLoading) {
                 series.slices.template.tooltipText = '';
             } else {
-                series.slices.template.tooltipText = '{category}: {value}';
+                series.slices.template.tooltipText = '{value}';
                 if (series.tooltip) {
                     series.tooltip.fontSize = 12;
                     series.tooltip.fontFamily = 'Noto Sans';
@@ -260,6 +241,7 @@ export default {
 .chart-container {
     @apply flex justify-center items-center mb-4;
 }
+
 .p-data-table::v-deep {
     margin-top: 1rem;
     overflow-x: hidden;
