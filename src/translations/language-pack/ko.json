@@ -79,7 +79,10 @@
 				"LEGEND_UNSET": "미설정",
 				"NEED_SCHEDULER_HINT_TEXT": "스케줄을 등록해주세요.",
 				"SCHEDULE": "스케줄",
-				"TITLE": "파워 스케줄러"
+				"TITLE": "파워 스케줄러",
+				"TOOLTIP_COST_1": "파워 스케줄러를 통해 절감된 이 달의 비용",
+				"TOOLTIP_COST_2": "(기준: 이번 달 1일 ~ 현재)",
+				"TOOLTIP_RESOURCE": "적용 가능한 자원 종류"
 			},
 			"RESOURCE": {
 				"ALT_E_ID_INVALID_DESC": "리소스 그룹 목록을 확인해주세요.",
@@ -203,9 +206,9 @@
 		"WIDGETS": {
 			"ALL_SUMMARY_ALL": "합계",
 			"ALL_SUMMARY_COMPUTE": "컴퓨트",
-			"ALL_SUMMARY_DAILY": "일별",
 			"ALL_SUMMARY_DATABASE": "데이터베이스",
-			"ALL_SUMMARY_MONTHLY": "월별",
+			"ALL_SUMMARY_DAY": "일",
+			"ALL_SUMMARY_MONTH": "월",
 			"ALL_SUMMARY_NO_DATA_1": "Billing service is not supported yet.",
 			"ALL_SUMMARY_NO_DATA_2": "We are getting ready to support the billing service.",
 			"ALL_SUMMARY_SPENDINGS": "전체 지출",

@@ -64,7 +64,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    gray, indigo, coral,
+    gray, indigo, peacock,
 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
@@ -85,8 +85,8 @@ interface ProjectData {
 }
 
 const DATA_COUNT = 5;
-const COMPUTE_COLOR = indigo[600];
-const DATABASE_COLOR = coral[500];
+const COMPUTE_COLOR = peacock[500];
+const DATABASE_COLOR = indigo[400];
 
 
 export default {
@@ -121,6 +121,15 @@ export default {
             ]),
         });
 
+        /* util */
+        const formatBytes = (bytes, decimals = 2) => {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / (k ** i)).toFixed(dm))} ${sizes[i]}`;
+        };
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
             chart.responsive.enabled = true;
@@ -181,15 +190,7 @@ export default {
             chart.legend.markers.template.height = 8;
         };
 
-        const formatBytes = (bytes, decimals = 2) => {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-        };
-
+        /* api */
         const getData = async () => {
             state.loading = true;
             try {

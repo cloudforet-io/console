@@ -196,7 +196,7 @@ export default {
         const validationState = reactive({
             isUserIdValid: undefined as undefined | boolean,
             userIdInvalidText: '' as TranslateResult | string,
-            userIdValidText: vm.$t('IDENTITY.USER.FORM.NAME_VALID'),
+            userIdValidText: computed(() => vm.$t('IDENTITY.USER.FORM.NAME_VALID')),
             //
             isPasswordValid: undefined as undefined | boolean,
             passwordInvalidText: '' as TranslateResult | string,

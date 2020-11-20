@@ -272,8 +272,11 @@ export default {
         });
 
         const routeState = reactive({
-            routes: [{ name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' }, { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT'), path: `/identity/service-account/add/${props.provider}` }],
+            routes: computed(() => ([
+                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
+                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT'), path: `/identity/service-account/add/${props.provider}` }
+            ])),
         });
         const projectRef = ref<any>(null);
 
