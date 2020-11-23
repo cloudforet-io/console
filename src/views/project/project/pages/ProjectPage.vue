@@ -476,10 +476,10 @@ export default {
 .p-page-title::v-deep {
     @apply pb-5 border-b border-gray-200;
     .extra {
-        @apply justify-between;
+        @apply justify-between items-center;
     }
     .favorite-btn-wrapper {
-        @apply ml-2;
+        @apply mx-2;
     }
     .btns {
         @apply inline-flex items-center;

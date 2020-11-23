@@ -333,7 +333,7 @@ export default {
     @apply pb-4;
     .title {
         @apply text-gray-900;
-        font-size: 1.125rem;
+        font-size: 1rem;
         line-height: 1.2;
         font-weight: bold;
         .desc {
@@ -345,6 +345,7 @@ export default {
     }
     .time {
         @apply text-gray-500;
+        margin-top: 0.375rem;
         font-size: 0.625rem;
         line-height: 1;
     }
