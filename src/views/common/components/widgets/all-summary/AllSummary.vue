@@ -46,11 +46,11 @@
                         </p-chart-loader>
                     </div>
                     <div class="summary-wrapper col-span-12 lg:col-span-3">
-                        <div class="grid grid-cols-3">
-                            <div class="title col-span-3">
-                                {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
-                            </div>
-                            <template v-if="!loading" class="">
+                        <div class="title col-span-3">
+                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
+                        </div>
+                        <template v-if="!loading && dataList[selectedIndex].count > 0">
+                            <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
                                 <router-link v-for="(data, idx) of dataList[selectedIndex].summaryData" :key="idx"
                                              :to="data.to"
                                              class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
@@ -63,14 +63,32 @@
                                     </div>
                                     <span class="count">{{ data.count }}</span>
                                 </router-link>
-                            </template>
-                            <template v-else>
-                                <div v-for="v in skeletons" :key="v" class="flex items-center p-4 col-span-3">
-                                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
-                                    <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
+                        <template v-else-if="!loading">
+                            <div class="summary-content-wrapper no-data-wrapper grid">
+                                <div class="m-auto">
+                                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                    <p class="text">
+                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_SERVICE', { service: dataList[selectedIndex].title }) }}
+                                    </p>
+                                    <router-link to="/identity/service-account">
+                                        <p-icon-text-button
+                                            style-type="primary1"
+                                            name="ic_plus_bold"
+                                        >
+                                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_ADD_SERVICE_ACCOUNTS') }}
+                                        </p-icon-text-button>
+                                    </router-link>
                                 </div>
-                            </template>
-                        </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                                <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                                <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
                     </div>
                 </template>
                 <template v-else>
@@ -115,6 +133,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -149,6 +168,7 @@ const BOX_SWITCH_INTERVAL = 5000;
 export default {
     name: 'AllSummary',
     components: {
+        PIconTextButton,
         PButton,
         PSkeleton,
         PChartLoader,
@@ -641,16 +661,14 @@ export default {
         .content-wrapper {
             @apply bg-white;
             position: relative;
+            height: 27.5rem;
             border-radius: 0.375rem;
             padding: 1.25rem 1.5rem;
-            @screen sm {
-                min-height: 27rem;
-            }
             @screen md {
-                min-height: 23.625rem;
+                height: 25rem;
             }
             @screen lg {
-                min-height: 17.5rem;
+                height: 17.5rem;
             }
 
             .title {
@@ -687,6 +705,35 @@ export default {
                     padding: 0 0.5rem;
                     margin-bottom: 1.25rem;
                 }
+                .summary-content-wrapper {
+                    height: 5rem;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    @screen lg {
+                        height: 12rem;
+                    }
+                    &.no-data-wrapper {
+                        .empty-image {
+                            margin: 0 auto 0.5rem auto;
+                        }
+                        .text {
+                            @apply text-primary2;
+                            font-size: 0.875rem;
+                            font-weight: bold;
+                            line-height: 1.5;
+                            text-align: center;
+                            opacity: 0.7;
+                            margin-bottom: 0.625rem;
+                        }
+                        .p-button {
+                            min-width: auto;
+                            height: 1.25rem;
+                            font-size: 0.75rem;
+                            line-height: 1.2;
+                            padding: 0.5rem;
+                        }
+                    }
+                }
                 .summary-row {
                     position: relative;
                     display: block;
@@ -694,6 +741,7 @@ export default {
                     line-height: 1.2;
                     cursor: pointer;
                     padding: 0.25rem 0.5rem;
+                    margin: auto 0;
                     &:hover {
                         @apply bg-secondary2;
                         .provider {

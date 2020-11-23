@@ -220,6 +220,7 @@
 			"TITLE": "プロジェクト変更"
 		},
 		"WIDGETS": {
+			"ALL_SUMMARY_ADD_SERVICE_ACCOUNTS": "サービスアカウントの追加",
 			"ALL_SUMMARY_ALL": "合計",
 			"ALL_SUMMARY_COMPUTE": "コンピューティング",
 			"ALL_SUMMARY_DATABASE": "データベース",
@@ -227,6 +228,7 @@
 			"ALL_SUMMARY_MONTH": "月",
 			"ALL_SUMMARY_NO_DATA_1": "ビリングサービスは準備中です。",
 			"ALL_SUMMARY_NO_DATA_2": "2021年1月、SpaceONEでビリングサービスを提供する予定です。",
+			"ALL_SUMMARY_NO_SERVICE": "",
 			"ALL_SUMMARY_SPENDINGS": "支出全体",
 			"ALL_SUMMARY_STORAGE": "ストレージ",
 			"ALL_SUMMARY_TREND_TITLE": "トレンド",
