@@ -51,12 +51,14 @@
                                 {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
                             </div>
                             <template v-if="!loading" class="">
-                                <router-link v-for="(data, idx) of dataList[selectedIndex].data" :key="idx"
+                                <router-link v-for="(data, idx) of dataList[selectedIndex].summaryData" :key="idx"
                                              :to="data.to"
                                              class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
                                 >
                                     <div class="text-group">
-                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">
+                                            {{ data.provider === 'all' ? $t('COMMON.WIDGETS.ALL_SUMMARY_ALL') : data.label }}
+                                        </span>
                                         <span class="type">{{ data.type }}</span>
                                     </div>
                                     <span class="count">{{ data.count }}</span>
@@ -123,7 +125,7 @@ interface ChartData {
     date: string;
     count: number;
 }
-interface TypeData {
+interface SummaryData {
     provider: string;
     label: string | TranslateResult;
     count: number | string;
@@ -194,7 +196,7 @@ export default {
                     type: 'compute',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
                     count: state.count.compute,
-                    data: state.computeData,
+                    summaryData: state.computeSummaryData,
                     suffix: state.suffix.compute,
                     to: referenceRouter('', { resource_type: 'inventory.Server' }),
                 },
@@ -202,7 +204,7 @@ export default {
                     type: 'database',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE'),
                     count: state.count.database,
-                    data: state.databaseData,
+                    summaryData: state.databaseSummaryData,
                     suffix: state.suffix.database,
                     to: '/inventory/cloud-service?provider=all&service=Database',
                 },
@@ -210,7 +212,7 @@ export default {
                     type: 'storage',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
                     count: state.count.storage,
-                    data: state.storageData,
+                    summaryData: state.storageSummaryData,
                     suffix: state.suffix.storage,
                     to: '/inventory/cloud-service?provider=all&service=Storage',
                 },
@@ -222,9 +224,9 @@ export default {
                     beta: true,
                 },
             ])),
-            computeData: [] as TypeData[],
-            databaseData: [] as TypeData[],
-            storageData: [] as TypeData[],
+            computeSummaryData: [] as SummaryData[],
+            databaseSummaryData: [] as SummaryData[],
+            storageSummaryData: [] as SummaryData[],
         });
         const chartState = reactive({
             loading: true,
@@ -319,26 +321,23 @@ export default {
         const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
         /* api */
-        const getCount = () => {
-            forIn(CLOUD_SERVICE_LABEL, async (val, key) => {
-                try {
-                    const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
-                        label: val,
-                        project_id: props.projectId,
-                    });
-                    console.log(res.results);
-                    const count = res.results[0]?.total || 0;
-                    if (key === 'storage') {
-                        const formattedSize = formatBytes(count, 1, false);
-                        state.count[key] = formattedSize.count;
-                        state.suffix[key] = formattedSize.unit;
-                    } else {
-                        state.count[key] = count;
-                    }
-                } catch (e) {
-                    console.error(e);
+        const getCount = async (type) => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                    label: CLOUD_SERVICE_LABEL[type],
+                    project_id: props.projectId,
+                });
+                const count = res.results[0]?.total || 0;
+                if (type === 'storage') {
+                    const formattedSize = formatBytes(count, 1, false);
+                    state.count[type] = formattedSize.count;
+                    state.suffix[type] = formattedSize.unit;
+                } else {
+                    state.count[type] = count;
                 }
-            });
+            } catch (e) {
+                console.error(e);
+            }
         };
         const getTrend = async (type) => {
             try {
@@ -374,9 +373,10 @@ export default {
         };
         const getSummaryInfo = async (type) => {
             try {
+                // set value of 'All' type
                 let param;
                 let count;
-                let to;
+                let allLink;
                 if (type === 'compute') {
                     param = {
                         labels: ['Compute'],
@@ -390,7 +390,7 @@ export default {
                         },
                     };
                     count = state.count.compute;
-                    to = referenceRouter('', { resource_type: 'inventory.Server' });
+                    allLink = referenceRouter('', { resource_type: 'inventory.Server' });
                 } else if (type === 'database') {
                     param = {
                         labels: ['Database'],
@@ -403,7 +403,7 @@ export default {
                         },
                     };
                     count = state.count.database;
-                    to = '/inventory/cloud-service?provider=all&service=Database';
+                    allLink = '/inventory/cloud-service?provider=all&service=Database';
                 } else {
                     param = {
                         labels: ['Storage'],
@@ -423,15 +423,17 @@ export default {
                         ],
                     };
                     count = `${state.count.storage} ${state.suffix.storage}`;
-                    to = '/inventory/cloud-service?provider=all&service=Storage';
+                    allLink = '/inventory/cloud-service?provider=all&service=Storage';
                 }
+
+                // set value of 'each' type
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
-                const summaryData: TypeData[] = [
+                const summaryData: SummaryData[] = [
                     {
                         provider: 'all',
-                        label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_ALL'),
+                        label: '',
                         count,
-                        to,
+                        to: allLink,
                     },
                 ];
                 res.results.forEach((d) => {
@@ -450,14 +452,14 @@ export default {
                     });
                 });
                 if (type === 'compute') {
-                    state.computeData = summaryData;
+                    state.computeSummaryData = summaryData;
                 } else if (type === 'database') {
-                    state.databaseData = summaryData;
+                    state.databaseSummaryData = summaryData;
                 } else {
-                    state.storageData = summaryData;
+                    state.storageSummaryData = summaryData;
                 }
             } catch (e) {
-                console.log(e);
+                console.error(e);
             }
         };
 
@@ -476,12 +478,15 @@ export default {
         };
         const asyncInit = async () => {
             state.loading = true;
-            await getCount();
-            //
+            await getCount('compute');
             await getSummaryInfo('compute');
             state.loading = false;
             setBoxInterval();
+
+            await getCount('database');
             await getSummaryInfo('database');
+
+            await getCount('storage');
             await getSummaryInfo('storage');
         };
         init();
