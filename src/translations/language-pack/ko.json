@@ -274,6 +274,7 @@
 			"SERVICE_SUMMARY_PROJECT": "프로젝트 ",
 			"SERVICE_SUMMARY_SERVER": "서버 ",
 			"TOP_PROJECT_CLOUD_SERVICE": "클라우드 서비스 ",
+			"TOP_PROJECT_COMPUTE": "컴퓨트",
 			"TOP_PROJECT_CREATE_DASHBOARD": "대시보드를 만드세요! ",
 			"TOP_PROJECT_CREATE_GUIDE": "프로젝트를 만든 후 서비스 계정을 등록하세요. ",
 			"TOP_PROJECT_CREATE_PROJECT": "프로젝트 생성",
@@ -283,7 +284,6 @@
 			"TOP_PROJECT_PROJECT": "프로젝트 ",
 			"TOP_PROJECT_PROJECT_GROUP": "프로젝트 그룹 ",
 			"TOP_PROJECT_RANK": "랭킹",
-			"TOP_PROJECT_SERVER": "서버 ",
 			"TOP_PROJECT_STORAGE": "저장소",
 			"TOP_PROJECT_TITLE": "가장 많은 리소스를 사용중인 프로젝트"
 		}
