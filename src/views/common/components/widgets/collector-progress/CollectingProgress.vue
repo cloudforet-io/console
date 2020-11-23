@@ -7,7 +7,7 @@
                 </p>
                 <div class="more-btn">
                     <router-link to="/management/collector-history" class="more">
-                        {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
+                        <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
                         <p-i name="ic_arrow_right" width="1rem" height="1rem"
                              color="inherit transparent"
                         />
@@ -175,13 +175,14 @@ export default {
 .top {
     @apply flex pb-4;
     .title {
-        @apply text-gray-900;
+        @apply text-gray-900 flex-grow;
         font-size: 1.125rem;
         line-height: 1.2;
         font-weight: bold;
     }
     .more-btn {
         @apply flex-shrink-0 flex justify-end;
+        font-size: 0.75rem;
     }
 }
 .widget-layout::v-deep {
@@ -200,7 +201,7 @@ export default {
     }
 }
 .more {
-    @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer;
+    @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer float-right;
     &:hover {
         @apply text-secondary underline;
     }

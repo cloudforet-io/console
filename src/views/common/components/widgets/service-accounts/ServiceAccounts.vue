@@ -157,7 +157,7 @@ export default {
             label.verticalCenter = 'middle';
             label.fontSize = 25;
             label.fontWeight = 'lighter';
-            label.fill = am4core.color(gray[500]);
+            label.fill = am4core.color(gray[900]);
             if (isLoading) {
                 label.text = '';
             } else {

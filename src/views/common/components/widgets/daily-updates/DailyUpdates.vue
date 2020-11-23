@@ -4,7 +4,6 @@
             <div class="top">
                 <p class="title">
                     {{ $t('COMMON.WIDGETS.DAILY_UPDATE_TITLE') }}
-                    <span class="desc">({{ $t('COMMON.WIDGETS.DAILY_UPDATE_MANAGED_RESOURCE') }})</span>
                 </p>
                 <p class="time">
                     {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DESC') }}
