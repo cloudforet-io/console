@@ -11,7 +11,7 @@
         <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
         >
-            <div class="col-span-12 md:col-span-6 lg:col-span-12
+            <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
                 <favorites-widget class="hidden lg:block
@@ -23,7 +23,7 @@
                                       daily-updates"
                 />
             </div>
-            <div class="col-span-12 md:col-span-6 lg:col-span-12
+            <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
                 <service-accounts class="col-span-12" />
@@ -107,6 +107,7 @@ export default {
 
 .widget-wrapper {
     @apply grid-cols-12;
+    grid-auto-rows: max-content;
     display: inline-grid;
     grid-gap: 1.25rem;
 }
@@ -114,11 +115,6 @@ export default {
 .daily-updates {
     height: 33.75rem;
 }
-
-//.widget-layout::v-deep {
-//    @apply border border-gray-100;
-//    border-radius: 0.375rem;
-//}
 
 @screen lg {
     .daily-updates {
