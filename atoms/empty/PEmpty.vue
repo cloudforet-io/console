@@ -27,9 +27,10 @@ export default {
     height: 100%;
     justify-content: center;
     align-items: center;
-    font-size: 1.5rem;
-    line-height: 2rem;
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1.2;
 
-    @apply text-primary2;
+    @apply text-gray-300;
 }
 </style>
