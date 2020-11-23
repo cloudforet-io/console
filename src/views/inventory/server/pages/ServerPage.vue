@@ -97,7 +97,7 @@
         </p-tab>
 
         <div v-else class="empty-space">
-            {{ $t('INVENTORY.SERVER.MAIN.NO_SELECTED_SERVER') }}
+            <p-empty>{{ $t('INVENTORY.SERVER.MAIN.NO_SELECTED_SERVER') }}</p-empty>
         </div>
         <p-table-check-modal v-if="!!checkTableModalState.visible"
                              :visible.sync="checkTableModalState.visible"
@@ -181,6 +181,7 @@ import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -238,6 +239,7 @@ const serverStore = {
 export default {
     name: 'Server',
     components: {
+        PEmpty,
         ServerHistory,
         ServerMember,
         PDynamicLayout,
