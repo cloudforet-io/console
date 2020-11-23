@@ -133,7 +133,8 @@
 			"404_MSG": "Oops, nothing is here.",
 			"NO_RESOURCE_GO_BACK_1": "Click here",
 			"NO_RESOURCE_GO_BACK_2": "to go back home.",
-			"NO_RESOURCE_MSG": "There are no matching resources. "
+			"NO_RESOURCE_MSG": "There are no matching resources. ",
+			"NO_RESOURCE_TITLE": "No Resources"
 		},
 		"FNB": {
 			"PRIVACY": "Privacy Policy",
