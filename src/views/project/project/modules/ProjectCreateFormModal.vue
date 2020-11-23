@@ -1,23 +1,23 @@
 <template>
     <p-button-modal
         :header-title="updateMode ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
-        :centered="true"
+        centered
         size="md"
-        :fade="true"
+        fade
         :scrollable="false"
-        :backdrop="true"
+        backdrop
         :visible.sync="proxyVisible"
-        :disabled="!isProjectNameValid"
+        :disabled="showValidation && !isProjectNameValid"
         @confirm="confirm"
     >
         <template #body>
             <p-field-group :label="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_LABEL')"
                            :invalid-text="projectNameInvalidText"
-                           :invalid="projectName && !isProjectNameValid"
-                           :required="true"
+                           :invalid="showValidation && !isProjectNameValid"
+                           required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="projectName" class="block w-full" :class="{'is-invalid': invalid}"
+                    <p-text-input v-model="projectName" class="block w-full" :invalid="showValidation && invalid"
                                   :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_PLACEHOLDER')"
                     />
                 </template>
@@ -78,13 +78,17 @@ export default {
             type: String,
             default: '',
         },
+        currentProject: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             projectNames: [] as string[],
-            projectName: undefined as undefined | string,
+            projectName: props.currentProject,
             projectNameInvalidText: computed(() => {
                 let invalidText = '' as TranslateResult;
                 if (typeof state.projectName === 'string') {
@@ -104,6 +108,7 @@ export default {
                 }
                 return false;
             }),
+            showValidation: false,
         });
 
         const getProjectNames = async () => {
@@ -117,18 +122,20 @@ export default {
         };
 
         const confirm = async () => {
+            if (!state.showValidation) state.showValidation = true;
             if (!state.isProjectNameValid) return;
 
             const item = {
                 name: state.projectName,
             };
             emit('confirm', item);
+            state.showValidation = false;
         };
 
-        const init = async () => {
+        /** Init */
+        (async () => {
             await getProjectNames();
-        };
-        init();
+        })();
 
         return {
             ...toRefs(state),
