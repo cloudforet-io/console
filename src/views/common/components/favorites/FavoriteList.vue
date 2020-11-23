@@ -5,15 +5,15 @@
             {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM') }}
         </div>
         <template v-else>
-            <a v-for="item in displayItems" :key="item.id" class="item"
-               :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
-               :href="referenceRouter(
-                   item.id, {
-                       resource_type: 'inventory.CloudServiceType',
-                   })"
-               @click="onClickItem(item, $event)"
-               @mouseenter="hoveredItem = item"
-               @mouseleave="hoveredItem = null"
+            <router-link v-for="item in displayItems" :key="item.id" class="item"
+                         :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
+                         :to="referenceRouter(
+                             item.id, {
+                                 resource_type: 'inventory.CloudServiceType',
+                             })"
+                         @click="onClickItem(item, $event)"
+                         @mouseenter="hoveredItem = item"
+                         @mouseleave="hoveredItem = null"
             >
                 <span class="icon"><slot name="icon" :item="item" /></span>
                 <span class="name">{{ item.name }}</span>
@@ -22,7 +22,7 @@
                                class="delete-btn"
                                @click.prevent.stop="onClickDelete(item)"
                 />
-            </a>
+            </router-link>
             <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click.stop="onClickToggle">
                 {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
                 <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
