@@ -5,24 +5,27 @@
             {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM') }}
         </div>
         <template v-else>
-            <router-link v-for="item in displayItems" :key="item.id" class="item"
-                         :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
-                         :to="referenceRouter(
-                             item.id, {
-                                 resource_type: item.resourceType,
-                             })"
-                         @click="onClickItem(item, $event)"
-                         @mouseenter="hoveredItem = item"
-                         @mouseleave="hoveredItem = null"
+            <div v-for="item in displayItems" :key="item.id" class="item"
+                 :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
+                 @click="onClickItem(item, $event)"
+                 @mouseenter="hoveredItem = item"
+                 @mouseleave="hoveredItem = null"
             >
-                <span class="icon"><slot name="icon" :item="item" /></span>
-                <span class="name">{{ item.name }}</span>
+                <router-link :to="referenceRouter(
+                                 item.id, {
+                                     resource_type: item.resourceType,
+                                 })"
+                             class="item-link"
+                >
+                    <span class="icon"><slot name="icon" :item="item" /></span>
+                    <span class="name">{{ item.name }}</span>
+                </router-link>
                 <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id" name="ic_delete"
                                width="1rem" height="1rem"
                                class="delete-btn"
                                @click.prevent.stop="onClickDelete(item)"
                 />
-            </router-link>
+            </div>
             <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click.stop="onClickToggle">
                 {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
                 <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
@@ -117,6 +120,9 @@ export default {
     cursor: pointer;
     &.hovered {
         @apply bg-secondary2 text-secondary;
+    }
+    .item-link {
+        @apply flex flex-grow;
     }
     .icon {
         @apply flex-shrink-0 flex overflow-hidden;

@@ -56,6 +56,7 @@ import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import {
+    onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -87,6 +88,7 @@ export default {
     setup(props) {
         const state = reactive({
             chartRef: null as HTMLElement|null,
+            chart: null as null|any,
             data: [] as any,
             filteredData: [] as any,
             selectedProvider: 'aws',
@@ -124,6 +126,29 @@ export default {
             }
         };
 
+        const getRegionList = async () => {
+            const resp = await SpaceConnector.client.inventory.region.list({
+                query: {
+                    filter: [
+                        {
+                            k: 'region_code',
+                            v: 'global',
+                            o: 'not',
+                        },
+                    ],
+                },
+            });
+            state.data = [
+                ...resp.results.map(d => ({
+                    title: d.name,
+                    latitude: parseInt(d.tags.latitude),
+                    longitude: parseInt(d.tags.longitude),
+                    color: props.providers[d.provider].color as string,
+                    ...d,
+                })),
+            ];
+        };
+
         const animateBullet = (circle) => {
             const animation = circle.animate([{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }],
                 1000, am4core.ease.circleOut);
@@ -153,27 +178,6 @@ export default {
             polygonSeries.mapPolygons.template.fill = am4core.color(gray[200]);
             polygonSeries.calculateVisualCenter = true;
 
-            const resp = await SpaceConnector.client.inventory.region.list({
-                query: {
-                    filter: [
-                        {
-                            k: 'region_code',
-                            v: 'global',
-                            o: 'not',
-                        },
-                    ],
-                },
-            });
-            state.data = [
-                ...resp.results.map(d => ({
-                    title: d.name,
-                    latitude: parseInt(d.tags.latitude),
-                    longitude: parseInt(d.tags.longitude),
-                    color: props.providers[d.provider].color as string,
-                    ...d,
-                })),
-            ];
-
             const imageSeries = chart.series.push(new am4maps.MapImageSeries());
             imageSeries.mapImages.template.propertyFields.longitude = 'longitude';
             imageSeries.mapImages.template.propertyFields.latitude = 'latitude';
@@ -191,7 +195,6 @@ export default {
             const mapImageSeries = chart.series.push(new am4maps.MapImageSeries());
             const mapImage = mapImageSeries.mapImages;
             const mapImageTemplate = mapImage.template;
-
             const mapMarker = mapImageTemplate.createChild(am4core.Sprite);
             mapMarker.path = 'M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z';
             mapMarker.width = 24;
@@ -203,9 +206,7 @@ export default {
             mapMarker.verticalCenter = 'bottom';
 
             const mapLabel = mapImageTemplate.createChild(am4core.Label);
-
             mapLabel.horizontalCenter = 'middle';
-
             const marker = mapImage.create();
 
             circle2.events.on('hit', async (event) => {
@@ -218,10 +219,11 @@ export default {
                     drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker, mapLabel);
                 }
             });
-
             const originCoords = { longitude: 126.871867, latitude: 37.528547 };
+            await getRegionList();
             drawMarker(originCoords, marker, mapLabel);
             imageSeries.data = state.data;
+            state.chart = chart;
         };
 
         const goToCloudService = (item) => {
@@ -269,8 +271,7 @@ export default {
         const init = async () => {
             state.loading = true;
             await store.dispatch('resource/provider/load');
-            await getFilteredData('ap-northeast-2');
-            await drawChart();
+            await Promise.all([getRegionList(), getFilteredData('ap-northeast-2'), drawChart()]);
             state.loading = false;
         };
 
@@ -281,6 +282,10 @@ export default {
                 drawChart();
             }
         }, { immediate: true });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),
