@@ -428,8 +428,7 @@ export default {
                 .header-decorator {
                     @apply inline-block bg-primary3 text-primary;
                     border-radius: 2px;
-                    width: 4.5rem;
-                    padding: 0.2rem;
+                    padding: 0.2rem 0.5rem;
                     margin-left: 0.5rem;
                     font-size: 0.75rem;
                     text-align: center;

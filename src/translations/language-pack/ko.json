@@ -129,12 +129,11 @@
 		},
 		"ERROR": {
 			"404_GO_BACK_1": "이전 페이지로 돌아가기 >> 버튼으로 처리 (108번 라인과 동일하게)",
-			"404_GO_BACK_2": "가기",
 			"404_MSG": "이런, 내용을 찾을 수 없습니다.",
 			"NO_RESOURCE_GO_BACK_1": "이전 페이지로 돌아가기  >> 버튼으로 처리  (108번 라인과 동일하게)",
 			"NO_RESOURCE_GO_BACK_2": "메인 페이지로 이동하세요.",
 			"NO_RESOURCE_MSG": "리소스를 찾을 수 없습니다.",
-			"NO_RESOURCE_TITLE": ""
+			"NO_RESOURCE_TITLE": "리소스가 없습니다. "
 		},
 		"FNB": {
 			"PRIVACY": "개인정보처리방침 ",
@@ -235,7 +234,6 @@
 			"DAILY_UPDATE_DELETED": "삭제",
 			"DAILY_UPDATE_DESC": "00:00 ~ 현재 (로컬 시간 기준) ",
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
-			"DAILY_UPDATE_MANAGED_RESOURCE": "",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "클라우드 서비스",
@@ -757,7 +755,7 @@
 			"REPORT_DESC": "SpaceONE은 프로젝트를 바탕으로 한 월간 보고서를 제공합니다. 곧 더 많은 콘텐츠를 제공할 예정입니다. ",
 			"REPORT_DOWNLOAD_FILE_DESC": "*제공하는 파일 형식 (PDF, PPTX, CSV)",
 			"REPORT_LABEL_COMPANY_NAME": "보고서 표지 제목 ",
-			"REPORT_LOADING_DESC": "",
+			"REPORT_LOADING_DESC": "조금만 기다려주세요",
 			"REPORT_LOADING_TITLE": "로딩중...",
 			"REPORT_PERIOD": "기간(지난 1개월)",
 			"TAB_MEMBER": "구성원 ",
