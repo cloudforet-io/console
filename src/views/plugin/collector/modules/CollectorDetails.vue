@@ -8,7 +8,7 @@
                 <p-lazy-img :src="baseState.data.tags.icon" width="1rem" height="1rem" />
                 <span class="ml-2 leading-none">{{ baseState.data.name }}</span>
             </template>
-            <template #data-plugin_info.options.supported_resource_type="{data}">
+            <template #data-plugin_info.metadata.metadata.supported_resource_type="{data}">
                 <p-text-list :items="data || []" delimiter=", " />
             </template>
         </p-definition-table>
@@ -61,7 +61,7 @@ export default {
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_VERSION'), name: 'plugin_info.version' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PROVIDER'), name: 'provider' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PRIORITY'), name: 'priority' },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.options.supported_resource_type' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.metadata.metadata.supported_resource_type' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_LAST_COLLECTED'), name: 'last_collected_at', formatter: timestampFormatter },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_CREATED'), name: 'created_at', formatter: timestampFormatter },
             ]),
@@ -84,6 +84,7 @@ export default {
         const getCollectorDetailData = async () => {
             const res = await SpaceConnector.client.inventory.collector.get({
                 collector_id: props.collectorId,
+                only: [...baseState.fields.map(d => d.name), 'plugin_info.options.filter_format', 'tags'],
             });
             baseState.loading = false;
             if (res) baseState.data = res;

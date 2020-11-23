@@ -39,7 +39,7 @@ import {
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import config from '@/lib/config';
@@ -163,11 +163,14 @@ export default {
             return query.data;
         };
 
-        const getParams = () => {
+        const getParams = (type?: DynamicLayoutType) => {
             // eslint-disable-next-line camelcase
             const params: any = { server_id: props.serverId };
             const query = getQuery();
-            if (query) params.query = query;
+            if (query) {
+                params.query = query;
+                if (type === 'list') delete params.query.sort;
+            }
             const keyPath = state.currentLayout.options?.root_path;
             if (keyPath) params.key_path = keyPath;
             return params;
@@ -178,7 +181,7 @@ export default {
             state.data = dataMap[state.fetchOptionKey];
             try {
                 const api = SpaceConnector.client.inventory.server[getApiActionByLayoutType(state.currentLayout.type)];
-                const res = await api(getParams());
+                const res = await api(getParams(state.currentLayout.type));
 
                 if (res.total_count !== undefined) state.totalCount = res.total_count;
                 state.data = res.results || res;
