@@ -97,16 +97,16 @@
                             <span class="value">{{ userState.email }}</span>
                         </div>
                         <div class="context-info">
-                            <span class="label">Role</span>
-                            <span v-if="userState.isDomainOwner" class="value">Root Admin</span>
-                            <span v-else class="value">Domain Admin</span>
+                            <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
+                            <span v-if="userState.isDomainOwner" class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_ROOT_ADMIN') }}</span>
+                            <span v-else class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_DOMAIN_ADMIN') }}</span>
                         </div>
                         <div class="context-info">
-                            <span class="label">Time zone</span>
+                            <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
                             <span class="value">{{ userState.timezone }}</span>
                         </div>
                         <div class="context-info">
-                            <span class="label">Language</span>
+                            <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                             <span class="value">{{ userState.language }}</span>
                         </div>
                     </template>
@@ -245,30 +245,30 @@ export default {
                     ],
                 },
             ]),
-            supportMenu: [
+            supportMenu: computed(() => [
                 {
                     type: 'item',
-                    label: 'User Guide',
+                    label: vm.$t('COMMON.GNB.SUPPORT.LABEL_USER_GUIDE'),
                     name: 'user-guide',
                     link: 'https://spaceone-dev.gitbook.io/user-guide/',
                     target: '_blank',
                 },
                 {
                     type: 'item',
-                    label: 'API Guide',
+                    label: vm.$t('COMMON.GNB.SUPPORT.LABEL_API_GUIDE'),
                     name: 'api-guide',
                     link: 'https://spaceone-dev.gitbook.io/spaceone-apis',
                     target: '_blank',
                 },
                 {
                     type: 'item',
-                    label: 'GitHub',
+                    label: vm.$t('COMMON.GNB.SUPPORT.LABEL_GITHUB'),
                     name: 'github',
                     link: 'https://github.com/spaceone-dev',
                     target: '_blank',
                 },
-            ],
-            accountMenu: [
+            ]),
+            accountMenu: computed(() => [
                 {
                     type: 'info',
                 },
@@ -276,12 +276,12 @@ export default {
                     type: 'divider',
                 },
                 {
-                    type: 'item', label: 'Profile', name: 'profile',
+                    type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_PROFILE'), name: 'profile',
                 },
                 {
-                    type: 'item', label: 'Log out', name: 'logout',
+                    type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_LOGOUT'), name: 'logout',
                 },
-            ],
+            ]),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;

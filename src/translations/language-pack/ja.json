@@ -139,6 +139,22 @@
 			"PRIVACY": "個人情報処理方針",
 			"PRIVACY_MSG": "準備中です"
 		},
+		"GNB": {
+			"ACCOUNT": {
+				"LABEL_LANGUAGE": "言語",
+				"LABEL_LOGOUT": "ログアウト",
+				"LABEL_PROFILE": "管理者ログイン",
+				"LABEL_ROLE": "ロール",
+				"LABEL_TIMEZONE": "タイムゾーン",
+				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
+				"ROLE_ROOT_ADMIN": "ルート管理者"
+			},
+			"SUPPORT": {
+				"LABEL_API_GUIDE": "APIガイド ",
+				"LABEL_GITHUB": "",
+				"LABEL_USER_GUIDE": "ユーザーガイド"
+			}
+		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}に表示されます",
 			"LIMIT_OF_RESOURCE": "表示されるリストは最大{limitCount}個",

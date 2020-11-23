@@ -139,6 +139,22 @@
 			"PRIVACY": "Privacy Policy",
 			"PRIVACY_MSG": "Will be updated"
 		},
+		"GNB": {
+			"ACCOUNT": {
+				"LABEL_LANGUAGE": "Language",
+				"LABEL_LOGOUT": "Log Out",
+				"LABEL_PROFILE": "Profile",
+				"LABEL_ROLE": "Role",
+				"LABEL_TIMEZONE": "Time zone",
+				"ROLE_DOMAIN_ADMIN": "Domain Admin",
+				"ROLE_ROOT_ADMIN": "Root Admin"
+			},
+			"SUPPORT": {
+				"LABEL_API_GUIDE": "API Guide",
+				"LABEL_GITHUB": "GitHub",
+				"LABEL_USER_GUIDE": "User Guide"
+			}
+		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "Every metric time displays in  {timezone}.",
 			"LIMIT_OF_RESOURCE": "Resource limit: {limitCount}",
