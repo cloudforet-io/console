@@ -28,7 +28,7 @@
                             progress-bar-wrapper"
                 >
                     <router-link v-for="(item, index) in filteredData" :key="index" class="progress-bar-link"
-                                 :to="referenceRouter(item.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' })"
+                                 :to="goToCloudService(item)"
                     >
                         <div class="progress-bar-label">
                             <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
@@ -65,6 +65,9 @@ import { store } from '@/store';
 import { coral, gray } from '@/components/styles/colors';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
+import { Location } from 'vue-router';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import { queryTagsToQueryString } from '@/lib/router-query-string';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -88,6 +91,7 @@ export default {
             filteredData: [] as any,
             selectedProvider: 'aws',
             selectedRegion: 'Asia Pacific (Seoul)',
+            selectedRegionCode: 'ap-northeast-2',
             loading: true,
             maxValue: 0,
         });
@@ -95,11 +99,11 @@ export default {
 
         const getFilteredData = async (regionCode) => {
             // state.loading = true;
+            state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                     query: new QueryHelper()
                         .setFilter({ k: 'region_code', v: regionCode, o: 'eq' }, { k: 'provider', v: state.selectedProvider, o: 'eq' })
-
                         .setPageLimit(10)
                         .setSort('count', true, 'name')
                         .data,
@@ -220,6 +224,48 @@ export default {
             imageSeries.data = state.data;
         };
 
+        const goToCloudService = (item) => {
+            let res: Location;
+            const filters: QueryTag[] = [];
+            filters.push({
+                key: { label: 'Region', name: 'region_code' },
+                operator: '=',
+                value: { label: state.selectedRegion, name: state.selectedRegionCode },
+            });
+            if (item.resource_type === 'inventory.Server') {
+                filters.push({
+                    key: { label: 'Provider', name: 'provider' },
+                    operator: '=',
+                    value: { label: item.provider, name: item.provider },
+                },
+                {
+                    key: { label: 'Cloud Service Type', name: 'cloud_service_type' },
+                    operator: '=',
+                    value: { label: item.cloud_service_type, name: item.cloud_service_type },
+                });
+                res = {
+                    name: 'server',
+                    query: {
+                        filters: queryTagsToQueryString(filters),
+                    },
+                };
+            } else {
+                res = {
+                    name: 'cloudServicePage',
+                    params: {
+                        provider: item.provider,
+                        group: item.cloud_service_group,
+                        name: item.cloud_service_type,
+                    },
+                    query: {
+                        filters: queryTagsToQueryString(filters),
+                    },
+                };
+            }
+            return res;
+        };
+
+
         const init = async () => {
             state.loading = true;
             await store.dispatch('resource/provider/load');
@@ -239,6 +285,7 @@ export default {
         return {
             ...toRefs(state),
             referenceRouter,
+            goToCloudService,
         };
     },
 };
