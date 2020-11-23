@@ -80,9 +80,9 @@
 				"NEED_SCHEDULER_HINT_TEXT": "スケジュルを登録してください。",
 				"SCHEDULE": "スケジュール",
 				"TITLE": "パワースケジューラ",
-				"TOOLTIP_COST_1": "",
-				"TOOLTIP_COST_2": "",
-				"TOOLTIP_RESOURCE": ""
+				"TOOLTIP_COST_1": "パワースケジューラによって削減された今月の費用",
+				"TOOLTIP_COST_2": "【基準：今月1日〜現在】",
+				"TOOLTIP_RESOURCE": "適用可能なリソースの種類"
 			},
 			"RESOURCE": {
 				"ALT_E_ID_INVALID_DESC": "リソースグループリストを確認してください",
@@ -122,19 +122,18 @@
 			"FAVORITES": {
 				"FAVORITE_LIST": {
 					"NO_ITEM": "お気に入りが設定されていません。",
-					"TOGGLE_LESS": "",
+					"TOGGLE_LESS": "隠す",
 					"TOGGLE_MORE": "もっと見る"
 				}
 			}
 		},
 		"ERROR": {
 			"404_GO_BACK_1": "前のページに戻る",
-			"404_GO_BACK_2": "",
 			"404_MSG": "内容が見つかりません",
 			"NO_RESOURCE_GO_BACK_1": "前のページに戻る",
 			"NO_RESOURCE_GO_BACK_2": "メインページに移動します。",
 			"NO_RESOURCE_MSG": "リソースが見つけられません。",
-			"NO_RESOURCE_TITLE": ""
+			"NO_RESOURCE_TITLE": "リソースがありません。"
 		},
 		"FNB": {
 			"PRIVACY": "個人情報処理方針",
@@ -235,14 +234,13 @@
 			"DAILY_UPDATE_DELETED": "削除",
 			"DAILY_UPDATE_DESC": "00:00〜現在（ローカル時間基準）",
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
-			"DAILY_UPDATE_MANAGED_RESOURCE": "",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "クラウドサービス",
 				"LABEL_PROJECT": "プロジェクト",
 				"NO_DATA": "ない",
 				"TITLE": "お気に入り",
-				"TOGGLE_LESS": "",
+				"TOGGLE_LESS": "隠す",
 				"TOGGLE_MORE": "もっと見る"
 			},
 			"HEALTH_DASHBOARD_DESC_1": "AWSビジネス若しくはエンタープライズサポートプランを使用している場合、AWS Health Dashboardが利用できます",
@@ -430,7 +428,7 @@
 				"REGION": "リージョン",
 				"SERVICE_CATEGORY": "サービスカテゴリー",
 				"SERVICE_PROVIDER": "サービスプロバイダー",
-				"SHOW_MAJOR": "",
+				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "{provider} クラウドサービス"
 			},
 			"PAGE": {
@@ -632,7 +630,7 @@
 				"ALT_E_UPDATE_SCHEDULE_TITLE": "スケジュール変更に失敗",
 				"ALT_E_UPDATE_TITLE": "コレクタ変更に失敗",
 				"ALT_S_ADD_SCHEDULE_TITLE": "スケジュールの追加完了",
-				"ALT_S_COLLECT_START_TITLE": "",
+				"ALT_S_COLLECT_START_TITLE": "データ収集開始",
 				"ALT_S_DELETE_SCHEDULE_TITLE": "スケジュールの削除完了",
 				"ALT_S_DELETE_TITLE": "コレクタが削除されました",
 				"ALT_S_DISABLE_TITLE": "コレクタが非活性化されました",
@@ -648,7 +646,7 @@
 				"COLLECT_DATA": "データ収集",
 				"COLLECT_MODAL_ACTION_GET_ALL": "全てのリソース読み込み",
 				"COLLECT_MODAL_ACTION_GET_NEW": "新しいリソースだけを読み込み",
-				"COLLECT_MODAL_ACTION_LABEL": "",
+				"COLLECT_MODAL_ACTION_LABEL": "作業タイプ",
 				"COLLECT_MODAL_CREDENTIALS_ALL": "全てのキー",
 				"COLLECT_MODAL_CREDENTIALS_LABEL": "暗号化キー",
 				"COLLECT_MODAL_LABEL_ID": "ID",
@@ -757,8 +755,8 @@
 			"REPORT_DESC": "SpaceONEは、プロジェクトベースの月次レポートを提供します。今後提供するコンテンツを追加する予定です",
 			"REPORT_DOWNLOAD_FILE_DESC": "*提供するファイル形式（PDF、PPTX、CSV）",
 			"REPORT_LABEL_COMPANY_NAME": "レポートのタイトル",
-			"REPORT_LOADING_DESC": "",
-			"REPORT_LOADING_TITLE": "",
+			"REPORT_LOADING_DESC": "少々お待ちください。",
+			"REPORT_LOADING_TITLE": "ロード中···",
 			"REPORT_PERIOD": "期間（過去1ヶ月）",
 			"TAB_MEMBER": "メンバー",
 			"TAB_REPORT": "レポート",

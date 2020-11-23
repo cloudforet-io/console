@@ -129,7 +129,6 @@
 		},
 		"ERROR": {
 			"404_GO_BACK_1": "Try going",
-			"404_GO_BACK_2": "back.",
 			"404_MSG": "Oops, nothing is here.",
 			"NO_RESOURCE_GO_BACK_1": "Click here",
 			"NO_RESOURCE_GO_BACK_2": "to go back home.",
@@ -235,7 +234,6 @@
 			"DAILY_UPDATE_DELETED": "Deleted",
 			"DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
-			"DAILY_UPDATE_MANAGED_RESOURCE": "Managed Resources",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",
@@ -757,7 +755,7 @@
 			"REPORT_DESC": "SpaceONE offers monthly report based on this project. We will update more content soon.",
 			"REPORT_DOWNLOAD_FILE_DESC": "* Only PDF, PPTX formats are avilable.",
 			"REPORT_LABEL_COMPANY_NAME": "Report Title",
-			"REPORT_LOADING_DESC": "Please wait around 10 seconds!",
+			"REPORT_LOADING_DESC": "Please, wait for a moment",
 			"REPORT_LOADING_TITLE": "Loading...",
 			"REPORT_PERIOD": "Period (Last one month)",
 			"TAB_MEMBER": "Member",
