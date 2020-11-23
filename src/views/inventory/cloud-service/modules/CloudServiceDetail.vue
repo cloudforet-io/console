@@ -32,7 +32,7 @@ import {
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import {DynamicLayout, DynamicLayoutType} from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import {
     DynamicLayoutEventListeners,
@@ -176,11 +176,14 @@ export default {
             return query.data;
         };
 
-        const getParams = () => {
+        const getParams = (type?: DynamicLayoutType) => {
             // eslint-disable-next-line camelcase
             const params: any = { cloud_service_id: props.cloudServiceId };
             const query = getQuery();
-            if (query) params.query = query;
+            if (query) {
+                params.query = query;
+                if (type === 'list') delete params.query.sort;
+            }
             // eslint-disable-next-line camelcase
             const keyPath = state.currentLayout.options?.root_path;
             // eslint-disable-next-line camelcase
@@ -193,7 +196,7 @@ export default {
             state.data = dataMap[state.fetchOptionKey];
             try {
                 const api = SpaceConnector.client.inventory.cloudService[getApiActionByLayoutType(state.currentLayout.type)];
-                const res = await api(getParams());
+                const res = await api(getParams(state.currentLayout.type));
 
                 if (res.total_count !== undefined) state.totalCount = res.total_count;
                 state.data = res.results || res;
