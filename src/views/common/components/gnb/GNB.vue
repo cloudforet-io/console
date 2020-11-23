@@ -4,14 +4,14 @@
             <div class="site-map-wrapper">
                 <site-map :is-domain-owner="userState.isDomainOwner" :visible.sync="sitemapVisible" />
             </div>
-            <div class="logo-wrapper">
-                <router-link to="/dashboard">
+            <router-link to="/dashboard">
+                <div class="logo-wrapper">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden lg:inline-block"
                          src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
                     >
-                </router-link>
-            </div>
+                </div>
+            </router-link>
             <div v-for="(dItem, idx) in defaultMenuList"
                  :key="idx"
                  class="menu-wrapper hidden lg:inline-block"
@@ -206,9 +206,9 @@ export default {
                         {
                             type: 'item', label: vm.$t('MENU.IDENTITY.USER'), name: 'user', link: '/identity/user',
                         },
-                        {
-                            type: 'item', label: vm.$t('MENU.IDENTITY.ROLE'), name: 'role', disabled: true, link: '',
-                        },
+                        // {
+                        //     type: 'item', label: vm.$t('MENU.IDENTITY.ROLE'), name: 'role', disabled: true, link: '',
+                        // },
                     ],
                 },
                 {
