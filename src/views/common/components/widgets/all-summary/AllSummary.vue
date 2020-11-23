@@ -33,7 +33,7 @@
                             <p-button v-for="(d, idx) in dateTypes"
                                       :key="idx"
                                       :class="{'selected': selectedDateType === d.name}"
-                                      @click="selectedDateType = d.name"
+                                      @click="onClickDateTypeButton(d.name)"
                             >
                                 {{ d.label }}
                             </p-button>
@@ -96,7 +96,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    orderBy, forEach, find, range, forIn,
+    find, forEach, orderBy, range,
 } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -105,8 +105,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import { TranslateResult } from 'vue-i18n';
 
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
@@ -144,6 +143,7 @@ enum CLOUD_SERVICE_LABEL {
 }
 
 const DAY_COUNT = 14;
+const MONTH_COUNT = 12;
 const BOX_SWITCH_INTERVAL = 5000;
 
 export default {
@@ -174,7 +174,7 @@ export default {
             selectedIndexInterval: undefined,
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
-            selectedDateType: 'daily' as keyof DATE_TYPE,
+            selectedDateType: 'daily' as keyof typeof DATE_TYPE,
             dateTypes: computed(() => ([
                 { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAY') },
                 { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTH') },
@@ -231,9 +231,7 @@ export default {
         const chartState = reactive({
             loading: true,
             registry: {},
-            computeData: [] as ChartData[],
-            databaseData: [] as ChartData[],
-            storageData: [] as ChartData[],
+            data: [] as ChartData[],
         });
         const colorState = reactive({
             aws: computed(() => props.providers.aws.color),
@@ -281,9 +279,7 @@ export default {
             chart.paddingLeft = -5;
             chart.paddingBottom = 0;
             chart.paddingTop = 10;
-            if (state.selectedType === 'compute') chart.data = chartState.computeData;
-            else if (state.selectedType === 'database') chart.data = chartState.databaseData;
-            else if (state.selectedType === 'storage') chart.data = chartState.storageData;
+            chart.data = chartState.data;
 
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'date';
@@ -318,7 +314,10 @@ export default {
             bullet.label.fill = am4core.color(primary);
             bullet.label.dy = -10;
         };
-        const numberCommaFormatter = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const numberCommaFormatter = (num) => {
+            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num;
+        };
 
         /* api */
         const getCount = async (type) => {
@@ -328,6 +327,8 @@ export default {
                     project_id: props.projectId,
                 });
                 const count = res.results[0]?.total || 0;
+                if (count === 0) return;
+
                 if (type === 'storage') {
                     const formattedSize = formatBytes(count, 1, false);
                     state.count[type] = formattedSize.count;
@@ -340,31 +341,43 @@ export default {
             }
         };
         const getTrend = async (type) => {
+            const utcToday = dayjs().utc();
+            const dateType = state.selectedDateType;
+            const dateRange = dateType === DATE_TYPE.monthly ? MONTH_COUNT : DAY_COUNT;
+            const dateUnit = dateType === DATE_TYPE.monthly ? 'month' : 'day';
+            const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+
             try {
                 const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                     label: CLOUD_SERVICE_LABEL[type],
-                    aggregate: state.selectedDateType,
+                    aggregate: dateType,
                     project_id: props.projectId,
                 });
+
                 const chartData = res.results.map(d => ({
-                    date: dayjs(d.date).format('MM/DD'),
+                    date: dayjs(d.date),
                     count: type === 'storage' ? formatBytes(d.total, 1, false).count : d.total,
                 }));
-                forEach(range(0, DAY_COUNT), (i) => {
-                    const date = dayjs().subtract(i, 'day').format('MM/DD');
+                forEach(range(0, dateRange), (i) => {
+                    const date = utcToday.subtract(i, dateUnit);
                     if (!find(chartData, { date })) {
                         chartData.push({ date, count: null });
                     }
                 });
-                const orderedData = orderBy(chartData, ['date'], ['asc']);
-                const formattedData = orderedData.map(d => ({
-                    date: dayjs(d.date).format('M/D'),
-                    count: d.count,
-                }));
 
-                if (type === 'compute') chartState.computeData = formattedData;
-                else if (type === 'database') chartState.databaseData = formattedData;
-                else chartState.storageData = formattedData;
+                const orderedData = orderBy(chartData, ['date'], ['asc']);
+                chartState.data = orderedData.map((d) => {
+                    if (dateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
+                        return {
+                            date: d.date.format('MMM, YY'),
+                            count: d.count,
+                        };
+                    }
+                    return {
+                        date: d.date.format(dateFormat),
+                        count: d.count,
+                    };
+                });
             } catch (e) {
                 console.error(e);
             } finally {
@@ -469,38 +482,44 @@ export default {
             state.selectedIndex = idx;
             clearInterval(state.selectedIndexInterval);
         };
-
-        const init = () => {
-            getTrend('compute');
-            getTrend('database');
-            getTrend('storage');
-            drawChart();
+        const onClickDateTypeButton = (type) => {
+            state.selectedDateType = type;
+            clearInterval(state.selectedIndexInterval);
         };
-        const asyncInit = async () => {
+
+        const init = async () => {
             state.loading = true;
             await getCount('compute');
-            await getSummaryInfo('compute');
+            if (state.count.compute > 0) await getSummaryInfo('compute');
             state.loading = false;
             setBoxInterval();
 
             await getCount('database');
-            await getSummaryInfo('database');
+            if (state.count.database > 0) await getSummaryInfo('database');
 
             await getCount('storage');
-            await getSummaryInfo('storage');
+            if (state.count.storage > 0) await getSummaryInfo('storage');
+        };
+        const chartInit = async () => {
+            await getTrend('compute');
+            drawChart();
         };
         init();
-        asyncInit();
+        chartInit();
 
         watch([() => state.chartRef, () => chartState.loading], ([chartContext, loading]) => {
             if (chartContext && !loading) {
                 drawChart();
             }
         });
-        watch(() => state.selectedType, () => {
-            drawChart();
+        watch(() => state.selectedType, async () => {
+            if (state.selectedType !== 'spendings') {
+                await getTrend(state.selectedType);
+                drawChart();
+            }
         }, { immediate: false });
-        watch(() => state.selectedDateType, () => {
+        watch(() => state.selectedDateType, async () => {
+            await getTrend(state.selectedType);
             drawChart();
         }, { immediate: false });
 
@@ -509,6 +528,7 @@ export default {
             chartState,
             colorState,
             onClickBox,
+            onClickDateTypeButton,
             numberCommaFormatter,
         };
     },
@@ -600,7 +620,7 @@ export default {
                     font-weight: bold;
                 }
                 .suffix {
-                    @apply text-gray-300;
+                    @apply text-gray-500;
                     font-size: 1rem;
                     font-weight: normal;
                     opacity: 0.7;
@@ -611,7 +631,7 @@ export default {
                 }
             }
             .title {
-                @apply text-gray-500;
+                @apply text-gray-900;
                 font-size: 1rem;
                 text-transform: capitalize;
             }
