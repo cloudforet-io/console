@@ -166,7 +166,8 @@ export default {
             overflow-y: auto;
         }
         .title {
-            @apply text-sm leading-normal;
+            @apply leading-normal;
+            font-size: 1rem;
         }
         .top {
              @apply mt-6;

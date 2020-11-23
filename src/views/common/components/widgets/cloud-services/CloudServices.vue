@@ -82,13 +82,11 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { store } from '@/store';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
 
 const DATA_LENGTH = 8;
 export default {
     name: 'CloudServices',
     components: {
-        PTooltipButton,
         WidgetLayout,
         PSelectableItem,
         PSkeleton,

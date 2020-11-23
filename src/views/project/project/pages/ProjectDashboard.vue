@@ -1,17 +1,7 @@
 <template>
     <div class="grid gap-4 grid-flow-row grid-cols-12">
-        <service-summary class="col-start-1 col-end-13
-                                sm:col-end-6
-                                lg:col-end-5
-                                "
-                         v-bind="serverSummaryState"
-                         :project-id="projectId"
-        />
-        <service-summary class="col-start-1 col-end-13
-                                sm:col-start-6 sm:col-end-13
-                                lg:col-start-5 lg:col-end-9"
-                         v-bind="cloudServiceSummaryState"
-                         :project-id="projectId"
+        <all-summary class="col-span-12 lg:col-span-8"
+                     :providers="providers" :project-id="projectId"
         />
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
                                sm:col-end-13 lg:row-start-2 cloud-service"
@@ -39,7 +29,7 @@
             </p-tab>
         </div>
         <service-accounts-table
-            class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9 lg:row-start-4"
+            class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9 lg:row-start-4 service-accounts-table"
         />
         <daily-updates class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
@@ -62,9 +52,9 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
+import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
 import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyUpdates.vue';
-import ServiceSummary from '@/views/common/components/widgets/service-summary/ServiceSummary.vue';
 import ServiceAccountsTable from '@/views/common/components/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import HealthDashboard from '@/views/common/components/widgets/health-dashboard/HealthDashboard.vue';
 import ResourcesByRegion from '@/views/common/components/widgets/resources-by-region/ResourcesByRegion.vue';
@@ -85,10 +75,10 @@ interface SummaryState {
 export default {
     name: 'ProjectDashboard',
     components: {
+        AllSummary,
         ResourcesByRegion,
         CloudServices,
         DailyUpdates,
-        ServiceSummary,
         ServiceAccountsTable,
         PTab,
         HealthDashboard,
@@ -107,6 +97,7 @@ export default {
             cloudServices: {
                 color: secondary1,
             },
+            providers: computed(() => vm.$store.state.resource.provider.items),
         });
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const projectFilter = `&filters=project_id%3A%3D${projectId.value}`;
@@ -152,16 +143,49 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.all-summary-page::v-deep {
+    margin-top: 1.25rem;
+    .top-part {
+        .box {
+            border-radius: 2px;
+            &:not(.selected) {
+                @apply border border-gray-200;
+            }
+        }
+    }
+    .bottom-part {
+        .content-wrapper {
+            @apply border border-gray-200;
+            border-radius: 2px;
+        }
+    }
+}
 .cloud-service {
+    @apply border border-gray-200;
     height: 26rem;
+    border-radius: 2px;
     &::v-deep .widget-contents {
         overflow-y: auto;
         margin-bottom: 1rem;
     }
 }
 
+.resources-by-region {
+    .title {
+        font-size: 1.125rem;
+    }
+}
+
+.service-accounts-table {
+    @apply border border-gray-200;
+    border-radius: 2px;
+}
+
 .daily-updates {
+    @apply border border-gray-200;
     height: 39.2rem;
+    border-radius: 2px;
+    margin-top: 1.25rem;
 }
 
 .health-dashboard {
