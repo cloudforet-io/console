@@ -256,7 +256,7 @@ export default {
         const state = reactive({
             loading: false,
             // date
-            weekdayTexts: [
+            weekdayTexts: computed(() => ([
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_SUN'),
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_MON'),
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_TUE'),
@@ -264,7 +264,7 @@ export default {
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_THU'),
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_FRI'),
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_SAT'),
-            ],
+            ])),
             timezones: [
                 { type: 'item', label: 'UTC (default)', name: 'UTC' },
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },

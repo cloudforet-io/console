@@ -144,7 +144,7 @@ interface JobModel {
 }
 
 export default {
-    name: 'PCollectorHistoryJob',
+    name: 'CollectorHistoryJob',
     components: {
         PCollapsiblePanel,
         PEmpty,
@@ -192,7 +192,7 @@ export default {
                 { label: 'Resource Type', name: 'additional.resource_type' },
                 { label: 'Resource ID', name: 'additional.resource_id' },
             ],
-            statusList: [
+            statusList: computed(() => ([
                 {
                     key: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'), class: 'all',
                 },
@@ -205,7 +205,7 @@ export default {
                 {
                     key: 'failure', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILURE'), class: 'failure', icon: true,
                 },
-            ],
+            ])),
             activatedStatus: 'all',
             //
             disabledIndex: [0, 3],
