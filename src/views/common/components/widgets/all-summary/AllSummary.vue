@@ -392,51 +392,48 @@ export default {
                 let param;
                 let count;
                 let allLink;
+                const defaultParam: any = {
+                    labels: [CLOUD_SERVICE_LABEL[type]],
+                    is_major: true,
+                    query: {
+                        sort: {
+                            name: 'count',
+                            desc: true,
+                        },
+                    },
+                };
+                if (props.projectId) {
+                    defaultParam.query.filter = {
+                        key: 'project_id',
+                        value: [props.projectId],
+                        operator: 'in',
+                    };
+                }
                 if (type === 'compute') {
                     param = {
-                        labels: ['Compute'],
+                        ...defaultParam,
                         resource_type: 'inventory.Server',
-                        is_major: true,
-                        query: {
-                            sort: {
-                                name: 'count',
-                                desc: true,
-                            },
-                        },
                     };
                     count = state.count.compute;
                     allLink = referenceRouter('', { resource_type: 'inventory.Server' });
                 } else if (type === 'database') {
                     param = {
-                        labels: ['Database'],
-                        is_major: true,
-                        query: {
-                            sort: {
-                                name: 'count',
-                                desc: true,
-                            },
-                        },
+                        ...defaultParam,
                     };
                     count = state.count.database;
                     allLink = '/inventory/cloud-service?provider=all&service=Database';
                 } else {
                     param = {
-                        labels: ['Storage'],
-                        is_major: true,
-                        query: {
-                            sort: {
-                                name: 'size',
-                                desc: true,
-                            },
-                        },
-                        fields: [
-                            {
-                                name: 'size',
-                                operator: 'sum',
-                                key: 'data.size',
-                            },
-                        ],
+                        ...defaultParam,
                     };
+                    param.query.sort = { name: 'size', desc: true };
+                    param.fields = [
+                        {
+                            name: 'size',
+                            operator: 'sum',
+                            key: 'data.size',
+                        },
+                    ];
                     count = `${state.count.storage} ${state.suffix.storage}`;
                     allLink = '/inventory/cloud-service?provider=all&service=Storage';
                 }
