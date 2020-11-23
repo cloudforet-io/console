@@ -101,14 +101,14 @@
                                    @create-project-group="openProjectGroupForm(null)"
                 />
             </div>
-            <s-project-group-create-form-modal v-if="projectGroupFormVisible"
-                                               :id="projectState.groupId"
-                                               :parent="createTargetNode ? createTargetNode.node.data
-                                                   : null"
-                                               :visible.sync="projectGroupFormVisible"
-                                               :update-mode="updateMode"
-                                               @create="onProjectGroupCreate"
-                                               @update="onProjectGroupUpdate"
+            <project-group-create-form-modal v-if="projectGroupFormVisible"
+                                             :id="projectState.groupId"
+                                             :parent="createTargetNode ? createTargetNode.node.data
+                                                 : null"
+                                             :visible.sync="projectGroupFormVisible"
+                                             :update-mode="updateMode"
+                                             @create="onProjectGroupCreate"
+                                             @update="onProjectGroupUpdate"
             />
 
             <p-button-modal
@@ -153,7 +153,7 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import SProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
+import ProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
@@ -169,11 +169,13 @@ import ProjectCardList from '@/views/project/project/modules/ProjectCardList.vue
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
+import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 
 
 export default {
     name: 'ProjectPage',
     components: {
+        ProjectCreateFormModal,
         FavoriteList,
         FavoriteButton,
         ProjectCardList,
@@ -186,7 +188,7 @@ export default {
         PPageTitle,
         ProjectSearch,
         PButtonModal,
-        SProjectGroupCreateFormModal,
+        ProjectGroupCreateFormModal,
         PIconTextButton,
     },
     setup(props, { root }) {

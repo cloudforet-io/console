@@ -1,23 +1,23 @@
 <template>
     <p-button-modal
         :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
-        :centered="true"
+        centered
         :scrollable="false"
         size="md"
-        :fade="true"
-        :backdrop="true"
+        fade
+        backdrop
         :visible.sync="proxyVisible"
-        :disabled="!isValid"
+        :disabled="showValidation && !isValid"
         @confirm="confirm"
     >
         <template #body>
             <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
                            :invalid-text="projectGroupNameInvalidText"
-                           :invalid="projectGroupName && !isValid"
-                           :required="true"
+                           :invalid="showValidation && !isValid"
+                           required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="projectGroupName" class="block w-full" :class="{'is-invalid': invalid}"
+                    <p-text-input v-model="projectGroupName" class="block w-full" :invalid="showValidation && invalid"
                                   :placeholder="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER')"
                     />
                 </template>
@@ -109,6 +109,7 @@ export default {
                 }
                 return false;
             }),
+            showValidation: false,
         });
 
         const getProjectGroupNames = async () => {
@@ -160,6 +161,7 @@ export default {
             }
         };
         const confirm = async () => {
+            if (!state.showValidation) state.showValidation = true;
             if (!state.isValid) return;
             const item = {
                 name: state.projectGroupName,
@@ -169,6 +171,7 @@ export default {
             } else {
                 await updateProjectGroup(item);
             }
+            state.showValidation = false;
         };
 
         watch(() => props.id, async (after) => {
