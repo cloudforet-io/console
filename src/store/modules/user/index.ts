@@ -23,6 +23,7 @@ const state: UserState = {
     language: storedUserState.language,
     timezone: storedUserState.timezone,
     reportState: storedUserState.reportState,
+    powerSchedulerState: storedUserState.powerSchedulerState,
 };
 
 export default {
