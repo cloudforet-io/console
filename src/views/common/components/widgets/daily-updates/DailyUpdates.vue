@@ -313,8 +313,8 @@ export default {
             @apply rounded;
         }
     }
-    min-height: 37rem;
-    max-height: 47rem;
+    min-height: 25.625rem;
+    max-height: 35rem;
     overflow-y: auto;
 }
 

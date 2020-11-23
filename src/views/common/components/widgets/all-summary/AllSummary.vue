@@ -229,7 +229,7 @@ export default {
             storageSummaryData: [] as SummaryData[],
         });
         const chartState = reactive({
-            loading: true,
+            loading: false,
             registry: {},
             data: [] as ChartData[],
         });
@@ -240,15 +240,6 @@ export default {
         });
 
         /* util */
-        const setBoxInterval = () => {
-            state.selectedIndexInterval = setInterval(() => {
-                if (state.selectedIndex < 3) {
-                    state.selectedIndex += 1;
-                } else {
-                    state.selectedIndex = 0;
-                }
-            }, BOX_SWITCH_INTERVAL);
-        };
         const formatBytes: any = (bytes, decimals = 2, toString = true) => {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -314,6 +305,16 @@ export default {
             bullet.label.fill = am4core.color(primary);
             bullet.label.dy = -10;
         };
+        const setBoxInterval = () => {
+            state.selectedIndexInterval = setInterval(() => {
+                disposeChart();
+                if (state.selectedIndex < 3) {
+                    state.selectedIndex += 1;
+                } else {
+                    state.selectedIndex = 0;
+                }
+            }, BOX_SWITCH_INTERVAL);
+        };
         const numberCommaFormatter = (num) => {
             if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return num;
@@ -348,6 +349,7 @@ export default {
             const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
 
             try {
+                chartState.loading = true;
                 const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                     label: CLOUD_SERVICE_LABEL[type],
                     aggregate: dateType,
@@ -502,20 +504,18 @@ export default {
         };
         const chartInit = async () => {
             await getTrend('compute');
-            drawChart();
         };
         init();
         chartInit();
 
-        watch([() => state.chartRef, () => chartState.loading], ([chartContext, loading]) => {
-            if (chartContext && !loading) {
+        watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
+            if (!loading && chartContext) {
                 drawChart();
             }
-        });
-        watch(() => state.selectedType, async () => {
-            if (state.selectedType !== 'spendings') {
-                await getTrend(state.selectedType);
-                drawChart();
+        }, { immediate: false });
+        watch(() => state.selectedType, (type) => {
+            if (type !== 'spendings') {
+                getTrend(type);
             }
         }, { immediate: false });
         watch(() => state.selectedDateType, async () => {
