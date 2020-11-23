@@ -236,6 +236,7 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_MANAGED_RESOURCE": "Managed Resources",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"DAILY_UPDATE_TITLE_DESC": "Managed Resources",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",
 				"LABEL_PROJECT": "Project",

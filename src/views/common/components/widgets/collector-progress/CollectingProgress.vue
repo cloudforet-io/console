@@ -1,13 +1,18 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.COLLECTING_PROGRESS')">
-        <template #extra>
-            <div class="flex justify-end">
-                <router-link to="/management/collector-history" class="more">
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
-                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                         color="inherit transparent"
-                    />
-                </router-link>
+    <widget-layout>
+        <template #title>
+            <div class="top">
+                <p class="title">
+                    {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS') }}
+                </p>
+                <div class="more-btn">
+                    <router-link to="/management/collector-history" class="more">
+                        {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
+                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                             color="inherit transparent"
+                        />
+                    </router-link>
+                </div>
             </div>
         </template>
         <p-data-table :items="items" :loading="loading" :fields="fields"
@@ -35,7 +40,7 @@
                 <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
             </template>
         </p-data-table>
-    </p-widget-layout>
+    </widget-layout>
 </template>
 
 <script lang="ts">
@@ -55,6 +60,7 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 
     enum JOB_STATE {
@@ -86,6 +92,7 @@ export interface JobModel {
 export default {
     name: 'CollectorRuns',
     components: {
+        WidgetLayout,
         PSkeleton,
         PWidgetLayout,
         PI,
@@ -165,6 +172,18 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.top {
+    @apply flex pb-4;
+    .title {
+        @apply text-gray-900;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        font-weight: bold;
+    }
+    .more-btn {
+        @apply flex-shrink-0 flex justify-end;
+    }
+}
 .widget-layout::v-deep {
     @apply border border-gray-100;
     border-radius: 0.375rem;

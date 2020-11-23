@@ -1,7 +1,16 @@
 <template>
-    <p-widget-layout ref="widgetRef" class="daily-updates" :title="$t('COMMON.WIDGETS.DAILY_UPDATE_TITLE')"
-                     :sub-title="$t('COMMON.WIDGETS.DAILY_UPDATE_DESC')"
-    >
+    <widget-layout ref="widgetRef" class="daily-updates">
+        <template #title>
+            <div class="top">
+                <p class="title">
+                    {{ $t('COMMON.WIDGETS.DAILY_UPDATE_TITLE') }}
+                    <span class="desc">({{ $t('COMMON.WIDGETS.DAILY_UPDATE_MANAGED_RESOURCE') }})</span>
+                </p>
+                <p class="time">
+                    {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DESC') }}
+                </p>
+            </div>
+        </template>
         <template #default>
             <div v-if="loading" class="mr-10 flex items-center overflow-hidden">
                 <p-skeleton width="2rem" height="2rem" class="mx-10" />
@@ -21,12 +30,12 @@
                                         class="rounded flex-shrink-0 service-img"
                             />
                         </div>
-<!--                        <div v-else-if="item.isServer">-->
-<!--                            <p-i name="ic_server"-->
-<!--                                 width="2rem" height="2rem"-->
-<!--                                 class="rounded flex-shrink-0"-->
-<!--                            />-->
-<!--                        </div>-->
+                        <!--                        <div v-else-if="item.isServer">-->
+                        <!--                            <p-i name="ic_server"-->
+                        <!--                                 width="2rem" height="2rem"-->
+                        <!--                                 class="rounded flex-shrink-0"-->
+                        <!--                            />-->
+                        <!--                        </div>-->
                         <p v-if="item.created_count || item.deleted_count" class="daily-service">
                             {{ item.title }}<br> <span class="text-sm">{{ item.total_count || 0 }}</span>
                         </p>
@@ -72,7 +81,7 @@
                 <img :src="'./images/illust_no-update.svg'" class="no-data-img">
             </div>
         </template>
-    </p-widget-layout>
+    </widget-layout>
 </template>
 
 <script lang="ts">
@@ -92,6 +101,7 @@ import { store } from '@/store';
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { find } from 'lodash';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -148,6 +158,7 @@ const getDeletedAtFilters = () => `filters=deleted_at:=${dayjs().format('YYYY-MM
 export default {
     name: 'DailyUpdates',
     components: {
+        WidgetLayout,
         PWidgetLayout,
         PLazyImg,
         PI,
@@ -319,6 +330,27 @@ export default {
     }
 }
 
+.top {
+    @apply pb-4;
+    .title {
+        @apply text-gray-900;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        font-weight: bold;
+        .desc {
+            @apply text-gray-700;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            font-weight: normal;
+        }
+    }
+    .time {
+        @apply text-gray-500;
+        font-size: 0.625rem;
+        line-height: 1;
+    }
+}
+
 .managed-resources {
     @apply text-gray-700;
     font-size: 0.75rem;
@@ -332,7 +364,7 @@ export default {
 }
 
 .card-wrapper {
-    @apply overflow-hidden whitespace-no-wrap w-full px-4;
+    @apply overflow-hidden whitespace-no-wrap w-full;
     .daily-update-card {
         @apply flex items-center w-full content-between overflow-hidden;
         padding-left: 1rem;

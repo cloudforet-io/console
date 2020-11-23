@@ -106,7 +106,8 @@ export default {
 }
 
 .widget-wrapper {
-    @apply grid grid-cols-12;
+    @apply grid-cols-12;
+    display: inline-grid;
     grid-gap: 1.25rem;
 }
 
@@ -114,13 +115,10 @@ export default {
     height: 33.75rem;
 }
 
-.widget-layout::v-deep {
-    @apply border border-gray-100;
-    border-radius: 0.375rem;
-    .item-container.card .contents {
-        padding: 1rem 1rem 1rem 0.75rem;
-    }
-}
+//.widget-layout::v-deep {
+//    @apply border border-gray-100;
+//    border-radius: 0.375rem;
+//}
 
 @screen lg {
     .daily-updates {

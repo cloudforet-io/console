@@ -1,12 +1,16 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNTS')">
-        <template #extra>
-            <router-link :to="'/identity/service-account'">
-                <span class="add-btn">
+    <widget-layout>
+        <template #title>
+            <div class="top">
+                <p class="title">
+                    {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
+                </p>
+                <router-link :to="'/identity/service-account'" class="add-btn">
                     <p-i name="ic_plus_bold" width="0.75rem" height="0.75rem"
                          color="inherit"
-                    /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}</span>
-            </router-link>
+                    /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
+                </router-link>
+            </div>
         </template>
         <div class="chart-container">
             <p-chart-loader :loading="loading" class="chart">
@@ -36,7 +40,7 @@
                 </template>
             </p-data-table>
         </div>
-    </p-widget-layout>
+    </widget-layout>
 </template>
 
 <script lang="ts">
@@ -67,6 +71,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 am4core.useTheme(am4themes_animated);
 
@@ -86,6 +91,7 @@ interface Data {
 export default {
     name: 'ServiceAccounts',
     components: {
+        WidgetLayout,
         PI,
         PDataTable,
         PWidgetLayout,
@@ -224,6 +230,20 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.top {
+    @apply flex justify-between items-center pb-4;
+    .title {
+        @apply text-gray-900;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        font-weight: bold;
+    }
+    .add-btn {
+        @apply flex-shrink-0 flex justify-end items-center text-blue-500;
+        line-height: 1.2;
+        font-size: 0.75rem;
+    }
+}
 .chart {
     height: 11.25rem;
     width: 100%;
@@ -231,11 +251,6 @@ export default {
 .count {
     font-size: 0.875rem;
     font-weight: bold;
-}
-.add-btn {
-    @apply text-blue-500 float-right;
-    line-height: 1.2;
-    font-size: 0.75rem;
 }
 .legends {
     @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;

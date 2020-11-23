@@ -1,8 +1,8 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.TOP_PROJECT_TITLE')"
-                     class="top-projects"
+    <widget-layout :title="$t('COMMON.WIDGETS.TOP_PROJECT_TITLE')"
+                   class="top-projects"
     >
-        <div class="flex flex-col h-full">
+        <div class="contents-container">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
                     <p-skeleton width="100%" height="100%" />
@@ -74,7 +74,7 @@
                 </p-button>
             </div>
         </div>
-    </p-widget-layout>
+    </widget-layout>
 </template>
 
 <script lang="ts">
@@ -101,6 +101,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import {
     gray, indigo, peacock,
 } from '@/styles/colors';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 am4core.useTheme(am4themes_animated);
 
@@ -127,6 +128,7 @@ const DATABASE_COLOR = indigo[400];
 export default {
     name: 'TopProjects',
     components: {
+        WidgetLayout,
         PButton,
         PDataTable,
         PIconTextButton,
@@ -310,19 +312,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.top-projects::v-deep .widget-contents {
-    padding-bottom: 1.5rem;
-}
-.top-projects {
-    .create-project-button {
-        @apply text-secondary;
-        font-weight: normal;
-        line-height: 1.2;
-        padding: 0;
-        &:hover {
-            @apply text-blue-800;
-        }
-    }
+.contents-container {
+    @apply pt-4 flex flex-col h-full;
 }
 .chart {
     height: 13rem;
@@ -351,5 +342,15 @@ export default {
     padding-left: 1.2rem;
     width: 100%;
     max-width: 12rem;
+}
+.create-project-button {
+    @apply text-secondary;
+    font-weight: normal;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    padding: 0;
+    &:hover {
+        @apply text-blue-800;
+    }
 }
 </style>
