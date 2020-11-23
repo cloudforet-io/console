@@ -328,6 +328,11 @@ export default {
     }
     .progress-bar-wrapper {
         @apply grid;
+        grid-column-gap: 0.5rem;
+
+        @screen lg {
+            grid-column-gap: 0;
+        }
     }
 }
 .progress-bar-link {

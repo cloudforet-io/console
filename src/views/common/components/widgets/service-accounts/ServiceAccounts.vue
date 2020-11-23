@@ -234,7 +234,7 @@ export default {
     @apply flex justify-between items-center pb-4;
     .title {
         @apply text-gray-900;
-        font-size: 1.125rem;
+        font-size: 1rem;
         line-height: 1.2;
         font-weight: bold;
     }

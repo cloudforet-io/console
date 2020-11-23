@@ -173,10 +173,10 @@ export default {
 
 <style lang="postcss" scoped>
 .top {
-    @apply flex pb-4;
+    @apply flex justify-between pb-4;
     .title {
-        @apply text-gray-900 flex-grow;
-        font-size: 1.125rem;
+        @apply text-gray-900;
+        font-size: 1rem;
         line-height: 1.2;
         font-weight: bold;
     }
