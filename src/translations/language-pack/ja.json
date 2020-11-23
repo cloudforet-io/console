@@ -756,6 +756,8 @@
 			"REPORT_DESC": "SpaceONEは、プロジェクトベースの月次レポートを提供します。今後提供するコンテンツを追加する予定です",
 			"REPORT_DOWNLOAD_FILE_DESC": "*提供するファイル形式（PDF、PPTX、CSV）",
 			"REPORT_LABEL_COMPANY_NAME": "レポートのタイトル",
+			"REPORT_LOADING_DESC": "",
+			"REPORT_LOADING_TITLE": "",
 			"REPORT_PERIOD": "期間（過去1ヶ月）",
 			"TAB_MEMBER": "メンバー",
 			"TAB_REPORT": "レポート",

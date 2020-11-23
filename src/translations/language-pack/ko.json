@@ -756,6 +756,8 @@
 			"REPORT_DESC": "SpaceONE은 프로젝트를 바탕으로 한 월간 보고서를 제공합니다. 곧 더 많은 콘텐츠를 제공할 예정입니다. ",
 			"REPORT_DOWNLOAD_FILE_DESC": "*제공하는 파일 형식 (PDF, PPTX, CSV)",
 			"REPORT_LABEL_COMPANY_NAME": "보고서 표지 제목 ",
+			"REPORT_LOADING_DESC": "",
+			"REPORT_LOADING_TITLE": "로딩중...",
 			"REPORT_PERIOD": "기간(지난 1개월)",
 			"TAB_MEMBER": "구성원 ",
 			"TAB_REPORT": "보고서",

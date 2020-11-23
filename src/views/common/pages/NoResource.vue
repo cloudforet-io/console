@@ -1,7 +1,7 @@
 <template>
     <div class="wrap">
         <p-page-navigation :routes="route" class="page-navigation" />
-        <p-page-title :title="'No Resources'" child class="page-title"
+        <p-page-title :title="$t('COMMON.ERROR.NO_RESOURCE_TITLE')" child class="page-title"
                       @goBack="$router.go(-1)"
         />
         <div class="error">
