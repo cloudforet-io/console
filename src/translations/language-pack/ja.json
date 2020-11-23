@@ -133,7 +133,8 @@
 			"404_MSG": "内容が見つかりません",
 			"NO_RESOURCE_GO_BACK_1": "前のページに戻る",
 			"NO_RESOURCE_GO_BACK_2": "メインページに移動します。",
-			"NO_RESOURCE_MSG": "リソースが見つけられません。"
+			"NO_RESOURCE_MSG": "リソースが見つけられません。",
+			"NO_RESOURCE_TITLE": ""
 		},
 		"FNB": {
 			"PRIVACY": "個人情報処理方針",
