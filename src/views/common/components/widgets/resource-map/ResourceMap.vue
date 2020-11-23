@@ -1,18 +1,22 @@
 <template>
-    <p-pane-layout class="resource-map">
-        <p class="title">
-            {{ $t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS') }} ({{ data.length }})
-        </p>
-        <div class="flex-wrap sm:flex-wrap md:flex-wrap lg:flex-no-wrap xl:flex-no-wrap chart-wrapper">
-            <div class="chart-loader">
-                <div id="chartRef" ref="chartRef" />
-                <div v-if="!loading" class="block 2xs:hidden xs:hidden sm:hidden lg:block xl:block 2xl:block 3xl:block circle-wrapper">
+    <widget-layout class="resource-map">
+        <template #title>
+            <p class="title">
+                {{ $t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS') }} <span class="count">({{ data.length }})</span>
+            </p>
+        </template>
+        <div class="contents-wrapper">
+            <div class="col-span-12 lg:col-span-9 chart-wrapper">
+                <div class="chart-loader">
+                    <div id="chartRef" ref="chartRef" />
+                </div>
+                <div v-if="!loading" class="circle-wrapper">
                     <p class="circle" :style="{background: providers['aws'].color }" /><span>AWS</span>
                     <p class="circle" :style="{background: providers['google_cloud'].color }" /><span>Google</span>
                     <p class="circle" :style="{background: providers['azure'].color }" /><span>Azure</span>
                 </div>
             </div>
-            <div v-if="!loading" class="resource-info-wrapper">
+            <div v-if="!loading" class="col-span-12 lg:col-span-3 resource-info-wrapper">
                 <div class="resource-info-title">
                     <span class="resource-info-provider"
                           :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
@@ -20,18 +24,20 @@
                         {{ providers[selectedProvider].label }} </span>
                     <span class="resource-info-region">{{ selectedRegion }}</span>
                 </div>
-                <div class="grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 progress-bar-wrapper">
-                    <div v-for="(item, index) in filteredData" :key="index" class="progress-bar">
-                        <router-link :to="referenceRouter(item.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' })">
-                            <div class="progress-bar-label">
-                                <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
-                                <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
-                            </div>
-                            <p-progress-bar :percentage="(item.count / maxValue) * 100"
-                                            class="progress-bar" :class="selectedProvider"
-                            />
-                        </router-link>
-                    </div>
+                <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
+                            progress-bar-wrapper"
+                >
+                    <router-link v-for="(item, index) in filteredData" :key="index" class="progress-bar-link"
+                                 :to="referenceRouter(item.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' })"
+                    >
+                        <div class="progress-bar-label">
+                            <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
+                            <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
+                        </div>
+                        <p-progress-bar :percentage="(item.count / maxValue) * 100"
+                                        class="progress-bar" :class="selectedProvider"
+                        />
+                    </router-link>
                 </div>
             </div>
             <div v-else class="w-full flex items-center justify-center">
@@ -41,34 +47,32 @@
                 />
             </div>
         </div>
-    </p-pane-layout>
+    </widget-layout>
 </template>
 
 <script lang="ts">
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
-import am4geodata_worldLow from '@amcharts/amcharts4-geodata/worldLow';
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
+import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import {
-    computed, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
 import { coral, gray } from '@/components/styles/colors';
-import referenceRouter from '@/lib/reference/referenceRouter';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
-am4core.useTheme(am4themes_animated);
+am4core.useTheme(am4themesAnimated);
 
 export default {
     name: 'ResourceMap',
     components: {
+        WidgetLayout,
         PLottie,
-        PPaneLayout,
         PProgressBar,
     },
     props: {
@@ -90,7 +94,7 @@ export default {
         /* Create map instance */
 
         const getFilteredData = async (regionCode) => {
-            state.loading = true;
+            // state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                     query: new QueryHelper()
@@ -99,7 +103,9 @@ export default {
                         .setPageLimit(10)
                         .setSort('count', true, 'name')
                         .data,
+                    // eslint-disable-next-line camelcase
                     is_major: true,
+                    // eslint-disable-next-line camelcase
                     is_primary: true,
                 });
                 state.filteredData = res.results;
@@ -110,7 +116,7 @@ export default {
             } catch (e) {
                 console.error(e);
             } finally {
-                state.loading = false;
+                // state.loading = false;
             }
         };
 
@@ -130,7 +136,7 @@ export default {
 
         const drawChart = async () => {
             const chart = am4core.create('chartRef', am4maps.MapChart);
-            chart.geodata = am4geodata_worldLow;
+            chart.geodata = am4geodataWorldLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
@@ -240,58 +246,44 @@ export default {
 
 <style lang="postcss" scoped>
 .resource-map {
-    @apply border border-gray-100;
-    border-radius: 0.375rem;
-    height: 40rem;
+    @apply flex flex-col;
+    height: 53rem;
 
-    @screen 2xs {
-        height: 52rem;
-    }
-    @screen xs {
-        height: 52rem;
-    }
     @screen sm {
-        height: 52rem;
-    }
-    @screen md {
-        height: 42rem;
-    }
-    @screen lg {
-        height: 34rem;
-    }
-    @screen xl {
-        height: 34rem;
+        height: 41rem;
     }
 
-    @screen 2xl {
-        height: 34rem;
+    @screen lg {
+        height: 28.625rem;
     }
 }
 .title {
     @apply text-gray-900;
-    font-size: 1rem;
+    margin-bottom: 0.875rem;
+    font-size: 1.125rem;
     font-weight: bold;
     line-height: 120%;
-    margin-top: 1rem;
-    margin-left: 1.5rem;
+    .count {
+        font-weight: normal;
+    }
 }
-.chart-wrapper {
-    height: 90%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-left: 1.5rem;
-    margin-top: 1.1875rem;
-    padding-bottom: 2rem;
+.contents-wrapper {
+    @apply grid grid-cols-12 grid-flow-row gap-4 h-full;
 
-    .chart-loader {
+    .chart-wrapper {
+        @apply flex flex-col justify-between;
         flex-shrink: 0;
-        width: 72%;
         flex-grow: 1;
         margin-right: 1rem;
-        height: 21rem;
+        .chart-loader {
+            @apply w-full h-full;
+            height: 21.625rem;
+        }
+        #chartRef {
+            @apply w-full h-full;
+        }
         .circle-wrapper {
-            @apply mt-3;
+            margin-top: 0.625rem;
             .circle {
                 @apply inline-block;
                 margin-right: 0.25rem;
@@ -305,76 +297,79 @@ export default {
                 line-height: 1.5;
             }
         }
-        #chartRef {
-            @apply w-full h-full;
-        }
-        @screen 2xs {
-            height: 18.75rem;
-        }
-        @screen xs {
-            height: 18.75rem;
-        }
-        @screen sm {
-            height: 18.75rem;
-        }
-        @screen md {
-            height: 21.625rem;
-        }
-        @screen lg {
-            height: 28rem;
-        }
-        @screen xl {
-            height: 28rem;
-        }
-        @screen 2xl {
-            height: 28rem;
-        }
     }
-
 }
 .resource-info-wrapper {
-    margin-right: 1.5rem;
-    margin-left: 1.5rem;
     width: 100%;
     height: 100%;
     .resource-info-title {
-        @apply font-bold;
-        margin-bottom: 1rem;
+        @apply truncate;
+        margin-bottom: 0.625rem;
+        font-size: 0.875rem;
+        font-weight: bold;
         line-height: 1.5;
-    }
-    .progress-bar-wrapper {
-        display: grid;
-        column-gap: 2rem;
-        .progress-bar-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.25rem;
+
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        white-space: normal;
+
+        @screen sm {
+            white-space: nowrap;
         }
 
-        .progress-bar {
-            margin-bottom: 0.5rem;
+        @screen lg {
+            @apply px-2;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            white-space: normal;
+        }
+    }
+    .progress-bar-wrapper {
+        @apply grid;
+    }
+}
+.progress-bar-link {
+    @apply py-1;
 
-            &.aws {
-                >>> .tracker-bar {
-                    background-color: #f90;
-                }
+    @screen lg {
+        @apply px-2;
+    }
+
+    .progress-bar-label {
+        @apply mb-1 flex justify-between;
+        font-size: 0.75rem;
+        line-height: 1.2;
+    }
+    &:hover {
+        @apply bg-blue-100 cursor-pointer underline;
+        border-radius: 0.125rem;
+    }
+    .progress-bar {
+        padding: 0;
+        >>> .background-bar {
+            height: 0.25rem;
+        }
+        >>> .tracker-bar {
+            height: 0.25rem;
+            margin-top: -0.25rem;
+        }
+        &.aws {
+            >>> .tracker-bar {
+                background-color: #f90;
             }
+        }
 
-            &.google_cloud {
-                >>> .tracker-bar {
-                    background-color: #4285f4;
-                }
+        &.google_cloud {
+            >>> .tracker-bar {
+                background-color: #4285f4;
             }
+        }
 
-            &.azure {
-                >>> .tracker-bar {
-                    background-color: #00bcf2;
-                }
-            }
-
-            &:hover {
-                @apply bg-blue-100 cursor-pointer underline;
-                border-radius: 0.125rem;
+        &.azure {
+            >>> .tracker-bar {
+                background-color: #00bcf2;
             }
         }
     }

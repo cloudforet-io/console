@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
+import { indigo } from '@/styles/colors';
 
 const SPECIAL_LABEL_MAP = {
     // eslint-disable-next-line camelcase
@@ -19,7 +20,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
         providers[providerInfo.provider] = {
             label: SPECIAL_LABEL_MAP[providerInfo.provider] || providerInfo.name,
             name: providerInfo.name,
-            color: providerInfo.tags.color,
+            color: providerInfo.tags.color || indigo[400],
             icon: providerInfo.tags.icon,
             // eslint-disable-next-line camelcase
             linkTemplate: providerInfo.tags?.external_link_template,

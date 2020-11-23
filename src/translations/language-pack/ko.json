@@ -234,8 +234,8 @@
 			"DAILY_UPDATE_DELETED": "삭제",
 			"DAILY_UPDATE_DESC": "00:00 ~ 현재 (로컬 시간 기준) ",
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
-			"DAILY_UPDATE_MANAGED_RESOURCE": "",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 변경 사항 ",
+			"DAILY_UPDATE_MANAGED_RESOURCE": "",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "클라우드 서비스",
 				"LABEL_PROJECT": "프로젝트",

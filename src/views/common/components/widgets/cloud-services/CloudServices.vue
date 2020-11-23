@@ -1,5 +1,27 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.CLOUD_SERVICE_TITLE')" :help="$t('COMMON.WIDGETS.CLOUD_SERVICE_HELP')">
+    <widget-layout class="cloud-services-widget">
+        <template #title>
+            <div class="top">
+                <p class="title">
+                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_TITLE') }}
+                </p>
+                <div class="help">
+                    <p-i v-if="projectId"
+                         v-tooltip.top="$t('COMMON.WIDGETS.CLOUD_SERVICE_HELP')"
+                         name="ic_tooltip" width="1rem"
+                         height="1rem"
+                         class="icon"
+                         color="inherit transparent"
+                    />
+                </div>
+                <router-link v-if="moreInfo" to="/inventory/cloud-service" class="more">
+                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
+                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                         color="inherit transparent"
+                    />
+                </router-link>
+            </div>
+        </template>
         <template #default>
             <div class="grid gap-2
                         grid-cols-1
@@ -47,35 +69,28 @@
                 </template>
             </div>
         </template>
-        <template #extra>
-            <div v-if="moreInfo">
-                <router-link to="/inventory/cloud-service" class="more">
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
-                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                         color="inherit transparent"
-                    />
-                </router-link>
-            </div>
-        </template>
-    </p-widget-layout>
+        <template #extra />
+    </widget-layout>
 </template>
 
 <script lang="ts">
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import { range } from 'lodash';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { store } from '@/store';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
 
 export default {
     name: 'CloudServices',
     components: {
-        PWidgetLayout,
+        PTooltipButton,
+        WidgetLayout,
         PSelectableItem,
         PSkeleton,
         PI,
@@ -202,6 +217,33 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.widget-layout::v-deep {
+    .item-container.card .contents {
+        padding: 1rem 1rem 1rem 0.75rem;
+    }
+}
+.top {
+    @apply mb-3 flex w-full items-center;
+    .title {
+        @apply flex-shrink-0;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        font-weight: bold;
+    }
+    .help {
+        @apply ml-2 flex-shrink-0 flex-grow text-gray-400;
+        .icon {
+            cursor: help;
+        }
+    }
+    .more {
+        @apply flex-shrink-0 text-sm text-blue-600 font-normal inline-flex items-center cursor-pointer;
+        justify-self: flex-end;
+        &:hover {
+            @apply text-secondary underline;
+        }
+    }
+}
 
 .group-name {
     @apply font-bold mb-1 truncate leading-tight;
