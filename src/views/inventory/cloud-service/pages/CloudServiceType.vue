@@ -255,7 +255,7 @@ export default {
                 })),
             ]),
         });
-        const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.label || selectedProvider.value);
+        const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.name || selectedProvider.value);
         const filterState = reactive({
             serviceCategories: zipObject([
                 'Compute', 'Container', 'Database', 'Networking', 'Storage', 'Security', 'Analytics', 'Application Integration', 'Management',
@@ -704,6 +704,7 @@ export default {
 }
 
 .page-title {
+    @apply capitalize;
     margin-bottom: 0;
 }
 .empty-cloud-service {
