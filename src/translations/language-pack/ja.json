@@ -274,6 +274,7 @@
 			"SERVICE_SUMMARY_PROJECT": "プロジェクト",
 			"SERVICE_SUMMARY_SERVER": "サーバ",
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
+			"TOP_PROJECT_COMPUTE": "コンピューティング",
 			"TOP_PROJECT_CREATE_DASHBOARD": "ダッシュボードを作成してください",
 			"TOP_PROJECT_CREATE_GUIDE": "プロジェクトを作成した後、サービスのアカウントを登録してください",
 			"TOP_PROJECT_CREATE_PROJECT": "プロジェクト作成",
@@ -283,7 +284,6 @@
 			"TOP_PROJECT_PROJECT": "プロジェクト",
 			"TOP_PROJECT_PROJECT_GROUP": "プロジェクトグループ",
 			"TOP_PROJECT_RANK": "ランキング",
-			"TOP_PROJECT_SERVER": "サーバ",
 			"TOP_PROJECT_STORAGE": "ストレージ",
 			"TOP_PROJECT_TITLE": "最もリソースを使用しているプロジェクト"
 		}

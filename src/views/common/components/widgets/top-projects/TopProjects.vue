@@ -154,7 +154,7 @@ export default {
                 { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK'), width: 3 },
                 { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
                 { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
-                { name: 'server', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
+                { name: 'server', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_COMPUTE') },
                 { name: 'database', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
                 { name: 'storage', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
             ]),
