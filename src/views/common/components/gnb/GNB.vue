@@ -16,13 +16,14 @@
                  :key="idx"
                  class="menu-wrapper hidden lg:inline-block"
             >
-                <div class="menu-button opacity mr-4 lg:mr-8"
-                     :class="[{
+                <template v-if="dItem.show !== false">
+                    <div class="menu-button opacity mr-4 lg:mr-8"
+                         :class="[{
                          opened: dItem.menu.length > 0 && openedMenu === dItem.key,
                          selected: dItem.parentRoutes.includes(selectedMenu)
                      }]"
-                     @click.stop="toggleMenu(dItem.key)"
-                >
+                         @click.stop="toggleMenu(dItem.key)"
+                    >
                     <span v-if="dItem.menu.length > 0">
                         <span>{{ dItem.key }}</span>
                         <p-i class="arrow-button"
@@ -31,27 +32,28 @@
                              color="inherit transparent"
                         />
                     </span>
-                    <router-link v-else :to="dItem.link" class="block">
-                        <span>{{ dItem.key }}</span>
-                    </router-link>
-                </div>
-                <p-context-menu
-                    v-if="openedMenu === dItem.key && dItem.menu.length > 0"
-                    v-click-outside="hideMenu"
-                    :menu="dItem.menu" theme="white"
-                >
-                    <template #item-plugin>
-                        <div v-if="!userState.isDomainOwner" class="empty" />
-                    </template>
-                    <template #item--format="{item}">
-                        <router-link :to="item.link" @click.native="hideMenu">
-                            <div>
-                                <span>{{ item.label }}</span>
-                                <span v-if="item.isNew" class="new-text">new</span>
-                            </div>
+                        <router-link v-else :to="dItem.link" class="block">
+                            <span>{{ dItem.key }}</span>
                         </router-link>
-                    </template>
-                </p-context-menu>
+                    </div>
+                    <p-context-menu
+                            v-if="openedMenu === dItem.key && dItem.menu.length > 0"
+                            v-click-outside="hideMenu"
+                            :menu="dItem.menu" theme="white"
+                    >
+                        <template #item-plugin>
+                            <div v-if="!userState.isDomainOwner" class="empty" />
+                        </template>
+                        <template #item--format="{item}">
+                            <router-link :to="item.link" @click.native="hideMenu">
+                                <div>
+                                    <span>{{ item.label }}</span>
+                                    <span v-if="item.isNew" class="new-text">new</span>
+                                </div>
+                            </router-link>
+                        </template>
+                    </p-context-menu>
+                </template>
             </div>
         </div>
 
@@ -175,6 +177,7 @@ export default {
             openedMenu: null,
             sitemapVisible: false,
             profileVisible: false,
+            showAutomation: store.state.user.powerSchedulerState,
             defaultMenuList: computed(() => [
                 {
                     key: vm.$t('MENU.PROJECT.PROJECT'),
@@ -213,6 +216,7 @@ export default {
                 },
                 {
                     key: vm.$t('MENU.AUTOMATION.AUTOMATION'),
+                    show: state.showAutomation,
                     link: '/automation',
                     parentRoutes: ['automation'],
                     menu: [
