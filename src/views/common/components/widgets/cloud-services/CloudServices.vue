@@ -15,7 +15,7 @@
                     />
                 </div>
                 <router-link v-if="moreInfo" to="/inventory/cloud-service" class="more">
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}
+                    <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
                     <p-i name="ic_arrow_right" width="1rem" height="1rem"
                          color="inherit transparent"
                     />
@@ -49,13 +49,13 @@
                 <template v-else>
                     <router-link v-for="(item, index) in data" :key="index" :to="item.href">
                         <p-selectable-item
-                            :icon-url="iconUrl(item)" theme="card"
+                            :icon-url="iconUrl(item)" theme="card" class="card"
                         >
                             <template #contents>
-                                <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
+                                <div class="group-name">
                                     {{ item.group }}
                                 </div>
-                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
+                                <div class="name">
                                     {{ item.name }}
                                 </div>
                             </template>
@@ -244,19 +244,26 @@ export default {
     }
 }
 
-.group-name {
-    @apply font-bold mb-1 truncate leading-tight;
-    font-size: 0.875rem;
-}
-.name {
-    @apply text-xs text-gray truncate leading-tight;
-}
-.count {
-    @apply ml-1;
-    font-size: 0.875rem;
+.card {
+    .group-name {
+        @apply font-bold mb-1 truncate leading-tight;
+        font-size: 0.875rem;
+    }
+    .name {
+        @apply text-xs text-gray truncate leading-tight;
+        text-decoration: none;
+    }
+    .count {
+        @apply ml-1;
+        font-size: 0.875rem;
+    }
+    &:hover {
+        @apply underline;
+    }
 }
 .more {
-    @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer;
+    @apply text-blue-500 font-normal float-right inline-flex items-center cursor-pointer;
+    font-size: 0.75rem;
     &:hover {
         @apply text-secondary underline;
     }
