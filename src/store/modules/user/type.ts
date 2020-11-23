@@ -12,6 +12,7 @@ export interface UserState {
     language?: string;
     timezone?: string;
     reportState?: boolean;
+    powerSchedulerState?: boolean;
 }
 
 export interface SignInRequest {

@@ -22,3 +22,7 @@ export const setTimezone = (state: UserState, timezone: string): void => {
 export const setReportState = (state: UserState, reportState: boolean): void => {
     state.reportState = reportState;
 };
+
+export const setPowerSchedulerState = (state: UserState, powerSchedulerState: boolean): void => {
+    state.powerSchedulerState = powerSchedulerState;
+};
