@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout :title="$t('COMMON.WIDGETS.RESOURCE_BY_REGION_TITLE')" class="resources-by-region">
+    <widget-layout :title="$t('COMMON.WIDGETS.RESOURCE_BY_REGION_TITLE')" class="resources-by-region">
         <div class="reverse">
             <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
@@ -42,7 +42,7 @@
                 </p-grid-layout>
             </div>
         </div>
-    </p-widget-layout>
+    </widget-layout>
 </template>
 
 <script lang="ts">
@@ -51,7 +51,8 @@ import {
     computed,
     getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
@@ -113,7 +114,7 @@ interface ResourcesByRegionProps {
 export default {
     name: 'ResourcesByRegion',
     components: {
-        PWidgetLayout,
+        WidgetLayout,
         PBadge,
         PGridLayout,
         PSelectableItem,
@@ -334,10 +335,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.resources-by-region {
-    border: none;
+.resources-by-region::v-deep {
     height: 27.1rem;
-    &::v-deep .widget-contents {
+    .title {
+        margin-bottom: 1.25rem;
+    }
+    .widget-contents {
         overflow-y: auto;
         margin-bottom: 2rem;
     }
