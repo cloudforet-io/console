@@ -26,9 +26,7 @@
             <div class="grid gap-2
                         grid-cols-1
                         sm:grid-cols-2
-                        lg:grid-cols-3
-                        xl:grid-cols-4
-                        2xl:grid-cols-6"
+                        md:grid-cols-4"
             >
                 <template v-if="loading">
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
@@ -86,6 +84,7 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
 
+const DATA_LENGTH = 8;
 export default {
     name: 'CloudServices',
     components: {
@@ -188,7 +187,7 @@ export default {
                         is_primary: true,
                     });
                     state.data = [
-                        ...res.results.map(d => ({
+                        ...res.results.splice(0, DATA_LENGTH).map(d => ({
                             count: d.count,
                             group: d.cloud_service_group,
                             icon: d.icon,
