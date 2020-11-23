@@ -387,11 +387,17 @@ export default {
 
         const createAll = async () => {
             state.createLoading = true;
-            const scheduleId = await createSchedule();
-            await state.timeTable.createOrUpdate(scheduleId);
-            await state.kanban.onSave(scheduleId);
+            const scheduleId = props.scheduleId || await createSchedule();
+            if (disabledState.visible) {
+                if (disabledState.current === 'time-table') await state.timeTable.createOrUpdate(scheduleId);
+                else if (disabledState.current === 'kanban') await state.kanban.onSave(scheduleId);
+            } else {
+                await state.timeTable.createOrUpdate(scheduleId);
+                await state.kanban.onSave(scheduleId);
+            }
             state.createLoading = false;
             emit('create');
+            emit('edit-finish');
         };
 
         const onClickCancel = () => {
