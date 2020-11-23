@@ -40,7 +40,7 @@
 				"DELETE_ALL": "Turn Off All",
 				"EDIT": "Edit",
 				"EDIT_NAME_MODAL_TITLE": "Edit scheduler name",
-				"HIGH": "HIGH",
+				"HIGH": "High priority",
 				"KANBAN_HINT_TEXT_1": "High priority",
 				"KANBAN_HINT_TEXT_2": "Please, set group's priority",
 				"LOW": "Low priority",
@@ -172,7 +172,7 @@
 			"ADMIN_ID": "Admin ID",
 			"ADMIN_SIGN_IN": "Admin Sign in",
 			"ALT_E_LOGIN": "Please, check your ID or Password",
-			"MEMBER_SIGN_IN": "Sign in with member account credentials",
+			"MEMBER_SIGN_IN": "Sign in wih member account credentials",
 			"OR": "or",
 			"PASSWORD": "Password",
 			"PASSWORD_REQUIRED": "Please enter password",
@@ -218,7 +218,7 @@
 			"ALL_SUMMARY_UPCOMING": "Upcoming",
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "Create a collector",
 			"CLOUD_SERVICE_HELP": "Displays only major services in cloud service.",
-			"CLOUD_SERVICE_SEE_MORE": "view all",
+			"CLOUD_SERVICE_SEE_MORE": "more",
 			"CLOUD_SERVICE_TITLE": "Cloud Services",
 			"COLLECTING_PROGRESS": "Collecting Progress",
 			"COLLECTING_PROGRESS_STATUS": "Status",
@@ -236,7 +236,6 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_MANAGED_RESOURCE": "Managed Resources",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
-			"DAILY_UPDATE_TITLE_DESC": "Managed Resources",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",
 				"LABEL_PROJECT": "Project",
@@ -246,7 +245,6 @@
 				"TOGGLE_MORE": "show more"
 			},
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",
-			"HEALTH_DASHBOARD_DESC_1_2": "",
 			"HEALTH_DASHBOARD_DESC_2": "Can't see the widget? even you are using a suitable plan. Please contact us.",
 			"HEALTH_DASHBOARD_DESC_3": "Check your AWS Support Plans first.",
 			"HEALTH_DASHBOARD_HELP": "Get a notice the status of AWS services.",
@@ -263,7 +261,7 @@
 			"RUN_COLLECTOR_START_TIME": "Start Time",
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SERVICE_ACCOUNTS_ACCOUNT": "Account",
-			"SERVICE_ACCOUNTS_ADD": "add",
+			"SERVICE_ACCOUNTS_ADD": "Add",
 			"SERVICE_ACCOUNTS_PROJECT": "Project",
 			"SERVICE_ACCOUNTS_PROVIDER": "Provider",
 			"SERVICE_ACCOUNT_TABLE_ACCOUNT_NAME": "Account Name",
@@ -287,7 +285,7 @@
 			"TOP_PROJECT_RANK": "Rank",
 			"TOP_PROJECT_SERVER": "Server",
 			"TOP_PROJECT_STORAGE": "Storage",
-			"TOP_PROJECT_TITLE": "Top Resource Managing Projects"
+			"TOP_PROJECT_TITLE": "Top 5 Resource Managing Projects"
 		}
 	},
 	"IDENTITY": {
