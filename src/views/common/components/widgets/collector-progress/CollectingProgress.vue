@@ -28,7 +28,7 @@
             <template #no-data="{fields}">
                 <tr key="noData" class="bg-primary3">
                     <td :colspan="fields.length" class="text-gray">
-                        {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS') }}
+                        {{$t('COMMON.WIDGETS.COLLECTING_PROGRESS_NO_RUNNING')}}
                     </td>
                 </tr>
             </template>
@@ -121,7 +121,7 @@ export default {
             const items = [] as JobModel[];
             jobs.forEach((job) => {
                 const newJob = {
-                    progress: `${((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100}%`,
+                    progress: `${(Math.round((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100)}%`,
                     ...job,
                 };
                 items.push(newJob);

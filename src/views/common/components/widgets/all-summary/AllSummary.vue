@@ -351,7 +351,7 @@ export default {
                 if (count === 0) return;
 
                 if (type === 'storage') {
-                    const formattedSize = formatBytes(count, 1, false);
+                    const formattedSize = formatBytes(count, 2, false);
                     state.count[type] = formattedSize.count;
                     state.suffix[type] = formattedSize.unit;
                 } else {
@@ -378,7 +378,7 @@ export default {
 
                 const chartData = res.results.map(d => ({
                     date: dayjs(d.date),
-                    count: type === 'storage' ? formatBytes(d.total, 1, false).count : d.total,
+                    count: type === 'storage' ? formatBytes(d.total, 2, false).count : d.total,
                 }));
                 forEach(range(0, dateRange), (i) => {
                     const date = utcToday.subtract(i, dateUnit);
@@ -479,7 +479,7 @@ export default {
                         provider: d.provider,
                         label: props.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === 'storage' ? formatBytes(d.size, 1) : d.count,
+                        count: type === 'storage' ? formatBytes(d.size, 2) : d.count,
                         to: detailLink,
                     });
                 });

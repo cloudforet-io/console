@@ -148,7 +148,7 @@ export default {
 
         const getDataInProject = async () => {
             const query = new QueryHelper()
-                .setSort('created_at')
+                .setSort('count', true, 'name')
                 .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                 query: query.data,
@@ -173,7 +173,7 @@ export default {
             state.loading = true;
             await store.dispatch('resource/provider/load');
             const query = new QueryHelper()
-                .setSort('created_at')
+                .setSort('count', true, 'name')
                 .setPage(1, 9);
             try {
                 if (props.projectFilter) {
@@ -206,7 +206,7 @@ export default {
 
         return {
             ...toRefs(state),
-            skeletons: range(9),
+            skeletons: range(8),
             iconUrl: (item: Value): string => item.icon || state.providers[item.provider]?.icon || '',
         };
     },

@@ -143,7 +143,7 @@
 			"ACCOUNT": {
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_LOGOUT": "ログアウト",
-				"LABEL_PROFILE": "管理者ログイン",
+				"LABEL_PROFILE": "個人情報",
 				"LABEL_ROLE": "ロール",
 				"LABEL_TIMEZONE": "タイムゾーン",
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
@@ -239,6 +239,7 @@
 			"CLOUD_SERVICE_SEE_MORE": "もっと見る",
 			"CLOUD_SERVICE_TITLE": "クラウドサービス",
 			"COLLECTING_PROGRESS": "収集進行率",
+			"COLLECTING_PROGRESS_NO_RUNNING": "実行中の作業がありません。",
 			"COLLECTING_PROGRESS_STATUS": "進捗率",
 			"COLLECTING_PROGRESS_TITLE_TIME": "名 / 時間",
 			"COLLECTOR_HELP": "コレクタ実行及び収集履歴を表示します",
@@ -252,6 +253,7 @@
 			"DAILY_UPDATE_DELETED": "削除",
 			"DAILY_UPDATE_DESC": "00:00〜現在（ローカル時間基準）",
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
+			"DAILY_UPDATE_NO_DATA": "今日の変動事項はありません。",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "クラウドサービス",
