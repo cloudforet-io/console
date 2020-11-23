@@ -40,7 +40,7 @@
 				"DELETE_ALL": "모두 끄기",
 				"EDIT": "편집하기",
 				"EDIT_NAME_MODAL_TITLE": "스케줄러 이름 편집",
-				"HIGH": "",
+				"HIGH": "우선순위 높음 ",
 				"KANBAN_HINT_TEXT_1": "우선순위 높음",
 				"KANBAN_HINT_TEXT_2": "우선순위를 정하세요.",
 				"LOW": "우선순위 낮음",
