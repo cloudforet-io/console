@@ -263,7 +263,7 @@ export default {
 
         /** Breadcrumb */
         const routeState = reactive({
-            route: [{ name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' }, { name: vm.$t('MENU.INVENTORY.SERVER'), path: '/inventory/server' }],
+            route: computed(() => [{ name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' }, { name: vm.$t('MENU.INVENTORY.SERVER'), path: '/inventory/server' }]),
         });
 
 
