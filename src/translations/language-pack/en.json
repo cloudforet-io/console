@@ -239,6 +239,7 @@
 			"CLOUD_SERVICE_SEE_MORE": "more",
 			"CLOUD_SERVICE_TITLE": "Cloud Services",
 			"COLLECTING_PROGRESS": "Collecting Progress",
+			"COLLECTING_PROGRESS_NO_RUNNING": "No Running Jobs",
 			"COLLECTING_PROGRESS_STATUS": "Status",
 			"COLLECTING_PROGRESS_TITLE_TIME": "Title / Time",
 			"COLLECTOR_HELP": "Manage resources by custom plugins.",
@@ -252,6 +253,7 @@
 			"DAILY_UPDATE_DELETED": "Deleted",
 			"DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
+			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",

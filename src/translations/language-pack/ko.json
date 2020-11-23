@@ -239,6 +239,7 @@
 			"CLOUD_SERVICE_SEE_MORE": "더보기 ",
 			"CLOUD_SERVICE_TITLE": "클라우드 서비스 ",
 			"COLLECTING_PROGRESS": "수집 진행률 ",
+			"COLLECTING_PROGRESS_NO_RUNNING": "실행 중인 작업이 없습니다. ",
 			"COLLECTING_PROGRESS_STATUS": "진행률 ",
 			"COLLECTING_PROGRESS_TITLE_TIME": "이름 / 시간 ",
 			"COLLECTOR_HELP": "컬렉터 실행 및 수집 내역을 보여줍니다.",
@@ -252,6 +253,7 @@
 			"DAILY_UPDATE_DELETED": "삭제",
 			"DAILY_UPDATE_DESC": "00:00 ~ 현재 (로컬 시간 기준) ",
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
+			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "클라우드 서비스",

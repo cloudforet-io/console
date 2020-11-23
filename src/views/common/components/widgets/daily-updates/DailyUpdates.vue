@@ -77,7 +77,8 @@
                 </div>
             </div>
             <div v-if="!loading && ( data.length === 0 && alertData.length === 0) " class="h-full flex flex-col justify-center">
-                <img :src="'./images/illust_no-update.svg'" class="no-data-img">
+                <img src="@/assets/images/illust_spaceship_2.svg" class="no-data-img">
+                <p class="no-data-text">{{$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')}}</p>
             </div>
         </template>
     </widget-layout>
@@ -360,7 +361,14 @@ export default {
 
 .no-data-img {
     @apply mx-auto mb-4 flex-shrink-0;
-    max-width: 14rem;
+    width: 8.875rem;
+    opacity: 0.7;
+}
+.no-data-text {
+    @apply text-center text-primary2;
+    font-weight: bold;
+    font-size: 0.875rem;
+    line-height: 150%;
 }
 
 .card-wrapper {
