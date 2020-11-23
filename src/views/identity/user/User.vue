@@ -73,7 +73,7 @@
         </p-tab>
 
         <div v-else id="empty-space">
-            {{ $t('IDENTITY.USER.NO_SELECTED') }}
+            <p-empty>{{ $t('IDENTITY.USER.NO_SELECTED') }}</p-empty>
         </div>
         <p-table-check-modal
             v-if="!!modalState.mode"
@@ -133,6 +133,7 @@ import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { useStore } from '@/store/toolset';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 
 interface UserModel {
@@ -154,6 +155,7 @@ interface UserModel {
 export default {
     name: 'User',
     components: {
+        PEmpty,
         PQuerySearchTable,
         PPageNavigation,
         PIconTextButton,
