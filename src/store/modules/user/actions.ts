@@ -44,6 +44,15 @@ const getReportState = async (): Promise<boolean> => {
     }
 };
 
+const getPowerSchedulerState = async (): Promise<boolean> => {
+    try {
+        await SpaceConnector.client.powerScheduler.domain.get();
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
 const updateUser = async (userId: string, userType: string, userRequest: UpdateUserRequest): Promise<void> => {
     const request: any = {};
 
@@ -90,6 +99,9 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
 
     const reportState = await getReportState();
     commit('setReportState', reportState);
+
+    const powerSchedulerState = await getPowerSchedulerState();
+    commit('setPowerSchedulerState', powerSchedulerState);
 };
 
 export const signOut = (): void => {
