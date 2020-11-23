@@ -60,13 +60,12 @@
                 </div>
             </div>
         </div>
-        <p-icon-modal
-            :visible.sync="loading"
-            lottie-name="lottie_interval"
-            header-title="Loading..."
-            body-text="Please wait around 10 seconds!"
-            :button-text="$t('PROJECT.DETAIL.REPORT_CANCEL')"
-            @clickButton="onClickCancel"
+        <p-icon-modal :visible.sync="loading"
+                      lottie-name="lottie_interval"
+                      :header-title="$t('PROJECT.DETAIL.REPORT_LOADING_TITLE')"
+                      :body-text="$t('PROJECT.DETAIL.REPORT_LOADING_DESC')"
+                      :button-text="$t('PROJECT.DETAIL.REPORT_CANCEL')"
+                      @clickButton="onClickCancel"
         />
     </div>
 </template>
