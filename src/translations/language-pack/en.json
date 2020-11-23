@@ -220,6 +220,7 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ALL_SUMMARY_ADD_SERVICE_ACCOUNTS": "Add Service Accounts",
 			"ALL_SUMMARY_ALL": "All",
 			"ALL_SUMMARY_COMPUTE": "Compute",
 			"ALL_SUMMARY_DATABASE": "Database",
@@ -227,6 +228,7 @@
 			"ALL_SUMMARY_MONTH": "Month",
 			"ALL_SUMMARY_NO_DATA_1": "Billing service is not supported yet.",
 			"ALL_SUMMARY_NO_DATA_2": "We are getting ready to support the billing service.",
+			"ALL_SUMMARY_NO_SERVICE": "No {service}",
 			"ALL_SUMMARY_SPENDINGS": "Overall-Spendings",
 			"ALL_SUMMARY_STORAGE": "Storage",
 			"ALL_SUMMARY_TREND_TITLE": "Trend",
