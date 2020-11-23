@@ -111,7 +111,7 @@
         <div v-else>
             <p-page-navigation v-if="selectedJobId" :routes="subRoute" />
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
-            <p-collector-history-job :job-id="selectedJobId" />
+            <collector-history-job :job-id="selectedJobId" />
         </div>
     </general-page-layout>
 </template>
@@ -128,7 +128,7 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import PCollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
+import CollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
@@ -195,7 +195,7 @@ export default {
         PPageNavigation,
         PCollectorHistoryChart,
         PPagination,
-        PCollectorHistoryJob,
+        CollectorHistoryJob,
         PQuerySearchTable,
         PPageTitle,
         GeneralPageLayout,
@@ -267,10 +267,10 @@ export default {
             modalVisible: false,
         });
         const routeState = reactive({
-            route: [
+            route: computed(() => ([
                 { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
                 { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
-            ],
+            ])),
         });
         const subRouteState = reactive({
             subRoute: computed(() => [
