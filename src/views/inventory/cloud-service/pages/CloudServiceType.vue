@@ -338,10 +338,11 @@ export default {
             let res: Location;
             const filters: QueryTag[] = [];
             state.tags.forEach((tag: QueryTag) => {
-                if (tag.key) {
-                    if (tag.key.name === 'project_id') filters.push(tag);
-                    if (tag.key.name === 'region_code') filters.push(tag);
-                    if (tag.key.name === 'collection_info.service_accounts') filters.push(tag);
+                if (tag) {
+                    if (tag.key?.name === 'project_id') filters.push(tag);
+                    if (tag.key?.name === 'region_code') filters.push(tag);
+                    if (tag.key?.name === 'collection_info.service_accounts') filters.push(tag);
+                    filters.push(tag);
                 }
             });
             if (item.resource_type === 'inventory.Server') {
