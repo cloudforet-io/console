@@ -90,7 +90,7 @@
                                              }"
                                              class="link"
                                              :style="{
-                                                 backgroundImage: `url('${getProvider(provider).icon}')`
+                                                 backgroundImage: `url('${getProvider(provider).icon || require('@/assets/icons/ic_provider_other.svg')}')`
                                              }"
                                 />
                             </div>
@@ -131,6 +131,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 interface Props {
     searchText: string;
@@ -142,6 +143,7 @@ interface Props {
 export default {
     name: 'ProjectCardList',
     components: {
+        PLazyImg,
         FavoriteButton,
         PI,
         PButton,
@@ -386,6 +388,7 @@ export default {
             .provider {
                 @apply truncate;
                 min-width: 0;
+                height: 1.25rem;
             }
             .link {
                 @apply flex-shrink-0 inline-block mr-2;
@@ -393,7 +396,7 @@ export default {
                 width: 1.25rem;
                 background-repeat: no-repeat;
                 background-size: 100%;
-                background-position: bottom;
+                background-position: center;
                 line-height: 1.25rem;
             }
         }
