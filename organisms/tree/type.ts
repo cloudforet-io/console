@@ -1,11 +1,11 @@
-import { TreeItem, TreeNode } from '@/components/molecules/tree-node/PTreeNode.toolset';
+import { TreeItem, TreeNode, TreeNodeState } from '@/components/molecules/tree-node/type';
 
-export interface Tree {
-    nodes: TreeNode[];
-    selectedNodes: TreeItem[];
-    firstSelectedNode?: TreeItem;
-    applyState(TreeItem): void;
-    setNodeState(item: TreeItem, state: {[name: string]: boolean}): void;
-    deleteNode(item: TreeItem): void;
-    setSelectedNodes(item: TreeItem): void;
+export interface Tree<T=any> {
+    nodes: TreeNode<T>[];
+    selectedNodes: TreeItem<T>[];
+    firstSelectedNode?: TreeItem<T>;
+    applyState(item: TreeItem<T>): void;
+    setNodeState(item: TreeItem<T>, state: TreeNodeState): void;
+    deleteNode(item: TreeItem<T>): void;
+    setSelectedNodes(item: TreeItem<T>): void;
 }
