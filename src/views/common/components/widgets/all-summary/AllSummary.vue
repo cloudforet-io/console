@@ -221,7 +221,7 @@ export default {
                     count: state.count.compute,
                     summaryData: state.computeSummaryData,
                     suffix: state.suffix.compute,
-                    to: (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' }),
+                    to: (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A%3D${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' }),
                 },
                 {
                     type: 'database',
@@ -440,7 +440,7 @@ export default {
                         resource_type: 'inventory.Server',
                     };
                     count = state.count.compute;
-                    allLink = (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' });
+                    allLink = (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A%3D${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' });
                 } else if (type === 'database') {
                     param = {
                         ...defaultParam,

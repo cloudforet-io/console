@@ -113,14 +113,14 @@ export default {
         const serverSummaryState: SummaryState = reactive({
             type: 'server',
             title: computed(() => vm.$t('COMMON.WIDGETS.SERVICE_SUMMARY_SERVER')),
-            to: `/inventory/server?filters=project_id%3A${projectId.value}`,
+            to: `/inventory/server?filters=project_id%3A%3D${projectId.value}`,
             color: secondary,
         });
 
         const cloudServiceSummaryState: SummaryState = reactive({
             type: 'cloudService',
             title: computed(() => vm.$t('COMMON.WIDGETS.SERVICE_SUMMARY_CLOUD_SERVICE')),
-            to: `/inventory/cloud-service?filters=project_id%3A${projectId.value}&provider=all`,
+            to: `/inventory/cloud-service?filters=project_id%3A%3D${projectId.value}&provider=all`,
             color: secondary1,
         });
 
