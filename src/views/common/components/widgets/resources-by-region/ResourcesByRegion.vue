@@ -320,7 +320,7 @@ export default {
             onSelected(item) {
                 if (props.projectFilter && props.isServer) {
                     vm.$router.push({
-                        path: `/inventory/server?&filters=region_code%3A${item.name}&filters=project_id%3A%3D${props.projectId}`,
+                        path: `/inventory/server?&filters=region_code%3A%3D${item.name}&filters=project_id%3A%3D${props.projectId}`,
                     });
                 }
                 if (props.projectFilter && !props.isServer) {

@@ -246,15 +246,15 @@ export default {
                     },
                     server: {
                         label: d.server_count,
-                        link: `/inventory/server?filters=project_id%3A${d.project_id}`,
+                        link: `/inventory/server?filters=project_id%3A%3D${d.project_id}`,
                     },
                     database: {
                         label: d.database_count,
-                        link: `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A${d.project_id}`,
+                        link: `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A%3D${d.project_id}`,
                     },
                     storage: {
                         label: formatBytes(d.storage_size, 2),
-                        link: `/inventory/cloud-service?provider=all&service=Storage&primary=false&filters=project_id%3A${d.project_id}`,
+                        link: `/inventory/cloud-service?provider=all&service=Storage&primary=false&filters=project_id%3A%3D${d.project_id}`,
                     },
                 }));
                 const orderedData = orderBy(data, ['total'], ['desc']);

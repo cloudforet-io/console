@@ -132,10 +132,10 @@ export default {
         const getLink = (data, projectFilter?) => {
             let link = '';
             if (data.resource_type === 'inventory.Server' && !projectFilter) {
-                link = `/inventory/server?filters=provider%3A${data.provider}&filters=cloud_service_type%3A${data.cloud_service_type}`;
+                link = `/inventory/server?filters=provider%3A%3D${data.provider}&filters=cloud_service_type%3A%3D${data.cloud_service_type}`;
             }
             if (data.resource_type === 'inventory.Server' && projectFilter) {
-                link = `/inventory/server?filters=provider%3A${data.provider}&filters=cloud_service_type%3A${data.cloud_service_type}${projectFilter}`;
+                link = `/inventory/server?filters=provider%3A%3D${data.provider}&filters=cloud_service_type%3A%3D${data.cloud_service_type}${projectFilter}`;
             }
             if (data.resource_type === 'inventory.CloudService' && !projectFilter) {
                 link = `/inventory/cloud-service/${data.provider}/${data.cloud_service_group}/${data.cloud_service_type}?provider=${data.provider}`;
