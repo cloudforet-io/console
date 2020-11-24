@@ -10,28 +10,30 @@
             <ul v-for="(aItem, aIdx) in allMenu"
                 :key="aIdx"
             >
-                <router-link :to="aItem.link">
-                    <li class="menu" @click="hide">
-                        <p-i :name="aItem.icon"
-                             color="inherit inherit"
-                             height="1.5rem" width="1.5rem"
-                        /> {{ aItem.label }}
-                    </li>
-                </router-link>
-                <div v-if="aItem.subMenus.length > 0">
-                    <div v-for="(sItem, sIdx) in aItem.subMenus"
-                         :key="sIdx"
-                    >
-                        <div v-if="!sItem.isAdminMenu || isDomainOwner">
-                            <router-link v-if="sItem" :to="sItem.link">
-                                <li class="submenu" @click="hide">
-                                    {{ sItem.label }}
-                                    <span v-if="sItem.isNew" class="new-text">new</span>
-                                </li>
-                            </router-link>
+                <template v-if="aItem.show !== false">
+                    <router-link :to="aItem.link">
+                        <li class="menu" @click="hide">
+                            <p-i :name="aItem.icon"
+                                 color="inherit inherit"
+                                 height="1.5rem" width="1.5rem"
+                            /> {{ aItem.label }}
+                        </li>
+                    </router-link>
+                    <div v-if="aItem.subMenus.length > 0">
+                        <div v-for="(sItem, sIdx) in aItem.subMenus"
+                             :key="sIdx"
+                        >
+                            <div v-if="!sItem.isAdminMenu || isDomainOwner">
+                                <router-link v-if="sItem" :to="sItem.link">
+                                    <li class="submenu" @click="hide">
+                                        {{ sItem.label }}
+                                        <span v-if="sItem.isNew" class="new-text">new</span>
+                                    </li>
+                                </router-link>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </ul>
         </div>
     </div>
@@ -43,6 +45,7 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
+import { store } from '@/store';
 
 export default {
     name: 'SiteMap',
@@ -65,6 +68,7 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            showAutomation: store.state.user.powerSchedulerState,
             allMenu: computed(() => ([
                 {
                     label: vm.$t('MENU.DASHBOARD.DASHBOARD'), link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
@@ -92,6 +96,7 @@ export default {
                 },
                 {
                     label: vm.$t('MENU.AUTOMATION.AUTOMATION'),
+                    show: state.showAutomation,
                     link: '/automation',
                     icon: 'ic_automation',
                     subMenus: [
