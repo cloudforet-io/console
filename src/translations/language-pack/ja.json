@@ -143,7 +143,7 @@
 			"ACCOUNT": {
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_LOGOUT": "ログアウト",
-				"LABEL_PROFILE": "個人情報",
+				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
 				"LABEL_TIMEZONE": "タイムゾーン",
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
@@ -151,7 +151,7 @@
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "APIガイド ",
-				"LABEL_GITHUB": "",
+				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "ユーザーガイド"
 			}
 		},

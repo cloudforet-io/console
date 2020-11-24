@@ -125,6 +125,7 @@ import { TranslateResult } from 'vue-i18n';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { Location } from 'vue-router';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
@@ -134,6 +135,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import { queryTagsToQueryString } from '@/lib/router-query-string';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -148,7 +151,7 @@ interface SummaryData {
     label: string | TranslateResult;
     count: number | string;
     type?: string;
-    to: string;
+    to: string | Location;
 }
 
 enum DATE_TYPE {
@@ -218,7 +221,7 @@ export default {
                     count: state.count.compute,
                     summaryData: state.computeSummaryData,
                     suffix: state.suffix.compute,
-                    to: referenceRouter('', { resource_type: 'inventory.Server' }),
+                    to: (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' }),
                 },
                 {
                     type: 'database',
@@ -226,7 +229,8 @@ export default {
                     count: state.count.database,
                     summaryData: state.databaseSummaryData,
                     suffix: state.suffix.database,
-                    to: '/inventory/cloud-service?provider=all&service=Database',
+                    to: (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A%3D${props.projectId}`
+                        : '/inventory/cloud-service?provider=all&service=Database',
                 },
                 {
                     type: 'storage',
@@ -234,13 +238,14 @@ export default {
                     count: state.count.storage,
                     summaryData: state.storageSummaryData,
                     suffix: state.suffix.storage,
-                    to: '/inventory/cloud-service?provider=all&service=Storage',
+                    to: (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Storage&filters=project_id%3A%3D${props.projectId}&primary=false`
+                        : '/inventory/cloud-service?provider=all&service=Storage&primary=false',
                 },
                 {
                     type: 'spendings',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_SPENDINGS'),
                     count: state.overallSpendings,
-                    to: '/',
+                    to: (props.projectId !== undefined) ? `/project/${props.projectId}` : '/',
                     beta: true,
                 },
             ])),
@@ -422,7 +427,7 @@ export default {
                         },
                     },
                 };
-                if (props.projectId) {
+                if (props.projectId !== undefined) {
                     defaultParam.query.filter = {
                         key: 'project_id',
                         value: [props.projectId],
@@ -435,13 +440,14 @@ export default {
                         resource_type: 'inventory.Server',
                     };
                     count = state.count.compute;
-                    allLink = referenceRouter('', { resource_type: 'inventory.Server' });
+                    allLink = (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' });
                 } else if (type === 'database') {
                     param = {
                         ...defaultParam,
                     };
                     count = state.count.database;
-                    allLink = '/inventory/cloud-service?provider=all&service=Database';
+                    allLink = (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A%3D${props.projectId}`
+                        : '/inventory/cloud-service?provider=all&service=Database';
                 } else {
                     param = {
                         ...defaultParam,
@@ -455,7 +461,8 @@ export default {
                         },
                     ];
                     count = `${state.count.storage} ${state.suffix.storage}`;
-                    allLink = '/inventory/cloud-service?provider=all&service=Storage';
+                    allLink = (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Storage&filters=project_id%3A%3D${props.projectId}&primary=false`
+                        : '/inventory/cloud-service?provider=all&service=Storage&primary=false';
                 }
 
                 // set value of 'each' type
@@ -469,11 +476,49 @@ export default {
                     },
                 ];
                 res.results.forEach((d) => {
-                    let detailLink;
-                    if (type === 'compute') {
-                        detailLink = `/inventory/server?filters=provider%3A${d.provider}`;
+                    let detailLink: Location;
+                    // if (type === 'compute') {
+                    //     detailLink = `/inventory/server?filters=provider%3A${d.provider}`;
+                    // } else {
+                    //     detailLink = referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' });
+                    // }
+                    const filters: QueryTag[] = [];
+                    if (props.projectId !== undefined) {
+                        filters.push({
+                            key: { label: 'Project', name: 'project_id' },
+                            operator: '=',
+                            value: { label: props.projectId, name: props.projectId },
+                        });
+                    }
+                    if (d.resource_type === 'inventory.Server') {
+                        filters.push({
+                            key: { label: 'Provider', name: 'provider' },
+                            operator: '=',
+                            value: { label: d.provider, name: d.provider },
+                        }, {
+                            key: { label: 'Cloud Service Type', name: 'cloud_service_type' },
+                            operator: '=',
+                            value: { label: d.cloud_service_type, name: d.cloud_service_type },
+                        });
+                        detailLink = {
+                            name: 'server',
+                            query: {
+                                filters: queryTagsToQueryString(filters),
+                            },
+                        };
                     } else {
-                        detailLink = referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' });
+                        detailLink = {
+                            name: 'CloudServicePage',
+                            params: {
+                                provider: d.provider,
+                                group: d.cloud_service_group,
+                                name: d.cloud_service_type,
+                            },
+                            query: {
+                                filters: queryTagsToQueryString(filters),
+                            },
+                        };
+                        return detailLink;
                     }
                     summaryData.push({
                         provider: d.provider,
@@ -482,6 +527,7 @@ export default {
                         count: type === 'storage' ? formatBytes(d.size, 2) : d.count,
                         to: detailLink,
                     });
+                    return summaryData;
                 });
                 if (type === 'compute') {
                     state.computeSummaryData = summaryData;
