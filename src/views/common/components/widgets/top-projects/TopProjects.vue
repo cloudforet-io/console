@@ -41,27 +41,27 @@
                     </template>
                     <template #col-project_group-format="{ value }">
                         <router-link class="link-text" :to="value.link">
-                            {{ value.label }}
+                            <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-project-format="{ value }">
                         <router-link class="link-text" :to="value.link">
-                            {{ value.label }}
+                            <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-server-format="{ value }">
                         <router-link class="link-text" :to="value.link">
-                            {{ value.label }}
+                            <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-database-format="{ value }">
                         <router-link class="link-text" :to="value.link">
-                            {{ value.label }}
+                            <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-storage-format="{ value }">
                         <router-link class="link-text" :to="value.link">
-                            {{ value.label }}
+                            <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                 </p-data-table>
@@ -88,7 +88,6 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -132,7 +131,6 @@ export default {
         PButton,
         PDataTable,
         PIconTextButton,
-        PWidgetLayout,
         PChartLoader,
         PSkeleton,
         PI,

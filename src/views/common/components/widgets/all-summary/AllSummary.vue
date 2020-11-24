@@ -477,11 +477,6 @@ export default {
                 ];
                 res.results.forEach((d) => {
                     let detailLink: Location;
-                    // if (type === 'compute') {
-                    //     detailLink = `/inventory/server?filters=provider%3A${d.provider}`;
-                    // } else {
-                    //     detailLink = referenceRouter(d.cloud_service_type_id, { resource_type: 'inventory.CloudServiceType' });
-                    // }
                     const filters: QueryTag[] = [];
                     if (props.projectId !== undefined) {
                         filters.push({
@@ -508,7 +503,7 @@ export default {
                         };
                     } else {
                         detailLink = {
-                            name: 'CloudServicePage',
+                            name: 'cloudServicePage',
                             params: {
                                 provider: d.provider,
                                 group: d.cloud_service_group,
@@ -518,7 +513,6 @@ export default {
                                 filters: queryTagsToQueryString(filters),
                             },
                         };
-                        return detailLink;
                     }
                     summaryData.push({
                         provider: d.provider,
@@ -527,7 +521,6 @@ export default {
                         count: type === 'storage' ? formatBytes(d.size, 2) : d.count,
                         to: detailLink,
                     });
-                    return summaryData;
                 });
                 if (type === 'compute') {
                     state.computeSummaryData = summaryData;
