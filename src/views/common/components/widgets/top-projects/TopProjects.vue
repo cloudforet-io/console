@@ -98,7 +98,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    gray, indigo, peacock,
+    gray, peacock, secondary,
 } from '@/styles/colors';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
@@ -120,8 +120,8 @@ interface ProjectData {
 }
 
 const DATA_COUNT = 5;
-const COMPUTE_COLOR = peacock[500];
-const DATABASE_COLOR = indigo[400];
+const COMPUTE_COLOR = secondary;
+const DATABASE_COLOR = peacock[200];
 
 
 export default {
@@ -183,7 +183,6 @@ export default {
             projectAxis.renderer.grid.template.location = 0;
             projectAxis.renderer.grid.template.strokeOpacity = 1;
             projectAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            projectAxis.renderer.baseGrid.disabled = true;
             projectAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             projectAxis.renderer.cellStartLocation = 0.3;
             projectAxis.renderer.cellEndLocation = 0.7;
@@ -191,15 +190,20 @@ export default {
 
             const valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
             valueAxis.renderer.minGridDistance = 60;
-            valueAxis.renderer.baseGrid.strokeOpacity = 0;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.grid.template.strokeOpacity = 1;
+            valueAxis.renderer.grid.template.adapter.add('strokeOpacity', (opacity, target) => {
+                // @ts-ignore
+                if (target.dataItem && (target.dataItem.value === 0)) return 0;
+                return opacity;
+            });
             valueAxis.renderer.labels.template.adapter.add('text', (label, target) => {
                 // @ts-ignore
                 if (target.dataItem && (target.dataItem.value === 0)) return '';
                 return label;
             });
             valueAxis.renderer.labels.template.fill = am4core.color(gray[500]);
+            valueAxis.renderer.baseGrid.disabled = true;
             valueAxis.fontSize = 11;
 
             const createSeries = (field, name) => {
@@ -208,8 +212,10 @@ export default {
                 series.dataFields.categoryY = 'rank';
                 series.dataFields.valueX = field;
                 series.fill = am4core.color(state.colors[field]);
-                series.strokeWidth = 0;
                 series.stacked = true;
+                series.stroke = am4core.color('white');
+                series.strokeWidth = 1;
+                series.strokeOpacity = 0;
             };
 
             chart.data = state.chartData;
