@@ -1,8 +1,6 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import jwt from 'jsonwebtoken';
-
-import { SpaceConnector } from '@/lib/space-connector';
+// Views
+import ErrorPage from '@/views/common/pages/ErrorPage.vue';
+import SignIn from '@/views/sign-in/Signin.vue';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
@@ -12,17 +10,11 @@ import pluginRoute from '@/routes/plugin/plugin-route';
 import projectRoute from '@/routes/project/project-route';
 import managementRoute from '@/routes/management/management-route';
 import automationRoute from '@/routes/automation/automation-route';
-
-// Views
-import SignIn from '@/views/sign-in/Signin.vue';
-import ErrorPage from '@/views/common/pages/ErrorPage.vue';
-
-Vue.use(VueRouter);
+import { RouterOptions } from 'vue-router';
 
 
-const router = new VueRouter({
+export const routerOptions = {
     mode: 'history',
-    hash: false,
     linkActiveClass: 'open active',
     routes: [
         {
@@ -85,30 +77,4 @@ const router = new VueRouter({
         },
         { path: '*', component: ErrorPage },
     ],
-});
-
-const isDomainOwner = () => JSON.parse(localStorage.getItem('user/userType')).data === 'DOMAIN_OWNER';
-
-router.beforeEach(async (to, from, next) => {
-    if (to.meta && to.meta.excludeAuth) {
-        if (to.meta.isSignInPage) {
-            if (SpaceConnector.isTokenAlive) {
-                try {
-                    next({ path: to.meta.query.nextPath });
-                } catch (e) {
-                    next('/');
-                }
-            }
-        }
-        next();
-    } else if (SpaceConnector.isTokenAlive) {
-        if (to.meta && to.meta.isDomainOwnerOnly && !isDomainOwner()) {
-            next({ name: 'error' });
-        }
-        next();
-    } else {
-        next({ name: 'Login', query: { nextPath: to.path } });
-    }
-});
-
-export default router;
+} as RouterOptions;

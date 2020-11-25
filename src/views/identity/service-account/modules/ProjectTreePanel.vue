@@ -48,41 +48,35 @@
             <div class="body-container">
                 <div class="tree-container">
                     <p-skeleton v-if="isLoading" class="tree-loader" />
-                    <template v-else>
-                        <p-tree-node v-for="(node, idx) in treeApiHandler.ts.metaState.nodes" :key="idx"
-                                     v-bind="treeApiHandler.ts.state"
-                                     :data.sync="node.data"
-                                     :children.sync="node.children"
-                                     :state.sync="node.state"
-                                     @toggle:click="toggle"
-                                     @node:click="selectItem"
-                                     @checkbox:click="selectItem"
-                        >
-                            <template #data="{data}">
-                                <span :class="{
-                                    'ml-2': data.item_type === 'PROJECT'
-                                }"
-                                >{{ data.name }}</span>
-                            </template>
-                            <template #toggle="{state, toggleSize, data, getListeners}">
-                                <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
-                                     :height="toggleSize"
-                                />
-                                <p-radio v-else-if="data.item_type === 'PROJECT'"
-                                         :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
-                                />
-                            </template>
-                            <template #toggle-right="{data}">
-                                <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
-                                     width="1rem" height="1rem" color="inherit transparent"
-                                />
-                            </template>
-                        </p-tree-node>
-                    </template>
+                    <p-tree v-else ref="treeRef"
+                            @toggle:click="toggle"
+                            @node:click="selectItem"
+                            @checkbox:click="selectItem"
+                    >
+                        <template #data="{data}">
+                            <span :class="{
+                                'ml-2': data.item_type === 'PROJECT'
+                            }"
+                            >{{ data.name }}</span>
+                        </template>
+                        <template #toggle="{state, toggleSize, data, getListeners}">
+                            <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
+                                 :height="toggleSize"
+                            />
+                            <p-radio v-else-if="data.item_type === 'PROJECT'"
+                                     :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
+                            />
+                        </template>
+                        <template #toggle-right="{data}">
+                            <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                                 width="1rem" height="1rem" color="inherit transparent"
+                            />
+                        </template>
+                    </p-tree>
                 </div>
                 <div class="no-select">
                     <p-radio class="mr-2"
-                             :selected="!treeApiHandler.ts.metaState.firstSelectedNode"
+                             :selected="!firstSelectedNode"
                              :value="true" @click="releaseProject"
                     /><span class="cursor-pointer" @click="releaseProject">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_SELECTION') }}</span>
                 </div>
@@ -95,25 +89,69 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, onMounted, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
-import { ProjectNodeState, ProjectTreeFluentAPI } from '@/lib/api/tree-node';
-import PTreeNode from '@/components/molecules/tree/PTreeNode.vue';
-import { fluentApi } from '@/lib/fluent-api';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
+import { TreeItem, TreeNode } from '@/components/molecules/tree-node/type';
 import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
+import PTree from '@/components/organisms/tree/PTree.vue';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+
+
+function getTreeItem<T=ProjectItemResp>(
+    key: number, level: number, node: TreeNode<T>, parent: TreeItem<T>|null = null,
+): TreeItem<T> {
+    return {
+        key,
+        level,
+        node,
+        parent,
+    };
+}
+const getParam = (id?: string, type?: string) => {
+    const param: any = {
+        sort: { key: 'name', desc: false },
+        item_type: 'ROOT',
+    };
+    if (id && type) {
+        param.item_id = id;
+        param.item_type = type;
+    }
+    return param;
+};
+
+const toNodes = (resp): TreeNode[]|boolean => {
+    if (resp.items.length === 0) {
+        return false;
+    }
+    return resp.items.map(d => ({
+        data: d,
+        children: d.has_child,
+        state: {
+            expanded: false,
+            selected: false,
+            loading: false,
+        },
+    }));
+};
 
 export default {
     name: 'ProjectTreePanel',
     components: {
-        PI, PPaneLayout, PSkeleton, PIconButton, PIconTextButton, PTreeNode, PRadio,
+        PTree,
+        PI,
+        PPaneLayout,
+        PSkeleton,
+        PIconButton,
+        PIconTextButton,
+        PRadio,
     },
     props: {
         targetName: {
@@ -122,43 +160,66 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance();
-        const projectApi = fluentApi.identity().project();
-        const treeApiHandler = new ProjectTreeFluentAPI({
-            treeAction: projectApi.tree().setSortBy('name').setSortDesc(false),
-            treeSearchAction: projectApi.treeSearch(),
-        });
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            error: false,
-            selectNode: computed(() => treeApiHandler.ts.metaState.firstSelectedNode),
+            treeRef: null as null|any,
+            firstSelectedNode: computed<TreeItem|null>(() => (state.treeRef ? state.treeRef.firstSelectedNode : null)),
             hasProject: true,
             isLoading: false,
+            error: false,
         });
+
+        const requestTreeData = async (node?: TreeNode): Promise<TreeNode[]|boolean> => {
+            try {
+                const res = await SpaceConnector.client.identity.project.tree(getParam(node?.data.id, node?.data.item_type));
+                return toNodes(res);
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        };
+
+        const getData = async (item?: TreeItem): Promise<void> => {
+            if (item) {
+                item.node.state.expanded = true;
+                item.node.state.loading = true;
+                state.treeRef.applyState(item);
+
+                item.node.children = await requestTreeData(item.node);
+
+                item.node.state.loading = false;
+                state.treeRef.applyState(item);
+            } else {
+                const res = await requestTreeData();
+                if (state.treeRef) state.treeRef.nodes = Array.isArray(res) ? res : [];
+            }
+        };
+
+        const refreshQuery = new QueryHelper().setCountOnly();
 
         const refreshProject = async () => {
             state.isLoading = true;
             state.hasProject = false;
-            const resp = await fluentApi.identity().project().list().setCountOnly()
-                .execute();
-            // treeApiHandler.ts.metaState.selectedNodes = [];
-            await treeApiHandler.getData();
-            if (resp.data.total_count) {
-                state.hasProject = true;
-            }
+            const [res] = await Promise.all([
+                SpaceConnector.client.identity.project.list({
+                    query: refreshQuery.data,
+                }), getData(),
+            ]);
+            if (res.total_count) state.hasProject = true;
             state.isLoading = false;
         };
 
-        const resetSelectedNode = (item: TreeItem<ProjectItemResp, ProjectNodeState>, compare?: TreeItem<ProjectItemResp, ProjectNodeState>) => {
+        const resetSelectedNode = (item: TreeItem<ProjectItemResp>, compare?: TreeItem<ProjectItemResp>) => {
             if (compare) {
                 if (compare.node.data.id === item.node.data.id) {
-                    treeApiHandler.ts.metaState.selectedNodes = [];
+                    state.treeRef.selectedNodes = [];
                 } else if (compare.parent) resetSelectedNode(item, compare.parent);
             } else {
-                if (!treeApiHandler.ts.metaState.firstSelectedNode) return;
-                if (!treeApiHandler.ts.metaState.firstSelectedNode.parent) return;
-                if (treeApiHandler.ts.metaState.firstSelectedNode.level <= item.level) return;
-                resetSelectedNode(item, treeApiHandler.ts.metaState.firstSelectedNode.parent);
+                if (!state.firstSelectedNode) return;
+                if (!state.firstSelectedNode.parent) return;
+                if (state.firstSelectedNode.level <= item.level) return;
+                resetSelectedNode(item, state.firstSelectedNode.parent);
             }
         };
 
@@ -167,58 +228,63 @@ export default {
             window.open(projectPath);
         };
         const selectProjectName = computed(() => {
-            if (treeApiHandler.ts.metaState.firstSelectedNode) {
-                return treeApiHandler.ts.metaState.firstSelectedNode.node.data.name;
+            if (state.firstSelectedNode) {
+                return state.firstSelectedNode.node.data.name;
             }
             return '';
         });
 
-        onMounted(async () => {
-            await refreshProject();
-            await treeApiHandler.getData();
+        const unWatch = watch(() => state.treeRef, async (treeRef) => {
+            if (treeRef) {
+                await refreshProject();
+                await getData();
+                unWatch();
+            }
         });
 
+
+        const toggle = async (item: TreeItem<ProjectItemResp>, matched: TreeItem<ProjectItemResp>[], e: MouseEvent) => {
+            e.stopPropagation();
+            if (item.node.state.expanded) {
+                resetSelectedNode(item);
+                item.node.state.expanded = false;
+                state.treeRef.applyState(item);
+                item.node.children = !!item.node.children;
+                return;
+            }
+
+            await getData(item);
+        };
+        const selectItem = (item: TreeItem<ProjectItemResp>) => {
+            if (item.node.data.item_type === 'PROJECT') {
+                if (!item.node.state.selected) state.treeRef.setSelectedNodes(item);
+            }
+        };
+        const confirm = () => {
+            if (state.firstSelectedNode) {
+                emit('confirm', state.firstSelectedNode.node.data);
+            } else {
+                emit('confirm', null);
+            }
+        };
+
+        const releaseProject = () => {
+            if (state.firstSelectedNode) {
+                state.treeRef.setNodeState(state.firstSelectedNode, { selected: false });
+                state.treeRef.selectedNodes = [];
+            }
+        };
+
         return {
-            treeApiHandler,
-            // treeRef: treeAPITS.ts.treeRef,
             ...toRefs(state),
-            // update: (event) => {
-            //     treeAPITS.ts.getSelectedNode(event);
-            // },
             refreshProject,
             goToProject,
             selectProjectName,
             resetSelectedNode,
-            async toggle(item: TreeItem<ProjectItemResp, ProjectNodeState>, matched: TreeItem<ProjectItemResp, ProjectNodeState>[], e: MouseEvent): Promise<void> {
-                e.stopPropagation();
-                if (item.node.state.expanded) {
-                    resetSelectedNode(item);
-                    item.node.state.expanded = false;
-                    treeApiHandler.ts.applyState(item);
-                    item.node.children = !!item.node.children;
-                    return;
-                }
-
-                await treeApiHandler.getData(item);
-            },
-            selectItem(item: TreeItem<ProjectItemResp, ProjectNodeState>): void {
-                if (item.node.data.item_type === 'PROJECT') {
-                    if (!item.node.state.selected) treeApiHandler.ts.setSelectedNodes(item);
-                }
-            },
-            confirm(): void {
-                if (treeApiHandler.ts.metaState.firstSelectedNode) {
-                    emit('confirm', treeApiHandler.ts.metaState.firstSelectedNode.node.data);
-                } else {
-                    emit('confirm', null);
-                }
-            },
-            releaseProject() {
-                if (treeApiHandler.ts.metaState.firstSelectedNode) {
-                    treeApiHandler.ts.setNodeState(treeApiHandler.ts.metaState.firstSelectedNode, { selected: false });
-                    treeApiHandler.ts.metaState.selectedNodes = [];
-                }
-            },
+            toggle,
+            selectItem,
+            confirm,
+            releaseProject,
         };
     },
 

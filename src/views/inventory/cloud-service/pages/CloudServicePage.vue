@@ -103,10 +103,10 @@
         <p-empty v-else style="height: auto; margin-top: 4rem;">
             {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
         </p-empty>
-        <s-project-tree-modal :visible.sync="changeProjectState.visible"
-                              :project-id="changeProjectState.projectId"
-                              :loading="changeProjectState.loading"
-                              @confirm="changeProject"
+        <project-tree-modal :visible.sync="changeProjectState.visible"
+                            :project-id="changeProjectState.projectId"
+                            :loading="changeProjectState.loading"
+                            @confirm="changeProject"
         />
         <s-collect-modal :visible.sync="tableState.collectModalVisible"
                          :resources="tableState.selectedItems"
@@ -124,7 +124,7 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import SProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
+import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
 import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
@@ -225,7 +225,7 @@ export default {
         STagsPanel,
         PDropdownMenuBtn,
         PEmpty,
-        SProjectTreeModal,
+        ProjectTreeModal,
         SCollectModal,
         Monitoring,
     },
@@ -584,24 +584,24 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item {
-        margin-left: 1rem;
-        &:last-child {
-            flex-grow: 1;
-        }
+.left-toolbox-item {
+    margin-left: 1rem;
+    &:last-child {
+        flex-grow: 1;
     }
+}
 
-    #empty-space {
-        @apply text-primary2;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
+#empty-space {
+    @apply text-primary2;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
 
-    .selected-data-tab {
-        @apply mt-8;
-    }
+.selected-data-tab {
+    @apply mt-8;
+}
 
-    >>> .p-dynamic-layout-query-search-table .p-query-search-table {
-        border-width: 1px;
-    }
+>>> .p-dynamic-layout-query-search-table .p-query-search-table {
+    border-width: 1px;
+}
 </style>

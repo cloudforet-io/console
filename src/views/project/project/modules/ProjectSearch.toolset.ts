@@ -1,6 +1,5 @@
-import { TreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
+import { TreeItem } from '@/components/molecules/tree-node/type';
 import { ProjectItemResp } from '@/views/project/project/type';
-import { ProjectNodeState } from '@/lib/api/tree-node';
 
 export type DataType = 'PROJECT'|'PROJECT_GROUP';
 
@@ -20,4 +19,4 @@ export interface SearchResult {
 }
 
 
-export type ProjectTreeItem = TreeItem<ProjectItemResp, ProjectNodeState>;
+export type ProjectTreeItem = TreeItem<ProjectItemResp>;

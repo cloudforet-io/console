@@ -333,8 +333,8 @@ export default {
                 tags: state.dictRef.getDict(),
             };
 
-            if (projectRef.value.selectNode) {
-                item.project_id = projectRef.value.selectNode.node.data.id;
+            if (projectRef.value.firstSelectedNode) {
+                item.project_id = projectRef.value.firstSelectedNode.node.data.id;
             }
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.create({

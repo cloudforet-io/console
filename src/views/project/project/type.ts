@@ -1,6 +1,5 @@
 import { TimeStamp } from '@/models';
 import { TreeItem } from '@/components/molecules/tree-node/type';
-import {FavoriteItem} from "@/store/modules/favorite/type";
 
 export interface ProjectGroupInfo {
     // eslint-disable-next-line camelcase

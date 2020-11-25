@@ -1,3 +1,5 @@
+import { RouteConfig } from 'vue-router';
+
 const CollectorPage = () => import('@/views/plugin/collector/pages/CollectorPage.vue');
 
 const CollectorPluginPage = () => import('@/views/plugin/collector/pages/CollectorPluginPage.vue');
@@ -56,4 +58,4 @@ export default {
             ],
         },
     ],
-};
+} as RouteConfig;

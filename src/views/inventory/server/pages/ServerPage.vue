@@ -111,10 +111,10 @@
                              :items="tableState.selectedItems"
                              @confirm="checkModalConfirm"
         />
-        <s-project-tree-modal :visible.sync="changeProjectState.visible"
-                              :project-id="changeProjectState.projectId"
-                              :loading="changeProjectState.loading"
-                              @confirm="changeProject"
+        <project-tree-modal :visible.sync="changeProjectState.visible"
+                            :project-id="changeProjectState.projectId"
+                            :loading="changeProjectState.loading"
+                            @confirm="changeProject"
         />
         <s-collect-modal :visible.sync="tableState.collectModalVisible"
                          :resources="tableState.selectedItems"
@@ -148,7 +148,7 @@ import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPage
 import ServerDetails from '@/views/inventory/server/modules/ServerDetails.vue';
 import ServerMember from '@/views/inventory/server/modules/ServerMember.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
-import SProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
+import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
 import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
 import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
 import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
@@ -251,7 +251,7 @@ export default {
         PDataTable,
         PTableCheckModal,
         PIconTextButton,
-        SProjectTreeModal,
+        ProjectTreeModal,
         SCollectModal,
         Monitoring,
         STagsPanel,

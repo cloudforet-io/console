@@ -1,3 +1,5 @@
+import { RouteConfig } from 'vue-router';
+
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
 const CloudServiceTypeSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceTypeSearch.vue');
@@ -82,4 +84,4 @@ export default {
 
         },
     ],
-};
+} as RouteConfig;

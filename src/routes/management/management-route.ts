@@ -1,5 +1,7 @@
+import { RouteConfig } from 'vue-router';
+
 const SupervisorPluginPage = () => import('@/views/management/supervisor/pages/SupervisorPluginPage.vue');
-const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory');
+const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory.vue');
 
 export default {
     path: 'management',
@@ -33,4 +35,4 @@ export default {
             component: CollectorHistory,
         },
     ],
-};
+} as RouteConfig;

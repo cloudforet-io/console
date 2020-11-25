@@ -117,10 +117,10 @@
                                   :centered="true"
                                   @confirm="deleteServiceAccount"
             />
-            <s-project-tree-modal :visible.sync="changeProjectState.visible"
-                                  :project-id="changeProjectState.projectId"
-                                  :loading="changeProjectState.loading"
-                                  @confirm="changeProject"
+            <project-tree-modal :visible.sync="changeProjectState.visible"
+                                :project-id="changeProjectState.projectId"
+                                :loading="changeProjectState.loading"
+                                @confirm="changeProject"
             />
         </template>
     </p-vertical-page-layout>
@@ -149,7 +149,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
-import SProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
+import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
 
 /* page modules */
 import ServiceAccountDetails from '@/views/identity/service-account/modules/ServiceAccountDetails.vue';
@@ -187,7 +187,7 @@ interface ProjectItemResp {
 export default {
     name: 'ServiceAccountPage',
     components: {
-        SProjectTreeModal,
+        ProjectTreeModal,
         PDoubleCheckModal,
         PDropdownMenuBtn,
         PIconTextButton,
@@ -224,7 +224,7 @@ export default {
         const routeState = reactive({
             route: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' }
+                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
             ])),
         });
 
@@ -445,7 +445,7 @@ export default {
             loading: false,
             projectId: computed(() => {
                 if (tableState.selectedItems.length > 1) return '';
-                return get(tableState.selectedItems[0], 'project_id', '');
+                return get(tableState.selectedItems[0], 'project_info.project_id', '');
             }),
         });
 

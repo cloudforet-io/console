@@ -64,7 +64,6 @@ import {
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PTree from '@/components/organisms/tree/PTree.vue';
 import { Tree } from '@/components/organisms/tree/type';
-import { getTreeItem } from '@/components/molecules/tree/PTreeNode.toolset';
 import { findIndex, reverse } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
@@ -75,6 +74,17 @@ import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.v
 interface TreeSearchResp {
     // eslint-disable-next-line camelcase
     open_path: string[];
+}
+
+function getTreeItem<T=ProjectItemResp>(
+    key: number, level: number, node: TreeNode<T>, parent: TreeItem<T>|null = null,
+): TreeItem<T> {
+    return {
+        key,
+        level,
+        node,
+        parent,
+    };
 }
 
 const toNodes = (resp): TreeNode[]|boolean => {
@@ -271,7 +281,7 @@ export default {
         const findNode = async (id: string) => {
             const res = await getSearchPath(id, 'PROJECT_GROUP');
             state.treeRef.nodes = await getRecursiveData(res.open_path) as TreeNode[];
-            emit('list', state.treeRef.nodes.length)
+            emit('list', state.treeRef.nodes.length);
         };
 
         const resetSelectedNode = (item: TreeItem, compare?: TreeItem) => {
@@ -312,7 +322,7 @@ export default {
             } else {
                 const res = await requestTreeData();
                 state.treeRef.nodes = Array.isArray(res) ? res : [];
-                emit('list', state.treeRef.nodes.length)
+                emit('list', state.treeRef.nodes.length);
             }
         };
 

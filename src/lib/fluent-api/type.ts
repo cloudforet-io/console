@@ -31,23 +31,6 @@ export interface LongFilterType {
     operator: string;
 }
 
-export enum FILTER_OPERATOR {
-    contain = '',
-    notContain = '!',
-    gt = '>',
-    gte = '>=',
-    lt = '<',
-    lte = '<=',
-    in = '=',
-    notIn = '!=',
-    regex = '$',
-    sum = 'sum',
-    ltTime = 'td_lt',
-    gtTime = 'td_gt',
-    lteTime = 'td_lte',
-    gteTime = 'td_gte',
-}
-
 
 export type OperatorType = keyof typeof OPERATOR_MAP;
 // type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$'|

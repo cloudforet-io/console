@@ -68,7 +68,8 @@ module.exports = {
           "item_id",
           "include_provider",
           "project_group_id",
-          "has_child"
+          "has_child",
+          "service_account_id"
         ]
       }
     ],

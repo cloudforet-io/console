@@ -1,8 +1,10 @@
+import { RouteConfig } from 'vue-router';
+
 const AddServiceAccountPage = () => import('@/views/identity/service-account/pages/AddServiceAccountPage.vue');
 
-const User = () => import('@/views/identity/user/User');
-const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage');
-const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage');
+const User = () => import('@/views/identity/user/User.vue');
+const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage.vue');
+const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
 const TagsPage = () => import('@/views/common/components/tags/TagsPage.vue');
 const NoResource = () => import('@/views/common/pages/NoResource.vue');
 
@@ -72,4 +74,4 @@ export default {
             ],
         },
     ],
-};
+} as RouteConfig;

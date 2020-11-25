@@ -1,3 +1,5 @@
+import { RouteConfig } from 'vue-router';
+
 const Dashboard = () => import('@/views/dashboard/Dashboard.vue');
 
 export default {
@@ -5,4 +7,4 @@ export default {
     name: 'dashboard',
     meta: { label: 'Dashboard' },
     component: Dashboard,
-};
+} as RouteConfig;

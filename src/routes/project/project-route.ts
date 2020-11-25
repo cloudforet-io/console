@@ -1,5 +1,7 @@
-const Project = () => import('@/views/project/project/pages/ProjectPage');
-const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail');
+import {RouteConfig} from "vue-router";
+
+const Project = () => import('@/views/project/project/pages/ProjectPage.vue');
+const ProjectDetail = () => import('@/views/project/project/pages/ProjectDetail.vue');
 
 export const PROJECT_MAIN_PAGE_NAME = 'projectMain';
 export const PROJECT_DETAIL_PAGE_NAME = 'projectDetail';
@@ -21,4 +23,4 @@ export default {
             component: ProjectDetail,
         },
     ],
-};
+} as RouteConfig;
