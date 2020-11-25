@@ -1,7 +1,15 @@
 <template>
-    <widget-layout :title="$t('COMMON.WIDGETS.TOP_PROJECT_TITLE')"
-                   class="top-projects"
-    >
+    <widget-layout class="top-projects">
+        <template #title>
+            <div class="top">
+                <span class="title">{{ $t('COMMON.WIDGETS.TOP_PROJECT_TITLE') }}</span>
+                <p-button class="create-project-button" @click="goToProjectPage">
+                    <p-i name="ic_plus" width="1rem" height="1rem"
+                         color="transparent inherit"
+                    /> {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_PROJECT') }}
+                </p-button>
+            </div>
+        </template>
         <div class="contents-container">
             <p-chart-loader :loading="loading" class="chart">
                 <template #loader>
@@ -66,13 +74,6 @@
                     </template>
                 </p-data-table>
             </template>
-            <div class="button-wrapper">
-                <p-button class="create-project-button" @click="goToProjectPage">
-                    <p-i name="ic_plus" width="1rem" height="1rem"
-                         color="transparent inherit"
-                    /> {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_PROJECT') }}
-                </p-button>
-            </div>
         </div>
     </widget-layout>
 </template>
@@ -316,6 +317,29 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.top-projects {
+    .top {
+        position: relative;
+    }
+    .title {
+        @apply text-gray-900;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        font-weight: bold;
+    }
+    .create-project-button {
+        @apply text-secondary;
+        position: absolute;
+        right: 1.25rem;
+        font-weight: normal;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        padding: 0;
+        &:hover {
+            @apply text-blue-800;
+        }
+    }
+}
 .contents-container {
     @apply pt-4 flex flex-col h-full;
 }
@@ -347,15 +371,5 @@ export default {
     padding-left: 1.2rem;
     width: 100%;
     max-width: 12rem;
-}
-.create-project-button {
-    @apply text-secondary;
-    font-weight: normal;
-    font-size: 0.75rem;
-    line-height: 1.2;
-    padding: 0;
-    &:hover {
-        @apply text-blue-800;
-    }
 }
 </style>

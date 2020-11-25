@@ -650,6 +650,8 @@ export default {
             }
 
             .content {
+                position: relative;
+                top: -0.25rem;
                 margin: auto 0;
             }
             .count {
