@@ -87,7 +87,6 @@
 </template>
 
 <script lang="ts">
-import { TreeNodeProps, treeNodeProps } from '@/components/molecules/tree/PTreeNode.toolset';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, onMounted, reactive, ref,
@@ -97,12 +96,63 @@ import { makeProxy } from '@/components/util/composition-helpers';
 import {
     forEach,
 } from 'lodash';
+import { TreeNodeState, TreeItem, TreeNodeProps } from '@/components/molecules/tree-node/type';
 
-const PTreeNode = import('@/components/molecules/tree/PTreeNode.vue');
+const PTreeNode = import('@/components/molecules/tree-node/PTreeNode.vue');
 export default {
     name: 'PTreeNode',
     components: { PI, PTreeNode },
-    props: treeNodeProps,
+    props: {
+        level: {
+            type: Number,
+            default: 0,
+        },
+        padSize: {
+            type: String,
+            default: '1rem',
+        },
+        toggleSize: {
+            type: String,
+            default: '1rem',
+        },
+        disableToggle: {
+            type: Boolean,
+            default: false,
+        },
+        classNames: {
+            type: Function,
+            default: ({ node }: TreeItem) => ({
+                basic: true,
+                ...node.state,
+            }),
+        },
+        /**
+         * sync
+         */
+        data: {
+            type: [Array, Object, String, Number, Boolean],
+            default: '',
+            required: true,
+        },
+        /**
+         * sync
+         */
+        children: {
+            type: [Array, Boolean],
+            default: false,
+        },
+        /**
+         * sync
+         */
+        state: {
+            type: Object,
+            default: (): TreeNodeState => ({ expanded: false, selected: false, loading: false }),
+            validator(state): boolean {
+                return state instanceof Object && state.expanded !== undefined;
+            },
+            required: true,
+        },
+    },
     setup(props: TreeNodeProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const depth = computed(() => {

@@ -112,16 +112,28 @@ list:
 | 3 | MouseEvent | MouseEvent |```MouseEvent``` |
 
 ```typescript
-import {BaseNodeStateType,TreeNodeProps,TreeNodeSyncStateType} from "./PTreeNode.toolset";
- 
-interface TreeNode<T=any, S extends BaseNodeStateType = BaseNodeStateType> extends TreeNodeProps {
-    key: number;
-    parent: TreeNode<T, S>|null;
-    sync: TreeNodeSyncStateType<T, S>;
+
+
+export interface TreeNodeState {
+    expanded: boolean;
+    selected: boolean;
+    loading: boolean;
 }
 
-type TreeNodeEventListener<T=any, S extends BaseNodeStateType = BaseNodeStateType>
-    = (node: TreeNode<T, S>, matched: TreeNode<T, S>[], e: MouseEvent) => void;
+export interface TreeNode<T=any> {
+    data: T;
+    children: TreeNode<T>[] | boolean;
+    state: TreeNodeState;
+}
+export interface TreeItem<T=any> {
+    key: number;
+    level: number;
+    parent: TreeItem<T>|null;
+    node: TreeNode<T>;
+    el?: HTMLElement;
+}
+
+
 ```
 
 <br>
