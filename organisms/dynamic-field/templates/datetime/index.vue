@@ -2,7 +2,7 @@
 import { DatetimeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
 import { DatetimeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/datetime/type';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
-import dayjs, {Dayjs} from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 

@@ -9,13 +9,11 @@
             <keep-alive>
                 <slot v-for="tab in keepTabs"
                       :name="proxyActiveTab === tab.name ? proxyActiveTab : undefined"
-                      :tabName="tab.name" :label="tab.label"
+                      v-bind="tab"
                 />
             </keep-alive>
             <template v-for="tab in nonKeepTabs">
-                <slot v-if="proxyActiveTab === tab.name" :name="tab.name" :tabName="tab.name"
-                      :label="tab.label"
-                />
+                <slot v-if="proxyActiveTab === tab.name" v-bind="tab" />
             </template>
         </div>
     </div>
