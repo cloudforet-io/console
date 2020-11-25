@@ -374,7 +374,6 @@ export default {
             const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
 
             try {
-                chartState.loading = true;
                 const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                     label: CLOUD_SERVICE_LABEL[type],
                     aggregate: dateType,
@@ -407,8 +406,6 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-            } finally {
-                chartState.loading = false;
             }
         };
         const getSummaryInfo = async (type) => {
@@ -559,7 +556,9 @@ export default {
             if (state.count.storage > 0) await getSummaryInfo('storage');
         };
         const chartInit = async () => {
+            chartState.loading = true;
             await getTrend('compute');
+            chartState.loading = false;
         };
         init();
         chartInit();
@@ -569,9 +568,10 @@ export default {
                 drawChart();
             }
         }, { immediate: false });
-        watch(() => state.selectedType, (type) => {
+        watch(() => state.selectedType, async (type) => {
             if (type !== 'spendings') {
-                getTrend(type);
+                await getTrend(type);
+                drawChart();
             }
         }, { immediate: false });
         watch(() => state.selectedDateType, async () => {
