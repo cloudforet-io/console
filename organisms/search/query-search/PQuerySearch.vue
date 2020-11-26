@@ -25,7 +25,7 @@
             <span v-if="operator" class="operator-tag">{{ operator }}</span>
         </template>
         <template #search-default="scope">
-            <component :is="component" v-bind="scope" v-on="scope.inputListeners"
+            <component :is="component" v-bind="scope"
             />
         </template>
         <template #search-right="scope">
@@ -259,9 +259,9 @@ export default {
                 operator: state.operator,
             } as QueryItem;
 
-            if (queryItem.key?.dataType && formatterMap[queryItem.key.dataType]) {
-                queryItem.value.name = formatterMap[queryItem.key.dataType](val.name);
-            }
+            // if (queryItem.key?.dataType && formatterMap[queryItem.key.dataType]) {
+            //     queryItem.value.name = formatterMap[queryItem.key.dataType](val.name);
+            // }
 
             emit('search', queryItem);
             clearText();

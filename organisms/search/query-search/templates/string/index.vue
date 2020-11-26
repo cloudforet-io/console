@@ -2,7 +2,7 @@
     <input v-focus.lazy="isFocused"
            v-bind="$attrs"
            type="text"
-           v-on="$listeners"
+           v-on="inputListeners"
     >
 </template>
 
