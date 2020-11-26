@@ -60,8 +60,10 @@ export default defineComponent({
         };
 
         watch(() => SpaceConnector.isTokenAlive, (after) => {
-            if (!after) state.isExpired = true;
-        });
+            if (!after) {
+                state.isExpired = true;
+            }
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
