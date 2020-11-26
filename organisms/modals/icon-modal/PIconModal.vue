@@ -12,6 +12,7 @@
                  class="block" :name="iconName"
                  width="5rem" height="5rem"
             />
+            <span v-if="emoji" class="wave">👋</span>
             <div class="text-wrapper">
                 <p v-if="headerTitle" class="header-title">
                     {{ headerTitle }}
@@ -21,7 +22,7 @@
                 </span>
             </div>
             <p-button
-                style-type="gray900" :outline="true"
+                :style-type="buttonType" :outline="outline"
                 @click="onClickButton"
             >
                 {{ buttonText }}
@@ -62,6 +63,10 @@ export default {
             type: String,
             default: undefined,
         },
+        emoji: {
+            type: Boolean,
+            default: undefined,
+        },
         headerTitle: {
             type: String,
             default: undefined,
@@ -73,6 +78,14 @@ export default {
         buttonText: {
             type: String,
             default: '',
+        },
+        buttonType: {
+            type: String,
+            default: 'gray900',
+        },
+        outline: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: IconModalProps, { emit }) {
@@ -108,6 +121,25 @@ export default {
         }
         .p-i-icon {
             margin: auto;
+        }
+        .wave {
+            animation-name: wave-animation;
+            animation-duration: 2.5s;
+            animation-iteration-count: infinite;
+            transform-origin: 70% 70%;
+            display: inline-block;
+            font-size: 4rem;
+        }
+
+        @keyframes wave-animation {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            30% { transform: rotate(14deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+            60% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
         }
         .text-wrapper {
             padding-top: 1.5rem;
