@@ -25,7 +25,15 @@
             <span v-if="operator" class="operator-tag">{{ operator }}</span>
         </template>
         <template #search-default="scope">
-            <component :is="component" v-bind="scope" />
+            <input v-focus.lazy="scope.isFocused"
+                   :value="scope.value"
+                   :placeholder="currentPlaceholder || scope.placeholder"
+                   :disabled="scope.disabled"
+                   :type="inputType"
+                   :step="currentDataType === 'integer' ? 1 : undefined"
+                   :min="currentDataType === 'integer' ? 0 : undefined"
+                   v-on="scope.inputListeners"
+            >
         </template>
         <template #search-right="scope">
             <div class="right">
@@ -50,7 +58,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { find, debounce } from 'lodash';
 import dayjs from 'dayjs';
@@ -67,6 +75,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import {
     HandlerResponse,
+    inputDataTypes,
     KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Component } from 'vue';
@@ -76,7 +85,7 @@ import {
     formatterMap,
     lastOnlyOperatorChars,
     operatorChars,
-    operatorCheckerMap, operatorMenuMap,
+    operatorCheckerMap, operatorMenuMap, placeholderMap,
 } from '@/components/organisms/search/query-search/config';
 import { defaultValueHandler } from '@/components/organisms/search/query-search/helper';
 
@@ -129,6 +138,8 @@ export default {
             selectedKey: null as KeyItem|null,
             operator: '' as OperatorType,
             currentDataType: computed(() => state.selectedKey?.dataType || 'string'),
+            currentPlaceholder: computed(() => placeholderMap[state.selectedKey?.dataType] || undefined),
+            inputType: computed(() => inputDataTypes[state.selectedKey?.dataType] || 'text'),
             keyTotalCount: computed(() => {
                 if (state.selectedKey) return 0;
                 return props.keyItems.length;
@@ -177,19 +188,7 @@ export default {
                 return state.keyMenu;
             }),
             visibleSearchGuide: false,
-            component: null,
         });
-
-        const loadComponent = async () => {
-            try {
-                state.component = () => import(`./templates/${state.selectedKey?.dataType || 'string'}/index.vue`);
-            } catch (e) {
-                state.component = () => import('./templates/string/index.vue');
-            }
-        };
-        watch(() => state.selectedKey, async () => {
-            await loadComponent();
-        }, { immediate: true });
 
         const onKeyInput = debounce(async (val: string) => {
             let keyItems: KeyItem[] = [...props.keyItems];
