@@ -49,6 +49,7 @@ directive(Vue);
 
 
 /** ********** INIT ************** */
+setStore();
 
 const initConfig = async () => {
     await config.init();
