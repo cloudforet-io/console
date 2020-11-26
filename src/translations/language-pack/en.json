@@ -184,6 +184,10 @@
 			"TIMEZONE": "Time Zone",
 			"TITLE": "Profile"
 		},
+		"SESSION_MODAL": {
+			"SESSION_EXPIRED": "Your session has expired.",
+			"SIGNIN": "Sign In"
+		},
 		"SIGN_IN": {
 			"ADMIN_ID": "Admin ID",
 			"ADMIN_SIGN_IN": "Admin Sign in",

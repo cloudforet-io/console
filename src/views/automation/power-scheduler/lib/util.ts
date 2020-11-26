@@ -82,20 +82,22 @@ export const changeTimezoneToLocal = (rule: RoutineRule[] | TicketRule[], ruleTy
         const offsetHours = (dayjs().tz(timezone).utcOffset()) / 60;
         const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
         rule.forEach((r) => {
-            r.times.forEach((time) => {
-                let newTime = time + offsetHours;
-                if (newTime < 24) {
-                    tmpRule[r.day].push(newTime);
-                } else {
-                    newTime -= 24;
-                    const weekIdx = weekdays.indexOf(r.day);
-                    if (weekIdx === 6) {
-                        tmpRule[weekdays[0]].push(newTime);
+            if (r.times) {
+                r.times.forEach((time) => {
+                    let newTime = time + offsetHours;
+                    if (newTime < 24) {
+                        tmpRule[r.day].push(newTime);
                     } else {
-                        tmpRule[weekdays[weekIdx + 1]].push(newTime);
+                        newTime -= 24;
+                        const weekIdx = weekdays.indexOf(r.day);
+                        if (weekIdx === 6) {
+                            tmpRule[weekdays[0]].push(newTime);
+                        } else {
+                            tmpRule[weekdays[weekIdx + 1]].push(newTime);
+                        }
                     }
-                }
-            });
+                });
+            }
         });
         Object.entries(tmpRule).forEach(([day, times]) => {
             newRule.push({ day, times });

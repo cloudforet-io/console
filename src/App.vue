@@ -5,8 +5,15 @@
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
         <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <p-toast-alert group="toastTopCenter" position="top center" />
-
-
+        <p-icon-modal
+            :visible.sync="isExpired"
+            emoji
+            :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
+            :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
+            :button-type="'primary-dark'"
+            :outline="false"
+            @clickButton="goToSignIn"
+        />
         <template v-if="showGNB">
             <GNB class="gnb" />
             <div class="app-body">
@@ -22,12 +29,14 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { SpaceConnector } from '@/lib/space-connector';
 
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
 import GNB from '@/views/common/components/gnb/GNB.vue';
+import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue';
 
 
 export default defineComponent({
@@ -36,16 +45,27 @@ export default defineComponent({
         GNB: GNB as any,
         PNoticeAlert,
         PToastAlert,
+        PIconModal: PIconModal as any,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
+            isExpired: false,
+        });
+
+        const goToSignIn = () => {
+            vm.$router.push({ name: 'Login' });
+        };
+
+        watch(() => SpaceConnector.isTokenAlive, (after) => {
+            if (!after) state.isExpired = true;
         });
 
         return {
             ...toRefs(state),
+            goToSignIn,
         };
     },
 });

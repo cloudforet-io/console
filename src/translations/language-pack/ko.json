@@ -184,6 +184,10 @@
 			"TIMEZONE": "타임존",
 			"TITLE": "개인 정보"
 		},
+		"SESSION_MODAL": {
+			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
+			"SIGNIN": "로그인 "
+		},
 		"SIGN_IN": {
 			"ADMIN_ID": "관리자 아이디",
 			"ADMIN_SIGN_IN": "관리자 로그인 ",

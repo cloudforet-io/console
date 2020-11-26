@@ -184,6 +184,10 @@
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},
+		"SESSION_MODAL": {
+			"SESSION_EXPIRED": "",
+			"SIGNIN": ""
+		},
 		"SIGN_IN": {
 			"ADMIN_ID": "管理者ID",
 			"ADMIN_SIGN_IN": "管理者ログイン",
