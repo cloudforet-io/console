@@ -35,11 +35,12 @@ export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
 export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler|undefined {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
 
-    const param = { distinct, resource_type: resourceType, options: { limit: limit || 10 } };
+    // eslint-disable-next-line camelcase
+    const param = { distinct_key: distinct, resource_type: resourceType, options: { limit: limit || 10 } };
 
     return async (inputText: string) => {
         try {
-            const res = await SpaceConnector.client.addOns.autocomplete.get({
+            const res = await SpaceConnector.client.addOns.autocomplete.distinct({
                 ...param, search: inputText,
             });
             return {
@@ -68,7 +69,7 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: strin
 
     return async (inputText: string) => {
         try {
-            const res = await SpaceConnector.client.addOns.autocomplete.get({
+            const res = await SpaceConnector.client.addOns.autocomplete.resource({
                 ...param, search: inputText,
             });
             return {
