@@ -170,7 +170,7 @@
 /* eslint-disable camelcase */
 import { Location } from 'vue-router';
 import {
-    zipObject, debounce, range, sortBy,
+    zipObject, debounce, range, sortBy, forEach,
 } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 
@@ -344,6 +344,13 @@ export default {
                     if (tag.key?.name === 'collection_info.service_accounts') filters.push(tag);
                     filters.push(tag);
                 }
+            });
+            forEach(filterState.regionFilter, (d) => {
+                filters.push({
+                    key: { label: 'Region', name: 'region_code' },
+                    operator: '=',
+                    value: { label: d, name: d},
+                });
             });
             if (item.resource_type === 'inventory.Server') {
                 filters.push({ key: { label: 'Provider', name: 'provider' }, operator: '=', value: { label: item.provider, name: item.provider } },
