@@ -6,5 +6,6 @@ export const loadAll = async ({ dispatch }): Promise<void|Error> => {
         dispatch('secret/load'),
         dispatch('collector/load'),
         dispatch('region/load'),
+        dispatch('plugin/load'),
     ]);
 };
