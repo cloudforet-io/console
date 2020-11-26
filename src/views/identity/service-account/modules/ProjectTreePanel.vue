@@ -100,9 +100,9 @@ import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import { TreeItem, TreeNode } from '@/components/molecules/tree-node/type';
-import { ProjectItemResp } from '@/lib/fluent-api/identity/project';
 import PTree from '@/components/organisms/tree/PTree.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ProjectItemResp } from '@/views/project/project/type';
 
 
 function getTreeItem<T=ProjectItemResp>(
@@ -115,6 +115,7 @@ function getTreeItem<T=ProjectItemResp>(
         parent,
     };
 }
+
 const getParam = (id?: string, type?: string) => {
     const param: any = {
         sort: { key: 'name', desc: false },

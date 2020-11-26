@@ -60,11 +60,10 @@ import { makeProxy } from '@/components/util/composition-helpers';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { TreeItem, TreeNode } from '@/components/molecules/tree-node/type';
-import { ProjectItemResp } from '@/views/project/project/type';
+import { ProjectItemResp, TreeSearchResp } from '@/views/project/project/type';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PTree from '@/components/organisms/tree/PTree.vue';
 import { SpaceConnector } from '@/lib/space-connector';
-import { TreeSearchResp } from '@/lib/fluent-api/identity/project';
 import { findIndex } from 'lodash';
 
 function getTreeItem<T=ProjectItemResp>(

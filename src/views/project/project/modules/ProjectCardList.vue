@@ -123,7 +123,7 @@ import {
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
+import { ProjectGroup } from '@/views/project/project/type';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';

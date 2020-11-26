@@ -36,7 +36,7 @@ import {
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { ProjectGroup } from '@/views/project/project/modules/ProjectSearch.toolset';
+import { ProjectGroup } from '@/views/project/project/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';

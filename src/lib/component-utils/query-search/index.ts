@@ -6,8 +6,8 @@ import {
     ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { map, size } from 'lodash';
-import { fluentApi } from '@/lib/fluent-api';
 import { SearchEnumItem, SearchEnums } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { SpaceConnector } from '@/lib/space-connector';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItem>
@@ -35,16 +35,16 @@ export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
 export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler|undefined {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
 
-    const api = fluentApi.addons().autocomplete().get()
-        .setResourceType(resourceType)
-        .setLimit(limit || 10)
-        .setDistinct(distinct);
+    const param = { distinct, resource_type: resourceType, options: { limit: limit || 10 } };
+
     return async (inputText: string) => {
         try {
-            const res = await api.setSearch(inputText).execute();
+            const res = await SpaceConnector.client.addOns.autocomplete.get({
+                ...param, search: inputText,
+            });
             return {
-                results: res.data.results.map(d => ({ label: d.name, name: d.key })),
-                totalCount: res.data.total_count,
+                results: res.results.map(d => ({ label: d.name, name: d.key })),
+                totalCount: res.total_count,
             };
         } catch (e) {
             return {
@@ -64,15 +64,16 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
  * @param limit
  */
 export function makeReferenceValueHandler(resourceType: string, dataType?: string, limit?: number): ValueHandler {
-    const api = fluentApi.addons().autocomplete().get()
-        .setResourceType(resourceType)
-        .setLimit(limit || 10);
+    const param = { resource_type: resourceType, options: { limit: limit || 10 } };
+
     return async (inputText: string) => {
         try {
-            const res = await api.setSearch(inputText).execute();
+            const res = await SpaceConnector.client.addOns.autocomplete.get({
+                ...param, search: inputText,
+            });
             return {
-                results: res.data.results.map(d => ({ label: d.name, name: d.key })),
-                totalCount: res.data.total_count,
+                results: res.results.map(d => ({ label: d.name, name: d.key })),
+                totalCount: res.total_count,
             };
         } catch (e) {
             return {

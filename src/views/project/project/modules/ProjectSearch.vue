@@ -71,19 +71,15 @@ import {
 import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
-import { fluentApi, ProjectGroupInfo } from '@/lib/fluent-api';
-import {
-    ProjectGroup, DataType, SearchResult,
-} from './ProjectSearch.toolset';
-import {ProjectState} from "@/views/project/project/type";
+import { ItemType } from '@/views/project/project/type';
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 const LIMIT = 5;
-
 
 interface MenuOption {
     title: string;
     items: any[];
-    type: DataType;
+    type: ItemType;
     count: number;
     icon: string;
     showMore: boolean;
@@ -91,7 +87,7 @@ interface MenuOption {
 
 interface MenuItem extends ContextMenuItem {
     icon?: string;
-    dataType?: DataType;
+    dataType?: ItemType;
 }
 
 const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
@@ -172,7 +168,7 @@ export default {
                         items: state.projectGroupItems,
                         type: 'PROJECT_GROUP',
                         count: state.projectGroupTotalCount,
-                        showMore: state.projectGroupTotalCount > state.projectGroupStart * LIMIT,
+                        showMore: state.projectGroupTotalCount >= state.projectGroupStart + LIMIT,
                         icon: 'ic_tree_project-group',
                     });
                 }
@@ -181,7 +177,7 @@ export default {
                     items: state.projectItems,
                     type: 'PROJECT',
                     count: state.projectTotalCount,
-                    showMore: state.projectTotalCount > state.projectStart * LIMIT,
+                    showMore: state.projectTotalCount >= state.projectStart + LIMIT,
                     icon: 'ic_tree_project',
                 });
                 return makeMenuItems(...menuOptions);
@@ -197,46 +193,49 @@ export default {
             return '';
         };
 
-        const projectGroupListApi = fluentApi.identity().projectGroup().list()
-            .setPageSize(LIMIT)
-            .setOnly('project_group_id', 'name');
-        const scopedProjectListApi = fluentApi.identity().projectGroup()
-            .listProjects().setRecursive(true)
-            .setPageSize(LIMIT);
-        const projectListApi = fluentApi.identity().project().list()
-            .setPageSize(LIMIT);
+        const projectGroupQuery = new QueryHelper().setOnly('project_group_id', 'name').setPageLimit(LIMIT);
+        const projectQuery = new QueryHelper().setOnly('project_id', 'name').setPageLimit(LIMIT);
 
 
         const listProjectGroups = async () => {
-            let api = projectGroupListApi;
             if (state.searchText) {
-                api = projectGroupListApi.setFilter({
-                    key: 'name',
-                    value: state.searchText,
-                    operator: '',
-                });
+                projectGroupQuery.setFilter({ k: 'name', v: state.searchText, o: 'contain' });
+            } else {
+                projectGroupQuery.setFilter();
             }
-            const res = await api.setThisPage(state.projectGroupStart).execute();
-            if (state.projectGroupStart === 1) state.projectGroupItems = res.data.results;
-            else state.projectGroupItems = [...state.projectGroupItems, ...res.data.results];
-            state.projectGroupTotalCount = res.data.total_count;
+
+            const res = await SpaceConnector.client.identity.projectGroup.list({
+                query: projectGroupQuery.setPageStart(state.projectGroupStart).data,
+            });
+            if (state.projectGroupStart === 1) state.projectGroupItems = res.results;
+            else state.projectGroupItems = [...state.projectGroupItems, ...res.results];
+            state.projectGroupTotalCount = res.total_count;
         };
 
         const listProjects = async () => {
-            let api = props.groupId
-                ? scopedProjectListApi.setProjectGroupId(props.groupId)
-                : projectListApi;
-            if (state.searchText) {
-                api = api.setFilter({
-                    key: 'name',
-                    value: state.searchText,
-                    operator: '',
-                });
+            const param = {} as any;
+            let api;
+            if (props.groupId) {
+                api = SpaceConnector.client.identity.projectGroup.listProjects;
+                param.recursive = true;
+                param.project_group_id = props.groupId;
+            } else {
+                api = SpaceConnector.client.identity.project.list;
             }
-            const res = await api.setThisPage(state.projectStart).execute();
-            if (state.projectStart === 1) state.projectItems = res.data.results;
-            else state.projectItems = [...state.projectItems, ...res.data.results];
-            state.projectTotalCount = res.data.total_count;
+
+            if (state.searchText) {
+                projectQuery.setFilter({ k: 'name', v: state.searchText, o: 'contain' });
+            } else {
+                projectQuery.setFilter();
+            }
+
+            param.query = projectQuery.setPageStart(state.projectStart).data;
+
+            const res = await api(param);
+
+            if (state.projectStart === 1) state.projectItems = res.results;
+            else state.projectItems = [...state.projectItems, ...res.results];
+            state.projectTotalCount = res.total_count;
         };
 
         const listItems = async () => {
@@ -292,10 +291,10 @@ export default {
 
         const onShowMore = async (item: MenuItem) => {
             if (item.dataType === 'PROJECT') {
-                state.projectStart += 1;
+                state.projectStart += LIMIT;
                 await listProjects();
             } else {
-                state.projectGroupStart += 1;
+                state.projectGroupStart += LIMIT;
                 await listProjectGroups();
             }
         };
