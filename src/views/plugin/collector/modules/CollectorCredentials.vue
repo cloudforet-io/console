@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
@@ -60,6 +60,7 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { DataTableField } from '@/components/organisms/tables/data-table/type';
+import { store } from '@/store';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 interface SecretModel {
@@ -95,18 +96,19 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
-            items: [],
+            items: [] as any,
             totalCount: 0,
             loading: true,
             selectIndex: [],
             selectedItems: [],
             fields: [
-                { name: 'name', label: 'Name', width: '400px' },
-                { name: 'created_at', label: 'Created', width: '400px' },
-                {
-                    name: 'collect', label: ' ', width: '150px', sortable: false,
-                },
+                { name: 'name', label: 'Name' },
+                { name: 'service_account_name', label: 'Service Account' },
+                { name: 'project_name', label: 'Project' },
+                { name: 'created_at', label: 'Created' },
             ] as DataTableField[],
             sortBy: '',
             sortDesc: '',
@@ -127,7 +129,13 @@ export default {
                 const res = await SpaceConnector.client.secret.secret.list({
                     query: query.data,
                 });
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    // eslint-disable-next-line camelcase
+                    service_account_name: computed(() => store.state.resource.serviceAccount.items[d.service_account_id]?.label || d.service_account_id).value,
+                    // eslint-disable-next-line camelcase
+                    project_name: computed(() => store.state.resource.project.items[d.project_id]?.label || d.project_id).value,
+                    ...d,
+                }));
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
@@ -137,7 +145,11 @@ export default {
         };
 
         const init = async () => {
-            await listCredentials();
+            await Promise.all([
+                vm.$store.dispatch('resource/serviceAccount/load'),
+                vm.$store.dispatch('resource/project/load'),
+                listCredentials(),
+            ]);
         };
         init();
 
