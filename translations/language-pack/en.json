@@ -17,18 +17,6 @@
 	"DEFINITION_TABLE": {
 		"NO_DATA": "No Data"
 	},
-	"DICT_INPUT": {
-		"KEY": "Key",
-		"VALUE": "Value"
-	},
-	"DICT_INPUT_GROUP": {
-		"ADD": "Add",
-		"INVALID_DUPLICATED_KEY": "duplicated key",
-		"INVALID_NO_KEY": "no key",
-		"INVALID_NO_VALUE": "no value",
-		"KEY_LABEL": "Key",
-		"VALUE_LABEL": "Value"
-	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "Type {text} to Confirm.",
 		"INVALID_TEXT": "text is not {text}"

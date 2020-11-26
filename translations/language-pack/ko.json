@@ -17,18 +17,6 @@
 	"DEFINITION_TABLE": {
 		"NO_DATA": "데이터가 없습니다."
 	},
-	"DICT_INPUT": {
-		"KEY": "키 ",
-		"VALUE": "값 "
-	},
-	"DICT_INPUT_GROUP": {
-		"ADD": "추가 ",
-		"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
-		"INVALID_NO_KEY": "키가 입력되지 않았습니다.",
-		"INVALID_NO_VALUE": "값이 입력되지 않았습니다.",
-		"KEY_LABEL": "키",
-		"VALUE_LABEL": "값"
-	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "확인을 위해 {text}를 입력하세요.",
 		"INVALID_TEXT": "{text}가 아닙니다."

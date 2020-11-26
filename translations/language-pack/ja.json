@@ -17,18 +17,6 @@
 	"DEFINITION_TABLE": {
 		"NO_DATA": "データがありません"
 	},
-	"DICT_INPUT": {
-		"KEY": "キー",
-		"VALUE": "値"
-	},
-	"DICT_INPUT_GROUP": {
-		"ADD": "追加",
-		"INVALID_DUPLICATED_KEY": "重複したキーです",
-		"INVALID_NO_KEY": "キーが入力されていません",
-		"INVALID_NO_VALUE": "値が入力されていません",
-		"KEY_LABEL": "キー",
-		"VALUE_LABEL": "値"
-	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "確認のため{text}を入力してください",
 		"INVALID_TEXT": "{text}ではありません"
