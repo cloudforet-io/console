@@ -45,9 +45,6 @@
                                   class="w-full"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_ACTION_LABEL')" class="mb-20">
-                    <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
-                </p-field-group>
             </div>
         </template>
     </p-button-modal>
@@ -205,10 +202,6 @@ export default {
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
             showValidation: false,
-            collectModeMenu: computed<MenuItem[]>(() => [
-                { name: COLLECT_MODE.all, label: vm.$t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_ACTION_GET_ALL'), type: 'item' },
-                { name: COLLECT_MODE.create, label: vm.$t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_ACTION_GET_NEW'), type: 'item' },
-            ]),
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
             image: computed<string>(() => get(state.collector, 'tags.icon', '')),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
