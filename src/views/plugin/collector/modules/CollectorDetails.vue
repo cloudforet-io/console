@@ -9,7 +9,7 @@
                 <span class="ml-2 leading-none">{{ baseState.data.name }}</span>
             </template>
             <template #data-plugin_info.metadata.metadata.supported_resource_type="{data}">
-                <p-text-list :items="data || []" delimiter=", " />
+                <p-text-list :items="data || []" delimiter="," class="text-list"/>
             </template>
         </p-definition-table>
         <p-panel-top :use-total-count="true" :total-count="filterState.items? filterState.items.length:0">
@@ -100,3 +100,8 @@ export default {
     },
 };
 </script>
+<style lang="postcss">
+.text-list {
+    line-height: inherit;
+}
+</style>

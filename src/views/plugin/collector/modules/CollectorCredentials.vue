@@ -37,7 +37,6 @@
                 </p-button>
             </template>
         </p-toolbox-table>
-
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
                             :collector-id="collectorId"
@@ -109,6 +108,9 @@ export default {
                 { name: 'service_account_name', label: 'Service Account' },
                 { name: 'project_name', label: 'Project' },
                 { name: 'created_at', label: 'Created' },
+                {
+                    name: 'collect', label: ' ', sortable: false,
+                },
             ] as DataTableField[],
             sortBy: '',
             sortDesc: '',

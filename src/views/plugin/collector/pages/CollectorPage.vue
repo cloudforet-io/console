@@ -52,11 +52,15 @@
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
                     </template>
+                    <template #col-collector_history-format="data">
+                        <router-link :to="'/management/collector-history'">
+                            <span class="view-detail">view detail
+                                <p-i name="ic_arrow_right" width="1rem" />
+                            </span>
+                        </router-link>
+                    </template>
                     <template #col-last_collected_at-format="{ value }">
                         {{ value ? timestampFormatter(value) : '' }}
-                    </template>
-                    <template #col-created_at-format="{ value }">
-                        {{ timestampFormatter(value) }}
                     </template>
                 </p-query-search-table>
             </template>
@@ -165,6 +169,7 @@ import config from '@/lib/config';
 import router from '@/routes';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
+import PI from '@/components/atoms/icons/PI.vue';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const STagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -179,6 +184,7 @@ type UrlQueryString = string | (string | null)[] | null | undefined;
 export default {
     name: 'CollectorPage',
     components: {
+        PI,
         PPageTitle,
         PLazyImg,
         PHorizontalLayout,
@@ -204,12 +210,13 @@ export default {
 
         const state = reactive({
             fields: computed(() => [
-                { name: 'name', label: 'Name', width: '14rem' },
+                { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
-                { name: 'plugin_info.version', label: 'Version', width: '5.5rem' },
-                { name: 'priority', label: 'Priority', width: '5.5rem' },
-                { name: 'last_collected_at', label: 'Last Collected', width: '9rem' },
-                { name: 'created_at', label: 'Created', width: '9rem' },
+                { name: 'priority', label: 'Priority' },
+                { name: 'plugin_info.plugin_id', label: 'Plugin' },
+                { name: 'plugin_info.version', label: 'Version' },
+                { name: 'collector_history', label: 'Collector History' },
+                { name: 'last_collected_at', label: 'Last Collected' },
             ]),
             excelFields: [
                 { key: 'name', name: 'Name' },
@@ -523,5 +530,12 @@ ul {
 }
 li {
     display: list-item;
+}
+
+.view-detail {
+    @apply text-blue-600;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-right: 0.3825rem;
 }
 </style>
