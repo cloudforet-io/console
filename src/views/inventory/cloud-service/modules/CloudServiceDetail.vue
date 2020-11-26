@@ -1,22 +1,25 @@
 <template>
     <div>
         <p-button-tab v-if="tabs.length > 0" :tabs="tabs" :active-tab="activeTab"
+                      keep-alive-all
                       @change="onChangeTab"
         >
             <template v-for="(layout, i) in layouts" :slot="layout.name">
-                <p-dynamic-layout :key="`${layout.name}-${i}`" v-bind="layout" :data="data"
-                                  :type-options="{
-                                      loading,
-                                      totalCount,
-                                      timezone,
-                                      selectIndex,
-                                      keyItems,
-                                      valueHandlerMap,
-                                      language,
-                                  }"
-                                  :field-handler="fieldHandler"
-                                  v-on="dynamicLayoutListeners"
-                />
+                <div :key="`${layout.name}-${i}`">
+                    <p-dynamic-layout v-bind="layout" :data="data"
+                                      :type-options="{
+                                          loading,
+                                          totalCount,
+                                          timezone,
+                                          selectIndex,
+                                          keyItems,
+                                          valueHandlerMap,
+                                          language,
+                                      }"
+                                      :field-handler="fieldHandler"
+                                      v-on="dynamicLayoutListeners"
+                    />
+                </div>
             </template>
         </p-button-tab>
     </div>
@@ -28,18 +31,13 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
-
-import {DynamicLayout, DynamicLayoutType} from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import {
-    DynamicLayoutEventListeners,
-    DynamicLayoutFetchOptions,
-    DynamicLayoutFieldHandler,
+    DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
-
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -184,9 +182,7 @@ export default {
                 params.query = query;
                 if (type === 'list') delete params.query.sort;
             }
-            // eslint-disable-next-line camelcase
             const keyPath = state.currentLayout.options?.root_path;
-            // eslint-disable-next-line camelcase
             if (keyPath) params.key_path = keyPath;
             return params;
         };
@@ -267,7 +263,6 @@ export default {
         }, { immediate: false });
 
         const init = async () => {
-            await store.dispatch('resource/loadAll');
             await loadSchemaAndData();
         };
 

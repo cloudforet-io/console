@@ -251,7 +251,6 @@ export default {
         }, { immediate: false });
 
         const init = async () => {
-            await store.dispatch('resource/loadAll');
             await loadSchemaAndData();
         };
 
