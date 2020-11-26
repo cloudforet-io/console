@@ -50,15 +50,10 @@ directive(Vue);
 
 /** ********** INIT ************** */
 
-// TODO: remove legacy store
-setStore();
-const { logout } = useStore();
-
 const initConfig = async () => {
     await config.init();
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
-        // TODO: open session expire modal
-        logout();
+        // Add session expiration process
     });
     Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'));
 };
