@@ -100,7 +100,7 @@ export const defaultCase = () => ({
                              v-bind="$props"
                              :menu="menu"
                              @search="search"
-                             @menu:select="search"
+                             @select-menu="search"
                              @input="input"
                              class="mt-10"
         >
@@ -157,10 +157,10 @@ export const controlCase = () => ({
                              :visibleMenu.sync="visibleMenu"
                              :isFocused.sync="isFocused"
                              @search="search"
-                             @menu:select="search"
+                             @select-menu="search"
                              @input="input"
                              @mousedown.stop="mousedown"
-                             @menu:hide="onMenuHide"
+                             @hide-menu="onMenuHide"
                              class="mt-10"
         >
             
@@ -209,7 +209,7 @@ export const controlCase = () => ({
                 state.visibleMenu = true;
             },
             onMenuHide(e) {
-                action('menu:hide')(e);
+                action('hide-menu')(e);
                 state.visibleMenu = false;
             },
         };

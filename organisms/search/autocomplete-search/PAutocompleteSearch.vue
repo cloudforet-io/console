@@ -111,7 +111,7 @@ export default {
 
         const hideMenu = () => {
             if (state.isAutoMode) state.proxyVisibleMenu = false;
-            emit('menu:hide');
+            emit('hide-menu');
         };
 
         const showMenu = () => {
@@ -146,7 +146,7 @@ export default {
         });
 
         const onFocusMenuItem = (idx: string) => {
-            emit('menu:focus', idx);
+            emit('focus-menu', idx);
         };
 
         const onSearchFocus = () => {
@@ -183,8 +183,8 @@ export default {
         };
 
         const onClickMenuItem = (name, idx) => {
-            if (listeners['menu:select']) {
-                emit('menu:select', name, idx);
+            if (listeners['select-menu']) {
+                emit('select-menu', name, idx);
             } else {
                 state.proxyValue = state.filteredMenu[idx].label;
                 emitSearch(name);

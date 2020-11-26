@@ -9,14 +9,14 @@
                            :visible-menu.sync="visibleMenu"
                            :is-focused.sync="isFocused"
                            :menu="menu"
-                           @menu:select="onMenuSelect"
+                           @select-menu="onMenuSelect"
                            @search="onSearch"
                            @input="onInput"
                            @keyup.esc="hideMenu"
                            @keydown.delete="onDelete"
                            @keydown="onKeydown"
                            @mousedown.stop="showMenu"
-                           @menu:hide="hideMenu"
+                           @hide-menu="hideMenu"
     >
         <template #search-left="scope">
             <span v-if="selectedKey" class="key-tag"
@@ -25,7 +25,8 @@
             <span v-if="operator" class="operator-tag">{{ operator }}</span>
         </template>
         <template #search-default="scope">
-            <component :is="component" v-bind="scope" />
+            <component :is="component" v-bind="scope" v-on="scope.inputListeners"
+            />
         </template>
         <template #search-right="scope">
             <div class="right">
@@ -79,6 +80,7 @@ import {
     operatorCheckerMap, operatorMenuMap,
 } from '@/components/organisms/search/query-search/config';
 import { defaultValueHandler } from '@/components/organisms/search/query-search/helper';
+import { makeByPassListeners } from '@/components/util/composition-helpers';
 
 
 dayjs.extend(utc);
@@ -357,6 +359,25 @@ export default {
             state.visibleSearchGuide = true;
         };
 
+        const querySearchListeners = {
+            input(e) {
+                emit('update:value', e.target.value);
+                makeByPassListeners(listeners, 'input', e.target.value, e);
+            },
+            blur(e) {
+                state.proxyIsFocused = false;
+                makeByPassListeners(listeners, 'blur', e);
+            },
+            focus(e) {
+                state.proxyIsFocused = true;
+                makeByPassListeners(listeners, 'focus', e);
+            },
+            keyup: (e) => {
+                if (e.code === 'Enter') emit('search', props.value, e);
+                makeByPassListeners(listeners, 'keyup', e);
+            },
+        };
+
 
         return {
             ...toRefs(state),
@@ -370,6 +391,7 @@ export default {
             onKeydown,
             excludeSlots: ['search-left', 'search-default', 'menu-no-data', 'search-right'],
             onHelpClick,
+            querySearchListeners,
         };
     },
 };

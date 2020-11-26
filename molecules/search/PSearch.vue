@@ -40,6 +40,7 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { makeByPassListeners, makeProxy } from '@/components/util/composition-helpers';
+import {SearchProps} from "@/components/molecules/search/type";
 
 export default {
     name: 'PSearch',
@@ -77,7 +78,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, listeners }) {
+    setup(props: SearchProps, { emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state: any = reactive({
             proxyIsFocused: props.isFocused === undefined

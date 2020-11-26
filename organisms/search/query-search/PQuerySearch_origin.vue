@@ -9,14 +9,14 @@
                            :visible-menu.sync="visibleMenu"
                            :is-focused.sync="isFocused"
                            :menu="menu"
-                           @menu:select="onMenuSelect"
+                           @select-menu="onMenuSelect"
                            @search="onSearch"
                            @input="onInput"
                            @keyup.esc="hideMenu"
                            @keydown.delete="onDelete"
                            @keydown="onKeydown"
                            @mousedown.stop="showMenu"
-                           @menu:hide="hideMenu"
+                           @hide-menu="hideMenu"
     >
         <template #search-left="scope">
             <span v-if="selectedKey" class="key-tag"

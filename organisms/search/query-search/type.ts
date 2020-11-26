@@ -40,19 +40,14 @@ export interface ValueHandlerMap {
     [key: string]: ValueHandler|undefined;
 }
 
-export interface QuerySearchState {
+export interface QuerySearchProps {
     placeholder?: string;
     focused: boolean;
     keyItems: KeyItem[];
     valueHandlerMap: ValueHandlerMap;
-}
-export interface QuerySearchSyncState {
     value: string;
 }
 
-export interface QuerySearchProps extends QuerySearchState, QuerySearchSyncState {
-}
-
-export interface QuerySearchListeners {
-    search?: (query: QueryItem) => Promise<void>|void;
+export interface QuerySearchEventArgs {
+    search: [QueryItem];
 }

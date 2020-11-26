@@ -1,4 +1,5 @@
 import { MenuItem } from '@/components/organisms/context-menu/type';
+import { SearchEventArgs } from '@/components/molecules/search/type';
 
 export type AutocompleteHandler = (inputText: string) => Promise<{
     results: MenuItem[];
@@ -19,3 +20,11 @@ export interface AutocompleteSearchProps {
 }
 
 
+export interface AutocompleteSearchEventArgs {
+    input: [string, InputEvent];
+    search: [string];
+    'hide-menu': [];
+    'focus-menu': [number]; // index of focused menu item
+    'select-menu': [string, number]; // name, index of selected menu item
+    delete: SearchEventArgs['delete'];
+}
