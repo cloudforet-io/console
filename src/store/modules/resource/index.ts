@@ -6,6 +6,7 @@ import secret from './secret';
 import collector from './collector';
 import provider from './provider';
 import region from './region';
+import plugin from './plugin';
 import * as actions from './actions';
 
 export default {
@@ -19,6 +20,7 @@ export default {
         collector,
         provider,
         region,
+        plugin,
     },
     actions,
 };
