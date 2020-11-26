@@ -26,7 +26,6 @@ export { default as PLoadingButton } from './components/molecules/buttons/loadin
 
 // molecule form components
 export { default as PCheckBox } from './components/molecules/forms/checkbox/PCheckBox.vue';
-export { default as PDictInput } from './components/molecules/forms/dict-input/PDictInput.vue';
 export { default as PTagsInput } from './components/organisms/forms/tags-input/PTagsInput.vue';
 export { default as PRadio } from './components/molecules/forms/radio/PRadio.vue';
 export { default as PSelect } from './components/molecules/forms/select/PSelect.vue';
@@ -56,4 +55,3 @@ export { default as PJsonSchemaForm } from './components/organisms/forms/json-sc
 
 // organisms tables
 export { default as PDataTable } from './components/organisms/tables/data-table/PDataTable.vue';
-

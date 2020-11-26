@@ -74,10 +74,10 @@
                 <collector-details :collector-id="selectedItems[0].collector_id" />
             </template>
             <template #tag>
-                <s-tags-panel :resource-id="selectedItems[0].collector_id"
-                              resource-type="inventory.Collector"
-                              resource-key="collector_id"
-                              tag-page-name="collectorTags"
+                <tags-panel :resource-id="selectedItems[0].collector_id"
+                            resource-type="inventory.Collector"
+                            resource-key="collector_id"
+                            tag-page-name="collectorTags"
                 />
             </template>
             <template #credentials>
@@ -172,7 +172,7 @@ import { TranslateResult } from 'vue-i18n';
 import PI from '@/components/atoms/icons/PI.vue';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
-const STagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
+const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
 const CollectorDetails = (): Component => import('@/views/plugin/collector/modules/CollectorDetails.vue') as Component;
@@ -203,9 +203,9 @@ export default {
         CollectorDetails,
         CollectorCredentials,
         CollectorSchedules,
-        STagsPanel,
+        TagsPanel,
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({

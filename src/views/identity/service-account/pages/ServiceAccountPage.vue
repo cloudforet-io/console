@@ -78,9 +78,9 @@
                     />
                 </template>
                 <template #tag>
-                    <s-tags-panel :resource-id="tableState.selectedAccountIds[0]"
-                                  resource-type="identity.ServiceAccount"
-                                  resource-key="service_account_id"
+                    <tags-panel :resource-id="tableState.selectedAccountIds[0]"
+                                resource-type="identity.ServiceAccount"
+                                resource-key="service_account_id"
                     />
                 </template>
                 <template #credentials>
@@ -146,7 +146,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
 import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
@@ -195,7 +195,7 @@ export default {
         PEmpty,
         ServiceAccountMember,
         ServiceAccountCredentials,
-        STagsPanel,
+        TagsPanel,
         PDynamicLayout,
         PDataTable,
         PHorizontalLayout,

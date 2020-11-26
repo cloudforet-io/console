@@ -125,6 +125,14 @@
 					"TOGGLE_LESS": "隠す",
 					"TOGGLE_MORE": "もっと見る"
 				}
+			},
+			"TAGS": {
+				"ADD": "追加",
+				"INVALID_DUPLICATED_KEY": "重複したキーです",
+				"INVALID_NO_KEY": "キーが入力されていません",
+				"INVALID_NO_VALUE": "値が入力されていません",
+				"KEY": "キー",
+				"VALUE": "値"
 			}
 		},
 		"ERROR": {

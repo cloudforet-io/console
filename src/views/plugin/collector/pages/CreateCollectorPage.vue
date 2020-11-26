@@ -17,7 +17,6 @@
                            :disabled="tabState.disabled"
                            @cancel="onClickCancel"
                            @confirm="onClickConfirm"
-                           @changeStep="onChangeStep"
         >
             <template #contents-conf="{tab}">
                 <div class="collector-input-wrapper">
@@ -53,11 +52,9 @@
                 <confirm-credentials :provider="provider" :supported-schema="supportedSchema" class="mt-8" />
             </template>
             <template #contents-tags>
-                <p-dict-input-group ref="dictRef"
-                                    :dict="tags"
-                                    show-validation
-                                    class="mt-8"
-                                    @change="onChangeTags"
+                <tags-input-group :tags.sync="tags"
+                                  :show-validation="true"
+                                  :is-valid.sync="isTagsValid"
                 />
             </template>
         </p-progress-wizard>
@@ -72,9 +69,9 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -94,7 +91,7 @@ export default {
         GeneralPageLayout,
         ConfirmCredentials,
         PProgressWizard,
-        PDictInputGroup,
+        TagsInputGroup,
         PIconTextButton,
         PPageNavigation,
         PLazyImg,
@@ -111,7 +108,6 @@ export default {
             //
             collectorNames: [],
             versions: [],
-            dictRef: null as any,
         });
         const formState = reactive({
             inputModel: {
@@ -144,12 +140,15 @@ export default {
                 return '';
             }),
             isVersionValid: computed(() => !(formState.inputModel.version.length === 0)),
+            isConfValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
             isTagsValid: true,
-            isValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
         });
         const routeState = reactive({
-            routes: [{ name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' }, { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
-                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR'), path: '/plugin/collector/create/plugins' }],
+            routes: computed(() => ([
+                { name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
+                { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
+                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR'), path: '/plugin/collector/create/plugins' },
+            ])),
         });
         const tabState = reactive({
             tabs: computed(() => [
@@ -170,13 +169,14 @@ export default {
             activeIdx: 0,
             loading: false,
             invalidState: computed(() => ({
-                conf: !formState.isValid,
+                conf: !formState.isConfValid,
                 credentials: false,
                 tags: !formState.isTagsValid,
             })),
             disabled: computed(() => some(tabState.invalidState, v => v === true)),
         });
 
+        /* api */
         const getPlugin = async () => {
             try {
                 const res = await SpaceConnector.client.repository.plugin.get({
@@ -220,33 +220,16 @@ export default {
             }
         };
 
+        /* event */
         const onClickBackButton = () => {
             root.$router.push('/plugin/collector/create/plugins');
         };
         const onClickCancel = () => {
             root.$router.go(-1);
         };
-
-        const onChangeStep = () => {
-            // set tags only when the current tab is tags (when dictRef exist)
-            if (state.dictRef) {
-                formState.isTagsValid = state.dictRef.allValidation();
-                state.tags = state.dictRef.getDict();
-            }
-        };
-
-        const onChangeTags = () => {
-            formState.isTagsValid = state.dictRef.isAllValid;
-        };
-
         const onClickConfirm = async () => {
-            if (!formState.isValid && formState.isTagsValid) {
+            if (!formState.isConfValid || !formState.isTagsValid) {
                 return;
-            }
-
-            // set tags only when the current tab is tags (when dictRef exist)
-            if (state.dictRef) {
-                state.tags = state.dictRef.getDict();
             }
 
             tabState.loading = true;
@@ -286,8 +269,6 @@ export default {
             tabState,
             onClickCancel,
             onClickConfirm,
-            onChangeStep,
-            onChangeTags,
             onClickBackButton,
         };
     },
@@ -304,6 +285,9 @@ export default {
         .p-text-input {
             width: 100%;
         }
+    }
+    .tags-input-group {
+        margin-top: 2rem;
     }
 }
 </style>

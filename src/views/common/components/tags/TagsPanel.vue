@@ -17,33 +17,37 @@
             :loading="loading"
             :col-copy="true"
         />
-        <s-tags-page v-if="tagEditPageVisible"
-                     :resource-id="resourceId"
-                     :resource-key="resourceKey" :resource-type="resourceType"
-                     @close="closeTag"
-                     @update="updateTag"
+        <tags-page v-if="tagEditPageVisible"
+                   :tags="tags"
+                   :resource-id="resourceId"
+                   :resource-key="resourceKey" :resource-type="resourceType"
+                   @close="closeTag"
+                   @update="updateTag"
         />
     </div>
 </template>
 
 <script lang="ts">
+import { map, get, camelCase } from 'lodash';
+
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, ref, toRefs, watch,
+    computed, reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
-import {
-    map, get, camelCase,
-} from 'lodash';
+
+import TagsPage from '@/views/common/components/tags/TagsPage.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import STagsPage from '@/views/common/components/tags/TagsPage.vue';
+
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
-    name: 'STagsPanel',
+    name: 'TagsPanel',
     components: {
-        PDataTable, PPanelTop, PButton, STagsPage,
+        PDataTable,
+        PPanelTop,
+        PButton,
+        TagsPage,
     },
     props: {
         resourceKey: {
@@ -64,27 +68,26 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-
-        const tags = ref({});
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
+            tags: {},
             fields: computed(() => [
                 { name: 'name', label: vm.$t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: vm.$t('COMMON.TAGS.VALUE'), type: 'item' },
             ]),
             loading: true,
-            items: computed(() => map(tags.value, (v, k) => ({ name: k, value: v })) || []),
+            items: computed(() => map(state.tags, (v, k) => ({ name: k, value: v })) || []),
         });
-
         const tagState = reactive({
             tagEditPageVisible: false,
         });
 
+        /* api */
         const getTags = async () => {
             if (!api.value) {
-                tags.value = {};
+                state.tags = {};
                 state.loading = false;
             }
 
@@ -93,15 +96,16 @@ export default {
                     [props.resourceKey]: props.resourceId,
                     query: { only: ['tags'] },
                 });
-                tags.value = res.tags;
+                state.tags = res.tags;
             } catch (e) {
-                tags.value = {};
+                state.tags = {};
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
 
+        /* event */
         const editTag = async () => {
             tagState.tagEditPageVisible = true;
         };

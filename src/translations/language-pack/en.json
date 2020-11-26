@@ -125,6 +125,14 @@
 					"TOGGLE_LESS": "show less",
 					"TOGGLE_MORE": "show more"
 				}
+			},
+			"TAGS": {
+				"ADD": "Add",
+				"INVALID_DUPLICATED_KEY": "duplicated key",
+				"INVALID_NO_KEY": "no key",
+				"INVALID_NO_VALUE": "no value",
+				"KEY": "Key",
+				"VALUE": "Value"
 			}
 		},
 		"ERROR": {

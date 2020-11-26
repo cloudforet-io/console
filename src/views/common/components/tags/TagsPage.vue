@@ -22,11 +22,10 @@
                     <span class="highlight">{{ $t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
                     {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
                 </div>
-                <p-dict-input-group ref="dictRef"
-                                    :dict="tags"
-                                    :disabled="loading"
-                                    :show-validation="showValidation"
-                                    :show-header="false"
+                <tags-input-group :tags.sync="newTags"
+                                  :disabled="loading"
+                                  :show-validation="showValidation"
+                                  :is-valid.sync="isTagsValid"
                 >
                     <template #addButton="scope">
                         <p-icon-text-button
@@ -37,7 +36,7 @@
                             {{ $t('COMMON.TAGS.ADD_TAG') }}
                         </p-icon-text-button>
                     </template>
-                </p-dict-input-group>
+                </tags-input-group>
             </p-pane-layout>
             <div class="buttons">
                 <p-button style-type="gray900" :outline="true" @click="goBack">
@@ -54,34 +53,39 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import {
+    camelCase, isEmpty, get,
+} from 'lodash';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 
+import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
+import FNB from '@/views/common/components/fnb/FNB.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import {
-    camelCase, isEmpty, get,
-} from 'lodash';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import FNB from '@/views/common/components/fnb/FNB.vue';
+import PButton from '@/components/atoms/buttons/PButton.vue';
+
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
-    name: 'CloudServicePage',
+    name: 'TagsPage',
     components: {
+        TagsInputGroup,
         FNB,
         PIconButton,
         PButton,
         PPaneLayout,
-        PDictInputGroup,
         PIconTextButton,
     },
     props: {
+        tags: {
+            type: Object,
+            default: () => ({}),
+        },
         resourceKey: {
             type: String,
             default: '',
@@ -105,50 +109,31 @@ export default {
 
         const state = reactive({
             showValidation: false,
-            loading: true,
-            tags: {},
-            dictRef: null as any,
-            noItem: computed(() => isEmpty(state.tags)),
+            loading: false,
+            newTags: {},
+            isTagsValid: true,
+            noItem: computed(() => isEmpty(state.newTags)),
         });
 
+        /* util */
         const goBack = () => {
             context.emit('close');
         };
 
-
-        const getTags = async () => {
-            if (!api.value) {
-                state.tags = {};
-                state.loading = false;
-            }
-
-            try {
-                const res = await api.value.get({
-                    [props.resourceKey]: props.resourceId,
-                    query: { only: ['tags'] },
-                });
-                state.tags = res.tags;
-            } catch (e) {
-                state.tags = {};
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-
+        /* api */
         const onSave = async () => {
             if (!state.showValidation) state.showValidation = true;
-            if (!state.dictRef.allValidation()) return;
+            if (!state.isTagsValid) return;
             if (!api.value) {
                 showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), new Error(), vm.$root);
                 return;
             }
 
             try {
+                state.loading = true;
                 await api.value.update({
                     [props.resourceKey]: props.resourceId,
-                    tags: state.dictRef.getDict(),
+                    tags: state.newTags,
                 });
                 showSuccessMessage(vm.$t('COMMON.TAGS.ALT_S_UPDATE'), '', vm.$root);
             } catch (e) {
@@ -161,7 +146,10 @@ export default {
             context.emit('update');
         };
 
-        getTags();
+        const init = () => {
+            state.newTags = props.tags;
+        };
+        init();
 
         return {
             ...toRefs(state),

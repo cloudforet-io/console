@@ -125,6 +125,14 @@
 					"TOGGLE_LESS": "가리기",
 					"TOGGLE_MORE": "더보기"
 				}
+			},
+			"TAGS": {
+				"ADD": "추가 ",
+				"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
+				"INVALID_NO_KEY": "키가 입력되지 않았습니다.",
+				"INVALID_NO_VALUE": "값이 입력되지 않았습니다.",
+				"KEY": "키 ",
+				"VALUE": "값 "
 			}
 		},
 		"ERROR": {

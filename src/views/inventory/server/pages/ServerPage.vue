@@ -52,9 +52,9 @@
                 <server-details :server-id="tableState.selectedServerIds[0]" />
             </template>
             <template #tag>
-                <s-tags-panel :resource-id="tableState.selectedServerIds[0]"
-                              resource-type="inventory.Server"
-                              resource-key="server_id"
+                <tags-panel :resource-id="tableState.selectedServerIds[0]"
+                            resource-type="inventory.Server"
+                            resource-key="server_id"
                 />
             </template>
             <template #member>
@@ -151,7 +151,7 @@ import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
 import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
 import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
-import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 
 /* types */
 import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
@@ -254,7 +254,7 @@ export default {
         ProjectTreeModal,
         SCollectModal,
         Monitoring,
-        STagsPanel,
+        TagsPanel,
         PPageTitle,
         PPageNavigation,
     },

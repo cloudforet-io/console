@@ -5,7 +5,6 @@ const AddServiceAccountPage = () => import('@/views/identity/service-account/pag
 const User = () => import('@/views/identity/user/User.vue');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage.vue');
 const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
-const TagsPage = () => import('@/views/common/components/tags/TagsPage.vue');
 const NoResource = () => import('@/views/common/pages/NoResource.vue');
 
 export default {
@@ -64,12 +63,6 @@ export default {
                     path: '/',
                     name: 'userMain',
                     component: User,
-                },
-                {
-                    path: ':resourceId/tags',
-                    name: 'userTags',
-                    props: true,
-                    component: TagsPage,
                 },
             ],
         },

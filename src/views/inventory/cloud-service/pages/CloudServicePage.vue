@@ -60,9 +60,9 @@
             </template>
 
             <template #tag>
-                <s-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
-                              resource-type="inventory.CloudServiceType"
-                              resource-key="cloud_service_id"
+                <tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
+                            resource-type="inventory.CloudService"
+                            resource-key="cloud_service_id"
                 />
             </template>
             <template #member>
@@ -129,7 +129,7 @@ import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudSer
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
 import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
-import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
@@ -222,7 +222,7 @@ export default {
         PPageTitle,
         PIconTextButton,
         PTab,
-        STagsPanel,
+        TagsPanel,
         PDropdownMenuBtn,
         PEmpty,
         ProjectTreeModal,

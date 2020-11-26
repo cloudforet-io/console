@@ -55,9 +55,9 @@
                 <br>
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_DESC_2') }}
             </div>
-            <p-dict-input-group ref="dictRef"
-                                :dict="tags"
-                                show-validation
+            <tags-input-group :tags.sync="tags"
+                              :show-validation="true"
+                              :is-valid.sync="isTagsValid"
             >
                 <template #addButton="scope">
                     <p-icon-text-button
@@ -69,7 +69,7 @@
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
                     </p-icon-text-button>
                 </template>
-            </p-dict-input-group>
+            </tags-input-group>
         </p-pane-layout>
 
         <p-pane-layout>
@@ -138,8 +138,8 @@ import {
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
+import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
@@ -152,7 +152,6 @@ import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
 import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -174,14 +173,13 @@ export default {
         PPageTitle,
         PPageNavigation,
         PFieldGroup,
-        PDictInputGroup,
+        TagsInputGroup,
         PPaneLayout,
         GeneralPageLayout,
         PIconTextButton,
         PButton,
         PRadio,
         ProjectTreePanel,
-        PI,
     },
     props: {
         provider: {
@@ -201,8 +199,6 @@ export default {
             serviceAccountNames: [] as string[],
             credentialNames: [] as string[],
             secretTypes: computed(() => get(state.providerObj, 'capability.supported_schema', [])),
-            tags: {},
-            dictRef: null as any,
         });
 
         const tabState = reactive({
@@ -233,6 +229,9 @@ export default {
                 }
                 return false;
             }),
+            //
+            tags: {},
+            isTagsValid: true,
             //
             credentialName: undefined as undefined | string,
             credentialNameInvalidText: computed(() => {
@@ -275,7 +274,7 @@ export default {
             routes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
                 { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT'), path: `/identity/service-account/add/${props.provider}` }
+                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT'), path: `/identity/service-account/add/${props.provider}` },
             ])),
         });
         const projectRef = ref<any>(null);
@@ -291,7 +290,7 @@ export default {
             } catch (e) {
                 console.error(e);
                 state.providerObj = {};
-                state.selectedSecretType = ''
+                state.selectedSecretType = '';
             } finally {
                 state.providerLoading = false;
             }
@@ -330,7 +329,7 @@ export default {
                 name: formState.accountName,
                 provider: props.provider,
                 data: formState.accountModel,
-                tags: state.dictRef.getDict(),
+                tags: formState.tags,
             };
 
             if (projectRef.value.firstSelectedNode) {
@@ -392,7 +391,7 @@ export default {
                     vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), vm.$root);
                 return;
             }
-            if (state.dictRef.allValidation() && !projectRef.value.error) {
+            if (formState.isTagsValid && !projectRef.value.error) {
                 await createServiceAccount();
                 if (state.serviceAccountId) {
                     if (formState.credentialModel.private_key) {

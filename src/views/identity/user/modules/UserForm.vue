@@ -96,10 +96,10 @@
                         </p-field-group>
 
                         <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')">
-                            <p-dict-input-group ref="tagInputRef"
-                                                :dict="formState.tags"
-                                                show-validation
-                                                class="tag-input"
+                            <tags-input-group class="tag-input"
+                                              :tags.sync="formState.tags"
+                                              :show-validation="true"
+                                              :is-valid.sync="validationState.isTagsValid"
                             />
                         </p-field-group>
                     </div>
@@ -118,7 +118,7 @@ import {
 } from '@vue/composition-api';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/PDictInputGroup.vue';
+import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -135,7 +135,7 @@ export default {
         PButtonModal,
         PFieldGroup,
         PTextInput,
-        PDictInputGroup,
+        TagsInputGroup,
         PHr,
         PSelectDropdown,
         PButton,
@@ -171,7 +171,6 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
-            tagInputRef: null as any,
             languages: [
                 { type: 'item', label: 'English', name: 'en' },
                 { type: 'item', label: '한국어', name: 'ko' },
@@ -202,6 +201,8 @@ export default {
             passwordInvalidText: '' as TranslateResult | string,
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
+            //
+            isTagsValid: true,
         });
 
         /* util */
@@ -276,6 +277,10 @@ export default {
                 }
             }
 
+            if (!validationState.isTagsValid) {
+                return;
+            }
+
             if (state.isInternalAuth) {
                 await checkPassword();
                 if (!validationState.isPasswordValid || !validationState.isPasswordCheckValid) {
@@ -293,13 +298,11 @@ export default {
                     data.password = formState.password;
                 }
             }
-            ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone'].forEach((key) => {
+            ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
                 if (formState[key]) {
                     data[key] = formState[key];
                 }
             });
-            state.tagInputRef.allValidation();
-            data.tags = state.tagInputRef.getDict();
             emit('confirm', data);
         };
 
@@ -368,7 +371,7 @@ export default {
         .tag-input {
             @apply bg-primary4;
             padding-top: 0.5rem;
-            .p-dict-input .input-box {
+            .tags-group .input-box {
                 width: auto;
             }
         }

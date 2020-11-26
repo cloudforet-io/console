@@ -71,8 +71,10 @@
                 </p-search-table>
             </template>
             <template #tag>
-                <s-tags-panel :resource-id="projectId" resource-key="project_id" resource-type="identity.Project"
-                              class="tab-bg"
+                <tags-panel :resource-id="projectId"
+                            resource-key="project_id"
+                            resource-type="identity.Project"
+                            class="tab-bg"
                 />
             </template>
             <template #report>
@@ -124,7 +126,7 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import STagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
@@ -162,7 +164,7 @@ export default {
         PTableCheckModal,
         PButtonModal,
         GeneralPageLayout,
-        STagsPanel,
+        TagsPanel,
         PPageTitle,
         PTab,
         PIconButton,
