@@ -741,7 +741,8 @@
 				"UPDATE_MODAL_PRIORITY_MIN": "1 이상으로 설정해주세요.",
 				"UPDATE_MODAL_RESET": "초기화",
 				"UPDATE_MODAL_TITLE": "컬렉터 편집",
-				"UPDATE_MODAL_VERSION_LABEL": "버전"
+				"UPDATE_MODAL_VERSION_LABEL": "버전",
+				"VIEW_DETAIL": "상세 보기 "
 			},
 			"PLUGINS": {
 				"BETA": "베타",

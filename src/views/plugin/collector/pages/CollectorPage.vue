@@ -43,7 +43,7 @@
                             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
                         </p-dropdown-menu-btn>
                     </template>
-                    <template #col-name-format="data">
+                    <template #col-plugin_name-format="data">
                         <p-lazy-img :src="getIcon(data)"
                                     width="1.5rem" height="1.5rem" class="mr-2"
                         />
@@ -52,10 +52,10 @@
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
                     </template>
-                    <template #col-collector_history-format="data">
-                        <router-link :to="'/management/collector-history'">
-                            <span class="view-detail">view detail
-                                <p-i name="ic_arrow_right" width="1rem" />
+                    <template #col-collector_history-format="{index, field, item}">
+                        <router-link :to="item.detailLink">
+                            <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
+                                <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
                             </span>
                         </router-link>
                     </template>
@@ -170,6 +170,7 @@ import router from '@/routes';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import PI from '@/components/atoms/icons/PI.vue';
+import { store } from '@/store';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -213,7 +214,7 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
                 { name: 'priority', label: 'Priority' },
-                { name: 'plugin_info.plugin_id', label: 'Plugin' },
+                { name: 'plugin_name', label: 'Plugin' },
                 { name: 'plugin_info.version', label: 'Version' },
                 { name: 'collector_history', label: 'Collector History' },
                 { name: 'last_collected_at', label: 'Last Collected' },
@@ -259,13 +260,13 @@ export default {
             querySearchHandlers: makeQuerySearchPropsWithSearchSchema({
                 title: 'Properties',
                 items: [
-                    { key: 'collector_id', name: 'Collector ID' },
+                    { key: 'last_collected_at', name: 'Last Collected' },
+                    { key: 'state', name: 'State' },
+                    { key: 'priority', name: 'Priority' },
+                    { key: 'plugin_name', name: 'Plugin' },
+                    { key: 'plugin_info.version', name: 'Version' },
+                    { key: 'collector_history', name: 'Collector History' },
                     { key: 'name', name: 'Name' },
-                    { key: 'state', name: 'State', enums: ['ENABLED', 'DISABLED'] },
-                    { key: 'plugin_info.options.supported_resource_type', name: 'Resource Type' },
-                    { key: 'plugin_info.plugin_id', name: 'Plugin ID' },
-                    { key: 'plugin_info.version', name: 'Plugin Version' },
-                    { key: 'provider', name: 'Provider' },
                 ],
             }, 'inventory.Collector'),
             loading: false,
@@ -367,17 +368,23 @@ export default {
                 .setFilter(...andFilters)
                 .setFilterOr(...orFilters)
                 .setOnly(
-                    'collector_id', 'name', 'state', 'priority', 'last_collected_at',
-                    'created_at', 'provider', 'tags', 'plugin_info',
+                    'collector_id', 'name', 'priority', 'last_collected_at',
+                    'provider', 'tags', 'plugin_info', 'state',
                 );
             return query.data;
         };
         const getCollectors = async () => {
             state.loading = true;
             try {
-                const query = getQuery();
-                const res = await SpaceConnector.client.inventory.collector.list({ query });
-                state.items = res.results;
+                const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery(), });
+                state.items = res.results.map(d => ({
+                    // eslint-disable-next-line camelcase
+                    plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
+                    // eslint-disable-next-line camelcase
+                    plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
+                    detailLink: `/management/collector-history?filters=collector_id%3A%3D${d.collector_id}`,
+                    ...d,
+                }));
                 state.totalCount = res.total_count || 0;
             } catch (e) {
                 console.error(e);
@@ -482,8 +489,7 @@ export default {
         };
 
         const init = async () => {
-            await setSearchTags();
-            await getCollectors();
+            await Promise.all([vm.$store.dispatch('resource/plugin/load'), setSearchTags(), getCollectors()]);
         };
         init();
 

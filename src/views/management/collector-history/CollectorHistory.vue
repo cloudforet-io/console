@@ -149,7 +149,11 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
-import { makeEnumValueHandler, makeDistinctValueHandler } from '@/lib/component-utils/query-search';
+import {
+    makeEnumValueHandler,
+    makeDistinctValueHandler,
+    makeReferenceValueHandler
+} from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
@@ -213,6 +217,10 @@ export default {
                     label: 'Status',
                 },
                 {
+                    name: 'collector_id',
+                    label: 'Collector Name',
+                },
+                {
                     dataType: 'datetime',
                     name: 'created_at',
                     label: 'Start Time',
@@ -221,6 +229,7 @@ export default {
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
                 status: makeEnumValueHandler(JOB_STATUS),
+                collector_id: makeReferenceValueHandler('inventory.Collector'),
             },
         };
         const state = reactive({

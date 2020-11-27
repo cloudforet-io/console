@@ -741,7 +741,8 @@
 				"UPDATE_MODAL_PRIORITY_MIN": "Priority must be greater than or equal to 1.",
 				"UPDATE_MODAL_RESET": "Reset",
 				"UPDATE_MODAL_TITLE": "Update Collector",
-				"UPDATE_MODAL_VERSION_LABEL": "Version"
+				"UPDATE_MODAL_VERSION_LABEL": "Version",
+				"VIEW_DETAIL": "view detail"
 			},
 			"PLUGINS": {
 				"BETA": "BETA",

@@ -59,11 +59,11 @@ export default defineComponent({
             vm.$router.push({ name: 'Login' });
         };
 
-        watch(() => SpaceConnector.isTokenAlive, (after) => {
-            if (!after) {
+        watch(() => SpaceConnector.isTokenAlive, (after, before) => {
+            if (!after && before !== undefined) {
                 state.isExpired = true;
             }
-        }, { immediate: false });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

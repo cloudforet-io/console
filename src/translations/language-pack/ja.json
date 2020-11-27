@@ -741,7 +741,8 @@
 				"UPDATE_MODAL_PRIORITY_MIN": "1以上で設定してください",
 				"UPDATE_MODAL_RESET": "初期化",
 				"UPDATE_MODAL_TITLE": "コレクタ編集",
-				"UPDATE_MODAL_VERSION_LABEL": "バージョン"
+				"UPDATE_MODAL_VERSION_LABEL": "バージョン",
+				"VIEW_DETAIL": "詳細を表示する "
 			},
 			"PLUGINS": {
 				"BETA": "ベータ",
