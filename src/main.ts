@@ -8,7 +8,7 @@ import router from '@/routes/index';
 import { store } from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
-import setStore, { useStore } from '@/store/toolset';
+import setStore from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';

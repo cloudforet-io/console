@@ -61,11 +61,11 @@ export default defineComponent({
             store.dispatch('user/signOut');
         };
 
-        watch(() => SpaceConnector.isTokenAlive, (after, before) => {
-            if (after !== true && before !== undefined && !vm.$route.meta.excludeAuth) {
+        watch(() => store.state.user.isSignedIn, (after, before) => {
+            if (after !== before && !after && !vm.$route.meta.excludeAuth) {
                 state.isExpired = true;
             }
-        }, { immediate: true });
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
