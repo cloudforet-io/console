@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { routerOptions } from '@/routes/config';
 
@@ -29,8 +28,7 @@ router.beforeEach(async (to, from, next) => {
             next({ name: 'error' });
         }
         next();
-    }
-    else {
+    } else {
         // await store.dispatch('user/signOut');
         next({ name: 'Login', query: { nextPath: to.path } });
     }

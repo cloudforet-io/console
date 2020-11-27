@@ -37,6 +37,7 @@ import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
 import GNB from '@/views/common/components/gnb/GNB.vue';
 import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue';
+import { store } from '@/store';
 
 
 export default defineComponent({
@@ -57,10 +58,11 @@ export default defineComponent({
 
         const goToSignIn = () => {
             vm.$router.push({ name: 'Login' });
+            store.dispatch('user/signOut');
         };
 
         watch(() => SpaceConnector.isTokenAlive, (after, before) => {
-            if (!after && before !== undefined) {
+            if (after !== true && before !== undefined && !vm.$route.meta.excludeAuth) {
                 state.isExpired = true;
             }
         }, { immediate: true });
