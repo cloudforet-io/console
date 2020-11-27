@@ -1,22 +1,20 @@
 <template>
     <div>
-        <p-toolbox-table :items="items"
-                         :fields="fields"
-                         sortable
-                         hover
-                         :sort-by.sync="sortBy"
-                         :sort-desc.sync="sortDesc"
-                         :all-page="allPage"
-                         :this-page.sync="thisPage"
-                         :select-index.sync="selectIndex"
-                         :page-size.sync="pageSize"
-                         :setting-visible="false"
-                         :loading="loading"
-                         use-cursor-loading
-                         @changePageSize="listCredentials"
-                         @changePageNumber="listCredentials"
-                         @clickRefresh="listCredentials"
-                         @changeSort="listCredentials"
+        <p-query-search-table :items="items"
+                              :fields="fields"
+                              :loading="loading"
+                              :total-count="totalCount"
+                              :query-tags="queryTags"
+                              :key-items="querySearchHandlers.keyItems"
+                              :value-handler-map="querySearchHandlers.valueHandlerMap"
+                              :sort-by.sync="sortBy"
+                              :sort-desc.sync="sortDesc"
+                              :this-page.sync="thisPage"
+                              :page-size.sync="pageSize"
+                              :selectable="false"
+                              :excel-visible="false"
+                              use-cursor-loading
+                              @change="onChange"
         >
             <template #toolbox-left>
                 <p-panel-top use-total-count
@@ -24,6 +22,12 @@
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_TITLE') }}
                 </p-panel-top>
+            </template>
+            <template #col-service_account_id-format="{index, field, item}">
+                {{ item.service_account_name }}
+            </template>
+            <template #col-project_id-format="{index, field, item}">
+                {{ item.project_name }}
             </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
@@ -36,7 +40,7 @@
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_COLLECT_DATA') }}
                 </p-button>
             </template>
-        </p-toolbox-table>
+        </p-query-search-table>
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
                             :collector-id="collectorId"
@@ -50,7 +54,6 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
@@ -60,6 +63,10 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { store } from '@/store';
+import { Options } from '@/components/organisms/tables/query-search-table/type';
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
+import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 interface SecretModel {
@@ -79,8 +86,8 @@ interface SecretModel {
 export default {
     name: 'CollectorCredentials',
     components: {
+        PQuerySearchTable,
         PPanelTop,
-        PToolboxTable,
         PButton,
         CollectDataModal,
     },
@@ -101,36 +108,60 @@ export default {
             items: [] as any,
             totalCount: 0,
             loading: true,
-            selectIndex: [],
-            selectedItems: [],
             fields: [
                 { name: 'name', label: 'Name' },
-                { name: 'service_account_name', label: 'Service Account' },
-                { name: 'project_name', label: 'Project' },
+                { name: 'service_account_id', label: 'Service Account' },
+                { name: 'project_id', label: 'Project' },
                 { name: 'created_at', label: 'Created' },
                 {
                     name: 'collect', label: ' ', sortable: false,
                 },
             ] as DataTableField[],
-            sortBy: '',
-            sortDesc: '',
-            pageSize: 10,
+            pageSize: 15,
             thisPage: 1,
-            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
+            sortBy: '',
+            sortDesc: true,
             collectDataVisible: false,
             targetCredentialId: null,
+            querySearchHandlers: {
+                keyItems: [
+                    {
+                        name: 'service_account_id',
+                        label: 'Service Account',
+                    },
+                    {
+                        name: 'project_id',
+                        label: 'Project',
+                    },
+                ],
+                valueHandlerMap: {
+                    service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
+                    project_id: makeReferenceValueHandler('identity.Project'),
+                },
+            },
+            queryTags: [],
         });
+
+        const getQuery = () => {
+            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.queryTags);
+
+            const query = new QueryHelper()
+                .setFilter({ k: 'provider', v: props.provider, o: 'eq' }, ...andFilters)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setSort(state.sortBy, state.sortDesc)
+                .setFilterOr(...orFilters)
+                .setKeyword(...keywords);
+
+            return query.data;
+        };
 
         const listCredentials = async (): Promise<void> => {
             state.loading = true;
             try {
-                const query = new QueryHelper()
-                    .setFilter({ k: 'provider', v: props.provider, o: 'eq' })
-                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                    .setSort(state.sortBy, state.sortDesc);
                 const res = await SpaceConnector.client.secret.secret.list({
-                    query: query.data,
+                    query: getQuery(),
                 });
+                console.log(res);
                 state.items = res.results.map(d => ({
                     // eslint-disable-next-line camelcase
                     service_account_name: computed(() => store.state.resource.serviceAccount.items[d.service_account_id]?.label || d.service_account_id).value,
@@ -144,6 +175,11 @@ export default {
             } finally {
                 state.loading = false;
             }
+        };
+
+        const onChange = async (item) => {
+            state.queryTags = item.queryTags;
+            await listCredentials();
         };
 
         const init = async () => {
@@ -167,8 +203,10 @@ export default {
             timestampFormatter,
             openCollectDataModal(item: SecretModel) {
                 state.collectDataVisible = true;
-                state.targetCredentialId = item.secret_id || null;
+                // @ts-ignore
+                state.targetCredentialId = item.secret_id || null as unknown as string;
             },
+            onChange,
         };
     },
 };
