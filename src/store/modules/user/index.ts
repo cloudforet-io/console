@@ -14,6 +14,7 @@ try {
 }
 
 const state: UserState = {
+    isSignedIn: storedUserState.isSignedIn || false,
     userId: storedUserState.userId,
     userType: storedUserState.userType,
     name: storedUserState.name,

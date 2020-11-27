@@ -97,6 +97,8 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
         commit('setUser', userInfo);
     }
 
+    commit('signIn');
+
     const reportState = await getReportState();
     commit('setReportState', reportState);
 
@@ -104,8 +106,9 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
     commit('setPowerSchedulerState', powerSchedulerState);
 };
 
-export const signOut = (): void => {
+export const signOut = ({ commit }): void => {
     SpaceConnector.flushToken();
+    commit('signOut');
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {

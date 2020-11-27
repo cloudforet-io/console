@@ -3,6 +3,7 @@ export type LanguageCode = 'ko' | 'en' | string;
 export type Timezone = 'UTC' | 'Asia/Seoul' | string;
 
 export interface UserState {
+    isSignedIn?: boolean;
     userId?: string;
     userType?: UserType;
     name?: string;
