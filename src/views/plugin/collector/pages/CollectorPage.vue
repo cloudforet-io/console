@@ -43,11 +43,11 @@
                             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
                         </p-dropdown-menu-btn>
                     </template>
-                    <template #col-plugin_name-format="data">
-                        <p-lazy-img :src="getIcon(data)"
+                    <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                        <p-lazy-img :src="item.plugin_icon"
                                     width="1.5rem" height="1.5rem" class="mr-2"
                         />
-                        {{ data.value }}
+                        {{ item.plugin_name }}
                     </template>
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
@@ -214,7 +214,7 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
                 { name: 'priority', label: 'Priority' },
-                { name: 'plugin_name', label: 'Plugin' },
+                { name: 'plugin_info.plugin_id', label: 'Plugin' },
                 { name: 'plugin_info.version', label: 'Version' },
                 { name: 'collector_history', label: 'Collector History' },
                 { name: 'last_collected_at', label: 'Last Collected' },
@@ -263,9 +263,8 @@ export default {
                     { key: 'last_collected_at', name: 'Last Collected' },
                     { key: 'state', name: 'State' },
                     { key: 'priority', name: 'Priority' },
-                    { key: 'plugin_name', name: 'Plugin' },
+                    { key: 'plugin_info.plugin_id', name: 'Plugin' },
                     { key: 'plugin_info.version', name: 'Version' },
-                    { key: 'collector_history', name: 'Collector History' },
                     { key: 'name', name: 'Name' },
                 ],
             }, 'inventory.Collector'),
@@ -376,7 +375,7 @@ export default {
         const getCollectors = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery(), });
+                const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
                     // eslint-disable-next-line camelcase
                     plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
@@ -507,7 +506,6 @@ export default {
             multiTabState,
             singleTabState,
             checkModalState,
-            getIcon: (data): void => get(data, 'item.tags.icon', ''),
             onSelect,
             onChange,
             onClickUpdate,
