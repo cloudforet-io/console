@@ -218,7 +218,7 @@ export default {
                 },
                 {
                     name: 'collector_id',
-                    label: 'Collector Name',
+                    label: 'Collector',
                 },
                 {
                     dataType: 'datetime',
@@ -239,7 +239,7 @@ export default {
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE'))),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
-                { label: 'Collector Name', name: 'collector_info', sortable: false },
+                { label: 'Collector', name: 'collector_info', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Task', name: 'task' },
                 { label: 'Start Time', name: 'created_at' },
