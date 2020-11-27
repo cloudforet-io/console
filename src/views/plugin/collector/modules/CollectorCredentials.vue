@@ -186,8 +186,8 @@ export default {
             await Promise.all([
                 vm.$store.dispatch('resource/serviceAccount/load'),
                 vm.$store.dispatch('resource/project/load'),
-                listCredentials(),
             ]);
+            await listCredentials();
         };
         init();
 

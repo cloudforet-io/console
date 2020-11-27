@@ -488,7 +488,8 @@ export default {
         };
 
         const init = async () => {
-            await Promise.all([vm.$store.dispatch('resource/plugin/load'), setSearchTags(), getCollectors()]);
+            await store.dispatch('resource/plugin/load');
+            await Promise.all([setSearchTags(), getCollectors()]);
         };
         init();
 
