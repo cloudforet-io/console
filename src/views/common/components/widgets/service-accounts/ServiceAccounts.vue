@@ -6,8 +6,8 @@
                     {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
                 </p>
                 <router-link :to="'/identity/service-account'" class="add-btn">
-                    <p-i name="ic_plus_bold" width="0.75rem" height="0.75rem"
-                         color="inherit"
+                    <p-i name="ic_plus" width="1rem" height="1rem"
+                         color="transparent inherit"
                     /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
                 </router-link>
             </div>
@@ -242,6 +242,9 @@ export default {
         @apply flex-shrink-0 flex justify-end items-center text-blue-500;
         line-height: 1.2;
         font-size: 0.75rem;
+        &:hover {
+            @apply text-blue-800;
+        }
     }
 }
 .chart {

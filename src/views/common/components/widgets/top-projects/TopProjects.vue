@@ -1,13 +1,16 @@
 <template>
     <widget-layout class="top-projects">
         <template #title>
-            <div class="top">
-                <span class="title">{{ $t('COMMON.WIDGETS.TOP_PROJECT_TITLE') }}</span>
-                <p-button class="create-project-button" @click="goToProjectPage">
+            <div class="top grid grid-cols-12">
+                <span class="title col-span-8 md:col-span-10">{{ $t('COMMON.WIDGETS.TOP_PROJECT_TITLE') }}</span>
+                <router-link :to="'/project'" class="create-project-button">
                     <p-i name="ic_plus" width="1rem" height="1rem"
                          color="transparent inherit"
-                    /> {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_PROJECT') }}
-                </p-button>
+                         class="add-icon"
+                    />
+                    <span class="hidden sm:block">{{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_PROJECT') }}</span>
+                    <span class="block sm:hidden">{{ $t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') }}</span>
+                </router-link>
             </div>
         </template>
         <div class="contents-container">
@@ -33,7 +36,7 @@
                                         width="1.5rem" height="1.5rem"
                                         class="get-started"
                     >
-                        {{ $t('COMMON.WIDGETS.TOP_PROJECT_GET_START') }}
+                        <span>{{ $t('COMMON.WIDGETS.TOP_PROJECT_GET_START') }}</span>
                     </p-icon-text-button>
                 </router-link>
             </div>
@@ -93,7 +96,6 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -129,7 +131,6 @@ export default {
     name: 'TopProjects',
     components: {
         WidgetLayout,
-        PButton,
         PDataTable,
         PIconTextButton,
         PChartLoader,
@@ -170,7 +171,6 @@ export default {
         };
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
-            chart.responsive.enabled = true;
             chart.logo.disabled = true;
             chart.paddingRight = 20;
             chart.paddingLeft = -5;
@@ -289,11 +289,6 @@ export default {
             }
         };
 
-        /* event */
-        const goToProjectPage = () => {
-            vm.$router.push(referenceRouter('', { resource_type: 'identity.Project' }));
-        };
-
         const init = async () => {
             await getData();
         };
@@ -310,7 +305,6 @@ export default {
             onRowClick(item) {
                 vm.$router.push(`/project/${item.project_id}`);
             },
-            goToProjectPage,
         };
     },
 };
@@ -330,13 +324,16 @@ export default {
     .create-project-button {
         @apply text-secondary;
         position: absolute;
+        display: inline-flex;
         right: 1.25rem;
-        font-weight: normal;
+        top: 0.25rem;
         font-size: 0.75rem;
-        line-height: 1.2;
-        padding: 0;
         &:hover {
             @apply text-blue-800;
+        }
+
+        .add-icon {
+            margin-right: 0.25rem;
         }
     }
 }
