@@ -28,8 +28,7 @@ router.beforeEach(async (to, from, next) => {
             next({ name: 'error' });
         }
         next();
-    }
-    else {
+    } else {
         next({ name: 'Login', query: { nextPath: to.path } });
     }
 });
