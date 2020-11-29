@@ -176,23 +176,20 @@ const data = {
 };
 
 
-const getInputType = (d) => {
+const getMenuType = (d) => {
     if (d === undefined || d === null) {
         return {
-            inputType: undefined,
             dataType: 'string',
             results: [],
         };
     }
     if (typeof d === 'string') {
         return {
-            inputType: 'VALUE' as const,
             dataType: 'string',
             results: [],
         };
     } if (typeof d === 'boolean') {
         return {
-            inputType: 'VALUE' as const,
             dataType: 'boolean',
             results: [],
         };
@@ -201,19 +198,16 @@ const getInputType = (d) => {
         if (Math.floor(d) !== d) dt = 'float';
         else dt = 'integer';
         return {
-            inputType: 'VALUE' as const,
             dataType: dt,
             results: [],
         };
     } if (Array.isArray(d)) {
         return {
-            inputType: 'KEY' as const,
             dataType: 'object',
             results: d.map((dt, k) => ({ label: k.toString(), name: k.toString() })),
         };
     }
     return {
-        inputType: 'KEY' as const,
         dataType: 'object',
         results: Object.keys(d).map(k => ({ label: k, name: k })),
     };
@@ -225,12 +219,11 @@ export const objHandler = async (inputText: string, keyItem: KeyItem) => {
         let resp: any = data;
         if (keyItem.subPaths) resp = get(data, keyItem.subPaths, undefined);
 
-        resp = getInputType(resp);
+        resp = getMenuType(resp);
 
         return {
             results: resp.results.filter(d => regex.test(d.name)).slice(0, 10),
             totalCount: resp.results.length,
-            inputType: resp.inputType,
         };
     } catch (e) {
         return {
