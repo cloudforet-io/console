@@ -94,13 +94,13 @@ import {
     QuerySearchProps,
     ValueHandler,
     ValueItem,
-    ValueMenuItem, InputType, OperatorMenuItem, QueryItem,
+    ValueMenuItem, MenuType, QueryItem,
 } from '@/components/organisms/search/query-search/type';
 
 /* Configs, Helpers */
 import {
     defaultHandlerMap,
-    formatterMap, inputValidatorMap,
+    formatterMap, inputValidatorMap, menuTypeMap,
     placeholderMap, supportOperatorMap,
 } from '@/components/organisms/search/query-search/config';
 import PSearch from '@/components/molecules/search/PSearch.vue';
@@ -108,8 +108,7 @@ import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     findKey,
     getDefaultKeyItemHandler,
-    getKeyMenu,
-    getOperatorMenu, getValueItem,
+    getKeyMenu, getValueItem,
     getValueMenu,
 } from '@/components/organisms/search/query-search/helper';
 
@@ -177,18 +176,20 @@ export default {
             }),
             operator: '' as OperatorType,
             supportOperators: operators as OperatorType[],
-            inputType: 'KEY' as InputType|undefined,
+            menuType: computed<MenuType>(() => {
+                if (!state.selectedKey || state.currentDataType === 'object') return 'KEY';
+                return menuTypeMap[state.currentDataType] || 'VALUE';
+            }),
 
             /* Menu */
             menuRef: null as any,
             visibleMenu: false,
             totalCount: 0 as undefined|number,
             filteredItems: [] as KeyItem[]|ValueItem[],
-            menu: computed<Array<KeyMenuItem|ValueMenuItem|OperatorMenuItem>>(() => {
-                if (state.inputType === 'KEY') return getKeyMenu(state.filteredItems, state.selectedKey, state.totalCount);
-                if (state.inputType === 'OPERATOR') return getOperatorMenu(state.filteredItems);
-                if (state.inputType === 'VALUE') getValueMenu(state.selectedKey, state.filteredItems, state.operator, state.totalCount);
-                return [];
+            menu: computed<Array<KeyMenuItem|ValueMenuItem>>(() => {
+                if (state.menuType === 'KEY') return getKeyMenu(state.filteredItems, state.selectedKey, state.totalCount);
+                if (state.menuType === 'VALUE') return getValueMenu(state.selectedKey, state.filteredItems, state.operator, state.totalCount);
+                return state.filteredItems.map(d => ({ ...d, type: d.type || 'item', data: d }));
             }),
             handler: computed<ValueHandler|null>(() => {
                 if (!state.selectedKey) return getDefaultKeyItemHandler(props.keyItems);
@@ -241,7 +242,7 @@ export default {
         const updateSupportOperators = (ops?: OperatorType[]) => {
             state.supportOperators = ops
                 || state.selectedKey?.operators
-                || supportOperatorMap[state.currentDataType] as OperatorType[]
+                || supportOperatorMap[state.currentDataType]
                 || operators;
         };
 
@@ -253,8 +254,7 @@ export default {
             } else if (item) state.selectedKeys.push(item);
             else state.selectedKeys.pop();
 
-            if (item) updateSupportOperators(item.operators);
-            if (!state.selectedKey || state.currentDataType === 'object') state.inputType = 'KEY';
+            updateSupportOperators(item?.operators);
         };
 
 
@@ -270,7 +270,6 @@ export default {
 
             state.totalCount = res.totalCount;
             state.filteredItems = res.results;
-            state.inputType = res.inputType;
         }, 150);
 
 
@@ -320,7 +319,7 @@ export default {
 
             if (!state.visibleMenu) await showMenu(false);
 
-            if (state.inputType === 'KEY' && val.length > 1 && e.data === ':') {
+            if (state.menuType === 'KEY' && val.length > 1 && e.data === ':') {
                 await findAndSetKey(val);
             } else await updateMenuItems(val);
         };
@@ -366,20 +365,19 @@ export default {
         const onMenuSelect = (value: string, idx: number) => {
             const selected = state.menu[idx];
 
-            if (state.inputType === 'KEY') {
+            if (state.menuType === 'KEY') {
                 updateSelectedKey(selected.data as KeyItem);
                 clearAll();
                 focus();
                 showMenu();
-            } else if (state.inputType === 'OPERATOR') {
-                if (state.supportOperators.includes(value)) {
+            } else if (state.menuType === 'OPERATOR') {
+                if (state.selectedKey?.dataType === 'datetime' && state.supportOperators.includes(value)) {
                     state.operator = value;
-                    state.inputType = 'VALUE';
+                    updateMenuItems(value);
                     focus();
+                    hideMenu();
                 }
-            } else {
-                emitSearch(selected.data as ValueItem);
-            }
+            } else emitSearch(selected.data as ValueItem);
         };
 
 

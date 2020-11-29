@@ -31,7 +31,7 @@ export interface QueryItem {
     value: ValueItem;
 }
 
-export type InputType ='KEY'|'VALUE'|'OPERATOR'
+export type MenuType ='KEY'|'VALUE'|'OPERATOR'
 
 export interface MenuItem<T> extends ContextMenuItem {
     data?: T;
@@ -39,12 +39,10 @@ export interface MenuItem<T> extends ContextMenuItem {
 
 export type KeyMenuItem = MenuItem<KeyItem>;
 export type ValueMenuItem = MenuItem<ValueItem>;
-export type OperatorMenuItem = ValueMenuItem;
 
 export interface HandlerResponse {
     results: ValueItem[];
     totalCount?: number;
-    inputType?: InputType;
 }
 export type ValueHandler = (inputText: string, keyItem: KeyItem, operator?: string) => Promise<HandlerResponse>|HandlerResponse;
 
@@ -63,22 +61,4 @@ export interface QuerySearchProps {
 
 export interface QuerySearchEventArgs {
     search: [QueryItem];
-}
-
-/** Input Templates */
-export interface QuerySearchInputProps {
-    isFocused: boolean;
-    value: string;
-    placeholder?: string;
-    operator: OperatorType;
-    visibleMenu?: boolean;
-    handler?: ValueHandler|null;
-    keyItem?: KeyItem;
-    supportOperators?: OperatorType[];
-}
-
-export interface QuerySearchInputEventArgs {
-    'update:operator': [OperatorType];
-    search: [ValueItem];
-    'update:visibleMenu': [boolean];
 }

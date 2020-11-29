@@ -1,5 +1,5 @@
 import {
-    KeyItem, KeyMenuItem, OperatorMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
+    KeyItem, KeyMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
 } from '@/components/organisms/search/query-search/type';
 import { find } from 'lodash';
 
@@ -59,23 +59,6 @@ export const getValueMenu = (keyItem: KeyItem, items: ValueItem[], operator: Ope
     ];
 };
 
-
-export const getOperatorMenu = (items: Array<ValueItem|OperatorType>): OperatorMenuItem[] => items.map((d) => {
-    if (typeof d === 'string') {
-        return {
-            label: d,
-            name: d,
-            type: 'item' as const,
-            data: d,
-        };
-    }
-    return {
-        label: d.label,
-        name: d.name,
-        type: 'item' as const,
-        data: d.name,
-    };
-});
 
 export const getValueItem = (val?: ValueItem|string|null, selectedKey?: KeyItem|null): null|ValueItem => {
     let valueItem: ValueItem|null;
