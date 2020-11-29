@@ -30,8 +30,13 @@ export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
     if (Array.isArray(tags)) {
         return tags.reduce((results, tag) => {
             if (tag.invalid) return results;
-            if (tag.key) results.push(`${tag.key.name}:${tag.operator}${tag.value?.name}`);
-            else results.push(`${tag.value?.name}`);
+            if (tag.key) {
+                let key = tag.key.name;
+                if (tag.key.subPaths) {
+                    key = `${key}.${tag.key.subPaths.join('.')}`;
+                }
+                results.push(`${key}:${tag.operator}${tag.value?.name}`);
+            } else results.push(`${tag.value?.name}`);
             return results;
         }, [] as string[]);
     }
@@ -41,7 +46,8 @@ export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
 const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]): QueryItem => {
     const queryItem: QueryItem = parseTag(queryString);
     if (queryItem.key?.name && keyItems) {
-        queryItem.key = find(keyItems, { name: queryItem.key.name }) || queryItem.key;
+        const key = find(keyItems, { name: queryItem.key.name });
+        if (key) queryItem.key = { ...key, subPaths: queryItem.key.subPaths };
     }
     // if (queryItem.key?.dataType === 'datetime') {
     //     const time = dayjs.utc(queryItem.value.name);

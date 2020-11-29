@@ -102,7 +102,7 @@ export function makeEnumValueHandler(
         return { label: d.label, name: k, icon: d.icon };
     });
 
-    return async (inputText: string, keyItem: KeyItem) => {
+    return async (inputText: string) => {
         let res: ValueItem[] = [...allItems];
         if (inputText) {
             const regex = RegExp(inputText, 'i');

@@ -182,6 +182,7 @@ import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import { objHandler } from '@/views/inventory/server/pages/test-query-search';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -409,6 +410,25 @@ export default {
                     typeOptionState.keyItems = res.options.fields.map(d => ({ label: d.name, name: d.key }));
                     typeOptionState.valueHandlerMap = makeDistinctValueHandlerMap(typeOptionState.keyItems, 'inventory.Server');
                 }
+
+
+                // TODO: remove after test
+                typeOptionState.keyItems.push({
+                    label: 'Tags',
+                    name: 'tags',
+                    dataType: 'object',
+                    operators: ['!=', '!', '='],
+                }, {
+                    label: 'Data',
+                    name: 'data',
+                    dataType: 'object',
+                }, {
+                    label: 'Raw',
+                    name: 'raw',
+                    dataType: 'object',
+                });
+                typeOptionState.valueHandlerMap.tags = objHandler;
+                typeOptionState.valueHandlerMap.data = objHandler;
 
                 // initiate queryTags with keyItems
                 fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItems);

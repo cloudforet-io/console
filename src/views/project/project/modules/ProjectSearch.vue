@@ -10,9 +10,9 @@
                                @delete="onDeleteAll"
                                @input="onInput"
                                @search="onSearch"
-                               @menu:select="onMenuSelect"
+                               @select-menu="onMenuSelect"
                                @mousedown.stop="onInput()"
-                               @menu:hide="hideMenu"
+                               @hide-menu="hideMenu"
                                @keydown.delete="onDeletePrefix"
         >
             <template #search-left>

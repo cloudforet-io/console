@@ -47,6 +47,7 @@ const dataTypeOperators: DataTypeOperators = {
         '<': 'datetime_lt',
         '<=': 'datetime_lte',
     },
+    object: defaultOperatorMap,
 };
 
 type SingleValueFiltersMap = Record<string, Filter[]>
@@ -127,6 +128,16 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
             }
         }
     },
+    object: (query: QueryParam, singleFiltersMap: SingleValueFiltersMap, multiFiltersMap: MultiValueFiltersMap) => {
+        const queryParam = {
+            ...query,
+            key: {
+                ...query.key,
+                name: query.key.name === 'raw' ? `${query.key.subPaths?.join('.')}` : `${query.key.name}.${query.key.subPaths?.join('.')}`,
+            },
+        } as QueryParam;
+        defaultFilterSetter(queryParam, singleFiltersMap, multiFiltersMap);
+    },
 };
 
 
@@ -183,7 +194,16 @@ const parseTag = (text: string): QueryItem => {
     const parsed = tagRegex.exec(text);
 
     const key: string|undefined = get(parsed, 'groups.key', undefined);
-    const keyItem: KeyItem|undefined = key ? { label: key, name: key } : undefined;
+    let keyItem: KeyItem|undefined;
+    if (key) {
+        const keys = key.split('.');
+        keyItem = { label: keys[0], name: keys[0] };
+
+        if (keys.length > 0) {
+            keyItem.subPaths = keys.slice(1);
+        }
+    }
+
 
     const operator = get(parsed, 'groups.operator', '').trim();
 
