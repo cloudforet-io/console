@@ -1,7 +1,7 @@
 <template>
     <div ref="contextMenu" class="p-context-menu" :class="theme"
          :style="autoHeightStyle"
-         @keyup.esc="$emit('keyup:esc',$event)"
+         @keyup.esc="onEsc"
     >
         <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
             <div key="loading" class="context-content context-item no-drag">
@@ -77,7 +77,7 @@
 
 <script lang="ts">
 import {
-    computed, ref, onMounted, Ref,
+    computed, ref, onMounted, Ref, watch,
 } from '@vue/composition-api';
 
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
@@ -134,6 +134,7 @@ export default {
         },
     },
     setup(props: ContextMenuProps, { emit }) {
+        let focusedEl: HTMLElement|null = null;
         const uuid = `${Math.random()}`.slice(2);
         const menuClick = (itemName, index, event) => {
             if (!props.menu[index].disabled) {
@@ -151,8 +152,18 @@ export default {
         const focus = (position) => {
             const idx = itemsIndex.value[position || 0];
             const el = document.getElementById(`context-item-${idx}-${uuid}`);
-            if (el) el.focus();
-            emit('focus', idx);
+            if (el) {
+                el.focus();
+                focusedEl = el;
+                emit('focus', idx);
+            }
+        };
+        const blur = () => {
+            if (focusedEl) {
+                focusedEl.blur();
+                focusedEl = null;
+            }
+            emit('blur');
         };
         const onUpKey = (idx: number) => {
             const pos = itemsIndex.value.indexOf(idx);
@@ -160,6 +171,7 @@ export default {
                 focus(pos - 1);
             } else {
                 emit('keyup:up:end');
+                blur();
             }
         };
         const onDownKey = (idx) => {
@@ -168,8 +180,14 @@ export default {
                 focus(pos);
             } else {
                 emit('keyup:down:end');
+                blur();
             }
         };
+        const onEsc = (e) => {
+            emit('keyup:esc', e);
+            blur();
+        };
+
 
         return {
             menuClick,
@@ -178,6 +196,7 @@ export default {
             focus,
             uuid,
             ...setAutoHeight(props),
+            onEsc,
         };
     },
 };

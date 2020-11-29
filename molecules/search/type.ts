@@ -7,6 +7,17 @@ export interface SearchProps {
     isFocused?: boolean; // sync
 }
 
+export interface InputListeners {
+    input: Function;
+    blur: Function;
+    focus: Function;
+    keyup: Function;
+}
+
+export interface SearchSlotScope extends SearchProps {
+    inputListeners: InputListeners;
+}
+
 export interface SearchEventArgs {
     input: [string, InputEvent];
     search: [string, KeyboardEvent];

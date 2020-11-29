@@ -1,99 +1,131 @@
 <template>
-    <p-autocomplete-search ref="searchRef"
-                           class="p-query-search"
-                           :class="{'no-menu': menu ? menu.length === 0 : false}"
-                           :value="searchText"
-                           :placeholder="placeholder"
-                           :loading="loading"
-                           :disable-icon="!!selectedKey"
-                           :visible-menu.sync="visibleMenu"
-                           :is-focused.sync="isFocused"
-                           :menu="menu"
-                           @select-menu="onMenuSelect"
-                           @search="onSearch"
-                           @input="onInput"
-                           @keyup.esc="hideMenu"
-                           @keydown.delete="onDelete"
-                           @keydown="onKeydown"
-                           @mousedown.stop="showMenu"
-                           @hide-menu="hideMenu"
-    >
-        <template #search-left="scope">
-            <span v-if="selectedKey" class="key-tag"
-                  :class="{active: isFocused || visibleMenu}"
-            >{{ selectedKey.label }}</span>
-            <span v-if="operator" class="operator-tag">{{ operator }}</span>
-        </template>
-        <template #search-default="scope">
-            <component :is="component" v-bind="scope"
-            />
-        </template>
-        <template #search-right="scope">
-            <div class="right">
-                <span v-if="selectedKey || scope.value" class="delete-btn" @click="onDeleteAll">
-                    <p-i class="icon" name="ic_delete" height="1rem"
-                         width="1rem"
-                    />
+    <div class="p-query-search">
+        <p-search :class="{'no-menu': menu ? menu.length === 0 : false}"
+                  :value="searchText"
+                  :placeholder="placeholder"
+                  :disable-icon="!!selectedKey"
+                  :visible-menu.sync="visibleMenu"
+                  :is-focused.sync="isFocused"
+        >
+            <template #left="scope">
+                <span v-if="selectedKey" :class="{active: isFocused || visibleMenu}">
+                    <span class="key-tag">{{ selectedKey.label }}</span>
+                    <template v-if="selectedKey.subPaths">
+                        <span v-for="(path, idx) in selectedKey.subPaths" :key="idx" class="key-tag">
+                            {{ path }}
+                        </span>
+                    </template>
                 </span>
-                <div class="separator" />
-                <span class="help" @click="onHelpClick">{{ $t('COMPONENT.QUERY_SEARCH.HELP') }}</span>
-                <p-query-search-guide v-model="visibleSearchGuide" />
-            </div>
-        </template>
-        <template #menu-no-data>
-            <div />
-        </template>
-        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-            <slot v-if="!excludeSlots.includes(slot)" :name="slot" v-bind="scope" />
-        </template>
-    </p-autocomplete-search>
+                <span v-if="operator" class="operator-tag">{{ operator }}</span>
+            </template>
+            <template #default="scope">
+                <input ref="inputRef" v-focus.lazy="isFocused"
+                       :value="searchText"
+                       :placeholder="currentPlaceholder || scope.placeholder"
+                       :type="inputElType"
+                       :step="currentDataType === 'integer' ? 1 : undefined"
+                       :min="currentDataType === 'integer' ? 0 : undefined"
+                       @input="onInput"
+                       @keyup.esc="leaveSearch"
+                       @keyup.down="focusMenu"
+                       @keydown.delete="onDelete"
+                       @keyup.enter="onEnter"
+                       @keydown="onKeydownCheck"
+                       @click.stop="showMenu"
+                       @focus="focus"
+                       @blur="blur"
+                >
+            </template>
+            <template #right="scope">
+                <div class="right">
+                    <span v-if="selectedKey || scope.value" class="delete-btn" @click="onDeleteAll">
+                        <p-i class="icon" name="ic_delete" height="1rem"
+                             width="1rem"
+                        />
+                    </span>
+                    <div class="separator" />
+                    <span class="help" @click="onHelpClick">{{ $t('COMPONENT.QUERY_SEARCH.HELP') }}</span>
+                    <p-query-search-guide v-model="visibleSearchGuide" />
+                </div>
+            </template>
+            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+                <slot :name="`search-${slot}`" v-bind="{...scope}" />
+            </template>
+        </p-search>
+        <p-context-menu v-show="visibleMenu"
+                        ref="menuRef"
+                        theme="secondary"
+                        :menu="menu"
+                        @select="onMenuSelect"
+                        @blur="focus"
+        >
+            <template #no-data>
+                <div />
+            </template>
+            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                <slot :name="`menu-${slot}`" v-bind="{...scope}" />
+            </template>
+        </p-context-menu>
+    </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
-import { find, debounce } from 'lodash';
+import { throttle, reduce, cloneDeep } from 'lodash';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 
 /* Components, Directives */
 import { focus as vFocus } from 'vue-focus';
-import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import PQuerySearchGuide from '@/components/organisms/search/query-search-guide/PQuerySearchGuide.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 /* Types */
-import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 import {
     HandlerResponse,
-    KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,
+    inputDataTypes,
+    KeyItem,
+    KeyMenuItem,
+    operators,
+    OperatorType,
+    QuerySearchProps,
+    ValueHandler,
+    ValueItem,
+    ValueMenuItem, InputType, OperatorMenuItem, QueryItem,
 } from '@/components/organisms/search/query-search/type';
-import { Component } from 'vue';
 
 /* Configs, Helpers */
 import {
-    formatterMap,
-    lastOnlyOperatorChars,
-    operatorChars,
-    operatorCheckerMap, operatorMenuMap,
+    defaultHandlerMap,
+    formatterMap, inputValidatorMap,
+    placeholderMap, supportOperatorMap,
 } from '@/components/organisms/search/query-search/config';
-import { defaultValueHandler } from '@/components/organisms/search/query-search/helper';
-import { makeByPassListeners } from '@/components/util/composition-helpers';
+import PSearch from '@/components/molecules/search/PSearch.vue';
+import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
+import {
+    findKey,
+    getDefaultKeyItemHandler,
+    getKeyMenu,
+    getOperatorMenu, getValueItem,
+    getValueMenu,
+} from '@/components/organisms/search/query-search/helper';
 
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 
-interface MenuItem<T> extends ContextMenuItem {
-    data?: T;
-}
-
 export default {
     name: 'PQuerySearch',
-    components: { PI, PQuerySearchGuide, PAutocompleteSearch },
+    components: {
+        PContextMenu,
+        PSearch,
+        PI,
+        PQuerySearchGuide,
+    },
     directives: { focus: vFocus },
     model: {
         prop: 'value',
@@ -121,205 +153,176 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: QuerySearchProps, { emit }) {
+    setup(props: QuerySearchProps, { emit, slots, refs }) {
         const state = reactive({
-            searchRef: null as null|Component,
-            visibleMenu: false,
+            /* Input */
+            inputRef: null as null|HTMLElement,
             isFocused: props.focused,
-            loading: false,
             searchText: props.value,
-            selectedKey: null as KeyItem|null,
-            operator: '' as OperatorType,
-            currentDataType: computed(() => state.selectedKey?.dataType || 'string'),
-            keyTotalCount: computed(() => {
-                if (state.selectedKey) return 0;
-                return props.keyItems.length;
+            currentDataType: computed(() => state.selectedKey?.dataType || ''),
+            currentPlaceholder: computed(() => placeholderMap[state.currentDataType] || undefined),
+            inputElType: computed(() => inputDataTypes[state.currentDataType] || 'text'),
+
+            /* Query */
+            selectedKeys: [] as KeyItem[],
+            selectedKey: computed<KeyItem|null>(() => {
+                if (state.selectedKeys.length === 0) return null;
+                if (state.selectedKeys.length === 1) return state.selectedKeys[0];
+                return {
+                    ...state.selectedKeys[0],
+                    subPaths: state.selectedKeys
+                        .slice(1, state.selectedKeys.length)
+                        .map(d => d.name),
+                };
             }),
-            valueTotalCount: 0 as undefined|number,
-            filteredKeyItems: [] as KeyItem[],
-            filteredValueItems: [] as ValueItem[],
-            keyMenu: computed<MenuItem<KeyItem>[]>(() => [
-                {
-                    label: `Key (${state.keyTotalCount})`,
-                    type: CONTEXT_MENU_TYPE.header,
-                },
-                ...state.filteredKeyItems.map(d => ({
-                    label: d.label,
-                    name: d.name,
-                    type: CONTEXT_MENU_TYPE.item,
-                    data: d,
-                })),
-            ]),
-            valueMenu: computed<MenuItem<ValueItem>[]>(() => {
-                if (state.selectedKey === null) return [];
-                if (state.filteredValueItems.length > 0) {
-                    return [
-                        {
-                            label: `${state.selectedKey.label} ${state.valueTotalCount === undefined ? '' : `(${state.valueTotalCount})`}`,
-                            type: CONTEXT_MENU_TYPE.header,
-                        },
-                        ...state.filteredValueItems.map(d => ({
-                            label: `${state.selectedKey?.label}:${state.operator} ${d.label}`,
-                            name: d.name,
-                            type: CONTEXT_MENU_TYPE.item,
-                            data: d,
-                        })),
-                    ];
-                }
+            operator: '' as OperatorType,
+            supportOperators: operators as OperatorType[],
+            inputType: 'KEY' as InputType|undefined,
+
+            /* Menu */
+            menuRef: null as any,
+            visibleMenu: false,
+            totalCount: 0 as undefined|number,
+            filteredItems: [] as KeyItem[]|ValueItem[],
+            menu: computed<Array<KeyMenuItem|ValueMenuItem|OperatorMenuItem>>(() => {
+                if (state.inputType === 'KEY') return getKeyMenu(state.filteredItems, state.selectedKey, state.totalCount);
+                if (state.inputType === 'OPERATOR') return getOperatorMenu(state.filteredItems);
+                if (state.inputType === 'VALUE') getValueMenu(state.selectedKey, state.filteredItems, state.operator, state.totalCount);
                 return [];
             }),
-            menu: computed<MenuItem<KeyItem|ValueItem>[]>(() => {
-                if (state.selectedKey) {
-                    if (operatorMenuMap[state.selectedKey.dataType]) {
-                        if (state.operator) return state.valueMenu;
-                        return operatorMenuMap[state.selectedKey.dataType];
-                    }
-                    return state.valueMenu;
-                }
-                return state.keyMenu;
+            handler: computed<ValueHandler|null>(() => {
+                if (!state.selectedKey) return getDefaultKeyItemHandler(props.keyItems);
+                return defaultHandlerMap[state.currentDataType]
+                    || props.valueHandlerMap[state.selectedKey.name]
+                    || null;
             }),
+
+            /* help */
             visibleSearchGuide: false,
-            component: null,
         });
 
-        const loadComponent = async () => {
-            try {
-                state.component = () => import(`./templates/${state.selectedKey?.dataType || 'string'}/index.vue`);
-            } catch (e) {
-                state.component = () => import('./templates/string/index.vue');
+        /* Control Input & Menu */
+        const focus = () => { state.isFocused = true; };
+        const blur = () => { state.isFocused = false; };
+        const hideMenu = () => { state.visibleMenu = false; };
+        const showMenu = async (refreshMenuItems = true) => {
+            if (refreshMenuItems) {
+                // eslint-disable-next-line no-use-before-define
+                await updateMenuItems(state.searchText);
+            }
+            state.visibleMenu = true;
+        };
+
+        let offMenuFocusWatch: WatchStopHandle|undefined;
+        const focusMenu = async () => {
+            if (!state.visibleMenu) await showMenu();
+            if (state.menuRef) state.menuRef.focus();
+            else {
+                if (offMenuFocusWatch) offMenuFocusWatch();
+                offMenuFocusWatch = watch(() => state.menuRef, (menuRef) => {
+                    if (menuRef) {
+                        menuRef.focus();
+                        if (offMenuFocusWatch) offMenuFocusWatch();
+                    }
+                });
             }
         };
-        watch(() => state.selectedKey, async () => {
-            await loadComponent();
-        }, { immediate: true });
 
-        const onKeyInput = debounce(async (val: string) => {
-            let keyItems: KeyItem[] = [...props.keyItems];
+        const leaveSearch = () => {
+            blur();
+            hideMenu();
+        };
 
-            if (!state.selectedKey && val) {
-                const regex = RegExp(val, 'i');
-                keyItems = props.keyItems.reduce((result, d) => {
-                    if (regex.test(d.label) || regex.test(d.name)) result.push(d);
-                    return result;
-                }, [] as KeyItem[]);
-            }
+        const clearAll = () => {
+            state.searchText = '';
+            state.operator = '';
+        };
 
-            state.filteredKeyItems = keyItems;
-        }, 150);
+        const updateSupportOperators = (ops?: OperatorType[]) => {
+            state.supportOperators = ops
+                || state.selectedKey?.operators
+                || supportOperatorMap[state.currentDataType] as OperatorType[]
+                || operators;
+        };
 
-        const onValueInput = debounce(async (inputText: string): Promise<void> => {
+
+        const updateSelectedKey = (item: KeyItem|null, replace = false) => {
+            if (replace) {
+                if (item) state.selectedKeys = [item];
+                else state.selectedKeys = [];
+            } else if (item) state.selectedKeys.push(item);
+            else state.selectedKeys.pop();
+
+            if (item) updateSupportOperators(item.operators);
+            if (!state.selectedKey || state.currentDataType === 'object') state.inputType = 'KEY';
+        };
+
+
+        const updateMenuItems = throttle(async (inputText: string): Promise<void> => {
             let res: HandlerResponse = { results: [], totalCount: undefined };
 
-            if (state.selectedKey) {
-                const handler = props.valueHandlerMap[state.selectedKey.name] || defaultValueHandler;
-                const func = handler(inputText, state.selectedKey);
+            if (state.handler) {
+                const func = state.handler(inputText, state.selectedKey as KeyItem, state.operator);
                 if (func instanceof Promise) {
                     res = await func;
                 } else res = func;
             }
 
-            state.valueTotalCount = res.totalCount;
-            state.filteredValueItems = res.results;
+            state.totalCount = res.totalCount;
+            state.filteredItems = res.results;
+            state.inputType = res.inputType;
         }, 150);
 
-        const findKey = (val: string): KeyItem|undefined => {
-            const value = val.toLowerCase();
-            const res = find(state.keyMenu,
-                (item: MenuItem<KeyItem>) => (item.type === 'item'
-                    && ((item.label && item.label.toString().toLowerCase() === value)
-                    || (item.name && item.name.toLowerCase() === value)))) as MenuItem<KeyItem>|null;
-
-            return res ? res.data : undefined;
-        };
-
-        const hideMenu = () => { state.visibleMenu = false; };
-        const focus = () => { state.isFocused = true; };
-        const clearText = () => {
-            state.searchText = '';
-            state.operator = '';
-        };
-
-
-        const showMenu = async () => {
-            if (state.selectedKey) await onValueInput(state.searchText);
-            await onKeyInput(state.searchText);
-            state.visibleMenu = true;
-        };
-
-
-        const onKeySelect = (keyItem: KeyItem) => {
-            clearText();
-            focus();
-        };
-
-        const emitSearch = (val: ValueItem) => {
-            const queryItem = {
-                key: state.selectedKey,
-                value: val,
-                operator: state.operator,
-            } as QueryItem;
-
-            // if (queryItem.key?.dataType && formatterMap[queryItem.key.dataType]) {
-            //     queryItem.value.name = formatterMap[queryItem.key.dataType](val.name);
-            // }
-
-            emit('search', queryItem);
-            clearText();
-            if (state.selectedKey) {
-                state.selectedKey = null;
-                hideMenu();
-            }
-        };
 
         const findAndSetKey = async (val: string) => {
-            state.selectedKey = findKey(val.substring(0, val.length - 1)) || null;
-            if (state.selectedKey) {
-                onKeySelect(state.selectedKey);
-                await onValueInput('');
+            const item = findKey(val.substring(0, val.length - 1), state.menu as KeyMenuItem[]) || null;
+            if (item) {
+                updateSelectedKey(item);
+                clearAll();
+                focus();
+                await showMenu();
             }
         };
 
-        const onInput = async (rawVal: string, e) => {
-            const val = rawVal || ''; // rawVal.trim()
-            state.searchText = val;
-
-            if (state.selectedKey) {
-                await onValueInput(state.searchText);
-            } else if (val.length > 1 && e.data === ':') await findAndSetKey(val);
-            else await onKeyInput(val);
-        };
-
-        const onSearch = (val?: ValueItem|string|null) => {
-            if (val && typeof val === 'object') {
-                emitSearch(val);
-            } else {
-                const str = typeof val === 'string' ? val.trim() : '';
-                if (str || state.selectedKey) emitSearch({ label: str, name: str });
-            }
-        };
-
-        const onMenuSelect = (value: string, idx: number) => {
-            if (state.selectedKey) {
-                if (operatorMenuMap[state.selectedKey.dataType]) {
-                    state.operator = value;
-                    focus();
-                } else {
-                    const val = state.valueMenu[idx].data;
-                    onSearch(val);
-                }
-            } else {
-                const selected = state.keyMenu[idx];
-                if (selected.data) {
-                    state.selectedKey = selected.data;
-                    onKeySelect(state.selectedKey);
-                    showMenu();
-                }
-            }
-        };
 
         const removeOperator = () => {
             if (state.operator.length === 2) state.operator = state.operator.substring(0, 1) as OperatorType;
             else state.operator = '';
+        };
+
+        /* Event triggers */
+        const emitSearch = (val?: ValueItem|string|null) => {
+            const valueItem = getValueItem(val, state.selectedKey);
+            if (!valueItem) return;
+
+            let queryItem = {
+                key: state.selectedKey,
+                value: valueItem,
+                operator: state.operator,
+            } as QueryItem;
+
+            if (formatterMap[state.currentDataType]) {
+                queryItem = formatterMap[state.currentDataType](cloneDeep(queryItem));
+            }
+
+            emit('search', queryItem);
+
+            clearAll();
+            if (state.selectedKey) updateSelectedKey(null, true);
+            hideMenu();
+        };
+
+
+        /* Event handlers */
+        const onInput = async (e) => {
+            const val = e.target.value || '';
+            state.searchText = val;
+
+            if (!state.visibleMenu) await showMenu(false);
+
+            if (state.inputType === 'KEY' && val.length > 1 && e.data === ':') {
+                await findAndSetKey(val);
+            } else await updateMenuItems(val);
         };
 
         const onDelete = async (e) => {
@@ -327,71 +330,119 @@ export default {
 
             if (state.operator) removeOperator();
             else if (state.selectedKey) {
-                state.selectedKey = null;
-                await onKeyInput('');
+                updateSelectedKey(null);
+                await updateMenuItems('');
+            }
+        };
+
+        const onEnter = () => {
+            emitSearch(state.searchText);
+        };
+
+        const onKeydownCheck = (e: KeyboardEvent) => {
+            if (!state.selectedKey) return;
+            if (state.searchText.length > 0) return;
+
+            /* check operator */
+            const op = state.operator + e.key;
+            if (state.supportOperators.some(d => d.startsWith(op))) {
+                state.operator += e.key;
+                e.preventDefault();
+            } else if (!state.supportOperators.includes(state.operator)) state.operator = '';
+
+            /* value validation */
+            if (inputValidatorMap[state.currentDataType]) {
+                const validator = inputValidatorMap[state.currentDataType];
+                if (!validator(e.key)) e.preventDefault();
             }
         };
 
         const onDeleteAll = () => {
-            state.selectedKey = null;
-            state.searchText = '';
+            updateSelectedKey(null, true);
+            clearAll();
+            focus();
         };
 
-        const onKeydown = (e: KeyboardEvent) => {
-            if (!state.selectedKey) return;
+        const onMenuSelect = (value: string, idx: number) => {
+            const selected = state.menu[idx];
 
-            if (operatorChars[state.selectedKey.dataType || 'string'].includes(e.key)) {
-                if (state.searchText.length > 0) return;
-                if (state.operator.length === 0) {
-                    state.operator = e.key;
-                    e.preventDefault();
-                } else if (state.operator.length === 1 && lastOnlyOperatorChars.includes(e.key)) {
-                    state.operator += e.key;
-                    e.preventDefault();
+            if (state.inputType === 'KEY') {
+                updateSelectedKey(selected.data as KeyItem);
+                clearAll();
+                focus();
+                showMenu();
+            } else if (state.inputType === 'OPERATOR') {
+                if (state.supportOperators.includes(value)) {
+                    state.operator = value;
+                    state.inputType = 'VALUE';
+                    focus();
                 }
-            } else if (!['Backspace', 'Enter'].includes(e.key)) {
-                const checker = operatorCheckerMap[state.selectedKey.dataType];
-                if (checker && !checker(e.key)) e.preventDefault();
+            } else {
+                emitSearch(selected.data as ValueItem);
             }
         };
 
+
+        /* Help */
         const onHelpClick = () => {
             state.visibleSearchGuide = true;
         };
 
-        const querySearchListeners = {
-            input(e) {
-                emit('update:value', e.target.value);
-                makeByPassListeners(listeners, 'input', e.target.value, e);
-            },
-            blur(e) {
-                state.proxyIsFocused = false;
-                makeByPassListeners(listeners, 'blur', e);
-            },
-            focus(e) {
-                state.proxyIsFocused = true;
-                makeByPassListeners(listeners, 'focus', e);
-            },
-            keyup: (e) => {
-                if (e.code === 'Enter') emit('search', props.value, e);
-                makeByPassListeners(listeners, 'keyup', e);
-            },
+        /* Window Events Binding */
+        const onWindowKeydown = (e: KeyboardEvent) => {
+            if (state.visibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.code)) {
+                e.preventDefault();
+            }
         };
+        onMounted(() => {
+            window.addEventListener('click', hideMenu);
+            window.addEventListener('blur', hideMenu);
+            window.addEventListener('keydown', onWindowKeydown, false);
+        });
+        onUnmounted(() => {
+            window.removeEventListener('click', hideMenu);
+            window.removeEventListener('blur', hideMenu);
+            window.removeEventListener('keydown', onWindowKeydown, false);
+        });
 
+
+        /* Slots */
+        const menuSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('menu-') && !['menu-no-data'].includes(name)) {
+                res[`${name.substring(5)}`] = d;
+            }
+            return res;
+        }, {}));
+
+        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('search-') && !['search-left', 'search-default', 'search-right'].includes(name)) {
+                res[`${name.substring(7)}`] = d;
+            }
+            return res;
+        }, {}));
 
         return {
             ...toRefs(state),
-            onInput,
-            onMenuSelect,
-            onSearch,
+            focus,
+            blur,
             showMenu,
             hideMenu,
+            focusMenu,
+            leaveSearch,
+            emitSearch,
+            onInput,
             onDelete,
+            onEnter,
+            onKeydownCheck,
             onDeleteAll,
-            onKeydown,
-            excludeSlots: ['search-left', 'search-default', 'menu-no-data', 'search-right'],
+            onMenuSelect,
+
+            /* help */
             onHelpClick,
-            querySearchListeners,
+
+            /* slots */
+            menuSlots,
+            searchSlots,
         };
     },
 };
@@ -399,6 +450,39 @@ export default {
 
 <style lang="postcss">
 .p-query-search {
+    @apply w-full relative;
+    .p-search {
+        @apply text-sm font-normal;
+    }
+    .menu-container {
+        @apply w-full relative;
+    }
+    .p-context-menu {
+        @apply font-normal;
+        min-width: unset;
+        .secondary {
+            &.context-header {
+                @apply text-secondary;
+            }
+            &.context-item {
+                &:hover {
+                    @apply bg-blue-200;
+                    color: currentColor !important;
+                }
+                &:focus {
+                    @apply bg-blue-200;
+                    color: currentColor !important;
+                }
+                &:active {
+                    @apply bg-blue-200;
+                    color: currentColor !important;
+                }
+            }
+        }
+    }
+    &.no-menu .p-context-menu {
+        border-width: 0;
+    }
     .key-tag {
         @apply bg-gray-200 rounded-sm px-2 text-xs mr-2;
         height: 1.125rem;
@@ -411,9 +495,6 @@ export default {
         @apply mr-2;
         height: 1.125rem;
         line-height: 1.125rem;
-    }
-    &.no-menu .p-context-menu {
-        border-width: 0;
     }
     .right {
         display: inline-flex;

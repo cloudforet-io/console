@@ -7,10 +7,12 @@ export enum CONTEXT_MENU_TYPE {
     info = 'info',
 }
 
+export const menuTypes = ['divider', 'header', 'item', 'info'] as const;
+
 export interface MenuItem {
     name?: string;
     label?: string | TranslateResult;
-    type: keyof typeof CONTEXT_MENU_TYPE;
+    type: typeof menuTypes[number];// keyof typeof CONTEXT_MENU_TYPE;
     disabled?: boolean;
     link?: string;
     target?: string;

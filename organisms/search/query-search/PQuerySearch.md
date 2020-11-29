@@ -69,62 +69,50 @@ It runs differently for each selected key item's data type.<br>
 ## Support operators.
 '!', '>', '>=', '<', '<=', '=', '!=', '$'
 
-## types
-```typescript
 
-const inputDataTypes = {
-    string: 'text',
-    integer: 'number',
-    float: 'number',
-    boolean: 'text',
-    datetime: 'datetime-local',
-};
+## Rules to follow when creating input components for contribution
+1. It interacts with the HTML Input Events below.<br>
+ so if you don't fire the following events in input component, it can behave weird.<br>
+ You can easily bind events with ```v-on="$listeners"``.<br> 
+ - input
+ - keyup(Escape, ArrowDown)
+ - keydown(Backspace)
+ - click
+ - focus
+ - blur
+ 
+2. You can emit a ```search``` event to complete the search.<br>
+ If the ```search``` event does not occur, search results cannot be exported.<br>
+ When emit the ```search``` event, be sure to export the ```ValueItem``` type format as the first argument.<br>
 
-type KeyDataType = keyof typeof inputDataTypes;
+ ```typescript
 
-interface KeyItem {
+interface ValueItem {
     label: string;
-    name: string;
-    dataType?: KeyDataType;
-}
-
-const operators = ['!', '>', '>=', '<', '<=', '=', '!=', '$'];
-type OperatorType = typeof operators[number];
-
-interface ValueItem<T=string> {
-    label: string;
-    name: T;
+    name: any;
     icon?: string;
     link?: string;
     target?: string;
 }
 
-interface QueryItem<T=string> {
-    key?: KeyItem;
-    operator: OperatorType;
-    value: ValueItem<T>;
-}
+```
 
-interface HandlerResponse {
-    results: ValueItem[];
-    totalCount?: number;
-}
-type ValueHandler = (inputText: string, keyItem: KeyItem) => Promise<HandlerResponse>|HandlerResponse;
+3. Input components receive the following props: <br>
 
-interface ValueHandlerMap {
-    [key: string]: ValueHandler|undefined;
-}
+```typescript
 
-interface QuerySearchProps {
-    placeholder: string;
-    focused: boolean;
-    keyItems: KeyItem[];
-    valueHandlerMap: ValueHandlerMap;
+export interface QuerySearchInputProps {
+    isFocused: boolean;
     value: string;
-}
-
-interface QuerySearchListeners {
-    search?: (query: QueryItem) => Promise<void>|void;
+    placeholder?: string;
+    operator: OperatorType;
+    visibleMenu?: boolean;
+    handler?: ValueHandler|null;
+    selectedKeys?: KeyItem[];
 }
 
 ```
+
+```isFocused```, ```operator```, ```selectedKeys``` are sync props, so please follow the ```update:<prop name>``` format.<br>
+
+4. If you want to use the basic handler or basic menu form that query search has, create a ```menu``` slot.

@@ -83,6 +83,7 @@ module.exports = {
     ],
     "@typescript-eslint/camelcase": ["off"], // use eslint camelcase rule
     "@typescript-eslint/no-empty-function": ["off"], // use eslint no-empty-function rule
+    "@typescript-eslint/no-use-before-define": ["off"], // use eslint no-use-before-define rule
     "@typescript-eslint/ban-ts-ignore": ["off"],
     "@typescript-eslint/explicit-function-return-type": ["off"]
   },

@@ -72,6 +72,11 @@ const stringConverter = (query: QueryItem): QueryTag => {
     return res;
 };
 
+const objectConverter = (query: QueryItem): QueryTag => {
+    const res: QueryTag = { ...query };
+    return res;
+};
+
 
 const converterMap: Record<KeyDataType, QueryTagConverter> = {
     boolean: booleanConverter,
@@ -79,6 +84,7 @@ const converterMap: Record<KeyDataType, QueryTagConverter> = {
     integer: integerConverter,
     float: floatConverter,
     string: stringConverter,
+    object: objectConverter,
 };
 
 const defaultConverter = (query: QueryItem, timezone: string): QueryTag => {
