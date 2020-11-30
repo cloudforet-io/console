@@ -18,7 +18,7 @@
         <div class="content-wrapper">
             <div class="left-part" :class="{'editing': isCreateMode || isEditMode}">
                 <div class="time-section">
-                    <div class="icon-item" />
+                    <div class="empty-box" />
                     <div v-for="time in range(0, 24)"
                          :key="time"
                          class="time"
@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <!--buttons-->
-                <div class="one-time-button-wrapper">
+                <div class="edit-button-wrapper">
                     <p-button v-if="isEditMode"
                               class="gray900 mr-4" :outline="true"
                               @click="onClickCancel"
@@ -753,7 +753,7 @@ export default {
                 display: inline-block;
                 width: 3rem;
                 cursor: default;
-                .icon-item {
+                .empty-box {
                     @apply border-b border-gray-200;
                     height: 3rem;
                 }
@@ -967,7 +967,7 @@ export default {
                     padding: 0 0.5rem;
                 }
             }
-            .one-time-button-wrapper {
+            .edit-button-wrapper {
                 position: absolute;
                 bottom: 1.5rem;
                 right: 1.5rem;
