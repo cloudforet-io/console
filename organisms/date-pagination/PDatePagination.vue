@@ -24,7 +24,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
@@ -54,17 +54,15 @@ export default {
         },
     },
     setup(props: DatePaginationProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             dateText: computed(() => {
-                const weekStart = props.date.startOf('week').format('M');
-                const weekEnd = props.date.endOf('week').format('M');
+                const weekStart = props.date.startOf('week').format('MM');
+                const weekEnd = props.date.endOf('week').format('MM');
                 if (props.type === 'week') {
                     if (weekStart !== weekEnd) {
-                        return `${weekStart + vm.$t('COMPONENT.DATE_PAGINATION.MONTH')} -
-                        ${weekEnd + vm.$t('COMPONENT.DATE_PAGINATION.MONTH')} ${props.date.format('YYYY') + vm.$t('COMPONENT.DATE_PAGINATION.YEAR')}`;
+                        return `${weekStart} - ${weekEnd}, ${props.date.format('YYYY')}`;
                     }
-                    return `${props.date.format('M') + vm.$t('COMPONENT.DATE_PAGINATION.MONTH')} ${props.date.format('YYYY') + vm.$t('COMPONENT.DATE_PAGINATION.YEAR')}`;
+                    return `${props.date.format('MM')}, ${props.date.format('YYYY')}`;
                 }
                 return props.date.format('YYYY-MM');
             }),
