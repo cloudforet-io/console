@@ -80,8 +80,8 @@ export default {
     },
     props: {
         tags: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         disabled: {
             type: Boolean,
@@ -176,9 +176,7 @@ export default {
             }));
         };
         const init = () => {
-            // convert tags(object) to items(object array) ; will be deprecated soon
-            state.items = map(props.tags, (v, k) => ({ key: k || '', value: v || '' }));
-
+            state.items = props.tags;
             if (props.showEmptyInput) state.items.push({ key: '', value: '' });
             initValidations();
         };
@@ -187,13 +185,6 @@ export default {
         watch(() => state.isAllValid, (after) => {
             emit('update:is-valid', after);
         });
-        watch(() => state.items, (after) => {
-            const tags = {};
-            forEach(after, (d) => {
-                tags[d.key] = d.value;
-            });
-            emit('update:tags', tags);
-        }, { deep: true });
 
         return {
             ...toRefs(state),

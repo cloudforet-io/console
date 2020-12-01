@@ -67,6 +67,7 @@ import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { TagItem } from '@/views/common/components/tags/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -83,8 +84,8 @@ export default {
     },
     props: {
         tags: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         resourceKey: {
             type: String,
@@ -102,22 +103,22 @@ export default {
             required: true,
         },
     },
-    setup(props, context) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
-            showValidation: false,
             loading: false,
-            newTags: {},
+            showValidation: false,
+            newTags: props.tags.slice(),
             isTagsValid: true,
             noItem: computed(() => isEmpty(state.newTags)),
         });
 
         /* util */
         const goBack = () => {
-            context.emit('close');
+            emit('close');
         };
 
         /* api */
@@ -143,13 +144,8 @@ export default {
                 state.loading = false;
             }
 
-            context.emit('update');
+            emit('update');
         };
-
-        const init = () => {
-            state.newTags = props.tags;
-        };
-        init();
 
         return {
             ...toRefs(state),

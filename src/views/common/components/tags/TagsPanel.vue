@@ -1,6 +1,6 @@
 <template>
     <div class="mb-8">
-        <p-panel-top :use-total-count="true" :total-count="items.length">
+        <p-panel-top :use-total-count="true" :total-count="tags.length">
             <template>{{ $t('COMMON.TAGS.TITLE') }}</template>
             <template #extra>
                 <p-button style-type="primary-dark"
@@ -13,7 +13,7 @@
 
         <p-data-table
             :fields="fields"
-            :items="items"
+            :items="tags"
             :loading="loading"
             :col-copy="true"
         />
@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { map, get, camelCase } from 'lodash';
+import { get, camelCase } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
@@ -38,6 +38,7 @@ import TagsPage from '@/views/common/components/tags/TagsPage.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { TagItem } from '@/views/common/components/tags/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 
@@ -72,13 +73,12 @@ export default {
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
-            tags: {},
+            loading: true,
+            tags: [] as TagItem[],
             fields: computed(() => [
-                { name: 'name', label: vm.$t('COMMON.TAGS.KEY'), type: 'item' },
+                { name: 'key', label: vm.$t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: vm.$t('COMMON.TAGS.VALUE'), type: 'item' },
             ]),
-            loading: true,
-            items: computed(() => map(state.tags, (v, k) => ({ name: k, value: v })) || []),
         });
         const tagState = reactive({
             tagEditPageVisible: false,
@@ -87,7 +87,7 @@ export default {
         /* api */
         const getTags = async () => {
             if (!api.value) {
-                state.tags = {};
+                state.tags = [];
                 state.loading = false;
             }
 
@@ -98,7 +98,7 @@ export default {
                 });
                 state.tags = res.tags;
             } catch (e) {
-                state.tags = {};
+                state.tags = [];
                 console.error(e);
             } finally {
                 state.loading = false;
