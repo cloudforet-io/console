@@ -9,12 +9,13 @@ const SPECIAL_LABEL_MAP = {
 };
 
 export const load = async ({ commit }): Promise<void|Error> => {
-    const response = await SpaceConnector.client.identity.provider.list({
-        query: {
-            only: ['provider', 'name', 'tags'],
-        },
-    });
-    const providers: ResourceMap = {};
+    try {
+        const response = await SpaceConnector.client.identity.provider.list({
+            query: {
+                only: ['provider', 'name', 'tags'],
+            },
+        });
+        const providers: ResourceMap = {};
 
     response.results.forEach((providerInfo: any): void => {
         let icon;
@@ -36,5 +37,6 @@ export const load = async ({ commit }): Promise<void|Error> => {
         };
     });
 
-    commit('setProviders', providers);
+        commit('setProviders', providers);
+    } catch (e) {}
 };

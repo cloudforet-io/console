@@ -24,6 +24,44 @@ export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
 });
 
 
+const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number) => {
+    if (d === undefined || d === null) {
+        return {
+            results: [],
+            totalCount: undefined,
+            dataType: undefined,
+        };
+    }
+    if (typeof d === 'string' || typeof d === 'boolean') {
+        return {
+            results,
+            totalCount,
+            dataType: typeof d,
+        };
+    }
+    if (typeof d === 'number') {
+        let type;
+        if (Math.floor(d) !== d) type = 'float';
+        else type = 'integer';
+
+        return {
+            results,
+            totalCount,
+            dataType: type,
+        };
+    }
+    if (Array.isArray(d)) {
+        return getHandlerResp(d[0], d.map(t => ({ label: t, name: t })), d.length);
+    }
+
+    const keys = Object.keys(d);
+    return {
+        results: keys.map(k => ({ label: k, name: k })),
+        totalCount: totalCount || keys.length,
+        dataType: 'object',
+    };
+};
+
 /**
  * @name makeDistinctValueHandler
  * @description A helper function that returns ValueHandler necessary for QuerySearch component.
@@ -35,18 +73,21 @@ export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
 export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler|undefined {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
 
-    // eslint-disable-next-line camelcase
-    const param = { distinct_key: distinct, resource_type: resourceType, options: { limit: limit || 10 } };
+    const param = { resource_type: resourceType, options: { limit: limit || 10 } };
 
-    return async (inputText: string) => {
+    return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.distinct({
-                ...param, search: inputText,
+                // eslint-disable-next-line camelcase
+                ...param, search: inputText, distinct_key: subPath ? `${distinct}.${subPath}` : distinct,
             });
-            return {
-                results: res.results.map(d => ({ label: d.name, name: d.key })),
-                totalCount: res.total_count,
-            };
+
+            return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
+
+            // return {
+            //     results: res.results.map(d => ({ label: d.name, name: d.key })),
+            //     totalCount: res.total_count,
+            // };
         } catch (e) {
             return {
                 results: [],
@@ -67,7 +108,7 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
 export function makeReferenceValueHandler(resourceType: string, dataType?: string, limit?: number): ValueHandler {
     const param = { resource_type: resourceType, options: { limit: limit || 10 } };
 
-    return async (inputText: string) => {
+    return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.resource({
                 ...param, search: inputText,
@@ -102,7 +143,7 @@ export function makeEnumValueHandler(
         return { label: d.label, name: k, icon: d.icon };
     });
 
-    return async (inputText: string) => {
+    return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
         let res: ValueItem[] = [...allItems];
         if (inputText) {
             const regex = RegExp(inputText, 'i');
@@ -130,7 +171,8 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
     const res = {};
     keys.forEach((k) => {
         if (Array.isArray(k)) {
-            res[k[0]] = makeDistinctValueHandler(resourceType, k[0], k[2]);
+            const [name, label, dataType] = k as KeyTuple;
+            res[name] = makeDistinctValueHandler(resourceType, label || name, dataType);
         } else if (typeof k === 'string') res[k] = makeDistinctValueHandler(resourceType, k);
         else res[k.name] = makeDistinctValueHandler(resourceType, k.name, k.dataType);
     });
