@@ -10,10 +10,15 @@ export const load = async ({ commit }): Promise<void|Error> => {
     const collectors: ResourceMap = {};
 
     response.results.forEach((collectorInfo: any): void => {
+        let icon;
+        collectorInfo.tags.forEach((tag) => {
+            if (tag.key === 'icon') icon = tag.value;
+        });
+
         collectors[collectorInfo.collector_id] = {
             label: collectorInfo.name,
             name: collectorInfo.name,
-            icon: collectorInfo.tags.icon,
+            icon,
         };
     });
 
