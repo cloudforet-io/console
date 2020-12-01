@@ -89,10 +89,12 @@ export default {
             }),
             version: process.env.VUE_APP_VERSION,
         });
-        const login = async (userId: string, credentials: Credentials) => {
-            store.user.setToken(credentials.refresh_token, credentials.access_token);
-            await store.user.setUser(state.userType, userId, vm);
-            setGtagUserID(vm, vm.$store);
+        const login = async (credentials: Credentials) => {
+            await vm.$store.dispatch('user/signIn', {
+                domain_id: vm.$store.state.domain.domainId,
+                credentials,
+            });
+            // setGtagUserID(vm, vm.$store);
             await vm.$router.push(props.nextPath);
         };
         return {

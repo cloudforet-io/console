@@ -1,11 +1,11 @@
 <template>
     <div class="user-info">
-        <p v-if="!loginFail" class="subtitle">
-            {{ $t('COMMON.SIGN_IN.TITLE') }}
-        </p>
-        <p v-else-if="loginFail" id="errorMsg" class="subtitle">
-            {{ $t('COMMON.SIGN_IN.VALIDATION') }}
-        </p>
+<!--        <p v-if="!loginFail" class="subtitle">-->
+<!--            {{ $t('COMMON.SIGN_IN.TITLE') }}-->
+<!--        </p>-->
+<!--        <p v-else-if="loginFail" id="errorMsg" class="subtitle">-->
+<!--            {{ $t('COMMON.SIGN_IN.VALIDATION') }}-->
+<!--        </p>-->
         <div id="login-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
             <form class="form w-full">
                 <div class="flex flex-col form">
@@ -43,7 +43,7 @@
                                     'is-invalid':invalid
                                 }"
                                 @input="checkPassword"
-                                @keyup.enter="login"
+                                @keyup.enter="signIn"
                             />
                         </template>
                     </p-field-group>
@@ -52,7 +52,7 @@
         </div>
         <div class="flex flex-col mb-4 md:w-full">
             <p-button style-type="primary" type="submit" size="lg"
-                      class="mb-8" @click="login"
+                      class="mb-8" @click="signIn"
             >
                 <span id="button-msg">{{ $t('COMMON.SIGN_IN.ADMIN_SIGN_IN') }}</span>
             </p-button>
@@ -75,8 +75,6 @@ import {
     formValidation,
     requiredValidation,
 } from '@/lib/compostion-util';
-import { useStore } from '@/store/toolset';
-import { showErrorMessage } from '@/lib/util';
 
 export default defineComponent({
     name: 'Admin',
@@ -87,11 +85,9 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as any;
-        const store = useStore();
         const state = reactive({
             userId: '',
             password: '',
-            loginFail: false,
         });
         const requireFieldValidations = {
             userId: [requiredValidation(vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED'))],
@@ -106,41 +102,15 @@ export default defineComponent({
             const result = await validateAPI.fieldValidation('password');
             return result;
         };
-        const login = async () => {
-            state.loginFail = false;
-            const data = {};
+        const signIn = async () => {
             const result = await validateAPI.allValidation();
             if (result) {
-                await vm.$store.dispatch('user/signIn', {
-                    domain_id: vm.$store.state.domain.domainId,
-                    credentials: {
-                        user_type: 'DOMAIN_OWNER',
-                        user_id: state.userId,
-                        password: state.password,
-                    },
-                }).catch((e) => {
-                    state.loginFail = true;
-                    state.password = '';
-                    showErrorMessage(vm.$t('COMMON.SIGN_IN.ALT_E_LOGIN'), '', context.root);
-                });
-
-                const response = await vm.$http.post('/identity/token/issue', {
-                    credentials: {
-                        user_type: 'DOMAIN_OWNER',
-                        user_id: state.userId,
-                        password: state.password,
-                    },
-                    domain_id: store.domain.state.domainId,
-                }, { skipAuthRefresh: true }).catch(() => {
-                    state.loginFail = true;
-                    state.password = '';
-                });
-                ['userId', 'password'].forEach((key) => {
-                    if (state[key]) {
-                        data[key] = state[key];
-                    }
-                });
-                context.emit('onLogin', state.userId, response.data);
+                const credentials = {
+                    user_type: 'DOMAIN_OWNER',
+                    user_id: state.userId,
+                    password: state.password,
+                };
+                context.emit('onLogin', credentials);
             }
         };
         const goToSignIn = () => {
@@ -149,7 +119,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             ...validateAPI,
-            login,
+            signIn,
             goToSignIn,
             checkUserId,
             checkPassword,
