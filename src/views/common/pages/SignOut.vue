@@ -24,6 +24,7 @@ export default {
         (async () => {
             try {
                 if (to.params.authSystem === 'GOOGLE_OAUTH2') {
+                    await store.dispatch('user/signOut');
                     if (!gapi.auth2) {
                         gapi.load('auth2', () => {
                             gapi.auth2.init();
@@ -33,7 +34,6 @@ export default {
                     auth2.signOut().then(() => {
                         auth2.disconnect();
                     });
-                    await store.dispatch('user/signOut');
                 }
                 if (to.params.authSystem === 'ID_PW') {
                     await store.dispatch('user/signOut');
