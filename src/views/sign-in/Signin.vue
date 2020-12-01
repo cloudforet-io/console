@@ -2,13 +2,13 @@
     <div>
         <div class="p-4 flex flex-col items-center text-center h-screen w-full wrapper default-theme">
             <div class="m-auto justify-center">
-                <div id="login-container" class="bg-primary4 lg rounded-lg p-8 md:p-16 ">
+                <div id="sign-in-container" class="bg-primary4 lg rounded-lg p-8 md:p-16 ">
                     <img id="logo" src="@/assets/images/brand/brand_logo.png">
                     <div class="header">
                         <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
                     </div>
                     <div class="user-info">
-                        <component :is="component" @onLogin="login" />
+                        <component :is="component" @onSignIn="signIn" />
                     </div>
                 </div>
                 <p class="version hidden sm:hidden md:block lg:block xl:block">
@@ -26,8 +26,7 @@ import {
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
-import { useStore } from '@/store/toolset';
-import { api } from '@/lib/api/axios';
+import { showErrorMessage } from '@/lib/util';
 
 
 interface State {
@@ -35,14 +34,8 @@ interface State {
     loader: () => Promise<any>;
 }
 
-interface Credentials {
-    // eslint-disable-next-line camelcase
-    access_token: string;
-    // eslint-disable-next-line camelcase
-    refresh_token: string;
-}
 export default {
-    name: 'Login',
+    name: 'SignIn',
     components: {
         PButton,
         PTextInput,
@@ -68,8 +61,6 @@ export default {
     },
     setup(props: any, context: any) {
         const vm = (getCurrentInstance() as any);
-        const store = useStore();
-        store.domain.getDomain(api);
 
         const state = reactive<any>({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
@@ -78,7 +69,6 @@ export default {
                 if (props.admin) {
                     authSystem = 'admin';
                 }
-
                 let component;
                 try {
                     component = () => import(`./templates/${authSystem}/index.vue`);
@@ -89,17 +79,22 @@ export default {
             }),
             version: process.env.VUE_APP_VERSION,
         });
-        const login = async (credentials: Credentials) => {
-            await vm.$store.dispatch('user/signIn', {
-                domain_id: vm.$store.state.domain.domainId,
-                credentials,
-            });
+        const signIn = async (credentials) => {
+            try {
+                await vm.$store.dispatch('user/signIn', {
+                    domain_id: vm.$store.state.domain.domainId,
+                    credentials,
+                });
+                await vm.$router.push(props.nextPath);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('COMMON.SIGN_IN.ALT_E_LOGIN'), '', context.root);
+            }
             // setGtagUserID(vm, vm.$store);
-            await vm.$router.push(props.nextPath);
         };
         return {
             ...toRefs(state),
-            login,
+            signIn,
         };
     },
 };
@@ -107,15 +102,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin background-theme $theme, $background {
-    &.$(theme) {
-        background: $background;
-        background-size: cover;
-
-        /* background-position: center center; */
-    }
-}
-
 .wrapper {
     position: absolute;
     width: 100%;
@@ -125,15 +111,15 @@ export default {
     overflow: hidden;
     background: url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg') no-repeat center center fixed;
     background-size: cover;
-
-    /* background-color: theme('colors.white'); */
-    @mixin background-theme 'default-theme', theme('colors.white');
-    @mixin background-theme 'color-theme', theme('colors.gray.default');
-    @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
-    @mixin background-theme 'video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
 }
 
-#login-container {
+.vue-notification-wrapper::v-deep {
+    .p-toast-alert {
+        margin-top: 10rem;
+    }
+}
+
+#sign-in-container {
     max-width: 26.5rem;
     bottom: 0;
 }

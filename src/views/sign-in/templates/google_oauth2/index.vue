@@ -1,11 +1,5 @@
 <template>
     <div>
-        <p v-if="!loginFail" class="subtitle">
-            {{ $t('COMMON.SIGN_IN.TITLE') }}
-        </p>
-        <p v-else-if="loginFail" id="errorMsg" class="subtitle">
-            {{ $t('COMMON.SIGN_IN.VALIDATION') }}
-        </p>
         <div class="user-info">
             <div class="g-signin2">
                 <div id="g-signin-btn" class="w-full" />
@@ -29,26 +23,22 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, onMounted, reactive, toRefs,
+    ComponentRenderProxy,
+    defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { useStore } from '@/store/toolset';
 
 // @ts-ignore
 const { gapi } = window;
 
 export default defineComponent({
-    name: 'Oauth',
+    name: 'GoogleSignIn',
     components: {
         PButton,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as any;
-        const state = reactive({
-            loginFail: false,
-        });
-        const store = useStore();
-        const onLogIn = async (googleUser) => {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const onSignIn = async (googleUser) => {
             const credentials = {
                 // eslint-disable-next-line camelcase
                 access_token: googleUser.getAuthResponse().access_token,
@@ -57,36 +47,35 @@ export default defineComponent({
             if (!auth2.isSignedIn.get()) {
                 return;
             }
-            context.emit('onLogin', credentials);
+            context.emit('onSignIn', credentials);
         };
         const goToAdmin = () => {
             vm.$router.push({ name: 'AdminLogin' });
         };
         onMounted(async () => {
             gapi.load('auth', () => {
-                const auth2 = gapi.auth2.init({
+                gapi.auth2.init({
                     // eslint-disable-next-line camelcase
-                    client_id: store.domain.state.pluginOption.client_id,
+                    client_id: vm.$store.state.domain.authOptions.client_id,
+                    // client_id: store.domain.state.pluginOption.client_id,
                     // eslint-disable-next-line camelcase
                     fetch_basic_profile: false,
                     scope: 'profile',
                 });
-
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
                     height: 48,
                     width: 'auto',
                     longtitle: true,
                     theme: 'dark',
-                    onsuccess: onLogIn,
+                    onsuccess: onSignIn,
                     onfailure: null,
                 });
             });
         });
         return {
             goToAdmin,
-            onLogIn,
-            ...toRefs(state),
+            onSignIn,
         };
     },
 });
