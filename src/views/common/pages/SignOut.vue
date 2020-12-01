@@ -32,18 +32,18 @@ export default {
                 if (to.params.authSystem === 'ID_PW') {
                     await store.dispatch('user/signOut');
                 }
+                const routerMeta: any = {
+                    name: 'Login',
+                    meta: { excludeAuth: true },
+                };
+                if (router && router.currentRoute.path) {
+                    routerMeta.query = { nextPath: router.currentRoute.path };
+                }
+                if (router) {
+                    await router.push(routerMeta);
+                }
             } catch (e) {
                 next({ name: 'error' });
-            }
-            const routerMeta: any = {
-                name: 'Login',
-                meta: { excludeAuth: true },
-            };
-            if (router && router.currentRoute.path) {
-                routerMeta.query = { nextPath: router.currentRoute.path };
-            }
-            if (router) {
-                await router.push(routerMeta);
             }
         })();
     },
