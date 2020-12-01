@@ -141,8 +141,8 @@ export default {
             state.data = [
                 ...resp.results.map(d => ({
                     title: d.name,
-                    latitude: parseInt(d.tags.latitude),
-                    longitude: parseInt(d.tags.longitude),
+                    latitude: parseInt(d.tags.find(tag => tag.key === 'latitude').value),
+                    longitude: parseInt(d.tags.find(tag => tag.key === 'longitude').value),
                     color: props.providers[d.provider].color as string,
                     ...d,
                 })),
