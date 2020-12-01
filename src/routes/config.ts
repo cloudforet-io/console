@@ -63,7 +63,7 @@ export const routerOptions = {
             path: '/sign-out/:authSystem',
             name: 'SignOut',
             component: SignOut,
-            meta: { label: '', excludeAuth: true },
+            meta: { label: '', excludeAuth: true, isSignInPage: false },
         },
         {
             path: '/',
