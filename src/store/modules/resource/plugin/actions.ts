@@ -19,10 +19,18 @@ export const load = async ({ commit }): Promise<void|Error> => {
         });
 
         pluginResponse.results.forEach((pluginInfo: any): void => {
+            let icon;
+            let label;
+            console.log(pluginInfo);
+            pluginInfo.tags.forEach((tag) => {
+                if (tag.key === 'icon') icon = tag.value;
+                else if (tag.key === 'description') label = tag.value;
+            });
+
             plugins[pluginInfo.plugin_id] = {
-                label: pluginInfo.tags.description || pluginInfo.name,
+                label: label || pluginInfo.name,
                 name: pluginInfo.name,
-                icon: pluginInfo.tags.icon,
+                icon,
             };
         });
     });

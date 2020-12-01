@@ -17,13 +17,22 @@ export const load = async ({ commit }): Promise<void|Error> => {
     const providers: ResourceMap = {};
 
     response.results.forEach((providerInfo: any): void => {
+        let icon;
+        let color = indigo[400];
+        let linkTemplate;
+
+        providerInfo.tags.forEach((tag) => {
+            if (tag.key === 'color') color = tag.value;
+            else if (tag.key === 'icon') icon = tag.value;
+            else if (tag.key === 'external_link_template') linkTemplate = tag.value;
+        });
+
         providers[providerInfo.provider] = {
             label: SPECIAL_LABEL_MAP[providerInfo.provider] || providerInfo.name,
             name: providerInfo.name,
-            color: providerInfo.tags.color || indigo[400],
-            icon: providerInfo.tags.icon,
-            // eslint-disable-next-line camelcase
-            linkTemplate: providerInfo.tags?.external_link_template,
+            icon,
+            color,
+            linkTemplate,
         };
     });
 

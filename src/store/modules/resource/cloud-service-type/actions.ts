@@ -10,10 +10,15 @@ export const load = async ({ commit }): Promise<void|Error> => {
     const cloudServiceTypes: ResourceMap = {};
 
     response.results.forEach((cloudServiceTypeInfo: any): void => {
+        let icon;
+        cloudServiceTypeInfo.tags.forEach((tag) => {
+            if (tag.key === 'spaceone:icon') icon = tag.value;
+        });
+
         cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
             label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
             name: cloudServiceTypeInfo.group,
-            icon: cloudServiceTypeInfo.tags['spaceone:icon'],
+            icon,
         };
     });
 
