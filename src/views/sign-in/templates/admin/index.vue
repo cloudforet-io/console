@@ -1,12 +1,6 @@
 <template>
     <div class="user-info">
-<!--        <p v-if="!loginFail" class="subtitle">-->
-<!--            {{ $t('COMMON.SIGN_IN.TITLE') }}-->
-<!--        </p>-->
-<!--        <p v-else-if="loginFail" id="errorMsg" class="subtitle">-->
-<!--            {{ $t('COMMON.SIGN_IN.VALIDATION') }}-->
-<!--        </p>-->
-        <div id="login-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
+        <div id="sign-in-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
             <form class="form w-full">
                 <div class="flex flex-col form">
                     <p class="input-title">
@@ -66,6 +60,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
+    ComponentRenderProxy,
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
@@ -77,14 +72,14 @@ import {
 } from '@/lib/compostion-util';
 
 export default defineComponent({
-    name: 'Admin',
+    name: 'AdminSignIn',
     components: {
         PButton,
         PTextInput,
         PFieldGroup,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as any;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             userId: '',
             password: '',
@@ -110,7 +105,7 @@ export default defineComponent({
                     user_id: state.userId,
                     password: state.password,
                 };
-                context.emit('onLogin', credentials);
+                context.emit('onSignIn', credentials);
             }
         };
         const goToSignIn = () => {
