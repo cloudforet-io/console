@@ -21,7 +21,6 @@ export const load = async ({ commit }): Promise<void|Error> => {
         pluginResponse.results.forEach((pluginInfo: any): void => {
             let icon;
             let label;
-            console.log(pluginInfo);
             pluginInfo.tags.forEach((tag) => {
                 if (tag.key === 'icon') icon = tag.value;
                 else if (tag.key === 'description') label = tag.value;
