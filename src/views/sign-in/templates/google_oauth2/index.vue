@@ -48,26 +48,8 @@ export default defineComponent({
             loginFail: false,
         });
         const store = useStore();
-        const login = async (userId, param) => {
-            state.loginFail = false;
-            await vm.$store.dispatch('user/signIn', {
-                domain_id: vm.$store.state.domain.domainId,
-                credentials: param,
-            }).catch(() => {
-                state.loginFail = true;
-            });
-
-            // console.debug('start oauth login');
-            const response = await vm.$http.post('/identity/token/issue', {
-                credentials: param,
-                domain_id: store.domain.state.domainId,
-            }, { skipAuthRefresh: true });
-            context.emit('onLogin', userId, response.data);
-        };
         const onLogIn = async (googleUser) => {
-            const profile = googleUser.getBasicProfile();
-            const userId = profile.getEmail();
-            const param = {
+            const credentials = {
                 // eslint-disable-next-line camelcase
                 access_token: googleUser.getAuthResponse().access_token,
             };
@@ -75,8 +57,7 @@ export default defineComponent({
             if (!auth2.isSignedIn.get()) {
                 return;
             }
-            auth2.disconnect();
-            await login(userId, param);
+            context.emit('onLogin', credentials);
         };
         const goToAdmin = () => {
             vm.$router.push({ name: 'AdminLogin' });
