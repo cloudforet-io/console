@@ -80,7 +80,7 @@ import {
     getCurrentInstance,
     reactive,
     toRefs,
-    defineComponent,
+    defineComponent, ComponentRenderProxy,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
@@ -91,20 +91,18 @@ import {
 } from '@/lib/compostion-util';
 
 export default defineComponent({
-    name: 'Local',
+    name: 'LocalSignIn',
     components: {
         PButton,
         PTextInput,
         PFieldGroup,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as any;
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             userId: '',
             password: '',
-            loginFail: false,
         });
-
         const requireFieldValidations = {
             userId: [requiredValidation(vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED'))],
             password: [requiredValidation(vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED'))],
@@ -119,35 +117,13 @@ export default defineComponent({
             return result;
         };
         const login = async () => {
-            state.loginFail = false;
-            const data = {};
             const result = await validateAPI.allValidation();
             if (result) {
-                await vm.$store.dispatch('user/signIn', {
-                    domain_id: vm.$store.state.domain.domainId,
-                    credentials: {
-                        user_id: state.userId,
-                        password: state.password,
-                    },
-                });
-
-                const response = await vm.$http.post('/identity/token/issue', {
-                    credentials: {
-                        user_type: 'USER',
-                        user_id: state.userId,
-                        password: state.password,
-                    },
-                    domain_id: vm.$store.state.domain.domainId,
-                }, { skipAuthRefresh: true }).catch(() => {
-                    state.loginFail = true;
-                    state.password = '';
-                });
-                ['userId', 'password'].forEach((key) => {
-                    if (state[key]) {
-                        data[key] = state[key];
-                    }
-                });
-                context.emit('onLogin', state.userId, response.data);
+                const credentials = {
+                    user_id: state.userId,
+                    password: state.password,
+                };
+                context.emit('onSignIn', credentials);
             }
         };
         const goToAdmin = () => {
@@ -166,46 +142,46 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .p-button.outline {
-        font-size: 0.875rem;
-        font-weight: normal;
-    }
+.p-button.outline {
+    font-size: 0.875rem;
+    font-weight: normal;
+}
 
-    .input-title {
-      font-size: 0.875rem;
-      font-weight: bold;
-      padding-bottom: 0.25rem;
-    }
+.input-title {
+    font-size: 0.875rem;
+    font-weight: bold;
+    padding-bottom: 0.25rem;
+}
 
-    .subtitle {
-        padding-top: 0.5rem;
-        font-weight: normal;
-        font-size: 0.875rem;
-        padding-bottom: 24px;
-    }
+.subtitle {
+    padding-top: 0.5rem;
+    font-weight: normal;
+    font-size: 0.875rem;
+    padding-bottom: 24px;
+}
 
-    #errorMsg {
-        @apply text-alert;
-    }
+#errorMsg {
+    @apply text-alert;
+}
 
-    .btn-divider {
-        @apply text-gray-200;
-        display: flex;
-        flex-basis: 100%;
-        align-items: center;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 0.875rem;
-        margin-bottom: 1em;
-    }
-    .btn-divider > span {
-        margin: 0.5rem;
-    }
-    .btn-divider::before,
-    .btn-divider::after {
-        @apply bg-gray-200;
-        content: "";
-        flex-grow: 1;
-        height: 1px;
-    }
+.btn-divider {
+    @apply text-gray-200;
+    display: flex;
+    flex-basis: 100%;
+    align-items: center;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 0.875rem;
+    margin-bottom: 1em;
+}
+.btn-divider > span {
+    margin: 0.5rem;
+}
+.btn-divider::before,
+.btn-divider::after {
+    @apply bg-gray-200;
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+}
 </style>

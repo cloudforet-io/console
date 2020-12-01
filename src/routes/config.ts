@@ -1,6 +1,7 @@
 // Views
 import ErrorPage from '@/views/common/pages/ErrorPage.vue';
 import SignIn from '@/views/sign-in/Signin.vue';
+import SignOut from '@/views/common/pages/SignOut.vue';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
@@ -58,6 +59,11 @@ export const routerOptions = {
                     }),
                 },
             ],
+        }, {
+            path: '/sign-out/:authSystem',
+            name: 'SignOut',
+            component: SignOut,
+            meta: { label: '', excludeAuth: true },
         },
         {
             path: '/',
