@@ -1,9 +1,19 @@
 import {
-    OperatorType, ValueItem, ValueHandler, QueryItem,
+    OperatorType, ValueItem, ValueHandler, QueryItem, KeyDataType,
 } from '@/components/organisms/search/query-search/type';
 
-/** Operator Chars */
-export const supportOperatorMap: Record<string, OperatorType[]> = {
+/** Input Type Map */
+export const inputTypeMap: Record<KeyDataType, string> = {
+    string: 'text',
+    integer: 'number',
+    float: 'number',
+    boolean: 'text',
+    datetime: 'text',
+    object: 'text',
+};
+
+/** Operator Map */
+export const supportOperatorMap: Partial<Record<KeyDataType, OperatorType[]>> = {
     integer: ['', '!', '>', '>=', '<', '<=', '=', '!='],
     float: ['', '!', '>', '>=', '<', '<=', '=', '!='],
     boolean: ['', '!', '=', '!='],
@@ -12,7 +22,7 @@ export const supportOperatorMap: Record<string, OperatorType[]> = {
 
 
 /** Placeholder Map */
-export const placeholderMap = {
+export const placeholderMap: Partial<Record<KeyDataType, string>> = {
     datetime: 'YYYY-MM-DD',
 };
 
@@ -25,7 +35,7 @@ export const menuTypeMap = {
 /** Input Validator Map */
 const datetimeRegex = RegExp(/^(\d)|[-]$/);
 
-export const inputValidatorMap: Record<string, (value: string) => boolean> = {
+export const inputValidatorMap: Partial<Record<KeyDataType, (value: string) => boolean>> = {
     datetime: value => datetimeRegex.test(value),
 };
 
@@ -51,7 +61,7 @@ const datetimeItems: ValueItem[] = [
     },
 ];
 
-export const defaultHandlerMap: Record<string, ValueHandler> = {
+export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
     boolean: (inputText: string, keyItem) => {
         const regex = RegExp(inputText || '', 'i');
         return {
@@ -74,30 +84,12 @@ export const defaultHandlerMap: Record<string, ValueHandler> = {
 /** QueryItem Formatter Map  */
 const datetimeFormatRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
 
-export const formatterMap: Record<string, (queryItem: QueryItem) => QueryItem> = {
+export const formatterMap: Partial<Record<KeyDataType, (queryItem: QueryItem) => QueryItem>> = {
     datetime: (queryItem) => {
         const res = datetimeFormatRegex.test(queryItem.value.name);
         if (res) {
             queryItem.value.label = res[0];
             queryItem.value.name = res[0];
-        }
-        return queryItem;
-    },
-    object: (queryItem) => {
-        if (!(queryItem.value.name as string).includes(':')) return queryItem;
-        if (queryItem.key) {
-            const subItems = (queryItem.value.name as string).split(':');
-            if (subItems[0]) {
-                /* set sub paths */
-                const subKeys = subItems[0].split('.');
-                if (queryItem.key.subPaths) queryItem.key.subPaths.push(...subKeys.map(d => d.trim()));
-                else queryItem.key.subPaths = subKeys;
-
-                /* set value */
-                const realValue = subItems[1] ? subItems[1].trim() : '';
-                queryItem.value.name = realValue;
-                queryItem.value.label = realValue;
-            }
         }
         return queryItem;
     },

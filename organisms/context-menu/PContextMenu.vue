@@ -31,8 +31,8 @@
                            :href="item.link"
                            :target="item.target"
                            @click.stop="menuClick(item.name, index, $event)"
-                           @keyup.up="onUpKey(index)"
-                           @keyup.down="onDownKey(index)"
+                           @keydown.up="onUpKey(index)"
+                           @keydown.down="onDownKey(index)"
                            @keyup.enter="menuClick(item.name, index, $event)"
                         >
                             <slot name="item--format" v-bind="{...$props, uuid, item, index}">

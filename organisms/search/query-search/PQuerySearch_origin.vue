@@ -75,7 +75,7 @@
 <!--import { CONTEXT_MENU_TYPE, MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';-->
 <!--import {-->
 <!--    HandlerResponse,-->
-<!--    inputDataTypes,-->
+<!--    inputTypeMap,-->
 <!--    KeyItem, OperatorType, QueryItem, QuerySearchProps, ValueItem,-->
 <!--} from '@/components/organisms/search/query-search/type';-->
 <!--import { Component } from 'vue';-->
@@ -139,7 +139,7 @@
 <!--            operator: '' as OperatorType,-->
 <!--            currentDataType: computed(() => state.selectedKey?.dataType || 'string'),-->
 <!--            currentPlaceholder: computed(() => placeholderMap[state.selectedKey?.dataType] || undefined),-->
-<!--            inputType: computed(() => inputDataTypes[state.selectedKey?.dataType] || 'text'),-->
+<!--            inputType: computed(() => inputTypeMap[state.selectedKey?.dataType] || 'text'),-->
 <!--            keyTotalCount: computed(() => {-->
 <!--                if (state.selectedKey) return 0;-->
 <!--                return props.keyItems.length;-->

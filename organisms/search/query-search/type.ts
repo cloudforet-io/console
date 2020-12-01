@@ -1,27 +1,23 @@
 import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
 
-export const inputDataTypes = {
-    string: 'text',
-    integer: 'number',
-    float: 'number',
-    boolean: 'text',
-    datetime: 'text',
-    object: 'text',
-};
-export type KeyDataType = keyof typeof inputDataTypes;
+
+export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', 'object'] as const;
+export type KeyDataType = typeof dataTypes[number];
 
 
-export const operators = ['', '!', '>', '>=', '<', '<=', '=', '!=', '$'];
-export type OperatorType = string;
+export const operators = ['', '!', '>', '>=', '<', '<=', '=', '!=', '$'] as const;
+export type OperatorType = typeof operators[number];
 
 export interface ValueItem {
     label: string;
     name: any;
 }
 
-export interface KeyItem extends ValueItem {
+
+export interface KeyItem {
+    label: string;
+    name: any;
     dataType?: KeyDataType;
-    subPaths?: string[];
     operators?: OperatorType[];
 }
 
@@ -29,6 +25,7 @@ export interface QueryItem {
     key?: KeyItem;
     operator: OperatorType;
     value: ValueItem;
+    subPath?: string;
 }
 
 export type MenuType ='KEY'|'VALUE'|'OPERATOR'
@@ -43,8 +40,10 @@ export type ValueMenuItem = MenuItem<ValueItem>;
 export interface HandlerResponse {
     results: ValueItem[];
     totalCount?: number;
+    dataType?: KeyDataType;
+    operators?: OperatorType[];
 }
-export type ValueHandler = (inputText: string, keyItem: KeyItem, operator?: string) => Promise<HandlerResponse>|HandlerResponse;
+export type ValueHandler = (inputText: string, keyItem: KeyItem, subPath?: string, operator?: string) => Promise<HandlerResponse>|HandlerResponse;
 
 
 export interface ValueHandlerMap {

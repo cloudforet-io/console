@@ -8,13 +8,10 @@
                   :is-focused.sync="isFocused"
         >
             <template #left="scope">
-                <span v-if="selectedKey" :class="{active: isFocused || visibleMenu}">
-                    <span class="key-tag">{{ selectedKey.label }}</span>
-                    <template v-if="selectedKey.subPaths">
-                        <span v-for="(path, idx) in selectedKey.subPaths" :key="idx" class="key-tag">
-                            {{ path }}
-                        </span>
-                    </template>
+                <span v-for="(keyItem, idx) in selectedKeys" :key="idx" class="key-tag"
+                      :class="{active: isFocused || visibleMenu}"
+                >
+                    {{ keyItem.label }}
                 </span>
                 <span v-if="operator" class="operator-tag">{{ operator }}</span>
             </template>
@@ -26,12 +23,12 @@
                        :step="currentDataType === 'integer' ? 1 : undefined"
                        :min="currentDataType === 'integer' ? 0 : undefined"
                        @input="onInput"
-                       @keyup.esc="leaveSearch"
-                       @keyup.down="focusMenu"
+                       @keydown.esc="leaveSearch"
+                       @keydown.down="focusMenu"
                        @keydown.delete="onDelete"
                        @keyup.enter="onEnter"
                        @keydown="onKeydownCheck"
-                       @click.stop="showMenu"
+                       @click.stop="showMenu(true)"
                        @focus="focus"
                        @blur="blur"
                 >
@@ -73,7 +70,9 @@
 import {
     computed, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
-import { throttle, reduce, cloneDeep } from 'lodash';
+import {
+    throttle, reduce, cloneDeep, findLastIndex,
+} from 'lodash';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -86,7 +85,6 @@ import PI from '@/components/atoms/icons/PI.vue';
 /* Types */
 import {
     HandlerResponse,
-    inputDataTypes,
     KeyItem,
     KeyMenuItem,
     operators,
@@ -94,22 +92,21 @@ import {
     QuerySearchProps,
     ValueHandler,
     ValueItem,
-    ValueMenuItem, MenuType, QueryItem,
+    ValueMenuItem, MenuType, QueryItem, KeyDataType, dataTypes,
 } from '@/components/organisms/search/query-search/type';
 
 /* Configs, Helpers */
 import {
     defaultHandlerMap,
-    formatterMap, inputValidatorMap, menuTypeMap,
+    formatterMap, inputTypeMap, inputValidatorMap, menuTypeMap,
     placeholderMap, supportOperatorMap,
 } from '@/components/organisms/search/query-search/config';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     findKey,
-    getDefaultKeyItemHandler,
-    getKeyMenu, getValueItem,
-    getValueMenu,
+    getDefaultKeyItemHandler, getKeyMenuForm,
+    getValueItem, getValueMenuForm,
 } from '@/components/organisms/search/query-search/helper';
 
 
@@ -152,51 +149,55 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: QuerySearchProps, { emit, slots, refs }) {
+    setup(props: QuerySearchProps, { emit, slots }) {
         const state = reactive({
             /* Input */
             inputRef: null as null|HTMLElement,
             isFocused: props.focused,
             searchText: props.value,
-            currentDataType: computed(() => state.selectedKey?.dataType || ''),
             currentPlaceholder: computed(() => placeholderMap[state.currentDataType] || undefined),
-            inputElType: computed(() => inputDataTypes[state.currentDataType] || 'text'),
+            inputElType: computed(() => inputTypeMap[state.currentDataType] || 'text'),
+            currentDataType: computed<KeyDataType|string>(() => {
+                if (state.selectedKeys.length > 1) return state.handlerResp.dataType || '';
+                if (state.rootKey) return state.rootKey.dataType || '';
+                return '';
+            }),
 
             /* Query */
             selectedKeys: [] as KeyItem[],
-            selectedKey: computed<KeyItem|null>(() => {
-                if (state.selectedKeys.length === 0) return null;
-                if (state.selectedKeys.length === 1) return state.selectedKeys[0];
-                return {
-                    ...state.selectedKeys[0],
-                    subPaths: state.selectedKeys
-                        .slice(1, state.selectedKeys.length)
-                        .map(d => d.name),
-                };
-            }),
+            subPath: computed<string|undefined>(() => state.selectedKeys.slice(1).map(d => d.name).join('.') || undefined),
+            selectedKey: computed<KeyItem|null>(() => state.selectedKeys[state.selectedKeys.length - 1] || null),
+            rootKey: computed<KeyItem|null>(() => state.selectedKeys[0] || null),
             operator: '' as OperatorType,
-            supportOperators: operators as OperatorType[],
-            menuType: computed<MenuType>(() => {
-                if (!state.selectedKey || state.currentDataType === 'object') return 'KEY';
-                return menuTypeMap[state.currentDataType] || 'VALUE';
+            supportOperators: computed<OperatorType[]>(() => {
+                if (supportOperatorMap[state.currentDataType]) return supportOperatorMap[state.currentDataType];
+                if (state.handlerResp.operators) return state.handlerResp.operators;
+                if (state.rootKey?.operators) return state.rootKey.operators;
+                return operators;
             }),
 
             /* Menu */
             menuRef: null as any,
             visibleMenu: false,
-            totalCount: 0 as undefined|number,
-            filteredItems: [] as KeyItem[]|ValueItem[],
-            menu: computed<Array<KeyMenuItem|ValueMenuItem>>(() => {
-                if (state.menuType === 'KEY') return getKeyMenu(state.filteredItems, state.selectedKey, state.totalCount);
-                if (state.menuType === 'VALUE') return getValueMenu(state.selectedKey, state.filteredItems, state.operator, state.totalCount);
-                return state.filteredItems.map(d => ({ ...d, type: d.type || 'item', data: d }));
+            menuType: computed<MenuType>(() => {
+                if (!state.selectedKey || state.currentDataType === 'object') return 'KEY';
+                return menuTypeMap[state.currentDataType] || 'VALUE';
             }),
+            menu: computed<Array<KeyMenuItem|ValueMenuItem>>(() => {
+                if (state.menuType === 'KEY') return getKeyMenuForm(state.handlerResp, state.selectedKeys, state.subPath);
+                if (state.menuType === 'VALUE') return getValueMenuForm(state.handlerResp, state.selectedKeys, state.operator, state.subPath);
+                return state.handlerResp.results.map(d => ({ ...d, type: 'item', data: d }));
+            }),
+
+            /* Handler */
             handler: computed<ValueHandler|null>(() => {
-                if (!state.selectedKey) return getDefaultKeyItemHandler(props.keyItems);
+                if (!state.rootKey) return getDefaultKeyItemHandler(props.keyItems);
                 return defaultHandlerMap[state.currentDataType]
-                    || props.valueHandlerMap[state.selectedKey.name]
+                    || props.valueHandlerMap[state.rootKey.name]
                     || null;
             }),
+            handlerResp: { results: [] } as HandlerResponse,
+
 
             /* help */
             visibleSearchGuide: false,
@@ -206,17 +207,15 @@ export default {
         const focus = () => { state.isFocused = true; };
         const blur = () => { state.isFocused = false; };
         const hideMenu = () => { state.visibleMenu = false; };
-        const showMenu = async (refreshMenuItems = true) => {
-            if (refreshMenuItems) {
-                // eslint-disable-next-line no-use-before-define
-                await updateMenuItems(state.searchText);
-            }
+        const showMenu = async (refresh = false) => {
             state.visibleMenu = true;
+            // eslint-disable-next-line no-use-before-define
+            if (refresh) await updateMenuItems(state.searchText);
         };
 
         let offMenuFocusWatch: WatchStopHandle|undefined;
         const focusMenu = async () => {
-            if (!state.visibleMenu) await showMenu();
+            if (!state.visibleMenu) await showMenu(true);
             if (state.menuRef) state.menuRef.focus();
             else {
                 if (offMenuFocusWatch) offMenuFocusWatch();
@@ -239,13 +238,6 @@ export default {
             state.operator = '';
         };
 
-        const updateSupportOperators = (ops?: OperatorType[]) => {
-            state.supportOperators = ops
-                || state.selectedKey?.operators
-                || supportOperatorMap[state.currentDataType]
-                || operators;
-        };
-
 
         const updateSelectedKey = (item: KeyItem|null, replace = false) => {
             if (replace) {
@@ -253,33 +245,31 @@ export default {
                 else state.selectedKeys = [];
             } else if (item) state.selectedKeys.push(item);
             else state.selectedKeys.pop();
-
-            updateSupportOperators(item?.operators);
         };
 
 
         const updateMenuItems = throttle(async (inputText: string): Promise<void> => {
-            let res: HandlerResponse = { results: [], totalCount: undefined };
+            let res: HandlerResponse = { results: [] };
 
             if (state.handler) {
-                const func = state.handler(inputText, state.selectedKey as KeyItem, state.operator);
+                const func = state.handler(inputText, state.selectedKey as KeyItem, state.subPath, state.operator);
                 if (func instanceof Promise) {
                     res = await func;
                 } else res = func;
             }
 
-            state.totalCount = res.totalCount;
-            state.filteredItems = res.results;
+            state.handlerResp = res;
         }, 150);
 
 
         const findAndSetKey = async (val: string) => {
-            const item = findKey(val.substring(0, val.length - 1), state.menu as KeyMenuItem[]) || null;
+            let item = findKey(val, state.handlerResp.results) || null;
+            if (!item && state.currentDataType === 'object') item = { label: val, name: val };
             if (item) {
                 updateSelectedKey(item);
                 clearAll();
                 focus();
-                await showMenu();
+                await updateMenuItems('');
             }
         };
 
@@ -295,9 +285,10 @@ export default {
             if (!valueItem) return;
 
             let queryItem = {
-                key: state.selectedKey,
+                key: state.rootKey,
                 value: valueItem,
                 operator: state.operator,
+                subPath: state.subPath,
             } as QueryItem;
 
             if (formatterMap[state.currentDataType]) {
@@ -317,11 +308,10 @@ export default {
             const val = e.target.value || '';
             state.searchText = val;
 
-            if (!state.visibleMenu) await showMenu(false);
+            if (!state.visibleMenu) await showMenu();
 
-            if (state.menuType === 'KEY' && val.length > 1 && e.data === ':') {
-                await findAndSetKey(val);
-            } else await updateMenuItems(val);
+            if (val.length > 1 && e.data === ':' && (!state.selectedKey || state.currentDataType === 'object')) await findAndSetKey(val.slice(0, val.length - 1));
+            else await updateMenuItems(val);
         };
 
         const onDelete = async (e) => {
@@ -335,12 +325,11 @@ export default {
         };
 
         const onEnter = () => {
-            emitSearch(state.searchText);
+            if (state.currentDataType !== 'object') emitSearch(state.searchText);
         };
 
         const onKeydownCheck = (e: KeyboardEvent) => {
-            if (!state.selectedKey) return;
-            if (state.searchText.length > 0) return;
+            if (state.searchText.length > 0 || !state.selectedKey) return;
 
             /* check operator */
             const op = state.operator + e.key;
@@ -362,18 +351,18 @@ export default {
             focus();
         };
 
-        const onMenuSelect = (value: string, idx: number) => {
+        const onMenuSelect = async (value: string, idx: number) => {
             const selected = state.menu[idx];
 
-            if (state.menuType === 'KEY') {
+            if (!state.selectedKey || state.currentDataType === 'object') {
                 updateSelectedKey(selected.data as KeyItem);
                 clearAll();
                 focus();
-                showMenu();
+                await showMenu(true);
+                await updateMenuItems(state.searchText);
             } else if (state.menuType === 'OPERATOR') {
-                if (state.selectedKey?.dataType === 'datetime' && state.supportOperators.includes(value)) {
+                if (state.supportOperators.includes(value)) {
                     state.operator = value;
-                    updateMenuItems(value);
                     focus();
                     hideMenu();
                 }
@@ -427,6 +416,7 @@ export default {
             hideMenu,
             focusMenu,
             leaveSearch,
+            updateMenuItems,
             emitSearch,
             onInput,
             onDelete,

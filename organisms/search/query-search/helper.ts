@@ -1,4 +1,5 @@
 import {
+    HandlerResponse,
     KeyItem, KeyMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
 } from '@/components/organisms/search/query-search/type';
 import { find } from 'lodash';
@@ -17,22 +18,22 @@ export const getDefaultKeyItemHandler = (staticKeyItems): ValueHandler => (val: 
     return {
         results: keyItems,
         totalCount: staticKeyItems.length,
-        inputType: 'KEY',
     };
 };
 
-export const getKeyMenu = (items: KeyItem[], keyItem: KeyItem|null, totalCount = 0): KeyMenuItem[] => {
+
+export const getKeyMenuForm = (resp: HandlerResponse, selectedKeys: KeyItem[], subPath?: string): KeyMenuItem[] => {
     let key = 'Key';
-    if (keyItem) {
-        key = keyItem.label;
-        if (Array.isArray(keyItem.subPaths)) key = `${keyItem.label}.${keyItem.subPaths.join('.')}`;
+    if (selectedKeys[0]) {
+        key = subPath ? `[${selectedKeys[0].label}] ${subPath}` : selectedKeys[0].label;
     }
+
     return [
         {
-            label: `${key} ${totalCount === undefined ? '' : `(${totalCount})`}`,
+            label: `${key} ${resp.totalCount === undefined ? '' : `(${resp.totalCount})`}`,
             type: 'header',
         },
-        ...items.map(d => ({
+        ...resp.results.map(d => ({
             label: d.label,
             name: d.name,
             type: 'item' as const,
@@ -41,16 +42,18 @@ export const getKeyMenu = (items: KeyItem[], keyItem: KeyItem|null, totalCount =
     ];
 };
 
-export const getValueMenu = (keyItem: KeyItem, items: ValueItem[], operator: OperatorType, totalCount?: number): ValueMenuItem[] => {
-    let key = keyItem.label;
-    if (Array.isArray(keyItem.subPaths)) key = `${keyItem.label}.${keyItem.subPaths.join('.')}`;
+export const getValueMenuForm = (resp: HandlerResponse, selectedKeys: KeyItem[], operator: OperatorType, subPath?: string): ValueMenuItem[] => {
+    let key;
+    if (selectedKeys[0]) {
+        key = subPath ? `[${selectedKeys[0].label}] ${subPath}` : selectedKeys[0].label;
+    }
 
     return [
         {
-            label: `${key} ${totalCount === undefined ? '' : `(${totalCount})`}`,
+            label: `${key} ${resp.totalCount === undefined ? '' : `(${resp.totalCount})`}`,
             type: 'header',
         },
-        ...items.map(d => ({
+        ...resp.results.map(d => ({
             label: `${key}:${operator} ${d.label}`,
             name: d.name,
             type: 'item' as const,
@@ -59,6 +62,7 @@ export const getValueMenu = (keyItem: KeyItem, items: ValueItem[], operator: Ope
     ];
 };
 
+export const getOperatorMenuForm = (items: ValueItem[], operator: OperatorType): ValueMenuItem[] => items.map(d => ({ ...d, type: 'item', data: d }));
 
 export const getValueItem = (val?: ValueItem|string|null, selectedKey?: KeyItem|null): null|ValueItem => {
     let valueItem: ValueItem|null;
@@ -76,12 +80,8 @@ export const getValueItem = (val?: ValueItem|string|null, selectedKey?: KeyItem|
 };
 
 
-export const findKey = (val: string, keyMenu: KeyMenuItem[]): KeyItem|undefined => {
+export const findKey = (val: string, items: KeyItem[]): KeyItem|undefined => {
     const value = val.toLowerCase();
-    const res = find(keyMenu,
-        (item: KeyMenuItem) => (item.type === 'item'
-            && ((item.label && item.label.toString().toLowerCase() === value)
-                || (item.name && item.name.toLowerCase() === value)))) as KeyMenuItem|null;
-
-    return res ? res.data : undefined;
+    const res = find(items, (item: KeyItem) => item.label.toLowerCase() === value || item.name.toLowerCase() === value);
+    return res || undefined;
 };
