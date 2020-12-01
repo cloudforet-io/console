@@ -151,6 +151,8 @@ import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 
 import { store } from '@/store';
 import router from '@/routes/index';
+import { queryTagsToQueryString } from '@/lib/router-query-string';
+import { Location } from 'vue-router';
 
 export default {
     name: 'GNB',
@@ -311,17 +313,21 @@ export default {
         const openProfile = () => {
             state.profileVisible = true;
         };
-        const logOut = () => {
-            store.dispatch('user/signOut');
-            const routerMeta: any = {
-                name: userState.isDomainOwner ? 'AdminLogin' : 'Login',
+
+        const getAuthSystem = async () => {
+            let authSystem;
+            if (store.state.user.userType === 'DOMAIN_OWNER') authSystem = 'ID_PW';
+            else authSystem = store.state.domain.authSystem;
+            return authSystem;
+        };
+        const logOut = async () => {
+            const res: Location = {
+                name: 'SignOut',
+                params: {
+                    authSystem: await getAuthSystem(),
+                },
             };
-            if (router && router.currentRoute.path) {
-                routerMeta.query = { nextPath: router.currentRoute.path };
-            }
-            if (router) {
-                router.push(routerMeta);
-            }
+            await router.push(res);
         };
 
         return {
