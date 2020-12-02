@@ -142,10 +142,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.p-button.outline {
-    font-size: 0.875rem;
-    font-weight: normal;
-}
 
 .input-title {
     font-size: 0.875rem;
@@ -162,6 +158,13 @@ export default defineComponent({
 
 #errorMsg {
     @apply text-alert;
+}
+
+.user-info {
+    margin-top: 1.125rem;
+    @screen md {
+        min-width: 18rem;
+    }
 }
 
 .btn-divider {

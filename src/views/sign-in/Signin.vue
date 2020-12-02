@@ -7,6 +7,8 @@
                     <div class="header">
                         <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
                     </div>
+                    <p v-if="isSignInFailed" class="mt-2 text-red-500 sm leading-normal">{{ $t('COMMON.SIGN_IN.VALIDATION') }}</p>
+                    <p v-else class="mt-2 text-sm leading-normal">{{ $t('COMMON.SIGN_IN.TITLE' )}}</p>
                     <div class="user-info">
                         <component :is="component" @onSignIn="signIn" />
                     </div>
@@ -20,13 +22,14 @@
 </template>
 
 <script lang="ts">
-import {
-    toRefs, reactive, computed, defineComponent, getCurrentInstance,
-} from '@vue/composition-api';
+    import {
+        toRefs, reactive, computed, defineComponent, getCurrentInstance, ComponentRenderProxy,
+    } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
 import { showErrorMessage } from '@/lib/util';
+import { RawLocation } from 'vue-router';
 
 
 interface State {
@@ -59,8 +62,8 @@ export default {
             });
         } else next();
     },
-    setup(props: any, context: any) {
-        const vm = (getCurrentInstance() as any);
+    setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive<any>({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
@@ -78,17 +81,19 @@ export default {
                 return component;
             }),
             version: process.env.VUE_APP_VERSION,
+            isSignInFailed: false,
         });
         const signIn = async (credentials) => {
+            state.isSignInFailed = false;
             try {
                 await vm.$store.dispatch('user/signIn', {
                     domain_id: vm.$store.state.domain.domainId,
                     credentials,
                 });
-                await vm.$router.push(props.nextPath);
+                await vm.$router.push(<RawLocation>props.nextPath);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('COMMON.SIGN_IN.ALT_E_LOGIN'), '', context.root);
+                state.isSignInFailed = true;
             }
             // setGtagUserID(vm, vm.$store);
         };
@@ -113,14 +118,9 @@ export default {
     background-size: cover;
 }
 
-.vue-notification-wrapper::v-deep {
-    .p-toast-alert {
-        margin-top: 10rem;
-    }
-}
-
 #sign-in-container {
     max-width: 26.5rem;
+    height: 39.375rem;
     bottom: 0;
 }
 
