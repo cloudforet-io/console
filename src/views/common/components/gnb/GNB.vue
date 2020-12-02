@@ -314,18 +314,9 @@ export default {
             state.profileVisible = true;
         };
 
-        const getAuthSystem = async () => {
-            let authSystem;
-            if (store.state.user.userType === 'DOMAIN_OWNER') authSystem = 'ID_PW';
-            else authSystem = store.state.domain.authSystem;
-            return authSystem;
-        };
         const logOut = async () => {
             const res: Location = {
                 name: 'SignOut',
-                params: {
-                    authSystem: await getAuthSystem(),
-                },
             };
             await router.push(res);
         };
