@@ -4,6 +4,7 @@ export type Timezone = 'UTC' | 'Asia/Seoul' | string;
 
 export interface UserState {
     isSignedIn?: boolean;
+    isSessionExpired?: boolean;
     userId?: string;
     userType?: UserType;
     name?: string;

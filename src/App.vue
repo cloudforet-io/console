@@ -31,7 +31,6 @@ import {
     ComponentRenderProxy, computed,
     defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@/lib/space-connector';
 
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
@@ -65,8 +64,8 @@ export default defineComponent({
             await router.push(res);
         };
 
-        watch(() => store.state.user.isSignedIn, (after, before) => {
-            if (after !== before && !after && vm.$route.meta.excludeAuth) {
+        watch(() => store.state.user.isSessionExpired, (after, before) => {
+            if (after !== before && !after && !vm.$route.meta.excludeAuth) {
                 state.isExpired = true;
             }
         }, { immediate: false });

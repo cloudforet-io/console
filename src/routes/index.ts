@@ -30,7 +30,7 @@ router.beforeEach(async (to, from, next) => {
         next();
     } else {
         // await store.dispatch('user/signOut');
-        next({ name: 'SignOut', params: { authSystem: router.app.$store.state.user.userType } });
+        next({ name: 'SignOut' });
     }
 });
 
