@@ -11,15 +11,15 @@ export const load = async ({ commit }): Promise<void|Error> => {
         });
         const cloudServiceTypes: ResourceMap = {};
 
-    response.results.forEach((cloudServiceTypeInfo: any): void => {
-        const cloudServiceTypeTags = tagsToObject(cloudServiceTypeInfo.tags);
+        response.results.forEach((cloudServiceTypeInfo: any): void => {
+            const cloudServiceTypeTags = tagsToObject(cloudServiceTypeInfo.tags);
 
-        cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
-            label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
-            name: cloudServiceTypeInfo.name,
-            icon: cloudServiceTypeTags['spaceone:icon'],
-        };
-    });
+            cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
+                label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
+                name: cloudServiceTypeInfo.name,
+                icon: cloudServiceTypeTags['spaceone:icon'],
+            };
+        });
 
         commit('setCloudServiceTypes', cloudServiceTypes);
     } catch (e) {}

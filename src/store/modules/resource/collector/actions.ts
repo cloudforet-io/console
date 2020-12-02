@@ -11,16 +11,16 @@ export const load = async ({ commit }): Promise<void|Error> => {
         });
         const collectors: ResourceMap = {};
 
-    response.results.forEach((collectorInfo: any): void => {
-        const collectorTags = tagsToObject(collectorInfo.tags);
+        response.results.forEach((collectorInfo: any): void => {
+            const collectorTags = tagsToObject(collectorInfo.tags);
 
-        collectors[collectorInfo.collector_id] = {
-            label: collectorInfo.name,
-            name: collectorInfo.name,
-            icon: collectorTags.icon,
-        };
-    });
+            collectors[collectorInfo.collector_id] = {
+                label: collectorInfo.name,
+                name: collectorInfo.name,
+                icon: collectorTags.icon,
+            };
+        });
 
-    commit('setCollectors', collectors);
+        commit('setCollectors', collectors);
     } catch (e) {}
 };

@@ -18,17 +18,17 @@ export const load = async ({ commit }): Promise<void|Error> => {
         });
         const providers: ResourceMap = {};
 
-    response.results.forEach((providerInfo: any): void => {
-        const providerTags = tagsToObject(providerInfo.tags);
+        response.results.forEach((providerInfo: any): void => {
+            const providerTags = tagsToObject(providerInfo.tags);
 
-        providers[providerInfo.provider] = {
-            label: SPECIAL_LABEL_MAP[providerInfo.provider] || providerInfo.name,
-            name: providerInfo.name,
-            icon: providerTags.icon,
-            color: providerTags.color || indigo[400],
-            linkTemplate: providerTags.external_link_template,
-        };
-    });
+            providers[providerInfo.provider] = {
+                label: SPECIAL_LABEL_MAP[providerInfo.provider] || providerInfo.name,
+                name: providerInfo.name,
+                icon: providerTags.icon,
+                color: providerTags.color || indigo[400],
+                linkTemplate: providerTags.external_link_template,
+            };
+        });
 
         commit('setProviders', providers);
     } catch (e) {}

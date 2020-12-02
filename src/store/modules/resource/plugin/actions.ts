@@ -10,30 +10,30 @@ export const load = async ({ commit }): Promise<void|Error> => {
             },
         });
 
-         const plugins: ResourceMap = {};
+        const plugins: ResourceMap = {};
 
-    const promises = repoResponse.results.map(async (repoInfo) => {
-        const pluginResponse = await SpaceConnector.client.repository.plugin.list({
-            query: {
-                only: ['plugin_id', 'name', 'tags'],
-            },
-            repository_id: repoInfo.repository_id,
+        const promises = repoResponse.results.map(async (repoInfo) => {
+            const pluginResponse = await SpaceConnector.client.repository.plugin.list({
+                query: {
+                    only: ['plugin_id', 'name', 'tags'],
+                },
+                repository_id: repoInfo.repository_id,
+            });
+
+
+            pluginResponse.results.forEach((pluginInfo: any): void => {
+                const pluginTags = tagsToObject(pluginInfo.tags);
+
+                plugins[pluginInfo.plugin_id] = {
+                    label: pluginTags.description || pluginInfo.name,
+                    name: pluginInfo.name,
+                    icon: pluginTags.icon,
+                };
+            });
         });
 
+        await Promise.all(promises);
 
-        pluginResponse.results.forEach((pluginInfo: any): void => {
-            const pluginTags = tagsToObject(pluginInfo.tags);
-
-            plugins[pluginInfo.plugin_id] = {
-                label: pluginTags.description || pluginInfo.name,
-                name: pluginInfo.name,
-                icon: pluginTags.icon,
-            };
-          });
-    });
-
-    await Promise.all(promises);
-
-    commit('setPlugins', plugins);
+        commit('setPlugins', plugins);
     } catch (e) {}
 };
