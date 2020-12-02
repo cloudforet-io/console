@@ -111,6 +111,10 @@ export const signOut = ({ commit }): void => {
     commit('signOut');
 };
 
+export const sessionExpired = ({ commit }): void => {
+    commit('sessionExpired');
+};
+
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
     await updateUser(state.userId, state.userType, userRequest);
     commit('setTimezone', userRequest.timezone);
@@ -135,4 +139,4 @@ export const getUser = async ({ commit, state }, userId): Promise<void> => {
         const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
     }
-}
+};

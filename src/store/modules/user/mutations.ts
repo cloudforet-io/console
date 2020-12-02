@@ -19,6 +19,10 @@ export const signOut = (state: UserState): void => {
     state.isSignedIn = false;
 };
 
+export const sessionExpired = (state: UserState): void => {
+    state.isSessionExpired = true;
+};
+
 export const setLanguage = (state: UserState, language: string): void => {
     state.language = language;
 };
