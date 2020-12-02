@@ -38,8 +38,8 @@ import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
 import GNB from '@/views/common/components/gnb/GNB.vue';
 import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue';
 import { store } from '@/store';
-import {Location} from "vue-router";
-import router from "@/routes";
+import { Location } from 'vue-router';
+import router from '@/routes';
 
 
 export default defineComponent({
@@ -58,21 +58,9 @@ export default defineComponent({
             isExpired: false,
         });
 
-        const getAuthSystem = async () => {
-            let authSystem;
-            if (store.state.user.userType === 'DOMAIN_OWNER') authSystem = 'ID_PW';
-            else authSystem = store.state.domain.authSystem;
-            return authSystem;
-        };
-
         const goToSignIn = async () => {
-            // vm.$router.push({ name: 'Login' });
-            // store.dispatch('user/signOut');
             const res: Location = {
                 name: 'SignOut',
-                params: {
-                    authSystem: await getAuthSystem(),
-                },
             };
             await router.push(res);
         };

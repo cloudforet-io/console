@@ -55,7 +55,8 @@ const initConfig = async () => {
     await config.init();
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
-        store.dispatch('user/signOut');
+        // store.dispatch('user/signOut');
+        router.push({ name: 'SignOut' });
     });
     Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'));
 };
