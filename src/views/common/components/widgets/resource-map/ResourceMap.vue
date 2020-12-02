@@ -157,10 +157,9 @@ export default {
             });
         };
 
-        const drawMarker = (coords, marker, mapLabel) => {
+        const drawMarker = (coords, marker) => {
             marker.latitude = coords.latitude;
             marker.longitude = coords.longitude;
-            mapLabel.text = state.selectedRegion;
         };
 
         const drawChart = async () => {
@@ -182,6 +181,7 @@ export default {
             imageSeries.mapImages.template.propertyFields.longitude = 'longitude';
             imageSeries.mapImages.template.propertyFields.latitude = 'latitude';
             imageSeries.mapImages.template.tooltipText = '{title}';
+            imageSeries.mapImages.template.nonScaling = true;
             const circle = imageSeries.mapImages.template.createChild(am4core.Circle);
             circle.radius = 3;
             circle.propertyFields.fill = 'color';
@@ -204,9 +204,8 @@ export default {
             mapMarker.fillOpacity = 1;
             mapMarker.horizontalCenter = 'middle';
             mapMarker.verticalCenter = 'bottom';
+            mapMarker.nonScaling = true;
 
-            const mapLabel = mapImageTemplate.createChild(am4core.Label);
-            mapLabel.horizontalCenter = 'middle';
             const marker = mapImage.create();
 
             circle2.events.on('hit', async (event) => {
@@ -216,13 +215,13 @@ export default {
                 state.selectedRegion = target.name;
                 await getFilteredData(target.region_code);
                 if (originTarget !== state.selectedRegion) {
-                    drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker, mapLabel);
+                    drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker);
                 }
             });
-            const originCoords = { longitude: 126.871867, latitude: 37.528547 };
+            const originCoords = { longitude: 126, latitude: 37 };
             await getRegionList();
-            drawMarker(originCoords, marker, mapLabel);
             imageSeries.data = state.data;
+            drawMarker(originCoords, marker);
             state.chart = chart;
         };
 

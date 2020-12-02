@@ -31,14 +31,8 @@
                                         class="rounded flex-shrink-0 service-img"
                             />
                         </div>
-                        <!--                        <div v-else-if="item.isServer">-->
-                        <!--                            <p-i name="ic_server"-->
-                        <!--                                 width="2rem" height="2rem"-->
-                        <!--                                 class="rounded flex-shrink-0"-->
-                        <!--                            />-->
-                        <!--                        </div>-->
                         <p v-if="item.created_count || item.deleted_count" class="daily-service">
-                            {{ item.title }}<br> <span class="text-sm">{{ item.total_count || 0 }}</span>
+                            {{ item.title }}<br> <span class="font-bold text-sm">{{ item.total_count || 0 }}</span>
                         </p>
                         <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>

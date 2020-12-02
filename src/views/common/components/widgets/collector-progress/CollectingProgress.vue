@@ -35,7 +35,7 @@
             <template #col-collector_info-format="{index, field, item}">
                 <span class="collector-provider"
                       :style="{color: providers[item.collector_info.provider] ? providers[item.collector_info.provider].color : undefined }"
-                >{{ providers[item.collector_info.provider].label }}</span>
+                >{{ providers[item.collector_info.provider] ? providers[item.collector_info.provider].label : item.collector_info.provider }}</span>
                 <span class="collector-title">{{ item.collector_info.name }}</span>
                 <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
             </template>
