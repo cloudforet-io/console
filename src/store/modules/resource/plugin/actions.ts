@@ -1,4 +1,5 @@
 import { SpaceConnector } from '@/lib/space-connector';
+import { tagsToObject } from '@/lib/util';
 import { ResourceMap } from '@/store/modules/resource/type';
 
 export const load = async ({ commit }): Promise<void|Error> => {
@@ -9,36 +10,30 @@ export const load = async ({ commit }): Promise<void|Error> => {
             },
         });
 
-         const plugins: ResourceMap = {};
+        const plugins: ResourceMap = {};
 
-    const promises = repoResponse.results.map(async (repoInfo) => {
-        const pluginResponse = await SpaceConnector.client.repository.plugin.list({
-            query: {
-                only: ['plugin_id', 'name', 'tags'],
-            },
-            repository_id: repoInfo.repository_id,
-        });
-
-
-        pluginResponse.results.forEach((pluginInfo: any): void => {
-            let icon;
-            let label;
-            console.log(pluginInfo);
-            pluginInfo.tags.forEach((tag) => {
-                if (tag.key === 'icon') icon = tag.value;
-                else if (tag.key === 'description') label = tag.value;
+        const promises = repoResponse.results.map(async (repoInfo) => {
+            const pluginResponse = await SpaceConnector.client.repository.plugin.list({
+                query: {
+                    only: ['plugin_id', 'name', 'tags'],
+                },
+                repository_id: repoInfo.repository_id,
             });
 
-            plugins[pluginInfo.plugin_id] = {
-                label: label || pluginInfo.name,
-                name: pluginInfo.name,
-                icon,
-            };
-          });
-    });
 
-    await Promise.all(promises);
+            pluginResponse.results.forEach((pluginInfo: any): void => {
+                const pluginTags = tagsToObject(pluginInfo.tags);
 
-    commit('setPlugins', plugins);
+                plugins[pluginInfo.plugin_id] = {
+                    label: pluginTags.description || pluginInfo.name,
+                    name: pluginInfo.name,
+                    icon: pluginTags.icon,
+                };
+            });
+        });
+
+        await Promise.all(promises);
+
+        commit('setPlugins', plugins);
     } catch (e) {}
 };

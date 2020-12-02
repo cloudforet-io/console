@@ -186,3 +186,11 @@ export const downloadURI = (uri: string, name?: string): void => {
     link.click();
     document.body.removeChild(link);
 };
+
+export const tagsToObject = (tags: Array<{ key: string; value: string }>): Record<string, string> => {
+    const tagsObject = {};
+    tags.forEach((tag) => {
+        tagsObject[tag.key] = tag.value;
+    });
+    return tagsObject;
+};
