@@ -51,7 +51,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -59,19 +59,16 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
-import { store } from '@/store';
-import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 
-    enum JOB_STATE {
-        created = 'CREATED',
-        progress = 'IN_PROGRESS',
-        failure = 'FAILURE',
-        timeout = 'TIMEOUT',
-        canceled = 'CANCELED',
-        success = 'SUCCESS'
-    }
-
+enum JOB_STATE {
+    created = 'CREATED',
+    progress = 'IN_PROGRESS',
+    failure = 'FAILURE',
+    timeout = 'TIMEOUT',
+    canceled = 'CANCELED',
+    success = 'SUCCESS'
+}
 
 export interface JobModel {
         job_id: string;
@@ -94,7 +91,6 @@ export default {
     components: {
         WidgetLayout,
         PSkeleton,
-        PWidgetLayout,
         PI,
         PDataTable,
     },
@@ -103,12 +99,15 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        timezone: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
             items: [] as JobModel[],
             fields: computed(() => [
                 { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_TITLE_TIME'), name: 'collector_info' },
@@ -130,8 +129,8 @@ export default {
         };
         const timeFormatter = (value) => {
             let time = dayjs(dayjs.unix(value.seconds)).utc();
-            if (state.timezone !== 'UTC') {
-                time = dayjs(dayjs.unix(value.seconds)).tz(state.timezone);
+            if (props.timezone !== 'UTC') {
+                time = dayjs(dayjs.unix(value.seconds)).tz(props.timezone);
             }
             return time.format('MM-DD HH:mm ~');
         };

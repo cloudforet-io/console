@@ -85,7 +85,6 @@
                         </template>
                         <template v-else>
                             <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                                <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
                                 <p-skeleton class="flex-grow" />
                             </div>
                         </template>
@@ -201,7 +200,7 @@ export default {
         const state = reactive({
             loading: false,
             chartRef: null as HTMLElement | null,
-            skeletons: range(3),
+            skeletons: range(4),
             //
             selectedIndexInterval: undefined,
             selectedIndex: 0,
@@ -594,9 +593,8 @@ export default {
             }
         }, { immediate: false });
         watch(() => state.selectedType, async (type) => {
-            getSummaryInfo(type);
             if (type !== 'spendings') {
-                await getTrend(type);
+                await Promise.all([getSummaryInfo(type), getTrend(type)]);
                 drawChart();
             }
         }, { immediate: false });

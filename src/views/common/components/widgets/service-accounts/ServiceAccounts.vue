@@ -44,34 +44,28 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { map, forEach, range } from 'lodash';
-import Chart, { ChartDataSets, ChartOptions } from 'chart.js';
 import Color from 'color';
-
-import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance,
-    onMounted, onUnmounted,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
-
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-
-import {
-    black, gray, violet, white, yellow,
-} from '@/styles/colors';
-import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
-import { SpaceConnector } from '@/lib/space-connector';
-import { store } from '@/store';
-
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+
+import {
+    computed, reactive, toRefs, watch,
+    getCurrentInstance, ComponentRenderProxy, onUnmounted,
+} from '@vue/composition-api';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
+import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+
+import {
+    gray, violet, white,
+} from '@/styles/colors';
+import { SpaceConnector } from '@/lib/space-connector';
 
 am4core.useTheme(am4themes_animated);
 
@@ -81,8 +75,6 @@ const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 interface Data {
     providerLabel?: string;
     provider?: string;
-    // name: string;
-    // icon: string;
     color: string;
     service_account_count: number;
     href: string;
@@ -94,11 +86,16 @@ export default {
         WidgetLayout,
         PI,
         PDataTable,
-        PWidgetLayout,
         PSkeleton,
         PChartLoader,
     },
-    setup() {
+    props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -170,20 +167,17 @@ export default {
         const getData = async () => {
             state.loading = true;
             state.data = [];
-            await store.dispatch('resource/provider/load');
             try {
                 const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider();
 
-                const providers = store.state.resource.provider.items;
-
                 if (res.results.length > 0) {
                     forEach(res.results, (d) => {
-                        if (providers[d.provider]) {
+                        if (props.providers[d.provider]) {
                             state.data.push({
-                                providerLabel: providers[d.provider].label || d.provider,
+                                providerLabel: props.providers[d.provider].label || d.provider,
                                 provider: d.provider,
                                 // icon: providers[d.provider].icon || '',
-                                color: providers[d.provider].color || '',
+                                color: props.providers[d.provider].color || '',
                                 href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
                                 service_account_count: d.service_account_count,
                                 ...d,
@@ -192,7 +186,7 @@ export default {
                         // else others.count += d.count;
                     });
                 } else {
-                    state.data = map(providers, p => ({
+                    state.data = map(props.providers, p => ({
                         name: p.label || '', color: p.color || '', service_account_count: 0, href: '',
                     }));
                 }

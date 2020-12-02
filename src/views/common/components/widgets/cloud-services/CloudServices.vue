@@ -72,16 +72,17 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
+/* eslint-disable camelcase */
 import { range } from 'lodash';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import { store } from '@/store';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+
+import { reactive, toRefs } from '@vue/composition-api';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
+import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+
+import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 const DATA_LENGTH = 8;
 export default {
@@ -93,6 +94,10 @@ export default {
         PI,
     },
     props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
         projectFilter: {
             type: String,
             default: '',
@@ -117,6 +122,8 @@ export default {
         }
 
         const state = reactive({
+            loading: true,
+            skeletons: range(8),
             data: [] as Array<{
                 count: number;
                 group: string;
@@ -125,8 +132,6 @@ export default {
                 provider: string;
                 href: string;
             }>,
-            loading: true,
-            providers: computed(() => store.state.resource.provider.items),
         });
 
         const getLink = (data, projectFilter?) => {
@@ -152,7 +157,6 @@ export default {
                 .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                 query: query.data,
-                // eslint-disable-next-line camelcase
                 is_primary: true,
             });
 
@@ -171,7 +175,6 @@ export default {
 
         const getData = async (): Promise<void> => {
             state.loading = true;
-            await store.dispatch('resource/provider/load');
             const query = new QueryHelper()
                 .setSort('count', true, 'name')
                 .setPage(1, 9);
@@ -181,7 +184,6 @@ export default {
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                         query: query.data,
-                        // eslint-disable-next-line camelcase
                         is_primary: true,
                     });
                     state.data = [
@@ -206,8 +208,7 @@ export default {
 
         return {
             ...toRefs(state),
-            skeletons: range(8),
-            iconUrl: (item: Value): string => item.icon || state.providers[item.provider]?.icon || '',
+            iconUrl: (item: Value): string => item.icon || props.providers[item.provider]?.icon || '',
         };
     },
 };

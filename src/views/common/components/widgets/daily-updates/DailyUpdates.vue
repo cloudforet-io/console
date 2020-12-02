@@ -11,11 +11,13 @@
             </div>
         </template>
         <template #default>
-            <div v-if="loading" class="mr-10 flex items-center overflow-hidden">
-                <p-skeleton width="2rem" height="2rem" class="mx-10" />
-                <div class="grid grid-cols-1 gap-1 w-full">
-                    <p-skeleton width="80%" height="0.625rem" />
-                    <p-skeleton width="100%" height="0.625rem" />
+            <div v-if="loading" class="overflow-hidden">
+                <div v-for="v in skeletons" :key="v" class="flex p-4 items-center">
+                    <p-skeleton width="2rem" height="2rem" class="mr-4 flex-shrink-0" />
+                    <div class="grid grid-cols-1 gap-1 w-full">
+                        <p-skeleton width="80%" height="0.625rem" />
+                        <p-skeleton width="100%" height="0.625rem" />
+                    </div>
                 </div>
             </div>
             <div v-if="!loading" class="card-wrapper">
@@ -24,7 +26,7 @@
                          class="daily-update-card"
                     >
                         <div>
-                            <p-lazy-img :src="iconUrl(item)"
+                            <p-lazy-img :src="item.icon"
                                         width="2rem" height="2rem"
                                         class="rounded flex-shrink-0 service-img"
                             />
@@ -58,7 +60,7 @@
                 </div>
                 <div v-for="(item, index) in data" :key="index" class="daily-update-card">
                     <div>
-                        <p-lazy-img :src="iconUrl(item)"
+                        <p-lazy-img :src="item.icon"
                                     width="2rem" height="2rem"
                                     class="rounded flex-shrink-0 service-img"
                         />
@@ -86,22 +88,20 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import {find, range} from 'lodash';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 
 import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { store } from '@/store';
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { find } from 'lodash';
-import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -150,6 +150,7 @@ interface State {
     widgetRef: any;
     dailyUpdates: boolean;
     alertData: any;
+    skeletons: number[];
 }
 
 const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
@@ -159,12 +160,15 @@ export default {
     name: 'DailyUpdates',
     components: {
         WidgetLayout,
-        PWidgetLayout,
         PLazyImg,
         PI,
         PSkeleton,
     },
     props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
         projectFilter: {
             type: String,
             default: '',
@@ -183,6 +187,7 @@ export default {
             loading: true,
             widgetRef: null,
             dailyUpdates: false,
+            skeletons: range(4),
         });
 
         const serverAPI = SpaceConnector.client.statistics.topic.dailyUpdateServer;
@@ -220,7 +225,7 @@ export default {
                 ...state.serverData.map(d => ({
                     title: d.cloud_service_group,
                     isServer: true,
-                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    icon: d.icon || props.providers[d.provider]?.icon,
                     href: `/inventory/server?&filters=provider%3A%3D${d.provider}${props.projectFilter}`,
                     createdHref: `/inventory/server?filters=provider%3A%3D${d.provider}${props.projectFilter}&${getCreatedAtFilters()}`,
                     deletedHref: `/inventory/server?filters=provider%3A%3D${d.provider}${props.projectFilter}&${getDeletedAtFilters()}`,
@@ -228,7 +233,7 @@ export default {
                 })),
                 ...state.cloudServiceData.map(d => ({
                     title: d.cloud_service_group,
-                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    icon: d.icon || props.providers[d.provider]?.icon,
                     href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
                     createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getCreatedAtFilters()}`,
                     deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getDeletedAtFilters()}`,
@@ -243,7 +248,7 @@ export default {
                 ...state.serverData.map(d => ({
                     title: d.cloud_service_group,
                     isServer: true,
-                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    icon: d.icon || props.providers[d.provider]?.icon,
                     href: `/inventory/server?&filters=provider%3A%3D${d.provider}`,
                     createdHref: `/inventory/server?&filters=provider%3A%3D${d.provider}&${getCreatedAtFilters()}`,
                     deletedHref: `/inventory/server?&filters=provider%3A%3D${d.provider}&${getDeletedAtFilters()}`,
@@ -251,7 +256,7 @@ export default {
                 })),
                 ...state.cloudServiceData.map(d => ({
                     title: d.cloud_service_group,
-                    icon: d.icon || store.state.resource.provider.items[d.provider]?.icon,
+                    icon: d.icon || props.providers[d.provider]?.icon,
                     href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
                     createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getCreatedAtFilters()}`,
                     deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getDeletedAtFilters()}`,
@@ -275,7 +280,7 @@ export default {
 
         const getData = async (): Promise<void> => {
             state.loading = true;
-            await Promise.all([store.dispatch('resource/provider/load'), getServerData(), getCloudServiceData()]);
+            await Promise.all([getServerData(), getCloudServiceData()]);
             if (props.projectFilter) {
                 const dataForFilter = await setProjectDashboardData() as any[];
                 await getAlertData(dataForFilter);
@@ -291,7 +296,6 @@ export default {
 
         return {
             ...toRefs(state),
-            iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
             getCreatedAtFilters,
             getDeletedAtFilters,
         };

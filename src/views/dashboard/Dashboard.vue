@@ -6,7 +6,7 @@
             <all-summary class="col-span-12" :providers="providers" />
             <resource-map class="col-span-12" :providers="providers" />
             <top-projects class="col-span-12" />
-            <cloud-services class="col-span-12" :more-info="true" />
+            <cloud-services class="col-span-12" :more-info="true" :providers="providers" />
         </div>
         <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
@@ -19,17 +19,17 @@
                                   :project="project" :cloud-service="cloudService"
                 />
 
-                <daily-updates class="col-span-12
-                                      daily-updates"
+                <daily-updates class="col-span-12 daily-updates"
+                               :providers="providers"
                 />
             </div>
             <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
-                <service-accounts class="col-span-12" />
-                <collector-progress class="col-span-12
-                                       collector-progress"
+                <service-accounts class="col-span-12" :providers="providers" />
+                <collector-progress class="col-span-12 collector-progress"
                                     :providers="providers"
+                                    :timezone="timezone"
                 />
             </div>
         </div>
@@ -49,8 +49,6 @@ import TopProjects from '@/views/common/components/widgets/top-projects/TopProje
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ResourceMap from '@/views/common/components/widgets/resource-map/ResourceMap.vue';
 import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectingProgress.vue';
-
-import { store } from '@/store';
 import FavoritesWidget from '@/views/common/components/widgets/favorites/FavoritesWidget.vue';
 
 
@@ -73,6 +71,7 @@ export default {
             providers: computed(() => vm.$store.state.resource.provider.items),
             project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
             cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
+            timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
         /** Init */
