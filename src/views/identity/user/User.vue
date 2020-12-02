@@ -132,8 +132,9 @@ import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-import { useStore } from '@/store/toolset';
+// import { useStore } from '@/store/toolset';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import {store} from "@/store";
 
 
 interface UserModel {
@@ -172,7 +173,7 @@ export default {
     },
     setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { user } = useStore();
+        // const { user } = useStore();
         const handlers = {
             keyItems: [
                 {
@@ -394,8 +395,9 @@ export default {
                 await SpaceConnector.client.identity.user.update({
                     ...item,
                 });
-                if (user.state.userId === item.user_id) {
-                    await user.setUser('USER', item.user_id, vm);
+                if (store.state.user.userId === item.user_id) {
+                    // await user.setUser('USER', item.user_id, vm);
+                    await store.dispatch('user/setUser', 'USER', item.user_id);
                     vm.$i18n.locale = item.language;
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_UPDATE_USER'), '', root);
@@ -483,17 +485,17 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item {
-        margin-left: 1rem;
-        &:last-child {
-            flex-grow: 1;
-        }
+.left-toolbox-item {
+    margin-left: 1rem;
+    &:last-child {
+        flex-grow: 1;
     }
+}
 
-    #empty-space {
-        @apply text-primary2 mt-6;
-        text-align: center;
-        margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-    }
+#empty-space {
+    @apply text-primary2 mt-6;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
 </style>
