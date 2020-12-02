@@ -27,6 +27,7 @@ import {
     defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { showErrorMessage } from '@/lib/util';
 
 // @ts-ignore
 const { gapi } = window;
@@ -52,6 +53,9 @@ export default defineComponent({
         const goToAdmin = () => {
             vm.$router.push({ name: 'AdminLogin' });
         };
+        const signInFail = () => {
+            console.error('sign in failed');
+        };
         onMounted(async () => {
             gapi.load('auth', () => {
                 gapi.auth2.init({
@@ -69,7 +73,7 @@ export default defineComponent({
                     longtitle: true,
                     theme: 'dark',
                     onsuccess: onSignIn,
-                    onfailure: null,
+                    onfailure: signInFail,
                 });
             });
         });
