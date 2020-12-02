@@ -51,27 +51,27 @@
                         <span class="col-rank">{{ `# ${index + 1}` }}</span>
                     </template>
                     <template #col-project_group-format="{ value }">
-                        <router-link class="link-text" :to="value.link">
+                        <router-link class="link-text" :to="value.to">
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-project-format="{ value }">
-                        <router-link class="link-text" :to="value.link">
+                        <router-link class="link-text" :to="value.to">
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-server-format="{ value }">
-                        <router-link class="link-text" :to="value.link">
+                        <router-link class="link-text" :to="value.to">
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-database-format="{ value }">
-                        <router-link class="link-text" :to="value.link">
+                        <router-link class="link-text" :to="value.to">
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-storage-format="{ value }">
-                        <router-link class="link-text" :to="value.link">
+                        <router-link class="link-text" :to="value.to">
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
@@ -87,26 +87,34 @@ import { orderBy, range } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import { Location } from 'vue-router';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { queryTagsToQueryString } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     gray, peacock, secondary,
 } from '@/styles/colors';
-import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 
 am4core.useTheme(am4themes_animated);
 
+enum CLOUD_SERVICE_LABEL {
+    compute = 'Compute',
+    database = 'Database',
+    storage = 'Storage',
+}
 
 interface ChartData {
     rank: string;
@@ -233,6 +241,36 @@ export default {
             chart.legend.markers.template.width = 8;
             chart.legend.markers.template.height = 8;
         };
+        const getLocation = (type, projectId) => {
+            const filters: QueryTag[] = [
+                {
+                    key: { label: 'Project Id', name: 'project_id' },
+                    operator: '=',
+                    value: { label: projectId, name: projectId },
+                },
+            ];
+            const query: Location['query'] = {};
+            let name: string;
+
+            // set query
+            if (type === 'compute') {
+                name = 'server';
+            } else {
+                name = 'cloudServiceMain';
+                query.provider = 'all';
+                query.service = CLOUD_SERVICE_LABEL[type];
+                if (type === 'storage') query.primary = 'false';
+            }
+
+            const location: Location = {
+                name,
+                query: {
+                    filters: queryTagsToQueryString(filters),
+                    ...query,
+                },
+            };
+            return location;
+        };
 
         /* api */
         const getData = async () => {
@@ -243,23 +281,23 @@ export default {
                     rank: d.rank,
                     project_group: {
                         label: d.project_group,
-                        link: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),
+                        to: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),
                     },
                     project: {
                         label: d.project,
-                        link: referenceRouter(d.project_id, { resource_type: 'identity.Project' }),
+                        to: referenceRouter(d.project_id, { resource_type: 'identity.Project' }),
                     },
                     server: {
                         label: d.server_count,
-                        link: `/inventory/server?filters=project_id%3A%3D${d.project_id}`,
+                        to: getLocation('compute', d.project_id),
                     },
                     database: {
                         label: d.database_count,
-                        link: `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A%3D${d.project_id}`,
+                        to: getLocation('database', d.project_id),
                     },
                     storage: {
                         label: formatBytes(d.storage_size, 2),
-                        link: `/inventory/cloud-service?provider=all&service=Storage&primary=false&filters=project_id%3A%3D${d.project_id}`,
+                        to: getLocation('storage', d.project_id),
                     },
                 }));
                 const orderedData = orderBy(data, ['total'], ['desc']);

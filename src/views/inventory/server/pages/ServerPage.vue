@@ -132,7 +132,6 @@ import {
 } from '@vue/composition-api';
 
 /* Components */
-import PStatus from '@/components/molecules/status/PStatus.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
@@ -176,13 +175,12 @@ import config from '@/lib/config';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { store } from '@/store';
-import { makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
+import { makeDistinctValueHandler, makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import { objHandler } from '@/views/inventory/server/pages/test-query-search';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -422,13 +420,9 @@ export default {
                     label: 'Data',
                     name: 'data',
                     dataType: 'object',
-                }, {
-                    label: 'Raw',
-                    name: 'raw',
-                    dataType: 'object',
                 });
-                typeOptionState.valueHandlerMap.tags = objHandler;
-                typeOptionState.valueHandlerMap.data = objHandler;
+                typeOptionState.valueHandlerMap.tags = makeDistinctValueHandler('inventory.Server', 'tags.key');
+                typeOptionState.valueHandlerMap.data = makeDistinctValueHandler('inventory.Server', 'data');
 
                 // initiate queryTags with keyItems
                 fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItems);

@@ -158,7 +158,7 @@ import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { CollectorModel } from '@/views/plugin/collector/type';
-import { getFiltersFromQueryTags, parseTag } from '@/lib/component-utils/query-search-tags';
+import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
@@ -171,6 +171,7 @@ import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import PI from '@/components/atoms/icons/PI.vue';
 import { store } from '@/store';
+import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -331,29 +332,8 @@ export default {
 
 
         // Url query
-        const searchTagsToUrlQueryString = (tags: QueryTag[]): UrlQueryString => {
-            if (Array.isArray(tags)) {
-                return tags.map((tag) => {
-                    let item;
-                    if (tag.key) item = `${tag.key.name}:${tag.operator}${tag.value?.name}`;
-                    else item = `${tag.value?.name}`;
-                    return item;
-                });
-            }
-            return null;
-        };
-        const urlQueryStringToSearchTags = (urlQueryString: UrlQueryString): QueryTag[] => {
-            if (!urlQueryString) return [];
-            if (Array.isArray(urlQueryString)) {
-                return urlQueryString.reduce((res, qs) => {
-                    if (qs) res.push(parseTag(qs));
-                    return res;
-                }, [] as QueryTag[]);
-            }
-            return [parseTag(urlQueryString as string)];
-        };
         const setSearchTags = () => {
-            state.searchTags = urlQueryStringToSearchTags(vm.$route.query.filters);
+            state.searchTags = queryStringToQueryTags(vm.$route.query.filters, state.querySearchHandlers.keyItems);
         };
 
         // Table
@@ -399,7 +379,7 @@ export default {
         const onChange = async (item) => {
             state.selectedIndexes = [];
             state.searchTags = item.queryTags;
-            const urlQueryString = searchTagsToUrlQueryString(item.queryTags);
+            const urlQueryString = queryTagsToQueryString(item.queryTags);
             // eslint-disable-next-line no-empty-function
             await vm.$router.replace({ query: { ...router.currentRoute.query, filters: urlQueryString } }).catch(() => {});
             try {

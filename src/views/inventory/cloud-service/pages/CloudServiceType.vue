@@ -349,7 +349,7 @@ export default {
                 filters.push({
                     key: { label: 'Region', name: 'region_code' },
                     operator: '=',
-                    value: { label: d, name: d},
+                    value: { label: d, name: d },
                 });
             });
             if (item.resource_type === 'inventory.Server') {

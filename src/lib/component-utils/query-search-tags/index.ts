@@ -2,7 +2,7 @@ import { get, forEach, groupBy } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
     KeyDataType,
-    KeyItem, OperatorType, QueryItem, ValueItem,
+    KeyItem, operators, OperatorType, QueryItem, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
@@ -114,7 +114,7 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
                 setSingleValueFiltersMap({
                     ...query,
                     value: { ...query.value, name: time.toISOString() },
-                    operator: `${query.operator}=`,
+                    operator: `${query.operator}=` as OperatorType,
                 }, singleFiltersMap);
             } else if (query.operator === '=') {
                 const gteQuery: QueryParam = {
@@ -133,7 +133,7 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
             ...query,
             key: {
                 ...query.key,
-                name: query.key.name === 'raw' ? `${query.key.subPaths?.join('.')}` : `${query.key.name}.${query.key.subPaths?.join('.')}`,
+                name: `${query.key.name}${query.subPath ? `.${query.subPath}` : ''}`,
             },
         } as QueryParam;
         defaultFilterSetter(queryParam, singleFiltersMap, multiFiltersMap);
@@ -184,6 +184,7 @@ const getFiltersFromQueryTags = (tags: QueryTag[]): {andFilters: Filter[]; orFil
 
 
 const tagRegex = new RegExp('^(?<key>.+?)?:(?<operator>[=|<|>|!|$]=?)?(?<value>.*)?');
+const slashRegex = /[/]/g;
 
 /**
  * @name parseTag
@@ -194,18 +195,23 @@ const parseTag = (text: string): QueryItem => {
     const parsed = tagRegex.exec(text);
 
     const key: string|undefined = get(parsed, 'groups.key', undefined);
-    let keyItem: KeyItem|undefined;
-    if (key) {
-        const keys = key.split('.');
-        keyItem = { label: keys[0], name: keys[0] };
 
-        if (keys.length > 0) {
-            keyItem.subPaths = keys.slice(1);
+    let keyItem: KeyItem|undefined;
+    let subPath: string|undefined;
+    if (key) {
+        const slashIdx = key.search(slashRegex);
+        if (slashIdx > 0) {
+            subPath = key.slice(slashIdx + 1) || undefined;
+
+            const realKey = key.slice(0, slashIdx);
+            keyItem = { label: realKey, name: realKey };
+        } else {
+            keyItem = { label: key, name: key };
         }
     }
 
-
-    const operator = get(parsed, 'groups.operator', '').trim();
+    let operator: OperatorType = get(parsed, 'groups.operator', '').trim() as OperatorType;
+    if (!operators.includes(operator)) operator = '';
 
     const value = parsed ? get(parsed, 'groups.value', '').trim() : text.trim();
     const valueItem: ValueItem = { label: value, name: value };
@@ -214,6 +220,7 @@ const parseTag = (text: string): QueryItem => {
         key: keyItem,
         operator,
         value: valueItem,
+        subPath,
     };
 };
 
@@ -237,7 +244,7 @@ const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[]
                 res.push({
                     key: keyMap[key] || { label: key, name: key },
                     value: { label: d as string, name: d },
-                    operator: filterKey[1],
+                    operator: filterKey[1] as OperatorType,
                 });
             });
         }

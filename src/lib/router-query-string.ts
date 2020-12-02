@@ -26,28 +26,13 @@ export const replaceQuery = async (key: string, value: RouteQueryString) => {
 
 
 /** QueryString Converter Helpers */
-export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
-    if (Array.isArray(tags)) {
-        return tags.reduce((results, tag) => {
-            if (tag.invalid) return results;
-            if (tag.key) {
-                let key = tag.key.name;
-                if (tag.key.subPaths) {
-                    key = `${key}.${tag.key.subPaths.join('.')}`;
-                }
-                results.push(`${key}:${tag.operator}${tag.value?.name}`);
-            } else results.push(`${tag.value?.name}`);
-            return results;
-        }, [] as string[]);
-    }
-    return null;
-};
-
 const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]): QueryItem => {
-    const queryItem: QueryItem = parseTag(queryString);
-    if (queryItem.key?.name && keyItems) {
-        const key = find(keyItems, { name: queryItem.key.name });
-        if (key) queryItem.key = { ...key, subPaths: queryItem.key.subPaths };
+    const parsedItem: QueryItem = parseTag(queryString);
+    if (parsedItem.key?.name) {
+        if (keyItems) {
+            const originKeyItem = find(keyItems, { name: parsedItem.key.name });
+            if (originKeyItem) parsedItem.key = { ...originKeyItem };
+        }
     }
     // if (queryItem.key?.dataType === 'datetime') {
     //     const time = dayjs.utc(queryItem.value.name);
@@ -58,7 +43,7 @@ const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]):
     //         };
     //     }
     // }
-    return queryItem;
+    return parsedItem;
 };
 
 export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?: KeyItem[]): QueryTag[] => {
@@ -70,6 +55,23 @@ export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?:
         }, [] as QueryTag[]);
     }
     return [getQueryItemFromQueryString(queryString as string, keyItems)];
+};
+
+export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
+    if (Array.isArray(tags)) {
+        return tags.reduce((results, tag) => {
+            if (tag.invalid) return results;
+            if (tag.key) {
+                let key = tag.key.name;
+                if (tag.subPath) {
+                    key = `${key}/${tag.subPath}`;
+                }
+                results.push(`${key}:${tag.operator}${tag.value?.name}`);
+            } else results.push(`${tag.value?.name}`);
+            return results;
+        }, [] as string[]);
+    }
+    return null;
 };
 
 export const queryStringToStringArray = (queryString: RouteQueryString): string[] => {
