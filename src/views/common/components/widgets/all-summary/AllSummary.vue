@@ -8,7 +8,7 @@
             >
                 <div class="content">
                     <div class="count">
-                        <router-link :to="data.to" class="anchor" :class="data.type">
+                        <router-link :to="getLocation(data.type)" class="anchor" :class="data.type">
                             <span class="number">
                                 <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
                                 <span>{{ numberCommaFormatter(data.count) }}</span>
@@ -51,7 +51,7 @@
                         </div>
                         <template v-if="!loading && dataList[selectedIndex].count > 0">
                             <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
-                                <router-link v-for="(data, idx) of dataList[selectedIndex].summaryData" :key="idx"
+                                <router-link v-for="(data, idx) of summaryData" :key="idx"
                                              :to="data.to"
                                              class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
                                 >
@@ -121,39 +121,27 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import { TranslateResult } from 'vue-i18n';
+import { Location } from 'vue-router';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { Location } from 'vue-router';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { queryTagsToQueryString } from '@/lib/router-query-string';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'allSummary';
 
-interface ChartData {
-    date: string;
-    count: number;
-}
-interface SummaryData {
-    provider: string;
-    label: string | TranslateResult;
-    count: number | string;
-    type?: string;
-    to: string | Location;
-}
-
+/* enum */
 enum DATE_TYPE {
     daily = 'daily',
     monthly = 'monthly',
@@ -162,6 +150,27 @@ enum CLOUD_SERVICE_LABEL {
     compute = 'Compute',
     database = 'Database',
     storage = 'Storage',
+    spendings = 'Spendings'
+}
+
+/* type */
+interface ChartData {
+    date: string;
+    count: number;
+}
+interface Data {
+    type: keyof typeof CLOUD_SERVICE_LABEL;
+    title: TranslateResult;
+    count: number;
+    suffix?: string;
+    beta?: boolean;
+}
+interface SummaryData {
+    type?: string;
+    provider: string;
+    label: string | TranslateResult;
+    count: number | string;
+    to: string | Location;
 }
 
 const DAY_COUNT = 14;
@@ -219,42 +228,31 @@ export default {
                     type: 'compute',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
                     count: state.count.compute,
-                    summaryData: state.computeSummaryData,
                     suffix: state.suffix.compute,
-                    to: (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A%3D${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' }),
                 },
                 {
                     type: 'database',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE'),
                     count: state.count.database,
-                    summaryData: state.databaseSummaryData,
                     suffix: state.suffix.database,
-                    to: (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A%3D${props.projectId}`
-                        : '/inventory/cloud-service?provider=all&service=Database',
                 },
                 {
                     type: 'storage',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
                     count: state.count.storage,
-                    summaryData: state.storageSummaryData,
                     suffix: state.suffix.storage,
-                    to: (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Storage&filters=project_id%3A%3D${props.projectId}&primary=false`
-                        : '/inventory/cloud-service?provider=all&service=Storage&primary=false',
                 },
                 {
                     type: 'spendings',
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_SPENDINGS'),
                     count: state.overallSpendings,
-                    to: (props.projectId !== undefined) ? `/project/${props.projectId}` : '/',
                     beta: true,
                 },
-            ])),
-            computeSummaryData: [] as SummaryData[],
-            databaseSummaryData: [] as SummaryData[],
-            storageSummaryData: [] as SummaryData[],
+            ] as Data[])),
+            summaryData: [] as SummaryData[],
         });
         const chartState = reactive({
-            loading: false,
+            loading: true,
             registry: {},
             data: [] as ChartData[],
         });
@@ -344,6 +342,39 @@ export default {
             if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return num;
         };
+        const getLocation = (type) => {
+            const filters: QueryTag[] = [];
+            const query: Location['query'] = {};
+            let name: string;
+
+            // set query
+            if (type === 'compute') {
+                name = 'server';
+            } else {
+                name = 'cloudServiceMain';
+                query.provider = 'all';
+                query.service = CLOUD_SERVICE_LABEL[type];
+                if (type === 'storage') query.primary = 'false';
+            }
+
+            // set filters
+            if (props.projectId) {
+                filters.push({
+                    key: { label: 'Project Id', name: 'project_id' },
+                    operator: '=',
+                    value: { label: props.projectId, name: props.projectId },
+                });
+            }
+
+            const location: Location = {
+                name,
+                query: {
+                    filters: queryTagsToQueryString(filters),
+                    ...query,
+                },
+            };
+            return location;
+        };
 
         /* api */
         const getCount = async (type) => {
@@ -408,80 +439,82 @@ export default {
                 console.error(e);
             }
         };
+        const getApiParameter = (type) => {
+            let param;
+            const defaultParam: any = {
+                labels: [CLOUD_SERVICE_LABEL[type]],
+                is_major: true,
+                query: {
+                    sort: {
+                        name: 'count',
+                        desc: true,
+                    },
+                },
+            };
+            if (props.projectId) {
+                defaultParam.query.filter = {
+                    key: 'project_id',
+                    operator: 'eq',
+                    value: props.projectId,
+                };
+            }
+
+            if (type === 'compute') {
+                param = {
+                    ...defaultParam,
+                    resource_type: 'inventory.Server',
+                };
+            } else if (type === 'database') {
+                param = {
+                    ...defaultParam,
+                };
+            } else if (type === 'storage') {
+                param = {
+                    ...defaultParam,
+                };
+                param.query.sort = { name: 'size', desc: true };
+                param.fields = [
+                    {
+                        name: 'size',
+                        operator: 'sum',
+                        key: 'data.size',
+                    },
+                ];
+            }
+            return param;
+        };
         const getSummaryInfo = async (type) => {
             try {
-                // set value of 'All' type
-                let param;
                 let count;
-                let allLink;
-                const defaultParam: any = {
-                    labels: [CLOUD_SERVICE_LABEL[type]],
-                    is_major: true,
-                    query: {
-                        sort: {
-                            name: 'count',
-                            desc: true,
-                        },
-                    },
-                };
-                if (props.projectId !== undefined) {
-                    defaultParam.query.filter = {
-                        key: 'project_id',
-                        value: [props.projectId],
-                        operator: 'in',
-                    };
-                }
                 if (type === 'compute') {
-                    param = {
-                        ...defaultParam,
-                        resource_type: 'inventory.Server',
-                    };
                     count = state.count.compute;
-                    allLink = (props.projectId !== undefined) ? `/inventory/server?filters=project_id%3A%3D${props.projectId}` : referenceRouter('', { resource_type: 'inventory.Server' });
                 } else if (type === 'database') {
-                    param = {
-                        ...defaultParam,
-                    };
                     count = state.count.database;
-                    allLink = (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Database&filters=project_id%3A%3D${props.projectId}`
-                        : '/inventory/cloud-service?provider=all&service=Database';
-                } else {
-                    param = {
-                        ...defaultParam,
-                    };
-                    param.query.sort = { name: 'size', desc: true };
-                    param.fields = [
-                        {
-                            name: 'size',
-                            operator: 'sum',
-                            key: 'data.size',
-                        },
-                    ];
+                } else if (type === 'storage') {
                     count = `${state.count.storage} ${state.suffix.storage}`;
-                    allLink = (props.projectId !== undefined) ? `/inventory/cloud-service?provider=all&service=Storage&filters=project_id%3A%3D${props.projectId}&primary=false`
-                        : '/inventory/cloud-service?provider=all&service=Storage&primary=false';
                 }
 
-                // set value of 'each' type
+                const param = getApiParameter(type);
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
                 const summaryData: SummaryData[] = [
                     {
                         provider: 'all',
                         label: '',
                         count,
-                        to: allLink,
+                        to: getLocation(type),
                     },
                 ];
                 res.results.forEach((d) => {
-                    let detailLink: Location;
+                    let detailLocation: Location;
                     const filters: QueryTag[] = [];
-                    if (props.projectId !== undefined) {
+                    if (props.projectId) {
                         filters.push({
                             key: { label: 'Project', name: 'project_id' },
                             operator: '=',
                             value: { label: props.projectId, name: props.projectId },
                         });
                     }
+
                     if (d.resource_type === 'inventory.Server') {
                         filters.push({
                             key: { label: 'Provider', name: 'provider' },
@@ -492,14 +525,14 @@ export default {
                             operator: '=',
                             value: { label: d.cloud_service_type, name: d.cloud_service_type },
                         });
-                        detailLink = {
+                        detailLocation = {
                             name: 'server',
                             query: {
                                 filters: queryTagsToQueryString(filters),
                             },
                         };
                     } else {
-                        detailLink = {
+                        detailLocation = {
                             name: 'cloudServicePage',
                             params: {
                                 provider: d.provider,
@@ -516,16 +549,10 @@ export default {
                         label: props.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
                         count: type === 'storage' ? formatBytes(d.size, 2) : d.count,
-                        to: detailLink,
+                        to: detailLocation,
                     });
                 });
-                if (type === 'compute') {
-                    state.computeSummaryData = summaryData;
-                } else if (type === 'database') {
-                    state.databaseSummaryData = summaryData;
-                } else {
-                    state.storageSummaryData = summaryData;
-                }
+                state.summaryData = summaryData;
             } catch (e) {
                 console.error(e);
             }
@@ -550,15 +577,13 @@ export default {
             setBoxInterval();
 
             await getCount('database');
-            if (state.count.database > 0) await getSummaryInfo('database');
-
             await getCount('storage');
-            if (state.count.storage > 0) await getSummaryInfo('storage');
         };
         const chartInit = async () => {
-            chartState.loading = true;
             await getTrend('compute');
-            chartState.loading = false;
+            setTimeout(() => {
+                chartState.loading = false;
+            }, 300);
         };
         init();
         chartInit();
@@ -569,6 +594,7 @@ export default {
             }
         }, { immediate: false });
         watch(() => state.selectedType, async (type) => {
+            getSummaryInfo(type);
             if (type !== 'spendings') {
                 await getTrend(type);
                 drawChart();
@@ -586,258 +612,257 @@ export default {
             onClickBox,
             onClickDateTypeButton,
             numberCommaFormatter,
+            getLocation,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.all-summary-page {
-    .top-part {
-        .box {
-            @apply bg-white;
-            position: relative;
-            display: flex;
-            height: 7.25rem;
-            cursor: pointer;
-            border-radius: 0.375rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            padding-left: 1rem;
-            @screen lg {
-                padding-left: 1.25rem;
-            }
+.top-part {
+    .box {
+        @apply bg-white;
+        position: relative;
+        display: flex;
+        height: 7.25rem;
+        cursor: pointer;
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding-left: 1rem;
+        @screen lg {
+            padding-left: 1.25rem;
+        }
 
-            &:hover {
-                background-color: rgba(theme('colors.indigo.400'), 0.1);
-            }
-            &.selected {
-                @apply bg-primary1 text-white;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                .count {
-                    @apply text-white;
-                    .dollar-sign {
-                        @apply text-white;
-                    }
-                    .suffix {
-                        @apply text-white;
-                        opacity: 1;
-                    }
-                }
-                .title {
-                    @apply text-white;
-                    font-weight: bold;
-                }
-                &:after {
-                    position: absolute;
-                    display: none;
-                    content: '';
-                    width: 0;
-                    border-style: solid;
-                    border-color: theme('colors.primary1') transparent;
-                    border-width: 0.5rem 0.5rem 0;
-                    bottom: -0.45rem;
-                    left: 50%;
-                    margin-left: -0.5rem;
-                    @screen sm {
-                        display: block;
-                    }
-                }
-            }
-            &.spendings {
-                .count .number {
-                    font-size: 1.25rem;
-                }
-            }
-
-            .content {
-                position: relative;
-                top: -0.25rem;
-                margin: auto 0;
-            }
+        &:hover {
+            background-color: rgba(theme('colors.indigo.400'), 0.1);
+        }
+        &.selected {
+            @apply bg-primary1 text-white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             .count {
-                @apply text-indigo-400;
-                position: relative;
-                display: inline-block;
-                line-height: 2.5rem;
-                &:hover {
-                    .anchor {
-                        border-bottom: 2px solid;
-                        &.spendings {
-                            border: none;
-                        }
-                    }
-                }
+                @apply text-white;
                 .dollar-sign {
-                    @apply text-gray-500;
-                    font-size: 1.5rem;
-                    font-weight: normal;
-                    padding-right: 0.25rem;
-                }
-                .number {
-                    font-size: 2rem;
-                    font-weight: bold;
+                    @apply text-white;
                 }
                 .suffix {
-                    @apply text-gray-500;
-                    font-size: 1rem;
-                    font-weight: normal;
-                    opacity: 0.7;
-                    padding-left: 0.5rem;
-                    &.storage {
-                        font-size: 0.875rem;
-                    }
+                    @apply text-white;
+                    opacity: 1;
                 }
             }
             .title {
-                @apply text-gray-900;
-                font-size: 1rem;
-                text-transform: capitalize;
+                @apply text-white;
+                font-weight: bold;
+            }
+            &:after {
+                position: absolute;
+                display: none;
+                content: '';
+                width: 0;
+                border-style: solid;
+                border-color: theme('colors.primary1') transparent;
+                border-width: 0.5rem 0.5rem 0;
+                bottom: -0.45rem;
+                left: 50%;
+                margin-left: -0.5rem;
+                @screen sm {
+                    display: block;
+                }
             }
         }
-    }
+        &.spendings {
+            .count .number {
+                font-size: 1.25rem;
+            }
+        }
 
-    .bottom-part {
-        margin-top: 1rem;
-
-        .content-wrapper {
-            @apply bg-white;
+        .content {
             position: relative;
-            height: 27.5rem;
-            border-radius: 0.375rem;
-            padding: 1.25rem 1.5rem;
-            @screen md {
-                height: 25rem;
+            top: -0.25rem;
+            margin: auto 0;
+        }
+        .count {
+            @apply text-indigo-400;
+            position: relative;
+            display: inline-block;
+            line-height: 2.5rem;
+            &:hover {
+                .anchor {
+                    border-bottom: 2px solid;
+                    &.spendings {
+                        border: none;
+                    }
+                }
             }
-            @screen lg {
-                height: 17.5rem;
+            .dollar-sign {
+                @apply text-gray-500;
+                font-size: 1.5rem;
+                font-weight: normal;
+                padding-right: 0.25rem;
             }
-
-            .title {
-                font-size: 1rem;
+            .number {
+                font-size: 2rem;
                 font-weight: bold;
-                margin-bottom: 1rem;
             }
-            .chart-wrapper {
-                position: relative;
-                .toggle-button-group {
-                    position: absolute;
-                    right: 0.5rem;
-                    top: 0;
-                    .p-button {
-                        @apply border border-gray-200 text-gray-300;
-                        height: 1.25rem;
-                        min-width: 2rem;
-                        font-size: 0.75rem;
-                        font-weight: normal;
-                        border-radius: 0.125rem;
-                        padding: 0.25rem;
-                        margin-left: 0.25rem;
-                        &.selected {
-                            @apply bg-gray-600 border-gray-600 text-white;
-                        }
-                    }
-                }
-                .chart {
-                    height: 13rem;
-                }
-            }
-            .summary-wrapper {
-                .title {
-                    padding: 0 0.5rem;
-                    margin-bottom: 1.25rem;
-                }
-                .summary-content-wrapper {
-                    height: 5rem;
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    @screen lg {
-                        height: 12rem;
-                    }
-                    &.no-data-wrapper {
-                        .empty-image {
-                            margin: 0 auto 0.5rem auto;
-                        }
-                        .text {
-                            @apply text-primary2;
-                            font-size: 0.875rem;
-                            font-weight: bold;
-                            line-height: 1.5;
-                            text-align: center;
-                            opacity: 0.7;
-                            margin-bottom: 0.625rem;
-                        }
-                        .p-button {
-                            min-width: auto;
-                            height: 1.25rem;
-                            font-size: 0.75rem;
-                            line-height: 1.2;
-                            padding: 0.5rem;
-                        }
-                    }
-                }
-                .summary-row {
-                    position: relative;
-                    display: block;
+            .suffix {
+                @apply text-gray-500;
+                font-size: 1rem;
+                font-weight: normal;
+                opacity: 0.7;
+                padding-left: 0.5rem;
+                &.storage {
                     font-size: 0.875rem;
-                    line-height: 1.2;
-                    cursor: pointer;
-                    padding: 0.25rem 0.5rem;
-                    margin: auto 0;
-                    &:hover {
-                        @apply bg-secondary2;
-                        .provider {
-                            text-decoration: underline;
-                        }
-                        .type {
-                            text-decoration: underline;
-                        }
-                        .count {
-                            text-decoration: underline;
-                        }
-                    }
+                }
+            }
+        }
+        .title {
+            @apply text-gray-900;
+            font-size: 1rem;
+            text-transform: capitalize;
+        }
+    }
+}
 
-                    .text-group {
-                        display: inline-block;
-                        width: 80%;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        .type {
-                            padding-left: 0.5rem;
-                        }
+.bottom-part {
+    margin-top: 1rem;
+
+    .content-wrapper {
+        @apply bg-white;
+        position: relative;
+        height: 27.5rem;
+        border-radius: 0.375rem;
+        padding: 1.25rem 1.5rem;
+        @screen md {
+            height: 25rem;
+        }
+        @screen lg {
+            height: 17.5rem;
+        }
+
+        .title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .chart-wrapper {
+            position: relative;
+            .toggle-button-group {
+                position: absolute;
+                right: 0.5rem;
+                top: 0;
+                .p-button {
+                    @apply border border-gray-200 text-gray-300;
+                    height: 1.25rem;
+                    min-width: 2rem;
+                    font-size: 0.75rem;
+                    font-weight: normal;
+                    border-radius: 0.125rem;
+                    padding: 0.25rem;
+                    margin-left: 0.25rem;
+                    &.selected {
+                        @apply bg-gray-600 border-gray-600 text-white;
+                    }
+                }
+            }
+            .chart {
+                height: 13rem;
+            }
+        }
+        .summary-wrapper {
+            .title {
+                padding: 0 0.5rem;
+                margin-bottom: 1.25rem;
+            }
+            .summary-content-wrapper {
+                height: 5rem;
+                overflow-y: auto;
+                overflow-x: hidden;
+                @screen lg {
+                    height: 12rem;
+                }
+                &.no-data-wrapper {
+                    .empty-image {
+                        margin: 0 auto 0.5rem auto;
+                    }
+                    .text {
+                        @apply text-primary2;
+                        font-size: 0.875rem;
+                        font-weight: bold;
+                        line-height: 1.5;
+                        text-align: center;
+                        opacity: 0.7;
+                        margin-bottom: 0.625rem;
+                    }
+                    .p-button {
+                        min-width: auto;
+                        height: 1.25rem;
+                        font-size: 0.75rem;
+                        line-height: 1.2;
+                        padding: 0.5rem;
+                    }
+                }
+            }
+            .summary-row {
+                position: relative;
+                display: block;
+                font-size: 0.875rem;
+                line-height: 1.2;
+                cursor: pointer;
+                padding: 0.25rem 0.5rem;
+                margin: auto 0;
+                &:hover {
+                    @apply bg-secondary2;
+                    .provider {
+                        text-decoration: underline;
+                    }
+                    .type {
+                        text-decoration: underline;
                     }
                     .count {
-                        @apply text-gray-600;
-                        position: absolute;
-                        right: 0.5rem;
+                        text-decoration: underline;
                     }
                 }
-            }
-            .empty-wrapper {
-                position: relative;
-                display: flex;
-                height: 100%;
 
-                .content {
-                    display: block;
-                    margin: auto;
-                    .empty-image {
-                        margin: auto;
+                .text-group {
+                    display: inline-block;
+                    width: 80%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    .type {
+                        padding-left: 0.5rem;
                     }
-                    .empty-text-group {
-                        text-align: center;
-                        line-height: 2rem;
-                        padding-top: 0.875rem;
-                        .empty-text {
-                            display: block;
-                            &.large {
-                                @apply text-primary;
-                                font-size: 1rem;
-                            }
-                            &.small {
-                                @apply text-gray;
-                                font-size: 0.875rem;
-                            }
+                }
+                .count {
+                    @apply text-gray-600;
+                    position: absolute;
+                    right: 0.5rem;
+                }
+            }
+        }
+        .empty-wrapper {
+            position: relative;
+            display: flex;
+            height: 100%;
+
+            .content {
+                display: block;
+                margin: auto;
+                .empty-image {
+                    margin: auto;
+                }
+                .empty-text-group {
+                    text-align: center;
+                    line-height: 2rem;
+                    padding-top: 0.875rem;
+                    .empty-text {
+                        display: block;
+                        &.large {
+                            @apply text-primary;
+                            font-size: 1rem;
+                        }
+                        &.small {
+                            @apply text-gray;
+                            font-size: 0.875rem;
                         }
                     }
                 }
@@ -846,7 +871,6 @@ export default {
     }
 }
 </style>
-
 <style lang="postcss">
 .allSummaryLabelBullet-group {
     display: none;
