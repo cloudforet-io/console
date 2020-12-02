@@ -69,7 +69,7 @@
                     </p-empty>
                 </template>
                 <template #card="{item}">
-                    <p-card-item :icon="item.tags.icon"
+                    <p-card-item :icon="item.icon"
                                  :title="item.name"
                                  :contents="item.tags.description"
                     >
@@ -104,9 +104,11 @@
 </template>
 
 <script lang="ts">
-import { get, range } from 'lodash';
+import { get, range, find } from 'lodash';
 
-import {toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy} from '@vue/composition-api';
+import {
+    toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
@@ -149,7 +151,8 @@ interface PluginModel {
     project_id: string;
     labels: string[];
     created_at: TimeStamp;
-    tags: object;
+    tags: object[];
+    icon?: string;
 }
 
 interface RepositoryModel {
@@ -229,7 +232,12 @@ export default {
                     query: query.data,
                 };
                 const res = await SpaceConnector.client.repository.plugin.list(params);
-                state.plugins = res.results;
+                state.plugins = [
+                    ...res.results.map(d => ({
+                        icon: d.tags.find(tag => tag.key === 'icon').value,
+                        ...d,
+                    })),
+                ];
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);

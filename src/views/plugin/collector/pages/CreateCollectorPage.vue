@@ -100,7 +100,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             plugin: {},
-            imageUrl: computed(() => get(state.plugin, 'tags.icon', '')),
+            imageUrl: computed(() => get(state.plugin, 'icon', '')),
             provider: computed(() => get(state.plugin, 'provider', '')),
             pluginId: get(root, '$route.params.pluginId', ''),
             tags: {},
@@ -183,10 +183,8 @@ export default {
                     plugin_id: state.pluginId,
                 });
                 state.plugin = res;
+                state.plugin.icon = res.tags.find(tag => tag.key === 'icon').value;
                 state.supportedSchema = res.capability.supported_schema;
-                if (res.tags?.icon) {
-                    state.tags.icon = res.tags.icon;
-                }
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'), e, vm.$root);

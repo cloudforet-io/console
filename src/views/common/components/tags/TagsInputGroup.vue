@@ -53,9 +53,7 @@
 </template>
 
 <script lang="ts">
-import {
-    forEach, map, some, range,
-} from 'lodash';
+import { some, range } from 'lodash';
 
 import {
     toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
