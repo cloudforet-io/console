@@ -1,4 +1,5 @@
 import { SpaceConnector } from '@/lib/space-connector';
+import { tagsToObject } from '@/lib/util';
 import { ResourceMap } from '@/store/modules/resource/type';
 
 export const load = async ({ commit }): Promise<void|Error> => {
@@ -19,17 +20,12 @@ export const load = async ({ commit }): Promise<void|Error> => {
         });
 
         pluginResponse.results.forEach((pluginInfo: any): void => {
-            let icon;
-            let label;
-            pluginInfo.tags.forEach((tag) => {
-                if (tag.key === 'icon') icon = tag.value;
-                else if (tag.key === 'description') label = tag.value;
-            });
+            const pluginTags = tagsToObject(pluginInfo.tags);
 
             plugins[pluginInfo.plugin_id] = {
-                label: label || pluginInfo.name,
+                label: pluginTags.description || pluginInfo.name,
                 name: pluginInfo.name,
-                icon,
+                icon: pluginTags.icon,
             };
         });
     });

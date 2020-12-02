@@ -1,4 +1,5 @@
 import { SpaceConnector } from '@/lib/space-connector';
+import { tagsToObject } from '@/lib/util';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { indigo } from '@/styles/colors';
 
@@ -17,22 +18,14 @@ export const load = async ({ commit }): Promise<void|Error> => {
     const providers: ResourceMap = {};
 
     response.results.forEach((providerInfo: any): void => {
-        let icon;
-        let color = indigo[400];
-        let linkTemplate;
-
-        providerInfo.tags.forEach((tag) => {
-            if (tag.key === 'color') color = tag.value;
-            else if (tag.key === 'icon') icon = tag.value;
-            else if (tag.key === 'external_link_template') linkTemplate = tag.value;
-        });
+        const providerTags = tagsToObject(providerInfo.tags);
 
         providers[providerInfo.provider] = {
             label: SPECIAL_LABEL_MAP[providerInfo.provider] || providerInfo.name,
             name: providerInfo.name,
-            icon,
-            color,
-            linkTemplate,
+            icon: providerTags.icon,
+            color: providerTags.color || indigo[400],
+            linkTemplate: providerTags.external_link_template,
         };
     });
 
