@@ -7,7 +7,7 @@
             <div class="btn-divider">
                 <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
             </div>
-            <div class="flex flex-col mb-4 md:w-full">
+            <div class="flex flex-col md:w-full">
                 <p-button :outline="true"
                           type="submit"
                           size="lg"
@@ -86,17 +86,8 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.subtitle {
-    padding-top: 0.5rem;
-    font-size: 0.875rem;
-}
-
-#errorMsg {
-    color: red;
-}
-
 #g-signin-btn {
-    padding-top: 1.5rem;
+    padding-top: 4rem;
     padding-bottom: 3.5rem;
 }
 
@@ -108,7 +99,7 @@ export default defineComponent({
     font-style: normal;
     font-weight: bold;
     font-size: 0.875rem;
-    margin-bottom: 1em;
+    margin-bottom: 2em;
 }
 .btn-divider > span {
     @apply text-gray-300;

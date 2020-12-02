@@ -21,7 +21,7 @@
                         </template>
                     </p-field-group>
                 </div>
-                <div class="flex flex-col mb-4 md:w-full">
+                <div class="flex flex-col mb-9 md:w-full">
                     <p class="input-title">
                         {{ $t('COMMON.SIGN_IN.PASSWORD') }}
                     </p>
@@ -44,7 +44,7 @@
                 </div>
             </form>
         </div>
-        <div class="flex flex-col mb-4 md:w-full">
+        <div class="flex flex-col md:w-full">
             <p-button style-type="primary" type="submit" size="lg"
                       class="mb-8" @click="signIn"
             >
@@ -129,18 +129,9 @@ export default defineComponent({
     font-weight: bold;
     padding-bottom: 0.25rem;
 }
-.subtitle {
-    padding-top: 0.5rem;
-    font-weight: normal;
-    font-size: 0.875rem;
-    padding-bottom: 1.5rem;
-}
-
-#errorMsg {
-    color: red;
-}
 
 .user-info {
+    margin-top: 1.125rem;
     @screen md {
         min-width: 18rem;
     }
