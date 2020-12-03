@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
 import {
-    select, boolean, text, object,
+    object,
 } from '@storybook/addon-knobs';
 import {
-    toRefs, reactive, ref, computed,
+    reactive,
 } from '@vue/composition-api';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import md from '@/components/organisms/dynamic-field/PDynamicField.md';
 
 export default {
-    title: 'others/dynamic-field',
+    title: 'Others/Dynamic/DynamicField',
     component: PDynamicField,
     parameters: {
         notes: md,

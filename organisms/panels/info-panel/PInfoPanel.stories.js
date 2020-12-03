@@ -1,12 +1,12 @@
 import { ref } from '@vue/composition-api';
 import {
-    text, number, select, object, boolean,
+    text, object,
 } from '@storybook/addon-knobs/vue';
 import PInfoPanel from '@/components/organisms/panels/info-panel/PInfoPanel.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 
 export default {
-    title: 'others/InfoPanel',
+    title: 'Others/Panel/InfoPanel',
     component: PInfoPanel,
     parameters: {
         info: {

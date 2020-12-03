@@ -3,7 +3,7 @@ import { boolean, select } from '@storybook/addon-knobs';
 import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/PDropdownBtn.vue';
 
 export default {
-    title: 'others/dropdown',
+    title: 'Others/Dropdown',
     component: PDropdownBtn,
     parameters: {
         info: {

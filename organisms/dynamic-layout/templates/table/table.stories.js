@@ -1,17 +1,17 @@
 /* eslint-disable camelcase */
 import {
-    computed, reactive, ref, toRefs,
+    reactive, toRefs,
 } from '@vue/composition-api';
 import casual, { arrayOf } from '@/components/util/casual';
 import { action } from '@storybook/addon-actions';
 import {
-    text, number, select, object, boolean,
+    text, object,
 } from '@storybook/addon-knobs/vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
-    title: 'others/dynamic-layout/table',
+    title: 'Others/Dynamic/DynamicLayout/Table',
     component: PDynamicLayout,
     parameters: {
         notes: md,

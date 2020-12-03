@@ -3,7 +3,7 @@ import { object } from '@storybook/addon-knobs';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 
 export default {
-    title: 'others/dropdownMenuBtn',
+    title: 'Others/Dropdown/DropdownMenuBtn',
     component: PDropdownMenuBtn,
     parameters: {
         info: {

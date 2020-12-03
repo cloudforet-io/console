@@ -1,9 +1,8 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import {
-    text, number, select, object, boolean, color,
+    select, color,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
@@ -42,7 +41,7 @@ const selectableItemProps = {
     },
 };
 export default {
-    title: 'others/SelectableItem',
+    title: 'Others/Select/SelectableItem',
     component: PSelectableItem,
     parameters: {
         info: {

@@ -1,15 +1,12 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 
 export default {
-    title: 'others/SelectableList',
+    title: 'Others/Select/SelectableList',
     component: PSelectableList,
     parameters: {
         info: {

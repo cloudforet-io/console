@@ -4,13 +4,13 @@ import {
 import { action } from '@storybook/addon-actions';
 import { getKnobProps } from '@sb/storybook-util';
 import {
-    text, number, select, object, boolean,
+    text, object,
 } from '@storybook/addon-knobs/vue';
 import casual, { arrayOf } from '@/components/util/casual';
 import PTextList from './PTextList.vue';
 
 export default {
-    title: 'others/TextList',
+    title: 'Others/List/TextList',
     component: PTextList,
     parameters: {
         info: {

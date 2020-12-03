@@ -1,16 +1,12 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
 import casual, { arrayOf } from '@/components/util/casual';
 import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChart.vue';
 
 export default {
-    title: 'others/MetricChart',
+    title: 'Others/Charts/MetricChart',
     component: PMetricChart,
     parameters: {
         info: {

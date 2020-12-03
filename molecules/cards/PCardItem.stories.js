@@ -3,7 +3,7 @@ import PCardItem from '@/components/molecules/cards/PCardItem.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 
 export default {
-    title: 'others/CardItem',
+    title: 'Others/Definition, Label, Item/CardItem',
     component: PCardItem,
     decorators: [withKnobs],
 };

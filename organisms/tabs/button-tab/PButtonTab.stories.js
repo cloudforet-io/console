@@ -1,14 +1,11 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import PButtonTab from './PButtonTab.vue';
 
 export default {
-    title: 'others/tabs/ButtonTab',
+    title: 'Others/Tab, Progress Tab/ButtonTab',
     component: PButtonTab,
     parameters: {
         info: {

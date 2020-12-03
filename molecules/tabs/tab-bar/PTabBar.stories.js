@@ -2,7 +2,7 @@ import { action } from '@storybook/addon-actions';
 import PTabBar from '@/components/molecules/tabs/tab-bar/PTabBar.vue';
 
 export default {
-    title: 'others/Tabs',
+    title: 'Others/Tab, Progress Tab/TabBar',
     component: PTabBar,
     parameters: {
         info: {

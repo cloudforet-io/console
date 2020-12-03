@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
-    title: 'others/dynamic-layout/item',
+    title: 'Others/Dynamic/DynamicLayout/item',
     component: PDynamicLayout,
     parameters: {
         notes: md,

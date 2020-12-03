@@ -1,14 +1,13 @@
 /* eslint-disable camelcase */
 import {
-    boolean, object, text, select,
+    object, text,
 } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
-import { ref } from '@vue/composition-api';
 import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
-    title: 'others/dynamic-layout/html',
+    title: 'Others/Dynamic/DynamicLayout/html',
     component: PDynamicLayout,
     parameters: {
         notes: md,

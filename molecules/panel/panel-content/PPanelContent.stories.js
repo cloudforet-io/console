@@ -3,7 +3,7 @@ import PanelContent from '@/components/molecules/panel/panel-content/PPanelConte
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 
 export default {
-    title: 'others/panelContents',
+    title: 'Others/Panel/PanelContents',
     component: { PanelContent, PBadge },
     parameters: {
         info: {

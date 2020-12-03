@@ -11,7 +11,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
-    title: 'others/dynamic-layout/query-search-table',
+    title: 'Others/Dynamic/DynamicLayout/QuerySearchTable',
     component: PDynamicLayout,
     parameters: {
         notes: md,

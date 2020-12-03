@@ -9,7 +9,7 @@ import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
-    title: 'others/dynamic-layout/simple-table',
+    title: 'Others/Dynamic/DynamicLayout/SimpleTable',
     component: PDynamicLayout,
     parameters: {
         notes: md,

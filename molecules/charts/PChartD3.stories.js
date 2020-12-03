@@ -3,7 +3,7 @@ import PChart from '@/components/molecules/charts/PChartD3.vue';
 import { autoProps } from '@sb/storybook-util';
 
 export default {
-    title: 'others/chart',
+    title: 'Others/Charts/Chart',
     component: PChart,
     decorators: [withKnobs],
 };

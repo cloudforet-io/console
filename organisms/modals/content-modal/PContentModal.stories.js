@@ -7,7 +7,7 @@ import PContentModal from '@/components/organisms/modals/content-modal/PContentM
 import faker from 'faker';
 
 export default {
-    title: 'others/content-modal',
+    title: 'Others/Modal/ContentModal',
     component: PContentModal,
     parameters: {
         info: {

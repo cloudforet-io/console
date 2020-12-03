@@ -1,16 +1,14 @@
 import {
-    toRefs, reactive, ref, computed, watch,
+    toRefs, reactive, watch,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import {
-    text, number, select, object, boolean,
+    boolean,
 } from '@storybook/addon-knobs/vue';
-import { map } from 'lodash';
 import { PChart } from '@/components/organisms/charts/chart-helper';
 import PChartLoader from './PChartLoader.vue';
 
 export default {
-    title: 'others/charts/ChartLoader',
+    title: 'Others/Charts/ChartLoader',
     component: PChartLoader,
     parameters: {
         info: {

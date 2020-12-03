@@ -1,16 +1,13 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import { getKnobProps } from '@sb/storybook-util';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
-    title: 'others/search-new',
+    title: 'Others/Search',
     component: PSearch,
     parameters: {
         info: {

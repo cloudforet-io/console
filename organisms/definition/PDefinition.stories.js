@@ -1,15 +1,11 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import { getKnobProps } from '@sb/storybook-util';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 
 export default {
-    title: 'others/Definition',
+    title: 'Others/Definition, Label, Item/Definition',
     component: PDefinition,
     parameters: {
         info: {

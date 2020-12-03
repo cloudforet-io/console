@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
-    title: 'others/Buttons(old)',
+    title: 'Others/Buttons(old)',
     component: PButton,
     decorators: [withDesign],
     parameters: {

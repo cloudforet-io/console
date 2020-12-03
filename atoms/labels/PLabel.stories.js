@@ -1,8 +1,7 @@
 import PLabel from '@/components/atoms/labels/PLabel.vue';
 
-
 export default {
-    title: 'others/label',
+    title: 'Others/Definition, Label, Item/Label',
     component: PLabel,
     parameters: {
         info: {

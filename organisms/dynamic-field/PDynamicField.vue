@@ -74,7 +74,6 @@ export default {
 
                 state.component = () => import(`./templates/${fieldProps.type}/index.vue`);
             } catch (e) {
-                state.component = () => import('./templates/text/index.vue');
             }
         };
 
