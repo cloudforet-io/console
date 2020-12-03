@@ -17,7 +17,7 @@
         <template #body>
             <div class="w-full">
                 <div class="flex w-full">
-                    <p-lazy-img :src="image" :loading="!image"
+                    <p-lazy-img :src="imageUrl" :loading="!imageUrl"
                                 width="5.5rem" height="5.5rem"
                                 class="mr-10 flex-grow-0"
                     />
@@ -126,7 +126,8 @@ interface CollectorModel {
     priority: number;
     created_at: TimeStamp;
     last_collected_at: TimeStamp | null;
-    tags: object;
+    tags: object[];
+    icon: string;
 }
 
 
@@ -203,7 +204,7 @@ export default {
             credential: null as SecretModel | null,
             showValidation: false,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
-            image: computed<string>(() => get(state.collector, 'tags.icon', '')),
+            imageUrl: computed<string>(() => state.collector?.tags.find(tag => tag.key === 'icon').value),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
             description: computed<string>(() => get(state.collector, 'tags.description', '')),
             filterFormats: computed<any[]>(() => get(state.collector, 'plugin_info.options.filter_format', [])),

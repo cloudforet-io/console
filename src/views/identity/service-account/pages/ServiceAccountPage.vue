@@ -6,7 +6,7 @@
             </p>
             <p-hr class="sidebar-divider" />
             <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                <p-hr v-if="provider.provider && provider.provider !== 'aws'" class="provider-divider" />
+                <p-hr v-if="provider.provider && provider.provider !== 'megazone'" class="provider-divider" />
                 <p-radio v-model="selectedProvider" :value="provider.provider">
                     <template #radio-left>
                         <img v-if="provider.icon"

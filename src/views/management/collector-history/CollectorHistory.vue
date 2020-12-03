@@ -46,7 +46,7 @@
                     </template>
                     <template #col-collector_info-format="{ value }">
                         <p-lazy-img
-                            :src="providers.find(d => d.provider === value.provider).tags.icon"
+                            :src="providers[value.provider].icon"
                             width="1rem" height="1rem"
                         />
                         <span class="pl-2">{{ value.name }}</span>
@@ -144,15 +144,12 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 import { KeyItem } from '@/components/organisms/search/query-search/type';
 
-import { ProviderModel } from '@/views/identity/service-account/type';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 import {
-    makeEnumValueHandler,
-    makeDistinctValueHandler,
-    makeReferenceValueHandler
+    makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
@@ -234,7 +231,7 @@ export default {
         };
         const state = reactive({
             loading: false,
-            providers: [] as ProviderModel[],
+            providers: computed(() => store.state.resource.provider.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE'))),
             fields: computed(() => [
@@ -357,16 +354,6 @@ export default {
                 state.loading = false;
             }
         };
-        const getProviders = async () => {
-            try {
-                const query = new QueryHelper();
-                query.setOnly('provider', 'tags.icon');
-                const res = await SpaceConnector.client.identity.provider.list({ query: query.data });
-                state.providers = res.results;
-            } catch (e) {
-                console.error(e);
-            }
-        };
 
         const onSelect = (item) => {
             state.selectedJobId = item.job_id;
@@ -410,7 +397,8 @@ export default {
         };
 
         const init = async () => {
-            await getProviders();
+            // get providers
+            await store.dispatch('resource/provider/load');
 
             const hash = router.currentRoute.hash;
             if (hash) {

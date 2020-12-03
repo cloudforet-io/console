@@ -124,7 +124,7 @@ export default {
         const state = reactive({
             loading: true,
             collector: null,
-            imageUrl: computed(() => get(state.collector, 'tags.icon', '')),
+            imageUrl: computed(() => state.collector?.tags.find(tag => tag.key === 'icon').value),
             proxyVisible: makeProxy<boolean>('visible', props, emit),
             pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info')),
             confirmBtnBind: computed(() => {

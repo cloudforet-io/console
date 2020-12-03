@@ -100,7 +100,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             plugin: {},
-            imageUrl: computed(() => get(state.plugin, 'icon', '')),
+            imageUrl: computed(() => state.plugin?.tags?.find(tag => tag.key === 'icon').value),
             provider: computed(() => get(state.plugin, 'provider', '')),
             pluginId: get(root, '$route.params.pluginId', ''),
             tags: {},
@@ -183,7 +183,6 @@ export default {
                     plugin_id: state.pluginId,
                 });
                 state.plugin = res;
-                state.plugin.icon = res.tags.find(tag => tag.key === 'icon').value;
                 state.supportedSchema = res.capability.supported_schema;
             } catch (e) {
                 console.error(e);
