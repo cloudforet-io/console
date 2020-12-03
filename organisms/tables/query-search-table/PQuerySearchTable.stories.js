@@ -10,7 +10,7 @@ import PQuerySearchTable from './PQuerySearchTable.vue';
 import md from './PQuerySearchTable.md';
 
 export default {
-    title: 'Data Display/Tables',
+    title: 'Data Display/Tables/QuerySearchTable',
     component: PQuerySearchTable,
     parameters: {
         notes: md,

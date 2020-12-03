@@ -6,7 +6,7 @@ export default {
     component: PSelectBtnGroupSkeleton,
 };
 
-export const skeleton = () => ({
+export const SelectBtnGroupSkeleton = () => ({
     components: { PSelectBtnGroupSkeleton },
     template: '<div class="w-screen h-screen"><PSelectBtnGroupSkeleton :buttons="buttons"></PSelectBtnGroupSkeleton></div>',
     props: {

@@ -4,7 +4,7 @@ import PPagination from '@/components/organisms/paginations/pagination/PPaginati
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
-    title: 'Navigation/Paginations',
+    title: 'Navigation/Paginations/Pagination',
     component: PPagination,
     parameters: {
         info: {

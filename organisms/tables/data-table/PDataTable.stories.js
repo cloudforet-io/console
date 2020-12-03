@@ -13,7 +13,7 @@ import casual, { arrayOf } from '@/components/util/casual';
 import { orderBy } from 'lodash';
 
 export default {
-    title: 'Data Display/Tables',
+    title: 'Data Display/Tables/DataTable',
     component: PDataTable,
     parameters: {
         notes: md,

@@ -44,7 +44,7 @@ const icons = Object.keys(icon.icons);
 
 
 export default {
-    title: 'Inputs/Buttons',
+    title: 'Inputs/Buttons/IconButton',
     component: PIconButton,
     parameters: {
         info: {

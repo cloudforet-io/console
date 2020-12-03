@@ -10,7 +10,7 @@ import casual, { arrayOf } from '@/components/util/casual';
 import PSearchTable from './PSearchTable.vue';
 
 export default {
-    title: 'Data Display/Tables',
+    title: 'Data Display/Tables/SearchTable',
     component: PSearchTable,
     parameters: {
         info: {

@@ -4,7 +4,7 @@ import {
 import PToggleButton from './PToggleButton.vue';
 
 export default {
-    title: 'Inputs/Buttons',
+    title: 'Inputs/Buttons/ToggleButton',
     component: PToggleButton,
     parameters: {
         info: {

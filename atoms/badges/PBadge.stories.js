@@ -129,5 +129,3 @@ export const linkBadge = () => ({
         ...actions,
     },
 });
-
-export const lightBadge = () => ({});

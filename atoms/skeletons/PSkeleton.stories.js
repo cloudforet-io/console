@@ -7,7 +7,7 @@ import {
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 export default {
-    title: 'Feedbacks/loading',
+    title: 'Feedbacks/Loading',
     component: PSkeleton,
     parameters: {
         info: {

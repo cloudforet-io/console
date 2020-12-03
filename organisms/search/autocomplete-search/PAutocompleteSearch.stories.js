@@ -72,7 +72,7 @@ function plainAutocompleteHandler(inputText, list, key) {
 }
 
 export default {
-    title: 'Inputs/Search',
+    title: 'Inputs/Search/AutoCompleteSearch',
     component: PAutocompleteSearch,
     parameters: {
         notes: md,

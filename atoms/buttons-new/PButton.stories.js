@@ -5,7 +5,7 @@ import PButton from '@/components/atoms/buttons-new/PButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {
-    title: 'Inputs/Buttons',
+    title: 'Inputs/Buttons/Button',
     component: PButton,
     decorators: [withDesign],
     parameters: {

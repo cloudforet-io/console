@@ -9,7 +9,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default {
-    title: 'Data Display/Tables',
+    title: 'Data Display/Tables/DefinitionTable',
     component: PDefinitionTable,
     parameters: {
         info: {

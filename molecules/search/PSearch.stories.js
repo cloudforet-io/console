@@ -7,7 +7,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 
 export default {
-    title: 'Others/Search',
+    title: 'Inputs/Search/Search',
     component: PSearch,
     parameters: {
         info: {

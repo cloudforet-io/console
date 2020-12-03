@@ -1,17 +1,11 @@
-import { autoProps } from '@sb/storybook-util';
 import { number, boolean, text } from '@storybook/addon-knobs';
-import {
-    toRefs, reactive, ref, computed,
-} from '@vue/composition-api';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { action } from '@storybook/addon-actions';
 
 export default {
-    title: 'Data Display/Title',
+    title: 'Data Display/Title/PageTitle',
     component: PPageTitle,
 };
-
-const getState = () => reactive({});
 
 export const pageTitle = () => ({
     components: { PPageTitle },

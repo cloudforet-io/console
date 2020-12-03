@@ -1,5 +1,4 @@
-import { text, number } from '@storybook/addon-knobs/vue';
-import { autoProps } from '@sb/storybook-util';
+import { computed } from '@vue/composition-api';
 import PPageNavigation from './PPageNavigation.vue';
 
 export default {
@@ -10,21 +9,16 @@ export default {
             summary: '',
             components: { PPageNavigation },
         },
-        centered: { disable: true },
     },
 };
 
 export const pageNavigation = () => ({
     components: { PPageNavigation },
-    template: `<div style="width: 80vw;">
-                    
-                </div>`,
-    data() {
-        return {
-        };
-    },
+    template: '<p-page-navigation :routes="route"></p-page-navigation>',
     props: {
-    },
-    methods: {
+        route: {
+            type: Array,
+            default: [{ name: 'Automation', path: '/automation' }, { name: 'Power Scheduler', path: '/automation/power-scheduler' }],
+        },
     },
 });

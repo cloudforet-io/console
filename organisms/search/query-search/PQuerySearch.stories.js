@@ -11,7 +11,7 @@ import PQuerySearch from './PQuerySearch.vue';
 import md from './PQuerySearch.md';
 
 export default {
-    title: 'Inputs/Search',
+    title: 'Inputs/Search/QuerySearch',
     component: PQuerySearch,
     parameters: {
         info: {

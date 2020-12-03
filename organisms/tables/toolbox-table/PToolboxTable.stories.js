@@ -3,7 +3,7 @@ import faker from 'faker';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 
 export default {
-    title: 'Data Display/Tables',
+    title: 'Data Display/Tables/ToolBoxTable',
     component: PToolboxTable,
     parameters: {
         info: {

@@ -3,7 +3,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 
 export default {
-    title: 'Inputs/Buttons',
+    title: 'Inputs/Buttons/SelectButtonGroup',
     component: PSelectBtnGroup,
     parameters: {
         info: {

@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
 
 export default {
-    title: 'Navigation/Paginations',
+    title: 'Navigation/Paginations/TextPagination',
     component: PTextPagination,
     parameters: {
         info: {

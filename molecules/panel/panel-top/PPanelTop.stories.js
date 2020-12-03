@@ -1,14 +1,13 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import {
-    text, number, select, object,
+    text,
 } from '@storybook/addon-knobs/vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 
 export default {
-    title: 'Data Display/Title',
+    title: 'Data Display/Title/PanelTitle',
     component: PPanelTop,
     parameters: {
         info: {
@@ -36,7 +35,7 @@ const getState = (props, context) => {
     return state;
 };
 
-export const panelTop = () => ({
+export const panelTitle = () => ({
     components: { PPanelTop },
     props: getProps(),
     template: `

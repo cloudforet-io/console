@@ -1,5 +1,3 @@
-import { text, number } from '@storybook/addon-knobs/vue';
-import { autoProps } from '@sb/storybook-util';
 import PMarkdown from './PMarkdown.vue';
 
 export default {

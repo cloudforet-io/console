@@ -3,7 +3,7 @@ import { text } from '@storybook/addon-knobs/vue';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 
 export default {
-    title: 'Inputs/Buttons',
+    title: 'Inputs/Buttons/CopyButton',
     component: PCopyButton,
     parameters: {
         info: {
