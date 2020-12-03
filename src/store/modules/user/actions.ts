@@ -108,11 +108,12 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
 
 export const signOut = ({ commit }): void => {
     SpaceConnector.flushToken();
+    commit('expireSession');
     commit('signOut');
 };
 
-export const sessionExpired = ({ commit }): void => {
-    commit('sessionExpired');
+export const expireSession = ({ commit }): void => {
+    commit('expireSession');
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {

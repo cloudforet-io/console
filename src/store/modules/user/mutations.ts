@@ -19,7 +19,7 @@ export const signOut = (state: UserState): void => {
     state.isSignedIn = false;
 };
 
-export const sessionExpired = (state: UserState): void => {
+export const expireSession = (state: UserState): void => {
     state.isSessionExpired = true;
 };
 
