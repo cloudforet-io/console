@@ -8,7 +8,6 @@ import router from '@/routes/index';
 import { store } from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
-import setStore from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
@@ -18,7 +17,6 @@ import 'codemirror/lib/codemirror.css';
 import '@/styles/style.pcss';
 import config from '@/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
-import { api } from '@/lib/api/axios';
 import { GTag, setGtagUserID } from '@/lib/gtag';
 import App from './App.vue';
 
@@ -49,15 +47,12 @@ directive(Vue);
 
 
 /** ********** INIT ************** */
-setStore();
-
 const initConfig = async () => {
     await config.init();
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
-        store.dispatch('user/sessionExpired');
+        store.dispatch('user/expireSession');
     });
-    Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'));
 };
 
 const initDomain = async () => {
