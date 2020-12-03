@@ -3,16 +3,7 @@
          :style="autoHeightStyle"
          @keyup.esc="onEsc"
     >
-        <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
-            <div key="loading" class="context-content context-item no-drag">
-                <slot name="loading-format" v-bind="{...$props, uuid}">
-                    <p-lottie name="thin-spinner" auto :size="1"
-                              class="flex items-center justify-center"
-                    />
-                </slot>
-            </div>
-        </slot>
-        <slot v-else-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
+        <slot v-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
             <div key="no-data" class="context-content context-item no-drag empty" :class="theme">
                 <slot name="no-data-format" v-bind="{...$props, uuid}">
                     {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
@@ -71,6 +62,14 @@
                     </slot>
                 </slot>
             </template>
+        </slot>
+
+        <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
+            <div key="loading" class="loader">
+                <slot name="loading-format" v-bind="{...$props, uuid}">
+                    <p-lottie name="thin-spinner" auto :size="1" />
+                </slot>
+            </div>
         </slot>
     </div>
 </template>
@@ -334,6 +333,13 @@ export default {
     }
     .no-drag {
         user-select: none;
+    }
+
+    .loader {
+        @apply absolute w-full h-full flex items-center justify-center bg-white;
+        left: 0;
+        top: 0;
+        opacity: 50%;
     }
 }
 </style>
