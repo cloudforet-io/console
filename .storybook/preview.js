@@ -25,6 +25,7 @@ import _ from 'lodash';
 import VTooltip from 'v-tooltip';
 import "@/components/styles/reset.pcss";
 import "@/components/styles/style.pcss";
+import SpaceOneTheme from './SpaceOneTheme';
 
 
 Vue.use(VueRouter);
@@ -56,6 +57,7 @@ addParameters({
             }
             return null;
         },
+        theme: SpaceOneTheme,
     },
     viewport: {
         viewports: {
@@ -74,6 +76,11 @@ addParameters({
                 }
             }
         }
+    },
+    options: {
+        showRoots: true,
+        storySort: (a, b) =>
+            a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, undefined, { numeric: true }),
     },
 });
 addDecorator(withA11y);

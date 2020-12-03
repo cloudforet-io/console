@@ -91,6 +91,7 @@
     "@storybook/addons": "^5.3.1",
     "@storybook/cli": "^5.3.1",
     "@storybook/preset-scss": "^1.0.2",
+    "@storybook/theming": "^6.1.9",
     "@storybook/vue": "^5.3.1",
     "@types/chart.js": "^2.9.18",
     "@types/color": "^3.0.1",
