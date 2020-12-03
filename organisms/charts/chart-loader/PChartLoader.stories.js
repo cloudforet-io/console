@@ -10,7 +10,7 @@ import { PChart } from '@/components/organisms/charts/chart-helper';
 import PChartLoader from './PChartLoader.vue';
 
 export default {
-    title: 'organisms/charts/ChartLoader',
+    title: 'others/charts/ChartLoader',
     component: PChartLoader,
     parameters: {
         info: {

@@ -4,7 +4,7 @@ import {
 import PToggleButton from './PToggleButton.vue';
 
 export default {
-    title: 'molecules/buttons/ToggleButton',
+    title: 'Inputs/Buttons',
     component: PToggleButton,
     parameters: {
         info: {
@@ -20,7 +20,7 @@ const getState = (props, context) => {
     return state;
 };
 
-export const defaultCase = () => ({
+export const toggleButton = () => ({
     components: { PToggleButton },
     template: `
         <div style="width: 80vw;">

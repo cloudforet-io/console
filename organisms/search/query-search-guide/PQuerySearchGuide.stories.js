@@ -4,7 +4,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 
 
 export default {
-    title: 'organisms/search/query-search-guide',
+    title: 'others/query-search-guide',
     component: PQuerySearchGuide,
     parameters: {
         info: {

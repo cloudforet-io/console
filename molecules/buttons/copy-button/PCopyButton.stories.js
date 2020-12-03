@@ -3,7 +3,7 @@ import { text } from '@storybook/addon-knobs/vue';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 
 export default {
-    title: 'molecules/buttons/PCopyButton',
+    title: 'Inputs/Buttons',
     component: PCopyButton,
     parameters: {
         info: {
@@ -13,7 +13,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const copyButton = () => ({
     components: { PCopyButton },
     template: ` <div> Copy Text: {{copyText}}
                     <p-copy-button :value="copyText"/>

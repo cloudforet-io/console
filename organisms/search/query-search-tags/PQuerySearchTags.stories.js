@@ -10,7 +10,7 @@ import md from './PQuerySearchTags.md';
 import PQuerySearchTags from './PQuerySearchTags.vue';
 
 export default {
-    title: 'organisms/search/QuerySearchTags',
+    title: 'Inputs/Search',
     component: PQuerySearchTags,
     parameters: {
         info: {
@@ -31,7 +31,7 @@ const actions = {
     change: action('change'),
 };
 
-export const defaultCase = () => ({
+export const querySearchTags = () => ({
     components: { PQuerySearchTags },
     props: {
         timezone: {

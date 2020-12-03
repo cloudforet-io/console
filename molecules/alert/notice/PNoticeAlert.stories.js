@@ -2,7 +2,7 @@ import { text, select } from '@storybook/addon-knobs/vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 
 export default {
-    title: 'molecules/alert',
+    title: 'Feedbacks/Alert',
     component: PNoticeAlert,
     parameters: {
         info: {

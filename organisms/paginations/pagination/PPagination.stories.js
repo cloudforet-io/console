@@ -4,7 +4,7 @@ import PPagination from '@/components/organisms/paginations/pagination/PPaginati
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
-    title: 'organisms/paginations',
+    title: 'Navigation/Paginations',
     component: PPagination,
     parameters: {
         info: {
@@ -19,7 +19,7 @@ const actions = {
     clickPage: action('click-page'),
 };
 
-export const baseCase = () => ({
+export const pagination = () => ({
     components: { PPagination },
     template: `<p-pagination :this-page.sync="thisPage" :page-size.sync="pageSize"
                              :total-count="totalCount" />`,

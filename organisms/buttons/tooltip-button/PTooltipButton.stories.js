@@ -3,7 +3,7 @@ import { text, boolean, object } from '@storybook/addon-knobs/vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/PTooltipButton.vue';
 
 export default {
-    title: 'Organisms/buttons/tooltip-button',
+    title: 'others/tooltip-button',
     component: PTooltipButton,
 };
 

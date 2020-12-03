@@ -8,7 +8,7 @@ import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 
 export default {
-    title: 'organisms/dynamic-layout/html',
+    title: 'others/dynamic-layout/html',
     component: PDynamicLayout,
     parameters: {
         notes: md,

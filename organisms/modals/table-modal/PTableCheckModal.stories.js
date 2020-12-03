@@ -6,7 +6,7 @@ import PTableCheckModel from '@/components/organisms/modals/table-modal/PTableCh
 import { sizeMapping } from '@/components/molecules/modals/type';
 
 export default {
-    title: 'organisms/modals/table-check-modal',
+    title: 'others/table-check-modal',
     component: PTableCheckModel,
 };
 

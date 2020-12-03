@@ -2,11 +2,11 @@ import PSelectBtnGroupSkeleton from '@/components/molecules/skeletons/PSelectBtn
 import { number } from '@storybook/addon-knobs';
 
 export default {
-    title: 'molecules/skeletons/p-select-btn-group',
+    title: 'Feedbacks/Loading',
     component: PSelectBtnGroupSkeleton,
 };
 
-export const defaultCase = () => ({
+export const skeleton = () => ({
     components: { PSelectBtnGroupSkeleton },
     template: '<div class="w-screen h-screen"><PSelectBtnGroupSkeleton :buttons="buttons"></PSelectBtnGroupSkeleton></div>',
     props: {

@@ -6,7 +6,7 @@ import { autoProps } from '@sb/storybook-util';
 import PTagsInput from '@/components/organisms/forms/tags-input/PTagsInput.vue';
 
 export default {
-    title: 'molecules/tags-input',
+    title: 'others/tags-input',
     component: PTagsInput,
     decorators: [withKnobs],
     parameters: {

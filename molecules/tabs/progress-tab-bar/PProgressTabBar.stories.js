@@ -6,7 +6,7 @@ import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/PProgr
 import md from '@/components/molecules/tabs/progress-tab-bar/PProgresTabBar.md';
 
 export default {
-    title: 'molecules/tabs/ProgressTabBar',
+    title: 'others/ProgressTabBar',
     component: PProgressTabBar,
     decorators: [withKnobs],
     parameters: {

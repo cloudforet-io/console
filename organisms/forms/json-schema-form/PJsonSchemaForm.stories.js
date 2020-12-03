@@ -7,7 +7,7 @@ import {
 // import { JsonSchemaObjectType } from '@/components/util/type';
 
 export default {
-    title: 'organisms/forms/json-schema-form',
+    title: 'Inputs/JsonSchemaForm',
     component: PJsonSchemaForm,
 };
 const defaultSchema = {
@@ -70,7 +70,7 @@ const defaultSchema = {
     required: ['required_string', 'required_number', 'required_integer'],
 };
 
-export const defaultCase = () => ({
+export const jsonDefaultCase = () => ({
     components: { PJsonSchemaForm, PButton },
     template: `
     <div style="width: 50rem">
@@ -127,3 +127,42 @@ export const customSchemaForm = () => ({
     },
 });
 
+export const customValidatorForm = () => ({
+    components: { PJsonSchemaForm, PButton },
+    template: `
+    <div class="w-64">
+        <p-json-schema-form
+          v-bind="jscTS.state"
+          :item.sync="jscTS.syncState.item"
+        />
+        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
+        <pre>{{jscTS.syncState.item}}</pre>
+    </div>
+  `,
+    setup(props, context) {
+        const jscTS = new JsonSchemaFormToolSet();
+        const checkEmail = (...args) => {
+            const prom = new Promise((resolve, reject) => {
+                const data = args[1] || '';
+                // console.debug(data.indexOf('@'));
+                if (data.indexOf('@') !== -1) {
+                    resolve(true);
+                }
+                resolve(false);
+            });
+            return prom;
+        };
+
+        const validation = {
+            isEmail: new CustomValidator(checkEmail, 'is it email?'),
+        };
+        const schema = new JsonSchemaObjectType(undefined, undefined, true);
+        schema.addStringProperty('name', 'Name', true);
+        schema.addStringProperty('emailDomain', 'EMail Domain', true, 'you start @ text', { isEmail: true });
+
+        jscTS.setProperty(schema, ['name', 'emailDomain'], validation);
+        return {
+            jscTS,
+        };
+    },
+});

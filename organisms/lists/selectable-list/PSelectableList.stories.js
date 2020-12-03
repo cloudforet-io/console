@@ -9,7 +9,7 @@ import { getKnobProps } from '@sb/storybook-util';
 import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
 
 export default {
-    title: 'organisms/SelectableList',
+    title: 'others/SelectableList',
     component: PSelectableList,
     parameters: {
         info: {
@@ -258,4 +258,3 @@ export const cardTheme = () => ({
         };
     },
 });
-

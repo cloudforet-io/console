@@ -3,11 +3,11 @@ import PDatePagination from '@/components/organisms/date-pagination/PDatePaginat
 import dayjs from 'dayjs';
 
 export default {
-    title: 'organisms/date-paginations',
+    title: 'Navigation/Paginations',
     component: PDatePagination,
 };
 
-export const monthCase = () => ({
+export const datePagination = () => ({
     components: { PDatePagination },
     template: `
 <div>

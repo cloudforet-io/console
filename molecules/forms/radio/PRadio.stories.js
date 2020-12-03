@@ -5,7 +5,7 @@ import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 
 
 export default {
-    title: 'molecules/forms/Radio',
+    title: 'Inputs/RadioButton',
     component: PRadio,
     decorators: [withKnobs],
 };
@@ -21,7 +21,7 @@ const setup = () => {
 };
 
 
-export const defaultCase = () => ({
+export const radio = () => ({
     components: { PRadio },
     props: {
         hovered: {

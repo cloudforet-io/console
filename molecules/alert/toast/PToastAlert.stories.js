@@ -2,11 +2,11 @@ import { text, select } from '@storybook/addon-knobs/vue';
 import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
 
 export default {
-    title: 'molecules/toast-alert',
+    title: 'Feedbacks/Alert',
     component: PToastAlert,
 };
 
-export const DefaultCase = () => ({
+export const toastAlert = () => ({
     components: { PToastAlert },
     template: `
 <div>

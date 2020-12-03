@@ -8,7 +8,7 @@ import {
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 
 export default {
-    title: 'molecules/panel/PanelTop',
+    title: 'Data Display/Title',
     component: PPanelTop,
     parameters: {
         info: {
@@ -36,7 +36,7 @@ const getState = (props, context) => {
     return state;
 };
 
-export const defaultCase = () => ({
+export const panelTop = () => ({
     components: { PPanelTop },
     props: getProps(),
     template: `

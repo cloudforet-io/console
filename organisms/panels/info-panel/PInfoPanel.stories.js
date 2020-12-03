@@ -6,7 +6,7 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/PInfoPanel.vue'
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 
 export default {
-    title: 'organisms/panel/InfoPanel',
+    title: 'others/InfoPanel',
     component: PInfoPanel,
     parameters: {
         info: {

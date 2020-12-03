@@ -2,7 +2,7 @@ import { action } from '@storybook/addon-actions';
 import PTabBar from '@/components/molecules/tabs/tab-bar/PTabBar.vue';
 
 export default {
-    title: 'molecules/tabs/TabBar',
+    title: 'others/Tabs',
     component: PTabBar,
     parameters: {
         info: {
@@ -23,7 +23,7 @@ const data = {
     activeTab: 'detail',
 };
 
-export const DefaultCase = () => ({
+export const tabBar = () => ({
     components: { PTabBar },
     template: `
 <div>

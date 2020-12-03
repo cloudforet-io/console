@@ -1,7 +1,7 @@
 import PHr from '@/components/atoms/hr/PHr.vue';
 
 export default {
-    title: 'atoms/hr',
+    title: 'Layouts/divider',
     component: { PHr },
     parameters: {
         info: {
@@ -10,7 +10,7 @@ export default {
     },
 };
 
-export const DefaultCase = () => ({
+export const divider = () => ({
     components: { PHr },
     template: `
 <div style="width: 50vw; height: 50vh; border: 1px dashed #415ee1">

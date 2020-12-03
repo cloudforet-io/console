@@ -44,7 +44,7 @@ const icons = Object.keys(icon.icons);
 
 
 export default {
-    title: 'molecules/buttons/PIconButton',
+    title: 'Inputs/Buttons',
     component: PIconButton,
     parameters: {
         info: {
@@ -54,7 +54,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const iconButton = () => ({
     components: { PIconButton },
     template: `
 <p-icon-button 

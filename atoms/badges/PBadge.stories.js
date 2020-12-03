@@ -6,7 +6,7 @@ import { withKnobs } from '@storybook/addon-knobs';
 
 
 export default {
-    title: 'atoms/badges',
+    title: 'Data Display/Badges',
     component: PBadge,
     parameters: {
         info: {
@@ -22,7 +22,7 @@ export default {
 const actions = {};
 const data = {};
 
-export const DefaultCase = () => ({
+export const Badge = () => ({
     components: { PBadge },
     template: `<PBadge style="width: auto" 
                        :styleType="styleType"
@@ -52,8 +52,8 @@ export const DefaultCase = () => ({
 });
 export const longBadge = () => ({
     components: { PBadge },
-    template: `<PBadge :styleType="styleType"  
-                       :text-color="textColor" 
+    template: `<PBadge :styleType="styleType"
+                       :text-color="textColor"
                        :backgroundColor="backgroundColor"
                        :outline="outline"
     >Badge with long size in length</PBadge>`,
@@ -129,3 +129,5 @@ export const linkBadge = () => ({
         ...actions,
     },
 });
+
+export const lightBadge = () => ({});

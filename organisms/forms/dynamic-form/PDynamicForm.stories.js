@@ -74,7 +74,7 @@ const getData = (props, context) => {
 };
 
 export default {
-    title: 'organisms/forms/DynamicForm',
+    title: 'others/DynamicForm',
     component: PDynamicForm,
     decorators: [withKnobs],
     parameters: {

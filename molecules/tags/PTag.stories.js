@@ -5,13 +5,13 @@ import { action } from '@storybook/addon-actions';
 import PTag from '@/components/molecules/tags/PTag.vue';
 
 export default {
-    title: 'molecules/tags/Tag',
+    title: 'Data Display/Tags',
     component: PTag,
     decorators: [withKnobs],
 };
 
 
-export const defaultCase = () => ({
+export const tag = () => ({
     components: { PTag },
     props: {
         ...autoProps(PTag),

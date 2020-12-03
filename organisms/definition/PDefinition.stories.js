@@ -9,7 +9,7 @@ import {
 import PDefinition from '@/components/organisms/definition/PDefinition.vue';
 
 export default {
-    title: 'organisms/Definition',
+    title: 'others/Definition',
     component: PDefinition,
     parameters: {
         info: {

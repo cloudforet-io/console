@@ -72,7 +72,7 @@ function plainAutocompleteHandler(inputText, list, key) {
 }
 
 export default {
-    title: 'organisms/search/AutocompleteSearch',
+    title: 'Inputs/Search',
     component: PAutocompleteSearch,
     parameters: {
         notes: md,
@@ -85,7 +85,7 @@ export default {
 };
 
 
-export const defaultCase = () => ({
+export const autoCompleteSearch = () => ({
     components: { PAutocompleteSearch },
     props: getKnobProps(autocompleteSearchProps, {
     }, {
@@ -100,7 +100,7 @@ export const defaultCase = () => ({
                              v-bind="$props"
                              :menu="menu"
                              @search="search"
-                             @select-menu="search"
+                             @menu:select="search"
                              @input="input"
                              class="mt-10"
         >
@@ -151,19 +151,19 @@ export const controlCase = () => ({
     template: `
     <div style="width: 80vw;">
         <p class="my-8 font-bold capitalize">Control menu visibility and focus</p>
-        <PAutocompleteSearch v-model="value" 
+        <PAutocompleteSearch v-model="value"
                              v-bind="$props"
                              :menu="menu"
                              :visibleMenu.sync="visibleMenu"
                              :isFocused.sync="isFocused"
                              @search="search"
-                             @select-menu="search"
+                             @menu:select="search"
                              @input="input"
                              @mousedown.stop="mousedown"
-                             @hide-menu="onMenuHide"
+                             @menu:hide="onMenuHide"
                              class="mt-10"
         >
-            
+
         </PAutocompleteSearch>
         <div class="mt-8 bg-blue-100 flex w-full">
             <div>
@@ -209,7 +209,7 @@ export const controlCase = () => ({
                 state.visibleMenu = true;
             },
             onMenuHide(e) {
-                action('hide-menu')(e);
+                action('menu:hide')(e);
                 state.visibleMenu = false;
             },
         };

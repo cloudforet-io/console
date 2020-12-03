@@ -2,7 +2,7 @@ import { number, text } from '@storybook/addon-knobs/vue';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 
 export default {
-    title: 'molecules/progress-bar',
+    title: 'Data Display/ProgressBar',
     component: PProgressBar,
     parameters: {
         info: {
@@ -12,7 +12,7 @@ export default {
     },
 };
 
-export const baseCase = () => ({
+export const progressBar = () => ({
     components: { PProgressBar },
     template: `<p-progress-bar :percentage="percentage"
                                 :style="'width: 160px;'" />`,

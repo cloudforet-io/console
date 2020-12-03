@@ -10,7 +10,7 @@ import casual, { arrayOf } from '@/components/util/casual';
 import PSearchTable from './PSearchTable.vue';
 
 export default {
-    title: 'organisms/tables/SearchTable',
+    title: 'Data Display/Tables',
     component: PSearchTable,
     parameters: {
         info: {
@@ -22,7 +22,7 @@ export default {
 };
 
 
-export const defaultCase = () => ({
+export const searchTable = () => ({
     components: { PSearchTable },
     props: {
         fields: {

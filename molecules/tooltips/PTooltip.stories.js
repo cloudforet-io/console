@@ -4,14 +4,14 @@ import { PLACEMENTS } from '@/components/molecules/tooltips/type';
 import { autoProps } from '@sb/storybook-util';
 
 export default {
-    title: 'Molecules/tooltips',
+    title: 'Data Display/Tooltips',
     component: Tooltip,
     parameters: {
         centered: { disable: true },
     },
 };
 
-export const DefaultCase = () => ({
+export const toolTip = () => ({
     components: { 'p-tooltip': Tooltip },
     props: {
         position: {

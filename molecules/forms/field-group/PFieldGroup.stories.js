@@ -4,7 +4,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from './PFieldGroup.vue';
 
 export default {
-    title: 'molecules/forms/fieldGroup',
+    title: 'Inputs/FieldGroup',
     component: PFieldGroup,
     parameters: {
         info: {
@@ -15,7 +15,7 @@ export default {
 };
 
 
-export const defaultCase = () => ({
+export const fieldGroup = () => ({
     components: { PFieldGroup, PTextInput },
     template: `
         <PFieldGroup 

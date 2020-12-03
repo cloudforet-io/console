@@ -9,7 +9,7 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default {
-    title: 'organisms/tables/DefinitionTable',
+    title: 'Data Display/Tables',
     component: PDefinitionTable,
     parameters: {
         info: {
@@ -20,7 +20,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const definitionTable = () => ({
     components: { PDefinitionTable },
     props: {
         fields: {
@@ -94,7 +94,7 @@ export const slotCase = () => ({
                 <p>Slots</p>
                 'data-{field index}' : Slot for definition field.
                 'data-{field.name}' : Slot for definition field. Use it only when all field names are distinct. Otherwise, it can cause unexpected error.<br>
-                It's useful when field names are duplicated. 
+                It's useful when field names are duplicated.
                 * Don't use 'data-{field.name}' slot together. It can cause multiple definition field.<br>
                 no-data : Slot for no data case.<br>
                 copy : Slot for all copy button. It replaces all copy button. <br>
@@ -118,9 +118,9 @@ export const slotCase = () => ({
                  - index <br>
                  - items(merged fields with data)<br>
             </div>
-            
-            
-            
+
+
+
             <p-definition-table v-bind="$props">
                 <template #data-name>
                     <p-lazy-img :src="data.tags.icon" width="1rem" height="1rem" />

@@ -11,7 +11,7 @@ import PQuerySearch from './PQuerySearch.vue';
 import md from './PQuerySearch.md';
 
 export default {
-    title: 'organisms/search/QuerySearch',
+    title: 'Inputs/Search',
     component: PQuerySearch,
     parameters: {
         info: {
@@ -23,7 +23,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const querySearch = () => ({
     components: { PQuerySearch },
     template: `
     <div style="width: 80vw;">
@@ -90,7 +90,7 @@ export const defaultHandlers = () => ({
     template: `
     <div style="width: 80vw;">
         <p class="my-8">
-            If no value handler map is given, the default handler is run. 
+            If no value handler map is given, the default handler is run.
             The default handler operates differently for each data type.
         </p>
         <PQuerySearch v-model="value"

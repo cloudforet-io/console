@@ -1,7 +1,7 @@
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 
 export default {
-    title: 'molecules/forms/checkBox',
+    title: 'Inputs/Checkbox',
     component: PCheckBox,
     parameters: {
         info: {
@@ -13,7 +13,7 @@ export default {
 const actions = {};
 
 
-export const multiSelect = () => ({
+export const multiCase = () => ({
     components: { PCheckBox },
     template: `
 <div>
@@ -34,7 +34,7 @@ selectIndex 타입이 Array일 경우 다중 선택 인덱스가 출력 됩니�
     },
 });
 
-export const singleSelect = () => ({
+export const checkbox = () => ({
     components: { PCheckBox },
     template: `
 <div>

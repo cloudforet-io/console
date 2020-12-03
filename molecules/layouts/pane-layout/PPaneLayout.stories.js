@@ -4,13 +4,13 @@ import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.
 
 
 export default {
-    title: 'molecules/layouts/PaneLayout',
+    title: 'Layouts/PaneLayout',
     component: PPaneLayout,
     decorators: [withKnobs],
 };
 
 
-export const defaultCase = () => ({
+export const paneLayout = () => ({
     components: { PPaneLayout },
     props: {
         ...autoProps(PPaneLayout),

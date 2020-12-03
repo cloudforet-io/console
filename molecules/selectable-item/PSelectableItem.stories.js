@@ -40,9 +40,9 @@ const selectableItemProps = {
             return ['default', 'card'].includes(theme);
         },
     },
-}
+};
 export default {
-    title: 'molecules/SelectableItem',
+    title: 'others/SelectableItem',
     component: PSelectableItem,
     parameters: {
         info: {

@@ -10,7 +10,7 @@ import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout
 import md from '@/components/organisms/dynamic-layout/PDynamicLayout.md';
 
 export default {
-    title: 'organisms/dynamic-layout/list',
+    title: 'others/dynamic-layout/list',
     component: PDynamicLayout,
     parameters: {
         notes: md,

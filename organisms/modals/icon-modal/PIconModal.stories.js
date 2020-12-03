@@ -3,11 +3,11 @@ import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue'
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
-    title: 'organisms/modals/icon-modal',
+    title: 'Feedbacks/Modals',
     component: PIconModal,
 };
 
-export const DefaultCase = () => ({
+export const iconModal = () => ({
     components: { PIconModal, PButton },
     template: `
 <div>

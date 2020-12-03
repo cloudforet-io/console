@@ -1,12 +1,12 @@
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 
 export default {
-    title: 'molecules/collapsible/collapsible-panel/PCollapsiblePanel',
+    title: 'Data Display/Collapsible',
     component: PCollapsiblePanel,
 };
 
 
-export const defaultCase = () => ({
+export const collapsiblePanel = () => ({
     components: { PCollapsiblePanel },
     props: {},
     template: `

@@ -3,7 +3,7 @@ import { text } from '@storybook/addon-knobs';
 
 
 export default {
-    title: 'molecules/anchor',
+    title: 'Inputs/Anchors',
     component: PAnchor,
     parameters: {
         info: {
@@ -13,7 +13,7 @@ export default {
     },
 };
 
-export const DefaultCase = () => ({
+export const anchor = () => ({
     components: { PAnchor },
     props: {
         href: {

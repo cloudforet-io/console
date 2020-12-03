@@ -5,7 +5,7 @@ import PButton from '@/components/atoms/buttons-new/PButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {
-    title: 'atoms/buttons-new',
+    title: 'Inputs/Buttons',
     component: PButton,
     decorators: [withDesign],
     parameters: {
@@ -24,7 +24,7 @@ const actions = {
 };
 const data = {};
 
-export const defaultCase = () => ({
+export const button = () => ({
     components: { PButton, PLottie },
     template: `
       <div style="display:flex; align-items:center; justify-content:center; width:1000px; height:100px;">

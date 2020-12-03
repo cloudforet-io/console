@@ -6,7 +6,7 @@ import { sizeMapping } from '@/components/molecules/modals/type';
 import PModal from '@/components/molecules/modals/PModal.vue';
 
 export default {
-    title: 'molecules/modals',
+    title: 'Feedbacks/Modals',
     component: PModal,
     parameters: {
         info: {

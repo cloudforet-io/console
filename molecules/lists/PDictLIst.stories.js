@@ -3,7 +3,7 @@ import PDictList from '@/components/molecules/lists/PDictList.vue';
 
 
 export default {
-    title: 'molecules/DictList',
+    title: 'others/DictList',
     component: PDictList,
     decorators: [withKnobs],
 };

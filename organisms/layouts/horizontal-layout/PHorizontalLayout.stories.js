@@ -3,11 +3,11 @@ import { action } from '@storybook/addon-actions';
 import { autoProps } from '@sb/storybook-util';
 
 export default {
-    title: 'organisms/layouts/Horizontal-layout',
+    title: 'Layouts/HorizontalLayout',
     component: PHorizontalLayout,
 };
 
-export const defaultCase = () => ({
+export const horizontalLayout = () => ({
     components: { PHorizontalLayout },
     props: {
         ...autoProps(PHorizontalLayout),

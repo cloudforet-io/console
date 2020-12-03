@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
 
 export default {
-    title: 'organisms/text-paginations',
+    title: 'Navigation/Paginations',
     component: PTextPagination,
     parameters: {
         info: {
@@ -16,7 +16,7 @@ const actions = {
     pageChange: action('pageChange'),
 };
 
-export const base = () => ({
+export const textPagination = () => ({
     components: { PTextPagination },
     template: '<p-text-pagination :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
     data() {

@@ -7,7 +7,7 @@ import {
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 export default {
-    title: 'atoms/skeletons/ItemSkeleton',
+    title: 'Feedbacks/loading',
     component: PSkeleton,
     parameters: {
         info: {
@@ -31,7 +31,7 @@ const getState = (props, context) => {
     return state;
 };
 
-export const defaultCase = () => ({
+export const skeleton = () => ({
     components: { PSkeleton },
     props: {},
     template: `

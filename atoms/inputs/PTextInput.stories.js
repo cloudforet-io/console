@@ -2,7 +2,7 @@ import { boolean } from '@storybook/addon-knobs/vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 export default {
-    title: 'atoms/inputs',
+    title: 'Inputs/Input',
     component: PTextInput,
     parameters: {
         info: {
@@ -12,7 +12,7 @@ export default {
     },
 };
 
-export const DefaultCase = () => ({
+export const input = () => ({
     components: { PTextInput },
     template: `<div>
                     <p-text-input v-model="value" :disabled="disabled"></p-text-input>

@@ -4,11 +4,11 @@ import PStatus from '@/components/molecules/status/PStatus.vue';
 import { safe } from '@/components/styles/colors';
 
 export default {
-    title: 'molecules/status',
+    title: 'Data Display/Status',
     component: PStatus,
 };
 
-export const DefaultCase = () => ({
+export const status = () => ({
     components: { PStatus },
     props: {
         ...autoProps(PStatus, [

@@ -3,13 +3,13 @@ import PBoardLayout from '@/components/organisms/layouts/board-layout/PBoardLayo
 import { autoProps } from '@sb/storybook-util';
 
 export default {
-    title: 'organisms/layouts/board-layout',
+    title: 'Layouts/BoardLayout',
     component: PBoardLayout,
     decorators: [withKnobs],
 };
 
 
-export const BoardLayout = () => ({
+export const boardLayout = () => ({
     components: { PBoardLayout },
     props: {
         ...autoProps(PBoardLayout),

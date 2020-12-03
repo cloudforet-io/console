@@ -6,7 +6,7 @@ import {
 import md from '@/components/organisms/forms/json-schema-field-group/PJsonSchemaFieldGroup.md';
 
 export default {
-    title: 'organisms/forms/json-schema-field-group',
+    title: 'others/json-schema-field-group',
     component: PJsonSchemaFieldGroup,
     parameters: {
         notes: md,

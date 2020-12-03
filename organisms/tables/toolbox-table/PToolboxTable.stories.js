@@ -3,7 +3,7 @@ import faker from 'faker';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 
 export default {
-    title: 'organisms/tables/toolbox-table',
+    title: 'Data Display/Tables',
     component: PToolboxTable,
     parameters: {
         info: {
@@ -59,7 +59,7 @@ const mockupMixin = {
     },
 };
 
-export const table = () => ({
+export const toolboxTable = () => ({
     components: { PToolboxTable },
     mixins: [mockupMixin],
     template: `
@@ -113,7 +113,7 @@ export const rowSlot = () => ({
     template: `
 <div style="width: 80vw">
     <p-toolbox-table
-        :items="items" 
+        :items="items"
         :fields="fields"
         :selectable="selectable"
         :sortable="sortable"
@@ -161,7 +161,7 @@ export const colSlot = () => ({
     template: `
 <div style="width: 80vw">
     <p-toolbox-table
-        :items="items" 
+        :items="items"
         :fields="fields"
         :selectable="selectable"
         :sortable="sortable"

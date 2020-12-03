@@ -3,7 +3,7 @@ import PMenuItem from '@/components/molecules/menu-item/PMenuItem.vue';
 import { text, number, boolean } from '@storybook/addon-knobs';
 
 export default {
-    title: 'Molecules/MenuItem',
+    title: 'others/MenuItem',
     component: PMenuItem,
 };
 

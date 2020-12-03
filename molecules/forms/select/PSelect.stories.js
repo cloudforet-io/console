@@ -3,7 +3,7 @@ import PSelect from '@/components/molecules/forms/select/PSelect.vue';
 import { autoProps } from '@sb/storybook-util';
 
 export default {
-    title: 'molecules/forms/select',
+    title: 'others/select',
     component: PSelect,
     parameters: {
         info: {

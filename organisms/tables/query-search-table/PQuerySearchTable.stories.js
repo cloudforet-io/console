@@ -10,7 +10,7 @@ import PQuerySearchTable from './PQuerySearchTable.vue';
 import md from './PQuerySearchTable.md';
 
 export default {
-    title: 'organisms/tables/QuerySearchTable',
+    title: 'Data Display/Tables',
     component: PQuerySearchTable,
     parameters: {
         notes: md,
@@ -39,7 +39,7 @@ const getHandler = items => async (inputText, keyItem) => {
     };
 };
 
-export const defaultCase = () => ({
+export const querySearchTable = () => ({
     components: { PQuerySearchTable },
     props: {
         fields: {

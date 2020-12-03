@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 export default {
-    title: 'atoms/buttons',
+    title: 'others/Buttons(old)',
     component: PButton,
     decorators: [withDesign],
     parameters: {
@@ -23,7 +23,7 @@ const actions = {
 };
 const data = {};
 
-export const defaultCase = () => ({
+export const button = () => ({
     components: { PButton },
     template: `
 <p-button

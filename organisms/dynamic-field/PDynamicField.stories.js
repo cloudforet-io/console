@@ -9,7 +9,7 @@ import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vu
 import md from '@/components/organisms/dynamic-field/PDynamicField.md';
 
 export default {
-    title: 'organisms/dynamic-view/dynamic-field',
+    title: 'others/dynamic-field',
     component: PDynamicField,
     parameters: {
         notes: md,

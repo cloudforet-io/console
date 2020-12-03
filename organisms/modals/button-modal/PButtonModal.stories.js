@@ -10,7 +10,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import { sizeMapping } from '@/components/molecules/modals/type';
 
 export default {
-    title: 'organisms/modals/button-modal',
+    title: 'Feedbacks/Modals',
     component: PButtonModal,
     parameters: {
         info: {
@@ -47,7 +47,7 @@ const pcmProps = [
     { name: 'footerVisible' },
 ];
 
-export const modal = () => ({
+export const buttonModal = () => ({
     components: { PButtonModal, PButton },
     template: `<div>
                 <p-button styleType="primary" @click="click">Launch a modal</p-button>

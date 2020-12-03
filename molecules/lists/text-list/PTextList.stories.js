@@ -10,7 +10,7 @@ import casual, { arrayOf } from '@/components/util/casual';
 import PTextList from './PTextList.vue';
 
 export default {
-    title: 'molecules/lists/TextList',
+    title: 'others/TextList',
     component: PTextList,
     parameters: {
         info: {

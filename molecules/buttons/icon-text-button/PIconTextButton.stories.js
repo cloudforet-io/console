@@ -22,7 +22,7 @@ const sizeMapping = {
 const icons = Object.keys(icon.icons);
 
 export default {
-    title: 'molecules/buttons/PIconTextButton',
+    title: 'others/PIconTextButton',
     component: PIconTextButton,
     parameters: {
         info: {

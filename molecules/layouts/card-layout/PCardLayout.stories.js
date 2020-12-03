@@ -5,7 +5,7 @@ import CardLayout from '@/components/molecules/layouts/card-layout/PCardLayout.v
 
 
 export default {
-    title: 'molecules/layouts/CardLayout',
+    title: 'Layouts/CardLayout',
     component: CardLayout,
     decorators: [withKnobs],
     parameters: {
@@ -18,7 +18,7 @@ export default {
 };
 
 
-export const defaultCase = () => ({
+export const cardLayout = () => ({
     components: { CardLayout },
     props: {
         ...autoProps(CardLayout),

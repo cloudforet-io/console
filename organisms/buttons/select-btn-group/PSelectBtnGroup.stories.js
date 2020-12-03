@@ -3,7 +3,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
 
 export default {
-    title: 'organisms/buttons/select-btn-group',
+    title: 'Inputs/Buttons',
     component: PSelectBtnGroup,
     parameters: {
         info: {
@@ -13,7 +13,7 @@ export default {
     },
 };
 
-export const base = () => ({
+export const seletButtonGroup = () => ({
     components: { PSelectBtnGroup },
     template: `
 <div style="width: 50vw">
@@ -83,8 +83,8 @@ export const withTrHelper = () => ({
     components: { PSelectBtnGroup },
     template: `
 <div style="width: 50vw">
-    <PSelectBtnGroup 
-        :buttons="btns" 
+    <PSelectBtnGroup
+        :buttons="btns"
         :selected.sync="selected"
         @clickButton="clickButton"
         @click-ip="clickIP"
@@ -131,8 +131,8 @@ export const scroll = () => ({
     components: { PSelectBtnGroup },
     template: `
 <div style="width: 30vw">
-    <PSelectBtnGroup 
-        :buttons="btns" 
+    <PSelectBtnGroup
+        :buttons="btns"
         :selected.sync="selected"
         @clickButton="clickButton"
         @click-ip="clickIP"

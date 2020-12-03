@@ -4,7 +4,7 @@ import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue
 
 
 export default {
-    title: 'molecules/layouts/BoxLayout',
+    title: 'others/BoxLayout',
     component: PBoxLayout,
     decorators: [withKnobs],
 };

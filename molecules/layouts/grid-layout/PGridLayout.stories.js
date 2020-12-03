@@ -1,7 +1,7 @@
 import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
 
 export default {
-    title: 'molecules/layouts/GridLayout',
+    title: 'others/GridLayout',
     component: PGridLayout,
 };
 

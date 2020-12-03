@@ -3,7 +3,7 @@ import { autoProps } from '@sb/storybook-util';
 import PLottie from './PLottie.vue';
 
 export default {
-    title: 'molecules/lottie',
+    title: 'Foundation/Graphics',
     component: PLottie,
     parameters: {
         info: {
@@ -14,7 +14,7 @@ export default {
     },
 };
 
-export const DefaultCase = () => ({
+export const lottie = () => ({
     components: { PLottie },
     template: `<div style="width: 80vw;">
                     <button @click="show">display loading</button>

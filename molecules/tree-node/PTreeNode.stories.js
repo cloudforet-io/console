@@ -9,10 +9,11 @@ import casual from '@/components/util/casual';
 import PI from '@/components/atoms/icons/PI.vue';
 import PTreeNode from '@/components/molecules/tree-node/PTreeNode.vue';
 import md from '@/components/molecules/tree-node/PTreeNode.md';
+import { getKnobProps } from '@sb/storybook-util';
 import style from './PTreeNodes.stories.scss';
 
 export default {
-    title: 'molecules/tree/TreeNode',
+    title: 'Data Display/Tree',
     component: PTreeNode,
     parameters: {
         notes: md,
@@ -85,8 +86,14 @@ const childrenData = [
 ];
 
 
-export const defaultCase = () => ({
+export const treeNode = ({ treeNodeProps }) => ({
     components: { PTreeNode },
+    props: getKnobProps(treeNodeProps, {
+    }, {
+        children: true,
+        data: true,
+        state: true,
+    }),
     template: `
         <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
             <div>
@@ -96,7 +103,8 @@ export const defaultCase = () => ({
             </div>
             <div class="flex">
                 <div class="bg-coral-100 w-1/2">
-                    <PTreeNode :data.sync="state.data"
+                    <PTreeNode v-bind="$props"
+                               :data.sync="state.data"
                                :children.sync="state.children"
                                :state.sync="state.state"
                                @row:click="rowClick"
@@ -160,12 +168,19 @@ export const defaultCase = () => ({
 });
 
 
-export const apiCase = () => ({
+export const apiCase = ({ treeNodeProps }) => ({
     components: { PTreeNode },
+    props: getKnobProps(treeNodeProps, {
+    }, {
+        children: true,
+        data: true,
+        state: true,
+    }),
     template: `
         <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
             <div class="bg-coral-100 w-1/2">
-                <PTreeNode :data.sync="state.data"
+                <PTreeNode v-bind="$props"
+                           :data.sync="state.data"
                            :children.sync="state.children"
                            :state.sync="state.state"
                            @toggle:click="toggleClick"
@@ -205,8 +220,14 @@ export const apiCase = () => ({
     },
 });
 
-export const slotCase = () => ({
+export const slotCase = ({ treeNodeProps }) => ({
     components: { PTreeNode, PI },
+    props: getKnobProps(treeNodeProps, {
+    }, {
+        children: true,
+        data: true,
+        state: true,
+    }, { data: text }),
     template: `
         <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
             <div>
@@ -230,7 +251,8 @@ export const slotCase = () => ({
             </div>
             <div style="display: flex; margin-top: 2rem;">
                 <div class="bg-coral-100 w-1/2">
-                    <PTreeNode :data.sync="state.data"
+                    <PTreeNode v-bind="$props"
+                               :data.sync="state.data"
                                :children.sync="state.children"
                                :state.sync="state.state"
                                @toggle:click="toggleClick"
@@ -244,8 +266,8 @@ export const slotCase = () => ({
                             <div class="text-right"><p-i name="common-gear"></p-i></div>
                         </template>
                         <template #icon="{children, state}">
-                            <p-i :name="children ? 
-                                        (state.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder') 
+                            <p-i :name="children ?
+                                        (state.expanded ? 'ic_tree_folder--opened' : 'ic_tree_folder')
                                         : 'ic_tree_project'"
                                  width="1rem" height="1rem"
                                  class="mx-2"
@@ -280,12 +302,19 @@ export const slotCase = () => ({
     },
 });
 
-export const levelSlotCase = () => ({
+export const levelSlotCase = ({ treeNodeProps }) => ({
     components: { PTreeNode },
+    props: getKnobProps(treeNodeProps, {
+    }, {
+        children: true,
+        data: true,
+        state: true,
+    }, { data: text }),
     template: `
     <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
-            <PTreeNode :data.sync="state.data"
+            <PTreeNode v-bind="$props"
+                       :data.sync="state.data"
                        :children.sync="state.children"
                        :state.sync="state.state"
             >
@@ -310,12 +339,19 @@ export const levelSlotCase = () => ({
     },
 });
 
-export const customEventListener = () => ({
+export const customEventListener = ({ treeNodeProps }) => ({
     components: { PTreeNode },
+    props: getKnobProps(treeNodeProps, {
+    }, {
+        children: true,
+        data: true,
+        state: true,
+    }, { data: text }),
     template: `
     <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
-            <PTreeNode :data.sync="state.data"
+            <PTreeNode v-bind="$props"
+                       :data.sync="state.data"
                        :children.sync="state.children"
                        :state.sync="state.state"
                        @hello:click="onHelloClick"

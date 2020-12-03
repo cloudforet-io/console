@@ -8,7 +8,7 @@ import {
 import PButtonTab from './PButtonTab.vue';
 
 export default {
-    title: 'organisms/tabs/ButtonTab',
+    title: 'others/tabs/ButtonTab',
     component: PButtonTab,
     parameters: {
         info: {

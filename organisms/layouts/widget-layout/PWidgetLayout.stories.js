@@ -27,7 +27,7 @@ const widgetLayoutProps = {
     },
 };
 export default {
-    title: 'organisms/layouts/WidgetLayout',
+    title: 'Layouts/WidgetLayout',
     component: PWidgetLayout,
     parameters: {
         info: {
@@ -45,7 +45,7 @@ const getState = () => {
     return state;
 };
 
-export const defaultCase = () => ({
+export const widgetLayout = () => ({
     components: { PWidgetLayout },
     props: getKnobProps(widgetLayoutProps, {
         title: 'title',

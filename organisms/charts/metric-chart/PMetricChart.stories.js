@@ -10,7 +10,7 @@ import casual, { arrayOf } from '@/components/util/casual';
 import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChart.vue';
 
 export default {
-    title: 'organisms/charts/MetricChart',
+    title: 'others/MetricChart',
     component: PMetricChart,
     parameters: {
         info: {

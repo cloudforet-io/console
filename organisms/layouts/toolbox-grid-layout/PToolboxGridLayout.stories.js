@@ -5,7 +5,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
 
 export default {
-    title: 'organisms/layouts/toolbox-grid-layout',
+    title: 'others/ToolBoxGridLayout',
     component: PToolboxGridLayout,
     parameters: {
         info: {
@@ -14,7 +14,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const toolBoxGridLayout = () => ({
     components: { PToolboxGridLayout },
     template: `<PToolboxGridLayout
                 v-bind="$props"

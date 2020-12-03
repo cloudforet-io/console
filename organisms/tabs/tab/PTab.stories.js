@@ -2,7 +2,7 @@ import { action } from '@storybook/addon-actions';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 
 export default {
-    title: 'organisms/tabs/tab',
+    title: 'Navigation/Tabs',
     component: PTab,
     parameters: {
         info: {
@@ -60,14 +60,14 @@ export const oneTab = () => ({
     <PTab :tabs="tabs" :activeTab.sync="activeTab" >
     <template #detail="{tabName}" >
         <keep-alive>
-           <p> this tab is {{tabName}}</p> 
-        </keep-alive>  
+           <p> this tab is {{tabName}}</p>
+        </keep-alive>
     </template>
     <template #info="{tabName}" >
-           <p> this tab is {{tabName}}</p> 
+           <p> this tab is {{tabName}}</p>
     </template>
     <template #tags="{tabName}" >
-           <p> this tab is {{tabName}}</p> 
+           <p> this tab is {{tabName}}</p>
     </template>
 
     </PTab>

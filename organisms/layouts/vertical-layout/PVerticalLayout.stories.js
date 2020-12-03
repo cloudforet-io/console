@@ -4,7 +4,7 @@ import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/PVer
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
 
 export default {
-    title: 'organisms/layouts/vertical-layout',
+    title: 'Layouts/VerticalLayout',
     component: PVerticalLayout,
     decorators: [withKnobs],
     parameters: {
@@ -15,7 +15,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const verticalLayout = () => ({
     components: { PVerticalLayout },
     props: {
     },

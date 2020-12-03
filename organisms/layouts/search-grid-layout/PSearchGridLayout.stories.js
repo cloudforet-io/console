@@ -5,7 +5,7 @@ import { number, object, select } from '@storybook/addon-knobs/vue';
 import casual, { arrayOf } from '@/components/util/casual';
 
 export default {
-    title: 'organisms/layouts/Search-grid-layout',
+    title: 'others/SearchGridLayout',
     component: PSearchGridLayout,
     parameters: {
         info: {
@@ -31,7 +31,7 @@ const getHandler = items => async (inputText, keyItem) => {
     };
 };
 
-export const defaultCase = () => ({
+export const searchGridLayout = () => ({
     components: { PSearchGridLayout },
     props: {
         thisPage: {

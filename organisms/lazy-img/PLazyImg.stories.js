@@ -3,11 +3,11 @@ import { boolean } from '@storybook/addon-knobs/vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default {
-    title: 'organisms/lazy-img',
+    title: 'FeedBacks/Loading',
     component: PLazyImg,
 };
 
-export const DefaultCase = () => ({
+export const lazyImg = () => ({
     components: { PLazyImg },
     template: `        
 <div>

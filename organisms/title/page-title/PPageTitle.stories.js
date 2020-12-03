@@ -7,13 +7,13 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import { action } from '@storybook/addon-actions';
 
 export default {
-    title: 'Organisms/title/page-title',
+    title: 'Data Display/Title',
     component: PPageTitle,
 };
 
 const getState = () => reactive({});
 
-export const defaultCase = () => ({
+export const pageTitle = () => ({
     components: { PPageTitle },
     template: '<PPageTitle v-bind="$props"></PPageTitle>',
     props: {
@@ -56,7 +56,7 @@ export const childMode = () => ({
           v-bind="$props"
           @goBack="goBack"
         >
-        
+
         </PPageTitle>`,
     props: {
         child: {

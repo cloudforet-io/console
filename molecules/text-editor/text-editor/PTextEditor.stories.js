@@ -2,7 +2,7 @@ import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEdi
 import { computed } from '@vue/composition-api';
 
 export default {
-    title: 'molecules/text-editor/text-editor',
+    title: 'Inputs/TextEditor',
     component: PTextEditor,
     parameters: {
         info: {
@@ -58,7 +58,7 @@ const value = {
     ],
 };
 
-export const defaultCase = () => ({
+export const textEditor = () => ({
     components: { PTextEditor },
     props: {
         item: {

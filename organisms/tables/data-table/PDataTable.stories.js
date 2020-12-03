@@ -13,7 +13,7 @@ import casual, { arrayOf } from '@/components/util/casual';
 import { orderBy } from 'lodash';
 
 export default {
-    title: 'organisms/tables/DataTable',
+    title: 'Data Display/Tables',
     component: PDataTable,
     parameters: {
         notes: md,
@@ -57,7 +57,7 @@ const mockupMixin = {
     },
 };
 
-export const defaultCase = () => ({
+export const dataTable = () => ({
     components: { PDataTable },
     props: {
         fields: {
@@ -189,9 +189,9 @@ export const selectTable = () => ({
     mixins: [mockupMixin],
     template: `
 <div style="background-color: white;">
-<PDataTable 
+<PDataTable
     ref="table"
-    :items="items" 
+    :items="items"
     :fields="fields"
     :hover="true"
     @rowLeftClick="rowLeftClick"
@@ -201,7 +201,7 @@ export const selectTable = () => ({
 </PDataTable>
 <p>select index: {{selectIndex}} </p>
 <p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
-<p>{{selected}}</p> 
+<p>{{selected}}</p>
 </div>
 `,
     data() {
@@ -224,9 +224,9 @@ export const rowClickMultiSelectMode = () => ({
     mixins: [mockupMixin],
     template: `
 <div>
-<PDataTable 
+<PDataTable
     ref="table"
-    :items="items" 
+    :items="items"
     :fields="fields"
     :hover="true"
     :rowClickMultiSelectMode="true"
@@ -237,7 +237,7 @@ export const rowClickMultiSelectMode = () => ({
 </PDataTable>
 <p>select index: {{selectIndex}} </p>
 <p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
-<p>{{selected}}</p> 
+<p>{{selected}}</p>
 </div>
 `,
     data() {
@@ -259,8 +259,8 @@ export const rowVBind = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
     template: `
-<PDataTable 
-    :items="items" 
+<PDataTable
+    :items="items"
     :fields="fields"
     :hover="true"
     @rowLeftClick="rowLeftClick"
@@ -307,8 +307,8 @@ export const customRowSlot = () => ({
     },
     mixins: [mockupMixin],
     template: `
-<PDataTable 
-    :items="items" 
+<PDataTable
+    :items="items"
     :fields="fields"
     :hover="true"
     @rowLeftClick="rowLeftClick"
@@ -344,8 +344,8 @@ export const customColSlot = () => ({
     mixins: [mockupMixin],
     template: `
         <div style="background-color: white;">
-<PDataTable 
-    :items="items" 
+<PDataTable
+    :items="items"
     :fields="fields"
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
@@ -371,38 +371,38 @@ export const customColSlot = () => ({
         sendEmail: action('send_email'),
     },
 });
-//
-// export const loading = () => ({
-//     components: { PDataTable },
-//     mixins: [mockupMixin],
-//     template: `<PDataTable
-//                 :items="items"
-//                 :fields="fields"
-//                 :hover="true"
-//                 :loading="loading"
-//                 :useCursorLoding="useCursorLoading"
-//                 @rowLeftClick="rowLeftClick"
-//                 @rowRightClick="rowRightClick"
-//                 @rowMiddleClick="rowMiddleClick"
-//                 @rowMouseOver="rowMouseOver"
-//                 @rowMouseOut="rowMouseOut"
-//                 >
-//                </PDataTable>
-//               `,
-//     props: {
-//         loading: {
-//             default: boolean('loading', true),
-//         },
-//         useCursorLoading: {
-//             default: boolean('useCursorLoading', false),
-//         },
-//     },
-//     data() {
-//         return {
-//             ...data,
-//         };
-//     },
-//     methods: {
-//         ...actions,
-//     },
-// });
+
+export const loading = () => ({
+    components: { PDataTable },
+    mixins: [mockupMixin],
+    template: `<PDataTable
+                :items="items"
+                :fields="fields"
+                :hover="true"
+                :loading="loading"
+                :useCursorLoding="useCursorLoading"
+                @rowLeftClick="rowLeftClick"
+                @rowRightClick="rowRightClick"
+                @rowMiddleClick="rowMiddleClick"
+                @rowMouseOver="rowMouseOver"
+                @rowMouseOut="rowMouseOut"
+                >
+               </PDataTable>
+              `,
+    props: {
+        loading: {
+            default: boolean('loading', true),
+        },
+        useCursorLoading: {
+            default: boolean('useCursorLoading', false),
+        },
+    },
+    data() {
+        return {
+            ...data,
+        };
+    },
+    methods: {
+        ...actions,
+    },
+});

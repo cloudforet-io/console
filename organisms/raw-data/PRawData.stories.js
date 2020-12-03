@@ -1,7 +1,7 @@
 import PRawData from '@/components/organisms/raw-data/PRawData.vue';
 
 export default {
-    title: 'organisms/raw-data/raw-data',
+    title: 'Data Display/RawData',
     component: PRawData,
     parameters: {
         info: {
@@ -57,7 +57,7 @@ const value = {
     ],
 };
 
-export const defaultCase = () => ({
+export const rawData = () => ({
     components: { PRawData },
     props: {
         item: {

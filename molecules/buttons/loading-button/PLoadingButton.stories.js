@@ -4,7 +4,7 @@ import {
 import PLoadingButton from './PLoadingButton.vue';
 
 export default {
-    title: 'molecules/buttons/LoadingButton',
+    title: 'others/LoadingButton',
     component: PLoadingButton,
     parameters: {
         info: {

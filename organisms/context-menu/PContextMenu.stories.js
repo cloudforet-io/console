@@ -7,7 +7,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import md from '@/components/organisms/context-menu/PContextMenu.md';
 
 export default {
-    title: 'organisms/context-menu/context-menu',
+    title: 'Inputs/ContextMenu',
     component: PContextMenu,
     parameters: {
         notes: md,
@@ -32,7 +32,7 @@ const actions = {
 };
 
 
-export const defaultCase = () => ({
+export const contextMenu = () => ({
     components: { PContextMenu },
     template: `
 <div>
@@ -171,7 +171,7 @@ export const slotCase = () => ({
                         >
                             <template #menu="{menu}">
                                 <template v-for="(m, i) in menu">
-                                    <div v-if="m.type === 'item'" 
+                                    <div v-if="m.type === 'item'"
                                           :key="i"
                                          class="border-b border-blue-200 py-1 text-center text-xs"
                                     >
@@ -270,7 +270,7 @@ export const slotCase = () => ({
             </tbody>
         </table>
     </div>
-    
+
 </div>`,
     props: {
         theme: {
@@ -320,7 +320,7 @@ export const whiteCase = () => ({
     components: { PContextMenu, PI },
     template: `
 <div class="context-menu-story">
-    <p-context-menu 
+    <p-context-menu
             style="position:static; width:15.125rem;"
             ref="contextRef"
             :menu="menu"

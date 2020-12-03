@@ -3,7 +3,7 @@ import icon from 'vue-svgicon';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
-    title: 'atoms/icon',
+    title: 'Foundation/graphics',
     component: PI,
     parameters: {
         info: {
@@ -14,7 +14,7 @@ export default {
 };
 
 const icons = Object.keys(icon.icons);
-export const DefaultCase = () => ({
+export const Icons = () => ({
     components: { PI },
     props: {
         name: {
@@ -66,9 +66,9 @@ export const allIcons = () => ({
     template: `
         <div style="width:100vw;border: 1px solid #eee;display: grid; row-gap: 0.5rem;column-gap: 0.5rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
             <div v-for="icon in iconList">
-                <p-i v-bind="$props" :name="icon"/> <label style="user-select: all">{{icon}}</label>    
+                <p-i v-bind="$props" :name="icon"/> <label style="user-select: all">{{icon}}</label>
             </div>
-            
+
                    <span style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
                         <p-i v-bind="$props"/>
                    </span>
