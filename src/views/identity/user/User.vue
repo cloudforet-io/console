@@ -132,9 +132,8 @@ import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-// import { useStore } from '@/store/toolset';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import {store} from "@/store";
+import { store } from '@/store';
 
 
 interface UserModel {

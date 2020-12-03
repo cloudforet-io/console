@@ -7,10 +7,17 @@
                     <div class="header">
                         <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
                     </div>
-                    <p v-if="isSignInFailed" class="mt-2 text-red-500 sm leading-normal">{{ $t('COMMON.SIGN_IN.VALIDATION') }}</p>
-                    <p v-else class="mt-2 text-sm leading-normal">{{ $t('COMMON.SIGN_IN.TITLE' )}}</p>
+                    <p v-if="isSignInFailed" class="mt-2 text-red-500 sm leading-normal">
+                        {{ $t('COMMON.SIGN_IN.VALIDATION') }}
+                    </p>
+                    <p v-else class="mt-2 text-sm leading-normal">
+                        {{ $t('COMMON.SIGN_IN.TITLE' ) }}
+                    </p>
                     <div class="user-info">
-                        <component :is="component" @onSignIn="signIn" />
+                        <component :is="component" @on-sign-in="signIn"
+                                   @go-to-admin-sign-in="adminSignIn"
+                                   @go-to-user-sign-in="userSignIn"
+                        />
                     </div>
                 </div>
                 <p class="version hidden sm:hidden md:block lg:block xl:block">
@@ -22,20 +29,13 @@
 </template>
 
 <script lang="ts">
-    import {
-        toRefs, reactive, computed, defineComponent, getCurrentInstance, ComponentRenderProxy,
-    } from '@vue/composition-api';
+import {
+    toRefs, reactive, computed, defineComponent, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
-import { showErrorMessage } from '@/lib/util';
 import { RawLocation } from 'vue-router';
-
-
-interface State {
-    component: any;
-    loader: () => Promise<any>;
-}
 
 export default {
     name: 'SignIn',
@@ -67,14 +67,13 @@ export default {
 
         const state = reactive<any>({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
+            authSystem: computed(() => vm.$store.getters['domain/getAuthSystem']),
             component: computed(() => {
-                let authSystem = vm.$store.getters['domain/getAuthSystem'];
-                if (props.admin) {
-                    authSystem = 'admin';
-                }
                 let component;
+                const auth = state.authSystem;
                 try {
-                    component = () => import(`./templates/${authSystem}/index.vue`);
+                    if (props.admin) component = () => import('./templates/admin/index.vue');
+                    else component = () => import(`./templates/${auth}/index.vue`);
                 } catch (e) {
                     component = () => import('./templates/local/index.vue');
                 }
@@ -90,16 +89,25 @@ export default {
                     domain_id: vm.$store.state.domain.domainId,
                     credentials,
                 });
-                await vm.$router.push(<RawLocation>props.nextPath);
+                await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);
                 state.isSignInFailed = true;
             }
-            // setGtagUserID(vm, vm.$store);
+            setGtagUserID(vm);
+        };
+
+        const userSignIn = () => {
+            if (props.admin) vm.$router.replace({ name: 'Login' });
+        };
+        const adminSignIn = () => {
+            vm.$router.replace({ name: 'AdminLogin' });
         };
         return {
             ...toRefs(state),
             signIn,
+            userSignIn,
+            adminSignIn,
         };
     },
 };

@@ -141,8 +141,8 @@ export default {
             state.data = [
                 ...resp.results.map(d => ({
                     title: d.name,
-                    latitude: parseInt(d.tags.find(tag => tag.key === 'latitude').value),
-                    longitude: parseInt(d.tags.find(tag => tag.key === 'longitude').value),
+                    latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
+                    longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
                     color: props.providers[d.provider].color as string,
                     ...d,
                 })),
@@ -218,7 +218,7 @@ export default {
                     drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker);
                 }
             });
-            const originCoords = { longitude: 126, latitude: 37 };
+            const originCoords = { longitude: 126.871867 , latitude: 37.528547 };
             await getRegionList();
             imageSeries.data = state.data;
             drawMarker(originCoords, marker);

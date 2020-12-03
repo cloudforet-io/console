@@ -3,7 +3,7 @@
 </template>
 <script lang="ts">
 import router from '@/routes/index';
-import store from '@/store';
+import { store } from '@/store';
 // @ts-ignore
 const { gapi } = window;
 const getAuth2 = (clientId): Promise<any> => new Promise(((resolve, reject) => {

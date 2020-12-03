@@ -3,15 +3,14 @@ import Hashids from 'hashids';
 import config from '@/lib/config';
 import { VueRouter } from 'vue-router/types/router';
 import { VueConstructor } from 'vue/types/umd';
-import { Store } from 'vuex';
 import { Vue } from 'vue/types/vue';
+import { store } from '@/store';
 
-export const setGtagUserID = (vue: Vue, store: Store<any>) => {
+export const setGtagUserID = (vue: Vue) => {
     if (vue.$gtag) {
         try {
             if (store.state.domain.domainId && store.state.user.userId) {
                 const hashids = new Hashids(store.state.user.userId);
-
                 // eslint-disable-next-line camelcase
                 vue.$gtag.set({
                     // eslint-disable-next-line camelcase
@@ -20,7 +19,7 @@ export const setGtagUserID = (vue: Vue, store: Store<any>) => {
                 });
             }
         } catch (e) {
-            console.error('init gtag userid fail', e);
+            console.error('failed to init gtag', e);
         }
     } else if (config.get('GTAG_ID') !== 'DISABLED') {
         console.error('not set $gtag');

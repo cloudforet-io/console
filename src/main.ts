@@ -73,7 +73,7 @@ const initDomain = async () => {
 
 const initGtag = () => {
     if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), Vue, router);
-    setGtagUserID(Vue.prototype, store);
+    setGtagUserID(Vue.prototype);
 };
 
 const initLanguage = () => {

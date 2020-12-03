@@ -12,7 +12,7 @@
                           type="submit"
                           size="lg"
                           class="admin-btn"
-                          @click="goToAdmin"
+                          @click="goToAdminSignIn"
                 >
                     <span id="button-msg">{{ $t('COMMON.SIGN_IN.ROOT_ACCOUNT') }}</span>
                 </p-button>
@@ -39,7 +39,7 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const onSignIn = async (googleUser) => {
+        const signIn = async (googleUser) => {
             const credentials = {
                 // eslint-disable-next-line camelcase
                 access_token: googleUser.getAuthResponse().access_token,
@@ -48,13 +48,13 @@ export default defineComponent({
             if (!auth2.isSignedIn.get()) {
                 return;
             }
-            context.emit('onSignIn', credentials);
-        };
-        const goToAdmin = () => {
-            vm.$router.push({ name: 'AdminLogin' });
+            context.emit('on-sign-in', credentials);
         };
         const signInFail = () => {
             console.error('sign in failed');
+        };
+        const goToAdminSignIn = () => {
+            context.emit('go-to-admin-sign-in');
         };
         onMounted(async () => {
             gapi.load('auth', () => {
@@ -72,14 +72,14 @@ export default defineComponent({
                     width: 'auto',
                     longtitle: true,
                     theme: 'dark',
-                    onsuccess: onSignIn,
+                    onsuccess: signIn,
                     onfailure: signInFail,
                 });
             });
         });
         return {
-            goToAdmin,
-            onSignIn,
+            goToAdminSignIn,
+            signIn,
         };
     },
 });

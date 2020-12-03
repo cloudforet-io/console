@@ -50,9 +50,7 @@
             >
                 <span id="button-msg">{{ $t('COMMON.SIGN_IN.ADMIN_SIGN_IN') }}</span>
             </p-button>
-            <router-link to="/dashboard">
-                <span class="user-signin">{{ $t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}</span>
-            </router-link>
+            <span class="user-sign-in-btn" @click="goToUserSignIn">{{ $t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}</span>
         </div>
     </div>
 </template>
@@ -105,17 +103,17 @@ export default defineComponent({
                     user_id: state.userId,
                     password: state.password,
                 };
-                context.emit('onSignIn', credentials);
+                context.emit('on-sign-in', credentials);
             }
         };
-        const goToSignIn = () => {
-            vm.$router.push({ name: 'Login' });
+        const goToUserSignIn = () => {
+            context.emit('go-to-user-sign-in');
         };
         return {
             ...toRefs(state),
             ...validateAPI,
             signIn,
-            goToSignIn,
+            goToUserSignIn,
             checkUserId,
             checkPassword,
         };
@@ -137,8 +135,8 @@ export default defineComponent({
     }
 }
 
-.user-signin {
-    @apply text-gray-400 text-sm;
+.user-sign-in-btn {
+    @apply text-gray-400 text-sm cursor-pointer;
     &:hover {
         @apply text-blue-500;
     }
