@@ -72,7 +72,8 @@
                     v-if="openedMenu === 'support'"
                     v-click-outside="hideMenu"
                     class="right-align"
-                    :menu="supportMenu" theme="white"
+                    :menu="supportMenu"
+                    theme="white"
                 >
                     <template #item--format="{item}" />
                 </p-context-menu>
@@ -88,7 +89,7 @@
                 <p-context-menu
                     v-if="openedMenu === 'account'"
                     v-click-outside="hideMenu"
-                    class="white right-align"
+                    class="right-align"
                     :menu="accountMenu"
                     theme="white"
                 >
@@ -431,6 +432,10 @@ export default {
             }
         }
         .p-context-menu {
+            &.right-align {
+                right: 0;
+                left: auto;
+            }
             .border {
                 @apply border-gray-200;
                 border-top: none;
