@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { AuthType, AuthSystem } from './type';
+import { AuthType, AuthSystem, ExtendedAuthType } from './type';
 
 const AUTH_SYSTEM_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',
@@ -23,6 +23,13 @@ const getAuthType = (pluginInfo): AuthType => {
     return 'INTERNAL';
 };
 
+const EXTENDED_AUTH_TYPE_MAP = {
+    google_oauth2: 'GOOGLE_OAUTH2',
+    keyclock: 'KEYCLOCK',
+};
+
+const getExtendedAuthType = (authType): ExtendedAuthType | undefined => EXTENDED_AUTH_TYPE_MAP[authType];
+
 const getAuthOptions = (pluginInfo): any => {
     const pluginOptions = pluginInfo?.options || {};
     const pluginMetadata = pluginInfo?.metadata || {};
@@ -42,6 +49,7 @@ export const load = async ({ commit, state }, name: string): Promise<void|Error>
             name: domainResponse.name,
             authType: getAuthType(domainResponse.plugin_info),
             authSystem: getAuthSystem(domainResponse.plugin_info?.options?.auth_type),
+            extendedAuthType: getExtendedAuthType(domainResponse.plugin_info?.options?.auth_type),
             authOptions: getAuthOptions(domainResponse.plugin_info),
         });
     } else {
