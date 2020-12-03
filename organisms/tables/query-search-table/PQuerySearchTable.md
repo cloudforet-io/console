@@ -23,7 +23,7 @@ interface QuerySearchTableFunctions {
 
 ```typescript
 import { DataTableFieldType } from 'DataTable';
-import { KeyItem, ValueHandlerMap } from 'QuerySearch';
+import { KeyItemSet, ValueHandlerMap } from 'QuerySearch';
 import { QueryTag } from 'QuerySearchTags';
 
 export interface QuerySearchTableProps {
@@ -36,7 +36,7 @@ export interface QuerySearchTableProps {
     thisPage: number; // sync
     pageSize: number; // sync
     totalCount: number;
-    keyItems: KeyItem[];
+    keyItemSets: KeyItemSet[];
     valueHandlerMap: ValueHandlerMap;
     queryTags: QueryTag[];
 }

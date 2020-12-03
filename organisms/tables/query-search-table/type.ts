@@ -1,4 +1,4 @@
-import { KeyItem, QueryItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet, QueryItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { DataTableFieldType } from '@/components/organisms/tables/data-table/type';
 
@@ -12,7 +12,7 @@ export interface QuerySearchTableProps {
     thisPage?: number; // sync
     pageSize?: number; // sync
     totalCount: number;
-    keyItems: KeyItem[];
+    keyItemSets: KeyItemSet[];
     valueHandlerMap: ValueHandlerMap;
     queryTags?: QueryTag[]; // sync
     selectable: boolean;

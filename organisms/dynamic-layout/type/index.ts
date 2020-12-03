@@ -1,6 +1,6 @@
 import { DynamicLayoutOptions, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import {
     BeforeCreateDynamicField,
     DynamicFieldHandler,
@@ -28,7 +28,7 @@ export interface DynamicLayoutTypeOptions {
     colCopy: boolean;
     searchable: boolean;
     excelVisible: boolean;
-    keyItems: KeyItem[];
+    keyItemSets: KeyItemSet[];
     valueHandlerMap: ValueHandlerMap;
     language: string;
     listMap?: Record<string, Partial<DynamicLayoutTypeOptions>>;

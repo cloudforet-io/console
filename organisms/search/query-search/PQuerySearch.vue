@@ -49,20 +49,22 @@
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <p-context-menu v-show="visibleMenu"
-                        ref="menuRef"
-                        theme="secondary"
-                        :menu="menu"
-                        @select="onMenuSelect"
-                        @blur="focus"
-        >
-            <template #no-data>
-                <div />
-            </template>
-            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
-                <slot :name="`menu-${slot}`" v-bind="{...scope}" />
-            </template>
-        </p-context-menu>
+        <div v-show="visibleMenu" class="menu-container">
+            <p-context-menu ref="menuRef"
+                            theme="secondary"
+                            :loading="lazyLoading"
+                            :menu="menu"
+                            @select="onMenuSelect"
+                            @blur="focus"
+            >
+                <template #no-data>
+                    <div />
+                </template>
+                <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                    <slot :name="`menu-${slot}`" v-bind="{...scope}" />
+                </template>
+            </p-context-menu>
+        </div>
     </div>
 </template>
 
@@ -71,7 +73,7 @@ import {
     computed, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
 import {
-    throttle, reduce, cloneDeep, findLastIndex,
+    throttle, reduce, cloneDeep, debounce,
 } from 'lodash';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -105,7 +107,7 @@ import PSearch from '@/components/molecules/search/PSearch.vue';
 import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     findKey,
-    getDefaultKeyItemHandler, getKeyMenuForm,
+    getRootKeyItemHandler, getKeyMenuForm,
     getValueItem, getValueMenuForm,
 } from '@/components/organisms/search/query-search/helper';
 
@@ -140,7 +142,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        keyItems: {
+        keyItemSets: {
             type: Array,
             default: () => [],
         },
@@ -180,20 +182,19 @@ export default {
             menuRef: null as any,
             visibleMenu: false,
             menuType: computed<MenuType>(() => {
-                if (!state.selectedKey || state.currentDataType === 'object') return 'KEY';
+                if (!state.rootKey) return 'ROOT_KEY';
+                if (state.currentDataType === 'object') return 'KEY';
                 return menuTypeMap[state.currentDataType] || 'VALUE';
             }),
-            menu: computed<Array<KeyMenuItem|ValueMenuItem>>(() => {
-                if (state.menuType === 'KEY') return getKeyMenuForm(state.handlerResp, state.selectedKeys, state.subPath);
-                if (state.menuType === 'VALUE') return getValueMenuForm(state.handlerResp, state.selectedKeys, state.operator, state.subPath);
-                return state.handlerResp.results.map(d => ({ ...d, type: 'item', data: d }));
-            }),
+            menu: [] as Array<KeyMenuItem|ValueMenuItem>,
 
             /* Handler */
+            loading: false,
+            lazyLoading: false,
             handler: computed<ValueHandler|null>(() => {
-                if (!state.rootKey) return getDefaultKeyItemHandler(props.keyItems);
+                if (state.menuType === 'ROOT_KEY') return getRootKeyItemHandler(props.keyItemSets);
                 return defaultHandlerMap[state.currentDataType]
-                    || props.valueHandlerMap[state.rootKey.name]
+                    || props.valueHandlerMap[state.rootKey?.name as string]
                     || null;
             }),
             handlerResp: { results: [] } as HandlerResponse,
@@ -247,18 +248,39 @@ export default {
             else state.selectedKeys.pop();
         };
 
+        const setMenu = (res: HandlerResponse) => {
+            if (state.menuType === 'ROOT_KEY') state.menu = res.results;
+            else if (state.menuType === 'KEY') state.menu = getKeyMenuForm(res, state.selectedKeys, state.subPath);
+            else if (state.menuType === 'VALUE') state.menu = getValueMenuForm(res, state.selectedKeys, state.operator, state.subPath);
+            else state.menu = res.results.map(d => ({ ...d, type: 'item', data: d }));
+        };
+
+        const updateLoader = debounce(() => {
+            state.lazyLoading = state.loading;
+        }, 500);
+        const updateLoading = (value, force = false) => {
+            state.loading = value;
+            if (force) state.lazyLoading = value;
+            else if (state.lazyLoading !== state.loading) updateLoader();
+        };
+
 
         const updateMenuItems = throttle(async (inputText: string): Promise<void> => {
             let res: HandlerResponse = { results: [] };
+            updateLoading(true);
 
             if (state.handler) {
                 const func = state.handler(inputText, state.selectedKey as KeyItem, state.subPath, state.operator);
                 if (func instanceof Promise) {
                     res = await func;
-                } else res = func;
+                } else {
+                    res = func;
+                }
             }
 
             state.handlerResp = res;
+            setMenu(res);
+            updateLoading(false, true);
         }, 150);
 
 
@@ -266,10 +288,10 @@ export default {
             let item = findKey(val, state.handlerResp.results) || null;
             if (!item && state.currentDataType === 'object') item = { label: val, name: val };
             if (item) {
-                updateSelectedKey(item);
                 clearAll();
                 focus();
-                await updateMenuItems('');
+                updateSelectedKey(item);
+                await updateMenuItems(state.searchText);
             }
         };
 
@@ -354,12 +376,12 @@ export default {
         const onMenuSelect = async (value: string, idx: number) => {
             const selected = state.menu[idx];
 
-            if (!state.selectedKey || state.currentDataType === 'object') {
+            if (state.menuType === 'ROOT_KEY' || state.menuType === 'KEY') {
+                hideMenu();
                 updateSelectedKey(selected.data as KeyItem);
                 clearAll();
                 focus();
                 await showMenu(true);
-                await updateMenuItems(state.searchText);
             } else if (state.menuType === 'OPERATOR') {
                 if (state.supportOperators.includes(value)) {
                     state.operator = value;
@@ -438,7 +460,7 @@ export default {
 
 <style lang="postcss">
 .p-query-search {
-    @apply w-full relative;
+    @apply w-full;
     .p-search {
         @apply text-sm font-normal;
     }
@@ -448,11 +470,13 @@ export default {
     .p-context-menu {
         @apply font-normal;
         min-width: unset;
+        max-width: 100%;
         .secondary {
             &.context-header {
                 @apply text-secondary;
             }
             &.context-item {
+                @apply truncate;
                 &:hover {
                     @apply bg-blue-200;
                     color: currentColor !important;

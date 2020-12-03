@@ -152,7 +152,7 @@ interface DynamicLayoutTypeOptions {
     timezone: string;
     selectIndex: number[];
     selectable: boolean;
-    keyItems: KeyItem[]; // See QuerySearchTable
+    keyItemSets: KeyItemSet[]; // See QuerySearchTable
     valueHandlerMap: ValueHandlerMap; // See QuerySearchTable
     language: string;
     listMap: Record<string, Partial<DynamicLayoutTypeOptions>>;
@@ -170,7 +170,7 @@ interface DynamicLayoutTypeOptions {
 | timezone | string |```'UTC'``` | Used to display datetime. |
 | selectIndex | number[] |```[]``` | Used to initiate selectIndex of tables. Works only 'selectable' is ```true``` |
 | selectable | boolean | ```false``` | Used to make tables selectable. |
-| keyItems | KeyItem[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
+| keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
 | valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
 | language | string | ```'en'``` | NOT supported yet except markdown type. |
 | listMap | Record<string, Partial<DynamicLayoutTypeOptions>> | ```{}``` | Only for list type. Give layout's name as key, and type options as value. If value is ```undefined```, other type options will be automatically bound to each component. |
@@ -184,7 +184,7 @@ interface DynamicLayoutTypeOptions {
 | item | ```loading``` |
 | simple-table | ```loading```, ```totalCount```, ```timezone``` |
 | table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable``` |
-| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```keyItems```, ```valueHandlerMap``` |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```keyItemSets```, ```valueHandlerMap``` |
 | raw | - |
 | markdown | ```language``` |
 | list | ```listMap``` |

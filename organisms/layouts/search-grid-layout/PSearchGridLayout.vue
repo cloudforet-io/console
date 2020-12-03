@@ -18,7 +18,7 @@
             <template #toolbox-left>
                 <slot name="toolbox-left" />
                 <div class="left-toolbox-item hidden lg:block">
-                    <p-query-search :key-items="keyItems"
+                    <p-query-search :key-item-sets="keyItemSets"
                                     :value-handler-map="valueHandlerMap"
                                     @search="onSearch"
                     />
@@ -28,7 +28,7 @@
                 <div class="flex flex-col flex-1">
                     <p-query-search class="block lg:hidden mb-6"
                                     :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && proxyState.queryTags.length === 0}"
-                                    :key-items="keyItems"
+                                    :key-item-sets="keyItemSets"
                                     :value-handler-map="valueHandlerMap"
                                     @search="onSearch"
                     />
@@ -109,7 +109,7 @@ export default {
             default: 0,
             required: true,
         },
-        keyItems: {
+        keyItemSets: {
             type: Array,
             default: () => [],
         },

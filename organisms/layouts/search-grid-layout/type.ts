@@ -1,5 +1,5 @@
 import { GridLayoutProps } from '@/components/molecules/layouts/grid-layout/type';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 
@@ -12,7 +12,7 @@ export interface SearchGridLayoutProps extends GridLayoutProps {
     cardMinWidth?: string;
     cardHeight?: string;
     loading: boolean;
-    keyItems: KeyItem[];
+    keyItemSets: KeyItemSet[];
     valueHandlerMap: ValueHandlerMap;
     queryTags?: QueryTag[];
 }

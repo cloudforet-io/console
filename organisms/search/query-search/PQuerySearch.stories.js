@@ -28,19 +28,24 @@ export const defaultCase = () => ({
     template: `
     <div style="width: 80vw;">
         <PQuerySearch v-model="value"
-                      :keyItems="keyItems"
+                      :keyItemSets="keyItemSets"
                       :valueHandlerMap="valueHandlerMap"
                       @search="onSearch"
         ></PQuerySearch>
         <pre class="mt-8">{{queries}}</pre>
     </div>`,
     setup(props, context) {
-        const keyItems = [{
-            label: 'Project ID', name: 'project_id',
-        }, {
-            label: 'Project Name', name: 'name',
-        }, {
-            label: 'Project Group ID', name: 'project_group_id',
+        const keyItemSets = [{
+            title: 'Key',
+            items: [
+                {
+                    label: 'Project ID', name: 'project_id',
+                }, {
+                    label: 'Project Name', name: 'name',
+                }, {
+                    label: 'Project Group ID', name: 'project_group_id',
+                }
+            ]
         }];
 
         const valueItems = {
@@ -50,7 +55,7 @@ export const defaultCase = () => ({
         };
 
         const valueHandlerMap = {};
-        keyItems.forEach((k) => {
+        keyItemSets[0].items.forEach((k) => {
             const items = valueItems[k.name];
             valueHandlerMap[k.name] = inputText => ({
                 results: items.reduce((result, d) => {
@@ -64,7 +69,7 @@ export const defaultCase = () => ({
 
         const state = reactive({
             value: '',
-            keyItems,
+            keyItemSets,
             valueHandlerMap,
             queries: [],
         });
@@ -89,27 +94,40 @@ export const defaultHandlers = () => ({
             The default handler operates differently for each data type.
         </p>
         <PQuerySearch v-model="value"
-                      :keyItems="keyItems"
+                      :keyItemSets="keyItemSets"
                       @search="onSearch"
         ></PQuerySearch>
         <pre class="mt-8">{{queries}}</pre>
     </div>`,
     setup(props, context) {
-        const keyItems = [{
-            label: 'Boolean', name: 'boolean', dataType: 'boolean',
-        }, {
-            label: 'String', name: 'string', dataType: 'string',
-        }, {
-            label: 'Integer', name: 'integer', dataType: 'integer',
-        }, {
-            label: 'Float', name: 'float', dataType: 'float',
-        }, {
-            label: 'Datetime', name: 'datetime', dataType: 'datetime',
+        const keyItemSets = [{
+            title: 'Key',
+            items: [{
+                label: 'Boolean',
+                name: 'boolean',
+                dataType: 'boolean',
+            }, {
+                label: 'String',
+                name: 'string',
+                dataType: 'string',
+            }, {
+                label: 'Integer',
+                name: 'integer',
+                dataType: 'integer',
+            }, {
+                label: 'Float',
+                name: 'float',
+                dataType: 'float',
+            }, {
+                label: 'Datetime',
+                name: 'datetime',
+                dataType: 'datetime',
+            }]
         }];
 
         const state = reactive({
             value: '',
-            keyItems,
+            keyItemSets,
             queries: [],
         });
 

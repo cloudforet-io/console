@@ -1,23 +1,42 @@
 import {
     HandlerResponse,
-    KeyItem, KeyMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
+    KeyItem, KeyItemSet, KeyMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
 } from '@/components/organisms/search/query-search/type';
 import { find } from 'lodash';
 
 
-export const getDefaultKeyItemHandler = (staticKeyItems): ValueHandler => (val: string, keyItem: KeyItem) => {
-    let keyItems: KeyItem[] = [...staticKeyItems];
+const getAllKeyMenuItems = (keyItemSets: KeyItemSet[]): KeyMenuItem[] => {
+    const allKeyMenuItems: KeyMenuItem[] = [];
+    keyItemSets.forEach((d) => {
+        allKeyMenuItems.push({
+            label: `${d.title} (${d.items.length})`,
+            name: d.title,
+            type: 'header',
+        },
+        ...d.items.map(k => ({
+            ...k,
+            type: 'item' as const,
+            data: k,
+        })));
+    });
 
-    if (val) {
-        const regex = RegExp(val, 'i');
-        keyItems = staticKeyItems.reduce((result, d) => {
-            if (regex.test(d.label) || regex.test(d.name)) result.push(d);
-            return result;
-        }, [] as KeyItem[]);
-    }
-    return {
-        results: keyItems,
-        totalCount: staticKeyItems.length,
+    return allKeyMenuItems;
+};
+
+export const getRootKeyItemHandler = (keyItemSets: KeyItemSet[]): ValueHandler => {
+    const allKeyMenuItems = getAllKeyMenuItems(keyItemSets);
+    return (val: string) => {
+        let keyItems: KeyMenuItem[] = [...allKeyMenuItems];
+
+        if (val) {
+            const regex = RegExp(val, 'i');
+            keyItems = allKeyMenuItems.filter(d => d.type === 'header' || regex.test(d.label));
+        }
+
+        return {
+            results: keyItems,
+            totalCount: allKeyMenuItems.length,
+        };
     };
 };
 
@@ -31,12 +50,13 @@ export const getKeyMenuForm = (resp: HandlerResponse, selectedKeys: KeyItem[], s
     return [
         {
             label: `${key} ${resp.totalCount === undefined ? '' : `(${resp.totalCount})`}`,
+            name: key,
             type: 'header',
         },
         ...resp.results.map(d => ({
             label: d.label,
             name: d.name,
-            type: 'item' as const,
+            type: (d as ValueMenuItem).type || 'item' as const,
             data: d,
         })),
     ];
@@ -51,6 +71,7 @@ export const getValueMenuForm = (resp: HandlerResponse, selectedKeys: KeyItem[],
     return [
         {
             label: `${key} ${resp.totalCount === undefined ? '' : `(${resp.totalCount})`}`,
+            name: key,
             type: 'header',
         },
         ...resp.results.map(d => ({

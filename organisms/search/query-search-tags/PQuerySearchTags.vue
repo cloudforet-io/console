@@ -25,7 +25,8 @@
                 />
                 <span v-if="tag.key">
                     <span class="key-label">
-                        {{ tag.key.label || tag.key.name }}<template v-if="tag.subPath">.{{ tag.subPath }}</template>
+                        [{{ tag.key.label || tag.key.name }}]
+                        <template v-if="tag.subPath">{{ tag.subPath }}</template>
                     </span>
                     :{{ tag.operator }}
                     <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">

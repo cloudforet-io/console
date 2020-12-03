@@ -15,7 +15,7 @@
                               :select-index="selectIndex"
                               :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
-                              :key-items="keyItems"
+                              :key-item-sets="keyItemSets"
                               :value-handler-map="valueHandlerMap"
                               :query-tags.sync="queryTags"
                               :selectable="selectable"
@@ -54,7 +54,7 @@ import PQuerySearchTable from '@/components/organisms/tables/query-search-table/
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDynamicField from '@/components/organisms/dynamic-field/PDynamicField.vue';
 import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 import { forEach, get } from 'lodash';
 import {
     QuerySearchTableListeners,
@@ -126,11 +126,14 @@ export default {
             timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
             loading: computed(() => (props.typeOptions?.loading || false)),
             totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
-            keyItems: computed<KeyItem[]>(() => {
-                if (props.typeOptions?.keyItems) return props.typeOptions?.keyItems;
+            keyItemSets: computed<KeyItemSet[]>(() => {
+                if (props.typeOptions?.keyItemSets) return props.typeOptions?.keyItemSets;
                 if (!props.options.fields) return [];
 
-                return props.options.fields.map(d => ({ label: d.name, name: d.key }));
+                return [{
+                    title: 'Filters',
+                    items: props.options.fields.map(d => ({ label: d.name, name: d.key })),
+                }];
             }),
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],

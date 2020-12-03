@@ -38,7 +38,7 @@
         <template v-if="searchable" #toolbox-left="scope">
             <slot name="toolbox-left" v-bind="scope" />
             <div class="left-toolbox-item hidden lg:block">
-                <p-query-search :key-items="keyItems"
+                <p-query-search :key-item-sets="keyItemSets"
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
@@ -48,7 +48,7 @@
             <div class="flex flex-col flex-1">
                 <p-query-search class="block lg:hidden mt-4"
                                 :class="{ 'mb-4': !!$scopedSlots['toolbox-bottom'] && proxyState.queryTags.length === 0}"
-                                :key-items="keyItems"
+                                :key-item-sets="keyItemSets"
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
                 />
@@ -133,7 +133,7 @@ export default {
             type: Number,
             default: 0,
         },
-        keyItems: {
+        keyItemSets: {
             type: Array,
             default: () => [],
         },

@@ -64,11 +64,23 @@ export const defaultCase = () => ({
         totalCount: {
             default: number('totalCount', 50),
         },
-        keyItems: {
-            default: object('keyItems', [
-                { name: 'id', label: 'ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'group', label: 'Group' },
+        keyItemSets: {
+            default: object('keyItemSets', [
+                {
+                    title: 'Key',
+                    items: [{
+                        name: 'id',
+                        label: 'ID',
+                    },
+                    {
+                        name: 'name',
+                        label: 'Name',
+                    },
+                    {
+                        name: 'group',
+                        label: 'Group',
+                    }],
+                },
             ]),
         },
         valueHandlerMap: {

@@ -1,4 +1,4 @@
-import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
+import { ContextMenuType } from '@/components/organisms/context-menu/type';
 
 
 export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', 'object'] as const;
@@ -12,7 +12,6 @@ export interface ValueItem {
     label: string;
     name: any;
 }
-
 
 export interface KeyItem {
     label: string;
@@ -28,17 +27,18 @@ export interface QueryItem {
     subPath?: string;
 }
 
-export type MenuType ='KEY'|'VALUE'|'OPERATOR'
+export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
 
-export interface MenuItem<T> extends ContextMenuItem {
+export interface MenuItem<T> {
+    type: ContextMenuType;
     data?: T;
 }
 
-export type KeyMenuItem = MenuItem<KeyItem>;
-export type ValueMenuItem = MenuItem<ValueItem>;
+export interface KeyMenuItem extends KeyItem, MenuItem<KeyItem> {}
+export interface ValueMenuItem extends ValueItem, MenuItem<ValueItem> {}
 
 export interface HandlerResponse {
-    results: ValueItem[];
+    results: Array<ValueItem|ValueMenuItem>;
     totalCount?: number;
     dataType?: KeyDataType;
     operators?: OperatorType[];
@@ -50,10 +50,16 @@ export interface ValueHandlerMap {
     [key: string]: ValueHandler|undefined;
 }
 
+export interface KeyItemSet {
+    title: string;
+    items: KeyItem[];
+}
+
+
 export interface QuerySearchProps {
     placeholder?: string;
     focused: boolean;
-    keyItems: KeyItem[];
+    keyItemSets: KeyItemSet[];
     valueHandlerMap: ValueHandlerMap;
     value: string;
 }
