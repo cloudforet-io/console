@@ -24,14 +24,14 @@
             <p class="tag-title">
                 {{ $t('PROJECT.DETAIL.MODAL_ADDED_MEMBERS') }}
             </p>
-            <p-box-layout class="tag-container">
+            <p class="tag-container">
                 <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
                        class="tag"
                        @delete="tagTools.deleteTag(idx)"
                 >
                     {{ tag }}
                 </p-tag>
-            </p-box-layout>
+            </p>
         </template>
     </p-button-modal>
 </template>
@@ -47,7 +47,6 @@ import {
     getCurrentInstance,
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
-import PBoxLayout from '@/components/molecules/layouts/box-layout/PBoxLayout.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { isEqual } from 'lodash';
@@ -105,7 +104,6 @@ export default {
     components: {
         PSearchTable,
         PButtonModal,
-        PBoxLayout,
         PTag,
     },
     directives: {
@@ -219,11 +217,27 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+
 .tag-title {
     @apply font-semibold leading-normal text-sm mb-1 mt-8;
 }
 .tag-container {
     height: 7.5rem;
+    padding: 0.5rem;
+    border-radius: 0.125rem;
+    background-color: theme('colors.primary4');
+    border: 0.0625rem solid theme('colors.gray.100');
+
+    /*
+    @define-mixin box-color $theme, $bg-color, $line-color {
+        &.$(theme) {
+            background-color: $bg-color;
+            border-color: $line-color;
+        }
+    }
+    @mixin box-color primary4, theme('colors.primary4'), theme('colors.gray.100');
+     */
+
     >>> .p-tag.deletable {
         @apply bg-white border border-primary;
         .p-i-icon {

@@ -26,13 +26,10 @@ export { default as PLoadingButton } from './components/molecules/buttons/loadin
 
 // molecule form components
 export { default as PCheckBox } from './components/molecules/forms/checkbox/PCheckBox.vue';
-export { default as PTagsInput } from './components/organisms/forms/tags-input/PTagsInput.vue';
 export { default as PRadio } from './components/molecules/forms/radio/PRadio.vue';
-export { default as PSelect } from './components/molecules/forms/select/PSelect.vue';
 
 // molecule layout components
 export { default as PGridLayout } from './components/molecules/layouts/grid-layout/PGridLayout.vue';
-export { default as PBoxLayout } from './components/molecules/layouts/box-layout/PBoxLayout.vue';
 export { default as PPaneLayout } from './components/molecules/layouts/pane-layout/PPaneLayout.vue';
 
 // organisms buttons
@@ -50,7 +47,6 @@ export { default as PSelectDropdown } from './components/organisms/dropdown/sele
 export { default as PDynamicField } from './components/organisms/dynamic-field/PDynamicField.vue';
 
 // organisms forms
-export { default as PJsonSchemaFieldGroup } from './components/organisms/forms/json-schema-field-group/PJsonSchemaFieldGroup.vue';
 export { default as PJsonSchemaForm } from './components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
 
 // organisms tables
