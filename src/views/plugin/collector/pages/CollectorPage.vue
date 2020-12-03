@@ -11,7 +11,7 @@
             <template #container="{ height }">
                 <p-query-search-table :fields="fields"
                                       :items="items"
-                                      :key-items="querySearchHandlers.keyItems"
+                                      :key-item-sets="querySearchHandlers.keyItemSets"
                                       :value-handler-map="querySearchHandlers.valueHandlerMap"
                                       :loading="loading"
                                       :total-count="totalCount"
@@ -258,8 +258,8 @@ export default {
                 { name: 'priority', label: 'Priority' },
             ],
             // query
-            querySearchHandlers: makeQuerySearchPropsWithSearchSchema({
-                title: 'Properties',
+            querySearchHandlers: makeQuerySearchPropsWithSearchSchema([{
+                title: 'Filters',
                 items: [
                     { key: 'last_collected_at', name: 'Last Collected' },
                     { key: 'state', name: 'State' },
@@ -268,7 +268,7 @@ export default {
                     { key: 'plugin_info.version', name: 'Version' },
                     { key: 'name', name: 'Name' },
                 ],
-            }, 'inventory.Collector'),
+            }], 'inventory.Collector'),
             loading: false,
             searchTags: [],
             pageSize: 15,
@@ -333,7 +333,7 @@ export default {
 
         // Url query
         const setSearchTags = () => {
-            state.searchTags = queryStringToQueryTags(vm.$route.query.filters, state.querySearchHandlers.keyItems);
+            state.searchTags = queryStringToQueryTags(vm.$route.query.filters, state.querySearchHandlers.keyItemSets);
         };
 
         // Table

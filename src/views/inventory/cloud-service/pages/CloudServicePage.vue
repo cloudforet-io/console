@@ -160,6 +160,7 @@ import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import config from '@/lib/config';
+import { Filter } from '@/lib/space-connector/type';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -257,9 +258,6 @@ export default {
 
 
         /** Main Table */
-        // TODO: Remove it after change to new provider store
-        const providerSchemaOptions = {};
-
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
             pageStart: 1,
             pageLimit: cloudServiceStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
@@ -274,7 +272,7 @@ export default {
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
-            keyItems: [],
+            keyItemSets: [],
             valueHandlerMap: {},
             colCopy: false,
         });
@@ -311,6 +309,11 @@ export default {
             collectModalVisible: false,
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
+            fixedFilters: computed<Filter[]>(() => [
+                { k: 'provider', o: 'eq', v: props.provider },
+                { k: 'cloud_service_group', o: 'eq', v: props.group },
+                { k: 'cloud_service_type', o: 'eq', v: props.name },
+            ]),
         });
 
         const onTableHeightChange = (height) => {
@@ -334,20 +337,15 @@ export default {
                     },
                 });
 
-                // declare keyItems and valueHandlerMap with search schema
-                if (schema?.options?.search[0]) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search[0], 'inventory.CloudService');
-                    typeOptionState.keyItems = searchProps.keyItems;
+                // declare keyItemSets and valueHandlerMap with search schema
+                if (schema?.options?.search) {
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService', tableState.fixedFilters);
+                    typeOptionState.keyItemSets = searchProps.keyItemSets;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
-
-                // declare keyItems and valueHandlerMap with table fields
-                } else if (schema?.options?.fields) {
-                    typeOptionState.keyItems = schema.options.fields.map(d => ({ label: d.name, name: d.key }));
-                    typeOptionState.valueHandlerMap = makeDistinctValueHandlerMap(typeOptionState.keyItems, 'inventory.CloudService');
                 }
 
-                // initiate queryTags with keyItems
-                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItems);
+                // initiate queryTags with keyItemSets
+                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItemSets);
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = schema;
@@ -359,16 +357,10 @@ export default {
         const getQuery = () => {
             const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(fetchOptionState.queryTags);
 
-            andFilters.push(
-                { k: 'provider', o: 'eq', v: props.provider },
-                { k: 'cloud_service_group', o: 'eq', v: props.group },
-                { k: 'cloud_service_type', o: 'eq', v: props.name },
-            );
-
             const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...andFilters)
+                .setFilter(...andFilters, ...tableState.fixedFilters)
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
 

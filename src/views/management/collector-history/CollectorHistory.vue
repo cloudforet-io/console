@@ -13,7 +13,7 @@
                     :fields="fields"
                     :items="items"
                     :query-tags="tags"
-                    :key-items="handlers.keyItems"
+                    :key-item-sets="handlers.keyItemSets"
                     :value-handler-map="handlers.valueHandlerMap"
                     :loading="loading"
                     :total-count="totalCount"
@@ -142,7 +142,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
-import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
@@ -204,25 +204,28 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const handlers = {
-            keyItems: [
-                {
-                    name: 'job_id',
-                    label: 'Job ID',
-                },
-                {
-                    name: 'status',
-                    label: 'Status',
-                },
-                {
-                    name: 'collector_id',
-                    label: 'Collector',
-                },
-                {
-                    dataType: 'datetime',
-                    name: 'created_at',
-                    label: 'Start Time',
-                },
-            ],
+            keyItemSets: [{
+                title: 'Filters',
+                items: [
+                    {
+                        name: 'job_id',
+                        label: 'Job ID',
+                    },
+                    {
+                        name: 'status',
+                        label: 'Status',
+                    },
+                    {
+                        name: 'collector_id',
+                        label: 'Collector',
+                    },
+                    {
+                        dataType: 'datetime',
+                        name: 'created_at',
+                        label: 'Start Time',
+                    },
+                ],
+            }],
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
                 status: makeEnumValueHandler(JOB_STATUS),
@@ -268,7 +271,7 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems as KeyItem[]),
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets as KeyItemSet[]),
             querySearchRef: null as null|QuerySearchTableFunctions,
             modalVisible: false,
         });

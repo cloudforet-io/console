@@ -21,7 +21,7 @@
                     :fields="fields"
                     :items="items"
                     :query-tags="searchTags"
-                    :key-items="querySearchHandlers.keyItems"
+                    :key-item-sets="querySearchHandlers.keyItemSets"
                     :value-handler-map="querySearchHandlers.valueHandlerMap"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
@@ -220,20 +220,23 @@ export default {
             //
             searchTags: [],
             querySearchHandlers: {
-                keyItems: [
-                    {
-                        name: 'service_account_id',
-                        label: 'Service Account',
-                    },
-                    {
-                        name: 'project_id',
-                        label: 'Project',
-                    },
-                    {
-                        name: 'status',
-                        label: 'Status',
-                    },
-                ],
+                keyItemSets: [{
+                    title: 'Filters',
+                    items: [
+                        {
+                            name: 'service_account_id',
+                            label: 'Service Account',
+                        },
+                        {
+                            name: 'project_id',
+                            label: 'Project',
+                        },
+                        {
+                            name: 'status',
+                            label: 'Status',
+                        },
+                    ],
+                }],
                 valueHandlerMap: {
                     service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
                     project_id: makeReferenceValueHandler('identity.Project'),

@@ -1,8 +1,8 @@
-import { get, forEach, groupBy } from 'lodash';
+import { get, forEach, flatMap } from 'lodash';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import {
     KeyDataType,
-    KeyItem, operators, OperatorType, QueryItem, ValueItem,
+    KeyItem, KeyItemSet, operators, OperatorType, QueryItem, ValueItem,
 } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator } from '@/lib/space-connector/type';
 
@@ -224,13 +224,11 @@ const parseTag = (text: string): QueryItem => {
     };
 };
 
-const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[] = []): QueryTag[] => {
+const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItemSets: KeyItemSet[] = []): QueryTag[] => {
     const res: QueryTag[] = [];
 
     const keyMap = {};
-    forEach(keyItems, (d) => {
-        keyMap[d.name] = d;
-    });
+    flatMap(keyItemSets, d => d.items).forEach((d) => { keyMap[d.name] = d; });
 
     forEach(queryFilters, (values, k) => {
         if (k === 'keywords') {
@@ -244,7 +242,8 @@ const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItems: KeyItem[]
                 res.push({
                     key: keyMap[key] || { label: key, name: key },
                     value: { label: d as string, name: d },
-                    operator: filterKey[1] as OperatorType,
+                    operator: filterKey[2] as OperatorType,
+                    subPath: filterKey[1] || undefined,
                 });
             });
         }
@@ -258,7 +257,7 @@ const queryTagsToQueryFilters = (queryTags: QueryTag[]): QueryFilters => {
     };
     queryTags.forEach((tag) => {
         if (tag.key) {
-            const filterKey = `${tag.key.name}/${tag.operator}`;
+            const filterKey = `${tag.key.name}/${tag.subPath}/${tag.operator}`;
             if (!res[filterKey]) res[filterKey] = [];
             res[filterKey].push(tag.value.name);
         } else {

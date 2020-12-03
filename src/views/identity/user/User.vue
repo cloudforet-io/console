@@ -16,7 +16,7 @@
                     :this-page.sync="thisPage"
                     :page-size.sync="pageSize"
                     :total-count="totalCount"
-                    :key-items="keyItems"
+                    :key-item-sets="keyItemSets"
                     :value-handler-map="valueHandlerMap"
                     :query-tags="tags"
                     :style="{'height': height+'px'}"
@@ -120,7 +120,6 @@ import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCh
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { KeyItem } from '@/components/organisms/search/query-search/type';
 import { Options } from '@/components/organisms/tables/query-search-table/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
@@ -134,6 +133,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { store } from '@/store';
+import {KeyItemSet} from "@/components/organisms/search/query-search/type";
 
 
 interface UserModel {
@@ -174,28 +174,31 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         // const { user } = useStore();
         const handlers = {
-            keyItems: [
-                {
-                    name: 'user_id',
-                    label: 'User ID',
-                },
-                {
-                    name: 'name',
-                    label: 'Name',
-                },
-                {
-                    name: 'group',
-                    label: 'Group',
-                },
-                {
-                    name: 'email',
-                    label: 'E-mail',
-                },
-                {
-                    name: 'mobile',
-                    label: 'Phone',
-                },
-            ],
+            keyItemSets: [{
+                title: 'Filters',
+                items: [
+                    {
+                        name: 'user_id',
+                        label: 'User ID',
+                    },
+                    {
+                        name: 'name',
+                        label: 'Name',
+                    },
+                    {
+                        name: 'group',
+                        label: 'Group',
+                    },
+                    {
+                        name: 'email',
+                        label: 'E-mail',
+                    },
+                    {
+                        name: 'mobile',
+                        label: 'Phone',
+                    },
+                ],
+            }],
             valueHandlerMap: {
                 user_id: makeDistinctValueHandler('identity.User', 'user_id'),
                 name: makeDistinctValueHandler('identity.User', 'name'),
@@ -254,9 +257,9 @@ export default {
                     type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.DISABLE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
-            keyItems: handlers.keyItems as KeyItem[],
+            keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets),
         });
         const modalState = reactive({
             visible: false,

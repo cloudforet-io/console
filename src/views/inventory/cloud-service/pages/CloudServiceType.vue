@@ -100,7 +100,7 @@
                                       :page-size.sync="pageSize"
                                       :total-count="totalCount"
                                       :query-tags="tags"
-                                      :key-items="keyItems"
+                                      :key-item-sets="keyItemSets"
                                       :value-handler-map="valueHandlerMap"
                                       @change="onChange"
                                       @refresh="onChange"
@@ -192,7 +192,7 @@ import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
@@ -267,8 +267,8 @@ export default {
             isPrimary: true,
         });
         const handlers = makeQuerySearchPropsWithSearchSchema(
-            {
-                title: 'Properties',
+            [{
+                title: 'Filters',
                 items: [
                     { key: 'cloud_service_type', name: 'Cloud Service Type' },
                     { key: 'cloud_service_group', name: 'Cloud Service Group' },
@@ -276,7 +276,7 @@ export default {
                     { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
                     { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
                 ],
-            },
+            }],
             'inventory.CloudService',
         );
 
@@ -285,9 +285,9 @@ export default {
             providerName: 'All',
             cardClass: () => ['card-item', 'cloud-service-type-item'],
             loading: true,
-            keyItems: handlers.keyItems as KeyItem[],
+            keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets),
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,

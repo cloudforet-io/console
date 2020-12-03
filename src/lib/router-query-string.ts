@@ -1,10 +1,12 @@
 import {
-    find,
+    find, flatMap,
 } from 'lodash';
 import router from '@/routes';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { parseTag } from '@/lib/component-utils/query-search-tags';
-import { KeyItem, QueryItem } from '@/components/organisms/search/query-search/type';
+import {
+    KeyItemSet, QueryItem,
+} from '@/components/organisms/search/query-search/type';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -26,11 +28,11 @@ export const replaceQuery = async (key: string, value: RouteQueryString) => {
 
 
 /** QueryString Converter Helpers */
-const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]): QueryItem => {
+const getQueryItemFromQueryString = (queryString: string, keyItemSets?: KeyItemSet[]): QueryItem => {
     const parsedItem: QueryItem = parseTag(queryString);
     if (parsedItem.key?.name) {
-        if (keyItems) {
-            const originKeyItem = find(keyItems, { name: parsedItem.key.name });
+        if (keyItemSets) {
+            const originKeyItem = find(flatMap(keyItemSets, d => d.items), { name: parsedItem.key.name });
             if (originKeyItem) parsedItem.key = { ...originKeyItem };
         }
     }
@@ -46,15 +48,15 @@ const getQueryItemFromQueryString = (queryString: string, keyItems?: KeyItem[]):
     return parsedItem;
 };
 
-export const queryStringToQueryTags = (queryString: RouteQueryString, keyItems?: KeyItem[]): QueryTag[] => {
+export const queryStringToQueryTags = (queryString: RouteQueryString, keyItemSets?: KeyItemSet[]): QueryTag[] => {
     if (!queryString) return [];
     if (Array.isArray(queryString)) {
         return queryString.reduce((res, qs) => {
-            if (qs) res.push(getQueryItemFromQueryString(qs, keyItems));
+            if (qs) res.push(getQueryItemFromQueryString(qs, keyItemSets));
             return res;
         }, [] as QueryTag[]);
     }
-    return [getQueryItemFromQueryString(queryString as string, keyItems)];
+    return [getQueryItemFromQueryString(queryString as string, keyItemSets)];
 };
 
 export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {

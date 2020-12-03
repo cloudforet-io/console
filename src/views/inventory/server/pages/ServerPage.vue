@@ -160,7 +160,7 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { ServerModel } from '@/models/inventory/server';
 
 
-import { get } from 'lodash';
+import { flatMap, get } from 'lodash';
 import {
     showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
@@ -281,7 +281,7 @@ export default {
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
-            keyItems: [],
+            keyItemSets: [],
             valueHandlerMap: {},
             colCopy: false,
         });
@@ -339,7 +339,8 @@ export default {
                 .setFilterOr(...orFilters)
                 .setKeyword(...keywords);
 
-            query.setOnly(...typeOptionState.keyItems.map(d => d.name), 'collection_info.collectors');
+            query.setOnly(...flatMap(typeOptionState.keyItemSets, d => d.items).map(d => d.name), 'collection_info.collectors');
+
             if (tableState.schema?.options?.fields) {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
@@ -397,35 +398,45 @@ export default {
                     },
                 });
 
-                // declare keyItems and valueHandlerMap with search schema
+                // declare keyItemSets and valueHandlerMap with search schema
                 if (res?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search[0], 'inventory.Server');
-                    typeOptionState.keyItems = searchProps.keyItems;
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search, 'inventory.Server');
+                    typeOptionState.keyItemSets = searchProps.keyItemSets;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
-
-                    // declare keyItems and valueHandlerMap with table fields
-                } else if (res?.options?.fields) {
-                    typeOptionState.keyItems = res.options.fields.map(d => ({ label: d.name, name: d.key }));
-                    typeOptionState.valueHandlerMap = makeDistinctValueHandlerMap(typeOptionState.keyItems, 'inventory.Server');
                 }
 
 
                 // TODO: remove after test
-                typeOptionState.keyItems.push({
-                    label: 'Tags',
-                    name: 'tags',
-                    dataType: 'object',
-                    operators: ['!=', '!', '='],
-                }, {
-                    label: 'Data',
-                    name: 'data',
-                    dataType: 'object',
+                typeOptionState.keyItemSets.push({
+                    title: 'Advanced',
+                    items: [{
+                        label: 'Tags',
+                        name: 'tags',
+                        dataType: 'object',
+                        operators: ['!=', '!', '='],
+                    }, {
+                        label: 'Data',
+                        name: 'data',
+                        dataType: 'object',
+                        operators: ['!=', '!', '='],
+                    }, {
+                        label: 'Nics',
+                        name: 'nics',
+                        dataType: 'object',
+                        operators: ['!=', '!', '='],
+                    }, {
+                        label: 'Disks',
+                        name: 'disks',
+                        dataType: 'object',
+                        operators: ['!=', '!', '='],
+                    }],
                 });
                 typeOptionState.valueHandlerMap.tags = makeDistinctValueHandler('inventory.Server', 'tags.key');
                 typeOptionState.valueHandlerMap.data = makeDistinctValueHandler('inventory.Server', 'data');
 
-                // initiate queryTags with keyItems
-                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItems);
+
+                // initiate queryTags with keyItemSets
+                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItemSets);
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = res;

@@ -3,6 +3,7 @@
                     centered
                     fade
                     backdrop
+                    scrollable
                     size="xl"
                     :footer-cancel-button-bind="{
                         styleType: 'gray900',

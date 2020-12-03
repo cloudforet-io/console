@@ -12,7 +12,7 @@
                                           totalCount,
                                           timezone,
                                           selectIndex,
-                                          keyItems,
+                                          keyItemSets,
                                           valueHandlerMap,
                                           language,
                                       }"
@@ -34,7 +34,7 @@ import {
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { KeyItem, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
@@ -95,7 +95,7 @@ export default {
             totalCount: 0,
             timezone: computed(() => getTimezone()),
             selectIndex: [] as number[],
-            keyItems: [] as KeyItem[],
+            keyItemSets: [] as KeyItemSet[],
             valueHandlerMap: {} as ValueHandlerMap,
             language: computed(() => store.state.user.language),
 
@@ -124,11 +124,11 @@ export default {
 
 
         const setSearchOptions = () => {
-            const { keyItems, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                state.currentLayout.options.search[0],
+            const { keyItemSets, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
+                state.currentLayout.options.search,
                 'inventory.CloudService',
             );
-            state.keyItems = keyItems;
+            state.keyItemSets = keyItemSets;
             state.valueHandlerMap = valueHandlerMap;
         };
 

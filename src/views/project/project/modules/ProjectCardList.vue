@@ -29,16 +29,16 @@
                         {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT') }}
                     </p>
                     <p class="content-order">
-                        {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER') }}
+                        <strong>1.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1') }}
                     </p>
-                    <p-button style-type="primary-dark" class="mt-8"
-                              @click="$emit('create-project-group')"
+                    <p class="content-order">
+                        <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
+                    </p>
+                    <p-icon-text-button style-type="primary-dark" class="mt-6" name="ic_plus_bold"
+                                        width="1rem" height="1rem" @click="$emit('create-project-group')"
                     >
-                        <p-i name="ic_plus_bold" color="inherit"
-                             width="1rem" height="1rem" class="mr-1 cursor-pointer add-btn"
-                        />
                         {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
-                    </p-button>
+                    </p-icon-text-button>
                 </div>
                 <div v-else-if="noProject" class="empty-project">
                     <p class="text-primary2">
@@ -69,10 +69,31 @@
                         </template>
                         <span v-else>
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
-                            <span class="summary-item-num">{{ cardSummary[item.project_id] ? cardSummary[item.project_id].serverCount : 'N/A' }}</span>
+                            <router-link v-if="cardSummary[item.project_id]"
+                                         class="summary-item-num"
+                                         :to="{
+                                             name: 'server',
+                                             query: {filters: `project_id:=${item.project_id}`}
+                                         }"
+                            >{{ cardSummary[item.project_id].serverCount }}
+                            </router-link>
+                            <span v-else class="summary-item-num none">N/A</span>
+
                             <span class="mx-2 text-gray-300 divider">|</span>
+
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
-                            <span class="summary-item-num">{{ cardSummary[item.project_id] ? cardSummary[item.project_id].cloudServiceCount : 'N/A' }}</span>
+                            <router-link v-if="cardSummary[item.project_id]"
+                                         class="summary-item-num"
+                                         :to="{
+                                             name: 'cloudService',
+                                             query: {
+                                                 provider: 'all',
+                                                 filters: `project_id:=${item.project_id}`
+                                             }
+                                         }"
+                            >{{ cardSummary[item.project_id].cloudServiceCount }}
+                            </router-link>
+                            <span v-else class="summary-item-num none">N/A</span>
                         </span>
                     </div>
                 </div>
@@ -96,8 +117,8 @@
                             </div>
                         </div>
                         <div class="account-add">
-                            <router-link class="icon-wrapper" :to="{name: 'serviceAccount',}">
-                                <p-i name="ic_plus_thin" scale="0.8" />
+                            <router-link class="icon-wrapper" :to="{name: 'serviceAccount'}">
+                                <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
                             </router-link>
                             <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                         </div>
@@ -126,12 +147,11 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/type';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 
 interface Props {
     searchText: string;
@@ -143,10 +163,9 @@ interface Props {
 export default {
     name: 'ProjectCardList',
     components: {
-        PLazyImg,
+        PIconTextButton,
         FavoriteButton,
         PI,
-        PButton,
         PSkeleton,
         PCheckBox,
         PToolboxGridLayout,
@@ -317,6 +336,23 @@ export default {
 
 .empty-container {
     @apply flex-col text-center justify-start;
+    .title {
+        @apply mb-4 text-primary-dark;
+        margin-top: 5rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+    .content {
+        @apply mb-4 text-gray-600;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .content-order {
+        @apply text-gray-dark;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
     .empty-project {
         @apply text-gray-300 text-center text-base;
     }
@@ -369,6 +405,14 @@ export default {
         }
         .summary-item-num {
             @apply ml-2 font-bold;
+            &:hover:not(.none) {
+                @apply text-secondary;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+            &.none {
+                @apply text-gray-300;
+            }
         }
         .skeleton-loading {
             @apply flex items-center pb-2 pr-15;
@@ -398,12 +442,16 @@ export default {
                 background-size: 100%;
                 background-position: center;
                 line-height: 1.25rem;
+                &:hover {
+                    opacity: 50%;
+                }
             }
         }
         .account-add {
             @apply flex-shrink-0 inline-flex items-center text-gray-900;
             .add-label {
                 @apply ml-2;
+                line-height: 1.2;
             }
             .icon-wrapper {
                 @apply bg-gray-100 rounded-full inline-flex justify-center items-center;
@@ -414,6 +462,9 @@ export default {
                 @apply text-secondary font-bold;
                 .icon-wrapper {
                     @apply bg-blue-300;
+                }
+                .add-label {
+                    text-decoration: underline;
                 }
             }
         }

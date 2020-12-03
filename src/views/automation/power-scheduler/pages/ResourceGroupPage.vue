@@ -321,7 +321,7 @@ export default {
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: false,
-            keyItems: [],
+            keyItemSets: [],
             valueHandlerMap: {},
             colCopy: false,
             searchable: computed(() => !props.readMode),
@@ -407,10 +407,10 @@ export default {
                 });
 
                 const querySearchProps = makeQuerySearchPropsWithSearchSchema(
-                    state.schema.options.search[0],
+                    state.schema.options.search,
                     resourceType,
                 );
-                typeOptionState.keyItems = querySearchProps.keyItems;
+                typeOptionState.keyItemSets = querySearchProps.keyItemSets;
                 typeOptionState.valueHandlerMap = querySearchProps.valueHandlerMap;
 
                 if (state.schema.options?.fields) {

@@ -16,7 +16,7 @@
                 :page-size.sync="pageSize"
                 :total-count="totalCount"
                 :query-tags="tags"
-                :key-items="keyItems"
+                :key-item-sets="keyItemSets"
                 :value-handler-map="valueHandlerMap"
                 :pagination-values="[12, 24, 36]"
                 card-height="18.25rem"
@@ -160,7 +160,7 @@ import dayjs from 'dayjs';
 import { getTimezone } from '@/lib/util';
 
 /* Types */
-import { KeyItem } from '@/components/organisms/search/query-search/type';
+import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
@@ -193,10 +193,13 @@ export default {
          * Handlers for query search
          * */
         const handlers = {
-            keyItems: [
+            keyItemSets: [
                 {
-                    name: 'project_id',
-                    label: 'Project',
+                    title: 'Filters',
+                    items: [{
+                        name: 'project_id',
+                        label: 'Project',
+                    }],
                 },
             ],
             valueHandlerMap: {
@@ -210,9 +213,9 @@ export default {
             items: [] as any,
             cardClass: () => ['card-item', 'power-scheduler-list'],
             loading: false,
-            keyItems: handlers.keyItems as KeyItem[],
+            keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItems),
+            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets),
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,

@@ -1,42 +1,33 @@
 import {
     KeyDataType,
-    KeyItem,
+    KeyItem, KeyItemSet,
     ValueHandler,
     ValueHandlerMap,
     ValueItem,
 } from '@/components/organisms/search/query-search/type';
-import { map, size } from 'lodash';
+import {
+    map, size, flatMap, flatten, uniq, cloneDeep,
+} from 'lodash';
 import { SearchEnumItem, SearchEnums } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { SpaceConnector } from '@/lib/space-connector';
+import { Filter } from '@/lib/space-connector/type';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
-type KeyParam = Array<KeyTuple | string | KeyItem>
+type KeyParam = Array<KeyTuple | string | KeyItemSet>
 
-/**
- * @name makeKeyItems
- * @description A helper function that returns KeyItem[] necessary for QuerySearch component.
- * @param keys
- */
-export const makeKeyItems = (keys: KeyParam): KeyItem[] => keys.map((d) => {
-    if (Array.isArray(d)) return { name: d[0], label: d[1] || d[0], dataType: d[2] };
-    if (typeof d === 'string') return { name: d, label: d };
-    return d;
-});
-
-
-const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number) => {
+const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, dataType?: KeyDataType) => {
     if (d === undefined || d === null) {
         return {
             results: [],
             totalCount: undefined,
-            dataType: undefined,
+            dataType: dataType || undefined,
         };
     }
     if (typeof d === 'string' || typeof d === 'boolean') {
         return {
             results,
             totalCount,
-            dataType: typeof d,
+            dataType: dataType || typeof d,
         };
     }
     if (typeof d === 'number') {
@@ -47,18 +38,33 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number) 
         return {
             results,
             totalCount,
-            dataType: type,
+            dataType: dataType || type,
         };
     }
+
+    /* array case */
     if (Array.isArray(d)) {
-        return getHandlerResp(d[0], d.map(t => ({ label: t, name: t })), d.length);
+        if (typeof d[0] === 'object') {
+            /* when first item is array */
+            if (Array.isArray(d[0])) {
+                const next = uniq(flatten(d));
+                return getHandlerResp(next, next.map(t => ({ label: t, name: t })), d.length, 'object');
+            }
+            /* when first item is object */
+            const next = uniq(flatMap(d, (t => Object.keys(t))));
+            return getHandlerResp(next, next.map(t => ({ label: t, name: t })), d.length, 'object');
+        }
+
+        /* when first item is primitive type */
+        return getHandlerResp(d, d.map(t => ({ label: t, name: t })), d.length, 'object');
     }
 
+    /* object case */
     const keys = Object.keys(d);
     return {
         results: keys.map(k => ({ label: k, name: k })),
-        totalCount: totalCount || keys.length,
-        dataType: 'object',
+        totalCount: keys.length,
+        dataType: dataType || 'object',
     };
 };
 
@@ -70,28 +76,44 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number) 
  * @param dataType
  * @param limit
  */
-export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: string, limit?: number): ValueHandler|undefined {
+export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: KeyDataType, filters?: Filter[], limit?: number): ValueHandler|undefined {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
 
-    const param = { resource_type: resourceType, options: { limit: limit || 10 } };
+    const staticParam: any = {
+        resource_type: resourceType,
+        options: { limit: limit || 10 },
+        // eslint-disable-next-line camelcase
+        distinct_key: distinct,
+    };
 
     return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
+        const param = cloneDeep(staticParam);
+        param.search = inputText;
+        if (subPath) {
+            // eslint-disable-next-line camelcase
+            param.distinct_key = `${distinct}.${subPath}`;
+            // eslint-disable-next-line camelcase
+            param.options.search_type = 'key';
+        }
+        if (filters) {
+            param.options.filter = filters;
+        }
+
         try {
-            const res = await SpaceConnector.client.addOns.autocomplete.distinct({
-                // eslint-disable-next-line camelcase
-                ...param, search: inputText, distinct_key: subPath ? `${distinct}.${subPath}` : distinct,
-            });
+            const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
 
             return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
 
             // return {
             //     results: res.results.map(d => ({ label: d.name, name: d.key })),
             //     totalCount: res.total_count,
+            //     dataType,
             // };
         } catch (e) {
             return {
                 results: [],
                 totalCount: 0,
+                dataType,
             };
         }
     };
@@ -105,10 +127,12 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
  * @param dataType
  * @param limit
  */
-export function makeReferenceValueHandler(resourceType: string, dataType?: string, limit?: number): ValueHandler {
+export function makeReferenceValueHandler(resourceType: string, dataType?: KeyDataType, limit?: number): ValueHandler|undefined {
+    if (['datetime', 'boolean', 'object'].includes(dataType || '')) return undefined;
+
     const param = { resource_type: resourceType, options: { limit: limit || 10 } };
 
-    return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
+    return async (inputText: string) => {
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.resource({
                 ...param, search: inputText,
@@ -116,11 +140,13 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: strin
             return {
                 results: res.results.map(d => ({ label: d.name, name: d.key })),
                 totalCount: res.total_count,
+                dataType,
             };
         } catch (e) {
             return {
                 results: [],
                 totalCount: 0,
+                dataType,
             };
         }
     };
@@ -143,7 +169,7 @@ export function makeEnumValueHandler(
         return { label: d.label, name: k, icon: d.icon };
     });
 
-    return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
+    return async (inputText: string) => {
         let res: ValueItem[] = [...allItems];
         if (inputText) {
             const regex = RegExp(inputText, 'i');
@@ -174,7 +200,11 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
             const [name, label, dataType] = k as KeyTuple;
             res[name] = makeDistinctValueHandler(resourceType, label || name, dataType);
         } else if (typeof k === 'string') res[k] = makeDistinctValueHandler(resourceType, k);
-        else res[k.name] = makeDistinctValueHandler(resourceType, k.name, k.dataType);
+        else {
+            (k as KeyItemSet).items.forEach((d) => {
+                res[d.name] = makeDistinctValueHandler(resourceType, d.name, d.dataType);
+            });
+        }
     });
     return res;
 }

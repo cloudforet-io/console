@@ -6,7 +6,7 @@
                 <p-query-search-table
                     :fields="fields"
                     :items="items"
-                    :key-items="keyItems"
+                    :key-item-sets="keyItemSets"
                     :total-count="totalCount"
                     :style="{height: `${height}px`}"
                     @select="onSelect"
@@ -109,12 +109,15 @@ export default {
                 });
                 return items;
             }),
-            keyItems: [
-                { name: 'plugin_id', label: 'Collector ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'version', label: 'Version' },
-            ],
+            keyItemSets: {
+                title: 'Filters',
+                items: [
+                    { name: 'plugin_id', label: 'Collector ID' },
+                    { name: 'name', label: 'Name' },
+                    { name: 'state', label: 'State' },
+                    { name: 'version', label: 'Version' },
+                ],
+            },
         });
         const pluginDetailState = reactive({
             name: computed(() => vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_TITLE')),
