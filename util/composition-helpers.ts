@@ -1,10 +1,7 @@
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, ref, Ref, UnwrapRef,
+    computed, getCurrentInstance, onMounted, onUnmounted, ref, Ref,
 } from '@vue/composition-api';
-import { every } from 'lodash';
-import VueI18n from 'vue-i18n';
-import { isNotEmpty } from '@/components/util/helpers';
 
 /**
  * Event listeners by pass
@@ -132,93 +129,3 @@ export const windowEventMount = (eventName: string, func: any) => {
     onMounted(() => window.addEventListener(eventName, func));
     onUnmounted(() => window.removeEventListener(eventName, func));
 };
-
-
-type validationFunction = (value: any, data?: any, options?: any) => boolean|Promise<boolean>;
-type message = string|VueI18n.TranslateResult;
-
-
-/**
- * use it when generate validation function
- */
-export class Validation {
-    /**
-     * make new validation
-     * @param func validation func, if invalid return false
-     * @param invalidMessage
-     */
-    constructor(public func: validationFunction, public invalidMessage?: message) { }
-}
-
-
-/**
- * use it when make validation for data form.
- * returns a set of state & functions for validation.
- * @param data
- * @param validation validation function map
- * @return {
- *          {
- *          allValidation: (function(): boolean),
- *          validState: UnwrapRef<any>,
- *          fieldValidation: fieldValidation,
- *          invalidMsg: UnwrapRef<any>,
- *          invalidState: Ref<any>
- *          }
- *      }
- */
-export const formValidation = (data: any, validation: object) => {
-    const validationFields = Object.keys(validation);
-    const invalidMsg = reactive(Object.fromEntries(validationFields.map(x => [x, ''])));
-    const invalidState = reactive(Object.fromEntries(validationFields.map(x => [x, false])));
-    const validState = reactive(Object.fromEntries(validationFields.map(x => [x, false])));
-    const isAllValid = computed(() => every(invalidState, val => val === false));
-    /**
-     * validated only one field
-     * @param name
-     * @return {boolean}
-     */
-    const fieldValidation = async (name: string) => {
-        const vds = validation[name];
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < vds.length; i++) {
-            const vd = vds[i];
-            // eslint-disable-next-line no-await-in-loop
-            const check = await vd.func(data[name], data);
-            if (!check) {
-                invalidMsg[name] = vd.invalidMessage;
-                invalidState[name] = true;
-                return false;
-            }
-        }
-        invalidState[name] = false;
-        validState[name] = true;
-        return true;
-    };
-    /**
-     * validated all fields
-     * @return {boolean}
-     */
-    const allValidation = async () => {
-        let result = true;
-        const vds = Object.keys(validation);
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < vds.length; i++) {
-            // eslint-disable-next-line no-await-in-loop
-            const validateResult = await fieldValidation(vds[i]);
-            if (!validateResult) {
-                result = false;
-            }
-        }
-        return result;
-    };
-    return {
-        fieldValidation,
-        allValidation,
-        invalidMsg,
-        invalidState,
-        validState,
-        isAllValid,
-    };
-};
-
-export const requiredValidation = (invalidMessage?: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
