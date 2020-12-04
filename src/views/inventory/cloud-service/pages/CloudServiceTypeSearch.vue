@@ -3,8 +3,9 @@
 </template>
 
 <script lang="ts">
-
+import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
+import { locationQueryToString } from '@/lib/router-query-string';
 
 const DEFAULT_URL = '/inventory/cloud-service';
 const ERROR_URL = '/inventory/cloud-service/no-resource';
@@ -27,7 +28,12 @@ export default {
                 if (result.url === DEFAULT_URL) {
                     next(ERROR_URL);
                 } else {
-                    next(result.url);
+                    let link = result.url;
+                    if (!isEmpty(to.query)) {
+                        const queryString = locationQueryToString(to.query);
+                        link += `?${queryString}`;
+                    }
+                    next(link);
                 }
             } catch (e) {
                 next(ERROR_URL);

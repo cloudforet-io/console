@@ -1,6 +1,7 @@
 import {
-    find, flatMap,
+    find, flatMap, forEach,
 } from 'lodash';
+import { Location } from 'vue-router';
 import router from '@/routes';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { parseTag } from '@/lib/component-utils/query-search-tags';
@@ -83,4 +84,19 @@ export const queryStringToStringArray = (queryString: RouteQueryString): string[
         if (d !== null) res.push(d);
         return res;
     }, [] as string[]);
+};
+
+export const locationQueryToString = (locationQuery: Location['query']): string => {
+    if (!locationQuery) return '';
+    const queryStrings: string[] = [];
+    forEach(locationQuery, (v, k) => {
+        if (k === 'filters') {
+            let filters: string[] = locationQuery.filters as string[];
+            filters = filters.map(d => `filters=${d}`);
+            queryStrings.push(...filters);
+        } else {
+            queryStrings.push(`${k}=${v}`);
+        }
+    });
+    return queryStrings.join('&');
 };

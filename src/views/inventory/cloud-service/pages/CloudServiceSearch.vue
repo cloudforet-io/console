@@ -2,8 +2,10 @@
     <div />
 </template>
 <script lang="ts">
-
+/* eslint-disable camelcase */
+import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
+import { locationQueryToString } from '@/lib/router-query-string';
 
 const DEFAULT_URL = '/inventory/cloud-service';
 const ERROR_URL = '/inventory/cloud-service/no-resource';
@@ -27,13 +29,16 @@ export default {
                 const result = await SpaceConnector.client.addOns.pageDiscovery.get({
                     resource_type: 'inventory.CloudService',
                     search: to.params.id,
-                    // eslint-disable-next-line camelcase
                     search_key: to.params.searchKey,
                 });
                 if (result.url === DEFAULT_URL) {
                     next(ERROR_URL);
                 } else {
                     link = `${result.url}?filters=${to.params.searchKey}:${to.params.id}`;
+                    if (!isEmpty(to.query)) {
+                        const queryString = locationQueryToString(to.query);
+                        link += `&${queryString}`;
+                    }
                     next(link);
                 }
             } catch (e) {

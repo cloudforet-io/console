@@ -1,95 +1,138 @@
+/* eslint-disable camelcase */
+import { concat } from 'lodash';
+import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
 
-interface ReferenceLinkFormatter {
-    (baseUrl: string, data: string, reference: Reference): string;
+interface LinkFormatter {
+    (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
 }
 
-export const projectLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}/${data}`;
-    return queryString;
+const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = { name, query };
+    if (data) {
+        if (location.query?.filters) {
+            location.query.filters = concat(location.query?.filters, `server_id%3A${data}`);
+        } else {
+            location.query = {
+                filters: `server_id%3A${data}`,
+            };
+        }
+    }
+    return location;
 };
 
-export const projectGroupLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}?select_pg=${data}`;
-    return queryString;
+const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = {
+        name,
+        query,
+        params: { id: data },
+    };
+    return location;
 };
 
-export const serverLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = data ? `${baseUrl}?filters=server_id%3A${data}` : `${baseUrl}`;
-    return queryString;
+const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = {
+        name,
+        query: {
+            ...query,
+            select_pg: data,
+        },
+    };
+    return location;
 };
 
-export const collectorLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}?filters=collector_id%3A${data}`;
-    return queryString;
+const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = { name, query };
+    if (data) {
+        if (location.query?.filters) {
+            location.query.filters = concat(location.query?.filters, `collector_id%3A${data}`);
+        } else {
+            location.query = {
+                filters: `collector_id%3A${data}`,
+            };
+        }
+    }
+    return location;
 };
 
-const serviceAccountLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}/${data}`;
-    return queryString;
+const serviceAccountLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = {
+        name,
+        query,
+        params: { id: data },
+    };
+    return location;
 };
 
-const cloudServiceLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}/${reference.reference_key || 'reference.resource_id'}/${data}`;
-    return queryString;
+const cloudServiceLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = {
+        name,
+        query,
+        params: {
+            searchKey: reference.reference_key || 'reference.resource_id',
+            id: data,
+        },
+    };
+    return location;
 };
 
-const cloudServiceTypeLinkFormatter: ReferenceLinkFormatter = (baseUrl, data, reference) => {
-    const queryString = `${baseUrl}/${data}`;
-    return queryString;
+const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = {
+        name,
+        query,
+        params: { id: data },
+    };
+    return location;
 };
 
 
-type RouterMap = Record<ReferenceType, { baseUrl: string; formatter: ReferenceLinkFormatter}>
+type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}>
 
 const routerMap: RouterMap = {
     'inventory.Server':
         {
-            baseUrl: '/inventory/server',
+            name: 'server',
             formatter: serverLinkFormatter,
         },
     'identity.Project':
         {
-            baseUrl: '/project',
+            name: 'projectDetail',
             formatter: projectLinkFormatter,
         },
     'identity.ProjectGroup':
         {
-            baseUrl: '/project',
+            name: 'projectMain',
             formatter: projectGroupLinkFormatter,
         },
     'inventory.Collector':
         {
-            baseUrl: '/plugin/collector',
+            name: 'collector',
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
         {
-            baseUrl: '/identity/service-account/search',
+            name: 'serviceAccountSearch',
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
         {
-            baseUrl: '/inventory/cloud-service/search',
+            name: 'cloudServiceSearch',
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            baseUrl: '/inventory/cloud-service/type/search',
+            name: 'cloudServiceTypeSearch',
             formatter: cloudServiceTypeLinkFormatter,
         },
 };
 
-export const referenceRouter = (data: string, reference: Reference): string => {
+export const referenceRouter = (data: string, reference: Reference, query?: Location['query']): Location => {
     if (routerMap[reference.resource_type]) {
-        const { baseUrl, formatter } = routerMap[reference.resource_type];
-        const link = formatter(baseUrl, data, reference);
-        return link;
+        const { name, formatter } = routerMap[reference.resource_type];
+        return formatter(name, data, reference, query);
     }
     console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);
-
-
-    return '';
+    return {};
 };
 
 export default referenceRouter;
