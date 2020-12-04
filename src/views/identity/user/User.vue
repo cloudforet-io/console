@@ -172,7 +172,6 @@ export default {
     },
     setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        // const { user } = useStore();
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',

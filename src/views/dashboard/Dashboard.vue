@@ -47,7 +47,7 @@ import ServiceAccounts from '@/views/common/components/widgets/service-accounts/
 import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
 import TopProjects from '@/views/common/components/widgets/top-projects/TopProjects.vue';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import ResourceMap from '@/views/common/components/widgets/resource-map/ResourceMap.vue';
+import ResourceMap from '@/views/common/components/widgets/region-map/RegionMap.vue';
 import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectingProgress.vue';
 import FavoritesWidget from '@/views/common/components/widgets/favorites/FavoritesWidget.vue';
 

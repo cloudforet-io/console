@@ -6,7 +6,7 @@
                     <p class="input-title">
                         {{ $t('COMMON.SIGN_IN.USER_ID') }}
                     </p>
-                    <PFieldGroup :invalid-text="invalidMsg.userId" :invalid="invalidState.userId">
+                    <PFieldGroup :invalid-text="idInvalidText" :invalid="!isIdValid">
                         <template #default="{invalid}">
                             <p-text-input
                                 v-model="userId"
@@ -25,7 +25,7 @@
                     <p class="input-title">
                         {{ $t('COMMON.SIGN_IN.PASSWORD') }}
                     </p>
-                    <PFieldGroup :invalid-text="invalidMsg.password" :invalid="invalidState.password">
+                    <PFieldGroup :invalid-text="passwordInvalidText" :invalid="!isPasswordValid">
                         <template v-slot:default="{invalid}">
                             <p-text-input
                                 v-model="password"
@@ -79,10 +79,7 @@ import {
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import {
-    formValidation,
-    requiredValidation,
-} from '@/lib/compostion-util';
+import { TranslateResult } from 'vue-i18n';
 
 export default defineComponent({
     name: 'LocalSignIn',
@@ -94,38 +91,58 @@ export default defineComponent({
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            userId: '',
+            userId: '' as string | undefined,
             password: '',
         });
-        const requireFieldValidations = {
-            userId: [requiredValidation(vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED'))],
-            password: [requiredValidation(vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED'))],
-        };
-        const validateAPI = formValidation(state, requireFieldValidations);
+
+        const validationState = reactive({
+            isIdValid: undefined as undefined | boolean,
+            idInvalidText: '' as TranslateResult | string,
+            isPasswordValid: undefined as undefined | boolean,
+            passwordInvalidText: '' as TranslateResult | string,
+            isPasswordCheckValid: undefined as undefined | boolean,
+            passwordCheckInvalidText: '' as TranslateResult | string,
+        });
+
         const checkUserId = async () => {
-            const result = await validateAPI.fieldValidation('userId');
-            return result;
-        };
-        const checkPassword = async () => {
-            const result = await validateAPI.fieldValidation('password');
-            return result;
-        };
-        const signIn = async () => {
-            const result = await validateAPI.allValidation();
-            if (result) {
-                const credentials = {
-                    user_id: state.userId,
-                    password: state.password,
-                };
-                context.emit('on-sign-in', credentials);
+            if (!state.userId) {
+                validationState.isIdValid = false;
+                validationState.idInvalidText = vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED');
+            } else {
+                validationState.isIdValid = true;
+                validationState.idInvalidText = '';
             }
+        };
+
+        const checkPassword = async () => {
+            if ((state.password.replace(/ /g, '').length !== state.password.length)
+            || !state.password) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
+            } else {
+                validationState.isPasswordValid = true;
+                validationState.passwordInvalidText = '';
+            }
+        };
+
+        const signIn = async () => {
+            await checkUserId();
+            await checkPassword();
+            if (!validationState.isIdValid || !validationState.isPasswordValid) {
+                return;
+            }
+            const credentials = {
+                user_id: state.userId,
+                password: state.password,
+            };
+            context.emit('on-sign-in', credentials);
         };
         const goToAdminSignIn = () => {
             context.emit('go-to-admin-sign-in');
         };
         return {
             ...toRefs(state),
-            ...validateAPI,
+            ...toRefs(validationState),
             signIn,
             goToAdminSignIn,
             checkUserId,
@@ -145,6 +162,7 @@ export default defineComponent({
 
 .user-info {
     margin-top: 1.125rem;
+
     @screen md {
         min-width: 18rem;
     }

@@ -52,7 +52,7 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, SetupContext, watch, UnwrapRef, getCurrentInstance, ComponentRenderProxy,
+    toRefs, reactive, computed, SetupContext, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';
@@ -60,11 +60,8 @@ import { makeProxy } from '@/lib/compostion-util';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import { MenuItem } from '@/components/organisms/context-menu/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { formValidation, requiredValidation } from '@/components/util/composition-helpers';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
 
@@ -130,7 +127,6 @@ interface CollectorModel {
     icon: string;
 }
 
-
 interface Props {
     visible: boolean;
     credentialId: string | null;
@@ -147,39 +143,12 @@ const map = {
     menu: 'enums',
 };
 
-const setValidation = (forms, values) => {
-    const formKey = map.key;
-    const vd = {};
-
-    forms.forEach((form) => {
-        vd[form[formKey]] = form[map.required] ? [requiredValidation()] : [];
-    });
-
-    const {
-        allValidation,
-        fieldValidation,
-        invalidMsg,
-        invalidState,
-        isAllValid,
-    } = formValidation(values, vd);
-
-    return {
-        formKey,
-        allValidation,
-        fieldValidation,
-        invalidMsg,
-        invalidState,
-        isAllValid,
-    };
-};
-
 export default {
     name: 'CollectDataModal',
     components: {
         PButtonModal,
         PFieldGroup,
         PTextInput,
-        PSelectDropdown,
         PLazyImg,
     },
     props: {
@@ -202,7 +171,6 @@ export default {
             proxyVisible: makeProxy('visible', props, context.emit),
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
-            showValidation: false,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
             imageUrl: computed<string>(() => state.collector?.tags.find(tag => tag.key === 'icon').value),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
@@ -214,23 +182,12 @@ export default {
             })),
         });
 
-        let vdApi = setValidation(state.filterFormats, state.filters);
-
-        const onChange = async (val): Promise<void> => {
-            if (!state.showValidation) return;
-            await vdApi.fieldValidation(val);
-            context.emit('changeValidState', vdApi.isAllValid);
-        };
-
         const onClickReset = (): void => {
             if (state.loading) return;
 
             state.selectedCollectMode = COLLECT_MODE.all;
-            state.showValidation = false;
             state.filters = {};
-            vdApi = setValidation(state.filterFormats, state.filters);
         };
-
 
         const getCollectParams = () => {
             const params: any = {
@@ -244,7 +201,6 @@ export default {
         const collectorApi = SpaceConnector.client.inventory.collector.collect;
         const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
-            state.showValidation = true;
             try {
                 await collectorApi(getCollectParams());
                 showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
@@ -254,10 +210,8 @@ export default {
             } finally {
                 state.proxyVisible = false;
             }
-            // }
             state.loading = false;
         };
-
 
         const getCollector = async (): Promise<void> => {
             state.loading = true;
@@ -300,8 +254,6 @@ export default {
 
         return {
             ...toRefs(state),
-            vdApi,
-            onChange,
             onClickReset,
             onClickCollectConfirm,
         };
@@ -322,27 +274,11 @@ export default {
     margin-bottom: 2rem;
     font-size: 0.875rem;
 }
-.right-container {
-    @apply px-4 w-1/2;
-}
 .sub-header {
     @apply text-gray-400;
     margin-bottom: 0.875rem;
     margin-top: 0.875rem;
     font-size: 0.875rem;
     font-weight: bold;
-}
-.reset-btn {
-    margin-right: auto;
-}
-.confirm-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    .spinner {
-        display: inline-flex;
-        padding-right: 0.25rem;
-    }
 }
 </style>

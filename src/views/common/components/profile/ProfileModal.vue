@@ -295,13 +295,13 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .profile-form {
-        text-align: left;
+.profile-form {
+    text-align: left;
     .form-div {
         padding: 0 1rem;
     }
     .dropdown {
         text-align: left;
     }
-    }
+}
 </style>
