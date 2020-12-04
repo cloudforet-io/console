@@ -35,7 +35,6 @@ import {
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
-import { RawLocation } from 'vue-router';
 
 export default {
     name: 'SignIn',
