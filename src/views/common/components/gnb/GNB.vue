@@ -123,7 +123,7 @@
                             </div>
                         </div>
                         <div v-else>
-                            <div @click="logOut">
+                            <div @click="signOut">
                                 {{ item.label }}
                             </div>
                         </div>
@@ -286,7 +286,7 @@ export default {
                     type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_PROFILE'), name: 'profile',
                 },
                 {
-                    type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_LOGOUT'), name: 'logout',
+                    type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT'), name: 'signOut',
                 },
             ]),
             selectedMenu: computed(() => {
@@ -315,7 +315,7 @@ export default {
             state.profileVisible = true;
         };
 
-        const logOut = async () => {
+        const signOut = async () => {
             const res: Location = {
                 name: 'SignOut',
             };
@@ -328,7 +328,7 @@ export default {
             hideMenu,
             toggleMenu,
             openProfile,
-            logOut,
+            signOut,
         };
     },
 };

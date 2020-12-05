@@ -1,6 +1,7 @@
 // Views
 import ErrorPage from '@/views/common/pages/ErrorPage.vue';
-import SignIn from '@/views/sign-in/Signin.vue';
+import SignIn from '@/views/sign-in/pages/SignIn.vue';
+import DomainAdminSignIn from '@/views/sign-in/pages/Domain_Admin_SignIn.vue';
 import SignOut from '@/views/common/pages/SignOut.vue';
 
 // Routes
@@ -34,7 +35,7 @@ export const routerOptions = {
             children: [
                 {
                     path: '/',
-                    name: 'Login',
+                    name: 'SignIn',
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
@@ -47,19 +48,20 @@ export const routerOptions = {
                 },
                 {
                     path: 'admin',
-                    name: 'AdminLogin',
+                    name: 'AdminSignIn',
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
                     },
-                    component: SignIn,
+                    component: DomainAdminSignIn,
                     props: route => ({
                         admin: true,
                         nextPath: route.query.nextPath || '/',
                     }),
                 },
             ],
-        }, {
+        },
+        {
             path: '/sign-out',
             name: 'SignOut',
             component: SignOut,

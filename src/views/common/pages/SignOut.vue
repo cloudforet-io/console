@@ -72,7 +72,7 @@ export default {
                 }
             }
             // go sign in
-            await router.push({ name: 'Login', query: { nextPath: from.fullPath } });
+            await router.push({ name: 'SignIn', query: { nextPath: from.fullPath } });
         })();
     },
 };
