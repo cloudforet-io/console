@@ -186,7 +186,7 @@ export default {
             circle.radius = 3;
             circle.propertyFields.fill = 'color';
             const circle2 = imageSeries.mapImages.template.createChild(am4core.Circle);
-            circle2.radius = 2;
+            circle2.radius = 3;
             circle2.propertyFields.fill = 'color';
             circle2.events.on('inited', (event) => {
                 animateBullet(event.target);

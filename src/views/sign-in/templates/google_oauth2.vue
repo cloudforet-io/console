@@ -1,18 +1,6 @@
 <template>
     <div class="google-oauth-wrapper">
-        <div class="g-signin2">
-            <div id="g-signin-btn" />
-        </div>
-<!--        <div>-->
-<!--            <p-button :outline="true"-->
-<!--                      type="submit"-->
-<!--                      size="lg"-->
-<!--                      class="admin-btn"-->
-<!--                      @click="goToAdminSignIn"-->
-<!--            >-->
-<!--                <span id="button-msg">{{ $t('COMMON.SIGN_IN.ROOT_ACCOUNT') }}</span>-->
-<!--            </p-button>-->
-<!--        </div>-->
+        <div id="g-sign-in-btn" />
     </div>
 </template>
 
@@ -22,13 +10,12 @@ import {
     defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { showErrorMessage } from '@/lib/util';
 
 // @ts-ignore
 const { gapi } = window;
 
 export default defineComponent({
-    name: 'GoogleSignIn_old',
+    name: 'GoogleSignIn',
     components: {
         PButton,
     },
@@ -61,12 +48,11 @@ export default defineComponent({
                     fetch_basic_profile: false,
                     scope: 'profile',
                 });
-                gapi.signin2.render('g-signin-btn', {
+                gapi.signin2.render('g-sign-in-btn', {
                     scope: 'email',
-                    height: 48,
+                    height: 40,
                     width: 'auto',
                     longtitle: true,
-                    theme: 'dark',
                     onsuccess: signIn,
                     onfailure: signInFail,
                 });
@@ -81,28 +67,13 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.btn-divider {
-    @apply text-gray-200;
-    display: flex;
-    flex-basis: 100%;
-    align-items: center;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 0.875rem;
-    margin-bottom: 2em;
-}
-.btn-divider > span {
-    @apply text-gray-300;
-    margin: 0.5rem;
-}
-.btn-divider::before,
-.btn-divider::after {
-    @apply bg-gray-200;
-    content: "";
-    flex-grow: 1;
-    height: 1px;
-    font-size: 0;
-    line-height: 0px;
-    margin: 0 8px;
+#g-sign-in-btn {
+    @apply border border-gray-900;
+    border-radius: 2px;
+    box-shadow: none;
+    overflow: hidden;
+    >>> span {
+        @apply text-gray-900;
+    }
 }
 </style>

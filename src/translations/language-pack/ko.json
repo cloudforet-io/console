@@ -150,7 +150,7 @@
 		"GNB": {
 			"ACCOUNT": {
 				"LABEL_LANGUAGE": "언어",
-				"LABEL_LOGOUT": "로그아웃",
+				"LABEL_SIGN_OUT": "로그아웃",
 				"LABEL_PROFILE": "프로필",
 				"LABEL_ROLE": "역할",
 				"LABEL_TIMEZONE": "타임존",
@@ -199,7 +199,7 @@
 		"SIGN_IN": {
 			"ADMIN_ID": "관리자 아이디",
 			"ADMIN_SIGN_IN": "관리자 로그인 ",
-			"ALT_E_LOGIN": "아이디 또는 비밀번호를 확인해 주세요.",
+			"ALT_E_SIGN_IN": "아이디 또는 비밀번호를 확인해 주세요.",
 			"MEMBER_SIGN_IN": "사용자 계정으로 로그인",
 			"OR": "또는 ",
 			"PASSWORD": "비밀번호 ",
