@@ -26,6 +26,14 @@
                 <p class="sign-in-subtitle">
                     for member account credentials
                 </p>
+                <div v-if="showErrorMessage" class="error-msg-box">
+                    <span class="error-msg">Please Confirm your Id or Password.</span>
+                    <p-i name="ic_delete" width="1.5rem" height="1.5rem"
+                         class="cursor-pointer"
+                         color="transparent inherit"
+                         @click="hideErrorMessage"
+                    />
+                </div>
                 <local-sign-in />
                 <div class="btn-divider">
                     <span>OR</span>
@@ -55,6 +63,10 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import LocalSignIn from '@/views/sign-in/templates/local.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
+
+// @ts-ignore
+const { gapi } = window;
 
 export default {
     name: 'SignIn',
@@ -102,10 +114,10 @@ export default {
                 return component;
             }),
             version: process.env.VUE_APP_VERSION,
-            isSignInFailed: false,
+            showErrorMessage: false,
         });
         const signIn = async (credentials) => {
-            state.isSignInFailed = false;
+            state.showErrorMessage = false;
             try {
                 await vm.$store.dispatch('user/signIn', {
                     domain_id: vm.$store.state.domain.domainId,
@@ -113,10 +125,15 @@ export default {
                 });
                 await vm.$router.push(props.nextPath);
             } catch (e) {
+                const auth2 = await getAuth2(vm.$store.state.domain.authOptions.client_id);
+                await googleOauthSignOut(auth2);
                 console.error(e);
-                state.isSignInFailed = true;
+                state.showErrorMessage = true;
             }
             setGtagUserID(vm);
+        };
+        const hideErrorMessage = () => {
+            state.showErrorMessage = false;
         };
         const goToAdminSignIn = () => {
             vm.$router.replace({ name: 'AdminSignIn' });
@@ -126,6 +143,7 @@ export default {
             ...toRefs(state),
             signIn,
             goToAdminSignIn,
+            hideErrorMessage,
         };
     },
 };
@@ -208,6 +226,22 @@ export default {
         }
     }
 }
+.error-msg-box {
+    @apply bg-red-100 text-red-500;
+
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 2.25rem;
+    border-radius: 0.125rem;
+    padding: 0.5rem;
+    margin-top: -2.75rem;
+    .error-msg {
+        font-size: 0.875rem;
+        line-height: 140%;
+    }
+}
+
 .btn-divider {
     @apply text-gray-200;
     display: flex;

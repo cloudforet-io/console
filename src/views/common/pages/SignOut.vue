@@ -6,7 +6,7 @@ import router from '@/routes/index';
 import { store } from '@/store';
 // @ts-ignore
 const { gapi } = window;
-const getAuth2 = (clientId): Promise<any> => new Promise(((resolve, reject) => {
+export const getAuth2 = (clientId): Promise<any> => new Promise(((resolve, reject) => {
     if (!gapi.auth2) {
         gapi.load('auth2', (resp) => {
             gapi.auth2.init({
@@ -25,7 +25,7 @@ const getAuth2 = (clientId): Promise<any> => new Promise(((resolve, reject) => {
         resolve(gapi.auth2.getAuthInstance());
     }
 }));
-const googleOauthSignOut = (auth2): Promise<void> => new Promise(((resolve, reject) => {
+export const googleOauthSignOut = (auth2): Promise<void> => new Promise(((resolve, reject) => {
     auth2.signOut().then((resp) => {
         auth2.disconnect();
         resolve();

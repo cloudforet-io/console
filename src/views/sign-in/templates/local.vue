@@ -134,7 +134,7 @@ export default defineComponent({
     margin: auto;
     width: 25.0625rem;
     .input-label {
-        @apply font-bold text-gray-900;
+        @apply font-bold text-gray-900 mt-2;
         font-size: 0.875rem;
         line-height: 140%;
         margin-bottom: 0.375rem;

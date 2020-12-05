@@ -34,6 +34,11 @@ export default defineComponent({
         };
         const signInFail = () => {
             console.error('sign in failed');
+            if (gapi.auth2) {
+                gapi.auth2.signOut().then((resp) => {
+                    auth2.disconnect();
+                });
+            }
         };
         const goToAdminSignIn = () => {
             context.emit('go-to-admin-sign-in');

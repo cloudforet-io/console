@@ -20,10 +20,22 @@
         </div>
         <div class="right-container">
             <div class="admin-wrapper">
-                <p class="sign-in-title">Sign In</p>
-                <p class="sign-in-subtitle">for Domain Admin</p>
+                <p class="sign-in-title">
+                    Sign In
+                </p>
+                <p class="sign-in-subtitle">
+                    for Domain Admin
+                </p>
+                <div v-if="showErrorMessage" class="error-msg-box">
+                    <span class="error-msg">Please Confirm your Id or Password.</span>
+                    <p-i name="ic_delete" width="1.5rem" height="1.5rem"
+                         class="cursor-pointer"
+                         color="transparent inherit"
+                         @click="hideErrorMessage"
+                    />
+                </div>
                 <form class="form">
-                    <p class="input-label">
+                    <p class="input-label mt-2">
                         {{ $t('COMMON.SIGN_IN.ADMIN_ID') }}
                     </p>
                     <p-field-group :invalid-text="idInvalidText"
@@ -131,7 +143,7 @@ export default {
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             authSystem: computed(() => vm.$store.getters['domain/getAuthSystem']),
             version: process.env.VUE_APP_VERSION,
-            isSignInFailed: false,
+            showErrorMessage: false,
             userId: '' as string | undefined,
             password: '',
         });
@@ -164,14 +176,14 @@ export default {
             }
         };
         const signIn = async () => {
-            state.isSignInFailed = false;
-
+            state.showErrorMessage = false;
             await checkUserId();
             await checkPassword();
             if (!validationState.isIdValid || !validationState.isPasswordValid) {
                 return;
             }
             const credentials = {
+                // eslint-disable-next-line camelcase
                 user_type: 'DOMAIN_OWNER',
                 user_id: state.userId,
                 password: state.password,
@@ -184,9 +196,12 @@ export default {
                 await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);
-                state.isSignInFailed = true;
+                state.showErrorMessage = true;
             }
             setGtagUserID(vm);
+        };
+        const hideErrorMessage = () => {
+            state.showErrorMessage = false;
         };
         const goToUserSignIn = () => {
             if (props.admin) vm.$router.replace({ name: 'SignIn' });
@@ -198,6 +213,7 @@ export default {
             goToUserSignIn,
             checkUserId,
             checkPassword,
+            hideErrorMessage,
         };
     },
 };
@@ -248,15 +264,26 @@ export default {
     }
 }
 
-.version {
-    bottom: 0;
-}
-
 .right-container {
     @apply bg-primary4;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+}
+
+.error-msg-box {
+    @apply bg-red-100 text-red-500;;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 2.25rem;
+    border-radius: 0.125rem;
+    padding: 0.5rem;
+    margin-top: -2.75rem;
+    .error-msg {
+        font-size: 0.875rem;
+        line-height: 140%;
+    }
 }
 
 .admin-wrapper {
@@ -271,7 +298,7 @@ export default {
         @apply text-gray-400;
         font-size: 0.875rem;
         line-height: 140%;
-        margin-bottom: 3.125rem;
+        margin-bottom: 3rem;
     }
     .input-label {
         @apply font-bold text-gray-900;
