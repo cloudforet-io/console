@@ -1,70 +1,58 @@
 <template>
-    <div class="user-info">
-        <div id="sign-in-info" class="field-group text-left ">
-            <form class="form">
-                <div class="flex flex-col w-full">
-                    <p class="input-title">
-                        {{ $t('COMMON.SIGN_IN.USER_ID') }}
-                    </p>
-                    <PFieldGroup :invalid-text="idInvalidText" :invalid="!isIdValid">
-                        <template #default="{invalid}">
-                            <p-text-input
-                                v-model="userId"
-                                placeholder="User ID"
-                                class="w-full"
-                                autocomplete="username"
-                                :class="{
-                                    'is-invalid':invalid
-                                }"
-                                @input="checkUserId"
-                            />
-                        </template>
-                    </PFieldGroup>
-                </div>
-                <div class="flex flex-col mb-4 w-full">
-                    <p class="input-title">
-                        {{ $t('COMMON.SIGN_IN.PASSWORD') }}
-                    </p>
-                    <PFieldGroup :invalid-text="passwordInvalidText" :invalid="!isPasswordValid">
-                        <template v-slot:default="{invalid}">
-                            <p-text-input
-                                v-model="password"
-                                type="password"
-                                class="w-full"
-                                placeholder="Password"
-                                autocomplete="current-password"
-                                :class="{
-                                    'is-invalid':invalid
-                                }"
-                                @input="checkPassword"
-                                @keyup.enter="signIn"
-                            />
-                        </template>
-                    </PFieldGroup>
-                </div>
-            </form>
-        </div>
-        <div class="flex flex-col mb-10 md:w-full">
-            <p-button style-type="primary" type="submit" size="lg"
-                      @click="signIn"
-            >
-                {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
-            </p-button>
-        </div>
+    <div class="local-wrapper">
+        <form class="form">
+            <p>
+                {{ $t('COMMON.SIGN_IN.USER_ID') }}
+            </p>
+            <PFieldGroup :invalid-text="idInvalidText" :invalid="!isIdValid">
+                <template #default="{invalid}">
+                    <p-text-input
+                        v-model="userId"
+                        placeholder="User ID"
+                        autocomplete="username"
+                        :class="{
+                            'is-invalid':invalid
+                        }"
+                        @input="checkUserId"
+                    />
+                </template>
+            </PFieldGroup>
+            <p class="input-title">
+                {{ $t('COMMON.SIGN_IN.PASSWORD') }}
+            </p>
+            <PFieldGroup :invalid-text="passwordInvalidText" :invalid="!isPasswordValid">
+                <template v-slot:default="{invalid}">
+                    <p-text-input
+                        v-model="password"
+                        type="password"
+                        placeholder="Password"
+                        autocomplete="current-password"
+                        :class="{
+                            'is-invalid':invalid
+                        }"
+                        @input="checkPassword"
+                        @keyup.enter="signIn"
+                    />
+                </template>
+            </PFieldGroup>
+        </form>
+        <p-button style-type="primary" type="submit" size="lg"
+                  @click="signIn"
+        >
+            {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
+        </p-button>
         <div class="btn-divider">
             <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
         </div>
-        <div class="flex flex-col mb-4 w-full">
-            <p-button
-                :outline="true"
-                style-type="gray"
-                type="submit"
-                size="lg"
-                @click="goToAdminSignIn"
-            >
-                {{ $t('COMMON.SIGN_IN.ROOT_ACCOUNT') }}
-            </p-button>
-        </div>
+        <p-button
+            :outline="true"
+            style-type="gray"
+            type="submit"
+            size="lg"
+            @click="goToAdminSignIn"
+        >
+            {{ $t('COMMON.SIGN_IN.ROOT_ACCOUNT') }}
+        </p-button>
     </div>
 </template>
 
@@ -82,7 +70,7 @@ import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vu
 import { TranslateResult } from 'vue-i18n';
 
 export default defineComponent({
-    name: 'LocalSignIn',
+    name: 'LocalSignIn_old',
     components: {
         PButton,
         PTextInput,
@@ -153,21 +141,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-
-.input-title {
-    font-size: 0.875rem;
-    font-weight: bold;
-    padding-bottom: 0.25rem;
-}
-
-.user-info {
-    margin-top: 1.125rem;
-
-    @screen md {
-        min-width: 18rem;
-    }
-}
-
 .btn-divider {
     @apply text-gray-200;
     display: flex;

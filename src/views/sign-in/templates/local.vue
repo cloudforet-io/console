@@ -1,30 +1,27 @@
 <template>
-    <div class="admin-wrapper">
+    <div class="local-wrapper">
         <form class="form">
-            <p class="input-title">
-                {{ $t('COMMON.SIGN_IN.ADMIN_ID') }}
+            <p class="input-label">
+                {{ $t('COMMON.SIGN_IN.USER_ID') }}
             </p>
-            <p-field-group :invalid-text="idInvalidText"
-                           :invalid="!isIdValid"
-            >
+            <PFieldGroup :invalid-text="idInvalidText" :invalid="!isIdValid">
                 <template #default="{invalid}">
                     <p-text-input
                         v-model="userId"
-                        placeholder="Admin ID"
+                        placeholder="User ID"
                         autocomplete="username"
                         :class="{
                             'is-invalid':invalid
                         }"
+                        class="input-box"
                         @input="checkUserId"
                     />
                 </template>
-            </p-field-group>
-            <p class="input-title">
+            </PFieldGroup>
+            <p class="input-label">
                 {{ $t('COMMON.SIGN_IN.PASSWORD') }}
             </p>
-            <p-field-group :invalid-text="passwordInvalidText"
-                           :invalid="!isPasswordValid"
-            >
+            <PFieldGroup :invalid-text="passwordInvalidText" :invalid="!isPasswordValid">
                 <template v-slot:default="{invalid}">
                     <p-text-input
                         v-model="password"
@@ -34,35 +31,38 @@
                         :class="{
                             'is-invalid':invalid
                         }"
+                        class="input-box"
                         @input="checkPassword"
                         @keyup.enter="signIn"
                     />
                 </template>
-            </p-field-group>
+            </PFieldGroup>
         </form>
-        <p-button style-type="primary" type="submit" size="lg"
+        <p-button style-type="primary1" type="submit" size="lg"
+                  class="sign-in-btn"
                   @click="signIn"
         >
-            <span id="button-msg">{{ $t('COMMON.SIGN_IN.ADMIN_SIGN_IN') }}</span>
+            {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
         </p-button>
-        <span class="user-sign-in-btn" @click="goToUserSignIn">{{ $t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}</span>
+
     </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    ComponentRenderProxy,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    getCurrentInstance,
+    reactive,
+    toRefs,
+    defineComponent, ComponentRenderProxy,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import { TranslateResult } from 'vue-i18n';
 
-
 export default defineComponent({
-    name: 'AdminSignIn',
+    name: 'LocalSignIn',
     components: {
         PButton,
         PTextInput,
@@ -74,6 +74,7 @@ export default defineComponent({
             userId: '' as string | undefined,
             password: '',
         });
+
         const validationState = reactive({
             isIdValid: undefined as undefined | boolean,
             idInvalidText: '' as TranslateResult | string,
@@ -82,6 +83,7 @@ export default defineComponent({
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
+
         const checkUserId = async () => {
             if (!state.userId) {
                 validationState.isIdValid = false;
@@ -91,9 +93,10 @@ export default defineComponent({
                 validationState.idInvalidText = '';
             }
         };
+
         const checkPassword = async () => {
             if ((state.password.replace(/ /g, '').length !== state.password.length)
-               || !state.password) {
+          || !state.password) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
             } else {
@@ -101,6 +104,7 @@ export default defineComponent({
                 validationState.passwordInvalidText = '';
             }
         };
+
         const signIn = async () => {
             await checkUserId();
             await checkPassword();
@@ -108,21 +112,16 @@ export default defineComponent({
                 return;
             }
             const credentials = {
-                user_type: 'DOMAIN_OWNER',
                 user_id: state.userId,
                 password: state.password,
             };
             context.emit('on-sign-in', credentials);
-        };
-        const goToUserSignIn = () => {
-            context.emit('go-to-user-sign-in');
         };
 
         return {
             ...toRefs(state),
             ...toRefs(validationState),
             signIn,
-            goToUserSignIn,
             checkUserId,
             checkPassword,
         };
@@ -131,5 +130,22 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-
+.local-wrapper {
+    margin: auto;
+    width: 25.0625rem;
+    .input-label {
+        @apply font-bold text-gray-900;
+        font-size: 0.875rem;
+        line-height: 140%;
+        margin-bottom: 0.375rem;
+    }
+    .input-box {
+        width: 100%;
+        margin-bottom: 0.625rem;
+    }
+    .sign-in-btn {
+        width: 100%;
+        margin-top: 2.5rem;
+    }
+}
 </style>
