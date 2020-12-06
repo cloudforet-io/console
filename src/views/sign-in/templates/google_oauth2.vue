@@ -36,7 +36,7 @@ export default defineComponent({
             console.error('sign in failed');
             if (gapi.auth2) {
                 gapi.auth2.signOut().then((resp) => {
-                    auth2.disconnect();
+                    gapi.auth2.disconnect();
                 });
             }
         };
