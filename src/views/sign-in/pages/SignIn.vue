@@ -26,6 +26,7 @@
                 <p class="sign-in-subtitle">
                     for member account credentials
                 </p>
+                <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
                 <div v-if="showErrorMessage" class="error-msg-box">
                     <span class="error-msg">Please Confirm your Id or Password.</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
@@ -64,9 +65,6 @@ import PBadge from '@/components/atoms/badges/PBadge.vue';
 import LocalSignIn from '@/views/sign-in/templates/local.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
-
-// @ts-ignore
-const { gapi } = window;
 
 export default {
     name: 'SignIn',
@@ -147,7 +145,6 @@ export default {
         };
     },
 };
-
 </script>
 
 <style lang="postcss" scoped>
@@ -192,6 +189,18 @@ export default {
             margin-left: 1rem;
         }
     }
+
+    @media screen and (width < 478px) {
+        display: none;
+    }
+
+    @media screen and (478px <= width < 768px) {
+        display: none;
+    }
+
+    @media screen and (768px <= width) {
+        display: flex;
+    }
 }
 
 .right-container {
@@ -209,6 +218,9 @@ export default {
         line-height: 140%;
         margin-bottom: 3.125rem;
     }
+    .logo-character {
+        display: none;
+    }
     .template-wrapper {
         margin: auto;
         width: 25rem;
@@ -225,10 +237,32 @@ export default {
             }
         }
     }
+
+    @media screen and (width < 478px) {
+        .template-wrapper {
+            width: 15rem;
+            margin: auto 2.5rem;
+            align-self: center;
+
+            .logo-character {
+                @apply mx-auto;
+                display: block;
+                width: 33%;
+                margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
+            }
+
+            .sign-in-title {
+                display: none;
+            }
+
+            .sign-in-subtitle {
+                display: none;
+            }
+        }
+    }
 }
 .error-msg-box {
     @apply bg-red-100 text-red-500;
-
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -239,6 +273,14 @@ export default {
     .error-msg {
         font-size: 0.875rem;
         line-height: 140%;
+    }
+
+    @media screen and (width < 478px) {
+        height: 3.5rem;
+        width: 15rem;
+        position: absolute;
+        z-index: 1;
+        margin-top: -4rem;
     }
 }
 

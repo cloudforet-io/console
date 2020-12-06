@@ -26,6 +26,7 @@
                 <p class="sign-in-subtitle">
                     for Domain Admin
                 </p>
+                <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
                 <div v-if="showErrorMessage" class="error-msg-box">
                     <span class="error-msg">Please Confirm your Id or Password.</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
@@ -262,6 +263,18 @@ export default {
             margin-left: 1rem;
         }
     }
+
+    @media screen and (width < 478px) {
+        display: none;
+    }
+
+    @media screen and (478px <= width < 768px) {
+        display: none;
+    }
+
+    @media screen and (768px <= width) {
+        display: flex;
+    }
 }
 
 .right-container {
@@ -272,7 +285,7 @@ export default {
 }
 
 .error-msg-box {
-    @apply bg-red-100 text-red-500;;
+    @apply bg-red-100 text-red-500;
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -284,11 +297,22 @@ export default {
         font-size: 0.875rem;
         line-height: 140%;
     }
+
+    @media screen and (width < 478px) {
+        height: 3.5rem;
+        width: 15rem;
+        position: absolute;
+        z-index: 1;
+        margin-top: -4rem;
+    }
 }
 
 .admin-wrapper {
     margin: auto;
     width: 25.0625rem;
+    .logo-character {
+        display: none;
+    }
     .sign-in-title {
         @apply text-primary-dark;
         font-size: 2rem;
@@ -319,6 +343,30 @@ export default {
         @apply text-blue-600 cursor-pointer;
         font-size: 0.875rem;
         line-height: 140%;
+    }
+
+    @media screen and (width < 478px) {
+        width: 15rem;
+        margin: auto 2.5rem;
+        align-self: center;
+        .logo-character {
+            @apply mx-auto;
+            display: block;
+            width: 33%;
+            margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
+        }
+        .sign-in-title {
+            display: none;
+        }
+        .sign-in-subtitle {
+            display: none;
+        }
+        .form {
+            margin-top: 0.5rem;
+        }
+        .input-label {
+            display: none;
+        }
     }
 }
 </style>

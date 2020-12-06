@@ -132,7 +132,7 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .local-wrapper {
     margin: auto;
-    width: 25.0625rem;
+    width: 100%;
     .input-label {
         @apply font-bold text-gray-900 mt-2;
         font-size: 0.875rem;
@@ -146,6 +146,16 @@ export default defineComponent({
     .sign-in-btn {
         width: 100%;
         margin-top: 2.5rem;
+    }
+
+    @media screen and (width < 478px) {
+        width: 15rem;
+        .form {
+            margin-top: 0.5rem;
+        }
+        .input-label {
+            display: none;
+        }
     }
 }
 </style>
