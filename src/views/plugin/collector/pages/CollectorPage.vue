@@ -260,6 +260,7 @@ export default {
             querySearchHandlers: makeQuerySearchPropsWithSearchSchema([{
                 title: 'Filters',
                 items: [
+                    { key: 'collector_id', name: 'Collector Id' },
                     { key: 'last_collected_at', name: 'Last Collected' },
                     { key: 'state', name: 'State' },
                     { key: 'priority', name: 'Priority' },

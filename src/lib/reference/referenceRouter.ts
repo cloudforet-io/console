@@ -11,10 +11,10 @@ const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     const location = { name, query };
     if (data) {
         if (location.query?.filters) {
-            location.query.filters = concat(location.query?.filters, `server_id%3A${data}`);
+            location.query.filters = concat(location.query?.filters, `server_id:=${data}`);
         } else {
             location.query = {
-                filters: `server_id%3A${data}`,
+                filters: `server_id:=${data}`,
             };
         }
     }
@@ -45,10 +45,10 @@ const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => 
     const location = { name, query };
     if (data) {
         if (location.query?.filters) {
-            location.query.filters = concat(location.query?.filters, `collector_id%3A${data}`);
+            location.query.filters = concat(location.query?.filters, `collector_id:=${data}`);
         } else {
             location.query = {
-                filters: `collector_id%3A${data}`,
+                filters: `collector_id:=${data}`,
             };
         }
     }

@@ -48,6 +48,17 @@
                             >{{ status.label }}</span>
                         </div>
                     </template>
+                    <template #col-service_account-format="{ value }">
+                        <router-link :to="referenceRouter(
+                            value.service_account_id,
+                            { resource_type: 'identity.ServiceAccount' })"
+                        >
+                            <span class="reference-link">
+                                <span class="text">{{ value.name }}</span>
+                                <p-i name="ic_external-link" height="1em" width="1em" />
+                            </span>
+                        </router-link>
+                    </template>
                     <template #col-sequence-format="{ value }">
                         <span class="float-right">{{ value }}</span>
                     </template>
@@ -91,7 +102,8 @@ import { capitalize, find } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+    computed, reactive, toRefs,
+    getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
@@ -100,11 +112,11 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
-import {
-    makeReferenceValueHandler, makeEnumValueHandler,
-} from '@/lib/component-utils/query-search';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
@@ -117,7 +129,6 @@ enum JOB_TASK_STATUS {
     success = 'SUCCESS',
     failure = 'FAILURE',
 }
-
 enum JOB_STATUS {
     created = 'CREATED',
     canceled = 'CANCELED',
@@ -146,6 +157,7 @@ interface JobModel {
 export default {
     name: 'CollectorHistoryJob',
     components: {
+        PI,
         PCollapsiblePanel,
         PEmpty,
         PDataTable,
@@ -176,7 +188,7 @@ export default {
             }))),
             fields: [
                 { label: 'No.', name: 'sequence', sortable: false },
-                { label: 'Service Account', name: 'service_account_id', sortable: false },
+                { label: 'Service Account', name: 'service_account', sortable: false },
                 { label: 'Project', name: 'project_id', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Created', name: 'created_count' },
@@ -245,19 +257,17 @@ export default {
             },
         });
 
-        const convertStatus = (status) => {
+        /* util */
+        const statusFormatter = (status) => {
             if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
             return capitalize(status);
         };
-        const convertServiceAccountName = (serviceAccountId) => {
-            const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
-            return serviceAccount?.name;
-        };
+        const serviceAccountFormatter = serviceAccountId => find(state.serviceAccounts, { service_account_id: serviceAccountId });
         const convertProjectName = (projectId) => {
             const project = find(state.projects, { project_id: projectId });
             return project?.name;
         };
-        const convertFinishedAtToDuration = (createdAt, finishedAt) => {
+        const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
                 const createdAtDatetime = dayjs(timestampFormatter(createdAt));
                 const finishedAtDatetime = dayjs(timestampFormatter(finishedAt));
@@ -271,19 +281,20 @@ export default {
             jobTasks.forEach((task, index) => {
                 const newTask = {
                     sequence: getPageStart(state.thisPage, state.pageSize) + index,
-                    service_account_id: convertServiceAccountName(task.service_account_id),
+                    service_account: serviceAccountFormatter(task.service_account_id),
                     project_id: convertProjectName(task.project_id),
-                    status: convertStatus(task.status),
+                    status: statusFormatter(task.status),
                     created_count: task.created_count,
                     updated_count: task.updated_count,
                     'errors.length': task.errors.length,
                     created_at: timestampFormatter(task.created_at),
-                    duration: convertFinishedAtToDuration(task.created_at, task.finished_at),
+                    duration: durationFormatter(task.created_at, task.finished_at),
                 };
                 state.items.push(newTask);
             });
         };
 
+        /* api */
         const getQuery = () => {
             let statusValues: JOB_TASK_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
@@ -357,6 +368,7 @@ export default {
             }
         };
 
+        /* event */
         const onSelect = (item, index) => {
             state.selectedIndexes = index;
         };
@@ -380,9 +392,7 @@ export default {
         return {
             ...toRefs(state),
             timestampFormatter,
-            convertStatus,
-            convertServiceAccountName,
-            convertProjectName,
+            referenceRouter,
             onSelect,
             onChange,
             onClickStatus,
@@ -414,6 +424,14 @@ export default {
             .p-data-table {
                 .failure {
                     @apply text-red-500;
+                }
+                .reference-link {
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                    .text {
+                        margin-right: 0.125rem;
+                    }
                 }
             }
         }

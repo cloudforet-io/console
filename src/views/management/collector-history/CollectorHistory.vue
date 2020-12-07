@@ -45,11 +45,22 @@
                         <span class="th-additional-info-text"> (completed / total)</span>
                     </template>
                     <template #col-collector_info-format="{ value }">
+                        <router-link :to="referenceRouter(
+                            value.collector_id,
+                            { resource_type: 'inventory.Collector' })"
+                        >
+                            <span class="reference-link">
+                                <span class="text">{{ value.name }}</span>
+                                <p-i name="ic_external-link" height="1em" width="1em" />
+                            </span>
+                        </router-link>
+                    </template>
+                    <template #col-collector_info.plugin_info-format="{ value }">
                         <p-lazy-img
-                            :src="providers[value.provider].icon"
+                            :src="plugins[value.plugin_id].icon"
                             width="1rem" height="1rem"
                         />
-                        <span class="pl-2">{{ value.name }}</span>
+                        <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
                     </template>
                     <template #col-sequence-format="{ value }">
                         <span class="float-right">{{ value }}</span>
@@ -144,6 +155,7 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
@@ -234,12 +246,13 @@ export default {
         };
         const state = reactive({
             loading: false,
-            providers: computed(() => store.state.resource.provider.items),
+            plugins: computed(() => store.state.resource.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE'))),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector', name: 'collector_info', sortable: false },
+                { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Task', name: 'task' },
                 { label: 'Start Time', name: 'created_at' },
@@ -400,8 +413,8 @@ export default {
         };
 
         const init = async () => {
-            // get providers
-            await store.dispatch('resource/provider/load');
+            // get plugins
+            await store.dispatch('resource/plugin/load');
 
             const hash = router.currentRoute.hash;
             if (hash) {
@@ -427,9 +440,10 @@ export default {
             onPaginationChange,
             onClickGoBack,
             onClickStatus,
+            onClickDate,
             statusFormatter,
             timestampFormatter,
-            onClickDate,
+            referenceRouter,
         };
     },
 };
@@ -504,6 +518,14 @@ export default {
             }
             .status-icon {
                 display: inline-flex;
+            }
+            .reference-link {
+                &:hover {
+                    text-decoration: underline;
+                }
+                .text {
+                    margin-right: 0.125rem;
+                }
             }
         }
     }
