@@ -29,6 +29,9 @@
                             {{ $t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_LABEL_ID') }}: {{ collectorId }}
                         </p>
                         <p class="info">
+                            {{ $t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_LABEL_PLUGIN') }}: {{ pluginName }}
+                        </p>
+                        <p class="info">
                             {{ $t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_LABEL_VERSION') }}: {{ version }}
                         </p>
                     </div>
@@ -131,6 +134,7 @@ interface Props {
     visible: boolean;
     credentialId: string | null;
     collectorId: string;
+    plugins: object;
 }
 
 const map = {
@@ -162,6 +166,10 @@ export default {
             type: String,
             default: '',
         },
+        plugins: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props: Props, context: SetupContext) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -172,7 +180,8 @@ export default {
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
-            imageUrl: computed<string>(() => state.collector?.tags.find(tag => tag.key === 'icon').value),
+            pluginName: computed<string>(() => props.plugins[state.collector?.plugin_info.plugin_id]?.name),
+            imageUrl: computed<string>(() => props.plugins[state.collector?.plugin_info.plugin_id]?.icon),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
             description: computed<string>(() => get(state.collector, 'tags.description', '')),
             filterFormats: computed<any[]>(() => get(state.collector, 'plugin_info.options.filter_format', [])),

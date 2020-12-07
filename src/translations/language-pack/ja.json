@@ -150,9 +150,9 @@
 		"GNB": {
 			"ACCOUNT": {
 				"LABEL_LANGUAGE": "言語",
-				"LABEL_SIGN_OUT": "ログアウト",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
+				"LABEL_SIGN_OUT": "ログアウト",
 				"LABEL_TIMEZONE": "タイムゾーン",
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
 				"ROLE_ROOT_ADMIN": "ルート管理者"
@@ -683,6 +683,7 @@
 				"COLLECT_MODAL_CREDENTIALS_LABEL": "暗号化キー",
 				"COLLECT_MODAL_LABEL_ID": "ID",
 				"COLLECT_MODAL_LABEL_OPTION": "収集オプション",
+				"COLLECT_MODAL_LABEL_PLUGIN": "プラグイン",
 				"COLLECT_MODAL_LABEL_VERSION": "バージョン",
 				"COLLECT_MODAL_TITLE": "データ収集",
 				"CREATE": "作成",

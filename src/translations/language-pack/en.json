@@ -150,9 +150,9 @@
 		"GNB": {
 			"ACCOUNT": {
 				"LABEL_LANGUAGE": "Language",
-				"LABEL_SIGN_OUT": "Sign Out",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
+				"LABEL_SIGN_OUT": "Sign Out",
 				"LABEL_TIMEZONE": "Time zone",
 				"ROLE_DOMAIN_ADMIN": "Domain Admin",
 				"ROLE_ROOT_ADMIN": "Root Admin"
@@ -683,6 +683,7 @@
 				"COLLECT_MODAL_CREDENTIALS_LABEL": "Credentials",
 				"COLLECT_MODAL_LABEL_ID": "Collector ID",
 				"COLLECT_MODAL_LABEL_OPTION": "Collect Options",
+				"COLLECT_MODAL_LABEL_PLUGIN": "Plugin",
 				"COLLECT_MODAL_LABEL_VERSION": "Version",
 				"COLLECT_MODAL_TITLE": "Collect Data",
 				"CREATE": "Create",

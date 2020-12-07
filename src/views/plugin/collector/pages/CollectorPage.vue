@@ -117,6 +117,7 @@
         <collect-data-modal v-if="collectDataModalVisible"
                             :visible.sync="collectDataModalVisible"
                             :collector-id="selectedItems[0].collector_id"
+                            :plugins="plugins"
         />
 
         <p-table-check-modal v-if="checkModalState.visible"
@@ -135,9 +136,10 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
-
+/* eslint-disable camelcase */
 import { Component } from 'vue/types/umd';
+import { TranslateResult } from 'vue-i18n';
+
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
@@ -154,10 +156,11 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import PI from '@/components/atoms/icons/PI.vue';
+import { CollectorModel } from '@/views/plugin/collector/type';
+import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { CollectorModel } from '@/views/plugin/collector/type';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
@@ -165,13 +168,10 @@ import {
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 import config from '@/lib/config';
 import router from '@/routes';
-import { MenuItem } from '@/components/organisms/context-menu/type';
-import { TranslateResult } from 'vue-i18n';
-import PI from '@/components/atoms/icons/PI.vue';
 import { store } from '@/store';
-import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -180,8 +180,6 @@ const CollectDataModal = (): Component => import('@/views/plugin/collector/modul
 const CollectorDetails = (): Component => import('@/views/plugin/collector/modules/CollectorDetails.vue') as Component;
 const CollectorCredentials = (): Component => import('@/views/plugin/collector/modules/CollectorCredentials.vue') as Component;
 const CollectorSchedules = (): Component => import('@/views/plugin/collector/modules/CollectorSchedules.vue') as Component;
-
-type UrlQueryString = string | (string | null)[] | null | undefined;
 
 export default {
     name: 'CollectorPage',
@@ -211,6 +209,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            plugins: computed(() => store.state.resource.plugin.items),
             fields: computed(() => [
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
@@ -357,9 +356,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
-                    // eslint-disable-next-line camelcase
                     plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
-                    // eslint-disable-next-line camelcase
                     plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
                     detailLink: `/management/collector-history?filters=collector_id%3A%3D${d.collector_id}`,
                     ...d,
@@ -457,7 +454,6 @@ export default {
                             fileType: 'xlsx',
                             timezone: getTimezone(),
                         },
-                        // eslint-disable-next-line camelcase
                         data_source: state.excelFields,
                     },
                 });

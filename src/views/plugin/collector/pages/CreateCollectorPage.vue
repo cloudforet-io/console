@@ -103,7 +103,7 @@ export default {
             imageUrl: computed(() => state.plugin?.tags?.find(tag => tag.key === 'icon').value),
             provider: computed(() => get(state.plugin, 'provider', '')),
             pluginId: get(root, '$route.params.pluginId', ''),
-            tags: {},
+            tags: [],
             supportedSchema: [],
             //
             collectorNames: [],

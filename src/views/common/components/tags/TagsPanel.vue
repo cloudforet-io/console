@@ -1,5 +1,5 @@
 <template>
-    <div class="mb-8">
+    <div>
         <p-panel-top :use-total-count="true" :total-count="tags.length">
             <template>{{ $t('COMMON.TAGS.TITLE') }}</template>
             <template #extra>
@@ -134,3 +134,8 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.p-data-table {
+    min-height: 10rem;
+}
+</style>
