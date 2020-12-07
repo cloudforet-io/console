@@ -23,14 +23,30 @@
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_TITLE') }}
                 </p-panel-top>
             </template>
-            <template #col-service_account_id-format="{index, field, item}">
-                {{ item.service_account_name }}
+            <template #col-service_account-format="{ item }">
+                <router-link :to="referenceRouter(
+                    item.service_account_id,
+                    { resource_type: 'identity.ServiceAccount' })"
+                >
+                    <span class="reference-link">
+                        <span class="text">{{ item.name }}</span>
+                        <p-i name="ic_external-link" height="1em" width="1em" />
+                    </span>
+                </router-link>
             </template>
-            <template #col-project_id-format="{index, field, item}">
-                {{ item.project_name }}
+            <template #col-project_id-format="{ item }">
+                <router-link :to="referenceRouter(
+                    item.project_id,
+                    { resource_type: 'identity.Project' })"
+                >
+                    <span class="reference-link">
+                        <span class="text">{{ item.project_name }}</span>
+                        <p-i name="ic_external-link" height="1em" width="1em" />
+                    </span>
+                </router-link>
             </template>
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value) }}
+                <span>{{ timestampFormatter(value) }}</span>
             </template>
             <template #col-collect-format="{item}">
                 <p-button
@@ -50,25 +66,29 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 import { timestampFormatter } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { TimeStamp } from '@/models';
-import { DataTableField } from '@/components/organisms/tables/data-table/type';
-import { store } from '@/store';
-import { Options } from '@/components/organisms/tables/query-search-table/type';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { DataTableField } from '@/components/organisms/tables/data-table/type';
+import { TimeStamp } from '@/models';
+import { store } from '@/store';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
+
+
 interface SecretModel {
     secret_id: string;
     name: string;
@@ -86,6 +106,7 @@ interface SecretModel {
 export default {
     name: 'CollectorCredentials',
     components: {
+        PI,
         PQuerySearchTable,
         PPanelTop,
         PButton,
@@ -110,7 +131,7 @@ export default {
             loading: true,
             fields: [
                 { name: 'name', label: 'Name' },
-                { name: 'service_account_id', label: 'Service Account' },
+                { name: 'service_account', label: 'Service Account' },
                 { name: 'project_id', label: 'Project' },
                 { name: 'created_at', label: 'Created' },
                 {
@@ -164,11 +185,8 @@ export default {
                 const res = await SpaceConnector.client.secret.secret.list({
                     query: getQuery(),
                 });
-                console.log(res);
                 state.items = res.results.map(d => ({
-                    // eslint-disable-next-line camelcase
                     service_account_name: computed(() => store.state.resource.serviceAccount.items[d.service_account_id]?.label || d.service_account_id).value,
-                    // eslint-disable-next-line camelcase
                     project_name: computed(() => store.state.resource.project.items[d.project_id]?.label || d.project_id).value,
                     ...d,
                 }));
@@ -187,8 +205,8 @@ export default {
 
         const init = async () => {
             await Promise.all([
-                vm.$store.dispatch('resource/serviceAccount/load'),
-                vm.$store.dispatch('resource/project/load'),
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/project/load'),
             ]);
             await listCredentials();
         };
@@ -204,6 +222,7 @@ export default {
             ...toRefs(state),
             listCredentials,
             timestampFormatter,
+            referenceRouter,
             openCollectDataModal(item: SecretModel) {
                 state.collectDataVisible = true;
                 // @ts-ignore
@@ -218,6 +237,16 @@ export default {
 <style lang="postcss" scoped>
 .p-toolbox-table {
     border-width: 0;
+}
+.p-data-table {
+    .reference-link {
+        &:hover {
+            text-decoration: underline;
+        }
+        .text {
+            margin-right: 0.125rem;
+        }
+    }
 }
 .credential-btn {
     float: right;

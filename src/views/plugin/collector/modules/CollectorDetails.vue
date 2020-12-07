@@ -69,7 +69,7 @@ export default {
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PLUGIN_NAME'), name: 'plugin_name' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_VERSION'), name: 'plugin_info.version' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PROVIDER'), name: 'provider' },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.metadata.metadata.supported_resource_type' },
+                // { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.metadata.metadata.supported_resource_type' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_LAST_COLLECTED'), name: 'last_collected_at', formatter: timestampFormatter },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_CREATED'), name: 'created_at', formatter: timestampFormatter },
             ]),
