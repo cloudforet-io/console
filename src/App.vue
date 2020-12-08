@@ -65,7 +65,7 @@ export default defineComponent({
         };
 
         watch(() => store.state.user.isSessionExpired, (after, before) => {
-            if (after !== before && !after && !vm.$route.meta.excludeAuth) {
+            if (after !== before && after && !vm.$route.meta.excludeAuth) {
                 state.isExpired = true;
             }
         }, { immediate: false });
