@@ -13,7 +13,7 @@
             <p-hr class="sidebar-divider" />
             <div v-for="(item) in sidebarState.items" :key="item.id"
                  class="sidebar-list-item"
-                 :class="{'selected': item.id === sidebarState.selectedItem.id}"
+                 :class="{'selected': item.name === sidebarState.selectedItem.name}"
                  @click="onClickSidebarItem(item)"
             >
                 {{ item.name }}
@@ -504,7 +504,7 @@ export default {
         };
 
         const onClickSidebarItem = async (item) => {
-            if (sidebarState.selectedItem.id !== item.id) {
+            if (sidebarState.selectedItem.name !== item.name) {
                 await vm.$router.replace({
                     name: 'cloudServicePage',
                     params: {
@@ -604,7 +604,7 @@ export default {
         /** ******* Page Init ******* */
         const initSidebar = async () => {
             await listCloudServiceTypeData();
-            sidebarState.selectedItem = sidebarState.items[0];
+            sidebarState.selectedItem = { name: props.name };
         };
         const init = async () => {
             await store.dispatch('resource/loadAll');
