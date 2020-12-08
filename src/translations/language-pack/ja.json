@@ -200,16 +200,22 @@
 			"ADMIN_ID": "管理者ID",
 			"ADMIN_SIGN_IN": "管理者ログイン",
 			"ALT_E_SIGN_IN": "ユーザー名またはパスワードを確認してください",
+			"CONTACT": "",
+			"FOR_DOMAIN_ADMIN": "",
+			"FOR_MEMBER_ACCOUNT": "",
 			"MEMBER_SIGN_IN": "ユーザーアカウントでログイン",
+			"NEED_HELP": "",
 			"OR": "または",
 			"PASSWORD": "パスワード",
 			"PASSWORD_REQUIRED": "パスワードを入力してください",
 			"ROOT_ACCOUNT": "管理者アカウントでログイン",
 			"SIGN_IN": "ログイン",
+			"SIGN_IN_FOR_ADMIN": "",
 			"TITLE": "最も簡単に使えるマルチクラウドサービススペースウォン",
 			"USER_ID": "ユーザー名",
 			"USER_ID_REQUIRED": "ユーザーIDを入力してください",
-			"VALIDATION": "ユーザー名、またはパスワードを確認してください。"
+			"VALIDATION": "ユーザー名、またはパスワードを確認してください。",
+			"VERSION": ""
 		},
 		"TAGS": {
 			"ADD_TAG": "タグの追加",

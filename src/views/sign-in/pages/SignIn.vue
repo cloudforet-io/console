@@ -13,31 +13,38 @@
             />
             <div class="version">
                 <p-badge style-type="primary" outline shape="square">
-                    Version {{ version }}
+                    {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
                 </p-badge>
-                <span class="help-msg">Need help?<span class="text-blue-600 ml-2">Contact us</span></span>
+                <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
+                    <p-anchor href="mailto:support@spaceone.dev" target="_blank"
+                              :show-icon="false" highlight
+                              class="text-blue-600 ml-2"
+                    >
+                        {{ $t('COMMON.SIGN_IN.CONTACT') }}
+                    </p-anchor>
+                </span>
             </div>
         </div>
         <div class="right-container">
             <div class="template-wrapper">
                 <p class="sign-in-title">
-                    Sign In
+                    {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
                 </p>
                 <p class="sign-in-subtitle">
-                    for member account credentials
+                    {{ $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
                 </p>
                 <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
                 <div v-if="showErrorMessage" class="error-msg-box">
-                    <span class="error-msg">Please Confirm your Id or Password.</span>
+                    <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
                          class="cursor-pointer"
                          color="transparent inherit"
                          @click="hideErrorMessage"
                     />
                 </div>
-                <local-sign-in />
+                <i-d-p-w-sign-in />
                 <div class="btn-divider">
-                    <span>OR</span>
+                    <span>{{$t('COMMON.SIGN_IN.OR')}}</span>
                 </div>
                 <component :is="component" class="sign-in-template"
                            @on-sign-in="signIn"
@@ -46,7 +53,7 @@
                     <p-i name="admin" width="1.5rem" height="1.5rem"
                          class="admin-icon"
                     />
-                    Sign in for Domain Admin
+                    {{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ADMIN') }}
                 </span>
             </div>
         </div>
@@ -62,15 +69,17 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import { setGtagUserID } from '@/lib/gtag';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import LocalSignIn from '@/views/sign-in/templates/local.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
+import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 
 export default {
     name: 'SignIn',
     components: {
+        PAnchor,
+        IDPWSignIn,
         PI,
-        LocalSignIn,
         PBadge,
         PLottie,
         PButton,

@@ -199,17 +199,23 @@
 		"SIGN_IN": {
 			"ADMIN_ID": "Admin ID",
 			"ADMIN_SIGN_IN": "Admin Sign in",
-			"ALT_E_SIGN_IN": "Please, check your ID or Password",
+			"ALT_E_SIGN_IN": "Please Confirm your Id or Password.",
+			"CONTACT": "Contact us",
+			"FOR_DOMAIN_ADMIN": "for Domain Admin",
+			"FOR_MEMBER_ACCOUNT": "for member account credentials",
 			"MEMBER_SIGN_IN": "Sign in with member account credentials",
-			"OR": "or",
+			"NEED_HELP": "Need help?",
+			"OR": "OR",
 			"PASSWORD": "Password",
 			"PASSWORD_REQUIRED": "Please enter password",
 			"ROOT_ACCOUNT": "Sign in with root account credentials",
 			"SIGN_IN": "Sign in ",
+			"SIGN_IN_FOR_ADMIN": "Sign in for Domain Admin",
 			"TITLE": "SpaceONE will make you easy on multi cloud management.",
 			"USER_ID": "ID",
 			"USER_ID_REQUIRED": "Please, enter ID",
-			"VALIDATION": "Please, check your ID or Password."
+			"VALIDATION": "Please, check your ID or Password.",
+			"VERSION": "Version"
 		},
 		"TAGS": {
 			"ADD_TAG": "Add Tags",

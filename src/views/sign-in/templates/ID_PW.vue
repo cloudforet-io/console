@@ -1,7 +1,10 @@
 <template>
     <div class="local-wrapper">
         <form class="form">
-            <p class="input-label">
+            <p v-if="isAdmin" class="input-label">
+                {{ $t('COMMON.SIGN_IN.ADMIN_ID') }}
+            </p>
+            <p v-else class="input-label">
                 {{ $t('COMMON.SIGN_IN.USER_ID') }}
             </p>
             <PFieldGroup :invalid-text="idInvalidText" :invalid="!isIdValid">
@@ -38,13 +41,12 @@
                 </template>
             </PFieldGroup>
         </form>
-        <p-button style-type="primary1" type="submit" size="lg"
+        <p-button :style-type="buttonStyleType" type="submit" size="lg"
                   class="sign-in-btn"
                   @click="signIn"
         >
             {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
         </p-button>
-
     </div>
 </template>
 
@@ -54,7 +56,7 @@ import {
     getCurrentInstance,
     reactive,
     toRefs,
-    defineComponent, ComponentRenderProxy,
+    defineComponent, ComponentRenderProxy, computed,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
@@ -62,11 +64,17 @@ import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vu
 import { TranslateResult } from 'vue-i18n';
 
 export default defineComponent({
-    name: 'LocalSignIn',
+    name: 'IDPWSignIn',
     components: {
         PButton,
         PTextInput,
         PFieldGroup,
+    },
+    props: {
+        isAdmin: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -118,12 +126,15 @@ export default defineComponent({
             context.emit('on-sign-in', credentials);
         };
 
+        const buttonStyleType = computed(() => (props.isAdmin ? 'primary-dark' : 'primary1'));
+
         return {
             ...toRefs(state),
             ...toRefs(validationState),
             signIn,
             checkUserId,
             checkPassword,
+            buttonStyleType,
         };
     },
 });

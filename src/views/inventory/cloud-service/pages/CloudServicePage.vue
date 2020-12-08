@@ -486,8 +486,8 @@ export default {
             const query = new QueryHelper();
             query
                 .setFilter({ k: 'provider', v: props.provider, o: 'eq' }, { k: 'group', v: props.group, o: 'eq' })
-                .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags')
-                .setSort('name');
+                .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary')
+                .setSort('is_primary', true);
             return query.data;
         };
 
