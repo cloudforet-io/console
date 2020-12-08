@@ -230,7 +230,7 @@ const cloudServiceStore = {
 };
 
 interface SidebarItemType {
-    id: string;
+    id?: string;
     name: string;
 }
 
@@ -482,15 +482,19 @@ export default {
             return {};
         };
 
+        const getCloudServiceTypeQuery = () => {
+            const query = new QueryHelper();
+            query
+                .setFilter({ k: 'provider', v: props.provider, o: 'eq' }, { k: 'group', v: props.group, o: 'eq' })
+                .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags')
+                .setSort('name');
+            return query.data;
+        };
+
         const listCloudServiceTypeData = async () => {
             try {
                 const res = await SpaceConnector.client.inventory.cloudServiceType.list({
-                    query: {
-                        filter: [
-                            { k: 'provider', v: props.provider, o: 'eq' }, { k: 'group', v: props.group, o: 'eq' },
-                        ],
-                        only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'],
-                    },
+                    query: getCloudServiceTypeQuery(),
                 });
                 sidebarState.items = res.results.map(d => ({
                     id: d.cloud_service_type_id,
@@ -512,6 +516,7 @@ export default {
                         group: props.group,
                         name: item.name,
                     },
+                    query: vm.$route.query,
                 });
                 await getTableSchema();
                 await listCloudServiceData();
