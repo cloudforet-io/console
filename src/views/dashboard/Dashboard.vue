@@ -5,6 +5,8 @@
         >
             <all-summary class="col-span-12" :providers="providers" />
             <resource-map class="col-span-12" :providers="providers" />
+            <personal-health-dashboard class="col-span-12" />
+            <trusted-advisor class="col-span-12" :providers="providers" />
             <top-projects class="col-span-12" />
             <cloud-services class="col-span-12" :more-info="true" :providers="providers" />
         </div>
@@ -50,11 +52,16 @@ import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPage
 import ResourceMap from '@/views/common/components/widgets/region-map/RegionMap.vue';
 import CollectorProgress from '@/views/common/components/widgets/collector-progress/CollectingProgress.vue';
 import FavoritesWidget from '@/views/common/components/widgets/favorites/FavoritesWidget.vue';
+import TrustedAdvisor from '@/views/common/components/widgets/trusted-advisor/TrustedAdvisor.vue';
+import PersonalHealthDashboard
+    from "@/views/common/components/widgets/personal-health-dashboard/PersonalHealthDashboard.vue";
 
 
 export default {
     name: 'Dashboard',
     components: {
+        PersonalHealthDashboard,
+        TrustedAdvisor,
         FavoritesWidget,
         CollectorProgress,
         ResourceMap,

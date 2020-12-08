@@ -280,6 +280,9 @@
 			"HEALTH_DASHBOARD_DESC_3": "先にAWSプランを確認してください",
 			"HEALTH_DASHBOARD_HELP": "AWSのサービスの状態とスケジュール済みタスク通知を見ることができます。",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"PERSONAL_HEALTH_DASHBOARD": {
+				"TITLE": ""
+			},
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "クラウドサービス",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "リージョン",
 			"RESOURCE_BY_REGION_REGIONS": "リージョン",
@@ -316,7 +319,20 @@
 			"TOP_PROJECT_PROJECT_GROUP": "プロジェクトグループ",
 			"TOP_PROJECT_RANK": "ランキング",
 			"TOP_PROJECT_STORAGE": "ストレージ",
-			"TOP_PROJECT_TITLE": "最もリソースを使用しているプロジェクト"
+			"TOP_PROJECT_TITLE": "最もリソースを使用しているプロジェクト",
+			"TRUSTED_ADVISOR": {
+				"LABEL_COST_OPTIMIZATION": "",
+				"LABEL_ERROR": "",
+				"LABEL_FAULT_TOLERANCE": "",
+				"LABEL_OK": "",
+				"LABEL_PERFORMANCE": "",
+				"LABEL_SECURITY": "",
+				"LABEL_SERVICE_LIMITS": "",
+				"LABEL_WARNING": "",
+				"SUB_TITLE_OVERALL": "",
+				"SUB_TITLE_PROJECT_SUMMARY": "",
+				"TITLE": ""
+			}
 		}
 	},
 	"IDENTITY": {

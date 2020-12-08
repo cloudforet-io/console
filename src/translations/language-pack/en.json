@@ -280,6 +280,9 @@
 			"HEALTH_DASHBOARD_DESC_3": "Check your AWS Support Plans first.",
 			"HEALTH_DASHBOARD_HELP": "Get a notice the status of AWS services.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"PERSONAL_HEALTH_DASHBOARD": {
+				"TITLE": "Personal Health Dashboard"
+			},
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "Cloud Service",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "Region",
 			"RESOURCE_BY_REGION_REGIONS": "Regions",
@@ -316,7 +319,20 @@
 			"TOP_PROJECT_PROJECT_GROUP": "Project Group",
 			"TOP_PROJECT_RANK": "Rank",
 			"TOP_PROJECT_STORAGE": "Storage",
-			"TOP_PROJECT_TITLE": "Top Resource Managing Projects"
+			"TOP_PROJECT_TITLE": "Top Resource Managing Projects",
+			"TRUSTED_ADVISOR": {
+				"LABEL_COST_OPTIMIZATION": "Cost Optimization",
+				"LABEL_ERROR": "Action recommended",
+				"LABEL_FAULT_TOLERANCE": "Fault Tolerance",
+				"LABEL_OK": "No problems detected",
+				"LABEL_PERFORMANCE": "Performance",
+				"LABEL_SECURITY": "Security",
+				"LABEL_SERVICE_LIMITS": "Service Limits",
+				"LABEL_WARNING": "Investigation recommended",
+				"SUB_TITLE_OVERALL": "Overall",
+				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
+				"TITLE": "Trusted Advisor"
+			}
 		}
 	},
 	"IDENTITY": {

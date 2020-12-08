@@ -280,6 +280,9 @@
 			"HEALTH_DASHBOARD_DESC_3": "AWS 플랜을 먼저 확인하세요. ",
 			"HEALTH_DASHBOARD_HELP": "AWS의 서비스 상태 및 예정된 작업 공지를 볼 수 있습니다.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"PERSONAL_HEALTH_DASHBOARD": {
+				"TITLE": "Personal Health Dashboard"
+			},
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "클라우드 서비스 ",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "지역",
 			"RESOURCE_BY_REGION_REGIONS": "리전 ",
@@ -316,7 +319,20 @@
 			"TOP_PROJECT_PROJECT_GROUP": "프로젝트 그룹 ",
 			"TOP_PROJECT_RANK": "랭킹",
 			"TOP_PROJECT_STORAGE": "저장소",
-			"TOP_PROJECT_TITLE": "가장 많은 리소스를 사용중인 프로젝트"
+			"TOP_PROJECT_TITLE": "가장 많은 리소스를 사용중인 프로젝트",
+			"TRUSTED_ADVISOR": {
+				"LABEL_COST_OPTIMIZATION": "Cost Optimization",
+				"LABEL_ERROR": "Action recommended",
+				"LABEL_FAULT_TOLERANCE": "Fault Tolerance",
+				"LABEL_OK": "No problems detected",
+				"LABEL_PERFORMANCE": "Performance",
+				"LABEL_SECURITY": "Security",
+				"LABEL_SERVICE_LIMITS": "Service Limits",
+				"LABEL_WARNING": "Investigation recommended",
+				"SUB_TITLE_OVERALL": "Overall",
+				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
+				"TITLE": "Trusted Advisor"
+			}
 		}
 	},
 	"IDENTITY": {
