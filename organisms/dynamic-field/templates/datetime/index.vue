@@ -55,11 +55,13 @@ export default {
                 time = dayjs(props.data);
             }
 
-            time = dayjs.tz(time, props.typeOptions?.timezone || 'UTC');
-            if (options.display_format) {
-                result = time.format(options.display_format);
-            } else {
-                result = time.format('YYYY-MM-DD HH:mm:ss');
+            if (time.isValid()) {
+                time = dayjs.tz(time, props.typeOptions?.timezone || 'UTC');
+                if (options.display_format) {
+                    result = time.format(options.display_format);
+                } else {
+                    result = time.format('YYYY-MM-DD HH:mm:ss');
+                }
             }
         }
 
