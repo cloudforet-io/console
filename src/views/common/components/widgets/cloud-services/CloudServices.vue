@@ -76,6 +76,7 @@
 import { range } from 'lodash';
 
 import { reactive, toRefs } from '@vue/composition-api';
+import { Location } from 'vue-router';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
@@ -83,6 +84,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { QueryStore } from '@/lib/query';
 
 const DATA_LENGTH = 8;
 export default {
@@ -120,7 +122,7 @@ export default {
             count: number;
             href: [string, object];
         }
-
+        const queryStore = new QueryStore();
         const state = reactive({
             loading: true,
             skeletons: range(8),
@@ -134,19 +136,55 @@ export default {
             }>,
         });
 
-        const getLink = (data, projectFilter?) => {
-            let link = '';
-            if (data.resource_type === 'inventory.Server' && !projectFilter) {
-                link = `/inventory/server?filters=provider%3A%3D${data.provider}&filters=cloud_service_type%3A%3D${data.cloud_service_type}`;
+        const getLink = (data, projectId?) => {
+            let link;
+            if (data.resource_type === 'inventory.Server' && !projectId) {
+                link = {
+                    name: 'server',
+                    query: {
+                        filters: queryStore.setFilters([
+                            { k: 'provider', v: data.provider, o: '=' },
+                            { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
+                        ]).rawQueryStrings,
+                    },
+                };
             }
-            if (data.resource_type === 'inventory.Server' && projectFilter) {
-                link = `/inventory/server?filters=provider%3A%3D${data.provider}&filters=cloud_service_type%3A%3D${data.cloud_service_type}${projectFilter}`;
+            if (data.resource_type === 'inventory.Server' && projectId) {
+                link = {
+                    name: 'server',
+                    query: {
+                        filters: queryStore.setFilters([
+                            { k: 'project_id', v: projectId, o: '=' },
+                            { k: 'provider', v: data.provider, o: '=' },
+                            { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
+                        ]).rawQueryStrings,
+                    },
+                };
             }
-            if (data.resource_type === 'inventory.CloudService' && !projectFilter) {
-                link = `/inventory/cloud-service/${data.provider}/${data.cloud_service_group}/${data.cloud_service_type}?provider=${data.provider}`;
+            if (data.resource_type === 'inventory.CloudService' && !projectId) {
+                link = {
+                    name: 'cloudServicePage',
+                    params: {
+                        provider: data.provider,
+                        group: data.cloud_service_group,
+                        name: data.cloud_service_type,
+                    },
+                };
             }
-            if (data.resource_type === 'inventory.CloudService' && projectFilter) {
-                link = `/inventory/cloud-service/${data.provider}/${data.cloud_service_group}/${data.cloud_service_type}?provider=${data.provider}${projectFilter}`;
+            if (data.resource_type === 'inventory.CloudService' && projectId) {
+                link = {
+                    name: 'cloudServicePage',
+                    params: {
+                        provider: data.provider,
+                        group: data.cloud_service_group,
+                        name: data.cloud_service_type,
+                    },
+                    query: {
+                        filters: queryStore.setFilters([
+                            { k: 'project_id', v: projectId, o: '=' },
+                        ]).rawQueryStrings,
+                    },
+                };
             }
             return link;
         };
@@ -168,7 +206,7 @@ export default {
                     name: d.cloud_service_type,
                     type: d.resource_type,
                     provider: d.provider,
-                    href: getLink(d, props.projectFilter),
+                    href: getLink(d, props.projectId),
                 })),
             ];
         };

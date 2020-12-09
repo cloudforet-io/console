@@ -295,17 +295,57 @@ export default {
                     title: d.cloud_service_group,
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
-                    href: `/inventory/server?&filters=provider%3A%3D${d.provider}`,
-                    createdHref: `/inventory/server?&filters=provider%3A%3D${d.provider}&${getCreatedAtFilters()}`,
-                    deletedHref: `/inventory/server?&filters=provider%3A%3D${d.provider}&${getDeletedAtFilters()}`,
+                    createdHref: {
+                        name: 'server',
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'provider', v: d.provider, o: '=' },
+                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                            ]).rawQueryStrings,
+                        },
+                    },
+                    deletedHref: {
+                        name: 'server',
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'provider', v: d.provider, o: '=' },
+                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                                { k: 'state', v: 'DELETED', o: '=' },
+                            ]).rawQueryStrings,
+                        },
+                    },
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
                     title: d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
-                    href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?`,
-                    createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getCreatedAtFilters()}`,
-                    deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${getDeletedAtFilters()}`,
+                    createdHref: {
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                            ]).rawQueryStrings,
+                        },
+                    },
+                    deletedHref: {
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                                { k: 'state', v: 'DELETED', o: '=' },
+                            ]).rawQueryStrings,
+                        },
+                    },
                     ...d,
                 })),
             ];

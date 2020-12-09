@@ -107,6 +107,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import {
     gray, peacock, secondary,
 } from '@/styles/colors';
+import { QueryStore } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 
@@ -147,6 +148,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
 
         const state = reactive({
             loading: true,
@@ -242,15 +244,8 @@ export default {
             chart.legend.markers.template.height = 8;
         };
         const getLocation = (type, projectId) => {
-            const filters: QueryTag[] = [
-                {
-                    key: { label: 'Project Id', name: 'project_id' },
-                    operator: '=',
-                    value: { label: projectId, name: projectId },
-                },
-            ];
-            const query: Location['query'] = {};
             let name: string;
+            const query: Location['query'] = {};
 
             // set query
             if (type === 'compute') {
@@ -265,7 +260,9 @@ export default {
             const location: Location = {
                 name,
                 query: {
-                    filters: queryTagsToQueryString(filters),
+                    filters: queryStore.setFilters([
+                        { k: 'project_id', v: projectId, o: '=' },
+                    ]).rawQueryStrings,
                     ...query,
                 },
             };

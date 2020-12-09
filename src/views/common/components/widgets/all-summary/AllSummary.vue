@@ -130,11 +130,11 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoade
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
+import { QueryStoreFilter } from '@/lib/query/type';
+import { QueryStore } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -196,6 +196,7 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
 
         const state = reactive({
             loading: false,
@@ -342,7 +343,7 @@ export default {
             return num;
         };
         const getLocation = (type) => {
-            const filters: QueryTag[] = [];
+            const filters: QueryStoreFilter[] = [...queryStore.filters];
             const query: Location['query'] = {};
             let name: string;
 
@@ -359,16 +360,14 @@ export default {
             // set filters
             if (props.projectId) {
                 filters.push({
-                    key: { label: 'Project Id', name: 'project_id' },
-                    operator: '=',
-                    value: { label: props.projectId, name: props.projectId },
+                    k: 'project_id', o: '=', v: props.projectId,
                 });
             }
 
             const location: Location = {
                 name,
                 query: {
-                    filters: queryTagsToQueryString(filters),
+                    filters: queryStore.setFilters(filters).rawQueryStrings,
                     ...query,
                 },
             };
@@ -482,6 +481,7 @@ export default {
             }
             return param;
         };
+
         const getSummaryInfo = async (type) => {
             try {
                 let count;
@@ -503,31 +503,24 @@ export default {
                         to: getLocation(type),
                     },
                 ];
+
+                const summaryQueryStore = new QueryStore();
                 res.results.forEach((d) => {
                     let detailLocation: Location;
-                    const filters: QueryTag[] = [];
+                    const filters: QueryStoreFilter[] = [];
                     if (props.projectId) {
                         filters.push({
-                            key: { label: 'Project', name: 'project_id' },
-                            operator: '=',
-                            value: { label: props.projectId, name: props.projectId },
+                            k: 'project_id', o: '=', v: props.projectId,
                         });
                     }
 
                     if (d.resource_type === 'inventory.Server') {
-                        filters.push({
-                            key: { label: 'Provider', name: 'provider' },
-                            operator: '=',
-                            value: { label: d.provider, name: d.provider },
-                        }, {
-                            key: { label: 'Cloud Service Type', name: 'cloud_service_type' },
-                            operator: '=',
-                            value: { label: d.cloud_service_type, name: d.cloud_service_type },
-                        });
+                        filters.push({ k: 'provider', o: '=', v: d.provider },
+                            { k: 'cloud_service_type', o: '=', v: d.cloud_service_type });
                         detailLocation = {
                             name: 'server',
                             query: {
-                                filters: queryTagsToQueryString(filters),
+                                filters: summaryQueryStore.setFilters(filters).rawQueryStrings,
                             },
                         };
                     } else {
@@ -539,7 +532,7 @@ export default {
                                 name: d.cloud_service_type,
                             },
                             query: {
-                                filters: queryTagsToQueryString(filters),
+                                filters: summaryQueryStore.setFilters(filters).rawQueryStrings,
                             },
                         };
                     }

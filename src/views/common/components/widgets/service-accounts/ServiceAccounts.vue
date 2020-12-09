@@ -34,7 +34,7 @@
                           :bordered="false"
             >
                 <template #col-provider-format="{ index, field, item }">
-                    <router-link :to="`/identity/service-account?provider=${item.provider}`">
+                    <router-link :to="goToServiceAccountPage(item)">
                         <span :style="{color: data[index].color}" class="provider-label">{{ item.providerLabel }}</span>
                     </router-link>
                 </template>
@@ -46,6 +46,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { map, forEach, range } from 'lodash';
+import { Location } from 'vue-router';
 import Color from 'color';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -66,10 +67,10 @@ import {
     gray, violet, white,
 } from '@/styles/colors';
 import { SpaceConnector } from '@/lib/space-connector';
+import { QueryStore } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 
-const DEFAULT_COUNT = 4;
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 
 interface Data {
@@ -97,6 +98,7 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
 
         const state = reactive({
             skeletons: range(4),
@@ -198,6 +200,16 @@ export default {
             }
         };
 
+        const goToServiceAccountPage = (item) => {
+            const res: Location = {
+                name: 'serviceAccount',
+                query: {
+                    provider: item.provider,
+                },
+            };
+            return res;
+        };
+
         const init = async () => {
             await getData();
         };
@@ -218,6 +230,7 @@ export default {
 
         return {
             ...toRefs(state),
+            goToServiceAccountPage,
         };
     },
 };

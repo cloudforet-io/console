@@ -5,13 +5,13 @@
                 <p class="title">
                     {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS') }}
                 </p>
-                <div class="more-btn">
-                    <router-link to="/management/collector-history" class="more">
+                <div class="more-btn" @click="goToCollectorHistory">
+                    <div class="more">
                         <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
                         <p-i name="ic_arrow_right" width="1rem" height="1rem"
                              color="inherit transparent"
                         />
-                    </router-link>
+                    </div>
                 </div>
             </div>
         </template>
@@ -28,7 +28,7 @@
             <template #no-data="{fields}">
                 <tr key="noData" class="bg-primary3">
                     <td :colspan="fields.length" class="text-gray">
-                        {{$t('COMMON.WIDGETS.COLLECTING_PROGRESS_NO_RUNNING')}}
+                        {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS_NO_RUNNING') }}
                     </td>
                 </tr>
             </template>
@@ -50,6 +50,7 @@ import dayjs from 'dayjs';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+import { Location } from 'vue-router';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
@@ -59,7 +60,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
-
+import { QueryStore } from '@/lib/query';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -106,6 +107,7 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
         const state = reactive({
             loading: false,
             items: [] as JobModel[],
@@ -153,6 +155,12 @@ export default {
             }
         };
 
+        const goToCollectorHistory = async () => {
+            await vm.$router.push({
+                name: 'collectorHistory',
+            });
+        };
+
         const init = async () => {
             await getData();
         };
@@ -163,8 +171,11 @@ export default {
             timeFormatter,
             getData,
             onRowClick() {
-                vm.$router.push('/plugin/collector');
+                vm.$router.push({
+                    name: 'collectorMain',
+                });
             },
+            goToCollectorHistory,
         };
     },
 };
