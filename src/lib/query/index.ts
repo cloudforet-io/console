@@ -96,12 +96,17 @@ export class QueryStore {
     }
 
     setFilters(filters: QueryStoreFilter[]): this {
-        this._filters = filters;
+        this._filters = [...filters];
+        return this;
+    }
+
+    addFilter(...filters: QueryStoreFilter[]): this {
+        this._filters.push(...filters);
         return this;
     }
 
     get filters(): QueryStoreFilter[] {
-        return this._filters;
+        return [...this._filters];
     }
 
     get queryTags(): QueryTag[] {
@@ -178,7 +183,7 @@ export class QueryStore {
         });
         return {
             filter,
-            keyword: keyword.join(' '),
+            keyword: keyword.join(' ') || '',
         };
     }
 }

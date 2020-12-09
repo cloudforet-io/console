@@ -158,8 +158,7 @@ import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
-import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
+import { replaceQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
@@ -167,6 +166,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import router from '@/routes';
+import { QueryStore } from '@/lib/query';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -215,6 +215,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -237,7 +238,7 @@ export default {
                         label: 'Start Time',
                     },
                 ],
-            }],
+            }] as KeyItemSet[],
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
                 status: makeEnumValueHandler(JOB_STATUS),
@@ -284,7 +285,7 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets as KeyItemSet[]),
+            tags: queryStore.setKeyItemSets(handlers.keyItemSets).queryTags,
             querySearchRef: null as null|QuerySearchTableFunctions,
             modalVisible: false,
         });
@@ -328,6 +329,8 @@ export default {
             });
         };
 
+        const query = new QueryHelper();
+        const apiQueryStore = new QueryStore();
         const getQuery = () => {
             let statusValues: JOB_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
@@ -338,29 +341,24 @@ export default {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
+            const filters = queryStore.filters;
+            statusValues.forEach((d) => {
+                filters.push({ k: 'status', v: d, o: '=' });
+            });
 
-            const query = new QueryHelper()
-                .setSort(state.sortBy, state.sortDesc)
+            const { filter, keyword } = apiQueryStore.setFilters(filters).apiQuery;
+
+            query.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...keywords)
-                .setFilterOr(...orFilters);
-
-            if (statusValues.length > 0) {
-                andFilters.push({
-                    k: 'status',
-                    v: statusValues,
-                    o: 'in',
-                });
-            }
-            query.setFilter(...andFilters);
+                .setKeyword(keyword)
+                .setFilter(...filter);
             return query.data;
         };
+
         const getJobs = async () => {
             state.loading = true;
             try {
-                const query = getQuery();
-                const res = await SpaceConnector.client.inventory.job.list({ query });
+                const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
                 state.jobs = res.results;
                 state.totalCount = res.total_count;
                 convertJobsToFieldItem(res.results);
@@ -378,9 +376,8 @@ export default {
         };
         const onChange = async (item) => {
             state.tags = item.queryTags;
-            const urlQueryString = queryTagsToQueryString(item.queryTags);
-            // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, filters: urlQueryString } }).catch(() => {});
+            queryStore.setFiltersAsQueryTag(item.queryTags);
+            replaceQuery('filters', queryStore.rawQueryStrings);
             try {
                 await getJobs();
             } catch (e) {
@@ -485,8 +482,6 @@ export default {
                 &.active {
                     @apply text-gray-900;
                     font-weight: bold;
-                    &:before {
-                    }
                 }
                 &.failure:hover, &.failure:focus, &.failure.active {
                     @apply text-red-500;

@@ -127,13 +127,13 @@ import { Timestamp } from '@/components/util/type';
 
 import { showErrorMessage, showSuccessMessage, userStateFormatter } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
+import { replaceQuery } from '@/lib/router-query-string';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { store } from '@/store';
-import {KeyItemSet} from "@/components/organisms/search/query-search/type";
+import { KeyItemSet } from '@/components/organisms/search/query-search/type';
+import { QueryStore } from '@/lib/query';
 
 
 interface UserModel {
@@ -172,6 +172,7 @@ export default {
     },
     setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -258,7 +259,7 @@ export default {
             ] as MenuItem[])),
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets),
+            tags: queryStore.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
         });
         const modalState = reactive({
             visible: false,
@@ -294,14 +295,13 @@ export default {
             activeTab: 'data',
         });
 
+        const query = new QueryHelper();
         const getQuery = () => {
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
-            const query = new QueryHelper();
+            const { filter, keyword } = queryStore.apiQuery;
             query.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setFilter(...andFilters)
-                .setFilterOr(...orFilters)
-                .setKeyword(...keywords);
+                .setFilter(...filter)
+                .setKeyword(keyword);
             return query.data;
         };
 
@@ -324,10 +324,6 @@ export default {
             }
         };
 
-        const changeQueryString = async (options) => {
-            await replaceQuery('filters', queryTagsToQueryString(options.queryTags));
-        };
-
         const onSelect = (index) => {
             state.selectedIndex = index;
         };
@@ -338,7 +334,8 @@ export default {
                 if (changed.thisPage !== undefined) state.thisPage = changed.thisPage;
                 if (changed.queryTags !== undefined) {
                     state.tags = changed.queryTags;
-                    replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
+                    queryStore.setFiltersAsQueryTag(changed.queryTags);
+                    replaceQuery('filters', queryStore.rawQueryStrings);
                 }
             }
             await getUsers();
@@ -479,7 +476,6 @@ export default {
             checkModalConfirm,
             onSelect,
             onChange,
-            changeQueryString,
         };
     },
 };

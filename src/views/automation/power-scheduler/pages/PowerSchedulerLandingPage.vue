@@ -154,17 +154,17 @@ import ScheduleHeatmap from '@/views/automation/power-scheduler/modules/Schedule
 
 /* Utils */
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import dayjs from 'dayjs';
 import { getTimezone } from '@/lib/util';
 
 /* Types */
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import { queryStringToQueryTags, queryTagsToQueryString, replaceQuery } from '@/lib/router-query-string';
+import { replaceQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import { QueryStore } from '@/lib/query';
 
 interface Scheduler {
     name: string;
@@ -188,6 +188,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /**
          * Handlers for query search
@@ -215,7 +216,7 @@ export default {
             loading: false,
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStringToQueryTags(vm.$route.query.filters, handlers.keyItemSets),
+            tags: queryStore.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,
@@ -244,14 +245,13 @@ export default {
         /**
          * Search Query, Page parameter for API
          * */
+        const query = new QueryHelper();
         const getParams = () => {
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.tags);
-            const query = new QueryHelper()
-                .setPageStart(getPageStart(state.thisPage, state.pageSize))
+            const { filter, keyword } = queryStore.apiQuery;
+            query.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize)
-                .setKeyword(...keywords)
-                .setFilter(...andFilters)
-                .setFilterOr(...orFilters);
+                .setKeyword(keyword)
+                .setFilter(...filter);
 
             return {
                 query: query.data,
@@ -321,8 +321,9 @@ export default {
         /**
          * Query String
          * */
-        const changeQueryString = async (options) => {
-            await replaceQuery('filters', queryTagsToQueryString(options.queryTags));
+        const changeQueryString = (options) => {
+            queryStore.setFiltersAsQueryTag(options.queryTags);
+            replaceQuery('filters', queryStore.rawQueryStrings);
         };
 
         /**
@@ -333,7 +334,7 @@ export default {
                 state.tags = options.queryTags;
                 state.pageSize = options.pageSize;
                 state.thisPage = options.thisPage;
-                await changeQueryString(options);
+                changeQueryString(options);
             }
             await listProjects();
         };
@@ -374,154 +375,154 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .power-scheduler {
-        .power-scheduler-project {
-            margin-top: 1.5rem;
-            .empty-project {
-                @apply w-full h-full;
-                .empty-project-img {
-                    @apply w-48 mx-auto pt-19 mb-8;
-                }
-            }
-        }
-
-        #current-date {
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
-        }
-
-        >>> .power-scheduler-list {
-            @apply border border-gray-200 rounded;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-
-            &:hover {
-                @apply border-gray-200 bg-blue-100;
-                cursor: pointer;
-            }
-        }
-
-        >>> .loading-spinner {
-            width: 100%;
-        }
-
-        .project-description {
-            @apply px-6 pt-6 pb-6;
-
-            .project {
-                .project-group-name {
-                    @apply text-gray-500 text-xs;
-                }
-
-                #project-name {
-                    @apply text-lg font-bold truncate pb-6 overflow-hidden;
-                }
-            }
-        }
-
-        .resources {
-            @apply flex justify-between;
-
-            .scheduled-resources {
-                p {
-                    @apply mb-1 text-xs;
-                }
-
-                .current-schedule-resources {
-                    @apply font-bold text-primary text-xs;
-                }
-
-                .max-schedule-resources {
-                    @apply text-gray-400 text-xs;
-                }
-            }
-
-            .saving {
-                .saving-this-month {
-                    @apply mb-1 text-xs;
-                    margin-right: 4.75rem;
-                }
-
-                .approximate {
-                    @apply text-gray-400 text-xs;
-                }
-
-                .costs {
-                    @apply float-right;
-
-                    .approx-costs {
-                        @apply text-primary font-bold;
-                        font-size: 1.25rem;
-                    }
-                }
-            }
-        }
-
-        .schedule {
-            @apply ml-6 mr-5 mt-6 mb-6 flex justify-between;
-
-            .schedule-title {
-                @apply font-bold text-gray-400 text-xs;
-
-                .schedule-title-num {
-                    @apply font-normal;
-                }
-            }
-
-            .scheduler-list-wrapper {
-                max-width: 70%;
-                .scheduler-list {
-                    @apply flex mb-2 w-full overflow-x-hidden;
-
-                    .p-i {
-                        flex-shrink: 0;
-                    }
-
-                    .scheduler-name {
-                        @apply ml-1 truncate;
-                        flex-grow: 1;
-                        font-size: 0.75rem;
-                        line-height: 1.2;
-
-                        &.schedule-on {
-                            @apply text-green-500;
-                        }
-                    }
-                }
-            }
-
-            .schedule-matrix {
-                white-space: nowrap;
-            }
-
-            .weekday {
-                @apply text-gray-400 inline-block;
-                font-size: 0.625rem;
-                width: 1rem;
-                height: 1rem;
-                text-align: center;
-            }
-
-            .schedule-add-btn {
-                @apply border border-gray-900 rounded-full inline-block z-10;
-                width: 1.25rem;
-                height: 1.25rem;
-                .add-btn-icon {
-                    @apply text-gray-900;
-                    margin-left: 0.125rem;
-                    margin-bottom: 0.0625rem;
-                }
-            }
-
-            .schedule-add-text {
-                @apply text-gray-900;
-                margin-left: 0.5rem;
-                font-size: 0.875rem;
-                line-height: 1.5;
-            }
-            &.no-schedule {
-                @apply ml-6 mr-5 mb-6 flex justify-center;
-                margin-top: 3.625rem;
+.power-scheduler {
+    .power-scheduler-project {
+        margin-top: 1.5rem;
+        .empty-project {
+            @apply w-full h-full;
+            .empty-project-img {
+                @apply w-48 mx-auto pt-19 mb-8;
             }
         }
     }
+
+    #current-date {
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+
+    >>> .power-scheduler-list {
+        @apply border border-gray-200 rounded;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+        &:hover {
+            @apply border-gray-200 bg-blue-100;
+            cursor: pointer;
+        }
+    }
+
+    >>> .loading-spinner {
+        width: 100%;
+    }
+
+    .project-description {
+        @apply px-6 pt-6 pb-6;
+
+        .project {
+            .project-group-name {
+                @apply text-gray-500 text-xs;
+            }
+
+            #project-name {
+                @apply text-lg font-bold truncate pb-6 overflow-hidden;
+            }
+        }
+    }
+
+    .resources {
+        @apply flex justify-between;
+
+        .scheduled-resources {
+            p {
+                @apply mb-1 text-xs;
+            }
+
+            .current-schedule-resources {
+                @apply font-bold text-primary text-xs;
+            }
+
+            .max-schedule-resources {
+                @apply text-gray-400 text-xs;
+            }
+        }
+
+        .saving {
+            .saving-this-month {
+                @apply mb-1 text-xs;
+                margin-right: 4.75rem;
+            }
+
+            .approximate {
+                @apply text-gray-400 text-xs;
+            }
+
+            .costs {
+                @apply float-right;
+
+                .approx-costs {
+                    @apply text-primary font-bold;
+                    font-size: 1.25rem;
+                }
+            }
+        }
+    }
+
+    .schedule {
+        @apply ml-6 mr-5 mt-6 mb-6 flex justify-between;
+
+        .schedule-title {
+            @apply font-bold text-gray-400 text-xs;
+
+            .schedule-title-num {
+                @apply font-normal;
+            }
+        }
+
+        .scheduler-list-wrapper {
+            max-width: 70%;
+            .scheduler-list {
+                @apply flex mb-2 w-full overflow-x-hidden;
+
+                .p-i {
+                    flex-shrink: 0;
+                }
+
+                .scheduler-name {
+                    @apply ml-1 truncate;
+                    flex-grow: 1;
+                    font-size: 0.75rem;
+                    line-height: 1.2;
+
+                    &.schedule-on {
+                        @apply text-green-500;
+                    }
+                }
+            }
+        }
+
+        .schedule-matrix {
+            white-space: nowrap;
+        }
+
+        .weekday {
+            @apply text-gray-400 inline-block;
+            font-size: 0.625rem;
+            width: 1rem;
+            height: 1rem;
+            text-align: center;
+        }
+
+        .schedule-add-btn {
+            @apply border border-gray-900 rounded-full inline-block z-10;
+            width: 1.25rem;
+            height: 1.25rem;
+            .add-btn-icon {
+                @apply text-gray-900;
+                margin-left: 0.125rem;
+                margin-bottom: 0.0625rem;
+            }
+        }
+
+        .schedule-add-text {
+            @apply text-gray-900;
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        &.no-schedule {
+            @apply ml-6 mr-5 mb-6 flex justify-center;
+            margin-top: 3.625rem;
+        }
+    }
+}
 </style>

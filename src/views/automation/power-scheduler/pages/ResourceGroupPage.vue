@@ -168,7 +168,6 @@
 /* eslint-disable camelcase */
 
 
-import { Filter } from '@/lib/space-connector/type';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -188,11 +187,6 @@ import {
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { forEach, camelCase, findIndex } from 'lodash';
 import { store } from '@/store';
-import {
-    getFiltersFromQueryTags,
-    queryFiltersToQueryTags,
-    queryTagsToQueryFilters,
-} from '@/lib/component-utils/query-search-tags';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -200,6 +194,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { showErrorMessage } from '@/lib/util';
+import { QueryStore } from '@/lib/query';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
 
@@ -283,6 +278,9 @@ export default {
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper() as QueryHelper;
+        const queryStore = new QueryStore();
+        const hiddenQueryStore = new QueryStore();
+        const extraQueryStore = new QueryStore();
 
         /* reactive variables */
         const formState = reactive({
@@ -301,10 +299,6 @@ export default {
 
             schema: null as any,
             data: null as any,
-
-            hiddenFilters: [] as Filter[],
-            extraFilters: [] as Filter[],
-            // dictRef: null as any,
         });
 
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
@@ -386,12 +380,10 @@ export default {
                 });
             }
 
-            state.hiddenFilters = [{ k: 'project_id', v: props.projectId, o: 'eq' }];
-            state.extraFilters = [];
+            hiddenQueryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+            extraQueryStore.setFilters([]);
             forEach(options, (d, k) => {
-                state.extraFilters.push({
-                    k, v: d, o: 'eq',
-                });
+                extraQueryStore.addFilter({ k, v: d, o: '=' });
             });
 
             return { ...options, include_id: true };
@@ -469,10 +461,15 @@ export default {
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
-                const { keywords, orFilters, andFilters } = getFiltersFromQueryTags(changed.queryTags);
-                queryHelper.setFilter(...state.hiddenFilters, ...state.extraFilters, ...andFilters)
-                    .setFilterOr(...orFilters)
-                    .setKeyword(...keywords);
+
+                const { filter, keyword } = queryStore
+                    .setFiltersAsQueryTag(changed.queryTags)
+                    .apiQuery;
+
+                queryHelper.setFilter(...hiddenQueryStore.apiQuery.filter,
+                    ...extraQueryStore.apiQuery.filter,
+                    ...filter)
+                    .setKeyword(keyword);
             }
 
             await listResources();
@@ -496,9 +493,8 @@ export default {
             fetchOptionState.sortDesc = true;
             fetchOptionState.sortBy = 'created_at';
 
-            if (formState.resourceGroup?.options.raw_filter) {
-                fetchOptionState.queryTags = queryFiltersToQueryTags(formState.resourceGroup.options.raw_filter);
-            } else fetchOptionState.queryTags = [];
+            queryStore.setFiltersAsRawQuery(formState.resourceGroup?.options.raw_filter || []);
+            fetchOptionState.queryTags = queryStore.queryTags;
 
             // set table schema
             if (state.selectedTypeIndex !== -1) await getPageSchema();
@@ -550,14 +546,10 @@ export default {
 
         /* list modal */
         const onListModalConfirm = () => {
-            const { keywords, andFilters } = getFiltersFromQueryTags(fetchOptionState.queryTags);
-            const query = new QueryHelper()
-                .setFilter(...state.extraFilters, ...andFilters)
-                .setKeyword(...keywords)
-                .data;
+            const { filter, keyword } = queryStore.apiQuery;
 
-            state.resource.filter = query.filter || [];
-            state.resource.keyword = query.keyword || '';
+            state.resource.filter = [...filter, ...extraQueryStore.apiQuery.filter];
+            state.resource.keyword = keyword;
 
             const params: ResourceGroupItem = {
                 name: state.name,
@@ -566,7 +558,7 @@ export default {
                     name: state.name,
                     resources: [{ ...state.resource }],
                     options: {
-                        raw_filter: queryTagsToQueryFilters(fetchOptionState.queryTags),
+                        raw_filter: queryStore.rawQueries,
                     },
                     // tags: state.dictRef.getDict(),
                 },

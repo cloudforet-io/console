@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-import { QueryFilters } from '@/lib/type';
 import { Filter } from '@/lib/space-connector/type';
 import {
     gray, safe, coral, peacock,
 } from '@/styles/colors';
+import { RawQuery } from '@/lib/query/type';
 
 export const modes = ['READ', 'CREATE'];
 export type ViewMode = typeof modes[number];
@@ -62,7 +62,7 @@ export interface ResourceGroup {
     name: string;
     resources: Resource[];
     options: {
-        raw_filter: QueryFilters;
+        raw_filter: RawQuery[];
     };
     // tags?: object;
 }

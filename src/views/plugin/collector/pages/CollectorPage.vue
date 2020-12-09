@@ -161,17 +161,16 @@ import { CollectorModel } from '@/views/plugin/collector/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { queryStringToQueryTags, queryTagsToQueryString } from '@/lib/router-query-string';
+import { replaceQuery } from '@/lib/router-query-string';
 import config from '@/lib/config';
-import router from '@/routes';
 import { store } from '@/store';
+import { QueryStore } from '@/lib/query';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -207,6 +206,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
 
         const state = reactive({
             plugins: computed(() => store.state.resource.plugin.items),
@@ -335,23 +335,22 @@ export default {
 
         // Url query
         const setSearchTags = () => {
-            state.searchTags = queryStringToQueryTags(vm.$route.query.filters, state.querySearchHandlers.keyItemSets);
+            queryStore.setFiltersAsRawQueryString(vm.$route.query.filters)
+                .setKeyItemSets(state.querySearchHandlers.keyItemSets);
+            state.searchTags = queryStore.queryTags;
         };
 
         // Table
+        const query = new QueryHelper().setOnly(
+            'collector_id', 'name', 'priority', 'last_collected_at',
+            'provider', 'tags', 'plugin_info', 'state',
+        );
         const getQuery = () => {
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
-            const query = new QueryHelper();
-            query
-                .setSort(state.sortBy, state.sortDesc)
+            const { filter, keyword } = queryStore.apiQuery;
+            query.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...keywords)
-                .setFilter(...andFilters)
-                .setFilterOr(...orFilters)
-                .setOnly(
-                    'collector_id', 'name', 'priority', 'last_collected_at',
-                    'provider', 'tags', 'plugin_info', 'state',
-                );
+                .setKeyword(keyword)
+                .setFilter(...filter);
             return query.data;
         };
         const getCollectors = async () => {
@@ -379,9 +378,9 @@ export default {
         const onChange = async (item) => {
             state.selectedIndexes = [];
             state.searchTags = item.queryTags;
-            const urlQueryString = queryTagsToQueryString(item.queryTags);
-            // eslint-disable-next-line no-empty-function
-            await vm.$router.replace({ query: { ...router.currentRoute.query, filters: urlQueryString } }).catch(() => {});
+
+            queryStore.setFiltersAsQueryTag(item.queryTags);
+            await replaceQuery('filters', queryStore.rawQueryStrings);
             try {
                 await getCollectors();
             } catch (e) {

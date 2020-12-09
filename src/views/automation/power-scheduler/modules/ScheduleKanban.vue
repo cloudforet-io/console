@@ -31,9 +31,9 @@
                     <div v-if="column.title === maxPriority.length.toString()" class="header-decorator">
                         {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.LOW') }}
                     </div>
-<!--                    <span v-if="column.title === '1'" id="header-priority">-->
-<!--                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.PRIORITY') }}-->
-<!--                    </span>-->
+                    <!--                    <span v-if="column.title === '1'" id="header-priority">-->
+                    <!--                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.PRIORITY') }}-->
+                    <!--                    </span>-->
                     <p-i v-if="column.title > 5 && (isCreateMode || isEditMode)" name="ic_delete" width="1.5rem"
                          color="transparent inherit"
                          class="header-button"
@@ -304,6 +304,7 @@ export default {
             if (state.isCreateMode || state.isEditMode) {
                 state.resourceGroupVisible = true;
             } else {
+                if (!state.selectedItem?.resource_group.resource_group_id) return;
                 vm.$router.push({
                     name: 'powerSchedulerResourceGroup',
                     params: {

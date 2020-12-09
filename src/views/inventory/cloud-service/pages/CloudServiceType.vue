@@ -191,15 +191,12 @@ import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigat
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
-    queryStringToQueryTags, queryTagsToQueryString, queryStringToStringArray, replaceQuery,
+    queryStringToStringArray, replaceQuery,
     RouteQueryString,
 } from '@/lib/router-query-string';
 import { Filter } from '@/lib/space-connector/type';
@@ -397,12 +394,12 @@ export default {
         const getParams = (isTriggeredBySideFilter = false) => {
             const { filters, labels } = sidebarFilters.value;
 
-            const apiQuery = queryStore.apiQuery;
+            const { filter, keyword } = queryStore.apiQuery;
             const query = new QueryHelper();
             query
                 .setPageLimit(state.pageSize)
-                .setKeyword(...apiQuery.keyword)
-                .setFilter(...apiQuery.filter, ...filters)
+                .setKeyword(keyword)
+                .setFilter(...filter, ...filters)
                 .setSort('count', true, 'name');
             if (isTriggeredBySideFilter) state.thisPage = 1;
             else query.setPageStart(getPageStart(state.thisPage, state.pageSize));

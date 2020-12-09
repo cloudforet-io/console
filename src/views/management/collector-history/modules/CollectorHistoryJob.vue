@@ -117,11 +117,11 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
+import { QueryStore } from '@/lib/query';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -173,6 +173,31 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const querySearchHandlers = {
+            keyItemSets: [{
+                title: 'Filters',
+                items: [
+                    {
+                        name: 'service_account_id',
+                        label: 'Service Account',
+                    },
+                    {
+                        name: 'project_id',
+                        label: 'Project',
+                    },
+                    {
+                        name: 'status',
+                        label: 'Status',
+                    },
+                ],
+            }],
+            valueHandlerMap: {
+                service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
+                project_id: makeReferenceValueHandler('identity.Project'),
+                status: makeEnumValueHandler(JOB_TASK_STATUS),
+            },
+        };
+        const queryStore = new QueryStore().setKeyItemSets(querySearchHandlers.keyItemSets);
         const state = reactive({
             loading: false,
             job: {} as JobModel,
@@ -231,30 +256,6 @@ export default {
             totalCount: 0,
             //
             searchTags: [],
-            querySearchHandlers: {
-                keyItemSets: [{
-                    title: 'Filters',
-                    items: [
-                        {
-                            name: 'service_account_id',
-                            label: 'Service Account',
-                        },
-                        {
-                            name: 'project_id',
-                            label: 'Project',
-                        },
-                        {
-                            name: 'status',
-                            label: 'Status',
-                        },
-                    ],
-                }],
-                valueHandlerMap: {
-                    service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
-                    project_id: makeReferenceValueHandler('identity.Project'),
-                    status: makeEnumValueHandler(JOB_TASK_STATUS),
-                },
-            },
         });
 
         /* util */
@@ -305,22 +306,20 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
 
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.searchTags);
+            queryStore.setFiltersAsQueryTag(state.searchTags);
+            statusValues.forEach((d) => {
+                queryStore.addFilter({ k: 'status', v: d, o: '=' });
+            });
+
+            const { filter, keyword } = queryStore.apiQuery;
 
             const query = new QueryHelper()
                 .setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(...keywords)
-                .setFilterOr(...orFilters);
+                .setKeyword(keyword);
 
-            if (statusValues.length > 0) {
-                andFilters.push({
-                    k: 'status',
-                    v: statusValues,
-                    o: 'in',
-                });
-            }
-            query.setFilter(...andFilters);
+
+            query.setFilter(...filter);
             return query;
         };
         const getJobTasks = async () => {
@@ -391,6 +390,7 @@ export default {
 
         return {
             ...toRefs(state),
+            querySearchHandlers,
             timestampFormatter,
             referenceRouter,
             onSelect,

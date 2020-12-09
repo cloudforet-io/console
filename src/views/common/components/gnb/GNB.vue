@@ -152,7 +152,6 @@ import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 
 import { store } from '@/store';
 import router from '@/routes/index';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
 import { Location } from 'vue-router';
 
 export default {

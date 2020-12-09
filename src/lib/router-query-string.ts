@@ -1,13 +1,7 @@
-import {
-    find, flatMap, forEach,
-} from 'lodash';
+import { forEach } from 'lodash';
 import { Location } from 'vue-router';
 import router from '@/routes';
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { parseTag } from '@/lib/component-utils/query-search-tags';
-import {
-    KeyItemSet, QueryItem,
-} from '@/components/organisms/search/query-search/type';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -18,46 +12,14 @@ dayjs.extend(tz);
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 
-/** QueryStringRef Helpers */
+
+/** QueryString Converter Helpers */
 export const replaceQuery = async (key: string, value: RouteQueryString) => {
     try {
         await router.replace({ query: { ...router.currentRoute.query, [key]: value } });
     } catch (e) {
 
     }
-};
-
-
-/** QueryString Converter Helpers */
-const getQueryItemFromQueryString = (queryString: string, keyItemSets?: KeyItemSet[]): QueryItem => {
-    const parsedItem: QueryItem = parseTag(queryString);
-    if (parsedItem.key?.name) {
-        if (keyItemSets) {
-            const originKeyItem = find(flatMap(keyItemSets, d => d.items), { name: parsedItem.key.name });
-            if (originKeyItem) parsedItem.key = { ...originKeyItem };
-        }
-    }
-    // if (queryItem.key?.dataType === 'datetime') {
-    //     const time = dayjs.utc(queryItem.value.name);
-    //     if (time.isValid()) {
-    //         queryItem.value = {
-    //             label: dayjs.tz(time, store.state.user.timezone || 'UTC').format('YYYY-MM-DD'),
-    //             name: time.format('YYYY-MM-DD'),
-    //         };
-    //     }
-    // }
-    return parsedItem;
-};
-
-export const queryStringToQueryTags = (queryString: RouteQueryString, keyItemSets?: KeyItemSet[]): QueryTag[] => {
-    if (!queryString) return [];
-    if (Array.isArray(queryString)) {
-        return queryString.reduce((res, qs) => {
-            if (qs) res.push(getQueryItemFromQueryString(qs, keyItemSets));
-            return res;
-        }, [] as QueryTag[]);
-    }
-    return [getQueryItemFromQueryString(queryString as string, keyItemSets)];
 };
 
 export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {

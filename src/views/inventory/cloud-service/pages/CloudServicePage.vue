@@ -168,18 +168,14 @@ import {
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
-import {
-    queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
-} from '@/lib/router-query-string';
+import { replaceQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import config from '@/lib/config';
-import { Filter } from '@/lib/space-connector/type';
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
@@ -278,7 +274,6 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryStore = new QueryStore();
-        const fixedQueryStore = new QueryStore();
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -396,15 +391,16 @@ export default {
             }
         };
 
+        const query = new QueryHelper();
+        const fixedQueryStore = new QueryStore();
         const getQuery = () => {
-            const apiQuery = queryStore.apiQuery;
+            const { filter, keyword } = queryStore.apiQuery;
             fixedQueryStore.setFilters(tableState.fixedFilters);
 
-            const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...apiQuery.filter, ...fixedQueryStore.apiQuery.filter)
-                .setKeyword(...apiQuery.keyword);
+                .setFilter(...filter, ...fixedQueryStore.apiQuery.filter)
+                .setKeyword(keyword);
 
             if (tableState.schema?.options?.fields) {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
@@ -482,7 +478,6 @@ export default {
             }
         };
 
-        // TODO: make it as helper
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
                 return referenceFieldFormatter(field.extraData.reference, field.data);
@@ -490,13 +485,17 @@ export default {
             return {};
         };
 
+        const cloudServiceTypeQuery = new QueryHelper();
+        const cloudServiceTypeQueryStore = new QueryStore();
         const getCloudServiceTypeQuery = () => {
-            const query = new QueryHelper();
-            query
-                .setFilter({ k: 'provider', v: props.provider, o: 'eq' }, { k: 'group', v: props.group, o: 'eq' })
+            cloudServiceTypeQueryStore.setFilters([
+                { k: 'provider', v: props.provider, o: '=' },
+                { k: 'group', v: props.group, o: '=' },
+            ]);
+            cloudServiceTypeQuery.setFilter(...cloudServiceTypeQueryStore.apiQuery.filter)
                 .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary')
                 .setSort('is_primary', true);
-            return query.data;
+            return cloudServiceTypeQuery.data;
         };
 
         const listCloudServiceTypeData = async () => {

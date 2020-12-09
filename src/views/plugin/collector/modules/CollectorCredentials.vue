@@ -80,11 +80,11 @@ import { timestampFormatter } from '@/lib/util';
 import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import { QueryStore } from '@/lib/query';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 
@@ -124,6 +124,26 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const querySearchHandlers = {
+            keyItemSets: [{
+                title: 'Filters',
+                items: [
+                    {
+                        name: 'service_account_id',
+                        label: 'Service Account',
+                    },
+                    {
+                        name: 'project_id',
+                        label: 'Project',
+                    },
+                ],
+            }],
+            valueHandlerMap: {
+                service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
+                project_id: makeReferenceValueHandler('identity.Project'),
+            },
+        };
+        const queryStore = new QueryStore().setKeyItemSets(querySearchHandlers.keyItemSets);
 
         const state = reactive({
             items: [] as any,
@@ -144,37 +164,19 @@ export default {
             sortDesc: true,
             collectDataVisible: false,
             targetCredentialId: null,
-            querySearchHandlers: {
-                keyItemSets: [{
-                    title: 'Filters',
-                    items: [
-                        {
-                            name: 'service_account_id',
-                            label: 'Service Account',
-                        },
-                        {
-                            name: 'project_id',
-                            label: 'Project',
-                        },
-                    ],
-                }],
-                valueHandlerMap: {
-                    service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
-                    project_id: makeReferenceValueHandler('identity.Project'),
-                },
-            },
             queryTags: [],
         });
 
+        const query = new QueryHelper();
         const getQuery = () => {
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(state.queryTags);
+            const { filter, keyword } = queryStore.setFiltersAsQueryTag(state.queryTags)
+                .addFilter({ k: 'provider', v: props.provider, o: '=' })
+                .apiQuery;
 
-            const query = new QueryHelper()
-                .setFilter({ k: 'provider', v: props.provider, o: 'eq' }, ...andFilters)
+            query.setFilter(...filter)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setSort(state.sortBy, state.sortDesc)
-                .setFilterOr(...orFilters)
-                .setKeyword(...keywords);
+                .setKeyword(keyword);
 
             return query.data;
         };
@@ -220,6 +222,7 @@ export default {
 
         return {
             ...toRefs(state),
+            querySearchHandlers,
             listCredentials,
             timestampFormatter,
             referenceRouter,

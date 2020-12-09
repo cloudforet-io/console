@@ -38,7 +38,6 @@ import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 import { getTimezone } from '@/lib/util';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
@@ -48,6 +47,7 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { find } from 'lodash';
+import { QueryStore } from '@/lib/query';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -145,34 +145,31 @@ export default {
             if (state.currentLayout.options?.search) setSearchOptions();
         };
 
-        const getQuery = (): undefined|any => {
-            const query = new QueryHelper();
-
+        const query = new QueryHelper();
+        const queryStore = new QueryStore();
+        const getQuery = (): any => {
             const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
             if (options.sortBy !== undefined) query.setSort(options.sortBy, options.sortDesc);
             if (options.pageLimit !== undefined) query.setPageLimit(options.pageLimit);
             if (options.pageStart !== undefined) query.setPageStart(options.pageStart);
             if (options.searchText !== undefined) query.setKeyword(options.searchText);
             if (options.queryTags !== undefined) {
-                const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(options.queryTags);
-                query.setFilter(...andFilters)
-                    .setFilterOr(...orFilters)
-                    .setKeyword(...keywords);
+                const { filter, keyword } = queryStore.setFiltersAsQueryTag(options.queryTags).apiQuery;
+                query.setFilter(...filter)
+                    .setKeyword(keyword);
             }
 
             return query.data;
         };
 
         const getParams = (type?: DynamicLayoutType) => {
-            // eslint-disable-next-line camelcase
-            const params: any = { server_id: props.serverId };
-            const query = getQuery();
-            if (query) {
-                params.query = query;
-                if (type === 'list') delete params.query.sort;
-            }
+            const params: any = { server_id: props.serverId, query: getQuery() };
+
+            if (type === 'list') delete params.query.sort;
+
             const keyPath = state.currentLayout.options?.root_path;
             if (keyPath) params.key_path = keyPath;
+
             return params;
         };
 

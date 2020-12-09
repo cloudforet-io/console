@@ -160,17 +160,16 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { ServerModel } from '@/models/inventory/server';
 
 
-import { flatMap, get } from 'lodash';
+import { get } from 'lodash';
 import {
     showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import {
-    queryTagsToQueryString, replaceQuery,
+    replaceQuery,
 } from '@/lib/router-query-string';
 import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
-import { getFiltersFromQueryTags } from '@/lib/component-utils/query-search-tags';
 import config from '@/lib/config';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -333,12 +332,12 @@ export default {
         };
 
         const getQuery = () => {
-            const apiQuery = queryStore.apiQuery;
+            const { filter, keyword } = queryStore.apiQuery;
 
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...apiQuery.filter)
-                .setKeyword(...apiQuery.keyword);
+                .setFilter(...filter)
+                .setKeyword(keyword);
 
 
             return query.data;
