@@ -183,6 +183,8 @@ import { Filter } from '@/lib/space-connector/type';
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+import { QueryStore } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -275,6 +277,8 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
+        const fixedQueryStore = new QueryStore();
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -345,10 +349,10 @@ export default {
             collectModalVisible: false,
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
-            fixedFilters: computed<Filter[]>(() => [
-                { k: 'provider', o: 'eq', v: props.provider },
-                { k: 'cloud_service_group', o: 'eq', v: props.group },
-                { k: 'cloud_service_type', o: 'eq', v: props.name },
+            fixedFilters: computed<QueryStoreFilter[]>(() => [
+                { k: 'provider', o: '=', v: props.provider },
+                { k: 'cloud_service_group', o: '=', v: props.group },
+                { k: 'cloud_service_type', o: '=', v: props.name },
             ]),
         });
 
@@ -381,7 +385,9 @@ export default {
                 }
 
                 // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItemSets);
+                fetchOptionState.queryTags = queryStore.setKeyItemSets(typeOptionState.keyItemSets)
+                    .setFiltersAsRawQueryString(vm.$route.query.filters)
+                    .queryTags;
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = schema;
@@ -391,14 +397,14 @@ export default {
         };
 
         const getQuery = () => {
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(fetchOptionState.queryTags);
+            const apiQuery = queryStore.apiQuery;
+            fixedQueryStore.setFilters(tableState.fixedFilters);
 
             const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...andFilters, ...tableState.fixedFilters)
-                .setFilterOr(...orFilters)
-                .setKeyword(...keywords);
+                .setFilter(...apiQuery.filter, ...fixedQueryStore.apiQuery.filter)
+                .setKeyword(...apiQuery.keyword);
 
             if (tableState.schema?.options?.fields) {
                 query.setOnly(...tableState.schema.options.fields.map((d) => {
@@ -441,8 +447,10 @@ export default {
                 }
                 if (changed.queryTags !== undefined) {
                     fetchOptionState.queryTags = changed.queryTags;
-                    // sync updated query tags to url query string
-                    replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
+                    /* api query setting */
+                    queryStore.setFiltersAsQueryTag(changed.queryTags);
+                    /* sync updated query tags to url query string */
+                    replaceQuery('filters', queryStore.rawQueryStrings);
                 }
             } else {
                 // init

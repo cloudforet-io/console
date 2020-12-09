@@ -86,14 +86,16 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
         distinct_key: distinct,
     };
 
-    return async (inputText: string, keyItem: KeyItem, subPath?: string) => {
+    return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
         const param = cloneDeep(staticParam);
         param.search = inputText;
+        if (currentDataType === 'object') {
+            // eslint-disable-next-line camelcase
+            param.options.search_type = currentDataType === 'object' ? 'key' : 'value';
+        }
         if (subPath) {
             // eslint-disable-next-line camelcase
             param.distinct_key = `${distinct}.${subPath}`;
-            // eslint-disable-next-line camelcase
-            param.options.search_type = 'key';
         }
         if (filters) {
             param.options.filter = filters;
@@ -102,13 +104,13 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
 
-            return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
+            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
 
-            // return {
-            //     results: res.results.map(d => ({ label: d.name, name: d.key })),
-            //     totalCount: res.total_count,
-            //     dataType,
-            // };
+            return {
+                results: res.results.map(d => ({ label: d.name, name: d.key })),
+                totalCount: res.total_count,
+                dataType,
+            };
         } catch (e) {
             return {
                 results: [],

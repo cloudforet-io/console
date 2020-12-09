@@ -61,7 +61,7 @@ const setSingleValueFiltersMap = (query: QueryParam, filtersMap: SingleValueFilt
     const newFilter = {
         k: query.key.name,
         v: query.value.name,
-        o: dataTypeOperators[query.key?.dataType || 'string'][query.operator],
+        o: dataTypeOperators[query.key?.dataType || 'string'][query.operator as string],
     };
 
     if (filtersMap[filterKey]) filtersMap[filterKey].push(newFilter);
@@ -76,7 +76,7 @@ const setMultiValueFiltersMap = (query: QueryParam, filtersMap: MultiValueFilter
         filtersMap[filterKey] = {
             k: query.key.name,
             v: [query.value.name],
-            o: dataTypeOperators[query.key?.dataType || 'string'][query.operator],
+            o: dataTypeOperators[query.key?.dataType || 'string'][query.operator as string],
         };
     }
 };
@@ -87,7 +87,7 @@ interface FilterSetter {
 
 
 const defaultFilterSetter = (query: QueryParam, singleFiltersMap: SingleValueFiltersMap, multiFiltersMap: MultiValueFiltersMap) => {
-    if (singleOnlyOperators.includes(query.operator)) {
+    if (singleOnlyOperators.includes(query.operator || '')) {
         setSingleValueFiltersMap(query as QueryParam, singleFiltersMap);
     } else {
         setMultiValueFiltersMap(query as QueryParam, multiFiltersMap);
@@ -104,13 +104,13 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
     datetime: (query: QueryParam, singleFiltersMap: SingleValueFiltersMap, multiFiltersMap: MultiValueFiltersMap) => {
         // datetime format case
         if (datetimeRegex.test(query.value.name as string)) {
-            if (singleOnlyOperators.includes(query.operator)) setSingleValueFiltersMap(query, singleFiltersMap);
+            if (singleOnlyOperators.includes(query.operator || '')) setSingleValueFiltersMap(query, singleFiltersMap);
             else setMultiValueFiltersMap(query, multiFiltersMap);
 
         // date format case
         } else if (dateRegex.test(query.value.name as string)) {
             const time = dayjs.tz(query.value.name as string, getTimezone()).utc();
-            if (['>', '<'].includes(query.operator)) {
+            if (['>', '<'].includes(query.operator as string)) {
                 setSingleValueFiltersMap({
                     ...query,
                     value: { ...query.value, name: time.toISOString() },
@@ -128,16 +128,7 @@ const filterSettersByDataType: Record<KeyDataType, FilterSetter> = {
             }
         }
     },
-    object: (query: QueryParam, singleFiltersMap: SingleValueFiltersMap, multiFiltersMap: MultiValueFiltersMap) => {
-        const queryParam = {
-            ...query,
-            key: {
-                ...query.key,
-                name: `${query.key.name}${query.subPath ? `.${query.subPath}` : ''}`,
-            },
-        } as QueryParam;
-        defaultFilterSetter(queryParam, singleFiltersMap, multiFiltersMap);
-    },
+    object: defaultFilterSetter,
 };
 
 
@@ -197,17 +188,8 @@ const parseTag = (text: string): QueryItem => {
     const key: string|undefined = get(parsed, 'groups.key', undefined);
 
     let keyItem: KeyItem|undefined;
-    let subPath: string|undefined;
     if (key) {
-        const slashIdx = key.search(slashRegex);
-        if (slashIdx > 0) {
-            subPath = key.slice(slashIdx + 1) || undefined;
-
-            const realKey = key.slice(0, slashIdx);
-            keyItem = { label: realKey, name: realKey };
-        } else {
-            keyItem = { label: key, name: key };
-        }
+        keyItem = { label: key, name: key };
     }
 
     let operator: OperatorType = get(parsed, 'groups.operator', '').trim() as OperatorType;
@@ -220,7 +202,6 @@ const parseTag = (text: string): QueryItem => {
         key: keyItem,
         operator,
         value: valueItem,
-        subPath,
     };
 };
 
@@ -242,8 +223,7 @@ const queryFiltersToQueryTags = (queryFilters: QueryFilters, keyItemSets: KeyIte
                 res.push({
                     key: keyMap[key] || { label: key, name: key },
                     value: { label: d as string, name: d },
-                    operator: filterKey[2] as OperatorType,
-                    subPath: filterKey[1] || undefined,
+                    operator: filterKey[1] as OperatorType,
                 });
             });
         }
@@ -257,7 +237,7 @@ const queryTagsToQueryFilters = (queryTags: QueryTag[]): QueryFilters => {
     };
     queryTags.forEach((tag) => {
         if (tag.key) {
-            const filterKey = `${tag.key.name}/${tag.subPath}/${tag.operator}`;
+            const filterKey = `${tag.key.name}/${tag.operator}`;
             if (!res[filterKey]) res[filterKey] = [];
             res[filterKey].push(tag.value.name);
         } else {

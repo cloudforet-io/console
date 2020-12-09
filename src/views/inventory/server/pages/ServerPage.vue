@@ -165,7 +165,7 @@ import {
     showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import {
-    queryStringToQueryTags, queryTagsToQueryString, replaceQuery,
+    queryTagsToQueryString, replaceQuery,
 } from '@/lib/router-query-string';
 import {
     makeQuerySearchPropsWithSearchSchema,
@@ -175,12 +175,13 @@ import config from '@/lib/config';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { store } from '@/store';
-import { makeDistinctValueHandler, makeDistinctValueHandlerMap } from '@/lib/component-utils/query-search';
+import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import { QueryStore } from '@/lib/query';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -259,6 +260,8 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryStore();
+        const query = new QueryHelper();
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -330,23 +333,13 @@ export default {
         };
 
         const getQuery = () => {
-            const { andFilters, orFilters, keywords } = getFiltersFromQueryTags(fetchOptionState.queryTags);
+            const apiQuery = queryStore.apiQuery;
 
-            const query = new QueryHelper();
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...andFilters)
-                .setFilterOr(...orFilters)
-                .setKeyword(...keywords);
+                .setFilter(...apiQuery.filter)
+                .setKeyword(...apiQuery.keyword);
 
-            query.setOnly(...flatMap(typeOptionState.keyItemSets, d => d.items).map(d => d.name), 'collection_info.collectors');
-
-            if (tableState.schema?.options?.fields) {
-                query.setOnly(...tableState.schema.options.fields.map((d) => {
-                    if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
-                    return d.key;
-                }), 'reference', 'primary_ip_address', 'collection_info.collectors');
-            }
 
             return query.data;
         };
@@ -381,8 +374,10 @@ export default {
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
-                // sync updated query tags to url query string
-                replaceQuery('filters', queryTagsToQueryString(changed.queryTags));
+                /* api query setting */
+                queryStore.setFiltersAsQueryTag(changed.queryTags);
+                /* sync updated query tags to url query string */
+                replaceQuery('filters', queryStore.rawQueryStrings);
             }
 
             await listServerData();
@@ -393,9 +388,6 @@ export default {
                 const res = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: 'inventory.Server',
                     schema: 'table',
-                    options: {
-                        include_id: true,
-                    },
                 });
 
                 // declare keyItemSets and valueHandlerMap with search schema
@@ -403,6 +395,15 @@ export default {
                     const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search, 'inventory.Server');
                     typeOptionState.keyItemSets = searchProps.keyItemSets;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
+                }
+
+
+                // set api query to get only a few specified data
+                if (tableState.schema?.options?.fields) {
+                    query.setOnly(...tableState.schema.options.fields.map((d) => {
+                        if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
+                        return d.key;
+                    }), 'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors');
                 }
 
 
@@ -436,7 +437,9 @@ export default {
 
 
                 // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryStringToQueryTags(vm.$route.query.filters, typeOptionState.keyItemSets);
+                fetchOptionState.queryTags = queryStore.setKeyItemSets(typeOptionState.keyItemSets)
+                    .setFiltersAsRawQueryString(vm.$route.query.filters)
+                    .queryTags;
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = res;

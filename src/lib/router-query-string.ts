@@ -65,10 +65,7 @@ export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
         return tags.reduce((results, tag) => {
             if (tag.invalid) return results;
             if (tag.key) {
-                let key = tag.key.name;
-                if (tag.subPath) {
-                    key = `${key}/${tag.subPath}`;
-                }
+                const key = tag.key.name;
                 results.push(`${key}:${tag.operator}${tag.value?.name}`);
             } else results.push(`${tag.value?.name}`);
             return results;

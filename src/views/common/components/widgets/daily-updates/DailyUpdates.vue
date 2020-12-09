@@ -74,7 +74,9 @@
             </div>
             <div v-if="!loading && ( data.length === 0 && alertData.length === 0) " class="h-full flex flex-col justify-center">
                 <img src="@/assets/images/illust_spaceship_2.svg" class="no-data-img">
-                <p class="no-data-text">{{$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')}}</p>
+                <p class="no-data-text">
+                    {{ $t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA') }}
+                </p>
             </div>
         </template>
     </widget-layout>
@@ -82,12 +84,14 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {find, range} from 'lodash';
+import { find, range } from 'lodash';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 
-import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, getCurrentInstance, reactive, toRefs, UnwrapRef,
+} from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
@@ -96,6 +100,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import { QueryStore } from '@/lib/query';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -173,6 +178,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state: UnwrapRef<State> = reactive({
             serverData: [],
             cloudServiceData: [],
@@ -214,23 +220,69 @@ export default {
             }
         };
 
+        const queryStore = new QueryStore();
+
         const setProjectDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
                     title: d.cloud_service_group,
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
-                    href: `/inventory/server?&filters=provider%3A%3D${d.provider}${props.projectFilter}`,
-                    createdHref: `/inventory/server?filters=provider%3A%3D${d.provider}${props.projectFilter}&${getCreatedAtFilters()}`,
-                    deletedHref: `/inventory/server?filters=provider%3A%3D${d.provider}${props.projectFilter}&${getDeletedAtFilters()}`,
+                    createdHref: {
+                        name: 'server',
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'provider', v: d.provider, o: '=' },
+                                { k: 'project_id', v: props.projectId, o: '=' },
+                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                            ]).rawQueryStrings,
+                        },
+                    },
+                    deletedHref: {
+                        name: 'server',
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'provider', v: d.provider, o: '=' },
+                                { k: 'project_id', v: props.projectId, o: '=' },
+                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                                { k: 'state', v: 'DELETED', o: '=' },
+                            ]).rawQueryStrings,
+                        },
+                    },
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
                     title: d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
-                    href: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}`,
-                    createdHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getCreatedAtFilters()}`,
-                    deletedHref: `/inventory/cloud-service/${d.provider}/${d.cloud_service_group}/${d.cloud_service_type}/?${props.projectFilter}&${getDeletedAtFilters()}`,
+                    createdHref: {
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'project_id', v: props.projectId, o: '=' },
+                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                            ]).rawQueryStrings,
+                        },
+                    },
+                    deletedHref: {
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                        query: {
+                            filters: queryStore.setFilters([
+                                { k: 'project_id', v: props.projectId, o: '=' },
+                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                                { k: 'state', v: 'DELETED', o: '=' },
+                            ]).rawQueryStrings,
+                        },
+                    },
                     ...d,
                 })),
             ];
