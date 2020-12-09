@@ -95,6 +95,7 @@ import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone, showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import router from '@/routes';
+import { QueryStore } from '@/lib/query';
 
 dayjs.extend(timezone);
 
@@ -207,11 +208,12 @@ export default {
         };
 
 
-        const listSchedule = async () => {
+        const query = new QueryHelper();
+        const queryStore = new QueryStore();
+        const listSchedule = async (init = false) => {
             state.loading = true;
             try {
-                const query = new QueryHelper()
-                    .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' })
+                query.setFilter(...queryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).apiQuery.filter)
                     .setSort('created_at');
                 const res = await SpaceConnector.client.powerScheduler.schedule.list({
                     // eslint-disable-next-line camelcase
@@ -228,7 +230,7 @@ export default {
                 state.selectedIndexes = [];
                 await setMode();
             } finally {
-                state.loading = false;
+                if (!init)state.loading = false;
             }
         };
 
@@ -301,8 +303,9 @@ export default {
 
         // init
         (async () => {
-            await listSchedule();
+            await listSchedule(true);
             await initSelectedSchedule(true);
+            state.loading = false;
         })();
 
 
@@ -326,59 +329,59 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .p-selectable-list::v-deep {
-        .item-container {
-            @apply mb-2;
-        }
-        .item-contents {
-            @apply ml-4 leading-none;
-        }
-        .item-name {
-            @apply text-sm leading-normal text-gray-900 truncate;
-        }
-        .item-time {
-            @apply text-xs text-gray-500;
-            line-height: 1.2;
-        }
-        .no-data {
-            @apply mt-6 mx-4 text-gray-200 font-normal;
-            line-height: 1.2;
-        }
+.p-selectable-list::v-deep {
+    .item-container {
+        @apply mb-2;
     }
-    .list-section {
-        @apply relative mx-1;
-        min-height: 8rem;
-        .title {
-            @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
-        }
+    .item-contents {
+        @apply ml-4 leading-none;
     }
+    .item-name {
+        @apply text-sm leading-normal text-gray-900 truncate;
+    }
+    .item-time {
+        @apply text-xs text-gray-500;
+        line-height: 1.2;
+    }
+    .no-data {
+        @apply mt-6 mx-4 text-gray-200 font-normal;
+        line-height: 1.2;
+    }
+}
+.list-section {
+    @apply relative mx-1;
+    min-height: 8rem;
+    .title {
+        @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
+    }
+}
 
-    .detail-container {
-        @apply relative w-full h-full;
-    }
-    .loading-backdrop {
-        @apply absolute w-full h-full overflow-hidden;
-        background-color: white;
-        opacity: 0.5;
-        top: 0;
-        z-index: 1;
-    }
-    .loading {
-        @apply absolute flex w-full h-full justify-center items-center;
-        top: 0;
-        max-height: 16.875rem;
-    }
-    .fade-in-enter-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-leave-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-enter, .fade-in-leave-to {
-        opacity: 0;
-    }
-    .fade-in-leave, .fade-in-enter-to {
-        opacity: 0.5;
-    }
+.detail-container {
+    @apply relative w-full h-full;
+}
+.loading-backdrop {
+    @apply absolute w-full h-full overflow-hidden;
+    background-color: white;
+    opacity: 0.5;
+    top: 0;
+    z-index: 1;
+}
+.loading {
+    @apply absolute flex w-full h-full justify-center items-center;
+    top: 0;
+    max-height: 16.875rem;
+}
+.fade-in-enter-active {
+    transition: opacity 0.2s;
+}
+.fade-in-leave-active {
+    transition: opacity 0.2s;
+}
+.fade-in-enter, .fade-in-leave-to {
+    opacity: 0;
+}
+.fade-in-leave, .fade-in-enter-to {
+    opacity: 0.5;
+}
 
 </style>
