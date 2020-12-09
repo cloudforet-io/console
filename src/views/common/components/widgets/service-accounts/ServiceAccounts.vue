@@ -254,6 +254,7 @@ export default {
 }
 
 .p-data-table::v-deep {
+    border-radius: 0.125rem;
     margin-top: 1rem;
     overflow-x: hidden;
     .default th {

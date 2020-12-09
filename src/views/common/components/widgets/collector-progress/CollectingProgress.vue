@@ -189,6 +189,7 @@ export default {
     border-radius: 0.375rem;
 }
 .p-data-table::v-deep {
+    border-radius: 0.125rem;
     .default th {
         @apply bg-gray-100 text-gray-400;
         height: 1.5rem;

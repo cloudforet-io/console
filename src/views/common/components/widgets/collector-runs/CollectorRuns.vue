@@ -190,6 +190,7 @@ export default {
     display: inline-flex;
 }
 .p-data-table::v-deep {
+    border-radius: 0.125rem;
     overflow-y: auto;
     td:first-child {
         @apply cursor-pointer;
