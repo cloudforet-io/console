@@ -34,36 +34,36 @@
                     <div class="font-bold"
                          :style="{'padding-left': '1.04rem','vertical-align': 'middle'}"
                     >
-                        <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}`">
-                            <span class="color" :style="{color: data[index].provider_color}" />
-                            {{ item.provider || 0 }}
+                        <router-link :to="item.provider.href">
+                            <span class="color" :style="{color: data[index].provider.providerColor}" />
+                            {{ item.provider.label || 0 }}
                         </router-link>
                     </div>
                 </template>
                 <template #col-service_account_name="{index, field, item}">
-                    <td v-tooltip.bottom="{content: item.service_account_name, delay: {show: 500}}">
-                        <router-link :to="`/identity/service-account?p=1&ps=15&provider=${item.provider}&filters=${item.service_account_name}`">
-                            {{ item.service_account_name || 0 }}
+                    <td v-tooltip.bottom="{content: item.serviceAccount.label, delay: {show: 500}}">
+                        <router-link :to="item.serviceAccount.href">
+                            {{ item.serviceAccount.label || 0 }}
                         </router-link>
                     </td>
                 </template>
                 <template #col-server_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.servers}">
-                        <router-link :to="`/inventory/server?p=1&ps=15&filters=collection_info.service_accounts%3A%3D${item.service_account_id}&filters=project_id%3A%3D${item.project_id}`">
-                            {{ item.server_count || 0 }}
+                        <router-link :to="item.server.href">
+                            {{ item.server.count || 0 }}
                         </router-link>
                     </div>
                 </template>
                 <template #col-cloud_service_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.cloud_services}">
-                        <router-link :to="`/inventory/cloud-service?provider=all&filters=collection_info.service_accounts%3A%3D${item.service_account_id}&filters=project_id%3A%3D${item.project_id}`">
-                            {{ item.cloud_service_count || 0 }}
+                        <router-link :to="item.cloudService.href">
+                            {{ item.cloudService.count|| 0 }}
                         </router-link>
                     </div>
                 </template>
                 <template #col-secret_count-format="{index, field, item}">
                     <div class="text-center font-bold" :style="{color: colors.credentials}">
-                        {{ item.secret_count || 0 }}
+                        {{ item.secret.count || 0 }}
                     </div>
                 </template>
             </p-data-table>
@@ -82,6 +82,10 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import { gray, secondary, secondary1 } from '@/styles/colors';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { QueryStore } from '@/lib/query';
+import { Location } from 'vue-router';
+import { QueryStoreFilter } from '@/lib/query/type';
 
 export default {
     name: 'ServiceAccountsTable',
@@ -92,6 +96,7 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectId = computed<string>(() => context.root.$route.params.id as string);
+        const queryStore = new QueryStore();
 
             interface DataType {
                 provider: string;
@@ -122,6 +127,41 @@ export default {
                 providers: computed(() => store.state.resource.provider.items),
             });
 
+            const getLink = (type, provider, serviceAccountId) => {
+                let link: Location = {};
+                const filters: QueryStoreFilter[] = [];
+                if (type === 'provider') {
+                    link = {
+                        name: 'serviceAccount',
+                        query: {
+                            provider,
+                        },
+                    };
+                }
+                if (type === 'cloudService') {
+                    filters.push({ k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
+                        { k: 'project_id', v: projectId.value, o: '=' });
+                    link = {
+                        name: 'cloudServiceMain',
+                        query: {
+                            provider: 'all',
+                            filters: queryStore.setFilters(filters).rawQueryStrings,
+                        },
+                    };
+                }
+                if (type === 'server') {
+                    filters.push({ k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
+                        { k: 'project_id', v: projectId.value, o: '=' });
+                    link = {
+                        name: 'server',
+                        query: {
+                            filters: queryStore.setFilters(filters).rawQueryStrings,
+                        },
+                    };
+                }
+                return link;
+            };
+
             const getData = async () => {
                 state.loading = true;
                 state.data = [];
@@ -131,14 +171,27 @@ export default {
                         project_id: projectId.value,
                     });
                     state.data = res.results.map(item => ({
-                        provider: item.provider,
-                        provider_color: state.providers[item.provider].color,
-                        service_account_name: item.service_account_name,
-                        service_account_id: item.service_account_id,
-                        cloud_service_count: item.cloud_service_count || 0,
-                        server_count: item.server_count || 0,
-                        secret_count: item.secret_count || 0,
-                        project_id: projectId.value,
+                        provider: {
+                            label: item.provider,
+                            providerColor: state.providers[item.provider].color,
+                            href: getLink('provider', item.provider, item.service_account_id),
+                        },
+                        serviceAccount: {
+                            label: item.service_account_name,
+                            id: item.service_account_id,
+                            href: referenceRouter(item.service_account_id, { resource_type: 'identity.ServiceAccount' }),
+                        },
+                        cloudService: {
+                            count: item.cloud_service_count || 0,
+                            href: getLink('cloudService', '', item.service_account_id),
+                        },
+                        server: {
+                            count: item.server_count || 0,
+                            href: getLink('server', '', item.service_account_id),
+                        },
+                        secret: {
+                            count: item.secret_count || 0,
+                        },
                     }));
                 } catch (e) {
                     console.error(e);
