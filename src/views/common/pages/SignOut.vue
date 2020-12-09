@@ -33,19 +33,10 @@ export const googleOauthSignOut = (auth2): Promise<void> => new Promise(((resolv
         reject(new Error('google oauth sign out error'));
     });
 }));
-const getAuthSystem = async () => {
-    let authSystem;
-    if (store.state.user.userType === 'DOMAIN_OWNER') authSystem = 'ID_PW';
-    else authSystem = store.state.domain.authSystem;
-    return authSystem;
-};
+
 export default {
     name: 'SignOut',
     props: {
-        authSystem: {
-            type: String,
-            default: undefined,
-        },
         isAdmin: {
             type: Boolean,
             default: false,
@@ -54,7 +45,7 @@ export default {
     beforeRouteEnter(to, from, next) {
         (async () => {
             // sign out
-            const authSystem = await getAuthSystem();
+            const authType = store.state.domain.extendedAuthType;
             try {
                 await router.app.$store.dispatch('user/signOut');
             } catch (e) {
@@ -62,7 +53,7 @@ export default {
                 next({ name: 'error' });
             }
             // google oauth disconnect
-            if (authSystem === 'GOOGLE_OAUTH2') {
+            if (authType !== undefined && authType === 'GOOGLE_OAUTH2') {
                 try {
                     const auth2 = await getAuth2(router.app.$store.state.domain.authOptions.client_id);
                     await googleOauthSignOut(auth2);

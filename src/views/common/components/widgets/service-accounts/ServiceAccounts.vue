@@ -35,7 +35,7 @@
             >
                 <template #col-provider-format="{ index, field, item }">
                     <router-link :to="`/identity/service-account?provider=${item.provider}`">
-                        <span :style="{color: data[index].color}">{{ item.providerLabel }}</span>
+                        <span :style="{color: data[index].color}" class="provider-label">{{ item.providerLabel }}</span>
                     </router-link>
                 </template>
             </p-data-table>
@@ -245,10 +245,7 @@ export default {
     height: 11.25rem;
     width: 100%;
 }
-.count {
-    font-size: 0.875rem;
-    font-weight: bold;
-}
+
 .legends {
     @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
 }
@@ -267,6 +264,11 @@ export default {
     }
     td {
         height: 2rem;
+    }
+}
+.provider-label {
+    &:hover {
+        text-decoration: underline;
     }
 }
 </style>

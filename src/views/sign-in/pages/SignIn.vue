@@ -42,7 +42,7 @@
                          @click="hideErrorMessage"
                     />
                 </div>
-                <i-d-p-w-sign-in />
+                <i-d-p-w-sign-in @on-sign-in="signIn" />
                 <div class="btn-divider">
                     <span>{{$t('COMMON.SIGN_IN.OR')}}</span>
                 </div>
@@ -64,15 +64,19 @@
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
+import { store } from '@/store';
+
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { setGtagUserID } from '@/lib/gtag';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
-import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
+import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
+
+import { setGtagUserID } from '@/lib/gtag';
+import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
+
 
 export default {
     name: 'SignIn',
@@ -109,10 +113,10 @@ export default {
 
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
-            authSystem: computed(() => vm.$store.getters['domain/getAuthSystem']),
+            authType: computed(() => store.state.domain.extendedAuthType),
             component: computed(() => {
                 let component;
-                const auth = state.authSystem;
+                const auth = state.authType;
                 try {
                     component = () => import(`../templates/${auth}.vue`);
                 } catch (e) {
@@ -126,13 +130,13 @@ export default {
         const signIn = async (credentials) => {
             state.showErrorMessage = false;
             try {
-                await vm.$store.dispatch('user/signIn', {
-                    domain_id: vm.$store.state.domain.domainId,
+                await store.dispatch('user/signIn', {
+                    domain_id: store.state.domain.domainId,
                     credentials,
                 });
                 await vm.$router.push(props.nextPath);
             } catch (e) {
-                const auth2 = await getAuth2(vm.$store.state.domain.authOptions.client_id);
+                const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
                 await googleOauthSignOut(auth2);
                 console.error(e);
                 state.showErrorMessage = true;
@@ -145,7 +149,6 @@ export default {
         const goToAdminSignIn = () => {
             vm.$router.replace({ name: 'AdminSignIn' });
         };
-
         return {
             ...toRefs(state),
             signIn,

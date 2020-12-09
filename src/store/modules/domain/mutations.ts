@@ -6,4 +6,5 @@ export const setDomain = (state: DomainState, domainInfo: DomainState): void => 
     state.authType = domainInfo.authType;
     state.authSystem = domainInfo.authSystem;
     state.authOptions = domainInfo.authOptions;
+    state.extendedAuthType = domainInfo.extendedAuthType;
 };

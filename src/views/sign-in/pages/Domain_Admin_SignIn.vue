@@ -31,11 +31,11 @@
                     {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
                 </p>
                 <p class="sign-in-subtitle">
-                    {{$t('COMMON.SIGN_IN.FOR_DOMAIN_ADMIN')}}
+                    {{ $t('COMMON.SIGN_IN.FOR_DOMAIN_ADMIN') }}
                 </p>
                 <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
                 <div v-if="showErrorMessage" class="error-msg-box">
-                    <span class="error-msg">{{$t('COMMON.SIGN_IN.ALT_E_SIGN_IN')}}</span>
+                    <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
                          class="cursor-pointer"
                          color="transparent inherit"
@@ -62,16 +62,22 @@
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { setGtagUserID } from '@/lib/gtag';
+import { TranslateResult } from 'vue-i18n';
+import { store } from '@/store';
+
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
-import { TranslateResult } from 'vue-i18n';
 import PI from '@/components/atoms/icons/PI.vue';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
+
+import { setGtagUserID } from '@/lib/gtag';
+
 
 export default {
     name: 'DomainAdminSignIn',
     components: {
+        PAnchor,
         IDPWSignIn,
         PI,
         PBadge,
@@ -101,7 +107,7 @@ export default {
 
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
-            authSystem: computed(() => vm.$store.getters['domain/getAuthSystem']),
+            authType: computed(() => store.state.domain.extendedAuthType),
             version: process.env.VUE_APP_VERSION,
             showErrorMessage: false,
             userId: '' as string | undefined,
