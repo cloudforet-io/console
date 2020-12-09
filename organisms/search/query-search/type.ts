@@ -22,9 +22,8 @@ export interface KeyItem {
 
 export interface QueryItem {
     key?: KeyItem;
-    operator: OperatorType;
+    operator?: OperatorType;
     value: ValueItem;
-    subPath?: string;
 }
 
 export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
@@ -43,7 +42,9 @@ export interface HandlerResponse {
     dataType?: KeyDataType;
     operators?: OperatorType[];
 }
-export type ValueHandler = (inputText: string, keyItem: KeyItem, subPath?: string, operator?: string) => Promise<HandlerResponse>|HandlerResponse;
+export type ValueHandler = (inputText: string, rootKey: KeyItem,
+                            dataType?: KeyDataType, subPath?: string,
+                            operator?: OperatorType) => Promise<HandlerResponse>|HandlerResponse;
 
 
 export interface ValueHandlerMap {

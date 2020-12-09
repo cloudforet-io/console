@@ -62,7 +62,7 @@ const datetimeItems: ValueItem[] = [
 ];
 
 export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
-    boolean: (inputText: string, keyItem) => {
+    boolean: (inputText: string) => {
         const regex = RegExp(inputText || '', 'i');
         return {
             results: booleanItems.reduce((res, d) => {
@@ -71,7 +71,7 @@ export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
             }, [] as ValueItem[]),
         };
     },
-    datetime: (inputText: string, keyItem) => {
+    datetime: (inputText: string) => {
         const regex = RegExp(inputText || '', 'i');
         return {
             results: datetimeItems.filter(d => regex.test(d.name)) as ValueItem[],
@@ -84,12 +84,23 @@ export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
 /** QueryItem Formatter Map  */
 const datetimeFormatRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
 
-export const formatterMap: Partial<Record<KeyDataType, (queryItem: QueryItem) => QueryItem>> = {
-    datetime: (queryItem) => {
-        const res = datetimeFormatRegex.test(queryItem.value.name);
+export const formatterMap: Partial<Record<KeyDataType, (queryItem: QueryItem, currentDataType?: KeyDataType, subPath?: string) => QueryItem>> = {
+    datetime(queryItem) {
+        if (queryItem.value.name === null) return queryItem;
+        const res = datetimeFormatRegex.exec(queryItem.value.name);
         if (res) {
             queryItem.value.label = res[0];
             queryItem.value.name = res[0];
+        }
+        return queryItem;
+    },
+    object(queryItem, currentDataType, subPath) {
+        if (queryItem.key) {
+            queryItem.key.dataType = currentDataType;
+            if (subPath) {
+                queryItem.key.name = `${queryItem.key.name}.${subPath}`;
+                queryItem.key.label = queryItem.key.name;
+            }
         }
         return queryItem;
     },

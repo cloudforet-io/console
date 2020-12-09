@@ -149,7 +149,7 @@ export default {
             return idxs;
         });
         const focus = (position) => {
-            const idx = itemsIndex.value[position || 0];
+            const idx = position === -1 ? itemsIndex.value[itemsIndex.value.length - 1] : itemsIndex.value[position || 0];
             const el = document.getElementById(`context-item-${idx}-${uuid}`);
             if (el) {
                 el.focus();

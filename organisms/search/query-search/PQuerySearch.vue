@@ -23,9 +23,6 @@
                        :step="currentDataType === 'integer' ? 1 : undefined"
                        :min="currentDataType === 'integer' ? 0 : undefined"
                        @input="onInput"
-                       @keydown.esc="leaveSearch"
-                       @keydown.down="focusMenu"
-                       @keydown.delete="onDelete"
                        @keyup.enter="onEnter"
                        @keydown="onKeydownCheck"
                        @click.stop="showMenu(true)"
@@ -108,14 +105,14 @@ import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 import {
     findKey,
     getRootKeyItemHandler, getKeyMenuForm,
-    getValueItem, getValueMenuForm,
+    getValueMenuForm,
 } from '@/components/organisms/search/query-search/helper';
 
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-
+const ROOT_KEY_SETTER = ':';
 export default {
     name: 'PQuerySearch',
     components: {
@@ -172,9 +169,9 @@ export default {
             rootKey: computed<KeyItem|null>(() => state.selectedKeys[0] || null),
             operator: '' as OperatorType,
             supportOperators: computed<OperatorType[]>(() => {
-                if (supportOperatorMap[state.currentDataType]) return supportOperatorMap[state.currentDataType];
                 if (state.handlerResp.operators) return state.handlerResp.operators;
-                if (state.rootKey?.operators) return state.rootKey.operators;
+                if (state.currentDataType === 'object' && state.rootKey?.operators) return state.rootKey.operators;
+                if (supportOperatorMap[state.currentDataType]) return supportOperatorMap[state.currentDataType];
                 return operators;
             }),
 
@@ -215,14 +212,14 @@ export default {
         };
 
         let offMenuFocusWatch: WatchStopHandle|undefined;
-        const focusMenu = async () => {
+        const focusMenu = async (idx = 0) => {
             if (!state.visibleMenu) await showMenu(true);
-            if (state.menuRef) state.menuRef.focus();
+            if (state.menuRef) state.menuRef.focus(idx);
             else {
                 if (offMenuFocusWatch) offMenuFocusWatch();
                 offMenuFocusWatch = watch(() => state.menuRef, (menuRef) => {
                     if (menuRef) {
-                        menuRef.focus();
+                        menuRef.focus(idx);
                         if (offMenuFocusWatch) offMenuFocusWatch();
                     }
                 });
@@ -264,13 +261,16 @@ export default {
             else if (state.lazyLoading !== state.loading) updateLoader();
         };
 
-
         const updateMenuItems = throttle(async (inputText: string): Promise<void> => {
             let res: HandlerResponse = { results: [] };
             updateLoading(true);
 
             if (state.handler) {
-                const func = state.handler(inputText, state.selectedKey as KeyItem, state.subPath, state.operator);
+                const func = state.handler(inputText,
+                    state.rootKey as KeyItem,
+                    state.currentDataType,
+                    state.subPath,
+                    state.operator);
                 if (func instanceof Promise) {
                     res = await func;
                 } else {
@@ -284,10 +284,27 @@ export default {
         }, 150);
 
 
-        const findAndSetKey = async (val: string) => {
+        const updateOperator = (operator?: OperatorType) => {
+            if (operator === undefined) {
+                if (state.operator.length === 2) state.operator = state.operator.substring(0, 1) as OperatorType;
+                else state.operator = '';
+            } else {
+                state.operator = operator;
+            }
+        };
+
+
+        const findAndSetKey = async (val: string, isRootKey = true) => {
             let item = findKey(val, state.handlerResp.results) || null;
-            if (!item && state.currentDataType === 'object') item = { label: val, name: val };
-            if (item) {
+            if (isRootKey) {
+                if (item) {
+                    clearAll();
+                    focus();
+                    updateSelectedKey(item, true);
+                    await updateMenuItems(state.searchText);
+                }
+            } else {
+                if (!item) item = { label: val, name: val };
                 clearAll();
                 focus();
                 updateSelectedKey(item);
@@ -295,26 +312,16 @@ export default {
             }
         };
 
-
-        const removeOperator = () => {
-            if (state.operator.length === 2) state.operator = state.operator.substring(0, 1) as OperatorType;
-            else state.operator = '';
-        };
-
         /* Event triggers */
-        const emitSearch = (val?: ValueItem|string|null) => {
-            const valueItem = getValueItem(val, state.selectedKey);
-            if (!valueItem) return;
-
+        const emitSearch = (valueItem: ValueItem) => {
             let queryItem = {
                 key: state.rootKey,
                 value: valueItem,
                 operator: state.operator,
-                subPath: state.subPath,
             } as QueryItem;
 
-            if (formatterMap[state.currentDataType]) {
-                queryItem = formatterMap[state.currentDataType](cloneDeep(queryItem));
+            if (formatterMap[state.rootKey?.dataType]) {
+                queryItem = formatterMap[state.rootKey.dataType](cloneDeep(queryItem), state.currentDataType, state.subPath);
             }
 
             emit('search', queryItem);
@@ -327,38 +334,68 @@ export default {
 
         /* Event handlers */
         const onInput = async (e) => {
-            const val = e.target.value || '';
+            const val = e.target.value === null || e.target.value === undefined ? '' : e.target.value;
             state.searchText = val;
 
             if (!state.visibleMenu) await showMenu();
 
-            if (val.length > 1 && e.data === ':' && (!state.selectedKey || state.currentDataType === 'object')) await findAndSetKey(val.slice(0, val.length - 1));
+            if (val.length > 1 && e.data === ROOT_KEY_SETTER && !state.rootKey) await findAndSetKey(val.slice(0, val.length - 1));
             else await updateMenuItems(val);
         };
 
         const onDelete = async (e) => {
             if (e.target.value) return;
 
-            if (state.operator) removeOperator();
-            else if (state.selectedKey) {
+            if (state.operator) {
+                updateOperator();
+                await updateMenuItems(state.searchText);
+            } else if (state.selectedKey) {
                 updateSelectedKey(null);
                 await updateMenuItems('');
             }
         };
 
-        const onEnter = () => {
-            if (state.currentDataType !== 'object') emitSearch(state.searchText);
+        const onEnter = async () => {
+            if (state.currentDataType === 'object') {
+                if (state.searchText) await findAndSetKey(state.searchText, false);
+            } else if (state.rootKey) {
+                if (state.searchText === '') emitSearch({ label: 'Null', name: null });
+                else emitSearch({ label: state.searchText, name: state.searchText });
+            } else if (state.searchText) emitSearch({ label: state.searchText, name: state.searchText });
         };
 
-        const onKeydownCheck = (e: KeyboardEvent) => {
-            if (state.searchText.length > 0 || !state.selectedKey) return;
+        const onKeydownCheck = async (e: KeyboardEvent) => {
+            if (e.key === 'Backspace') {
+                await onDelete(e);
+                return;
+            }
+            if (e.key === 'ArrowDown' || e.key === 'Down') {
+                await focusMenu();
+                return;
+            }
+            if (e.key === 'ArrowUp' || e.key === 'Up') {
+                await focusMenu(-1);
+                return;
+            }
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                leaveSearch();
+                return;
+            }
+
+            if (!state.selectedKey) return;
 
             /* check operator */
-            const op = state.operator + e.key;
-            if (state.supportOperators.some(d => d.startsWith(op))) {
-                state.operator += e.key;
-                e.preventDefault();
-            } else if (!state.supportOperators.includes(state.operator)) state.operator = '';
+            if (state.searchText.length === 0) {
+                const op = state.operator + e.key;
+                if (state.supportOperators.some(d => d.startsWith(op))) {
+                    e.preventDefault();
+                    updateOperator(op as OperatorType);
+                    await updateMenuItems(state.searchText);
+                } else if (!state.supportOperators.includes(state.operator)) {
+                    updateOperator('');
+                    if (state.operator !== '') await updateMenuItems(state.searchText);
+                }
+            }
 
             /* value validation */
             if (inputValidatorMap[state.currentDataType]) {
@@ -384,7 +421,7 @@ export default {
                 await showMenu(true);
             } else if (state.menuType === 'OPERATOR') {
                 if (state.supportOperators.includes(value)) {
-                    state.operator = value;
+                    updateOperator(value as OperatorType);
                     focus();
                     hideMenu();
                 }
@@ -436,12 +473,9 @@ export default {
             blur,
             showMenu,
             hideMenu,
-            focusMenu,
-            leaveSearch,
             updateMenuItems,
             emitSearch,
             onInput,
-            onDelete,
             onEnter,
             onKeydownCheck,
             onDeleteAll,

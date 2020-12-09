@@ -25,8 +25,7 @@
                 />
                 <span v-if="tag.key">
                     <span class="key-label">
-                        [{{ tag.key.label || tag.key.name }}]
-                        <template v-if="tag.subPath">{{ tag.subPath }}</template>
+                        {{ tag.key.label || tag.key.name }}
                     </span>
                     :{{ tag.operator }}
                     <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
@@ -50,7 +49,7 @@ import {
     QueryTag,
 } from '@/components/organisms/search/query-search-tags/type';
 import {
-    computed, ref,
+    computed, ref, watch,
 } from '@vue/composition-api';
 import { QueryItem } from '@/components/organisms/search/query-search/type';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -123,6 +122,10 @@ export default {
             tags: _tags.value,
             timezone: timezone.value,
         } as QuerySearchTagsProps);
+
+        watch(() => props.tags, (tags) => {
+            _tags.value = getConvertedQueryTags(tags, []);
+        });
 
         return {
             _tags,
