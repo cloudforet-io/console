@@ -222,7 +222,7 @@ export default {
             listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize);
 
-            if (text) listQuery.setApiFilter({ k: 'name', v: props.searchText, o: 'contain' });
+            if (text) listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
 
             const params: any = { include_provider: true, query: listQuery.data };
             if (id) params.project_group_id = id;

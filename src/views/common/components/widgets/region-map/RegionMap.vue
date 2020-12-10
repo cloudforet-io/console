@@ -97,7 +97,7 @@ export default {
             maxValue: 0,
         });
 
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper();
         /* Create map instance */
 
         const apiQuery = new ApiQueryHelper();
@@ -106,8 +106,10 @@ export default {
             state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    query: apiQuery.setApiFilter({ k: 'region_code', v: regionCode, o: 'eq' }, { k: 'provider', v: state.selectedProvider, o: 'eq' })
-                        .setPageLimit(10)
+                    query: apiQuery.setFilters([
+                        { k: 'region_code', v: regionCode, o: '=' },
+                        { k: 'provider', v: state.selectedProvider, o: '=' },
+                    ]).setPageLimit(10)
                         .setSort('count', true, 'name')
                         .data,
                     // eslint-disable-next-line camelcase
@@ -232,7 +234,7 @@ export default {
                 res = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'region_code', v: state.selectedRegionCode, o: '=' },
                             { k: 'provider', v: item.provider, o: '=' },
                             { k: 'cloud_service_type', v: item.cloud_service_type, o: '=' },
@@ -248,7 +250,7 @@ export default {
                         name: item.cloud_service_type,
                     },
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'region_code', v: state.selectedRegionCode, o: '=' },
                         ]).rawQueryStrings,
                     },

@@ -13,6 +13,7 @@ import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap,
 } from '@/lib/query/config';
+import { store as vuexStore } from '@/store';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -55,11 +56,11 @@ export class QueryHelper {
 
     private _filters: QueryStoreFilter[] = [];
 
-    private _timezone: ComputedRef<string>;
+    private _timezone: ComputedRef<string>|undefined;
 
-    constructor(timezone: ComputedRef<string> = computed(() => 'UTC')) {
-        this._timezone = timezone;
-    }
+    // constructor(store: typeof vuexStore = vuexStore) {
+    //     this._timezone = computed(() => store.state.user.timezone);
+    // }
 
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
@@ -163,7 +164,7 @@ export class QueryHelper {
             if (f.k) {
                 if (typeof f.v === 'string' && datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                     /* datetime case */
-                    const time = dayjs.tz(f.v, this._timezone.value).utc();
+                    const time = dayjs.tz(f.v, this._timezone?.value || 'UTC').utc();
 
                     if (f.o === '>t' || f.o === '>=t') {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });

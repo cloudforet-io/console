@@ -273,7 +273,7 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -360,6 +360,8 @@ export default {
             typeOptionState.selectIndex = selectIndex;
         };
 
+
+        const schemaQueryHelper = new QueryHelper();
         const getTableSchema = async () => {
             try {
                 const schema = await SpaceConnector.client.addOns.pageSchema.get({
@@ -372,17 +374,17 @@ export default {
                     },
                 });
 
+                schemaQueryHelper.setFilters(tableState.fixedFilters);
+
                 // declare keyItemSets and valueHandlerMap with search schema
                 if (schema?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService', tableState.fixedFilters);
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService', schemaQueryHelper.apiQuery.filter);
                     typeOptionState.keyItemSets = searchProps.keyItemSets;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
                 }
 
                 // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryStore.setKeyItemSets(typeOptionState.keyItemSets)
-                    .setFiltersAsRawQueryString(vm.$route.query.filters)
-                    .queryTags;
+                fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = schema;
@@ -392,15 +394,11 @@ export default {
         };
 
         const apiQuery = new ApiQueryHelper();
-        const fixedQueryStore = new QueryHelper();
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
-            fixedQueryStore.setFilters(tableState.fixedFilters);
-
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setApiFilter(...filter, ...fixedQueryStore.apiQuery.filter)
-                .setKeyword(keyword);
+                .setFilters(queryHelper.filters)
+                .addFilter(...tableState.fixedFilters);
 
             if (tableState.schema?.options?.fields) {
                 apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
@@ -444,9 +442,9 @@ export default {
                 if (changed.queryTags !== undefined) {
                     fetchOptionState.queryTags = changed.queryTags;
                     /* api query setting */
-                    queryStore.setFiltersAsQueryTag(changed.queryTags);
+                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
                     /* sync updated query tags to url query string */
-                    replaceUrlQuery('filters', queryStore.rawQueryStrings);
+                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             } else {
                 // init

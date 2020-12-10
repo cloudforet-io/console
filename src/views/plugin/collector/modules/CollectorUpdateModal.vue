@@ -181,9 +181,9 @@ export default {
             }
         };
 
-        const apiQuery = new ApiQueryHelper()
+        const apiQuery = new ApiQueryHelper();
         const getNames = async () => {
-            apiQuery.setApiFilter({ k: 'name', o: 'not', v: formState.inputModel.name });
+            apiQuery.setFilters([{ k: 'name', o: '!=', v: formState.inputModel.name }]);
             const res = await SpaceConnector.client.inventory.collector.list({ query: apiQuery.data });
             state.collectorNames = res.results.map(v => v.name);
         };

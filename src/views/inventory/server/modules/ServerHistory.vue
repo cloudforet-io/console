@@ -72,8 +72,7 @@ export default {
                 .setPage(
                     getPageStart(state.options.thisPage, state.options.pageSize),
                     state.options.pageSize,
-                )
-                .setKeyword(state.options.searchText)
+                ).setFilters([{ v: state.options.searchText }])
                 .data,
         });
 

@@ -47,7 +47,6 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { find } from 'lodash';
-import { QueryHelper } from '@/lib/query';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -157,17 +156,14 @@ export default {
         };
 
         const apiQuery = new ApiQueryHelper();
-        const queryStore = new QueryHelper();
         const getQuery = (): any => {
             const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
             if (options.sortBy !== undefined) apiQuery.setSort(options.sortBy, options.sortDesc);
             if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
             if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
-            if (options.searchText !== undefined) apiQuery.setKeyword(options.searchText);
+            if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
             if (options.queryTags !== undefined) {
-                const { filter, keyword } = queryStore.setFiltersAsQueryTag(options.queryTags).apiQuery;
-                apiQuery.setApiFilter(...filter)
-                    .setKeyword(keyword);
+                apiQuery.setFiltersAsQueryTag(options.queryTags);
             }
 
             return apiQuery.data;

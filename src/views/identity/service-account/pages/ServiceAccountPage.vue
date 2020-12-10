@@ -312,7 +312,7 @@ export default {
 
         /** Handling API with SpaceConnector * */
 
-        const apiQuery = new ApiQueryHelper(computed(() => vm.$store.state.user.timezone));
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
@@ -320,8 +320,6 @@ export default {
                     { k: 'provider', v: [selectedProvider.value], o: '=' },
                     { v: fetchOptionState.searchText },
                 );
-            // .setApiFilter({ k: 'provider', v: [selectedProvider.value], o: 'in' })
-            // .setKeyword(fetchOptionState.searchText);
             return apiQuery.data;
         };
 

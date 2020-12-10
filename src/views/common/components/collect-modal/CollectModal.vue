@@ -158,7 +158,7 @@ export default {
             state.loading = true;
 
             try {
-                apiQuery.setApiFilter({ k: 'collector_id', v: state.mergedCollectorIds, o: 'in' });
+                apiQuery.setFilters([{ k: 'collector_id', v: state.mergedCollectorIds, o: '=' }]);
                 const res = await SpaceConnector.client.inventory.collector.list({ query: apiQuery.data });
                 state.collectors = res.results;
             } catch (e) {

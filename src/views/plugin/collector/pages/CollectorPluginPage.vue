@@ -211,21 +211,21 @@ export default {
         });
 
 
-        const pluginApiQuery = new ApiQueryHelper()
+        const pluginApiQuery = new ApiQueryHelper();
         const getPlugins = async () => {
             state.loading = true;
             try {
                 pluginApiQuery.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                     .setSort(state.sortBy, state.sortBy !== 'name')
-                    .setKeyword(state.keyword);
+                    .setFilters([{ v: state.keyword }]);
 
 
                 if (state.resourceTypeSearchTags.length) {
-                    pluginApiQuery.setApiFilter({
+                    pluginApiQuery.setFilters([{
                         k: 'labels',
                         v: state.resourceTypeSearchTags,
-                        o: 'in',
-                    });
+                        o: '=',
+                    }]);
                 }
                 const params = {
                     service_type: 'inventory.Collector',
@@ -248,7 +248,7 @@ export default {
         };
 
 
-        const repoApiQuery = new ApiQueryHelper()
+        const repoApiQuery = new ApiQueryHelper();
         const getRepositories = async () => {
             try {
                 repoApiQuery.setSort('repository_type', true);

@@ -158,7 +158,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper();
 
         const chartState = reactive({
             loading: true,
@@ -277,7 +277,7 @@ export default {
             return referenceRouter(
                 state.trustedAdvisorId,
                 { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryStore.setFilters(filters).rawQueryStrings },
+                { filters: queryHelper.setFilters(filters).rawQueryStrings },
             );
         };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
@@ -293,7 +293,7 @@ export default {
             return referenceRouter(
                 state.trustedAdvisorId,
                 { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryStore.setFilters(filters).rawQueryStrings },
+                { filters: queryHelper.setFilters(filters).rawQueryStrings },
             );
         };
 

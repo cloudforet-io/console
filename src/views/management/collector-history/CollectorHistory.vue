@@ -215,7 +215,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -285,7 +285,7 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             querySearchRef: null as null|QuerySearchTableFunctions,
             modalVisible: false,
         });
@@ -330,8 +330,11 @@ export default {
         };
 
         const apiQuery = new ApiQueryHelper();
-        const apiQueryStore = new QueryHelper();
         const getQuery = () => {
+            apiQuery.setSort(state.sortBy, state.sortDesc)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFilters(queryHelper.filters);
+
             let statusValues: JOB_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
                 statusValues = [JOB_STATUS.progress];
@@ -341,17 +344,10 @@ export default {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
-            const filters = queryStore.filters;
             statusValues.forEach((d) => {
-                filters.push({ k: 'status', v: d, o: '=' });
+                apiQuery.addFilter({ k: 'status', v: d, o: '=' });
             });
 
-            const { filter, keyword } = apiQueryStore.setFilters(filters).apiQuery;
-
-            apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword)
-                .setApiFilter(...filter);
             return apiQuery.data;
         };
 
@@ -376,8 +372,8 @@ export default {
         };
         const onChange = async (item) => {
             state.tags = item.queryTags;
-            queryStore.setFiltersAsQueryTag(item.queryTags);
-            replaceUrlQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(item.queryTags);
+            replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             try {
                 await getJobs();
             } catch (e) {

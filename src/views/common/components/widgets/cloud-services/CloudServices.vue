@@ -123,7 +123,6 @@ export default {
             href: [string, object];
         }
 
-        const queryStore = new QueryHelper();
         const state = reactive({
             loading: true,
             skeletons: range(8),
@@ -137,13 +136,15 @@ export default {
             }>,
         });
 
+        const queryHelper = new QueryHelper();
+
         const getLink = (data, projectId?) => {
             let link;
             if (data.resource_type === 'inventory.Server' && !projectId) {
                 link = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'provider', v: data.provider, o: '=' },
                             { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
                         ]).rawQueryStrings,
@@ -154,7 +155,7 @@ export default {
                 link = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'project_id', v: projectId, o: '=' },
                             { k: 'provider', v: data.provider, o: '=' },
                             { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
@@ -181,7 +182,7 @@ export default {
                         name: data.cloud_service_type,
                     },
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'project_id', v: projectId, o: '=' },
                         ]).rawQueryStrings,
                     },
@@ -192,7 +193,7 @@ export default {
         const projectApiQuery = new ApiQueryHelper();
         const getDataInProject = async () => {
             projectApiQuery.setSort('count', true, 'name')
-                .setApiFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
+                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                 query: projectApiQuery.data,
                 is_primary: true,

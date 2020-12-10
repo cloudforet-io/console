@@ -121,7 +121,6 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
-import { QueryHelper } from '@/lib/query';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -197,7 +196,6 @@ export default {
                 status: makeEnumValueHandler(JOB_TASK_STATUS),
             },
         };
-        const queryStore = new QueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const state = reactive({
             loading: false,
             job: {} as JobModel,
@@ -296,8 +294,12 @@ export default {
         };
 
         /* api */
-        const apiQuery = new ApiQueryHelper();
+        const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
+            apiQuery.setSort(state.sortBy, state.sortDesc)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFiltersAsQueryTag(state.searchTags);
+
             let statusValues: JOB_TASK_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
                 statusValues = [JOB_TASK_STATUS.progress, JOB_TASK_STATUS.pending];
@@ -307,17 +309,9 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
 
-            queryStore.setFiltersAsQueryTag(state.searchTags);
             statusValues.forEach((d) => {
-                queryStore.addFilter({ k: 'status', v: d, o: '=' });
+                apiQuery.addFilter({ k: 'status', v: d, o: '=' });
             });
-
-            const { filter, keyword } = queryStore.apiQuery;
-
-            apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword)
-                .setApiFilter(...filter);
 
             return apiQuery.data;
         };
@@ -467,8 +461,6 @@ export default {
                     &.active {
                         @apply text-gray-900;
                         font-weight: bold;
-                        &:before {
-                        }
                     }
                     &.failure:hover, &.failure:focus, &.failure.active {
                         @apply text-red-500;

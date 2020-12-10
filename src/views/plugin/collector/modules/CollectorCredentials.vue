@@ -84,7 +84,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
-import { QueryHelper } from '@/lib/query';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 
@@ -143,7 +142,6 @@ export default {
                 project_id: makeReferenceValueHandler('identity.Project'),
             },
         };
-        const queryStore = new QueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
 
         const state = reactive({
             items: [] as any,
@@ -167,16 +165,12 @@ export default {
             queryTags: [],
         });
 
-        const apiQuery = new ApiQueryHelper();
+        const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
-            const { filter, keyword } = queryStore.setFiltersAsQueryTag(state.queryTags)
-                .addFilter({ k: 'provider', v: props.provider, o: '=' })
-                .apiQuery;
-
-            apiQuery.setApiFilter(...filter)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+            apiQuery.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setSort(state.sortBy, state.sortDesc)
-                .setKeyword(keyword);
+                .setFiltersAsQueryTag(state.queryTags)
+                .addFilter({ k: 'provider', v: props.provider, o: '=' });
 
             return apiQuery.data;
         };

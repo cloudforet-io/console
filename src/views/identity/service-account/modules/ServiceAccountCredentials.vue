@@ -64,18 +64,18 @@ export default {
         });
 
         const apiQuery = new ApiQueryHelper();
-        const getQuery = () => apiQuery.setApiFilter({
+        const getQuery = () => apiQuery.setFilters([{
             k: 'service_account_id',
             v: props.serviceAccountId,
-            o: 'eq',
-        })
+            o: '=',
+        }])
             .setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
             )
             .setOnly('secret_id', 'name', 'schema', 'created_at')
-            .setKeyword(state.options.searchText)
+            .setFilters([{ v: state.options.searchText }])
             .data;
 
         const api = SpaceConnector.client.secret.secret.list;

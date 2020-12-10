@@ -277,10 +277,9 @@ export default {
     },
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const apiQuery = new ApiQueryHelper() as ApiQueryHelper;
-        const queryStore = new QueryHelper();
-        const hiddenQueryStore = new QueryHelper();
-        const extraQueryStore = new QueryHelper();
+        const apiQuery = new ApiQueryHelper();
+        const tableQueryHelper = new QueryHelper();
+        const extraQueryHelper = new QueryHelper();
 
         /* reactive variables */
         const formState = reactive({
@@ -380,10 +379,9 @@ export default {
                 });
             }
 
-            hiddenQueryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
-            extraQueryStore.setFilters([]);
+            extraQueryHelper.setFilters([]);
             forEach(options, (d, k) => {
-                extraQueryStore.addFilter({ k, v: d, o: '=' });
+                extraQueryHelper.addFilter({ k, v: d, o: '=' });
             });
 
             return { ...options, include_id: true };
@@ -426,6 +424,10 @@ export default {
                     api = api[camelCase(d)];
                 });
 
+                apiQuery.setFilters(tableQueryHelper.filters)
+                    .addFilter(...extraQueryHelper.filters,
+                        { k: 'project_id', v: props.projectId, o: '=' });
+
                 const res = await api.list({
                     query: apiQuery.data,
                 });
@@ -461,16 +463,9 @@ export default {
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
-
-                const { filter, keyword } = queryStore
-                    .setFiltersAsQueryTag(changed.queryTags)
-                    .apiQuery;
-
-                apiQuery.setApiFilter(...hiddenQueryStore.apiQuery.filter,
-                    ...extraQueryStore.apiQuery.filter,
-                    ...filter)
-                    .setKeyword(keyword);
+                tableQueryHelper.setFiltersAsQueryTag(changed.queryTags);
             }
+
 
             await listResources();
         };
@@ -493,8 +488,8 @@ export default {
             fetchOptionState.sortDesc = true;
             fetchOptionState.sortBy = 'created_at';
 
-            queryStore.setFiltersAsRawQuery(formState.resourceGroup?.options.raw_filter || []);
-            fetchOptionState.queryTags = queryStore.queryTags;
+            tableQueryHelper.setFiltersAsRawQuery(formState.resourceGroup?.options.raw_filter || []);
+            fetchOptionState.queryTags = tableQueryHelper.queryTags;
 
             // set table schema
             if (state.selectedTypeIndex !== -1) await getPageSchema();
@@ -546,9 +541,9 @@ export default {
 
         /* list modal */
         const onListModalConfirm = () => {
-            const { filter, keyword } = queryStore.apiQuery;
+            const { filter, keyword } = tableQueryHelper.apiQuery;
 
-            state.resource.filter = [...filter, ...extraQueryStore.apiQuery.filter];
+            state.resource.filter = [...filter, ...extraQueryHelper.apiQuery.filter];
             state.resource.keyword = keyword;
 
             const params: ResourceGroupItem = {
@@ -558,7 +553,7 @@ export default {
                     name: state.name,
                     resources: [{ ...state.resource }],
                     options: {
-                        raw_filter: queryStore.rawQueries,
+                        raw_filter: tableQueryHelper.rawQueries,
                     },
                     // tags: state.dictRef.getDict(),
                 },

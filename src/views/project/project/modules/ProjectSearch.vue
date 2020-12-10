@@ -199,9 +199,9 @@ export default {
 
         const listProjectGroups = async () => {
             if (state.searchText) {
-                projectGroupQuery.setApiFilter({ k: 'name', v: state.searchText, o: 'contain' });
+                projectGroupQuery.setFilters([{ k: 'name', v: state.searchText, o: '' }]);
             } else {
-                projectGroupQuery.setApiFilter();
+                projectGroupQuery.setFilters([]);
             }
 
             const res = await SpaceConnector.client.identity.projectGroup.list({
@@ -224,9 +224,9 @@ export default {
             }
 
             if (state.searchText) {
-                projectQuery.setApiFilter({ k: 'name', v: state.searchText, o: 'contain' });
+                projectQuery.setFilters([{ k: 'name', v: state.searchText, o: '' }]);
             } else {
-                projectQuery.setApiFilter();
+                projectQuery.setFilters([]);
             }
 
             param.query = projectQuery.setPageStart(state.projectStart).data;

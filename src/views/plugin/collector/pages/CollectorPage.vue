@@ -207,7 +207,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper();
 
         const state = reactive({
             plugins: computed(() => store.state.resource.plugin.items),
@@ -336,9 +336,9 @@ export default {
 
         // Url query
         const setSearchTags = () => {
-            queryStore.setFiltersAsRawQueryString(vm.$route.query.filters)
+            queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters)
                 .setKeyItemSets(state.querySearchHandlers.keyItemSets);
-            state.searchTags = queryStore.queryTags;
+            state.searchTags = queryHelper.queryTags;
         };
 
         // Table
@@ -347,14 +347,12 @@ export default {
             'provider', 'tags', 'plugin_info', 'state',
         );
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
             apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword)
-                .setApiFilter(...filter);
+                .setFilters(queryHelper.filters);
             return apiQuery.data;
         };
-        const detailLinkQueryStore = new QueryHelper();
+        const detailLinkQueryHelper = new QueryHelper();
         const getCollectors = async () => {
             state.loading = true;
             try {
@@ -364,7 +362,7 @@ export default {
                     plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
                     detailLink: {
                         name: 'collectorHistory',
-                        query: { filters: detailLinkQueryStore.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
+                        query: { filters: detailLinkQueryHelper.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
                     },
                     ...d,
                 }));
@@ -384,8 +382,8 @@ export default {
             state.selectedIndexes = [];
             state.searchTags = item.queryTags;
 
-            queryStore.setFiltersAsQueryTag(item.queryTags);
-            await replaceUrlQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(item.queryTags);
+            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             try {
                 await getCollectors();
             } catch (e) {

@@ -285,7 +285,7 @@ export default {
             }
             if (changed.searchText !== undefined) {
                 memberTableState.options.searchText = changed.searchText;
-                memberTableQuery.setKeyword(changed.searchText);
+                memberTableQuery.setFilters([{ v: changed.searchText }]);
             }
             await listMembers();
         };
@@ -399,8 +399,7 @@ export default {
         }, { immediate: true });
 
 
-
-        const apiQuery = new ApiQueryHelper()
+        const apiQuery = new ApiQueryHelper();
         const getPageNavigation = async () => {
             const res = await SpaceConnector.client.identity.project.tree.search({
                 item_type: 'PROJECT',
@@ -408,11 +407,11 @@ export default {
                 item_id: projectId.value,
             });
 
-            apiQuery.setApiFilter({
+            apiQuery.setFilters([{
                 k: 'project_group_id',
                 v: res.open_path,
-                o: 'in',
-            });
+                o: '=',
+            }]);
             const projectGroupName = await SpaceConnector.client.identity.projectGroup.list({
                 query: apiQuery.data,
             });

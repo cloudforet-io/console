@@ -136,13 +136,13 @@ export default {
         };
 
         /* api */
-        const apiQuery = new ApiQueryHelper()
+        const apiQuery = new ApiQueryHelper();
         const getData = async () => {
             state.loading = true;
             try {
-                    apiQuery.setSort('created_at')
+                apiQuery.setSort('created_at')
                     .setPage(1, 5)
-                    .setApiFilter({ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: 'in' });
+                    .setFilters([{ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: '=' }]);
                 const res = await SpaceConnector.client.inventory.job.list({ query: apiQuery.data });
                 state.items = convertJobsToFieldItem(res.results);
             } catch (e) {

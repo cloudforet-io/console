@@ -196,7 +196,6 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
 
         const state = reactive({
             loading: false,
@@ -342,8 +341,9 @@ export default {
             if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return num;
         };
+
+        const queryHelper = new QueryHelper();
         const getLocation = (type) => {
-            const filters: QueryStoreFilter[] = [...queryStore.filters];
             const query: Location['query'] = {};
             let name: string;
 
@@ -359,15 +359,13 @@ export default {
 
             // set filters
             if (props.projectId) {
-                filters.push({
-                    k: 'project_id', o: '=', v: props.projectId,
-                });
+                queryHelper.addFilter({ k: 'project_id', o: '=', v: props.projectId });
             }
 
             const location: Location = {
                 name,
                 query: {
-                    filters: queryStore.setFilters(filters).rawQueryStrings,
+                    filters: queryHelper.rawQueryStrings,
                     ...query,
                 },
             };
@@ -504,7 +502,7 @@ export default {
                     },
                 ];
 
-                const summaryQueryStore = new QueryHelper();
+                const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
                     let detailLocation: Location;
                     const filters: QueryStoreFilter[] = [];
@@ -520,7 +518,7 @@ export default {
                         detailLocation = {
                             name: 'server',
                             query: {
-                                filters: summaryQueryStore.setFilters(filters).rawQueryStrings,
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     } else {
@@ -532,7 +530,7 @@ export default {
                                 name: d.cloud_service_type,
                             },
                             query: {
-                                filters: summaryQueryStore.setFilters(filters).rawQueryStrings,
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     }

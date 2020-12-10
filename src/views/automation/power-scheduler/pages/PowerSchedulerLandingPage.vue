@@ -188,7 +188,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /**
          * Handlers for query search
@@ -216,7 +216,7 @@ export default {
             loading: false,
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,
@@ -247,11 +247,9 @@ export default {
          * */
         const apiQuery = new ApiQueryHelper();
         const getParams = () => {
-            const { filter, keyword } = queryStore.apiQuery;
             apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize)
-                .setKeyword(keyword)
-                .setApiFilter(...filter);
+                .setFilters(queryHelper.filters);
 
             return {
                 query: apiQuery.data,
@@ -322,8 +320,8 @@ export default {
          * Query String
          * */
         const changeQueryString = (options) => {
-            queryStore.setFiltersAsQueryTag(options.queryTags);
-            replaceUrlQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(options.queryTags);
+            replaceUrlQuery('filters', queryHelper.rawQueryStrings);
         };
 
         /**

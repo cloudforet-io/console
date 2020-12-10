@@ -95,7 +95,6 @@ import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone, showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import router from '@/routes';
-import { QueryHelper } from '@/lib/query';
 
 dayjs.extend(timezone);
 
@@ -209,12 +208,12 @@ export default {
 
 
         const apiQuery = new ApiQueryHelper();
-        const queryStore = new QueryHelper();
         const listSchedule = async (init = false) => {
             state.loading = true;
             try {
-                apiQuery.setApiFilter(...queryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).apiQuery.filter)
-                    .setSort('created_at');
+                apiQuery.setSort('created_at')
+                    .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+
                 const res = await SpaceConnector.client.powerScheduler.schedule.list({
                     // eslint-disable-next-line camelcase
                     include_desired_state: true,

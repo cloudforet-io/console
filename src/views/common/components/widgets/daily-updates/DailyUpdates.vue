@@ -220,7 +220,7 @@ export default {
             }
         };
 
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper();
 
         const setProjectDashboardData = async () => {
             state.data = [
@@ -231,7 +231,7 @@ export default {
                     createdHref: {
                         name: 'server',
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'project_id', v: props.projectId, o: '=' },
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
@@ -241,7 +241,7 @@ export default {
                     deletedHref: {
                         name: 'server',
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'project_id', v: props.projectId, o: '=' },
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
@@ -262,7 +262,7 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'project_id', v: props.projectId, o: '=' },
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                             ]).rawQueryStrings,
@@ -276,7 +276,7 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'project_id', v: props.projectId, o: '=' },
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                                 { k: 'state', v: 'DELETED', o: '=' },
@@ -298,7 +298,7 @@ export default {
                     createdHref: {
                         name: 'server',
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                             ]).rawQueryStrings,
@@ -307,7 +307,7 @@ export default {
                     deletedHref: {
                         name: 'server',
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                                 { k: 'state', v: 'DELETED', o: '=' },
@@ -327,7 +327,7 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                             ]).rawQueryStrings,
                         },
@@ -340,7 +340,7 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
-                            filters: queryStore.setFilters([
+                            filters: queryHelper.setFilters([
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                                 { k: 'state', v: 'DELETED', o: '=' },
                             ]).rawQueryStrings,

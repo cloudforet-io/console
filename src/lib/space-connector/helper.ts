@@ -15,7 +15,7 @@ class ApiQueryHelper extends QueryHelper {
 
         const { filter, keyword } = this.apiQuery;
         if (keyword) this._data.keyword += keyword;
-        if (this._data.filter) this._data.filter.concat(filter);
+        if (filter.length > 0) this._data.filter = filter;
 
         return this._data;
     }

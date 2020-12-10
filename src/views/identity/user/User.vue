@@ -172,7 +172,7 @@ export default {
     },
     setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
+        const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -259,7 +259,7 @@ export default {
             ] as MenuItem[])),
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const modalState = reactive({
             visible: false,
@@ -297,11 +297,9 @@ export default {
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
             apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setApiFilter(...filter)
-                .setKeyword(keyword);
+                .setFilters(queryHelper.filters);
             return apiQuery.data;
         };
 
@@ -334,8 +332,8 @@ export default {
                 if (changed.thisPage !== undefined) state.thisPage = changed.thisPage;
                 if (changed.queryTags !== undefined) {
                     state.tags = changed.queryTags;
-                    queryStore.setFiltersAsQueryTag(changed.queryTags);
-                    replaceUrlQuery('filters', queryStore.rawQueryStrings);
+                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             }
             await getUsers();

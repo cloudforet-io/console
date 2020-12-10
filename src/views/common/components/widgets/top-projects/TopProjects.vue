@@ -146,7 +146,6 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
 
         const state = reactive({
             loading: true,
@@ -241,6 +240,8 @@ export default {
             chart.legend.markers.template.width = 8;
             chart.legend.markers.template.height = 8;
         };
+
+        const queryHelper = new QueryHelper();
         const getLocation = (type, projectId) => {
             let name: string;
             const query: Location['query'] = {};
@@ -258,7 +259,7 @@ export default {
             const location: Location = {
                 name,
                 query: {
-                    filters: queryStore.setFilters([
+                    filters: queryHelper.setFilters([
                         { k: 'project_id', v: projectId, o: '=' },
                     ]).rawQueryStrings,
                     ...query,

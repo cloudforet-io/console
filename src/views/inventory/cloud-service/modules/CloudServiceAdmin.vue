@@ -67,7 +67,7 @@ export default {
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
             )
-            .setKeyword(state.options.searchText)
+            .setFilters([{ v: state.options.searchText }])
             .data;
 
         const api = SpaceConnector.client.inventory.cloudService.member.list;

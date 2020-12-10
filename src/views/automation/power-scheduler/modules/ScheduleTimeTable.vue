@@ -427,17 +427,17 @@ export default {
         };
         const apiQuery = new ApiQueryHelper();
         const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
-            apiQuery.setApiFilter(
-                {
+            apiQuery.setFilters(
+                [{
                     k: 'rule_type',
                     v: settings.ruleType,
-                    o: 'eq',
+                    o: '=',
                 },
                 {
                     k: 'state',
                     v: settings.ruleState,
-                    o: 'eq',
-                },
+                    o: '=',
+                }],
             );
             try {
                 const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({

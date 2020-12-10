@@ -78,11 +78,11 @@ export default {
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
-            apiQuery.setApiFilter({
+            apiQuery.setFilters([{
                 k: 'provider',
                 v: props.provider,
-                o: 'eq',
-            });
+                o: '=',
+            }]);
             return apiQuery.data;
         };
 

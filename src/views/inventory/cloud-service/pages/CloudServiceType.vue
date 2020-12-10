@@ -199,7 +199,6 @@ import {
     queryStringToStringArray, replaceUrlQuery,
     RouteQueryString,
 } from '@/lib/router-query-string';
-import { Filter } from '@/lib/space-connector/type';
 import { Tags, TimeStamp } from '@/models';
 import { store } from '@/store';
 import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
@@ -240,7 +239,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const selectedProvider: Ref<string> = ref('all');
 
@@ -287,7 +286,7 @@ export default {
             loading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
@@ -301,11 +300,11 @@ export default {
 
         const regionApiQuery = new ApiQueryHelper();
         const getRegionQuery = (value) => {
-            regionApiQuery.setApiFilter({
+            regionApiQuery.setFilters([{
                 k: 'provider',
                 v: value,
-                o: 'contain',
-            });
+                o: '',
+            }]);
             return regionApiQuery.data;
         };
 
@@ -334,22 +333,23 @@ export default {
         /**
          * Card click event
          * */
-        const cardQueryStore = new QueryHelper();
+        const cardQueryHelper = new QueryHelper();
         const getToCloudService = (item) => {
             let res: Location;
-            const filters: QueryStoreFilter[] = [...queryStore.filters];
+            cardQueryHelper.setFilters(queryHelper.filters);
 
             forEach(filterState.regionFilter, (d) => {
-                filters.push({ k: 'region_code', o: '=', v: d });
+                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: d });
             });
 
             if (item.resource_type === 'inventory.Server') {
-                filters.push({ k: 'provider', o: '=', v: item.provider }, { k: 'cloud_service_type', o: '=', v: item.cloud_service_type });
+                cardQueryHelper.addFilter({ k: 'provider', o: '=', v: item.provider },
+                    { k: 'cloud_service_type', o: '=', v: item.cloud_service_type });
 
                 res = {
                     name: 'server',
                     query: {
-                        filters: cardQueryStore.setFilters(filters).rawQueryStrings,
+                        filters: cardQueryHelper.rawQueryStrings,
                     },
                 };
             } else {
@@ -361,28 +361,27 @@ export default {
                         name: item.cloud_service_type,
                     },
                     query: {
-                        filters: cardQueryStore.setFilters(filters).rawQueryStrings,
+                        filters: cardQueryHelper.rawQueryStrings,
                     },
                 };
             }
             return res;
         };
 
-        const sidebarQueryStore = new QueryHelper();
-        const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
-            const filters: QueryStoreFilter[] = [];
+        const sidebarQueryHelper = new QueryHelper();
+        const sidebarFilters = computed<{filters: QueryStoreFilter[]; labels: string[]}>(() => {
+            sidebarQueryHelper.setFilters([]);
             if (selectedProvider.value !== 'all') {
-                filters.push({ k: 'provider', v: selectedProvider.value, o: '=' });
+                sidebarQueryHelper.addFilter({ k: 'provider', v: selectedProvider.value, o: '=' });
             }
             if (filterState.regionFilter.length > 0) {
                 filterState.regionFilter.forEach((d) => {
-                    filters.push({ k: 'region_code', v: d, o: '=' });
+                    sidebarQueryHelper.addFilter({ k: 'region_code', v: d, o: '=' });
                 });
             }
-            sidebarQueryStore.setFilters(filters);
 
             const res = {
-                filters: sidebarQueryStore.apiQuery.filter,
+                filters: sidebarQueryHelper.filters,
                 labels: [] as string[],
             };
             if (filterState.serviceFilter.length > 0) {
@@ -395,12 +394,11 @@ export default {
         const getParams = (isTriggeredBySideFilter = false) => {
             const { filters, labels } = sidebarFilters.value;
 
-            const { filter, keyword } = queryStore.apiQuery;
-
             apiQuery.setPageLimit(state.pageSize)
-                .setKeyword(keyword)
-                .setApiFilter(...filter, ...filters)
+                .setFilters(filters)
+                .addFilter(...queryHelper.filters)
                 .setSort('count', true, 'name');
+
             if (isTriggeredBySideFilter) state.thisPage = 1;
             else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
@@ -455,8 +453,8 @@ export default {
         }, { immediate: false });
 
         const changeQueryString = async (options) => {
-            queryStore.setFiltersAsQueryTag(options.queryTags);
-            await replaceUrlQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(options.queryTags);
+            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
         };
 
         const onPaginationChange = async () => {

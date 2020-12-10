@@ -259,7 +259,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryHelper();
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const apiQuery = new ApiQueryHelper();
 
         /** Breadcrumb */
@@ -332,13 +332,9 @@ export default {
         };
 
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
-
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setApiFilter(...filter)
-                .setKeyword(keyword);
-
+                .setFilters(queryHelper.filters);
 
             return apiQuery.data;
         };
@@ -374,9 +370,9 @@ export default {
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
                 /* api query setting */
-                queryStore.setFiltersAsQueryTag(changed.queryTags);
+                queryHelper.setFiltersAsQueryTag(changed.queryTags);
                 /* sync updated query tags to url query string */
-                replaceUrlQuery('filters', queryStore.rawQueryStrings);
+                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
 
             await listServerData();
@@ -436,9 +432,7 @@ export default {
 
 
                 // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryStore.setKeyItemSets(typeOptionState.keyItemSets)
-                    .setFiltersAsRawQueryString(vm.$route.query.filters)
-                    .queryTags;
+                fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = res;
