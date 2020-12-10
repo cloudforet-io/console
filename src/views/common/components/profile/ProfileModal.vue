@@ -233,8 +233,8 @@ export default {
                 await store.dispatch('user/getUser', id);
                 formState.name = store.state.user.name;
                 formState.email = store.state.user.email;
-                formState.mobile = store.state.user.mobile;
-                formState.group = store.state.user.group;
+                // formState.mobile = store.state.user.mobile;
+                // formState.group = store.state.user.group;
                 formState.language = store.state.user.language;
                 formState.timezone = store.state.user.timezone;
             } catch (e) {
@@ -268,8 +268,8 @@ export default {
                 password: formState.password,
                 name: formState.name,
                 email: formState.email,
-                mobile: formState.mobile,
-                group: formState.group,
+                // mobile: formState.mobile,
+                // group: formState.group,
                 language: formState.language,
                 timezone: formState.timezone,
             };

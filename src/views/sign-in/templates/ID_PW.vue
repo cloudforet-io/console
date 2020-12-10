@@ -120,10 +120,9 @@ export default defineComponent({
                 return;
             }
             const credentials = {
-                user_id: state.userId,
                 password: state.password,
             };
-            context.emit('on-sign-in', credentials);
+            context.emit('on-sign-in', state.userId, credentials);
         };
 
         const buttonStyleType = computed(() => (props.isAdmin ? 'primary-dark' : 'primary1'));

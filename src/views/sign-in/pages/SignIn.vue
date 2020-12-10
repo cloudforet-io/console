@@ -127,11 +127,13 @@ export default {
             version: process.env.VUE_APP_VERSION,
             showErrorMessage: false,
         });
-        const signIn = async (credentials) => {
+        const signIn = async (userId, credentials) => {
             state.showErrorMessage = false;
             try {
                 await store.dispatch('user/signIn', {
-                    domain_id: store.state.domain.domainId,
+                    domainId: store.state.domain.domainId,
+                    userId,
+                    userType: 'USER',
                     credentials,
                 });
                 await vm.$router.push(props.nextPath);

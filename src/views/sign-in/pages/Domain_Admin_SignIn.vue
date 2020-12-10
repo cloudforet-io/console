@@ -122,16 +122,14 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
-        const signIn = async (credentials) => {
+        const signIn = async (userId, credentials) => {
             state.showErrorMessage = false;
             try {
                 await vm.$store.dispatch('user/signIn', {
-                    domain_id: vm.$store.state.domain.domainId,
-                    credentials: {
-                        // eslint-disable-next-line camelcase
-                        user_type: 'DOMAIN_OWNER',
-                        ...credentials,
-                    },
+                    domainId: vm.$store.state.domain.domainId,
+                    userId,
+                    userType: 'DOMAIN_OWNER',
+                    credentials,
                 });
                 await vm.$router.push(props.nextPath);
             } catch (e) {

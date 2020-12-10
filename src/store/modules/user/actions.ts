@@ -11,10 +11,9 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<UserState> => {
     return {
         userId: response.owner_id,
         userType: 'DOMAIN_OWNER',
+        backend: 'LOCAL',
         name: response.name,
         email: response.email,
-        mobile: response.mobile,
-        group: response.group,
         language: response.language,
         timezone: response.timezone,
     };
@@ -26,10 +25,9 @@ const getUserInfo = async (userId: string): Promise<UserState> => {
     return {
         userId: response.user_id,
         userType: 'USER',
+        backend: response.backend,
         name: response.name,
         email: response.email,
-        mobile: response.mobile,
-        group: response.group,
         language: response.language,
         timezone: response.timezone,
     };
@@ -65,8 +63,6 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userRequest.name) request.name = userRequest.name;
     if (userRequest.password) request.password = userRequest.password;
     if (userRequest.email) request.email = userRequest.email;
-    if (userRequest.mobile) request.mobile = userRequest.mobile;
-    if (userRequest.group) request.group = userRequest.group;
     if (userRequest.language) request.language = userRequest.language;
     if (userRequest.timezone) request.timezone = userRequest.timezone;
     if (userRequest.tags) request.tags = userRequest.tags;
@@ -84,7 +80,12 @@ const getUserInfoFromToken = (token: string): [string, string] => {
 };
 
 export const signIn = async ({ commit, state }, signInRequest: SignInRequest): Promise<void> => {
-    const response = await SpaceConnector.client.identity.token.issue(signInRequest, { skipAuthRefresh: true });
+    const response = await SpaceConnector.client.identity.token.issue({
+        domain_id: signInRequest.domainId,
+        user_id: signInRequest.userId,
+        user_type: signInRequest.userType,
+        credentials: signInRequest.credentials,
+    }, { skipAuthRefresh: true });
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 
     const [userType, userId] = getUserInfoFromToken(response.access_token);
@@ -97,8 +98,6 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
         commit('setUser', userInfo);
     }
 
-    commit('signIn');
-
     const reportState = await getReportState();
     commit('setReportState', reportState);
 
@@ -109,7 +108,6 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
 export const signOut = ({ commit }): void => {
     SpaceConnector.flushToken();
     commit('expireSession');
-    commit('signOut');
 };
 
 export const expireSession = ({ commit }): void => {

@@ -22,6 +22,8 @@ export default defineComponent({
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const signIn = async (googleUser) => {
+            const userProfile = googleUser.getBasicProfile();
+            const userId = userProfile.du;
             const credentials = {
                 // eslint-disable-next-line camelcase
                 access_token: googleUser.getAuthResponse().access_token,
@@ -30,7 +32,7 @@ export default defineComponent({
             if (!auth2.isSignedIn.get()) {
                 return;
             }
-            context.emit('on-sign-in', credentials);
+            context.emit('on-sign-in', userId, credentials);
         };
         const signInFail = () => {
             console.error('sign in failed');
