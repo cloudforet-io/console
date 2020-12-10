@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
-import { store } from '@/store';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 
@@ -42,16 +41,13 @@ export const userStateColor = Object.freeze({
     },
 });
 
-export const getTimezone = () => store.state.user.timezone || 'UTC';
-export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' for display Timezone
-
 // formatter
-export const timestampFormatter = (value) => {
-    if (value && value.seconds) return getLocalDatetimeFromTimeStamp(value.seconds);
+export const timestampFormatter = (value, timezone) => {
+    if (value && value.seconds) return DateTime.fromSeconds(Number(value.seconds)).setZone(timezone).toFormat('yyyy-LL-dd HH:mm:ss');
     return '';
 };
-export const iso8601Formatter = (time?: string, timezone?: string) => {
-    if (time) return dayjs.tz(dayjs(time), timezone || getTimezone()).format('YYYY-MM-DD HH:mm:ss');
+export const iso8601Formatter = (time: string, timezone: string) => {
+    if (time) return dayjs.tz(dayjs(time), timezone).format('YYYY-MM-DD HH:mm:ss');
     return '';
 };
 

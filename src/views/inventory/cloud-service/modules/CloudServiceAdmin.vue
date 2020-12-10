@@ -33,8 +33,8 @@ import { Options, SearchTableListeners } from '@/components/organisms/tables/sea
 
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { getTimezone } from '@/lib/util';
 import config from '@/lib/config';
+import { store } from '@/store';
 
 export default {
     name: 'CloudServiceAdmin',
@@ -108,7 +108,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: getTimezone(),
+                            timezone: store.state.user.timezone,
                         },
                         data_source: [
                             { name: 'User ID', key: 'user_info.user_id' },

@@ -49,10 +49,10 @@
                 </span>
             </template>
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value) }}
+                {{ timestampFormatter(value, timezone) }}
             </template>
             <template #col-last_schedule_at-format="{value}">
-                {{ value ? timestampFormatter(value): '' }}
+                {{ value ? timestampFormatter(value, timezone): '' }}
             </template>
         </p-toolbox-table>
 
@@ -119,6 +119,7 @@ export default {
     setup(props) {
         const vm: any = getCurrentInstance();
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             loading: true,
             items: [],
             selectIndex: [],
@@ -182,13 +183,13 @@ export default {
             state.editVisible = true;
         };
 
-        const apiQuery = new ApiQueryHelper()
+        const apiQuery = new ApiQueryHelper();
         const listSchedules = debounce(async (): Promise<void> => {
             state.loading = true;
             state.selectIndex = [];
             state.totalCount = 0;
             try {
-                    apiQuery.setSort(state.sortBy, state.sortDesc)
+                apiQuery.setSort(state.sortBy, state.sortDesc)
                     .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
 
                 const res = await SpaceConnector.client.inventory.collector.schedule.list({

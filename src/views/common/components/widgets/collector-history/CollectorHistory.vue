@@ -45,7 +45,6 @@ import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
-import { getTimezone } from '@/lib/util';
 import { queryTagsToQueryString } from '@/lib/router-query-string';
 import {
     coral, gray, primary2, black,
@@ -237,7 +236,7 @@ export default {
             state.data = [];
             try {
                 let today = dayjs();
-                if (state.timezone !== 'UTC') today = dayjs().tz(getTimezone());
+                if (state.timezone !== 'UTC') today = dayjs().tz(store.state.user.timezone);
                 const res = await SpaceConnector.client.statistics.topic.dailyJobSummary({
                     start: today.subtract(6, 'day').toISOString(),
                     end: today.toISOString(),

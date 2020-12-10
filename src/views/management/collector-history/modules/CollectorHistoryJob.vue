@@ -121,6 +121,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
+import { store } from '@/store';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -197,6 +198,7 @@ export default {
             },
         };
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             loading: false,
             job: {} as JobModel,
             collectorName: computed(() => state.job.collector_info?.name),
@@ -268,8 +270,8 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtDatetime = dayjs(timestampFormatter(createdAt));
-                const finishedAtDatetime = dayjs(timestampFormatter(finishedAt));
+                const createdAtDatetime = dayjs(timestampFormatter(createdAt, state.timezone));
+                const finishedAtDatetime = dayjs(timestampFormatter(finishedAt, state.timezone));
                 const duration = finishedAtDatetime.diff(createdAtDatetime, 'minute');
                 return `${duration.toString()} min`;
             }
@@ -286,7 +288,7 @@ export default {
                     created_count: task.created_count,
                     updated_count: task.updated_count,
                     'errors.length': task.errors.length,
-                    created_at: timestampFormatter(task.created_at),
+                    created_at: timestampFormatter(task.created_at, state.timezone),
                     duration: durationFormatter(task.created_at, task.finished_at),
                 };
                 state.items.push(newTask);

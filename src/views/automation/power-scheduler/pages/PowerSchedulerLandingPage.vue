@@ -156,7 +156,6 @@ import ScheduleHeatmap from '@/views/automation/power-scheduler/modules/Schedule
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import dayjs from 'dayjs';
-import { getTimezone } from '@/lib/util';
 
 /* Types */
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
@@ -165,6 +164,7 @@ import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { QueryHelper } from '@/lib/query';
+import { store } from '@/store';
 
 interface Scheduler {
     name: string;
@@ -222,7 +222,7 @@ export default {
             totalCount: 0,
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-            currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
+            currentDate: dayjs().tz(store.state.user.timezone).format('YYYY-MM-DD'),
             tooltip: computed(() => ({
                 resource: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_RESOURCE')} <br>
                                 [ALL] Server <br>

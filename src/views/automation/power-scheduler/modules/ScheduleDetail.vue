@@ -188,6 +188,7 @@ import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
+import { store } from '@/store';
 
 
 interface Props {
@@ -251,6 +252,7 @@ export default {
         });
 
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             title: computed(() => (props.mode === 'CREATE' ? vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CREATE_SCHEDULER') : state.schedule.name)),
 
             schedule: { ...defaultSchedule } as Schedule,
@@ -348,7 +350,7 @@ export default {
                         schedule_id: props.scheduleId,
                     });
                     state.schedule = res;
-                    state.created = timestampFormatter(res.created_at);
+                    state.created = timestampFormatter(res.created_at, state.timezone);
                 } catch (e) {
                     state.schedule = { ...defaultSchedule };
                     state.created = '';

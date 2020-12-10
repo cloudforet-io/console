@@ -18,7 +18,7 @@
                 </p-text-list>
             </template>
             <template #col-updated_at-format="{value}">
-                {{ iso8601Formatter(value) }}
+                {{ iso8601Formatter(value, timezone) }}
             </template>
         </p-search-table>
     </div>
@@ -26,7 +26,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
@@ -36,8 +38,9 @@ import { Options, SearchTableListeners } from '@/components/organisms/tables/sea
 
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getTimezone, iso8601Formatter } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import config from '@/lib/config';
+import { store } from '@/store';
 
 export default {
     name: 'CloudServiceHistory',
@@ -53,6 +56,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             fields: [
                 { label: 'Key', name: 'key' },
                 { label: 'Job ID', name: 'job_id' },
@@ -111,7 +115,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: getTimezone(),
+                            timezone: store.state.user.timezone,
                         },
                         data_source: [
                             { name: 'Key', key: 'key' },

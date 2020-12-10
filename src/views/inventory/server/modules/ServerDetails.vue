@@ -37,7 +37,6 @@ import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
-import { getTimezone } from '@/lib/util';
 import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
@@ -47,7 +46,6 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { find } from 'lodash';
-import { QueryHelper } from '@/lib/query';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -81,7 +79,7 @@ export default {
             data: undefined as any,
             loading: true,
             totalCount: 0,
-            timezone: computed(() => getTimezone()),
+            timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             keyItemSets: [] as KeyItemSet[],
             valueHandlerMap: {} as ValueHandlerMap,

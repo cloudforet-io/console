@@ -40,7 +40,6 @@ import {
 } from '@/components/organisms/dynamic-layout/type';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getTimezone } from '@/lib/util';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
@@ -92,7 +91,7 @@ export default {
             data: undefined as any,
             loading: true,
             totalCount: 0,
-            timezone: computed(() => getTimezone()),
+            timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             keyItemSets: [] as KeyItemSet[],
             valueHandlerMap: {} as ValueHandlerMap,

@@ -12,14 +12,16 @@
                         @change="onChange"
         >
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value) }}
+                {{ timestampFormatter(value, timezone) }}
             </template>
         </p-search-table>
     </div>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
@@ -28,6 +30,7 @@ import { Options, SearchTableListeners } from '@/components/organisms/tables/sea
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { timestampFormatter } from '@/lib/util';
+import { store } from '@/store';
 
 export default {
     name: 'ServiceAccountCredentials',
@@ -43,6 +46,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             fields: [
                 { label: 'Secret', name: 'secret_id' },
                 { label: 'Name', name: 'name' },

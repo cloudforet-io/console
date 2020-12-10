@@ -80,7 +80,7 @@
                         <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
                     </template>
                     <template #col-created_at-format="{value}">
-                        {{ timestampFormatter(value) }}
+                        {{ timestampFormatter(value, timezone) }}
                     </template>
                 </p-query-search-table>
                 <div v-if="!loading && items.length > 0" class="pagination">
@@ -246,6 +246,7 @@ export default {
             },
         };
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             loading: false,
             plugins: computed(() => store.state.resource.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
@@ -309,8 +310,8 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtMoment = dayjs(timestampFormatter(createdAt));
-                const finishedAtMoment = dayjs(timestampFormatter(finishedAt));
+                const createdAtMoment = dayjs(timestampFormatter(createdAt, state.timezone));
+                const finishedAtMoment = dayjs(timestampFormatter(finishedAt, state.timezone));
                 const duration = finishedAtMoment.diff(createdAtMoment, 'minute');
                 return `${duration.toString()} min`;
             }

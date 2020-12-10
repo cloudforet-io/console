@@ -31,7 +31,7 @@ import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import config from '@/lib/config';
-import { getTimezone } from '@/lib/util';
+import { store } from '@/store';
 
 export default {
     name: 'ServerMember',
@@ -105,7 +105,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: getTimezone(),
+                            timezone: store.state.user.timezone,
                         },
                         // eslint-disable-next-line camelcase
                         data_source: [

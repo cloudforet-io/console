@@ -92,7 +92,7 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
 
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { getTimezone, showErrorMessage } from '@/lib/util';
+import { showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import router from '@/routes';
 
@@ -107,7 +107,7 @@ interface Props {
 const listMapper = {
     icon: d => DESIRED_STATES[d.desired_state]?.icon || '',
 };
-const getFormattedTime = time => dayjs.unix(time.seconds).tz(getTimezone()).format('YYYY-MM-DD');
+const getFormattedTime = time => dayjs.unix(time.seconds).tz(store.state.user.timezone).format('YYYY-MM-DD');
 
 const validateProjectId = async (projectId): Promise<boolean> => {
     await store.dispatch('resource/project/load');

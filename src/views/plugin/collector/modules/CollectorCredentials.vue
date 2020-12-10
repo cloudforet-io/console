@@ -46,7 +46,7 @@
                 </router-link>
             </template>
             <template #col-created_at-format="{value}">
-                <span>{{ timestampFormatter(value) }}</span>
+                <span>{{ timestampFormatter(value, timezone) }}</span>
             </template>
             <template #col-collect-format="{item}">
                 <p-button
@@ -144,6 +144,7 @@ export default {
         };
 
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             items: [] as any,
             totalCount: 0,
             loading: true,

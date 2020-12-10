@@ -60,7 +60,7 @@
                         </router-link>
                     </template>
                     <template #col-last_collected_at-format="{ value }">
-                        {{ value ? timestampFormatter(value) : '' }}
+                        {{ value ? timestampFormatter(value,timezone) : '' }}
                     </template>
                 </p-query-search-table>
             </template>
@@ -163,7 +163,7 @@ import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
-    getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
+    showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
@@ -171,7 +171,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
-import { QueryStoreFilter } from '@/lib/query/type';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -210,6 +209,7 @@ export default {
         const queryHelper = new QueryHelper();
 
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.resource.plugin.items),
             fields: computed(() => [
                 { name: 'name', label: 'Name' },
@@ -457,7 +457,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: getTimezone(),
+                            timezone: store.state.user.timezone,
                         },
                         data_source: state.excelFields,
                     },

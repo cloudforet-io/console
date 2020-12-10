@@ -88,7 +88,7 @@ import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 
 import {
-    getTimezone, MenuItem, showErrorMessage, downloadURI,
+    showErrorMessage, downloadURI,
 } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
@@ -133,10 +133,10 @@ export default {
                 let sixMonthAgo = dayjs().subtract(6, 'month');
                 let now = dayjs();
                 if (state.timezone !== 'UTC') {
-                    sixMonthAgo = dayjs().tz(getTimezone()).subtract(6, 'month');
-                    now = dayjs().tz(getTimezone());
+                    sixMonthAgo = dayjs().tz(store.state.user.timezone).subtract(6, 'month');
+                    now = dayjs().tz(store.state.user.timezone);
                 }
-                const periods = [] as MenuItem[];
+                const periods = [] as any[];
                 while (now.isAfter(sixMonthAgo, 'day')) {
                     periods.push({
                         name: now.format('YYYY-MM'),
