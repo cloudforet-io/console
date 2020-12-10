@@ -139,6 +139,7 @@
 /* eslint-disable camelcase */
 import { Component } from 'vue/types/umd';
 import { TranslateResult } from 'vue-i18n';
+import { Location } from 'vue-router';
 
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
@@ -171,6 +172,7 @@ import { replaceQuery } from '@/lib/router-query-string';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { QueryStore } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -353,6 +355,20 @@ export default {
                 .setFilter(...filter);
             return query.data;
         };
+
+        const detailQueryStore = new QueryStore();
+        const getDetailLink = (data) => {
+            const filters: QueryStoreFilter[] = [];
+            filters.push({ k: 'collector_id', v: data.collector_id, o: '=' });
+            const res: Location = {
+                name: 'collectorHistory',
+                query: {
+                    filters: detailQueryStore.setFilters(filters).rawQueryStrings,
+                },
+            };
+            return res;
+        };
+
         const getCollectors = async () => {
             state.loading = true;
             try {
@@ -360,7 +376,7 @@ export default {
                 state.items = res.results.map(d => ({
                     plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
                     plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
-                    detailLink: `/management/collector-history?filters=collector_id%3A%3D${d.collector_id}`,
+                    detailLink: getDetailLink(d),
                     ...d,
                 }));
                 state.totalCount = res.total_count || 0;
