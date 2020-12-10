@@ -67,6 +67,7 @@ import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
+import { store } from '@/store';
 
 interface SecretModel {
     secret_id: string;
@@ -134,7 +135,6 @@ interface Props {
     visible: boolean;
     credentialId: string | null;
     collectorId: string;
-    plugins: object;
 }
 
 const map = {
@@ -166,10 +166,6 @@ export default {
             type: String,
             default: '',
         },
-        plugins: {
-            type: Object,
-            default: () => ({}),
-        },
     },
     setup(props: Props, context: SetupContext) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -180,8 +176,9 @@ export default {
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
-            pluginName: computed<string>(() => props.plugins[state.collector?.plugin_info.plugin_id]?.name),
-            imageUrl: computed<string>(() => props.plugins[state.collector?.plugin_info.plugin_id]?.icon),
+            plugin: computed(() => store.state.resource.plugin.items[state.collector?.plugin_info.plugin_id]),
+            pluginName: computed<string>(() => get(state.plugin, 'name', '')),
+            imageUrl: computed<string>(() => get(state.plugin, 'icon', '')),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
             description: computed<string>(() => get(state.collector, 'tags.description', '')),
             filterFormats: computed<any[]>(() => get(state.collector, 'plugin_info.options.filter_format', [])),

@@ -117,7 +117,6 @@
         <collect-data-modal v-if="collectDataModalVisible"
                             :visible.sync="collectDataModalVisible"
                             :collector-id="selectedItems[0].collector_id"
-                            :plugins="plugins"
         />
 
         <p-table-check-modal v-if="checkModalState.visible"
