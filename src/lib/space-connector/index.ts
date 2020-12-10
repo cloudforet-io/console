@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { QueryHelper } from '@/lib/space-connector/helper';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { AxiosRequestConfig } from 'axios';
 import API from './api';
 import { SessionTimeoutCallback, APIInfo } from './type';
@@ -95,5 +95,5 @@ class SpaceConnector {
 
 export {
     SpaceConnector,
-    QueryHelper,
+    ApiQueryHelper,
 };

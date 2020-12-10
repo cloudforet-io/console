@@ -40,7 +40,7 @@ import { ProjectGroup } from '@/views/project/project/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -112,19 +112,20 @@ export default {
             showValidation: false,
         });
 
+        const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name')
         const getProjectGroupNames = async () => {
-            const query = new QueryHelper().setOnly('name');
             const res = await SpaceConnector.client.identity.projectGroup.list({
-                query: query.data,
+                query: projectGroupNameApiQuery.data,
             });
             state.projectGroupNames = res.results.map(d => d.name);
         };
 
+
+        const projectGroupApiQuery = new ApiQueryHelper().setOnly('project_group_id', 'name');
         const getProjectGroup = async () => {
-            const query = new QueryHelper().setOnly('project_group_id', 'name');
             const res = await SpaceConnector.client.identity.projectGroup.get({
                 project_group_id: props.id,
-                query: query.data,
+                query: projectGroupApiQuery.data,
             });
             state.projectGroupName = res.name;
         };

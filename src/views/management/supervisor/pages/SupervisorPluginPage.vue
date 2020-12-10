@@ -109,7 +109,7 @@ export default {
                 });
                 return items;
             }),
-            keyItemSets: {
+            keyItemSets: [{
                 title: 'Filters',
                 items: [
                     { name: 'plugin_id', label: 'Collector ID' },
@@ -117,7 +117,7 @@ export default {
                     { name: 'state', label: 'State' },
                     { name: 'version', label: 'Version' },
                 ],
-            },
+            }],
         });
         const pluginDetailState = reactive({
             name: computed(() => vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_TITLE')),

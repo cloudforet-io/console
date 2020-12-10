@@ -157,8 +157,8 @@ import ServiceAccountCredentials from '@/views/identity/service-account/modules/
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
 
 /* utils */
-import { replaceQuery } from '@/lib/router-query-string';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { replaceUrlQuery } from '@/lib/router-query-string';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
@@ -312,13 +312,17 @@ export default {
 
         /** Handling API with SpaceConnector * */
 
+        const apiQuery = new ApiQueryHelper(computed(() => vm.$store.state.user.timezone));
         const getQuery = () => {
-            const query = new QueryHelper();
-            query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
+            apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter({ k: 'provider', v: [selectedProvider.value], o: 'in' })
-                .setKeyword(fetchOptionState.searchText);
-            return query.data;
+                .addFilter(
+                    { k: 'provider', v: [selectedProvider.value], o: '=' },
+                    { v: fetchOptionState.searchText },
+                );
+            // .setApiFilter({ k: 'provider', v: [selectedProvider.value], o: 'in' })
+            // .setKeyword(fetchOptionState.searchText);
+            return apiQuery.data;
         };
 
         const serviceAccountListApi = SpaceConnector.client.identity.serviceAccount.list;
@@ -353,7 +357,7 @@ export default {
                 if (changed.searchText !== undefined) {
                     fetchOptionState.searchText = changed.searchText;
                     // sync updated query tags to url query string
-                    replaceQuery('filters', changed.searchText);
+                    replaceUrlQuery('filters', changed.searchText);
                 }
             }
             listServiceAccountData();
@@ -531,7 +535,7 @@ export default {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
                 watch(selectedProvider, async (after, before) => {
                     if (after !== before) {
-                        replaceQuery('provider', after);
+                        replaceUrlQuery('provider', after);
                         await getTableSchema();
                         await listServiceAccountData();
                     }

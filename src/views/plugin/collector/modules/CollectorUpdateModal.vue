@@ -88,7 +88,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { CollectorPluginModel, CollectorUpdateParameter } from '@/views/plugin/collector/type';
 
@@ -179,9 +179,11 @@ export default {
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e, vm.$root);
             }
         };
+
+        const apiQuery = new ApiQueryHelper()
         const getNames = async () => {
-            const query = new QueryHelper().setFilter({ k: 'name', o: 'not', v: formState.inputModel.name });
-            const res = await SpaceConnector.client.inventory.collector.list({ query: query.data });
+            apiQuery.setApiFilter({ k: 'name', o: 'not', v: formState.inputModel.name });
+            const res = await SpaceConnector.client.inventory.collector.list({ query: apiQuery.data });
             state.collectorNames = res.results.map(v => v.name);
         };
         const getVersions = async () => {

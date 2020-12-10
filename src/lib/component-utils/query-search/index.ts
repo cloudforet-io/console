@@ -107,7 +107,10 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
             if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
 
             return {
-                results: res.results.map(d => ({ label: d.name, name: d.key })),
+                results: res.results.reduce((results, d) => {
+                    if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: d.key });
+                    return results;
+                }, []),
                 totalCount: res.total_count,
                 dataType,
             };
@@ -140,7 +143,10 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: KeyDa
                 ...param, search: inputText,
             });
             return {
-                results: res.results.map(d => ({ label: d.name, name: d.key })),
+                results: res.results.reduce((results, d) => {
+                    if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: d.key });
+                    return results;
+                }, []),
                 totalCount: res.total_count,
                 dataType,
             };

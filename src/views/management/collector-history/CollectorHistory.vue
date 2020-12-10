@@ -156,9 +156,9 @@ import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-s
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { replaceQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
@@ -166,7 +166,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import router from '@/routes';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -215,7 +215,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryStore = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -329,8 +329,8 @@ export default {
             });
         };
 
-        const query = new QueryHelper();
-        const apiQueryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
+        const apiQueryStore = new QueryHelper();
         const getQuery = () => {
             let statusValues: JOB_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
@@ -348,11 +348,11 @@ export default {
 
             const { filter, keyword } = apiQueryStore.setFilters(filters).apiQuery;
 
-            query.setSort(state.sortBy, state.sortDesc)
+            apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setKeyword(keyword)
-                .setFilter(...filter);
-            return query.data;
+                .setApiFilter(...filter);
+            return apiQuery.data;
         };
 
         const getJobs = async () => {
@@ -377,7 +377,7 @@ export default {
         const onChange = async (item) => {
             state.tags = item.queryTags;
             queryStore.setFiltersAsQueryTag(item.queryTags);
-            replaceQuery('filters', queryStore.rawQueryStrings);
+            replaceUrlQuery('filters', queryStore.rawQueryStrings);
             try {
                 await getJobs();
             } catch (e) {

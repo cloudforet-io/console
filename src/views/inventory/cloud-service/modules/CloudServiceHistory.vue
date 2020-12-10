@@ -35,7 +35,7 @@ import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone, iso8601Formatter } from '@/lib/util';
 import config from '@/lib/config';
 
@@ -65,11 +65,11 @@ export default {
             options: {} as Options,
         });
 
+        const apiQuery = new ApiQueryHelper();
         const getParams = () => ({
             cloud_service_id: props.cloudServiceId,
             key_path: 'collection_info.change_history',
-            query: new QueryHelper()
-                .setSort(state.options.sortBy, state.options.sortDesc)
+            query: apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
                 .setPage(
                     getPageStart(state.options.thisPage, state.options.pageSize),
                     state.options.pageSize,

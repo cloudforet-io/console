@@ -142,7 +142,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/type';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
@@ -216,13 +216,13 @@ export default {
 
         const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
         const listAllProjectApi = SpaceConnector.client.identity.project.list;
-        const listQuery = new QueryHelper();
+        const listQuery = new ApiQueryHelper();
 
         const getParams = (id?, text?) => {
             listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize);
 
-            if (text) listQuery.setFilter({ k: 'name', v: props.searchText, o: 'contain' });
+            if (text) listQuery.setApiFilter({ k: 'name', v: props.searchText, o: 'contain' });
 
             const params: any = { include_provider: true, query: listQuery.data };
             if (id) params.project_group_id = id;

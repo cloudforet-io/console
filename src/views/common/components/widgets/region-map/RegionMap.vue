@@ -59,7 +59,7 @@ import {
     onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
@@ -99,13 +99,13 @@ export default {
         });
         /* Create map instance */
 
+        const apiQuery = new ApiQueryHelper();
         const getFilteredData = async (regionCode) => {
             // state.loading = true;
             state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    query: new QueryHelper()
-                        .setFilter({ k: 'region_code', v: regionCode, o: 'eq' }, { k: 'provider', v: state.selectedProvider, o: 'eq' })
+                    query: apiQuery.setApiFilter({ k: 'region_code', v: regionCode, o: 'eq' }, { k: 'provider', v: state.selectedProvider, o: 'eq' })
                         .setPageLimit(10)
                         .setSort('count', true, 'name')
                         .data,
@@ -218,7 +218,7 @@ export default {
                     drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker);
                 }
             });
-            const originCoords = { longitude: 126.871867 , latitude: 37.528547 };
+            const originCoords = { longitude: 126.871867, latitude: 37.528547 };
             await getRegionList();
             imageSeries.data = state.data;
             drawMarker(originCoords, marker);

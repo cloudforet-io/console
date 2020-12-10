@@ -1,4 +1,4 @@
-import { SpaceConnector, QueryHelper } from '@/lib/space-connector';
+import { SpaceConnector, ApiQueryHelper } from '@/lib/space-connector';
 import { FavoriteState, FavoriteItem } from '@/store/modules/favorite/type';
 
 const FAVORITE_TYPE = 'project-group';
@@ -38,14 +38,14 @@ export const removeItem = async ({ commit, state, rootState }, favoriteItem: Par
     }
 };
 
+const apiQuery = new ApiQueryHelper() as ApiQueryHelper;
 export const load = async ({ commit, state, rootState }): Promise<void|Error> => {
-    const queryHelper = new QueryHelper() as QueryHelper;
-    queryHelper.setFilter({
+    apiQuery.setApiFilter({
         k: 'name',
         v: `console:${rootState.user.userType}:${rootState.user.userId}:favorite:${FAVORITE_TYPE}:`,
         o: 'contain',
     }).setOnly('data');
 
-    const response = await SpaceConnector.client.config.userConfig.list({ query: queryHelper.data });
+    const response = await SpaceConnector.client.config.userConfig.list({ query: apiQuery.data });
     commit('loadItem', response.results.map(config => config.data));
 };

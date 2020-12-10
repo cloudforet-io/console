@@ -72,7 +72,7 @@ import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { ItemType } from '@/views/project/project/type';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 const LIMIT = 5;
 
@@ -193,15 +193,15 @@ export default {
             return '';
         };
 
-        const projectGroupQuery = new QueryHelper().setOnly('project_group_id', 'name').setPageLimit(LIMIT);
-        const projectQuery = new QueryHelper().setOnly('project_id', 'name').setPageLimit(LIMIT);
+        const projectGroupQuery = new ApiQueryHelper().setOnly('project_group_id', 'name').setPageLimit(LIMIT);
+        const projectQuery = new ApiQueryHelper().setOnly('project_id', 'name').setPageLimit(LIMIT);
 
 
         const listProjectGroups = async () => {
             if (state.searchText) {
-                projectGroupQuery.setFilter({ k: 'name', v: state.searchText, o: 'contain' });
+                projectGroupQuery.setApiFilter({ k: 'name', v: state.searchText, o: 'contain' });
             } else {
-                projectGroupQuery.setFilter();
+                projectGroupQuery.setApiFilter();
             }
 
             const res = await SpaceConnector.client.identity.projectGroup.list({
@@ -224,9 +224,9 @@ export default {
             }
 
             if (state.searchText) {
-                projectQuery.setFilter({ k: 'name', v: state.searchText, o: 'contain' });
+                projectQuery.setApiFilter({ k: 'name', v: state.searchText, o: 'contain' });
             } else {
-                projectQuery.setFilter();
+                projectQuery.setApiFilter();
             }
 
             param.query = projectQuery.setPageStart(state.projectStart).data;

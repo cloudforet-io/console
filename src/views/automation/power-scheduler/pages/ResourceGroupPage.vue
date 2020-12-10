@@ -179,7 +179,7 @@ import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vu
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,
@@ -194,7 +194,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { showErrorMessage } from '@/lib/util';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
 
@@ -277,10 +277,10 @@ export default {
     },
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper() as QueryHelper;
-        const queryStore = new QueryStore();
-        const hiddenQueryStore = new QueryStore();
-        const extraQueryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper() as ApiQueryHelper;
+        const queryStore = new QueryHelper();
+        const hiddenQueryStore = new QueryHelper();
+        const extraQueryStore = new QueryHelper();
 
         /* reactive variables */
         const formState = reactive({
@@ -406,7 +406,7 @@ export default {
                 typeOptionState.valueHandlerMap = querySearchProps.valueHandlerMap;
 
                 if (state.schema.options?.fields) {
-                    queryHelper.setOnly(...state.schema.options.fields.map((d) => {
+                    apiQuery.setOnly(...state.schema.options.fields.map((d) => {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
                         return d.key;
@@ -427,7 +427,7 @@ export default {
                 });
 
                 const res = await api.list({
-                    query: queryHelper.data,
+                    query: apiQuery.data,
                 });
 
                 state.data = res.results;
@@ -449,15 +449,15 @@ export default {
             if (changed.sortBy !== undefined) {
                 fetchOptionState.sortBy = changed.sortBy;
                 fetchOptionState.sortDesc = !!changed.sortDesc;
-                queryHelper.setSort(changed.sortBy, changed.sortDesc);
+                apiQuery.setSort(changed.sortBy, changed.sortDesc);
             }
             if (changed.pageLimit !== undefined) {
                 fetchOptionState.pageLimit = changed.pageLimit;
-                queryHelper.setPageLimit(changed.pageLimit);
+                apiQuery.setPageLimit(changed.pageLimit);
             }
             if (changed.pageStart !== undefined) {
                 fetchOptionState.pageStart = changed.pageStart;
-                queryHelper.setPageStart(changed.pageStart);
+                apiQuery.setPageStart(changed.pageStart);
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
@@ -466,7 +466,7 @@ export default {
                     .setFiltersAsQueryTag(changed.queryTags)
                     .apiQuery;
 
-                queryHelper.setFilter(...hiddenQueryStore.apiQuery.filter,
+                apiQuery.setApiFilter(...hiddenQueryStore.apiQuery.filter,
                     ...extraQueryStore.apiQuery.filter,
                     ...filter)
                     .setKeyword(keyword);

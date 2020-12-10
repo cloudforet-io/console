@@ -39,7 +39,7 @@ import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone } from '@/lib/util';
 import config from '@/lib/config';
 import { store } from '@/store';
@@ -47,7 +47,7 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { find } from 'lodash';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -156,21 +156,21 @@ export default {
             if (state.currentLayout.options?.search) setSearchOptions();
         };
 
-        const query = new QueryHelper();
-        const queryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
+        const queryStore = new QueryHelper();
         const getQuery = (): any => {
             const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-            if (options.sortBy !== undefined) query.setSort(options.sortBy, options.sortDesc);
-            if (options.pageLimit !== undefined) query.setPageLimit(options.pageLimit);
-            if (options.pageStart !== undefined) query.setPageStart(options.pageStart);
-            if (options.searchText !== undefined) query.setKeyword(options.searchText);
+            if (options.sortBy !== undefined) apiQuery.setSort(options.sortBy, options.sortDesc);
+            if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
+            if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
+            if (options.searchText !== undefined) apiQuery.setKeyword(options.searchText);
             if (options.queryTags !== undefined) {
                 const { filter, keyword } = queryStore.setFiltersAsQueryTag(options.queryTags).apiQuery;
-                query.setFilter(...filter)
+                apiQuery.setApiFilter(...filter)
                     .setKeyword(keyword);
             }
 
-            return query.data;
+            return apiQuery.data;
         };
 
         const getParams = (type?: DynamicLayoutType) => {

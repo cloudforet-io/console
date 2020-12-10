@@ -154,7 +154,7 @@ import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 
 /* types */
 import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { ServerModel } from '@/models/inventory/server';
@@ -165,7 +165,7 @@ import {
     showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import {
-    replaceQuery,
+    replaceUrlQuery,
 } from '@/lib/router-query-string';
 import {
     makeQuerySearchPropsWithSearchSchema,
@@ -180,7 +180,7 @@ import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -259,8 +259,8 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
-        const query = new QueryHelper();
+        const queryStore = new QueryHelper();
+        const apiQuery = new ApiQueryHelper();
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -334,13 +334,13 @@ export default {
         const getQuery = () => {
             const { filter, keyword } = queryStore.apiQuery;
 
-            query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
+            apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...filter)
+                .setApiFilter(...filter)
                 .setKeyword(keyword);
 
 
-            return query.data;
+            return apiQuery.data;
         };
 
         const serverListApi = SpaceConnector.client.inventory.server.list;
@@ -376,7 +376,7 @@ export default {
                 /* api query setting */
                 queryStore.setFiltersAsQueryTag(changed.queryTags);
                 /* sync updated query tags to url query string */
-                replaceQuery('filters', queryStore.rawQueryStrings);
+                replaceUrlQuery('filters', queryStore.rawQueryStrings);
             }
 
             await listServerData();
@@ -399,7 +399,7 @@ export default {
 
                 // set api query to get only a few specified data
                 if (tableState.schema?.options?.fields) {
-                    query.setOnly(...tableState.schema.options.fields.map((d) => {
+                    apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         return d.key;
                     }), 'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors');

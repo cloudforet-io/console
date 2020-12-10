@@ -91,11 +91,11 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getTimezone, showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import router from '@/routes';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 dayjs.extend(timezone);
 
@@ -208,17 +208,17 @@ export default {
         };
 
 
-        const query = new QueryHelper();
-        const queryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
+        const queryStore = new QueryHelper();
         const listSchedule = async (init = false) => {
             state.loading = true;
             try {
-                query.setFilter(...queryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).apiQuery.filter)
+                apiQuery.setApiFilter(...queryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).apiQuery.filter)
                     .setSort('created_at');
                 const res = await SpaceConnector.client.powerScheduler.schedule.list({
                     // eslint-disable-next-line camelcase
                     include_desired_state: true,
-                    query: query.data,
+                    query: apiQuery.data,
                 });
 
                 state.scheduleList = res.results;

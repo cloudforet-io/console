@@ -161,16 +161,16 @@ import { CollectorModel } from '@/views/plugin/collector/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
     getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { replaceQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import config from '@/lib/config';
 import { store } from '@/store';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -206,7 +206,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryStore = new QueryHelper();
 
         const state = reactive({
             plugins: computed(() => store.state.resource.plugin.items),
@@ -341,18 +341,19 @@ export default {
         };
 
         // Table
-        const query = new QueryHelper().setOnly(
+        const apiQuery = new ApiQueryHelper().setOnly(
             'collector_id', 'name', 'priority', 'last_collected_at',
             'provider', 'tags', 'plugin_info', 'state',
         );
         const getQuery = () => {
             const { filter, keyword } = queryStore.apiQuery;
-            query.setSort(state.sortBy, state.sortDesc)
+            apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setKeyword(keyword)
-                .setFilter(...filter);
-            return query.data;
+                .setApiFilter(...filter);
+            return apiQuery.data;
         };
+        const detailLinkQueryStore = new QueryHelper();
         const getCollectors = async () => {
             state.loading = true;
             try {
@@ -360,7 +361,10 @@ export default {
                 state.items = res.results.map(d => ({
                     plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
                     plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
-                    detailLink: `/management/collector-history?filters=collector_id%3A%3D${d.collector_id}`,
+                    detailLink: {
+                        name: 'collectorHistory',
+                        query: { filters: detailLinkQueryStore.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
+                    },
                     ...d,
                 }));
                 state.totalCount = res.total_count || 0;
@@ -380,7 +384,7 @@ export default {
             state.searchTags = item.queryTags;
 
             queryStore.setFiltersAsQueryTag(item.queryTags);
-            await replaceQuery('filters', queryStore.rawQueryStrings);
+            await replaceUrlQuery('filters', queryStore.rawQueryStrings);
             try {
                 await getCollectors();
             } catch (e) {

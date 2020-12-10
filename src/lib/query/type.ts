@@ -11,8 +11,10 @@ export type ApiQuery = {
     keyword: string;
 }
 
+export type QueryStoreFilterValue = number | string | boolean | null;
+
 export type QueryStoreFilter = {
     k?: string;
-    v: any;
+    v: QueryStoreFilterValue | QueryStoreFilterValue[];
     o?: RawQueryOperator;
 }

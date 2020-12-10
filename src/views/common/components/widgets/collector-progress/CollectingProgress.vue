@@ -56,7 +56,7 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
 
@@ -136,14 +136,14 @@ export default {
         };
 
         /* api */
+        const apiQuery = new ApiQueryHelper()
         const getData = async () => {
             state.loading = true;
             try {
-                const query = new QueryHelper()
-                    .setSort('created_at')
+                    apiQuery.setSort('created_at')
                     .setPage(1, 5)
-                    .setFilter({ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: 'in' });
-                const res = await SpaceConnector.client.inventory.job.list({ query: query.data });
+                    .setApiFilter({ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: 'in' });
+                const res = await SpaceConnector.client.inventory.job.list({ query: apiQuery.data });
                 state.items = convertJobsToFieldItem(res.results);
             } catch (e) {
                 state.items = [];

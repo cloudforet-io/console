@@ -194,9 +194,9 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
-    queryStringToStringArray, replaceQuery,
+    queryStringToStringArray, replaceUrlQuery,
     RouteQueryString,
 } from '@/lib/router-query-string';
 import { Filter } from '@/lib/space-connector/type';
@@ -205,7 +205,7 @@ import { store } from '@/store';
 import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 
 
@@ -240,7 +240,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryStore = new QueryHelper();
 
         const selectedProvider: Ref<string> = ref('all');
 
@@ -299,14 +299,14 @@ export default {
             vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
         };
 
+        const regionApiQuery = new ApiQueryHelper();
         const getRegionQuery = (value) => {
-            const regionQuery = new QueryHelper();
-            regionQuery.setFilter({
+            regionApiQuery.setApiFilter({
                 k: 'provider',
                 v: value,
                 o: 'contain',
             });
-            return regionQuery.data;
+            return regionApiQuery.data;
         };
 
         const listRegionByProvider = async (selectedProviderValue) => {
@@ -334,7 +334,7 @@ export default {
         /**
          * Card click event
          * */
-        const cardQueryStore = new QueryStore();
+        const cardQueryStore = new QueryHelper();
         const getToCloudService = (item) => {
             let res: Location;
             const filters: QueryStoreFilter[] = [...queryStore.filters];
@@ -368,7 +368,7 @@ export default {
             return res;
         };
 
-        const sidebarQueryStore = new QueryStore();
+        const sidebarQueryStore = new QueryHelper();
         const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
             const filters: QueryStoreFilter[] = [];
             if (selectedProvider.value !== 'all') {
@@ -391,23 +391,23 @@ export default {
             return res;
         });
 
+        const apiQuery = new ApiQueryHelper();
         const getParams = (isTriggeredBySideFilter = false) => {
             const { filters, labels } = sidebarFilters.value;
 
             const { filter, keyword } = queryStore.apiQuery;
-            const query = new QueryHelper();
-            query
-                .setPageLimit(state.pageSize)
+
+            apiQuery.setPageLimit(state.pageSize)
                 .setKeyword(keyword)
-                .setFilter(...filter, ...filters)
+                .setApiFilter(...filter, ...filters)
                 .setSort('count', true, 'name');
             if (isTriggeredBySideFilter) state.thisPage = 1;
-            else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
+            else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
                 is_primary: filterState.isPrimary,
                 labels,
-                query: query.data,
+                query: apiQuery.data,
             };
         };
 
@@ -441,22 +441,22 @@ export default {
             if (after !== before) {
                 // await listCloudServiceType(after);
                 await listCloudServiceType(true);
-                await replaceQuery('provider', selectedProvider.value);
-                await replaceQuery('region', filterState.regionFilter);
-                await replaceQuery('service', filterState.serviceFilter);
+                await replaceUrlQuery('provider', selectedProvider.value);
+                await replaceUrlQuery('region', filterState.regionFilter);
+                await replaceUrlQuery('service', filterState.serviceFilter);
             }
         }, { immediate: false });
 
         watch<boolean, boolean>(() => filterState.isPrimary, async (after, before) => {
             if (after !== before) {
                 await listCloudServiceType();
-                await replaceQuery('primary', filterState.isPrimary.toString());
+                await replaceUrlQuery('primary', filterState.isPrimary.toString());
             }
         }, { immediate: false });
 
         const changeQueryString = async (options) => {
             queryStore.setFiltersAsQueryTag(options.queryTags);
-            await replaceQuery('filters', queryStore.rawQueryStrings);
+            await replaceUrlQuery('filters', queryStore.rawQueryStrings);
         };
 
         const onPaginationChange = async () => {

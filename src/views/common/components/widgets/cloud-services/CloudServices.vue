@@ -82,7 +82,7 @@ import PSelectableItem from '@/components/molecules/selectable-item/PSelectableI
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 const DATA_LENGTH = 8;
 export default {
@@ -150,13 +150,12 @@ export default {
             }
             return link;
         };
-
+        const projectApiQuery = new ApiQueryHelper();
         const getDataInProject = async () => {
-            const query = new QueryHelper()
-                .setSort('count', true, 'name')
-                .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
+            projectApiQuery.setSort('count', true, 'name')
+                .setApiFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                query: query.data,
+                query: projectApiQuery.data,
                 is_primary: true,
             });
 
@@ -173,17 +172,17 @@ export default {
             ];
         };
 
+        const apiQuery = new ApiQueryHelper();
         const getData = async (): Promise<void> => {
             state.loading = true;
-            const query = new QueryHelper()
-                .setSort('count', true, 'name')
+            apiQuery.setSort('count', true, 'name')
                 .setPage(1, 9);
             try {
                 if (props.projectFilter) {
                     await getDataInProject();
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                        query: query.data,
+                        query: apiQuery.data,
                         is_primary: true,
                     });
                     state.data = [

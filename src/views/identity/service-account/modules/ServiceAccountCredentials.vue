@@ -25,7 +25,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { timestampFormatter } from '@/lib/util';
 
@@ -63,12 +63,12 @@ export default {
             options: {} as Options,
         });
 
-        const getQuery = () => new QueryHelper()
-            .setFilter({
-                k: 'service_account_id',
-                v: props.serviceAccountId,
-                o: 'eq',
-            })
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => apiQuery.setApiFilter({
+            k: 'service_account_id',
+            v: props.serviceAccountId,
+            o: 'eq',
+        })
             .setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),

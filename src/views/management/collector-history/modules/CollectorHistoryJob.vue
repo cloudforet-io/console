@@ -118,10 +118,10 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -197,7 +197,7 @@ export default {
                 status: makeEnumValueHandler(JOB_TASK_STATUS),
             },
         };
-        const queryStore = new QueryStore().setKeyItemSets(querySearchHandlers.keyItemSets);
+        const queryStore = new QueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const state = reactive({
             loading: false,
             job: {} as JobModel,
@@ -296,6 +296,7 @@ export default {
         };
 
         /* api */
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             let statusValues: JOB_TASK_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
@@ -313,21 +314,18 @@ export default {
 
             const { filter, keyword } = queryStore.apiQuery;
 
-            const query = new QueryHelper()
-                .setSort(state.sortBy, state.sortDesc)
+            apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword);
+                .setKeyword(keyword)
+                .setApiFilter(...filter);
 
-
-            query.setFilter(...filter);
-            return query;
+            return apiQuery.data;
         };
         const getJobTasks = async () => {
             state.loading = true;
             try {
-                const query = getQuery();
                 const res = await SpaceConnector.client.inventory.jobTask.list({
-                    query: query.data,
+                    query: getQuery(),
                     job_id: props.jobId,
                 });
                 state.jobTasks = res.results;

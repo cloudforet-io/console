@@ -123,7 +123,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 
@@ -210,17 +210,18 @@ export default {
                 { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR'), path: '/plugin/collector/create/plugins' }],
         });
 
+
+        const pluginApiQuery = new ApiQueryHelper()
         const getPlugins = async () => {
             state.loading = true;
             try {
-                const query = new QueryHelper()
-                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                pluginApiQuery.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                     .setSort(state.sortBy, state.sortBy !== 'name')
                     .setKeyword(state.keyword);
 
 
                 if (state.resourceTypeSearchTags.length) {
-                    query.setFilter({
+                    pluginApiQuery.setApiFilter({
                         k: 'labels',
                         v: state.resourceTypeSearchTags,
                         o: 'in',
@@ -229,7 +230,7 @@ export default {
                 const params = {
                     service_type: 'inventory.Collector',
                     repository_id: state.selectedRepositoryId,
-                    query: query.data,
+                    query: pluginApiQuery.data,
                 };
                 const res = await SpaceConnector.client.repository.plugin.list(params);
                 state.plugins = [
@@ -245,11 +246,14 @@ export default {
                 state.loading = false;
             }
         };
+
+
+        const repoApiQuery = new ApiQueryHelper()
         const getRepositories = async () => {
             try {
-                const query = new QueryHelper().setSort('repository_type', true);
+                repoApiQuery.setSort('repository_type', true);
                 const res = await SpaceConnector.client.repository.repository.list({
-                    query: query.data,
+                    query: repoApiQuery.data,
                 });
                 state.repositories = res.results;
                 state.selectedRepositoryId = res.results[0].repository_id;

@@ -100,7 +100,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 
 import { getTimezone } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -220,7 +220,7 @@ export default {
             }
         };
 
-        const queryStore = new QueryStore();
+        const queryStore = new QueryHelper();
 
         const setProjectDashboardData = async () => {
             state.data = [

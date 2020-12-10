@@ -25,7 +25,7 @@
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
@@ -58,8 +58,8 @@ export default {
             options: {} as Options,
         });
 
-        const getQuery = () => new QueryHelper()
-            .setSort(state.options.sortBy, state.options.sortDesc)
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
