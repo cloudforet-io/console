@@ -67,8 +67,7 @@ import { coral, gray } from '@/components/styles/colors';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import { Location } from 'vue-router';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
+import { QueryHelper } from '@/lib/query';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -97,6 +96,8 @@ export default {
             loading: true,
             maxValue: 0,
         });
+
+        const queryStore = new QueryHelper();
         /* Create map instance */
 
         const apiQuery = new ApiQueryHelper();
@@ -227,27 +228,15 @@ export default {
 
         const goToCloudService = (item) => {
             let res: Location;
-            const filters: QueryTag[] = [];
-            filters.push({
-                key: { label: 'Region', name: 'region_code' },
-                operator: '=',
-                value: { label: state.selectedRegion, name: state.selectedRegionCode },
-            });
             if (item.resource_type === 'inventory.Server') {
-                filters.push({
-                    key: { label: 'Provider', name: 'provider' },
-                    operator: '=',
-                    value: { label: item.provider, name: item.provider },
-                },
-                {
-                    key: { label: 'Cloud Service Type', name: 'cloud_service_type' },
-                    operator: '=',
-                    value: { label: item.cloud_service_type, name: item.cloud_service_type },
-                });
                 res = {
                     name: 'server',
                     query: {
-                        filters: queryTagsToQueryString(filters),
+                        filters: queryStore.setFilters([
+                            { k: 'region_code', v: state.selectedRegionCode, o: '=' },
+                            { k: 'provider', v: item.provider, o: '=' },
+                            { k: 'cloud_service_type', v: item.cloud_service_type, o: '=' },
+                        ]).rawQueryStrings,
                     },
                 };
             } else {
@@ -259,7 +248,9 @@ export default {
                         name: item.cloud_service_type,
                     },
                     query: {
-                        filters: queryTagsToQueryString(filters),
+                        filters: queryStore.setFilters([
+                            { k: 'region_code', v: state.selectedRegionCode, o: '=' },
+                        ]).rawQueryStrings,
                     },
                 };
             }

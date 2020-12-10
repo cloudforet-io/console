@@ -21,23 +21,25 @@
                                card-height="auto" :card-class="() => []"
                 >
                     <template #card="{item, index}">
-                        <p-selectable-item :icon-url="item.icon" theme="card"
-                                           default-icon="ic_provider_other"
-                                           @click="onSelected(item, index)"
-                        >
-                            <template #contents>
-                                <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
-                                     class="mx-2 text-base truncate leading-tight"
-                                >
-                                    {{ item.name }}
-                                </div>
-                            </template>
-                            <template #extra>
-                                <p-badge :background-color="item.color" class="count">
-                                    {{ item.count }}
-                                </p-badge>
-                            </template>
-                        </p-selectable-item>
+                        <router-link :to="getLink(item)">
+                            <p-selectable-item :icon-url="item.icon" theme="card"
+                                               default-icon="ic_provider_other"
+                            >
+                                <!--                            @click="onSelected(item, index)"-->
+                                <template #contents>
+                                    <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}"
+                                         class="mx-2 text-base truncate leading-tight"
+                                    >
+                                        {{ item.name }}
+                                    </div>
+                                </template>
+                                <template #extra>
+                                    <p-badge :background-color="item.color" class="count">
+                                        {{ item.count }}
+                                    </p-badge>
+                                </template>
+                            </p-selectable-item>
+                        </router-link>
                     </template>
                 </p-grid-layout>
             </div>
@@ -70,6 +72,8 @@ import { store } from '@/store';
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { SpaceConnector } from '@/lib/space-connector';
+import { QueryHelper } from '@/lib/query';
+import { Location } from 'vue-router';
 
 interface Value {
     provider: string;
@@ -124,6 +128,7 @@ export default {
     props: resourceByRegionProps,
     setup(props: ResourcesByRegionProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryHelper();
 
         const state = reactive({
             chartRef: null,
@@ -309,6 +314,33 @@ export default {
             }
         };
 
+        const getLink = (item) => {
+            let res: Location;
+            if (props.projectId && props.isServer) {
+                res = {
+                    name: 'server',
+                    query: {
+                        filters: queryStore.setFilters([
+                            { k: 'region_code', v: item.name, o: '=' },
+                            { k: 'project_id', v: props.projectId, o: '=' },
+                        ]).rawQueryStrings,
+                    },
+                };
+            } else {
+                res = {
+                    name: 'cloudServiceMain',
+                    query: {
+                        provider: item.provider || 'all',
+                        filters: queryStore.setFilters([
+                            { k: 'region_code', v: item.name, o: '=' },
+                            { k: 'project_id', v: props.projectId, o: '=' },
+                        ]).rawQueryStrings,
+                    },
+                };
+            }
+            return res;
+        };
+
         setTimeout(() => {
             getData();
         }, 1000);
@@ -317,6 +349,7 @@ export default {
             ...toRefs(state),
             skeletons: range(4),
             defaultItems,
+            getLink,
             onSelected(item) {
                 if (props.projectFilter && props.isServer) {
                     vm.$router.push({

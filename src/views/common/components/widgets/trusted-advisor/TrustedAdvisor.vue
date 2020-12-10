@@ -11,10 +11,10 @@
                 <div class="title col-span-12">
                     <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_OVERALL') }}</span>
                 </div>
-                <div class="chart-wrapper col-span-6 xs:col-span-12">
+                <div class="chart-wrapper col-span-4 xs:col-span-12">
                     <div ref="chartRef" class="chart" />
                 </div>
-                <div class="legend-wrapper col-span-6 xs:col-span-12">
+                <div class="legend-wrapper col-span-8 xs:col-span-12">
                     <template v-for="([k, v]) of Object.entries(legendData)">
                         <router-link :key="k"
                                      :to="overallLinkFormatter(v.name)"
@@ -22,7 +22,7 @@
                         >
                             <div class="left-part">
                                 <span class="legend-circle" :style="{ 'background-color': v.color }" />
-                                <span class="legend-text hidden lg:inline-block" :class="v.name">{{ v.label }}</span>
+                                <span class="legend-text inline-block xs:hidden lg:inline-block" :class="v.name">{{ v.label }}</span>
                             </div>
                             <div class="right-part relative lg:absolute">
                                 <span :style="{ 'color': v.color }">{{ v.count }}</span>
@@ -99,12 +99,12 @@ import {
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
+import { QueryStoreFilter } from '@/lib/query/type';
+import { QueryHelper } from '@/lib/query';
 import { green, red, yellow } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
@@ -150,8 +150,15 @@ export default {
         WidgetLayout,
         PI,
     },
+    props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryHelper();
 
         const chartState = reactive({
             loading: true,
@@ -168,7 +175,7 @@ export default {
             thisPage: 1,
             allPage: 1,
             projects: computed(() => vm.$store.state.resource.project.items),
-            trustedAdvisorId: computed(() => {
+            trustedAdvisorId: computed<string>(() => {
                 const cloudServiceTypes = vm.$store.state.resource.cloudServiceType.items;
                 const trustedAdvisorId = findKey(cloudServiceTypes, { name: TRUSTED_ADVISER });
                 return trustedAdvisorId || '';
@@ -192,7 +199,7 @@ export default {
                     color: OK_COLOR,
                     count: chartState.data.find(d => d.status === STATUS.ok)?.count,
                 },
-            } as Record<string, LegendData>)),
+            })),
             tableData: computed(() => ([
                 {
                     label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
@@ -264,18 +271,13 @@ export default {
         };
         const getProjectBoxCount = (rowNum, colNum) => (state.projectSummaryData[colNum] ? state.projectSummaryData[colNum].counts[rowNum][1] : 0);
         const overallLinkFormatter = (status) => {
-            const filters: QueryTag[] = [];
-            filters.push({
-                key: { label: 'Status', name: 'data.status' },
-                operator: '=',
-                value: { label: status, name: status },
-            });
+            const filters: QueryStoreFilter[] = [];
+            filters.push({ k: 'data.status', o: '=', v: status });
+
             return referenceRouter(
                 state.trustedAdvisorId,
                 { resource_type: 'inventory.CloudServiceType' },
-                {
-                    filters: queryTagsToQueryString(filters),
-                },
+                { filters: queryStore.setFilters(filters).rawQueryStrings },
             );
         };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
@@ -283,32 +285,15 @@ export default {
             const category = CATEGORY[rowNum];
             const projectId = state.projectSummaryData[colNum]?.projectId;
 
-            const filters: QueryTag[] = [];
-            filters.push({
-                key: { label: 'Status', name: 'data.status' },
-                operator: '=',
-                value: { label: status, name: status },
-            });
-            if (category) {
-                filters.push({
-                    key: { label: 'Category', name: 'data.category' },
-                    operator: '=',
-                    value: { label: category, name: category },
-                });
-            }
-            if (projectId) {
-                filters.push({
-                    key: { label: 'Project Id', name: 'project_id' },
-                    operator: '=',
-                    value: { label: projectId, name: projectId },
-                });
-            }
+            const filters: QueryStoreFilter[] = [];
+            filters.push({ k: 'data.status', o: '=', v: status });
+            if (category) filters.push({ k: 'data.category', o: '=', v: category });
+            if (projectId) filters.push({ k: 'project_id', o: '=', v: projectId });
+
             return referenceRouter(
                 state.trustedAdvisorId,
                 { resource_type: 'inventory.CloudServiceType' },
-                {
-                    filters: queryTagsToQueryString(filters),
-                },
+                { filters: queryStore.setFilters(filters).rawQueryStrings },
             );
         };
 
@@ -382,8 +367,6 @@ export default {
         return {
             ...toRefs(state),
             chartState,
-            referenceRouter,
-            CATEGORY,
             changePageNumber,
             range,
             getProjectBoxStatus,
@@ -391,12 +374,6 @@ export default {
             overallLinkFormatter,
             projectSummaryLinkFormatter,
         };
-    },
-    props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
     },
 };
 </script>
@@ -428,6 +405,11 @@ export default {
     .legend-wrapper {
         @media screen and (width < 1024px) {
             width: 50%;
+            margin: auto;
+        }
+
+        @media screen and (width < 478px) {
+            width: 90%;
             margin: auto;
         }
         .legend-row {
@@ -502,9 +484,11 @@ export default {
 
             .left-part {
                 width: 20%;
+
                 @media screen and (576px < width < 1024px) {
                     width: 4%;
                 }
+
                 @media screen and (width < 576px) {
                     width: 8%;
                 }
@@ -522,9 +506,11 @@ export default {
             }
             .right-part {
                 width: 80%;
+
                 @media screen and (576px < width < 1024px) {
                     width: 96%;
                 }
+
                 @media screen and (width < 576px) {
                     width: 92%;
                 }

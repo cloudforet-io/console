@@ -91,6 +91,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { CollectorPluginModel, CollectorUpdateParameter } from '@/views/plugin/collector/type';
+import { store } from '@/store';
 
 
 interface Props {
@@ -124,9 +125,9 @@ export default {
         const state = reactive({
             loading: true,
             collector: null,
-            imageUrl: computed(() => state.collector?.tags.find(tag => tag.key === 'icon').value),
             proxyVisible: makeProxy<boolean>('visible', props, emit),
             pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info')),
+            imageUrl: computed<string>(() => get(store.state.resource.plugin.items[state.collector?.plugin_info.plugin_id], 'icon', '')),
             confirmBtnBind: computed(() => {
                 const defaultStyle: any = { style: { padding: 0 } };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';

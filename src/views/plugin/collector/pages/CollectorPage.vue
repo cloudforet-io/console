@@ -117,7 +117,6 @@
         <collect-data-modal v-if="collectDataModalVisible"
                             :visible.sync="collectDataModalVisible"
                             :collector-id="selectedItems[0].collector_id"
-                            :plugins="plugins"
         />
 
         <p-table-check-modal v-if="checkModalState.visible"
@@ -139,6 +138,7 @@
 /* eslint-disable camelcase */
 import { Component } from 'vue/types/umd';
 import { TranslateResult } from 'vue-i18n';
+import { Location } from 'vue-router';
 
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
@@ -171,6 +171,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;

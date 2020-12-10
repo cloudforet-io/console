@@ -99,14 +99,13 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     gray, peacock, secondary,
 } from '@/styles/colors';
+import { QueryHelper } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 
@@ -147,6 +146,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryStore = new QueryHelper();
 
         const state = reactive({
             loading: true,
@@ -242,15 +242,8 @@ export default {
             chart.legend.markers.template.height = 8;
         };
         const getLocation = (type, projectId) => {
-            const filters: QueryTag[] = [
-                {
-                    key: { label: 'Project Id', name: 'project_id' },
-                    operator: '=',
-                    value: { label: projectId, name: projectId },
-                },
-            ];
-            const query: Location['query'] = {};
             let name: string;
+            const query: Location['query'] = {};
 
             // set query
             if (type === 'compute') {
@@ -265,7 +258,9 @@ export default {
             const location: Location = {
                 name,
                 query: {
-                    filters: queryTagsToQueryString(filters),
+                    filters: queryStore.setFilters([
+                        { k: 'project_id', v: projectId, o: '=' },
+                    ]).rawQueryStrings,
                     ...query,
                 },
             };
