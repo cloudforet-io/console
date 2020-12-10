@@ -172,7 +172,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import config from '@/lib/config';
@@ -234,9 +234,6 @@ interface SidebarItemType {
 
 export default {
     name: 'CloudServicePage',
-    filters: {
-        getValue,
-    },
     components: {
         PLazyImg,
         PHr,
